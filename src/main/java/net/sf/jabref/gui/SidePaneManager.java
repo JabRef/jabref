@@ -17,6 +17,7 @@ package net.sf.jabref.gui;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.util.Util;
 
 import java.util.*;
 
@@ -169,7 +170,7 @@ public class SidePaneManager {
 
         for (int i = 0; i < componentNames.length; ++i) {
             try {
-                preferredPositions.put(componentNames[i], Integer.parseInt(componentPositions[i]));
+                preferredPositions.put(componentNames[i], Util.intValueOf(componentPositions[i]));
             } catch (NumberFormatException e) {
                 // Invalid integer format, ignore
             }
@@ -244,7 +245,7 @@ public class SidePaneManager {
     public synchronized void moveDown(SidePaneComponent comp) {
         if (visible.contains(comp)) {
             int currIndex = visible.indexOf(comp);
-            if (currIndex < visible.size() - 1) {
+            if (currIndex < (visible.size() - 1)) {
                 int newIndex = currIndex + 1;
                 visible.remove(currIndex);
                 visible.add(newIndex, comp);
@@ -263,7 +264,7 @@ public class SidePaneManager {
     /**
      * Update all side pane components to show information from the given
      * BasePanel.
-     * 
+     *
      * @param panel
      */
     private void setActiveBasePanel(BasePanel panel) {

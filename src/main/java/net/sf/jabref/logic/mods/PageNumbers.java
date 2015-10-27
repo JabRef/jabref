@@ -22,6 +22,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import net.sf.jabref.util.Util;
+
 /**
  * @author Michael Wrighton
  * @author S M Mahbub Murshed
@@ -42,8 +44,8 @@ public class PageNumbers {
         Pattern pattern = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
         Matcher matcher = pattern.matcher(numberString);
         if (matcher.matches()) {
-            start = Integer.parseInt(matcher.group(1));
-            end = Integer.parseInt(matcher.group(2));
+            start = Util.intValueOf(matcher.group(1));
+            end = Util.intValueOf(matcher.group(2));
         } else {
             freeform = numberString;
         }

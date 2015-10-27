@@ -31,6 +31,7 @@ import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.util.Util;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -380,7 +381,7 @@ public class IsiImporter extends ImportFormat {
         // Try two digit month
         for (String part : parts) {
             try {
-                int number = Integer.parseInt(part);
+                int number = Util.intValueOf(part);
                 MonthUtil.Month month = MonthUtil.getMonthByNumber(number);
                 if (month.isValid()) {
                     return month.bibtexFormat;

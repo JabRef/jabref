@@ -18,6 +18,7 @@ package net.sf.jabref.openoffice;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
@@ -198,11 +199,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
         for (String line1 : lines) {
             String line = line1;
-            if (!line.isEmpty() && line.charAt(line.length() - 1) == '\r') {
+            if (!line.isEmpty() && (line.charAt(line.length() - 1) == '\r')) {
                 line = line.substring(0, line.length() - 1);
             }
             // Check for empty line or comment:
-            if (line.trim().isEmpty() || line.charAt(0) == '#') {
+            if (line.trim().isEmpty() || (line.charAt(0) == '#')) {
                 continue;
             }
             // Check if we should change mode:
@@ -267,7 +268,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      */
     private void handleStructureLine(String line) {
         int index = line.indexOf("=");
-        if (index > 0 && index < line.length() - 1) {
+        if ((index > 0) && (index < (line.length() - 1))) {
             String formatString = line.substring(index + 1);
             //System.out.println("'"+line.substring(0, index)+"' : '"+formatString+"'");
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
@@ -298,15 +299,15 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      */
     private void handlePropertiesLine(String line, HashMap<String, Object> map) {
         int index = line.indexOf("=");
-        if (index > 0 && index <= line.length() - 1) {
+        if ((index > 0) && (index <= (line.length() - 1))) {
             String propertyName = line.substring(0, index).trim();
             String value = line.substring(index + 1);
-            if (value.trim().length() > 2 && quoted.matcher(value.trim()).matches()) {
+            if ((value.trim().length() > 2) && quoted.matcher(value.trim()).matches()) {
                 value = value.trim().substring(1, value.trim().length() - 1);
             }
             Object toSet = value;
             if (numPattern.matcher(value).matches()) {
-                toSet = Integer.parseInt(value);
+                toSet = Util.intValueOf(value);
             }
             else if (value.toLowerCase().trim().equals("true")) {
                 toSet = Boolean.TRUE;
@@ -357,11 +358,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public String getNumCitationMarker(int[] number, int minGroupingCount, boolean inList) {
         String bracketBefore = (String) citProperties.get("BracketBefore");
-        if (inList && citProperties.get("BracketBeforeInList") != null) {
+        if (inList && (citProperties.get("BracketBeforeInList") != null)) {
             bracketBefore = (String) citProperties.get("BracketBeforeInList");
         }
         String bracketAfter = (String) citProperties.get("BracketAfter");
-        if (inList && citProperties.get("BracketAfterInList") != null) {
+        if (inList && (citProperties.get("BracketAfterInList") != null)) {
             bracketAfter = (String) citProperties.get("BracketAfterInList");
         }
         // Sort the numbers:
@@ -376,7 +377,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             int i1 = lNum[i];
             if (combineFrom < 0) {
                 // Check if next entry is the next in the ref list:
-                if (i < lNum.length - 1 && lNum[i + 1] == i1 + 1) {
+                if ((i < (lNum.length - 1)) && (lNum[i + 1] == (i1 + 1))) {
                     combineFrom = i1;
                 } else {
                     // Add single entry:
@@ -389,11 +390,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             } else {
                 // We are building a list of combined entries.
                 // Check if it ends here:
-                if (i == lNum.length - 1 || lNum[i + 1] != i1 + 1) {
+                if ((i == (lNum.length - 1)) || (lNum[i + 1] != (i1 + 1))) {
                     if (written > 0) {
                         sb.append((String) citProperties.get("CitationSeparator"));
                     }
-                    if (minGroupingCount > 0 && i1 + 1 - combineFrom >= minGroupingCount) {
+                    if ((minGroupingCount > 0) && (((i1 + 1) - combineFrom) >= minGroupingCount)) {
                         sb.append(combineFrom);
                         sb.append((String) citProperties.get("GroupedNumbersSeparator"));
                         sb.append(i1);
@@ -459,7 +460,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         if (uniquefiers != null) {
             for (int i = 0; i < uniquefiers.length; i++) {
 
-                if (uniquefiers[i] != null && !uniquefiers[i].isEmpty()) {
+                if ((uniquefiers[i] != null) && !uniquefiers[i].isEmpty()) {
                     String authorField = (String) citProperties.get("AuthorField");
                     int maxAuthors = (Integer) citProperties.get("MaxAuthors");
                     if (piv == -1) {
@@ -497,10 +498,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                         //System.out.println("i="+i+" thisMarker='"+thisMarker+"'");
                         int prevALim = i > 0 ? unlimAuthors[i - 1] : unlimAuthors[0];
                         if (!thisMarker.equals(tmpMarker) ||
-                                al.size() > maxAuthors && unlimAuthors[i] != prevALim) {
+                                ((al.size() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
                             // No match. Update piv to exclude the previous entry. But first check if the
                             // previous entry was part of a group:
-                            if (piv > -1 && i > piv + 1) {
+                            if ((piv > -1) && (i > (piv + 1))) {
                                 // Do the grouping:
                                 group(entries, uniquefiers, piv, i - 1, (String) citProperties.get("UniquefierSeparator"));
                             }
@@ -512,7 +513,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 else {
                     // This entry has no uniquefier.
                     // Check if we just passed a group of more than one entry with uniquefier:
-                    if (piv > -1 && i > piv + 1) {
+                    if ((piv > -1) && (i > (piv + 1))) {
                         // Do the grouping:
                         group(entries, uniquefiers, piv, i - 1, (String) citProperties.get("UniquefierSeparator"));
                     }
@@ -628,9 +629,9 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 AuthorList al = AuthorList.getAuthorList(author);
                 sb.append(getAuthorLastName(al, 0));
 
-                if (al.size() > 1 && (al.size() <= maxAuthors || maxAuthors < 0)) {
+                if ((al.size() > 1) && ((al.size() <= maxAuthors) || (maxAuthors < 0))) {
                     int i = 1;
-                    while (i < al.size() - 1) {
+                    while (i < (al.size() - 1)) {
                         sb.append(authorSep);
                         sb.append(getAuthorLastName(al, i));
                         i++;
@@ -646,7 +647,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             if (year != null) {
                 sb.append(year);
             }
-            if (uniquifiers != null && uniquifiers[j] != null) {
+            if ((uniquifiers != null) && (uniquifiers[j] != null)) {
                 sb.append(uniquifiers[j]);
             }
         }
@@ -697,9 +698,9 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 if (al.size() > 0) {
                     sb.append(getAuthorLastName(al, 0));
                 }
-                if (al.size() > 1 && (al.size() <= maxAuthors || maxAuthors < 0)) {
+                if ((al.size() > 1) && ((al.size() <= maxAuthors) || (maxAuthors < 0))) {
                     int j = 1;
-                    while (j < al.size() - 1) {
+                    while (j < (al.size() - 1)) {
                         sb.append(authorSep);
                         sb.append(getAuthorLastName(al, j));
                         j++;
@@ -716,7 +717,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             if (year != null) {
                 sb.append(year);
             }
-            if (uniquefiers != null && uniquefiers[i] != null) {
+            if ((uniquefiers != null) && (uniquefiers[i] != null)) {
                 sb.append(uniquefiers[i]);
             }
             sb.append(endBrace);
@@ -738,7 +739,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         String[] fields = field.split("/");
         for (String s : fields) {
             String content = BibtexDatabase.getResolvedField(s, entry, database);
-            if (content != null && !content.trim().isEmpty()) {
+            if ((content != null) && !content.trim().isEmpty()) {
                 if (fieldFormatter != null) {
                     content = fieldFormatter.format(content);
                 }
@@ -760,7 +761,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
         if (al.size() > number) {
             AuthorList.Author a = al.getAuthor(number);
-            if (a.getVon() != null && !a.getVon().isEmpty()) {
+            if ((a.getVon() != null) && !a.getVon().isEmpty()) {
                 String von = a.getVon();
                 sb.append(von);
                 /*sb.append(von.substring(0, 1).toUpperCase());

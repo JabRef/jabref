@@ -17,6 +17,7 @@ package net.sf.jabref.groups.structure;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -77,8 +78,8 @@ public class SearchGroup extends AbstractGroup {
         case 2: {
             String name = tok.nextToken();
             String expression = tok.nextToken();
-            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            boolean caseSensitive = Util.intValueOf(tok.nextToken()) == 1;
+            boolean regExp = Util.intValueOf(tok.nextToken()) == 1;
             // version 0 contained 4 additional booleans to specify search
             // fields; these are ignored now, all fields are always searched
             return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
@@ -87,10 +88,10 @@ public class SearchGroup extends AbstractGroup {
         }
         case 3: {
             String name = tok.nextToken();
-            int context = Integer.parseInt(tok.nextToken());
+            int context = Util.intValueOf(tok.nextToken());
             String expression = tok.nextToken();
-            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            boolean caseSensitive = Util.intValueOf(tok.nextToken()) == 1;
+            boolean regExp = Util.intValueOf(tok.nextToken()) == 1;
             // version 0 contained 4 additional booleans to specify search
             // fields; these are ignored now, all fields are always searched
             return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
@@ -162,14 +163,14 @@ public class SearchGroup extends AbstractGroup {
         SearchGroup other = (SearchGroup) o;
         return name.equals(other.name)
                 && searchExpression.equals(other.searchExpression)
-                && caseSensitive == other.caseSensitive
-                && regExp == other.regExp
-                && getHierarchicalContext() == other.getHierarchicalContext();
+                && (caseSensitive == other.caseSensitive)
+                && (regExp == other.regExp)
+                && (getHierarchicalContext() == other.getHierarchicalContext());
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
      *      net.sf.jabref.BibtexEntry)
      */

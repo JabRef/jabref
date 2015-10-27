@@ -134,7 +134,7 @@ public class Util {
                     String s2 = StringUtil.shaveString(s);
 
                     try {
-                        Integer.parseInt(s2);
+                        intValueOf(s2);
                         result.append(s2);
                     } catch (NumberFormatException e) {
                         result.append('#').append(s2).append('#');

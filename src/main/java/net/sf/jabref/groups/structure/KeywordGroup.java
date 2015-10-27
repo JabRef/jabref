@@ -28,6 +28,7 @@ import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 
 /**
  * @author jzieren
@@ -95,8 +96,8 @@ public class KeywordGroup extends AbstractGroup {
                 String name = tok.nextToken();
                 String field = tok.nextToken();
                 String expression = tok.nextToken();
-                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            boolean caseSensitive = Util.intValueOf(tok.nextToken()) == 1;
+            boolean regExp = Util.intValueOf(tok.nextToken()) == 1;
                 return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
                         .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
                         AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
@@ -104,11 +105,11 @@ public class KeywordGroup extends AbstractGroup {
             }
             case 3: {
                 String name = tok.nextToken();
-                int context = Integer.parseInt(tok.nextToken());
+            int context = Util.intValueOf(tok.nextToken());
                 String field = tok.nextToken();
                 String expression = tok.nextToken();
-                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            boolean caseSensitive = Util.intValueOf(tok.nextToken()) == 1;
+            boolean regExp = Util.intValueOf(tok.nextToken()) == 1;
                 return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
                         .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
                         AbstractGroup.QUOTE_CHAR), caseSensitive, regExp, GroupHierarchyType.getByNumber(context));
@@ -166,7 +167,7 @@ public class KeywordGroup extends AbstractGroup {
         if (!supportsAdd()) {
             return null;
         }
-        if (entries != null && entries.length > 0) {
+        if ((entries != null) && (entries.length > 0)) {
             NamedCompound ce = new NamedCompound(
                     Localization.lang("add entries to group"));
             boolean modified = false;
@@ -202,7 +203,7 @@ public class KeywordGroup extends AbstractGroup {
             return null;
         }
 
-        if (entries != null && entries.length > 0) {
+        if ((entries != null) && (entries.length > 0)) {
             NamedCompound ce = new NamedCompound(Localization.lang("remove from group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
@@ -237,14 +238,14 @@ public class KeywordGroup extends AbstractGroup {
         return name.equals(other.name)
                 && searchField.equals(other.searchField)
                 && searchExpression.equals(other.searchExpression)
-                && caseSensitive == other.caseSensitive
-                && regExp == other.regExp
-                && getHierarchicalContext() == other.getHierarchicalContext();
+                && (caseSensitive == other.caseSensitive)
+                && (regExp == other.regExp)
+                && (getHierarchicalContext() == other.getHierarchicalContext());
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
      *      net.sf.jabref.BibtexEntry)
      */
@@ -284,8 +285,8 @@ public class KeywordGroup extends AbstractGroup {
                 return false;
             }
             // Found a match. See if it is a complete word:
-            if ((index == 0 || !Character.isLetterOrDigit(text.charAt(index - 1))) &&
-                    (index + word.length() == text.length()
+            if (((index == 0) || !Character.isLetterOrDigit(text.charAt(index - 1))) &&
+                    (((index + word.length()) == text.length())
                             || !Character.isLetterOrDigit(text.charAt(index + word.length())))) {
                 return true;
             } else {
@@ -319,14 +320,14 @@ public class KeywordGroup extends AbstractGroup {
             // reduce spaces at i to 1
             j = i;
             k = i;
-            while (j - 1 >= 0 && separator.indexOf(haystack.charAt(j - 1)) >= 0) {
+            while (((j - 1) >= 0) && (separator.indexOf(haystack.charAt(j - 1)) >= 0)) {
                 --j;
             }
-            while (k < haystack.length() && separator.indexOf(haystack.charAt(k)) >= 0) {
+            while ((k < haystack.length()) && (separator.indexOf(haystack.charAt(k)) >= 0)) {
                 ++k;
             }
-            sbOrig.replace(j, k, j >= 0 && k < sbOrig.length() ? separator : "");
-            sbLower.replace(j, k, j >= 0 && k < sbOrig.length() ? separator : "");
+            sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
+            sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
         }
 
         String result = sbOrig.toString().trim();

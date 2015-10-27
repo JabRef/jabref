@@ -18,6 +18,7 @@ package net.sf.jabref.bibtex.comparator;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 
 import java.util.Comparator;
 
@@ -34,7 +35,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
     private final String sortField;
     private final boolean descending;
-    private boolean binary;
+    private final boolean binary;
     private final boolean numeric;
     private final Comparator<BibtexEntry> next;
 
@@ -97,8 +98,8 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         }
         else if (numeric) {
             try {
-                Integer i1 = Integer.parseInt((String) f1);
-                Integer i2 = Integer.parseInt((String) f2);
+                Integer i1 = Util.intValueOf((String) f1);
+                Integer i2 = Util.intValueOf((String) f2);
                 // Ok, parsing was successful. Update f1 and f2:
                 f1 = i1;
                 f2 = i2;
@@ -108,13 +109,13 @@ public class EntryComparator implements Comparator<BibtexEntry> {
             }
         }
 
-        if (f1 == null && f2 == null) {
+        if ((f1 == null) && (f2 == null)) {
             return next != null ? next.compare(e1, e2) : idCompare(e1, e2);
         }
-        if (f1 != null && f2 == null) {
+        if ((f1 != null) && (f2 == null)) {
             return -1;
         }
-        if (f1 == null && f2 != null) {
+        if ((f1 == null) && (f2 != null)) {
             return 1;
         }
 
@@ -122,7 +123,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
         //String ours = ((String)e1.getField(sortField)).toLowerCase(),
         //    theirs = ((String)e2.getField(sortField)).toLowerCase();
-        if (f1 instanceof Integer && f2 instanceof Integer) {
+        if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
             result = -((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
             Integer f1AsInteger = new Integer(f1.toString());

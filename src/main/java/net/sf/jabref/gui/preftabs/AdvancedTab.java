@@ -43,6 +43,7 @@ import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.util.Util;
 
 class AdvancedTab extends JPanel implements PrefsTab {
 
@@ -284,7 +285,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
     public Optional<Integer> getPortAsInt() {
         try {
-            return Optional.of(Integer.parseInt(remoteServerPort.getText()));
+            return Optional.of(Util.intValueOf(remoteServerPort.getText()));
         } catch (NumberFormatException ex) {
             return Optional.empty();
         }
@@ -294,7 +295,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
     public boolean validateSettings() {
 
         try {
-            int portNumber = Integer.parseInt(remoteServerPort.getText());
+            int portNumber = Util.intValueOf(remoteServerPort.getText());
             if (RemoteUtil.isUserPort(portNumber)) {
                 return true; // Ok, the number was legal.
             } else {

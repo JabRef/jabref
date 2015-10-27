@@ -30,6 +30,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.ColorSetupPanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.Util;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
@@ -163,9 +164,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         colorPanel.storeSettings();
         prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {
-            int size = Integer.parseInt(fontSize.getText());
-            if (overrideFonts.isSelected() != oldOverrideFontSize ||
-                    size != oldMenuFontSize) {
+            int size = Util.intValueOf(fontSize.getText());
+            if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
+                    (size != oldMenuFontSize)) {
                 prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
                 JOptionPane.showMessageDialog(null,
                         Localization.lang("You have changed the menu and label font size.")
@@ -178,7 +179,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             ex.printStackTrace();
         }
         try {
-            int padding = Integer.parseInt(rowPadding.getText());
+            int padding = Util.intValueOf(rowPadding.getText());
             prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
@@ -189,7 +190,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     {
         try {
             // Test if the field value is a number:
-            Integer.parseInt(fieldValue);
+            Util.intValueOf(fieldValue);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
                     (null, Localization.lang("You must enter an integer value in the text field for") + " '" +

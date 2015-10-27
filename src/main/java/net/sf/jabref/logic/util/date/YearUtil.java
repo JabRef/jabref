@@ -2,6 +2,8 @@ package net.sf.jabref.logic.util.date;
 
 import java.util.Calendar;
 
+import net.sf.jabref.util.Util;
+
 public class YearUtil {
 
     private static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
@@ -38,12 +40,12 @@ public class YearUtil {
      * @return
      */
     static String toFourDigitYear(String year, int thisYear) {
-        if (year == null || year.length() != 2) {
+        if ((year == null) || (year.length() != 2)) {
             return year;
         }
 
         try {
-            int yearNumber = Integer.parseInt(year);
+            int yearNumber = Util.intValueOf(year);
             return String.valueOf(new Year(thisYear).toFourDigitYear(yearNumber));
         } catch (NumberFormatException e) {
             return year;
@@ -61,7 +63,7 @@ public class YearUtil {
         public Year(int year) {
             this.year = year;
             this.yearShort = this.year % 100;
-            this.century = this.year / 100 * 100;
+            this.century = (this.year / 100) * 100;
         }
 
         int toFourDigitYear(int relativeYear) {
@@ -70,11 +72,11 @@ public class YearUtil {
             }
             // 20 , 90
             // 99 > 30
-            if ((relativeYear + 100 - yearShort) % 100 > 30) {
+            if ((((relativeYear + 100) - yearShort) % 100) > 30) {
                 if (relativeYear < yearShort) {
                     return century + relativeYear;
                 } else {
-                    return century - 100 + relativeYear;
+                    return (century - 100) + relativeYear;
                 }
             } else {
                 if (relativeYear < yearShort) {

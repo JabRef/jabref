@@ -31,12 +31,13 @@ import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.fileformat.MedlineImporter;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Fetch or search from Pubmed http://www.ncbi.nlm.nih.gov/sites/entrez/
- * 
+ *
  */
 public class MedlineFetcher implements EntryFetcher {
 
@@ -118,15 +119,15 @@ public class MedlineFetcher implements EntryFetcher {
                 }
                 Matcher retMaxMatcher = retMaxPattern.matcher(inLine);
                 if (retMaxMatcher.find()) {
-                    result.retmax = Integer.parseInt(retMaxMatcher.group(1));
+                    result.retmax = Util.intValueOf(retMaxMatcher.group(1));
                 }
                 Matcher retStartMatcher = retStartPattern.matcher(inLine);
                 if (retStartMatcher.find()) {
-                    result.retstart = Integer.parseInt(retStartMatcher.group(1));
+                    result.retstart = Util.intValueOf(retStartMatcher.group(1));
                 }
                 Matcher countMatcher = countPattern.matcher(inLine);
                 if (doCount && countMatcher.find()) {
-                    result.count = Integer.parseInt(countMatcher.group(1));
+                    result.count = Util.intValueOf(countMatcher.group(1));
                     doCount = false;
                 }
             }
@@ -217,7 +218,7 @@ public class MedlineFetcher implements EntryFetcher {
                     }
 
                     try {
-                        numberToFetch = Integer.parseInt(strCount.trim());
+                        numberToFetch = Util.intValueOf(strCount.trim());
                         break;
                     } catch (RuntimeException ex) {
                         frame.showMessage(Localization.lang("Please enter a valid number"));

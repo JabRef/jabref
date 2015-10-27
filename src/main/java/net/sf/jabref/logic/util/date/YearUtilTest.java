@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.util.date;
 
 import net.sf.jabref.logic.util.date.YearUtil;
+import net.sf.jabref.util.Util;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,10 +37,11 @@ public class YearUtilTest {
         NumberFormat f = new DecimalFormat("00");
 
         for (int i = 0; i <= 30; i++) {
-            Assert.assertTrue("" + i, thisYear <= Integer.parseInt(YearUtil.toFourDigitYear(f.format((d2 + i) % 100))));
+            Assert.assertTrue("" + i, thisYear <= Util.intValueOf(YearUtil.toFourDigitYear(f.format((d2 + i) % 100))));
         }
         for (int i = 0; i < 70; i++) {
-            Assert.assertTrue("" + i, thisYear >= Integer.parseInt(YearUtil.toFourDigitYear(f.format((d2 - i + 100) % 100))));
+            Assert.assertTrue("" + i,
+                    thisYear >= Util.intValueOf(YearUtil.toFourDigitYear(f.format(((d2 - i) + 100) % 100))));
         }
     }
 

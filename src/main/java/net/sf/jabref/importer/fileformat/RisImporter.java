@@ -29,6 +29,7 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.util.Util;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -214,7 +215,7 @@ public class RisImporter extends ImportFormat {
                         if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
 
-                                int monthNumber = Integer.parseInt(parts[1]);
+                                int monthNumber = Util.intValueOf(parts[1]);
                                 MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                                 if (month.isValid()) {
                                     hm.put("month", month.bibtexFormat);

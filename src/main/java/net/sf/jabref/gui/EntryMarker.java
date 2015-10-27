@@ -6,6 +6,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -38,7 +39,7 @@ public class EntryMarker {
                 Matcher m = MARK_NUMBER_PATTERN.matcher(s);
                 if (m.find()) {
                     try {
-                        prevMarkLevel = Integer.parseInt(m.group(1));
+                        prevMarkLevel = Util.intValueOf(m.group(1));
                         newValue = s.substring(0, m.start(1)) + (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement) : markIncrement) + s.substring(m.end(1));
                     } catch (NumberFormatException ex) {
                         // Do nothing.
@@ -80,8 +81,8 @@ public class EntryMarker {
                 Matcher m = MARK_NUMBER_PATTERN.matcher(s);
                 if (m.find()) {
                     try {
-                        int prevMarkLevel = Integer.parseInt(m.group(1));
-                        if (!onlyMaxLevel || prevMarkLevel == MARK_COLOR_LEVELS) {
+                        int prevMarkLevel = Util.intValueOf(m.group(1));
+                        if (!onlyMaxLevel || (prevMarkLevel == MARK_COLOR_LEVELS)) {
                             if (prevMarkLevel > 1) {
                                 newValue = s.substring(0, m.start(1)) + s.substring(m.end(1));
                             } else {
@@ -172,7 +173,7 @@ public class EntryMarker {
         Matcher m = MARK_NUMBER_PATTERN.matcher(s);
         if (m.find()) {
             try {
-                return Integer.parseInt(m.group(1));
+                return Util.intValueOf(m.group(1));
             } catch (NumberFormatException ex) {
                 return 1;
             }
