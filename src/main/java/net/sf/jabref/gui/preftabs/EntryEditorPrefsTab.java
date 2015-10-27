@@ -36,7 +36,6 @@ import com.jgoodies.forms.layout.FormLayout;
 class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     private final JCheckBox autoOpenForm;
-    private final JCheckBox showSource;
     private final JCheckBox defSource;
     private final JCheckBox emacsMode;
     private final JCheckBox emacsRebindCtrlA;
@@ -78,7 +77,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
         autoOpenForm = new JCheckBox(Localization.lang("Open editor when a new entry is created"));
         defSource = new JCheckBox(Localization.lang("Show BibTeX source by default"));
-        showSource = new JCheckBox(Localization.lang("Show BibTeX source panel"));
         emacsMode = new JCheckBox(Localization.lang("Use Emacs key bindings"));
         emacsRebindCtrlA = new JCheckBox(Localization.lang("Rebind C-a, too"));
         emacsRebindCtrlF = new JCheckBox(Localization.lang("Rebind C-f, too"));
@@ -106,49 +104,20 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         firstNameModeButtonGroup.add(firstNameModeBoth);
 
         Insets marg = new Insets(0, 20, 3, 0);
-        defSource.setMargin(marg);
-        // We need a listener on showSource to enable and disable the source panel-related choices:
-        showSource.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                defSource.setEnabled(showSource.isSelected());
-            }
-        }
-                );
 
         emacsRebindCtrlA.setMargin(marg);
         // We need a listener on showSource to enable and disable the source panel-related choices:
-        emacsMode.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                emacsRebindCtrlA.setEnabled(emacsMode.isSelected());
-            }
-        }
-                );
+        emacsMode.addChangeListener(event -> emacsRebindCtrlA.setEnabled(emacsMode.isSelected()));
 
         emacsRebindCtrlF.setMargin(marg);
         // We need a listener on showSource to enable and disable the source panel-related choices:
-        emacsMode.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent event) {
-                emacsRebindCtrlF.setEnabled(emacsMode.isSelected());
-            }
-        }
-        );
+        emacsMode.addChangeListener(event -> emacsRebindCtrlF.setEnabled(emacsMode.isSelected()));
 
         
         autoCompFields = new JTextField(40);
         // We need a listener on autoComplete to enable and disable the
         // autoCompFields text field:
-        autoComplete.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                setAutoCompleteElementsEnabled(autoComplete.isSelected());
-            }
-        }
-                );
+        autoComplete.addChangeListener(event -> setAutoCompleteElementsEnabled(autoComplete.isSelected()));
 
         FormLayout layout = new FormLayout
                 (// columns
@@ -164,13 +133,12 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder.addSeparator(Localization.lang("Editor options"), cc.xyw(1, 1, 5));
         builder.add(autoOpenForm, cc.xy(2, 3));
         builder.add(disableOnMultiple, cc.xy(2, 5));
-        builder.add(showSource, cc.xy(2, 7));
-        builder.add(defSource, cc.xy(2, 9));
-        builder.add(emacsMode, cc.xy(2, 11));
-        builder.add(emacsRebindCtrlA, cc.xy(2, 13));
-        builder.add(emacsRebindCtrlF, cc.xy(2, 15));
+        builder.add(defSource, cc.xy(2, 7));
+        builder.add(emacsMode, cc.xy(2, 9));
+        builder.add(emacsRebindCtrlA, cc.xy(2, 11));
+        builder.add(emacsRebindCtrlF, cc.xy(2, 13));
         
-        builder.addSeparator(Localization.lang("Autocompletion options"), cc.xyw(1, 17, 5));
+        builder.addSeparator(Localization.lang("Autocompletion options"), cc.xyw(1, 15, 5));
         builder.add(autoComplete, cc.xy(2, 19));
         
         DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
@@ -202,7 +170,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     public void setValues() {
         autoOpenForm.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM));
         defSource.setSelected(prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE));
-        showSource.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_SOURCE));
         emacsMode.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS));
         emacsRebindCtrlA.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA));
         emacsRebindCtrlF.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
@@ -232,8 +199,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         oldAutoCompFModeAbbr = firstNameModeAbbr.isSelected();
         oldAutoCompFModeFull = firstNameModeFull.isSelected();
 
-        // This choice only makes sense when the source panel is visible:
-        defSource.setEnabled(showSource.isSelected());
         // similar for emacs CTRL-a and emacs mode
         emacsRebindCtrlA.setEnabled(emacsMode.isSelected());
         // Autocomplete fields is only enabled when autocompletion is selected
@@ -269,12 +234,10 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.DISABLE_ON_MULTIPLE_SELECTION, disableOnMultiple.isSelected());
         // We want to know if the following settings have been modified:
         boolean oldAutoComplete = prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE);
-        boolean oldShowSource = prefs.getBoolean(JabRefPreferences.SHOW_SOURCE);
         String oldAutoCompFields = prefs.get(JabRefPreferences.AUTO_COMPLETE_FIELDS);
         prefs.putInt(JabRefPreferences.SHORTEST_TO_COMPLETE, (Integer) shortestToComplete.getValue());
         prefs.putBoolean(JabRefPreferences.AUTO_COMPLETE, autoComplete.isSelected());
         prefs.put(JabRefPreferences.AUTO_COMPLETE_FIELDS, autoCompFields.getText());
-        prefs.putBoolean(JabRefPreferences.SHOW_SOURCE, showSource.isSelected());
         if (autoCompBoth.isSelected()) {
             prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, false);
             prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, false);
@@ -297,7 +260,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
         // We need to remove all entry editors from cache if the source panel setting
         // or the autocompletion settings have been changed:
-        if (oldShowSource != showSource.isSelected() || oldAutoComplete != autoComplete.isSelected()
+        if (oldAutoComplete != autoComplete.isSelected()
                 || !oldAutoCompFields.equals(autoCompFields.getText()) ||
                 oldAutoCompFF != autoCompFF.isSelected() || oldAutoCompLF != autoCompLF.isSelected() ||
                 oldAutoCompFModeAbbr != firstNameModeAbbr.isSelected() ||
