@@ -46,7 +46,7 @@ public class Localization {
      *
      * @param resBundle the ResourceBundle to use
      * @param idForErrorMessage output when translation is not found
-ö     * @param key the key to lookup in resBundle
+     * @param key the key to lookup in resBundle
      * @param params a list of Strings to replace %0, %1, ...
      * @return
      */
