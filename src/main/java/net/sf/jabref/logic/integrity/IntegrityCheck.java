@@ -100,8 +100,6 @@ public class IntegrityCheck {
 
             if (counter > 0) {
                 collector.add(new IntegrityMessage(Localization.lang("unexpected opening curly braket"), entry, fieldName));
-            } else if (counter < 0) {
-                collector.add(new IntegrityMessage(Localization.lang("unexpected closing curly braket"), entry, fieldName));
             }
         }
 
