@@ -23,6 +23,8 @@ import javax.swing.*;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -42,7 +44,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
  */
 public class MergeEntriesDialog extends JDialog {
 
-    private final Dimension DIM = new Dimension(800, 800);
     private final BasePanel panel;
     private final JabRefFrame frame;
     private final CellConstraints cc = new CellConstraints();
@@ -130,12 +131,10 @@ public class MergeEntriesDialog extends JDialog {
 
         pack();
 
-        if (getHeight() > DIM.height) {
-            setSize(new Dimension(getWidth(), DIM.height));
-        }
-        if (getWidth() > DIM.width) {
-            setSize(new Dimension(DIM.width, getHeight()));
-        }
+        setLocation(Globals.prefs.getInt(JabRefPreferences.MERGEENTRIES_POS_X),
+                Globals.prefs.getInt(JabRefPreferences.MERGEENTRIES_POS_Y));
+        setSize(Globals.prefs.getInt(JabRefPreferences.MERGEENTRIES_SIZE_X),
+                Globals.prefs.getInt(JabRefPreferences.MERGEENTRIES_SIZE_Y));
 
         // Show what we've got
         setVisible(true);
@@ -168,7 +167,17 @@ public class MergeEntriesDialog extends JDialog {
             ce.end();
             panel.undoManager.addEdit(ce);
             panel.output(Localization.lang("Merged entries"));
+            savePosition();
             dispose();
         }
+    }
+
+    private void savePosition() {
+        Point p = getLocation();
+        Dimension d = getSize();
+        Globals.prefs.putInt(JabRefPreferences.MERGEENTRIES_POS_X, p.x);
+        Globals.prefs.putInt(JabRefPreferences.MERGEENTRIES_POS_Y, p.y);
+        Globals.prefs.putInt(JabRefPreferences.MERGEENTRIES_SIZE_X, d.width);
+        Globals.prefs.putInt(JabRefPreferences.MERGEENTRIES_SIZE_Y, d.height);
     }
 }
