@@ -459,12 +459,10 @@ public class StringUtil {
             if (!escaped && (c == '\\')) {
                 escaped = true;
                 continue;
-            }
-            else if (!escaped && (c == ':')) {
+            } else if (!escaped && (c == ':')) {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
-            }
-            else if (!escaped && (c == ';')) {
+            } else if (!escaped && (c == ';')) {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
                 newList.add(thisEntry);

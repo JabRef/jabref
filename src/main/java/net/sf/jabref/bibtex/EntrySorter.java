@@ -116,7 +116,6 @@ public class EntrySorter implements DatabaseChangeListener {
                 changed = true;
                 break;
             case CHANGED_ENTRY:
-                // Entry changed. Resort list:
                 pos = Collections.binarySearch(set, e.getEntry(), comp);
                 int posOld = set.indexOf(e.getEntry());
                 if (pos < 0) {
