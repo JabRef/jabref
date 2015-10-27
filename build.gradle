@@ -41,7 +41,7 @@ dependencies {
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
     compile 'com.jgoodies:jgoodies-looks:2.7.0'
 
-    compile 'org.swinglabs.swingx:swingx-core:1.6.5-1'
+    compile 'org.swinglabs:swingx:1.6.1' // do not update, 1.6.5.1 is broken
 
     compile 'org.apache.pdfbox:pdfbox:1.8.10'
     compile 'org.apache.pdfbox:fontbox:1.8.10'
