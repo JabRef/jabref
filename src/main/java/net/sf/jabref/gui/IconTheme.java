@@ -136,6 +136,7 @@ public class IconTheme {
         FILE_EXCEL("\uf2d4"), /*css: file-excel */
         FILE_POWERPOINT("\uf2de"), /*css: file-powerpoint */
         FILE_TEXT("\uf2d2"), /*css: file-document */
+        FILE_MULTIPLE("\uf2d9"), /*css: file-multiple */
 
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
