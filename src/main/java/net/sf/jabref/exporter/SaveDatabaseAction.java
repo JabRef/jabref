@@ -25,9 +25,11 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
+import net.sf.jabref.logic.cleanup.AutoFormatter;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 import javax.swing.*;
 import java.io.File;
@@ -52,7 +54,6 @@ public class SaveDatabaseAction extends AbstractWorker {
 
 
     public SaveDatabaseAction(BasePanel panel) {
-
         this.panel = panel;
         this.frame = panel.frame();
     }
@@ -183,6 +184,12 @@ public class SaveDatabaseAction extends AbstractWorker {
             // If the option is set, autogenerate keys for all entries that are
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();
+
+            // onSave cleanup actions
+            for(BibtexEntry entry: panel.database.getEntries()) {
+                AutoFormatter formatter = new AutoFormatter(entry);
+                formatter.runDefaultCleanups();
+            }
 
             if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
                 success = false;
