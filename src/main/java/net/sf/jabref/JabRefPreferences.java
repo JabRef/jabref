@@ -137,7 +137,6 @@ public class JabRefPreferences {
     public static final String SEARCH_REQ = "searchReq";
     public static final String CASE_SENSITIVE_SEARCH = "caseSensitiveSearch";
     public static final String DEFAULT_AUTO_SORT = "defaultAutoSort";
-    public static final String SHOW_SOURCE = "showSource";
     public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
     public static final String STRINGS_SIZE_Y = "stringsSizeY";
     public static final String STRINGS_SIZE_X = "stringsSizeX";
@@ -542,7 +541,6 @@ public class JabRefPreferences {
         defaults.put(DUPLICATES_SIZE_X, 800);
         defaults.put(DUPLICATES_SIZE_Y, 600);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
-        defaults.put(SHOW_SOURCE, Boolean.TRUE);
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
         defaults.put(CASE_SENSITIVE_SEARCH, Boolean.FALSE);
         defaults.put(SEARCH_REQ, Boolean.TRUE);
