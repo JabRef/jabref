@@ -457,13 +457,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public GroupSelector groupSelector;
 
-    // The menus for importing/appending other formats
-    private final JMenu importMenu = JabRefFrame.subMenu("Import into current database");
-    private final JMenu importNewMenu = JabRefFrame.subMenu("Import into new database");
-    private final JMenu exportMenu = JabRefFrame.subMenu("Export");
-    JMenu customExportMenu = JabRefFrame.subMenu("Custom export");
-    private final JMenu newDatabaseMenu = JabRefFrame.subMenu("New database");
-
     // Other submenus
     private final JMenu checkAndFix = JabRefFrame.subMenu("Legacy tools...");
 
@@ -1133,14 +1126,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    /**
-     * Refresh import menus.
-     */
-    public void setUpImportMenus() {
-        setUpImportMenu(importMenu, false);
-        setUpImportMenu(importNewMenu, true);
-    }
-
     private void fillMenu() {
         //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         mb.setBorder(null);
@@ -1156,11 +1141,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JMenu newSpec = JabRefFrame.subMenu("New entry...");
         JMenu helpMenu = JabRefFrame.subMenu("Help");
 
-        setUpImportMenus();
-
-        newDatabaseMenu.add(newDatabaseAction);
-        newDatabaseMenu.add(newSubDatabaseAction);
-
         file.add(newDatabaseAction);
         file.add(open); //opendatabaseaction
         file.add(mergeDatabaseAction);
@@ -1170,8 +1150,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(saveSelectedAs);
         file.add(saveSelectedAsPlain);
         file.addSeparator();
-        //file.add(importMenu);
-        //file.add(importNewMenu);
         file.add(importNew);
         file.add(importCurrent);
         file.add(exportAll);
@@ -1528,7 +1506,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
                 selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
                 makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
-                incrementalSearch, replaceAll, importMenu, exportMenu, sendAsEmail, downloadFullText, writeXmpAction,
+                incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
                 openPdf, openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
@@ -1847,39 +1825,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     diag.toFront();
                 }
             });
-    }
-
-    private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {
-        importMenu.removeAll();
-
-        // Add a menu item for autodetecting import format:
-        importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_));
-
-        // Add custom importers
-        importMenu.addSeparator();
-
-        SortedSet<ImportFormat> customImporters = Globals.importFormatReader.getCustomImportFormats();
-        JMenu submenu = new JMenu(Localization.lang("Custom importers"));
-        submenu.setMnemonic(KeyEvent.VK_S);
-
-        // Put in all formatters registered in ImportFormatReader:
-        for (ImportFormat imFo : customImporters) {
-            submenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_, imFo));
-        }
-
-        if (!customImporters.isEmpty()) {
-            submenu.addSeparator();
-        }
-
-        submenu.add(customImpAction);
-
-        importMenu.add(submenu);
-        importMenu.addSeparator();
-
-        // Put in all formatters registered in ImportFormatReader:
-        for (ImportFormat imFo : Globals.importFormatReader.getBuiltInInputFormats()) {
-            importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_, imFo));
-        }
     }
 
     public FileHistory getFileHistory() {
