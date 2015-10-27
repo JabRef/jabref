@@ -40,6 +40,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.util.Util;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -186,7 +187,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 }
 
                 if ((row == 0) && (col == 1)) {
-                    ncWidth = Integer.parseInt(value.toString());
+                    ncWidth = Util.intValueOf(value.toString());
                     return;
                 }
 
@@ -202,7 +203,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     if (value == null) {
                         rowContent.length = -1;
                     } else {
-                        rowContent.length = Integer.parseInt(value.toString());
+                        rowContent.length = Util.intValueOf(value.toString());
                     }
                 }
             }
@@ -440,7 +441,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         String[] lengths = prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.length; i++) {
             if (i < lengths.length) {
-                tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
+                tableRows.add(new TableRow(names[i], Util.intValueOf(lengths[i])));
             } else {
                 tableRows.add(new TableRow(names[i]));
             }

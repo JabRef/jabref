@@ -25,6 +25,7 @@ import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class MetaData implements Iterable<String> {
@@ -52,7 +53,7 @@ public class MetaData implements Iterable<String> {
         boolean groupsTreePresent = false;
         Vector<String> flatGroupsData = null;
         Vector<String> treeGroupsData = null;
-        // The first version (0) lacked a version specification, 
+        // The first version (0) lacked a version specification,
         // thus this value defaults to 0.
         int groupsVersionOnDisk = 0;
 
@@ -71,7 +72,7 @@ public class MetaData implements Iterable<String> {
                 }
                 if (key.equals("groupsversion")) {
                     if (orderedData.size() >= 1) {
-                        groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
+                        groupsVersionOnDisk = Util.intValueOf(orderedData.firstElement());
                     }
                 } else if (key.equals("groupstree")) {
                     groupsTreePresent = true;
@@ -91,7 +92,7 @@ public class MetaData implements Iterable<String> {
             putGroups(treeGroupsData, db, groupsVersionOnDisk);
         }
 
-        if (!groupsTreePresent && flatGroupsData != null) {
+        if (!groupsTreePresent && (flatGroupsData != null)) {
             try {
                 groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
                 groupTreeValid = true;
@@ -127,7 +128,7 @@ public class MetaData implements Iterable<String> {
 
     /**
      * Retrieves the stored meta data.
-     * 
+     *
      * @param key the key to look up
      * @return null if no data is found
      */
@@ -138,7 +139,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Removes the given key from metadata.
      * Nothing is done if key is not found.
-     * 
+     *
      * @param key the key to remove
      */
     public void remove(String key) {
@@ -175,12 +176,12 @@ public class MetaData implements Iterable<String> {
             key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR);
             vec = getData(key);
         }
-        if (vec != null && !vec.isEmpty()) {
+        if ((vec != null) && !vec.isEmpty()) {
             String dir;
             dir = vec.get(0);
             // If this directory is relative, we try to interpret it as relative to
             // the file path of this bib file:
-            if (!new File(dir).isAbsolute() && file != null) {
+            if (!new File(dir).isAbsolute() && (file != null)) {
                 String relDir;
                 if (dir.equals(".")) {
                     // if dir is only "current" directory, just use its parent (== real current directory) as path
@@ -204,7 +205,7 @@ public class MetaData implements Iterable<String> {
         }
 
         // Check if the bib file location should be included, and if so, if it is set:
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && getFile() != null) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && (getFile() != null)) {
             // Check if we should add it as primary file dir (first in the list) or not:
             if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
                 dirs.add(0, getFile().getParent());
@@ -268,9 +269,9 @@ public class MetaData implements Iterable<String> {
 
             out.write(sb.toString());
         }
-        // write groups if present. skip this if only the root node exists 
+        // write groups if present. skip this if only the root node exists
         // (which is always the AllEntriesGroup).
-        if (groupsRoot != null && groupsRoot.getChildCount() > 0) {
+        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
             StringBuffer sb = new StringBuffer();
             // write version first
             sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupsversion:");
@@ -300,7 +301,7 @@ public class MetaData implements Iterable<String> {
     }
 
     /**
-     * Reads the next unit. Units are delimited by ';'. 
+     * Reads the next unit. Units are delimited by ';'.
      */
     private String getNextUnit(Reader reader) throws IOException {
         int c;
@@ -372,7 +373,7 @@ public class MetaData implements Iterable<String> {
 
     /**
      * Updates the stored key patterns to the given key patterns.
-     * 
+     *
      * @param labelPattern the key patterns to update to. <br />
      * A reference to this object is stored internally and is returned at getLabelPattern();
      */

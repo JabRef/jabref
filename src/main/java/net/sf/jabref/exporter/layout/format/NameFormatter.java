@@ -17,69 +17,70 @@ package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.bst.BibtexNameFormatter;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 /**
  * This layout formatter uses the Bibtex name.format$ method and provides ultimate flexibility:
- * 
+ *
  * The formatter needs a parameter to be passed in that follows the following format:
- * 
+ *
  * <case1>@<range11>@"<format>"@<range12>@"<format>"@<range13>...@@
- * 
+ *
  * <case2>@<range21>@... and so on.
  *
  * Individual cases are separated by @@ and items in a case by @.
- * 
- * Cases are just integers or the character * and will tell the formatter to apply the following formats if there are 
- * less or equal authors given to it. The cases must be in strict increasing order with the * in the last position. 
- * 
+ *
+ * Cases are just integers or the character * and will tell the formatter to apply the following formats if there are
+ * less or equal authors given to it. The cases must be in strict increasing order with the * in the last position.
+ *
  * For instance:
- * 
+ *
  * case1 = 2
  * case2 = 3
  * case3 = *
- * 
- * Ranges are either <integer>..<integer>, <integer> or the character * using a 1 based index for indexing 
- * authors from the given authorlist. Integer indexes can be negative to denote them to start from 
+ *
+ * Ranges are either <integer>..<integer>, <integer> or the character * using a 1 based index for indexing
+ * authors from the given authorlist. Integer indexes can be negative to denote them to start from
  * the end of the list where -1 is the last author.
- * 
+ *
  * For instance with an authorlist of "Joe Doe and Mary Jane and Bruce Bar and Arthur Kay":
- * 
+ *
  * 1..3 will affect Joe, Mary and Bruce
- * 
+ *
  * 4..4 will affect Arthur
- * 
+ *
  * * will affect all of them
- * 
+ *
  * 2..-1 will affect Mary, Bruce and Arthur
- * 
+ *
  * The <format> uses the Bibtex formatter format:
- * 
- * The four letter v, f, l, j indicate the name parts von, first, last, jr which 
+ *
+ * The four letter v, f, l, j indicate the name parts von, first, last, jr which
  * are used within curly braces. A single letter v, f, l, j indicates that the name should be abbreviated.
  * To put a quote in the format string quote it using \" (mh. this doesn't work yet)
- * 
+ *
  * I give some examples but would rather point you to the bibtex documentation.
- * 
+ *
  * "{ll}, {f}." Will turn "Joe Doe" into "Doe, J."
- * 
+ *
  * Complete example:
- * 
- * To turn: 
- * 
+ *
+ * To turn:
+ *
  * "Joe Doe and Mary Jane and Bruce Bar and Arthur Kay"
- * 
- * into 
- * 
+ *
+ * into
+ *
  * "Doe, J., Jane, M., Bar, B. and Kay, A."
- * 
+ *
  * you would use
- * 
+ *
  * 1@*@{ll}, {f}.@@2@1@{ll}, {f}.@2@ and {ll}, {f}.@@*@1..-3@{ll}, {f}., @-2@{ll}, {f}.@-1@ and {ll}, {f}.
- * 
+ *
  * Yeah this is trouble-some to write, but should work.
- * 
+ *
  * For more examples see the test-cases.
  *
  */
@@ -105,10 +106,10 @@ public class NameFormatter implements LayoutFormatter {
                     int s;
                     int e;
                     if (range.length == 2) {
-                        s = Integer.parseInt(range[0]);
-                        e = Integer.parseInt(range[1]);
+                        s = Util.intValueOf(range[0]);
+                        e = Util.intValueOf(range[1]);
                     } else {
-                        s = e = Integer.parseInt(range[0]);
+                        s = e = Util.intValueOf(range[0]);
                     }
                     if (s < 0) {
                         s += n + 1;
@@ -122,7 +123,7 @@ public class NameFormatter implements LayoutFormatter {
                         s = temp;
                     }
 
-                    if (s <= i && i <= e) {
+                    if ((s <= i) && (i <= e)) {
                         sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
                         break;
                     }
@@ -137,7 +138,7 @@ public class NameFormatter implements LayoutFormatter {
 
         AuthorList al = AuthorList.getAuthorList(toFormat);
 
-        if (parameters == null || parameters.isEmpty()) {
+        if ((parameters == null) || parameters.isEmpty()) {
             parameters = "*:*:\"{ff}{vv}{ll}{,jj} \"";
         }
 
@@ -153,7 +154,7 @@ public class NameFormatter implements LayoutFormatter {
             if (formatString[0].equals("*")) {
                 return format(toFormat, al, formatString);
             } else {
-                if (al.size() <= Integer.parseInt(formatString[0])) {
+                if (al.size() <= Util.intValueOf(formatString[0])) {
                     return format(toFormat, al, formatString);
                 }
             }

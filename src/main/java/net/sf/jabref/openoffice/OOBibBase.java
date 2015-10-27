@@ -39,6 +39,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.openoffice.sorting.AuthorYearTitleComparator;
 import net.sf.jabref.openoffice.sorting.YearAuthorTitleComparator;
+import net.sf.jabref.util.Util;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +74,7 @@ class OOBibBase {
     private XMultiServiceFactory mxDocFactory;
     private XTextDocument mxDoc;
     private XText text;
-    private XDesktop xDesktop;
+    private final XDesktop xDesktop;
     private XTextViewCursorSupplier xViewCursorSupplier;
     private XComponent xCurrentComponent;
     private XComponentLoader xComponentLoader;
@@ -453,7 +454,7 @@ class OOBibBase {
             Matcher m = citePattern.matcher(names[i]);
             if (m.find()) {
                 String typeStr = m.group(1);
-                int type = Integer.parseInt(typeStr);
+                int type = Util.intValueOf(typeStr);
                 types[i] = type; // Remember the type in case we need to uniqiefy.
                 String[] keys = m.group(2).split(",");
                 bibtexKeys[i] = keys;
@@ -480,7 +481,7 @@ class OOBibBase {
                     for (int j = 0; j < keys.length; j++) {
                         normCitMarkers[i][j] = cEntries[j].getCiteKey();
                         sb.append(cEntries[j].getCiteKey());
-                        if (j < keys.length - 1) {
+                        if (j < (keys.length - 1)) {
                             sb.append(',');
                         }
                     }
@@ -619,7 +620,7 @@ class OOBibBase {
                         seenBefore.add(bibtexKeys[j][k]);
                     }
                     String uniq = uniquefiers.get(bibtexKeys[j][k]);
-                    if (uniq != null && uniq.length() >= 0) {
+                    if ((uniq != null) && (uniq.length() >= 0)) {
                         needsChange = true;
                         BibtexDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
                         if (database != null) {
@@ -680,7 +681,7 @@ class OOBibBase {
             text.removeTextContent(bm);
 
             insertReferenceMark(names[i], citMarkers[i], cursor, types[i] != OOBibBase.INVISIBLE_CIT, style);
-            if (hadBibSection && getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null) {
+            if (hadBibSection && (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
                 cursor.collapseToEnd();
@@ -688,7 +689,7 @@ class OOBibBase {
                 insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
                 /* The following is for resetting the paragraph format, but should probably
                    not be done.
-                   
+
                 XParagraphCursor parCursor =
                     (XParagraphCursor)UnoRuntime.queryInterface(
                     java.lang.Class.forName("com.sun.star.text.XParagraphCursor"), cursor);
@@ -999,7 +1000,7 @@ class OOBibBase {
         for (int i = 0; i < charBefore; i++) {
             try {
                 cursor.goLeft((short) 1, true);
-                if (i >= charBefore - flex && Character.isWhitespace(cursor.getString().charAt(0))) {
+                if ((i >= (charBefore - flex)) && Character.isWhitespace(cursor.getString().charAt(0))) {
                     break;
                 }
             } catch (Exception ex) {
@@ -1009,10 +1010,10 @@ class OOBibBase {
         int length = cursor.getString().length();
         int added = length - citPart.length();
         cursor.collapseToStart();
-        for (int i = 0; i < charAfter + length; i++) {
+        for (int i = 0; i < (charAfter + length); i++) {
             try {
                 cursor.goRight((short) 1, true);
-                if (i >= charAfter + length - flex) {
+                if (i >= ((charAfter + length) - flex)) {
                     String strNow = cursor.getString();
                     if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {
                         break;
@@ -1161,7 +1162,7 @@ class OOBibBase {
         XTextCursor mxDocCursor = text.createTextCursorByRange(range.getEnd());
         mxDocCursor.goRight((short) 1, true);
         boolean couldExpand = true;
-        while (couldExpand && compare.compareRegionEnds(mxDocCursor, rangeEnd) > 0) {
+        while (couldExpand && (compare.compareRegionEnds(mxDocCursor, rangeEnd) > 0)) {
             couldExpand = mxDocCursor.goRight((short) 1, true);
         }
         // Finally, clear the bibliography:
@@ -1208,7 +1209,7 @@ class OOBibBase {
                                      OOBibStyle style)
             throws Exception {
 
-        // Check if there is "page info" stored for this citation. If so, insert it into 
+        // Check if there is "page info" stored for this citation. If so, insert it into
         // the citation text before inserting the citation:
         String pageInfo = getCustomProperty(name);
         if (pageInfo != null) {
@@ -1364,7 +1365,7 @@ class OOBibBase {
 
         int piv = 0;
         boolean madeModifications = false;
-        while (piv < names.length - 1) {
+        while (piv < (names.length - 1)) {
             XTextRange r1 = UnoRuntime.queryInterface
                     (XTextContent.class, nameAccess.getByName(names[piv])).getAnchor().getEnd();
             XTextRange r2 = UnoRuntime.queryInterface
@@ -1377,12 +1378,12 @@ class OOBibBase {
             XTextCursor mxDocCursor = r1.getText().createTextCursorByRange(r1);
             mxDocCursor.goRight((short) 1, true);
             boolean couldExpand = true;
-            while (couldExpand && compare.compareRegionEnds(mxDocCursor, r2) > 0) {
+            while (couldExpand && (compare.compareRegionEnds(mxDocCursor, r2) > 0)) {
                 couldExpand = mxDocCursor.goRight((short) 1, true);
             }
             String text = mxDocCursor.getString();
             // Check if the string contains no line breaks and only whitespace:
-            if (text.indexOf('\n') == -1 && text.trim().isEmpty()) {
+            if ((text.indexOf('\n') == -1) && text.trim().isEmpty()) {
 
                 // If we are supposed to set character format for citations, test this before
                 // making any changes. This way we can throw an exception before any reference

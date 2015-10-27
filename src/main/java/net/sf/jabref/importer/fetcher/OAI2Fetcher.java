@@ -37,14 +37,16 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.util.Util;
+
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * 
+ *
  * This class can be used to access any archive offering an OAI2 interface. By
  * default it will access ArXiv.org
- * 
+ *
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
  */
@@ -80,7 +82,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
 
     /**
-     * some archives - like ArXiv.org - might expect of you to wait some time 
+     * some archives - like ArXiv.org - might expect of you to wait some time
      */
     private boolean shouldWait() {
         return waitTime > 0;
@@ -93,8 +95,8 @@ public class OAI2Fetcher implements EntryFetcher {
 
 
     /**
-     * 
-     * 
+     *
+     *
      * @param oai2Host
      *            the host to query without leading http:// and without trailing /
      * @param oai2Script
@@ -127,7 +129,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     /**
      * Default Constructor. The archive queried will be ArXiv.org
-     * 
+     *
      */
     public OAI2Fetcher() {
         this(OAI2Fetcher.OAI2_ARXIV_HOST, OAI2Fetcher.OAI2_ARXIV_SCRIPT, OAI2Fetcher.OAI2_ARXIV_METADATAPREFIX,
@@ -136,10 +138,10 @@ public class OAI2Fetcher implements EntryFetcher {
 
     /**
      * Construct the query URL
-     * 
+     *
      * @param key
      *            The key of the OAI2 entry that the url should point to.
-     *            
+     *
      * @return a String denoting the query URL
      */
     public String constructUrl(String key) {
@@ -154,7 +156,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     /**
      * Strip subcategories from ArXiv key.
-     * 
+     *
      * @param key The key to fix.
      * @return Fixed key.
      */
@@ -183,14 +185,14 @@ public class OAI2Fetcher implements EntryFetcher {
     /**
      * Import an entry from an OAI2 archive. The BibtexEntry provided has to
      * have the field OAI2_IDENTIFIER_FIELD set to the search string.
-     * 
+     *
      * @param key
      *            The OAI2 key to fetch from ArXiv.
      * @return The imported BibtexEntry or null if none.
      */
     public BibtexEntry importOai2Entry(String key) {
         /**
-         * Fix for problem reported in mailing-list: 
+         * Fix for problem reported in mailing-list:
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
          */
         key = OAI2Fetcher.fixKey(key);
@@ -217,7 +219,7 @@ public class OAI2Fetcher implements EntryFetcher {
             if (key.matches("\\d\\d\\d\\d\\..*")) {
                 be.setField("year", "20" + key.substring(0, 2));
 
-                int monthNumber = Integer.parseInt(key.substring(2, 4));
+                int monthNumber = Util.intValueOf(key.substring(2, 4));
                 MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                 if (month.isValid()) {
                     be.setField("month", month.bibtexFormat);

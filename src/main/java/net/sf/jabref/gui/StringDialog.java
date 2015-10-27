@@ -59,6 +59,7 @@ import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.util.Util;
 
 class StringDialog extends JDialog {
 
@@ -157,7 +158,7 @@ class StringDialog extends JDialog {
             setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " + panel.getFile().getName());
         } else {
             // @formatter:off
-            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " 
+            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": "
                     + Localization.lang(GUIGlobals.untitledTitle));
             // @formatter:on
         }
@@ -238,7 +239,7 @@ class StringDialog extends JDialog {
                 if (!value.equals(((BibtexString) strings[row]).getName())) {
                     if (tbase.hasStringLabel((String) value)) {
                         // @formatter:off
-                        JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label " 
+                        JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label "
                                 + "already exists"),
                                 Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
                     } else if (((String) value).contains(" ")) {
@@ -292,7 +293,7 @@ class StringDialog extends JDialog {
         @Override
         public String getColumnName(int col) {
             // @formatter:off
-            return col == 0 ? Localization.lang("Name") : 
+            return col == 0 ? Localization.lang("Name") :
                 Localization.lang("Content");
             // @formatter:on
         }
@@ -308,7 +309,7 @@ class StringDialog extends JDialog {
         // A pure integer number cannot be used as a string label,
         // since Bibtex will read it as a number.
         try {
-            Integer.parseInt(name);
+            Util.intValueOf(name);
             return true;
         } catch (NumberFormatException ex) {
             return false;
@@ -404,7 +405,7 @@ class StringDialog extends JDialog {
                 panel.markBaseChanged();
             } catch (KeyCollisionException ex) {
                 // @formatter:off
-                JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label " 
+                JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label "
                         + "already exists"),
                         Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
                 // @formatter:on
@@ -455,8 +456,8 @@ class StringDialog extends JDialog {
                 assureNotEditing();
 
                 // @formatter:off
-                String msg = Localization.lang("Really delete the selected") + ' ' 
-                        + (sel.length > 1 ? sel.length + " " + Localization.lang("entries") 
+                String msg = Localization.lang("Really delete the selected") + ' '
+                        + (sel.length > 1 ? sel.length + " " + Localization.lang("entries")
                         : Localization.lang("entry")) + '?';
                 int answer = JOptionPane.showConfirmDialog(parent, msg, Localization.lang("Delete strings"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);

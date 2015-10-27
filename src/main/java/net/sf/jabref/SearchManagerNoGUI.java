@@ -24,6 +24,7 @@ import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 
 /**
  * @author Silberer, Zirn
@@ -85,29 +86,29 @@ class SearchManagerNoGUI {
         String[] searchTermsToPr = searchTerm.split("=");
         String field = searchTermsToPr[0];
         String[] years = searchTermsToPr[1].split("-");
-        int year1 = Integer.parseInt(years[0]);
-        int year2 = Integer.parseInt(years[1]);
+        int year1 = Util.intValueOf(years[0]);
+        int year2 = Util.intValueOf(years[1]);
 
-        if (year1 < 2000 && year2 >= 2000) { //for 199.
+        if ((year1 < 2000) && (year2 >= 2000)) { //for 199.
             regPt1 = "199+[" + years[0].substring(3, 4) + "-9]";
             reg1Set = true;
         } else {
             if (year1 < 2000) {
                 // @formatter:off
                 regPt1 = "199+[" + years[0].substring(3, 4) + "-"
-                        + Math.min(Integer.parseInt(years[1].substring(3, 4)), 9) + "]";
+                        + Math.min(Util.intValueOf(years[1].substring(3, 4)), 9) + "]";
                 reg1Set = true;
                 // @formatter:on
             }
         }
-        if (Integer.parseInt(years[1]) >= 2000 && year1 < 2000) { //for 200.
+        if ((Util.intValueOf(years[1]) >= 2000) && (year1 < 2000)) { //for 200.
             regPt2 = "200+[0-" + years[1].substring(3, 4) + "]";
             reg2Set = true;
         } else {
             if (year2 >= 2000) {
                 // @formatter:off
                 regPt2 = "200+[" + years[0].substring(3, 4) + "-"
-                        + Math.min(Integer.parseInt(years[1].substring(3, 4)), 9) + "]";
+                        + Math.min(Util.intValueOf(years[1].substring(3, 4)), 9) + "]";
                 // @formatter:on
                 reg2Set = true;
             }

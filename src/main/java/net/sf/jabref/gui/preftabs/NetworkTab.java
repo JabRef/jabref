@@ -28,6 +28,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.Util;
 
 public class NetworkTab extends JPanel implements PrefsTab {
 
@@ -102,13 +103,13 @@ public class NetworkTab extends JPanel implements PrefsTab {
         if (useProxy.isSelected()) {
             String host = defProxyHostname.getText();
             String port = defProxyPort.getText();
-            if (host == null || host.trim().isEmpty() ||
-                    port == null || port.trim().isEmpty()) {
+            if ((host == null) || host.trim().isEmpty() ||
+                    (port == null) || port.trim().isEmpty()) {
                 validSetting = false;
             } else {
                 Integer p;
                 try {
-                    p = Integer.parseInt(port);
+                    p = Util.intValueOf(port);
                     validSetting = p > 0;
                 } catch (NumberFormatException e) {
                     validSetting = false;

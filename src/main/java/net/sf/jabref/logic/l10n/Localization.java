@@ -3,7 +3,8 @@ package net.sf.jabref.logic.l10n;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.nio.charset.Charset;
+import net.sf.jabref.util.Util;
+
 import java.util.*;
 
 public class Localization {
@@ -68,7 +69,7 @@ public class Localization {
         }
 
         // replace %0, %1, ...
-        if (translation != null && !translation.isEmpty()) {
+        if ((translation != null) && !translation.isEmpty()) {
             // also done if no params are given
             //  Then, %c is translated to ":", %e is translated to "=", ...
             translation = translation.replaceAll("_", " ");
@@ -85,8 +86,8 @@ public class Localization {
                     } else {
                         b = false;
                         try {
-                            int index = Integer.parseInt(String.valueOf(c));
-                            if (params != null && index >= 0 && index <= params.length) {
+                            int index = Util.intValueOf(String.valueOf(c));
+                            if ((params != null) && (index >= 0) && (index <= params.length)) {
                                 sb.append(params[index]);
                             }
                         } catch (NumberFormatException e) {

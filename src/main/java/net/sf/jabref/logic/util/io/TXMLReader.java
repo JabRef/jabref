@@ -25,6 +25,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.*;
 
+import net.sf.jabref.util.Util;
+
 public class TXMLReader {
 
     private Document config; // XML data
@@ -104,7 +106,7 @@ public class TXMLReader {
             if (data != null) {
                 if (!data.isEmpty()) {
                     try {
-                        back = Integer.parseInt(data);
+                        back = Util.intValueOf(data);
                     } catch (Exception ignored) {
                     }
                 }

@@ -628,7 +628,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         String substring = page.substring(ind, page.length());
         Matcher m = pattern.matcher(substring);
         if (m.find()) {
-            return Integer.parseInt(m.group(1));
+            return Util.intValueOf(m.group(1));
         }
         throw new IOException(Localization.lang("Could not parse number of hits"));
     }

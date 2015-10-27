@@ -412,7 +412,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 //return nf.parse(number).intValue();
                 number = number.replaceAll(",", "");
                 //System.out.println(number);
-                return Integer.parseInt(number);
+                return Util.intValueOf(number);
             } catch (NumberFormatException ex) {
                 throw new IOException(Localization.lang("Could not parse number of hits"));
             } catch (IllegalStateException e) {

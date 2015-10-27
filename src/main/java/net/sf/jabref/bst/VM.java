@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
@@ -42,13 +43,13 @@ import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
 /**
- * 
+ *
  * A Bibtex Virtual machine that can execute .bst files.
- * 
+ *
  * Documentation can be found in the original bibtex distribution:
- * 
+ *
  * http://texcatalogue.sarovar.org/entries/bibtex.html#Download
- * 
+ *
  */
 
 public class VM implements Warn {
@@ -598,7 +599,7 @@ public class VM implements Warn {
              * The |built_in| function {\.{preamble\$}} pushes onto the stack
              * the concatenation of all the \.{preamble} strings read from the
              * database files. (or the empty string if there where none)
-             * 
+             *
              * @PREAMBLE strings read from the database files.
              */
             @Override
@@ -740,7 +741,7 @@ public class VM implements Warn {
              * precisely, a "special character", defined in Section 4) counts as
              * a single text character, even if it's missing its matching right
              * brace, and where braces don't count as text characters.
-             * 
+             *
              * From BibTeXing: For the purposes of counting letters in labels,
              * BibTEX considers everything contained inside the braces as a
              * single letter.
@@ -1062,7 +1063,7 @@ public class VM implements Warn {
      * list. It has no arguments. If a database entry doesn't have a value for a
      * field (and probably no database entry will have a value for every field),
      * that field variable is marked as missing for the entry.
-     * 
+     *
      * We use null for the missing entry designator.
      */
     private void read() {
@@ -1092,7 +1093,7 @@ public class VM implements Warn {
      * override any definition you define using this command. If you want to
      * define a string the user can't touch, use the FUNCTION command, which has
      * a compatible syntax.
-     * 
+     *
      * @param child
      */
     private void macro(Tree child) {
@@ -1187,7 +1188,7 @@ public class VM implements Warn {
     /**
      * Sorts the entry list using the values of the string entry variable
      * sort.key$. It has no arguments.
-     * 
+     *
      * @param child
      */
     private void sort(Tree child) {
@@ -1243,7 +1244,7 @@ public class VM implements Warn {
                         push(s.substring(1, s.length() - 1));
                         break;
                     case BstParser.INTEGER:
-                        push(Integer.parseInt(c.getText().substring(1)));
+                        push(Util.intValueOf(c.getText().substring(1)));
                         break;
                     case BstParser.QUOTED:
                         push(new Identifier(c.getText().substring(1)));
@@ -1320,7 +1321,7 @@ public class VM implements Warn {
      * entry.max$ and global.max$, used for limiting the lengths of string vari-
      * ables. You may have any number of these commands, but a variable's
      * declaration must precede its use.
-     * 
+     *
      * @param child
      */
     private void integers(Tree child) {
@@ -1337,7 +1338,7 @@ public class VM implements Warn {
      * Declares global string variables. It has one argument, a list of variable
      * names. You may have any number of these commands, but a variable's
      * declaration must precede its use.
-     * 
+     *
      * @param child
      */
     private void strings(Tree child) {

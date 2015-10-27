@@ -30,6 +30,7 @@ import net.sf.jabref.model.entry.AuthorList;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.util.Util;
 
 /**
  * Imports a SilverPlatter exported file. This is a poor format to parse,
@@ -162,7 +163,7 @@ public class SilverPlatterImporter extends ImportFormat {
                             if ((m + 2) < frest.length()) {
                                 String yr = frest.substring(m + 2).trim();
                                 try {
-                                    Integer.parseInt(yr);
+                                    Util.intValueOf(yr);
                                     h.put("year", yr);
                                 } catch (NumberFormatException ex) {
                                     // Let's assume that this wasn't a number, since it

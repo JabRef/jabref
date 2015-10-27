@@ -50,6 +50,7 @@ modified slightly by nizar batada for JabRef
  */
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.Util;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -324,7 +325,7 @@ public class FontSelectorDialog extends JDialog {
 
         int size;
         try {
-            size = Integer.parseInt(sizeField.getText());
+            size = Util.intValueOf(sizeField.getText());
         } catch (Exception e) {
             size = 14;
         }
@@ -424,7 +425,7 @@ public class FontSelectorDialog extends JDialog {
         String family = familyField.getText();
         int size;
         try {
-            size = Integer.parseInt(sizeField.getText());
+            size = Util.intValueOf(sizeField.getText());
         } catch (Exception e) {
             size = 14;
         }

@@ -16,6 +16,7 @@
 package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.exporter.layout.AbstractParamLayoutFormatter;
 
 import java.util.ArrayList;
@@ -235,7 +236,7 @@ public class Authors extends AbstractParamLayoutFormatter {
         }
         else if (Authors.numberPattern.matcher(key.trim()).matches()) {
             // Just a number:
-            int num = Integer.parseInt(key.trim());
+            int num = Util.intValueOf(key.trim());
             if (!setMaxAuthors) {
                 maxAuthors = num;
                 setMaxAuthors = true;

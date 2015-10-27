@@ -17,6 +17,7 @@ package net.sf.jabref.groups.structure;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
@@ -64,7 +65,7 @@ public class ExplicitGroup extends AbstractGroup {
         }
         case 3: {
             String name = tok.nextToken();
-            int context = Integer.parseInt(tok.nextToken());
+            int context = Util.intValueOf(tok.nextToken());
             ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context));
             newGroup.addEntries(tok, db);
             return newGroup;
