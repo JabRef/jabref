@@ -215,13 +215,9 @@ public class SidePaneManager {
 
         @Override
         public int compare(SidePaneComponent comp1, SidePaneComponent comp2) {
-            String comp1Name = getComponentName(comp1);
-            String comp2Name = getComponentName(comp2);
-
-            // Manually provide default values, since getOrDefault() doesn't exist prior to Java 8
-            int pos1 = preferredPositions.containsKey(comp1Name) ? preferredPositions.get(comp1Name) : 0;
-            int pos2 = preferredPositions.containsKey(comp2Name) ? preferredPositions.get(comp2Name) : 0;
-
+            int pos1 = preferredPositions.getOrDefault(getComponentName(comp1), 0);
+            int pos2 = preferredPositions.getOrDefault(getComponentName(comp2), 0);
+            // Could make a one-liner...
             return Integer.valueOf(pos1).compareTo(pos2);
         }
     }
