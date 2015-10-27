@@ -35,7 +35,6 @@ public class TestL10nFiles {
     @Test
     public void testCompletenessOfBundles() {
         for(String lang : Languages.LANGUAGES.values()) {
-            Assert.assertTrue(Files.exists(Paths.get("src/main/resources").resolve(Localization.INTEGRITY_RESOURCE_PREFIX + "_" + lang + ".properties")));
             Assert.assertTrue(Files.exists(Paths.get("src/main/resources").resolve(Localization.MENU_RESOURCE_PREFIX + "_" + lang + ".properties")));
             Assert.assertTrue(Files.exists(Paths.get("src/main/resources").resolve(Localization.RESOURCE_PREFIX + "_" + lang + ".properties")));
         }

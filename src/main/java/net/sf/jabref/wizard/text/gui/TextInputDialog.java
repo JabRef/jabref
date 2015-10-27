@@ -94,7 +94,6 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
-import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -108,7 +107,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private final JPanel buttons = new JPanel();
     private final JPanel rawPanel = new JPanel();
     private final JPanel sourcePanel = new JPanel();
-    private final IntegrityMessagePanel warnPanel;
     private JList<String> fieldList;
     private JRadioButton overRadio;
 
@@ -119,8 +117,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private JTextPane textPane;
     private JTextArea preview;
 
-    private final boolean inputChanged; // input changed, fired by insert buttons
-
     private final TagToMarkedTextStore marked;
 
     private final JabRefFrame _frame;
@@ -129,9 +125,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal, BibtexEntry bibEntry) {
         super(frame, title, modal);
-
-        warnPanel = new IntegrityMessagePanel(panel);
-        inputChanged = true; // for a first validCheck
 
         _frame = frame;
 
@@ -168,21 +161,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
         initSourcePanel();
 
         JTabbedPane tabbed = new JTabbedPane();
-        tabbed.addChangeListener(
-                new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e)
-                    {
-                        if (inputChanged)
-                        {
-                            warnPanel.updateView(entry);
-                        }
-                    }
-                });
 
         tabbed.add(rawPanel, Localization.lang("Raw_source"));
         tabbed.add(sourcePanel, Localization.lang("BibTeX_source"));
-        tabbed.add(warnPanel, Localization.lang("Messages_and_Hints"));
 
         // Panel Layout
         panel1.setLayout(new BorderLayout());

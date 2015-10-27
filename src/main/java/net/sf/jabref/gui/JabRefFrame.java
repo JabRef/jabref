@@ -43,10 +43,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.TableColumn;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.actions.*;
@@ -59,6 +61,9 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.logic.integrity.IntegrityCheck;
+import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -120,6 +125,42 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
+    private final GeneralAction checkIntegrity = new GeneralAction(Actions.CHECK_INTEGRITY, Localization.lang("Check integrity")) {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            IntegrityCheck check = new IntegrityCheck();
+            List<IntegrityMessage> messages = check.checkBibtexDatabase(basePanel().database());
+
+            if (messages.isEmpty()) {
+                JOptionPane.showMessageDialog(basePanel(), Localization.lang("No problems found."));
+            } else {
+                // prepare data model
+                Object[][] model = new Object[messages.size()][3];
+                int i = 0;
+                for (IntegrityMessage message : messages) {
+                    model[i][0] = message.getEntry().getCiteKey();
+                    model[i][1] = message.getFieldName();
+                    model[i][2] = message.getMessage();
+                    i++;
+                }
+
+                // construct view
+                JTable table = new JTable(
+                        model,
+                        new Object[] {"key", "field", "message"}
+                );
+                JScrollPane scrollPane = new JScrollPane(table);
+                String title = Localization.lang("%0 problem(s) found", String.valueOf(messages.size()));
+                JDialog dialog = new JDialog(JabRefFrame.this, title, false);
+                dialog.add(scrollPane);
+                dialog.setSize(600, 800);
+
+                // show view
+                dialog.setVisible(true);
+            }
+        }
+    };
 
     class ToolBar extends JToolBar {
 
@@ -194,7 +235,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction selectKeys = new SelectKeysAction();
     private final AbstractAction newDatabaseAction = new NewDatabaseAction(this);
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
-    private final AbstractAction integrityCheckAction = new IntegrityCheckAction(this);
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
     private final AbstractAction donationAction = new DonateAction();
     private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), helpDiag,
@@ -460,9 +500,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final JMenu exportMenu = JabRefFrame.subMenu("Export");
     JMenu customExportMenu = JabRefFrame.subMenu("Custom export");
     private final JMenu newDatabaseMenu = JabRefFrame.subMenu("New database");
-
-    // Other submenus
-    private final JMenu checkAndFix = JabRefFrame.subMenu("Legacy tools...");
 
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey("New entry"));
@@ -1335,9 +1372,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(abbreviateMedline);
         tools.add(unabbreviate);
         tools.addSeparator();
-        checkAndFix.add(integrityCheckAction);
-        tools.add(checkAndFix);
-
+        tools.add(checkIntegrity);
         mb.add(tools);
 
         options.add(showPrefs);
@@ -1529,7 +1564,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
                 openPdf, openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
-                closeDatabaseAction, switchPreview, integrityCheckAction,
+                closeDatabaseAction, switchPreview, checkIntegrity,
                 toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
                 abbreviateMedline, unabbreviate, exportAll, exportSelected,
                 importCurrent, saveAll, dbConnect, dbExport, focusTable));

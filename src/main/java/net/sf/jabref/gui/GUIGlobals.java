@@ -103,7 +103,6 @@ public class GUIGlobals {
     public static final String generalFieldsHelp = "GeneralFields.html";
     public static final String aboutPage = "About.html";
     public static final String importInspectionHelp = "ImportInspectionDialog.html";
-    public static final String shortIntegrityCheck = "ShortIntegrityCheck.html";
     public static final String remoteHelp = "RemoteHelp.html";
     public static final String journalAbbrHelp = "JournalAbbreviations.html";
     public static final String regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch";
