@@ -283,7 +283,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      */
     public void setBibtexEntry(BibtexEntry entry, BibtexDatabase database) {
         // Set all the values including key and entryType
-        Set<String> fields = entry.getAllFields();
+        Set<String> fields = entry.getFieldNames();
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         if (prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER)) {

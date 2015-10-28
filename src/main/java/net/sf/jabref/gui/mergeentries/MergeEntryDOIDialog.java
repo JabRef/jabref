@@ -175,7 +175,7 @@ public class MergeEntryDOIDialog extends JDialog {
         } else if (button.equals("done")) {
             // Create a new entry and add it to the undo stack
             // Remove the old entry and add it to the undo stack (which is not working...)
-            Set<String> joint = new TreeSet<>(mergedEntry.getAllFields());
+            Set<String> joint = new TreeSet<>(mergedEntry.getFieldNames());
             Boolean edited = false;
 
             for (String field : joint) {

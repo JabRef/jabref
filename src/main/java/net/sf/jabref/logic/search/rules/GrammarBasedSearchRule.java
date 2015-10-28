@@ -135,7 +135,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         public boolean compare(BibtexEntry entry) {
             // specification of fields to search is done in the search expression itself
-            String[] searchKeys = entry.getAllFields().toArray(new String[entry.getAllFields().size()]);
+            String[] searchKeys = entry.getFieldNames().toArray(new String[entry.getFieldNames().size()]);
 
             boolean noSuchField = true;
             // this loop iterates over all regular keys, then over pseudo keys like "type"

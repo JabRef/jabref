@@ -153,7 +153,7 @@ public class BibtexEntryWriter {
 
         // Then write remaining fields in alphabetic order.
         TreeSet<String> remainingFields = new TreeSet<>();
-        for (String key : entry.getAllFields()) {
+        for (String key : entry.getFieldNames()) {
             boolean writeIt = write ? BibtexFields.isWriteableField(key) :
                     BibtexFields.isDisplayableField(key);
             if (!writtenFields.contains(key) && writeIt) {
@@ -233,7 +233,7 @@ public class BibtexEntryWriter {
         }
         // Then write remaining fields in alphabetic order.
         TreeSet<String> remainingFields = new TreeSet<>();
-        for (String key : entry.getAllFields()) {
+        for (String key : entry.getFieldNames()) {
             boolean writeIt = write ? BibtexFields.isWriteableField(key) :
                     BibtexFields.isDisplayableField(key);
             if (!written.contains(key) && writeIt) {
@@ -273,7 +273,7 @@ public class BibtexEntryWriter {
 
         //STA get remaining fields
         TreeSet<String> remainingFields = new TreeSet<>();
-        for (String key : entry.getAllFields()) {
+        for (String key : entry.getFieldNames()) {
             //iterate through all fields
             boolean writeIt = write ? BibtexFields.isWriteableField(key) :
                     BibtexFields.isDisplayableField(key);

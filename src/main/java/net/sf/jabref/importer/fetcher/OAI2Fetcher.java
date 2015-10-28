@@ -210,7 +210,7 @@ public class OAI2Fetcher implements EntryFetcher {
             saxParser.parse(inputStream, handlerBase);
 
             /* Correct line breaks and spacing */
-            for (String name : be.getAllFields()) {
+            for (String name : be.getFieldNames()) {
                 be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name)));
             }
 

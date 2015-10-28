@@ -49,12 +49,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibtexEntry {
+    private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
     private static final String ID_FIELD = "id";
-
-    private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
 
     public static final Map<String, String> FIELD_ALIASES_OLD_TO_NEW = new HashMap<>(); // Bibtex to BibLatex
     public static final Map<String, String> FIELD_ALIASES_NEW_TO_OLD = new HashMap<>(); // BibLatex to Bibtex
@@ -137,9 +136,20 @@ public class BibtexEntry {
     /**
      * Returns an set containing the names of all fields that are
      * set for this particular entry.
+     *
+     * @return a set of existing field names
      */
-    public Set<String> getAllFields() {
+    public Set<String> getFieldNames() {
         return new TreeSet<>(fields.keySet());
+    }
+
+    /**
+     * Returns all fields of the BibTex entry
+     *
+     * @return a map of key, value pairs
+     */
+    public Map<String, String> getFields() {
+        return fields;
     }
 
     /**

@@ -27,9 +27,9 @@ public class XMPSchemaBibtexTest {
         Assert.assertEquals(e.getCiteKey(), x.getCiteKey());
         Assert.assertEquals(e.getType(), x.getType());
 
-        Assert.assertEquals(e.getAllFields().size(), x.getAllFields().size());
+        Assert.assertEquals(e.getFieldNames().size(), x.getFieldNames().size());
 
-        for (String name : e.getAllFields()) {
+        for (String name : e.getFieldNames()) {
             Assert.assertEquals(e.getField(name), x.getField(name));
         }
     }

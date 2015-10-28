@@ -183,8 +183,8 @@ public class DuplicateCheck {
 
     public static double compareEntriesStrictly(BibtexEntry one, BibtexEntry two) {
         HashSet<String> allFields = new HashSet<>();// one.getAllFields());
-        allFields.addAll(one.getAllFields());
-        allFields.addAll(two.getAllFields());
+        allFields.addAll(one.getFieldNames());
+        allFields.addAll(two.getFieldNames());
 
         int score = 0;
         for (String field : allFields) {

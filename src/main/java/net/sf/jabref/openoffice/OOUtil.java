@@ -300,7 +300,7 @@ class OOUtil {
             return null;
         }
         BibtexEntry e = (BibtexEntry) entry.clone();
-        for (String field : e.getAllFields()) {
+        for (String field : e.getFieldNames()) {
             if (field.equals(BibtexEntry.KEY_FIELD)) {
                 continue;
             }

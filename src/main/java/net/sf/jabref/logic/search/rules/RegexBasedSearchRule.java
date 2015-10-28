@@ -83,7 +83,7 @@ public class RegexBasedSearchRule implements SearchRule {
         // We need match for all words:
         boolean[] matchFound = new boolean[words.size()];
 
-        for (String field : bibtexEntry.getAllFields()) {
+        for (String field : bibtexEntry.getFieldNames()) {
             Object fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null) {
                 String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString());

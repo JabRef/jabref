@@ -54,9 +54,9 @@ class EntryChange extends Change {
         //        +" Modifications agree: "+modificationsAgree);
 
         TreeSet<String> allFields = new TreeSet<String>();
-        allFields.addAll(memEntry.getAllFields());
-        allFields.addAll(tmpEntry.getAllFields());
-        allFields.addAll(diskEntry.getAllFields());
+        allFields.addAll(memEntry.getFieldNames());
+        allFields.addAll(tmpEntry.getFieldNames());
+        allFields.addAll(diskEntry.getFieldNames());
 
         for (String field : allFields) {
             String mem = memEntry.getField(field);

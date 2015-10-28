@@ -120,7 +120,7 @@ public class BibtexDatabase {
     public TreeSet<String> getAllVisibleFields() {
         TreeSet<String> allFields = new TreeSet<>();
         for (BibtexEntry e : getEntries()) {
-            allFields.addAll(e.getAllFields());
+            allFields.addAll(e.getFieldNames());
         }
         TreeSet<String> toberemoved = new TreeSet<>();
         for (String field : allFields) {
@@ -358,7 +358,7 @@ public class BibtexDatabase {
             entry = (BibtexEntry) entry.clone();
         }
 
-        for (Object field : entry.getAllFields()) {
+        for (Object field : entry.getFieldNames()) {
             entry.setField(field.toString(), this.resolveForStrings(entry.getField(field.toString())));
         }
 

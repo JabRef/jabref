@@ -843,7 +843,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // First, remove fields that the user have removed.
             }
 
-            for (String field : entry.getAllFields()) {
+            for (String field : entry.getFieldNames()) {
                 if (BibtexFields.isDisplayableField(field)) {
                     if (newEntry.getField(field) == null) {
                         compound.addEdit(new UndoableFieldChange(entry, field, entry
@@ -855,7 +855,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             // Then set all fields that have been set by the user.
-            for (String field : newEntry.getAllFields()) {
+            for (String field : newEntry.getFieldNames()) {
                 String oldValue = entry.getField(field);
                 String newValue = newEntry.getField(field);
                 if (oldValue == null || !oldValue.equals(newValue)) {

@@ -138,7 +138,7 @@ class MODSEntry {
 
     private void populateExtensionFields(BibtexEntry e) {
 
-        for (String field : e.getAllFields()) {
+        for (String field : e.getFieldNames()) {
             String value = e.getField(field);
             field = MODSEntry.BIBTEX + field;
             extensionFields.put(field, value);
