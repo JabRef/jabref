@@ -53,6 +53,7 @@ public class CleanUpAction extends AbstractWorker {
     private static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     private static final String CLEANUP_DOI = "CleanUpDOI";
     private static final String CLEANUP_MONTH = "CleanUpMonth";
+    private static final String CLEANUP_PAGENUMBERS = "CleanUpPageNumbers";
     private static final String CLEANUP_MAKEPATHSRELATIVE = "CleanUpMakePathsRelative";
     private static final String CLEANUP_RENAMEPDF = "CleanUpRenamePDF";
     private static final String CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
@@ -70,6 +71,7 @@ public class CleanUpAction extends AbstractWorker {
         defaults.put(CLEANUP_SUPERSCRIPTS, Boolean.TRUE);
         defaults.put(CLEANUP_DOI, Boolean.TRUE);
         defaults.put(CLEANUP_MONTH, Boolean.TRUE);
+        defaults.put(CLEANUP_PAGENUMBERS, Boolean.TRUE);
         defaults.put(CLEANUP_MAKEPATHSRELATIVE, Boolean.TRUE);
         defaults.put(CLEANUP_RENAMEPDF, Boolean.TRUE);
         defaults.put(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, Boolean.FALSE);
@@ -86,6 +88,7 @@ public class CleanUpAction extends AbstractWorker {
     private JCheckBox cleanUpSuperscripts;
     private JCheckBox cleanUpDOI;
     private JCheckBox cleanUpMonth;
+    private JCheckBox cleanUpPageNumbers;
     private JCheckBox cleanUpMakePathsRelative;
     private JCheckBox cleanUpRenamePDF;
     private JCheckBox cleanUpRenamePDFonlyRelativePaths;
@@ -121,6 +124,7 @@ public class CleanUpAction extends AbstractWorker {
         cleanUpSuperscripts = new JCheckBox(Localization.lang("Convert 1st, 2nd, ... to real superscripts"));
         cleanUpDOI = new JCheckBox(Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
         cleanUpMonth = new JCheckBox(Localization.lang("Format content of month field to #mon#"));
+        cleanUpPageNumbers = new JCheckBox(Localization.lang("Ensure that page ranges are of the form num1--num2"));
         cleanUpMakePathsRelative = new JCheckBox(Localization.lang("Make paths of linked files relative (if possible)"));
         cleanUpRenamePDF = new JCheckBox(Localization.lang("Rename PDFs to given filename format pattern"));
         cleanUpRenamePDF.addChangeListener(new ChangeListener() {
@@ -150,6 +154,7 @@ public class CleanUpAction extends AbstractWorker {
         builder.add(cleanUpSuperscripts).xyw(1, 6, 2);
         builder.add(cleanUpDOI).xyw(1, 7, 2);
         builder.add(cleanUpMonth).xyw(1, 8, 2);
+        builder.add(cleanUpPageNumbers).xyw(1, 9, 2);
         builder.add(cleanUpUpgradeExternalLinks).xyw(1, 10, 2);
         builder.add(cleanUpMakePathsRelative).xyw(1, 11, 2);
         builder.add(cleanUpRenamePDF).xyw(1, 12, 2);
@@ -165,6 +170,7 @@ public class CleanUpAction extends AbstractWorker {
         cleanUpSuperscripts.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_SUPERSCRIPTS));
         cleanUpDOI.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_DOI));
         cleanUpMonth.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_MONTH));
+        cleanUpPageNumbers.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_PAGENUMBERS));
         cleanUpMakePathsRelative.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_MAKEPATHSRELATIVE));
         cleanUpRenamePDF.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_RENAMEPDF));
         cleanUpRenamePDFonlyRelativePaths.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS));
@@ -182,6 +188,7 @@ public class CleanUpAction extends AbstractWorker {
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_SUPERSCRIPTS, cleanUpSuperscripts.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_DOI, cleanUpDOI.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_MONTH, cleanUpMonth.isSelected());
+        Globals.prefs.putBoolean(CleanUpAction.CLEANUP_PAGENUMBERS, cleanUpPageNumbers.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_MAKEPATHSRELATIVE, cleanUpMakePathsRelative.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_RENAMEPDF, cleanUpRenamePDF.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, cleanUpRenamePDFonlyRelativePaths.isSelected());
@@ -236,6 +243,7 @@ public class CleanUpAction extends AbstractWorker {
         boolean choiceCleanUpSuperscripts = cleanUpSuperscripts.isSelected();
         boolean choiceCleanUpDOI = cleanUpDOI.isSelected();
         boolean choiceCleanUpMonth = cleanUpMonth.isSelected();
+        boolean choiceCleanUpPageNumbers = cleanUpPageNumbers.isSelected();
         boolean choiceCleanUpUpgradeExternalLinks = cleanUpUpgradeExternalLinks.isSelected();
         boolean choiceMakePathsRelative = cleanUpMakePathsRelative.isSelected();
         boolean choiceRenamePDF = cleanUpRenamePDF.isSelected();
@@ -284,6 +292,9 @@ public class CleanUpAction extends AbstractWorker {
             }
             if (choiceCleanUpMonth) {
                 doCleanUpMonth(entry, ce);
+            }
+            if (choiceCleanUpPageNumbers) {
+                doCleanUpPageNumbers(entry, ce);
             }
             fixWrongFileEntries(entry, ce);
             if (choiceMakePathsRelative) {
@@ -429,6 +440,18 @@ public class CleanUpAction extends AbstractWorker {
         if (!oldValue.equals(newValue)) {
             entry.setField("month", newValue);
             ce.addEdit(new UndoableFieldChange(entry, "month", oldValue, newValue));
+        }
+    }
+
+    private static void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
+        String oldValue = entry.getField("pages");
+        if (oldValue == null) {
+            return;
+        }
+        String newValue = oldValue.replaceAll(" *(\\d+) *- *(\\d+) *", "$1--$2");
+        if (!oldValue.equals(newValue)) {
+            entry.setField("pages", newValue);
+            ce.addEdit(new UndoableFieldChange(entry, "pages", oldValue, newValue));
         }
     }
 
