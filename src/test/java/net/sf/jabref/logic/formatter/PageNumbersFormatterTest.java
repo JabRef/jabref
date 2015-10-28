@@ -22,62 +22,41 @@ public class PageNumbersFormatterTest {
 
     @Test
     public void formatPageNumbers() {
-        String value = "1-2";
-        String result = formatter.format(value);
-
-        Assert.assertEquals("1--2", result);
+        expectCorrect("1-2", "1--2");
     }
 
     @Test
     public void formatPageNumbersCommaSeparated() {
-        String value = "1,2,3";
-        String result = formatter.format(value);
-
-        Assert.assertEquals("1,2,3", result);
+        expectCorrect("1,2,3", "1,2,3");
     }
 
     @Test
     public void ignoreWhitespaceInPageNumbers() {
-        String value = "   1  - 2 ";
-        String result = formatter.format(value);
-
-        Assert.assertEquals("1--2", result);
+        expectCorrect("   1  - 2 ", "1--2");
     }
 
     @Test
     public void keepCorrectlyFormattedPageNumbers() {
-        String value = "1--2";
-        String result = formatter.format(value);
-
-        Assert.assertEquals("1--2", result);
+        expectCorrect("1--2", "1--2");
     }
 
     @Test
     public void formatPageNumbersEmptyFields() {
-        String value = "";
-        String result = formatter.format(value);
-
-        Assert.assertEquals("", result);
-
-        value = null;
-        result = formatter.format(value);
-
-        Assert.assertEquals(null, result);
+        expectCorrect("", "");
+        expectCorrect(null, null);
     }
 
     @Test
     public void formatPageNumbersRemoveUnexpectedLiterals() {
-        String value = "{1}-{2}";
-        String result = formatter.format(value);
-
-        Assert.assertEquals("1--2", result);
+        expectCorrect("{1}-{2}", "1--2");
     }
 
     @Test
     public void formatPageNumbersRegexNotMatching() {
-        String value = "12";
-        String result = formatter.format(value);
+        expectCorrect("12", "12");
+    }
 
-        Assert.assertEquals("12", result);
+    private void expectCorrect(String input, String expected) {
+        Assert.assertEquals(expected, formatter.format(input));
     }
 }
