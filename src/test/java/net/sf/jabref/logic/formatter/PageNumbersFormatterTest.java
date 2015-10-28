@@ -1,90 +1,83 @@
 package net.sf.jabref.logic.formatter;
 
 import junit.framework.Assert;
-import net.sf.jabref.model.entry.BibtexEntry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class PageNumbersFormatterTest {
-    private BibtexEntry entry;
+    private PageNumbersFormatter formatter;
 
     @Before
     public void setUp() {
-        entry = new BibtexEntry();
+        formatter = new PageNumbersFormatter();
     }
 
     @After
     public void teardown() {
-        entry = null;
+        formatter = null;
     }
 
     @Test
     public void formatPageNumbers() {
-        entry.setField("pages", "1-2");
-        new PageNumbersFormatter(entry).format();
+        String value = "1-2";
+        String result = formatter.format(value);
 
-        Assert.assertEquals("1--2", entry.getField("pages"));
+        Assert.assertEquals("1--2", result);
     }
 
     @Test
     public void formatPageNumbersCommaSeparated() {
-        entry.setField("pages", "1,2,3");
-        new PageNumbersFormatter(entry).format();
+        String value = "1,2,3";
+        String result = formatter.format(value);
 
-        Assert.assertEquals("1,2,3", entry.getField("pages"));
+        Assert.assertEquals("1,2,3", result);
     }
 
     @Test
     public void ignoreWhitespaceInPageNumbers() {
-        entry.setField("pages", "   1  - 2 ");
-        new PageNumbersFormatter(entry).format();
+        String value = "   1  - 2 ";
+        String result = formatter.format(value);
 
-        Assert.assertEquals("1--2", entry.getField("pages"));
+        Assert.assertEquals("1--2", result);
     }
 
     @Test
     public void keepCorrectlyFormattedPageNumbers() {
-        entry.setField("pages", "1--2");
-        new PageNumbersFormatter(entry).format();
+        String value = "1--2";
+        String result = formatter.format(value);
 
-        Assert.assertEquals("1--2", entry.getField("pages"));
-    }
-
-    @Test
-    public void onlyFormatPageNumbersField() {
-        entry.setField("otherfield", "1-2");
-        new PageNumbersFormatter(entry).format();
-
-        Assert.assertEquals("1-2", entry.getField("otherfield"));
+        Assert.assertEquals("1--2", result);
     }
 
     @Test
     public void formatPageNumbersEmptyFields() {
-        entry.setField("pages", "");
-        new PageNumbersFormatter(entry).format();
+        String value = "";
+        String result = formatter.format(value);
 
-        Assert.assertEquals("", entry.getField("pages"));
+        Assert.assertEquals("", result);
 
-        entry.setField("pages", null);
-        new PageNumbersFormatter(entry).format();
+        value = null;
+        result = formatter.format(value);
 
-        Assert.assertEquals(null, entry.getField("pages"));
+        Assert.assertEquals(null, result);
     }
 
     @Test
     public void formatPageNumbersRemoveUnexpectedLiterals() {
-        entry.setField("pages", "{1}-{2}");
-        new PageNumbersFormatter(entry).format();
+        String value = "{1}-{2}";
+        String result = formatter.format(value);
 
-        Assert.assertEquals("1--2", entry.getField("pages"));
+        Assert.assertEquals("1--2", result);
     }
 
     @Test
     public void formatPageNumbersRegexNotMatching() {
-        entry.setField("pages", "12");
-        new PageNumbersFormatter(entry).format();
+        String value = "12";
+        String result = formatter.format(value);
 
-        Assert.assertEquals("12", entry.getField("pages"));
+        Assert.assertEquals("12", result);
     }
 }

@@ -41,7 +41,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.logic.formatter.PageNumbersFormatter;
+import net.sf.jabref.logic.cleanup.PageNumbersCleanup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.DOI;
@@ -447,7 +447,7 @@ public class CleanUpAction extends AbstractWorker {
     private static void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
         String oldValue = entry.getField("pages");
         // run formatter
-        new PageNumbersFormatter(entry).format();
+        new PageNumbersCleanup(entry).cleanup();
         // new value
         String newValue = entry.getField("pages");
         // undo action

@@ -1,18 +1,15 @@
 package net.sf.jabref.logic.formatter;
 
-import net.sf.jabref.model.entry.BibtexEntry;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * This class includes sensible defaults for consistent formatting of BibTex page numbers.
  */
-public class PageNumbersFormatter {
-    private BibtexEntry entry;
-
-    public PageNumbersFormatter(BibtexEntry entry) {
-        this.entry = entry;
+public class PageNumbersFormatter implements Formatter {
+    @Override
+    public String getName() {
+        return "Page numbers";
     }
 
     /**
@@ -28,17 +25,14 @@ public class PageNumbersFormatter {
      *     Invalid -> Invalid
      * </example>
      */
-    public void format() {
-        final String field = "pages";
+    public String format(String value) {
         final String rejectLiterals = "[^0-9,-]";
         final Pattern pagesPattern = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
         final String replace = "$1--$2";
 
-        String value = entry.getField(field);
-
         // nothing to do
         if (value == null || value.isEmpty()) {
-            return;
+            return value;
         }
 
         // remove unwanted literals incl. whitespace
@@ -50,7 +44,8 @@ public class PageNumbersFormatter {
         // replacement?
         if(!newValue.equals(cleanValue)) {
             // write field
-            entry.setField(field, newValue);
+            return newValue;
         }
+        return value;
     }
 }
