@@ -250,6 +250,12 @@ class EntryEditorTab {
         activeField = fieldEditor;
     }
 
+    public void setActive(String fieldName) {
+        if (editors.containsKey(fieldName)) {
+            activeField = editors.get(fieldName);
+        }
+    }
+
     public FieldEditor getActive() {
         return activeField;
     }
@@ -340,6 +346,10 @@ class EntryEditorTab {
 
     public EntryEditor getParent() {
         return parent;
+    }
+
+    public String getTabTitle() {
+        return tabTitle;
     }
 
     /**

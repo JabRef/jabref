@@ -758,6 +758,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
+    public void setFocusToField(String fieldName) {
+        for (Object tab : tabs) {
+            if (tab instanceof EntryEditorTab) {
+                if (((EntryEditorTab) tab).getFields().contains(fieldName)) {
+                    EntryEditorTab entryEditorTab = (EntryEditorTab) tab;
+                    setVisiblePanel(entryEditorTab.getTabTitle());
+                    entryEditorTab.setActive(fieldName);
+                    entryEditorTab.activate();
+                }
+            }
+        }
+
+    }
+
     /**
      * Updates this editor to show the given entry, regardless of type
      * correspondence.

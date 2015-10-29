@@ -48,6 +48,8 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 
 import net.sf.jabref.*;
@@ -150,6 +152,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         model,
                         new Object[] {"key", "field", "message"}
                 );
+
+                table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                ListSelectionModel selectionModel = table.getSelectionModel();
+
+                selectionModel.addListSelectionListener(new ListSelectionListener() {
+
+                    public void valueChanged(ListSelectionEvent e) {
+                        if (!e.getValueIsAdjusting()) {
+                            String citeKey = (String) model[table.getSelectedRow()][0];
+                            String fieldName = (String) model[table.getSelectedRow()][1];
+                            basePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
+                        }
+                    }
+                });
+
                 table.getColumnModel().getColumn(0).setPreferredWidth(80);
                 table.getColumnModel().getColumn(1).setPreferredWidth(30);
                 table.getColumnModel().getColumn(2).setPreferredWidth(250);
