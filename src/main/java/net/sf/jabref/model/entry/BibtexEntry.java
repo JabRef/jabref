@@ -306,7 +306,7 @@ public class BibtexEntry {
      * does not check values for content, so e.g. empty strings will be set as such.
      */
     public void setField(Map<String, String> fields) {
-        fields.putAll(fields);
+        this.fields.putAll(fields);
     }
 
     /**
