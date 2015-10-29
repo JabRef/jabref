@@ -150,11 +150,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         model,
                         new Object[] {"key", "field", "message"}
                 );
+                table.getColumnModel().getColumn(0).setPreferredWidth(80);
+                table.getColumnModel().getColumn(1).setPreferredWidth(30);
+                table.getColumnModel().getColumn(2).setPreferredWidth(250);
+                table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
                 JScrollPane scrollPane = new JScrollPane(table);
                 String title = Localization.lang("%0 problem(s) found", String.valueOf(messages.size()));
                 JDialog dialog = new JDialog(JabRefFrame.this, title, false);
                 dialog.add(scrollPane);
-                dialog.setSize(600, 800);
+                dialog.setSize(600, 500);
 
                 // show view
                 dialog.setVisible(true);
