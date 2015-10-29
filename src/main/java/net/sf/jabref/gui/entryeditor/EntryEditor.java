@@ -37,10 +37,7 @@ import java.beans.VetoableChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -747,7 +744,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     public void setVisiblePanel(String name) {
         for (int i = 0; i < tabbed.getTabCount(); ++i) {
-            if (name.equals(tabbed.getComponent(i).getName())) {
+            if ((tabbed.getComponent(i).getName() != null) && tabbed.getComponent(i).getName().equals(name)) {
                 tabbed.setSelectedIndex(i);
                 return;
             }

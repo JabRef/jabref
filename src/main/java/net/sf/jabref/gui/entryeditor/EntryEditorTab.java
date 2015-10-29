@@ -117,6 +117,9 @@ class EntryEditorTab {
         actionMap.put("prevtab", parent.frame.prevTab);
 
         panel.setName(title);
+        // Use the title for the scrollPane, too.
+        // This enables the correct execution of EntryEditor.setVisiblePanel(String name).
+        scrollPane.setName(title);
 
         int fieldsPerRow = compressed ? 2 : 1;
 
