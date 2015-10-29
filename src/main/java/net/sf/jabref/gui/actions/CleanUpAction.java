@@ -42,6 +42,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.cleanup.PageNumbersCleanup;
+import net.sf.jabref.logic.formatter.FieldFormatters;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.DOI;
@@ -451,7 +452,9 @@ public class CleanUpAction extends AbstractWorker {
         // new value
         String newValue = entry.getField("pages");
         // undo action
-        ce.addEdit(new UndoableFieldChange(entry, "pages", oldValue, newValue));
+        if(!oldValue.equals(newValue)) {
+            ce.addEdit(new UndoableFieldChange(entry, "pages", oldValue, newValue));
+        }
     }
 
     private static void fixWrongFileEntries(BibtexEntry entry, NamedCompound ce) {
