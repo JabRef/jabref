@@ -98,15 +98,6 @@ public class BibtexEntry {
     }
 
     /**
-     * Returns all fields of the BibTex entry
-     *
-     * @return a map of key, value pairs
-     */
-    public Map<String, String> getFields() {
-        return fields;
-    }
-
-    /**
      * Returns true if this entry contains the fields it needs to be
      * complete.
      */
