@@ -26,7 +26,7 @@ public class FileUtil {
     public static String getFileExtension(File file) {
         String name = file.getName();
         int pos = name.lastIndexOf('.');
-        if (pos >= 0 && pos < name.length() - 1) {
+        if ((pos >= 0) && (pos < (name.length() - 1))) {
             return name.substring(pos + 1).trim().toLowerCase();
         } else {
             return null;
@@ -107,14 +107,14 @@ public class FileUtil {
      */
     public static File expandFilename(final MetaData metaData, String name) {
         int pos = name.lastIndexOf('.');
-        String extension = pos >= 0 && pos < name.length() - 1 ? name
+        String extension = (pos >= 0) && (pos < (name.length() - 1)) ? name
                 .substring(pos + 1).trim().toLowerCase() : null;
         // Find the default directory for this field type, if any:
         String[] dir = metaData.getFileDirectory(extension);
         // Include the standard "file" directory:
         String[] fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
         // Include the directory of the bib file:
-        ArrayList<String> al = new ArrayList<String>();
+        ArrayList<String> al = new ArrayList<>();
         for (String aDir : dir) {
             if (!al.contains(aDir)) {
                 al.add(aDir);
@@ -157,13 +157,13 @@ public class FileUtil {
     public static File expandFilename(String name, String dir) {
 
         File file;
-        if (name == null || name.isEmpty()) {
+        if ((name == null) || name.isEmpty()) {
             return null;
         } else {
             file = new File(name);
         }
 
-        if (!file.exists() && dir != null) {
+        if (!file.exists() && (dir != null)) {
             if (dir.endsWith(System.getProperty("file.separator"))) {
                 name = dir + name;
             } else {
@@ -185,7 +185,7 @@ public class FileUtil {
                 try {
                     name = name.replaceAll("/", "\\\\");
                 } catch (StringIndexOutOfBoundsException exc) {
-                    System.err.println("An internal Java error was caused by the entry " + "\"" + name + "\"");
+                    LOGGER.error("An internal Java error was caused by the entry " + "\"" + name + "\"");
                 }
             } else {
                 name = name.replaceAll("\\\\", "/");
@@ -210,17 +210,17 @@ public class FileUtil {
      * @param dirs     directories to check.
      */
     public static File shortenFileName(File fileName, String[] dirs) {
-        if (fileName == null || fileName.length() == 0) {
+        if ((fileName == null) || (fileName.length() == 0)) {
             return fileName;
         }
-        if (!fileName.isAbsolute() || dirs == null) {
+        if (!fileName.isAbsolute() || (dirs == null)) {
             return fileName;
         }
 
         for (String dir : dirs) {
             if (dir != null) {
                 File result = shortenFileName(fileName, dir);
-                if (result != null && !result.equals(fileName)) {
+                if ((result != null) && !result.equals(fileName)) {
                     return result;
                 }
             }
@@ -229,10 +229,10 @@ public class FileUtil {
     }
 
     private static File shortenFileName(File fileName, String dir) {
-        if (fileName == null || fileName.length() == 0) {
+        if ((fileName == null) || (fileName.length() == 0)) {
             return fileName;
         }
-        if (!fileName.isAbsolute() || dir == null) {
+        if (!fileName.isAbsolute() || (dir == null)) {
             return fileName;
         }
 

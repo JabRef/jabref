@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -41,10 +41,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * 
+ *
  * This class can be used to access any archive offering an OAI2 interface. By
  * default it will access ArXiv.org
- * 
+ *
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
  */
@@ -80,7 +80,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
 
     /**
-     * some archives - like ArXiv.org - might expect of you to wait some time 
+     * some archives - like ArXiv.org - might expect of you to wait some time
      */
     private boolean shouldWait() {
         return waitTime > 0;
@@ -93,8 +93,8 @@ public class OAI2Fetcher implements EntryFetcher {
 
 
     /**
-     * 
-     * 
+     *
+     *
      * @param oai2Host
      *            the host to query without leading http:// and without trailing /
      * @param oai2Script
@@ -127,7 +127,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     /**
      * Default Constructor. The archive queried will be ArXiv.org
-     * 
+     *
      */
     public OAI2Fetcher() {
         this(OAI2Fetcher.OAI2_ARXIV_HOST, OAI2Fetcher.OAI2_ARXIV_SCRIPT, OAI2Fetcher.OAI2_ARXIV_METADATAPREFIX,
@@ -136,10 +136,10 @@ public class OAI2Fetcher implements EntryFetcher {
 
     /**
      * Construct the query URL
-     * 
+     *
      * @param key
      *            The key of the OAI2 entry that the url should point to.
-     *            
+     *
      * @return a String denoting the query URL
      */
     public String constructUrl(String key) {
@@ -154,7 +154,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     /**
      * Strip subcategories from ArXiv key.
-     * 
+     *
      * @param key The key to fix.
      * @return Fixed key.
      */
@@ -183,14 +183,14 @@ public class OAI2Fetcher implements EntryFetcher {
     /**
      * Import an entry from an OAI2 archive. The BibtexEntry provided has to
      * have the field OAI2_IDENTIFIER_FIELD set to the search string.
-     * 
+     *
      * @param key
      *            The OAI2 key to fetch from ArXiv.
      * @return The imported BibtexEntry or null if none.
      */
     public BibtexEntry importOai2Entry(String key) {
         /**
-         * Fix for problem reported in mailing-list: 
+         * Fix for problem reported in mailing-list:
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
          */
         key = OAI2Fetcher.fixKey(key);
@@ -264,9 +264,9 @@ public class OAI2Fetcher implements EntryFetcher {
     }
 
     @Override
-    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
+    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter statusOP) {
 
-        this.status = status;
+        status = statusOP;
 
         try {
             shouldContinue = true;

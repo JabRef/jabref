@@ -73,8 +73,8 @@ public class ExternalFileTypeEntryEditor {
         init(entry);
     }
 
-    private void init(ExternalFileType entry) {
-        this.entry = entry;
+    private void init(ExternalFileType inEntry) {
+        entry = inEntry;
         icon.setText(null);
 
         ButtonGroup bg = new ButtonGroup();
@@ -140,6 +140,7 @@ public class ExternalFileTypeEntryEditor {
         if (OS.WINDOWS) {
             application.getDocument().addDocumentListener(new DocumentListener() {
 
+                @SuppressWarnings("unused")
                 private void handle(DocumentEvent e) {
                     if (application.getText().isEmpty()) {
                         useDefault.setSelected(true);
@@ -166,11 +167,11 @@ public class ExternalFileTypeEntryEditor {
         }
 
         String title = editFileTitle;
-        
+
         if (entry.getName().isEmpty()) {
             title = newFileTitle;
         }
-        
+
         if (dParent != null) {
             diag = new JDialog(dParent, title, true);
         } else {
@@ -180,7 +181,7 @@ public class ExternalFileTypeEntryEditor {
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
 
-        BrowseListener browse = new BrowseListener(diag, application);
+        BrowseListener browse = new BrowseListener(application);
         browseBut.addActionListener(browse);
 
         if (dParent != null) {
@@ -225,30 +226,30 @@ public class ExternalFileTypeEntryEditor {
         selectedIcon = null;
     }
 
-    private void storeSettings(ExternalFileType entry) {
-        entry.setName(name.getText().trim());
-        entry.setMimeType(mimeType.getText().trim());
+    private void storeSettings(ExternalFileType fileTypeEntry) {
+        fileTypeEntry.setName(name.getText().trim());
+        fileTypeEntry.setMimeType(mimeType.getText().trim());
         // Set extension, but remove initial dot if user has added that:
         String ext = extension.getText().trim();
-        if (!ext.isEmpty() && ext.charAt(0) == '.') {
-            entry.setExtension(ext.substring(1));
+        if (!ext.isEmpty() && (ext.charAt(0) == '.')) {
+            fileTypeEntry.setExtension(ext.substring(1));
         } else {
-            entry.setExtension(ext);
+            fileTypeEntry.setExtension(ext);
         }
 
         if (selectedIcon != null) {
-            entry.setIconName(selectedIcon);
-            entry.setIcon(IconTheme.getImage(entry.getIconName()));
+            fileTypeEntry.setIconName(selectedIcon);
+            fileTypeEntry.setIcon(IconTheme.getImage(fileTypeEntry.getIconName()));
         }
         if (!OS.WINDOWS) {
-            entry.setOpenWith(application.getText().trim());
+            fileTypeEntry.setOpenWith(application.getText().trim());
         } else {
             // On Windows, store application as empty if the "Default" option is selected,
             // or if the application name is empty:
             if (useDefault.isSelected() || application.getText().trim().isEmpty()) {
-                entry.setOpenWith("");
+                fileTypeEntry.setOpenWith("");
             } else {
-                entry.setOpenWith(application.getText().trim());
+                fileTypeEntry.setOpenWith(application.getText().trim());
             }
         }
     }
@@ -263,7 +264,7 @@ public class ExternalFileTypeEntryEditor {
         private final JTextField comp;
 
 
-        public BrowseListener(JDialog parent, JTextField comp) {
+        public BrowseListener(JTextField comp) {
             this.comp = comp;
         }
 

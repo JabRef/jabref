@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -87,9 +87,9 @@ public class SearchResultsDialog {
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
     private EventTableModel<BibtexEntry> model;
-    private final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
+    private final EventList<BibtexEntry> entries = new BasicEventList<>();
     private SortedList<BibtexEntry> sortedEntries;
-    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
+    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<>();
 
     private JTable entryTable;
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -110,9 +110,8 @@ public class SearchResultsDialog {
         preview = new PreviewPanel(null, new MetaData(),
                 activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
-        sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
-        model = new EventTableModel<BibtexEntry>(sortedEntries,
-                new EntryTableFormat());
+        sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
+        model = new EventTableModel<>(sortedEntries, new EntryTableFormat());
         entryTable = new JTable(model);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         entryTable.setDefaultRenderer(JLabel.class, renderer);
@@ -124,7 +123,7 @@ public class SearchResultsDialog {
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
-        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<BibtexEntry>(sortedEntries);
+        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<>(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         entryTable.addMouseListener(new TableClickListener());
@@ -214,7 +213,6 @@ public class SearchResultsDialog {
      * by clicking the column labels.
      * @param comparatorChooser The comparator chooser controlling the sort order.
      */
-    @SuppressWarnings("unchecked")
     private void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
         // First column:
         java.util.List<Comparator> comparators = comparatorChooser
@@ -462,11 +460,11 @@ public class SearchResultsDialog {
                 case FILE_COL:
                     o = entry.getField(Globals.FILE_FIELD);
                     if (o != null) {
-                        FileListTableModel model = new FileListTableModel();
-                        model.setContent((String) o);
-                        fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
-                        if (model.getRowCount() > 0) {
-                            fileLabel.setIcon(model.getEntry(0).getType().getIcon());
+                        FileListTableModel tmpModel = new FileListTableModel();
+                        tmpModel.setContent((String) o);
+                        fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
+                        if (tmpModel.getRowCount() > 0) {
+                            fileLabel.setIcon(tmpModel.getEntry(0).getType().getIcon());
                         }
                         return fileLabel;
                     } else {

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,7 +26,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * @author jzieren
- * 
+ *
  */
 public class UndoableChangeAssignment extends AbstractUndoableEdit {
 
@@ -42,14 +42,14 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
      * Constructor for use in a group itself, where the enclosing node is
      * unknown. The node must be set using setEditedNode() before this instance
      * may be used.
-     * 
+     *
      * @param previousAssignment
      * @param currentAssignment
      */
     public UndoableChangeAssignment(Set<BibtexEntry> previousAssignment,
             Set<BibtexEntry> currentAssignment) {
-        m_previousAssignmentBackup = new HashSet<BibtexEntry>(previousAssignment);
-        m_newAssignmentBackup = new HashSet<BibtexEntry>(currentAssignment);
+        m_previousAssignmentBackup = new HashSet<>(previousAssignment);
+        m_newAssignmentBackup = new HashSet<>(currentAssignment);
     }
 
     public UndoableChangeAssignment(Set<BibtexEntry> previousAssignment,
@@ -62,7 +62,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
      * Sets the node of the group that was edited. If this node was not
      * specified at construction time, this method has to be called before this
      * instance may be used.
-     * 
+     *
      * @param node
      *            The node whose assignments were edited.
      */

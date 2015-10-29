@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -34,7 +34,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
     private final String sortField;
     private final boolean descending;
-    private boolean binary;
+    private final boolean binary;
     private final boolean numeric;
     private final Comparator<BibtexEntry> next;
 
@@ -108,13 +108,13 @@ public class EntryComparator implements Comparator<BibtexEntry> {
             }
         }
 
-        if (f1 == null && f2 == null) {
+        if ((f1 == null) && (f2 == null)) {
             return next != null ? next.compare(e1, e2) : idCompare(e1, e2);
         }
-        if (f1 != null && f2 == null) {
+        if ((f1 != null) && (f2 == null)) {
             return -1;
         }
-        if (f1 == null && f2 != null) {
+        if ((f1 == null) && (f2 != null)) {
             return 1;
         }
 
@@ -122,7 +122,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
         //String ours = ((String)e1.getField(sortField)).toLowerCase(),
         //    theirs = ((String)e2.getField(sortField)).toLowerCase();
-        if (f1 instanceof Integer && f2 instanceof Integer) {
+        if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
             result = -((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
             Integer f1AsInteger = new Integer(f1.toString());
@@ -148,7 +148,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         }
     }
 
-    private int idCompare(BibtexEntry b1, BibtexEntry b2) {
+    private static int idCompare(BibtexEntry b1, BibtexEntry b2) {
         return b1.getId().compareTo(b2.getId());
     }
 

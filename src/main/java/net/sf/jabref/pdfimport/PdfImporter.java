@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.pdfimport;
 
 import java.awt.Dimension;
@@ -55,7 +70,7 @@ public class PdfImporter {
     private final BasePanel panel;
     private MainTable entryTable;
     private int dropRow;
-    
+
     private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
 
     /**
@@ -71,13 +86,13 @@ public class PdfImporter {
         Dimension mySize = diag.getSize();
 
         if (parentSize.width > mySize.width) {
-            x = (parentSize.width - mySize.width) / 2 + topLeft.x;
+            x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
         } else {
             x = topLeft.x;
         }
 
         if (parentSize.height > mySize.height) {
-            y = (parentSize.height - mySize.height) / 2 + topLeft.y;
+            y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
         } else {
             y = topLeft.y;
         }
@@ -88,7 +103,7 @@ public class PdfImporter {
 
     /**
      * Creates the PdfImporter
-     * 
+     *
      * @param frame the JabRef frame
      * @param panel the panel to use
      * @param entryTable the entry table to work on
@@ -110,9 +125,9 @@ public class PdfImporter {
 
 
     /**
-     * 
+     *
      * Imports the PDF files given by fileNames
-     * 
+     *
      * @param fileNames states the names of the files to import
      * @return list of successful created BibTeX entries and list of non-PDF files
      */
@@ -120,8 +135,8 @@ public class PdfImporter {
         // sort fileNames in PDFfiles to import and other files
         // PDFfiles: variable files
         // other files: variable noPdfFiles
-        List<String> files = new ArrayList<String>(Arrays.asList(fileNames));
-        List<String> noPdfFiles = new ArrayList<String>();
+        List<String> files = new ArrayList<>(Arrays.asList(fileNames));
+        List<String> noPdfFiles = new ArrayList<>();
         PdfFileFilter pdfFilter = new PdfFileFilter();
         for (String file : files) {
             if (!pdfFilter.accept(file)) {
@@ -159,7 +174,7 @@ public class PdfImporter {
         // Get a list of file directories:
         String[] dirsS = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
 
-        List<BibtexEntry> res = new ArrayList<BibtexEntry>();
+        List<BibtexEntry> res = new ArrayList<>();
 
         fileNameLoop: for (String fileName : fileNames) {
             List<BibtexEntry> xmpEntriesInFile = readXmpEntries(fileName);
@@ -172,33 +187,29 @@ public class PdfImporter {
                 importDialog.showDialog();
                 doNotShowAgain = importDialog.getDoNotShowAgain();
             }
-            if (neverShow || importDialog.getResult() == JOptionPane.OK_OPTION) {
+            if (neverShow || (importDialog.getResult() == JOptionPane.OK_OPTION)) {
                 int choice = neverShow ? globalChoice : importDialog.getChoice();
                 DroppedFileHandler dfh;
                 BibtexEntry entry;
-                BibtexEntryType type;
                 InputStream in = null;
                 List<BibtexEntry> localRes = null;
                 switch (choice) {
                 case ImportDialog.XMP:
-                    //SplDatabaseChangeListener dataListener = new SplDatabaseChangeListener(frame, panel, entryTable, fileName);
-                    //panel.database().addDatabaseChangeListener(dataListener);
-                    //ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
                     PdfXmpImporter importer = new PdfXmpImporter();
                     try {
                         in = new FileInputStream(fileName);
                         localRes = importer.importEntries(in, frame);
-                        //importer.automatedImport(new String[]{ fileName });
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     } finally {
                         try {
                             in.close();
                         } catch (Exception ignored) {
+                            // Ignored
                         }
                     }
 
-                    if (localRes == null || localRes.isEmpty()) {
+                    if ((localRes == null) || localRes.isEmpty()) {
                         // import failed -> generate default entry
                         LOGGER.info(Localization.lang("Import failed"));
                         entry = createNewBlankEntry(fileName);
@@ -249,11 +260,12 @@ public class PdfImporter {
                         try {
                             in.close();
                         } catch (Exception ignored) {
+                            // Ignored
                         }
                     }
 
                     // import failed -> generate default entry
-                    if (localRes == null || localRes.isEmpty()) {
+                    if ((localRes == null) || localRes.isEmpty()) {
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -317,7 +329,7 @@ public class PdfImporter {
                 panel.database().insertEntry(be);
 
                 // Set owner/timestamp if options are enabled:
-                ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
+                ArrayList<BibtexEntry> list = new ArrayList<>();
                 list.add(be);
                 Util.setAutomaticFields(list, true, true, false);
 
@@ -336,7 +348,7 @@ public class PdfImporter {
 
                 /*int row = entryTable.findEntry(be);
                 if (row >= 0)
-                    // Selects the entry. The selection listener will open the editor.                      
+                    // Selects the entry. The selection listener will open the editor.
                      if (row >= 0) {
                         try{
                             entryTable.setRowSelectionInterval(row, row);
@@ -363,7 +375,7 @@ public class PdfImporter {
         return null;
     }
 
-    private List<BibtexEntry> readXmpEntries(String fileName) {
+    private static List<BibtexEntry> readXmpEntries(String fileName) {
         List<BibtexEntry> xmpEntriesInFile = null;
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName);
@@ -373,8 +385,8 @@ public class PdfImporter {
         return xmpEntriesInFile;
     }
 
-    private boolean hasXmpEntries(List<BibtexEntry> xmpEntriesInFile) {
-        return !(xmpEntriesInFile == null || xmpEntriesInFile.isEmpty());
+    private static boolean hasXmpEntries(List<BibtexEntry> xmpEntriesInFile) {
+        return !((xmpEntriesInFile == null) || xmpEntriesInFile.isEmpty());
     }
 
     public MainTable getEntryTable() {

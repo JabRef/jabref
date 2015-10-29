@@ -127,16 +127,12 @@ public class XMPUtil {
      *             Throws an IOException if the file cannot be read, so the user
      *             than remove a lock or cancel the operation.
      */
-    @SuppressWarnings("unchecked")
     public static List<BibtexEntry> readXMP(InputStream inputStream)
             throws IOException {
 
         List<BibtexEntry> result = new LinkedList<>();
 
-        PDDocument document = null;
-
-        try {
-            document = PDDocument.load(inputStream);
+        try (PDDocument document = PDDocument.load(inputStream)) {
             if (document.isEncrypted()) {
                 throw new EncryptionNotSupportedException(
                         "Error: Cannot read metadata from encrypted document.");
@@ -179,10 +175,6 @@ public class XMPUtil {
                     result.add(entry);
                 }
             }
-        } finally {
-            if (document != null) {
-                document.close();
-            }
         }
 
         // return null, if no metadata was found
@@ -207,7 +199,6 @@ public class XMPUtil {
      *
      * @return The bibtex entry found in the document information.
      */
-    @SuppressWarnings("unchecked")
     public static BibtexEntry getBibtexEntryFromDocumentInformation(
             PDDocumentInformation di) {
 
@@ -270,7 +261,6 @@ public class XMPUtil {
      *
      * @return The bibtex entry found in the document information.
      */
-    @SuppressWarnings("unchecked")
     public static BibtexEntry getBibtexEntryFromDublinCore(
             XMPSchemaDublinCore dcSchema) {
 
@@ -326,7 +316,7 @@ public class XMPUtil {
             try {
                 c = DateConverter.toCalendar(date);
             } catch (Exception ignored) {
-
+                // Ignored
             }
             if (c != null) {
                 entry.setField("year", String.valueOf(c.get(Calendar.YEAR)));
@@ -561,23 +551,14 @@ public class XMPUtil {
      *         found.
      * @throws IOException
      */
-    private static XMPMetadata readRawXMP(InputStream inputStream)
-            throws IOException {
-        PDDocument document = null;
-
-        try {
-            document = PDDocument.load(inputStream);
+    private static XMPMetadata readRawXMP(InputStream inputStream) throws IOException {
+        try (PDDocument document = PDDocument.load(inputStream)) {
             if (document.isEncrypted()) {
-                throw new EncryptionNotSupportedException(
-                        "Error: Cannot read metadata from encrypted document.");
+                throw new EncryptionNotSupportedException("Error: Cannot read metadata from encrypted document.");
             }
 
             return XMPUtil.getXMPMetadata(document);
 
-        } finally {
-            if (document != null) {
-                document.close();
-            }
         }
     }
 
@@ -944,7 +925,6 @@ public class XMPUtil {
      * @throws IOException
      * @throws TransformerException
      */
-    @SuppressWarnings("unchecked")
     private static void writeDublinCore(PDDocument document,
             Collection<BibtexEntry> entries, BibtexDatabase database)
                     throws IOException, TransformerException {
@@ -1082,7 +1062,6 @@ public class XMPUtil {
      * @throws IOException
      *             If the file could not be written to or could not be found.
      */
-    @SuppressWarnings("unchecked")
     public static void writeXMP(File file,
             Collection<BibtexEntry> bibtexEntries, BibtexDatabase database,
             boolean writePDFInfo) throws IOException, TransformerException {
@@ -1091,10 +1070,7 @@ public class XMPUtil {
             bibtexEntries = database.resolveForStrings(bibtexEntries, false);
         }
 
-        PDDocument document = null;
-
-        try {
-            document = PDDocument.load(file.getAbsoluteFile());
+        try (PDDocument document = PDDocument.load(file.getAbsoluteFile())) {
             if (document.isEncrypted()) {
                 throw new EncryptionNotSupportedException(
                         "Error: Cannot add metadata to encrypted document.");
@@ -1148,10 +1124,6 @@ public class XMPUtil {
                         + e.getLocalizedMessage());
             }
 
-        } finally {
-            if (document != null) {
-                document.close();
-            }
         }
     }
 
@@ -1230,20 +1202,16 @@ public class XMPUtil {
 
             } else if (args[0].endsWith(".bib")) {
                 // Read from bib and write as XMP
+                try (FileReader fr = new FileReader(args[0])) {
+                    ParserResult result = BibtexParser.parse(fr);
+                    Collection<BibtexEntry> entries = result.getDatabase().getEntries();
 
-                ParserResult result = BibtexParser
-                        .parse(new FileReader(args[0]));
-                Collection<BibtexEntry> entries = result.getDatabase()
-                        .getEntries();
-
-                if (entries.isEmpty()) {
-                    System.err.println("Could not find BibtexEntry in "
-                            + args[0]);
-                } else {
-                    System.out.println(XMPUtil.toXMP(entries, result
-                            .getDatabase()));
+                    if (entries.isEmpty()) {
+                        System.err.println("Could not find BibtexEntry in " + args[0]);
+                    } else {
+                        System.out.println(XMPUtil.toXMP(entries, result.getDatabase()));
+                    }
                 }
-
             } else {
                 XMPUtil.usage();
             }

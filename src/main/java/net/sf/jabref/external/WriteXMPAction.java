@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -40,7 +40,7 @@ import net.sf.jabref.logic.xmp.XMPUtil;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
- * 
+ *
  * This action goes through all selected entries in the BasePanel, and attempts
  * to write the XMP data to the external pdf.
  */
@@ -117,7 +117,7 @@ public class WriteXMPAction extends AbstractWorker {
         for (BibtexEntry entry : entries) {
 
             // Make a list of all PDFs linked from this entry:
-            List<File> files = new ArrayList<File>();
+            List<File> files = new ArrayList<>();
 
             // First check the (legacy) "pdf" field:
             String pdf = entry.getField("pdf");
@@ -135,7 +135,7 @@ public class WriteXMPAction extends AbstractWorker {
                 tm.setContent(field);
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
-                    if (flEntry.getType() != null && flEntry.getType().getName().toLowerCase().equals("pdf")) {
+                    if ((flEntry.getType() != null) && flEntry.getType().getName().toLowerCase().equals("pdf")) {
                         f = FileUtil.expandFilename(flEntry.getLink(), dirs);
                         if (f != null) {
                             files.add(f);
@@ -253,9 +253,9 @@ public class WriteXMPAction extends AbstractWorker {
                     3));
             progressArea.setText("");
 
-            JPanel panel = new JPanel();
-            panel.setBorder(BorderFactory.createEmptyBorder(3, 2, 3, 2));
-            panel.add(scrollPane);
+            JPanel tmpPanel = new JPanel();
+            tmpPanel.setBorder(BorderFactory.createEmptyBorder(3, 2, 3, 2));
+            tmpPanel.add(scrollPane);
 
             // progressArea.setPreferredSize(new Dimension(300, 300));
 
@@ -267,7 +267,7 @@ public class WriteXMPAction extends AbstractWorker {
             bb.addGlue();
             JPanel bbPanel = bb.getPanel();
             bbPanel.setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 3));
-            getContentPane().add(panel, BorderLayout.CENTER);
+            getContentPane().add(tmpPanel, BorderLayout.CENTER);
             getContentPane().add(bbPanel, BorderLayout.SOUTH);
 
             pack();
@@ -280,6 +280,7 @@ public class WriteXMPAction extends AbstractWorker {
             cancelButton.setEnabled(false);
         }
 
+        @SuppressWarnings("unused")
         public void open() {
             progressArea.setText("");
             canceled = false;

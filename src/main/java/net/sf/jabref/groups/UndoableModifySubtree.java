@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -31,13 +31,13 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
     private final int[] m_subtreeRootPath;
     private final GroupSelector m_groupSelector;
     /** This holds the new subtree (the root's modified children) to allow redo. */
-    private final Vector<TreeNode> m_modifiedSubtree = new Vector<TreeNode>();
+    private final Vector<TreeNode> m_modifiedSubtree = new Vector<>();
     private boolean m_revalidate = true;
     private final String m_name;
 
 
     /**
-     * 
+     *
      * @param subtree
      *            The root node of the subtree that was modified (this node may
      *            not be modified, it is just used as a convenience handle).

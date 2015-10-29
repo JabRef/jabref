@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -23,7 +23,6 @@ import java.util.*;
 
 public class EntrySorter implements DatabaseChangeListener {
 
-    //TreeSet set;
     private final ArrayList<BibtexEntry> set;
     private final Comparator<BibtexEntry> comp;
     private String[] idArray;
@@ -32,14 +31,11 @@ public class EntrySorter implements DatabaseChangeListener {
 
 
     public EntrySorter(Map<String, BibtexEntry> entries, Comparator<BibtexEntry> comp) {
-        //set = new TreeSet(comp);
-        set = new ArrayList<BibtexEntry>();
+        set = new ArrayList<>();
         this.comp = comp;
-        Set<String> keySet = entries.keySet();
         for (Map.Entry<String, BibtexEntry> stringBibtexEntryEntry : entries.entrySet()) {
             set.add(stringBibtexEntryEntry.getValue());
         }
-        //Collections.sort(set, comp);
         changed = true;
         index();
     }
@@ -73,7 +69,6 @@ public class EntrySorter implements DatabaseChangeListener {
             entryArray = new BibtexEntry[count];
             int piv = 0;
             for (BibtexEntry entry : set) {
-                //        for (int i=0; i<idArray.length; i++) {
                 idArray[piv] = entry.getId();
                 entryArray[piv] = entry;
                 piv++;
@@ -89,7 +84,6 @@ public class EntrySorter implements DatabaseChangeListener {
         synchronized (set) {
             return idArray[pos];
         }
-        //return ((BibtexEntry)(entryArray[pos])).getId();
     }
 
     public BibtexEntry getEntryAt(int pos) {
@@ -116,29 +110,20 @@ public class EntrySorter implements DatabaseChangeListener {
             case ADDED_ENTRY:
                 pos = -Collections.binarySearch(set, e.getEntry(), comp) - 1;
                 set.add(pos, e.getEntry());
-                //addEntry(e.getEntry());
-                //set.add(e.getEntry());
-                //changed = true;
-                //Collections.sort(set, comp);
                 break;
             case REMOVED_ENTRY:
                 set.remove(e.getEntry());
                 changed = true;
                 break;
             case CHANGED_ENTRY:
-                // Entry changed. Resort list:
-                //Collections.sort(set, comp);
                 pos = Collections.binarySearch(set, e.getEntry(), comp);
                 int posOld = set.indexOf(e.getEntry());
                 if (pos < 0) {
                     set.remove(posOld);
                     set.add(-pos - 1, e.getEntry());
                 }
-                //changed = true;
                 break;
             }
-
         }
-
     }
 }

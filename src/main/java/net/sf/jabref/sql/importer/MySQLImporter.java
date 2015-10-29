@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General public static License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,12 +26,12 @@ import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
 /**
- * 
+ *
  * @author ifsteinm.
- * 
+ *
  *  Jan 20th	Extends DBImporter to provide features specific for MySQL
  *  			Created after a refactory on SQLUtil
- *          
+ *
  */
 public class MySQLImporter extends DBImporter {
 
@@ -42,7 +42,7 @@ public class MySQLImporter extends DBImporter {
     }
 
     /**
-     * 
+     *
      * @return The singleton instance of the MySQLImporter
      */
     public static MySQLImporter getInstance() {
@@ -54,9 +54,9 @@ public class MySQLImporter extends DBImporter {
 
     @Override
     protected ResultSet readColumnNames(Connection conn) throws SQLException {
-        Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
-                "SHOW columns FROM entries;");
-        return statement.getResultSet();
+        try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn, "SHOW columns FROM entries;")) {
+            return statement.getResultSet();
+        }
     }
 
     @Override

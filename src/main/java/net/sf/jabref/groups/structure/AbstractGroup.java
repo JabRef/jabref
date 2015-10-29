@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -224,6 +224,7 @@ public abstract class AbstractGroup {
      *
      * @param db The database to refresh for.
      */
+    @SuppressWarnings("unused")
     public void refreshForNewDatabase(BibtexDatabase db) {
         // Default is to do nothing. Group types that are affected by a change
         // of database must override this method.

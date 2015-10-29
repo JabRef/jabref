@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -50,7 +50,7 @@ public class SearchManager extends SidePaneComponent
     /**
      * subscribed Objects
      */
-    private final Vector<SearchTextListener> listeners = new Vector<SearchTextListener>();
+    private final Vector<SearchTextListener> listeners = new Vector<>();
 
     //private JabRefFrame frame;
     private final JTextField searchField = new JTextField("", 12);
@@ -335,14 +335,14 @@ public class SearchManager extends SidePaneComponent
      * is selected.
      */
     private void updateKeyListeners() {
-        KeyListener[] listeners = searchField.getKeyListeners();
-        for (KeyListener listener : listeners) {
+        KeyListener[] tmpListeners = searchField.getKeyListeners();
+        for (KeyListener listener : tmpListeners) {
             searchField.removeKeyListener(listener);
         }
         if (increment.isSelected()) {
             searchField.addKeyListener(this);
         } else {
-            if (searchAutoComplete.isSelected() && autoCompleteListener != null) {
+            if (searchAutoComplete.isSelected() && (autoCompleteListener != null)) {
                 searchField.addKeyListener(autoCompleteListener);
             }
         }
@@ -380,10 +380,10 @@ public class SearchManager extends SidePaneComponent
      * @param t
      * @return
      */
-    private ArrayList<String> getSearchwords(String t) {
+    private static ArrayList<String> getSearchwords(String t) {
         // for now ... just seperate words by whitespace
         String[] strings = t.split(" ");
-        ArrayList<String> words = new ArrayList<String>(strings.length);
+        ArrayList<String> words = new ArrayList<>(strings.length);
         Collections.addAll(words, strings);
         return words;
     }
@@ -394,9 +394,9 @@ public class SearchManager extends SidePaneComponent
      * @param t
      */
     private void fireSearchlistenerEvent(String t) {
-        // parse the Search string to words    	
+        // parse the Search string to words
         ArrayList<String> words;
-        if (t == null || t.isEmpty()) {
+        if ((t == null) || t.isEmpty()) {
             words = null;
         } else {
             words = getSearchwords(t);
@@ -509,9 +509,9 @@ public class SearchManager extends SidePaneComponent
         if (e.getSource() == escape) {
             incSearch = false;
             clearSearchLater();
-        } else if ((e.getSource() == searchField || e.getSource() == search)
+        } else if (((e.getSource() == searchField) || (e.getSource() == search))
                 && !increment.isSelected()
-                && panel != null) {
+                && (panel != null)) {
 
             updatePrefs(); // Make sure the user's choices are recorded.
             if (searchField.getText().isEmpty()) {
@@ -778,10 +778,12 @@ public class SearchManager extends SidePaneComponent
 
     @Override
     public void keyPressed(KeyEvent e) {
+        // Nothing
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        // Nothing
     }
 
     @Override

@@ -33,7 +33,7 @@ public class CaseChangers {
 
     static {
         Set<String> smallerWords = new HashSet<>();
-        // NOTE: before JabRef 2.80, it was SKIP_WORDS = {"a", "an", "the", "for", "on", "of"}; in net.sf.jabref.logic.labelPattern.LabelPatternUtil.SKIP_WORDS 
+        // NOTE: before JabRef 2.80, it was SKIP_WORDS = {"a", "an", "the", "for", "on", "of"}; in net.sf.jabref.logic.labelPattern.LabelPatternUtil.SKIP_WORDS
 
         // Articles
         smallerWords.addAll(Arrays.asList("a", "an", "the"));
@@ -53,8 +53,8 @@ public class CaseChangers {
      */
     private static final class Word {
 
-        private char[] chars;
-        private boolean[] protectedChars;
+        private final char[] chars;
+        private final boolean[] protectedChars;
 
         public Word(char[] chars, boolean[] protectedChars) {
             this.chars = Objects.requireNonNull(chars);
@@ -228,6 +228,7 @@ public class CaseChangers {
             return Optional.of(getWords().get(getWords().size() - 1));
         }
 
+        @Override
         public String toString() {
             return words.stream().map(Word::toString).collect(Collectors.joining(" "));
         }
@@ -343,7 +344,7 @@ public class CaseChangers {
             title.getFirstWord().ifPresent(Word::toUpperFirst);
             title.getLastWord().ifPresent(Word::toUpperFirst);
 
-            for (int i = 0; i < title.getWords().size() - 2; i++) {
+            for (int i = 0; i < (title.getWords().size() - 2); i++) {
                 if (title.getWords().get(i).endsWithColon()) {
                     title.getWords().get(i + 1).toUpperFirst();
                 }

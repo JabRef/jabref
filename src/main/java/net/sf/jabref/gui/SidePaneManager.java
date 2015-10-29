@@ -36,10 +36,10 @@ public class SidePaneManager {
 
     private final SidePane sidep;
 
-    private final Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
-    private final Map<SidePaneComponent, String> componentNames = new HashMap<SidePaneComponent, String>();
+    private final Map<String, SidePaneComponent> components = new LinkedHashMap<>();
+    private final Map<SidePaneComponent, String> componentNames = new HashMap<>();
 
-    private final List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
+    private final List<SidePaneComponent> visible = new LinkedList<>();
 
 
     public SidePaneManager(JabRefFrame frame) {
@@ -161,8 +161,8 @@ public class SidePaneManager {
         }
     }
 
-    private Map<String, Integer> getPreferredPositions() {
-        Map<String, Integer> preferredPositions = new HashMap<String, Integer>();
+    private static Map<String, Integer> getPreferredPositions() {
+        Map<String, Integer> preferredPositions = new HashMap<>();
 
         String[] componentNames = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES);
         String[] componentPositions = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
@@ -191,14 +191,14 @@ public class SidePaneManager {
 
         // Split the map into a pair of parallel String arrays suitable for storage
         Set<String> var = preferredPositions.keySet();
-        String[] componentNames = var.toArray(new String[var.size()]);
+        String[] tmpComponentNames = var.toArray(new String[var.size()]);
         String[] componentPositions = new String[preferredPositions.size()];
 
-        for (int i = 0; i < componentNames.length; ++i) {
-            componentPositions[i] = preferredPositions.get(componentNames[i]).toString();
+        for (int i = 0; i < tmpComponentNames.length; ++i) {
+            componentPositions[i] = preferredPositions.get(tmpComponentNames[i]).toString();
         }
 
-        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, componentNames);
+        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, tmpComponentNames);
         Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, componentPositions);
     }
 
@@ -244,7 +244,7 @@ public class SidePaneManager {
     public synchronized void moveDown(SidePaneComponent comp) {
         if (visible.contains(comp)) {
             int currIndex = visible.indexOf(comp);
-            if (currIndex < visible.size() - 1) {
+            if (currIndex < (visible.size() - 1)) {
                 int newIndex = currIndex + 1;
                 visible.remove(currIndex);
                 visible.add(newIndex, comp);
@@ -263,7 +263,7 @@ public class SidePaneManager {
     /**
      * Update all side pane components to show information from the given
      * BasePanel.
-     * 
+     *
      * @param panel
      */
     private void setActiveBasePanel(BasePanel panel) {

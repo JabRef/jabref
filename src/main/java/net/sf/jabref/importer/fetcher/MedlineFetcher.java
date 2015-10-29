@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -36,7 +36,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Fetch or search from Pubmed http://www.ncbi.nlm.nih.gov/sites/entrez/
- * 
+ *
  */
 public class MedlineFetcher implements EntryFetcher {
 
@@ -73,7 +73,7 @@ public class MedlineFetcher implements EntryFetcher {
     ImportInspector dialog;
 
 
-    private String toSearchTerm(String in) {
+    private static String toSearchTerm(String in) {
         Pattern part1 = Pattern.compile(", ");
         Pattern part2 = Pattern.compile(",");
         Pattern part3 = Pattern.compile(" ");
@@ -168,29 +168,29 @@ public class MedlineFetcher implements EntryFetcher {
     }
 
     @Override
-    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
+    public boolean processQuery(String query, ImportInspector iIDialog, OutputPrinter frameOP) {
 
         shouldContinue = true;
 
         query = query.trim().replace(';', ',');
 
         if (query.matches("\\d+[,\\d+]*")) {
-            frame.setStatus(Localization.lang("Fetching Medline by id..."));
+            frameOP.setStatus(Localization.lang("Fetching Medline by id..."));
 
-            List<BibtexEntry> bibs = MedlineImporter.fetchMedline(query, frame);
+            List<BibtexEntry> bibs = MedlineImporter.fetchMedline(query, frameOP);
 
             if (bibs.isEmpty()) {
-                frame.showMessage(Localization.lang("No references found"));
+                frameOP.showMessage(Localization.lang("No references found"));
             }
 
             for (BibtexEntry entry : bibs) {
-                dialog.addEntry(entry);
+                iIDialog.addEntry(entry);
             }
             return true;
         }
 
         if (!query.isEmpty()) {
-            frame.setStatus(Localization.lang("Fetching Medline by term..."));
+            frameOP.setStatus(Localization.lang("Fetching Medline by term..."));
 
             String searchTerm = toSearchTerm(query);
 
@@ -198,7 +198,7 @@ public class MedlineFetcher implements EntryFetcher {
             SearchResult result = getIds(searchTerm, 0, 1);
 
             if (result.count == 0) {
-                frame.showMessage(Localization.lang("No references found"));
+                frameOP.showMessage(Localization.lang("No references found"));
                 return false;
             }
 
@@ -212,7 +212,7 @@ public class MedlineFetcher implements EntryFetcher {
                             .toString(numberToFetch));
 
                     if (strCount == null) {
-                        frame.setStatus(Localization.lang("Medline import canceled"));
+                        frameOP.setStatus(Localization.lang("Medline import canceled"));
                         return false;
                     }
 
@@ -220,7 +220,7 @@ public class MedlineFetcher implements EntryFetcher {
                         numberToFetch = Integer.parseInt(strCount.trim());
                         break;
                     } catch (RuntimeException ex) {
-                        frame.showMessage(Localization.lang("Please enter a valid number"));
+                        frameOP.showMessage(Localization.lang("Please enter a valid number"));
                     }
                 }
             }
@@ -235,15 +235,15 @@ public class MedlineFetcher implements EntryFetcher {
                 // get the ids from entrez
                 result = getIds(searchTerm, i, noToFetch);
 
-                List<BibtexEntry> bibs = MedlineImporter.fetchMedline(result.ids, frame);
+                List<BibtexEntry> bibs = MedlineImporter.fetchMedline(result.ids, frameOP);
                 for (BibtexEntry entry : bibs) {
-                    dialog.addEntry(entry);
+                    iIDialog.addEntry(entry);
                 }
-                dialog.setProgress(i + noToFetch, numberToFetch);
+                iIDialog.setProgress(i + noToFetch, numberToFetch);
             }
             return true;
         }
-        frame.showMessage(
+        frameOP.showMessage(
                 Localization.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
                 Localization.lang("Input error"), JOptionPane.ERROR_MESSAGE);
         return false;

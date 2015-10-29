@@ -113,7 +113,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private int lastTabbedPanelSelectionIndex = -1;
 
-    // The sidepane manager takes care of populating the sidepane. 
+    // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;
 
     public JTabbedPane tabbedPane; // initialized at constructor
@@ -601,7 +601,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 int height = (int) dim.getHeight();
                 int width = (int) dim.getWidth();
 
-                if (posX + sizeX > width) {
+                if ((posX + sizeX) > width) {
                     if (sizeX <= width) {
                         posX = width - sizeX;
                     } else {
@@ -610,7 +610,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     }
                 }
 
-                if (posY + sizeY > height) {
+                if ((posY + sizeY) > height) {
                     if (sizeY <= height) {
                         posY = height - sizeY;
                     } else {
@@ -666,7 +666,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         generalFetcher = new GeneralFetcher(sidePaneManager, this);
 
         sidePaneManager.register("groups", groupSelector);
-        sidePaneManager.register("search", searchManager);;
+        sidePaneManager.register("search", searchManager);
 
         // Show the search panel if it was visible at last shutdown:
         if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE)) {
@@ -681,7 +681,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Check if the file is already open.
         for (int i = 0; i < this.getTabbedPane().getTabCount(); i++) {
             BasePanel bp = this.baseAt(i);
-            if (bp.getFile() != null && bp.getFile().equals(file)) {
+            if ((bp.getFile() != null) && bp.getFile().equals(file)) {
                 //The file is already opened, so just raising its tab.
                 this.getTabbedPane().setSelectedComponent(bp);
                 return;
@@ -843,8 +843,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                                     Localization.lang("Save before closing"),
                                     JOptionPane.YES_NO_CANCEL_OPTION);
 
-                    if (answer == JOptionPane.CANCEL_OPTION ||
-                            answer == JOptionPane.CLOSED_OPTION) {
+                    if ((answer == JOptionPane.CANCEL_OPTION) ||
+                            (answer == JOptionPane.CLOSED_OPTION)) {
                         return false;
                     }
                     if (answer == JOptionPane.YES_OPTION) {
@@ -1022,10 +1022,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void markActiveBasePanel() {
         int now = tabbedPane.getSelectedIndex();
         int len = tabbedPane.getTabCount();
-        if (lastTabbedPanelSelectionIndex > -1 && lastTabbedPanelSelectionIndex < len) {
+        if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
             tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, GUIGlobals.inActiveTabbed);
         }
-        if (now > -1 && now < len) {
+        if ((now > -1) && (now < len)) {
             tabbedPane.setForegroundAt(now, GUIGlobals.activeTabbed);
         }
         lastTabbedPanelSelectionIndex = now;
@@ -1060,7 +1060,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
 
     class GeneralAction extends MnemonicAwareAction {
-        private final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
         private final String command;
 
@@ -1658,7 +1657,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     public void createDisabledIconsForMenuEntries(MenuElement menuElement) {
         for(MenuElement subElement : menuElement.getSubElements()) {
-            if(subElement instanceof JMenu || subElement instanceof JPopupMenu) {
+            if((subElement instanceof JMenu) || (subElement instanceof JPopupMenu)) {
                 createDisabledIconsForMenuEntries(subElement);
             } else if (subElement instanceof JMenuItem) {
                 JMenuItem item = (JMenuItem) subElement;
@@ -1736,7 +1735,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 int answer = JOptionPane.showConfirmDialog(JabRefFrame.this,
                         Localization.lang("Database has changed. Do you want to save before closing?"),
                         Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
-                if (answer == JOptionPane.CANCEL_OPTION || answer == JOptionPane.CLOSED_OPTION) {
+                if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
                     close = false; // The user has cancelled.
                 }
                 if (answer == JOptionPane.YES_OPTION) {
@@ -1746,7 +1745,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         saveAction.runCommand();
                         if (saveAction.isCancelled() || !saveAction.isSuccess()) {
                             // The action either not cancelled or unsuccessful.
-                            // Break! 
+                            // Break!
                             close = false;
                         }
 
@@ -1981,6 +1980,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             try {
                                 basePanel().runCommand(Actions.SAVE);
                             } catch (Throwable ignored) {
+                                // Ignored
                             }
                         }
                     }
@@ -2266,8 +2266,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //ForegroundLabel infoLabel = new ForegroundLabel("Showing search");
         public MyGlassPane() {
             addKeyListener(new KeyAdapter() {
+                // Nothing
             });
             addMouseListener(new MouseAdapter() {
+                // Nothing
             });
             /*  infoLabel.setForeground(new Color(255, 100, 100, 124));
 

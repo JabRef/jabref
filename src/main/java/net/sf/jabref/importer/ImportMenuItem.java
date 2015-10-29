@@ -39,9 +39,9 @@ import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.util.Util;
 
-/* 
+/*
  * TODO: could separate the "menu item" functionality from the importing functionality
- * 
+ *
  */
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
@@ -117,7 +117,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             }
 
             // We import all files and collect their results:
-            List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<ImportFormatReader.UnknownFormatImport>();
+            List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
             for (String filename : filenames) {
                 try {
                     if (importer != null) {
@@ -184,7 +184,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             if (bibtexResult != null) {
                 if (!openInNew) {
                     final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
-                    
+
                     ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
                     diag.addEntries(bibtexResult.getDatabase().getEntries());
                     diag.entryListComplete();

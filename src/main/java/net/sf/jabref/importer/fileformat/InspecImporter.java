@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -87,7 +87,7 @@ public class InspecImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -104,7 +104,7 @@ public class InspecImporter extends ImportFormat {
         in.close();
         String[] entries = sb.toString().split("__::__");
         String Type = "";
-        HashMap<String, String> h = new HashMap<String, String>();
+        HashMap<String, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.indexOf("Record") != 0) {
                 continue;

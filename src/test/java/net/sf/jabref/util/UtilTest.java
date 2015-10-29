@@ -158,7 +158,7 @@ public class UtilTest {
             StringUtil.stripBrackets(null);
             Assert.fail();
         } catch (NullPointerException ignored) {
-
+            // Ignored
         }
     }
 
@@ -267,8 +267,8 @@ public class UtilTest {
 
         try {
 
-            List<String> f = new LinkedList<String>(Arrays.asList(formats));
-            List<String> n = new LinkedList<String>(Arrays.asList(names));
+            List<String> f = new LinkedList<>(Arrays.asList(formats));
+            List<String> n = new LinkedList<>(Arrays.asList(names));
 
             n.add("testMe123454321");
             f.add("*@*@test");

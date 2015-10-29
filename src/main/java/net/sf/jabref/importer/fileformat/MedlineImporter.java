@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Importer for the Refer/Endnote format.
- * 
+ *
  * check here for details on the format
  * http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
  */
@@ -49,7 +49,7 @@ public class MedlineImporter extends ImportFormat {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
     @Override
@@ -66,7 +66,7 @@ public class MedlineImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         int i = 0;
-        while ((str = in.readLine()) != null && i < 50) {
+        while (((str = in.readLine()) != null) && (i < 50)) {
 
             if (str.toLowerCase().contains("<pubmedarticle>")) {
                 return true;
@@ -80,9 +80,9 @@ public class MedlineImporter extends ImportFormat {
 
     /**
      * Fetch and parse an medline item from eutils.ncbi.nlm.nih.gov.
-     * 
+     *
      * @param id One or several ids, separated by ","
-     * 
+     *
      * @return Will return an empty list on error.
      */
     public static List<BibtexEntry> fetchMedline(String id, OutputPrinter status) {
@@ -93,7 +93,7 @@ public class MedlineImporter extends ImportFormat {
             URLConnection data = url.openConnection();
             return new MedlineImporter().importEntries(data.getInputStream(), status);
         } catch (IOException e) {
-            return new ArrayList<BibtexEntry>();
+            return new ArrayList<>();
         }
     }
 
@@ -125,12 +125,12 @@ public class MedlineImporter extends ImportFormat {
             // Switch this to true if you want to make a local copy for testing.
             if (false) {
                 stream.reset();
-                FileOutputStream out = new FileOutputStream(new File("/home/alver/ut.txt"));
-                int c;
-                while ((c = stream.read()) != -1) {
-                    out.write((char) c);
+                try (FileOutputStream out = new FileOutputStream(new File("/home/alver/ut.txt"))) {
+                    int c;
+                    while ((c = stream.read()) != -1) {
+                        out.write((char) c);
+                    }
                 }
-                out.close();
             }
 
             // When you're done, report the results stored by your handler

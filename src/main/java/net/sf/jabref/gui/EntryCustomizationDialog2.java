@@ -37,8 +37,6 @@ import net.sf.jabref.model.entry.CustomEntryType;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
 
-    private static final long serialVersionUID = -3230726577951157332L;
-
     private final JabRefFrame frame;
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
@@ -55,11 +53,11 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     protected JButton exportTypes;
     private final List<String> preset = java.util.Arrays.asList(BibtexFields.getAllFieldNames());
     private String lastSelected;
-    private final Map<String, List<String>> reqLists = new HashMap<String, List<String>>();
-    private final Map<String, List<String>> optLists = new HashMap<String, List<String>>();
-    private final Map<String, List<String>> opt2Lists = new HashMap<String, List<String>>();
-    private final Set<String> defaulted = new HashSet<String>();
-    private final Set<String> changed = new HashSet<String>();
+    private final Map<String, List<String>> reqLists = new HashMap<>();
+    private final Map<String, List<String>> optLists = new HashMap<>();
+    private final Map<String, List<String>> opt2Lists = new HashMap<>();
+    private final Set<String> defaulted = new HashSet<>();
+    private final Set<String> changed = new HashSet<>();
 
     private boolean biblatexMode;
 
@@ -86,7 +84,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         main.setLayout(new BorderLayout());
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
-        java.util.List<String> entryTypes = new ArrayList<String>();
+        java.util.List<String> entryTypes = new ArrayList<>();
         for (String s : BibtexEntryType.getAllTypes()) {
             entryTypes.add(s);
         }
@@ -121,7 +119,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
         //right.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Fields")));
         right.setBorder(BorderFactory.createEtchedBorder());
-        ok = new JButton("Ok");
+        ok = new JButton(Localization.lang("Ok"));
         cancel = new JButton(Localization.lang("Cancel"));
         apply = new JButton(Localization.lang("Apply"));
         ok.addActionListener(this);
@@ -136,8 +134,6 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         bb.addGlue();
 
         AbstractAction closeAction = new AbstractAction() {
-
-            private static final long serialVersionUID = -6135336528807109378L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -285,7 +281,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             }
         }
 
-        Set<Object> toRemove = new HashSet<Object>();
+        Set<Object> toRemove = new HashSet<>();
         for (String o : BibtexEntryType.getAllTypes()) {
             if (!types.contains(o)) {
                 toRemove.add(o);
@@ -332,7 +328,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
     }
 
-    private boolean equalLists(List<String> one, List<String> two) {
+    private static boolean equalLists(List<String> one, List<String> two) {
         if ((one == null) && (two == null)) {
             return true; // Both null.
         }
