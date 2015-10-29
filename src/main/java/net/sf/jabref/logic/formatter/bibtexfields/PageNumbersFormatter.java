@@ -1,4 +1,6 @@
-package net.sf.jabref.logic.formatter;
+package net.sf.jabref.logic.formatter.bibtexfields;
+
+import net.sf.jabref.logic.formatter.Formatter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
