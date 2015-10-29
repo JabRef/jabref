@@ -378,7 +378,7 @@ public class ImportFormatReader {
             BibtexEntry entry = i.next();
 
             // If there are no fields, remove the entry:
-            if (entry.getAllFields().isEmpty()) {
+            if (entry.getFieldNames().isEmpty()) {
                 i.remove();
             }
         }

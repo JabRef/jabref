@@ -69,6 +69,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -241,7 +242,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
 
-                Set<String> deprecatedFields = new HashSet<>(BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.keySet());
+                Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
                 List<String> secondaryOptionalFields = entry.getType().getSecondaryOptionalFields();
@@ -252,8 +253,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 Set<String> optionalFieldsAndAliases = new HashSet<>();
                 for (String field : entry.getOptionalFields()) {
                     optionalFieldsAndAliases.add(field);
-                    if (BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.containsKey(field)) {
-                        optionalFieldsAndAliases.add(BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.get(field));
+                    if (EntryConverter.FIELD_ALIASES_LTX_TO_TEX.containsKey(field)) {
+                        optionalFieldsAndAliases.add(EntryConverter.FIELD_ALIASES_LTX_TO_TEX.get(field));
                     }
                 }
 
@@ -843,7 +844,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // First, remove fields that the user have removed.
             }
 
-            for (String field : entry.getAllFields()) {
+            for (String field : entry.getFieldNames()) {
                 if (BibtexFields.isDisplayableField(field)) {
                     if (newEntry.getField(field) == null) {
                         compound.addEdit(new UndoableFieldChange(entry, field, entry
@@ -855,7 +856,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             // Then set all fields that have been set by the user.
-            for (String field : newEntry.getAllFields()) {
+            for (String field : newEntry.getFieldNames()) {
                 String oldValue = entry.getField(field);
                 String newValue = newEntry.getField(field);
                 if (oldValue == null || !oldValue.equals(newValue)) {

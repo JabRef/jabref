@@ -1,7 +1,6 @@
 package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
@@ -34,8 +33,8 @@ public class BibtexParserTest {
 
         BibtexEntry e = c.iterator().next();
         Assert.assertEquals("test", e.getCiteKey());
-        Assert.assertEquals(2, e.getAllFields().size());
-        Set<String> o = e.getAllFields();
+        Assert.assertEquals(2, e.getFieldNames().size());
+        Set<String> o = e.getFieldNames();
         Assert.assertTrue(o.contains("author"));
         Assert.assertEquals("Ed von Test", e.getField("author"));
     }
@@ -111,8 +110,8 @@ public class BibtexParserTest {
 
             BibtexEntry e = c.iterator().next();
             Assert.assertEquals("test", e.getCiteKey());
-            Assert.assertEquals(2, e.getAllFields().size());
-            Assert.assertTrue(e.getAllFields().contains("author"));
+            Assert.assertEquals(2, e.getFieldNames().size());
+            Assert.assertTrue(e.getFieldNames().contains("author"));
             Assert.assertEquals("Ed von Test", e.getField("author"));
         }
         { // Empty String
@@ -189,8 +188,8 @@ public class BibtexParserTest {
 
         BibtexEntry e = c.iterator().next();
         Assert.assertEquals("test", e.getCiteKey());
-        Assert.assertEquals(2, e.getAllFields().size());
-        Assert.assertTrue(e.getAllFields().contains("author"));
+        Assert.assertEquals(2, e.getFieldNames().size());
+        Assert.assertTrue(e.getFieldNames().contains("author"));
         Assert.assertEquals("Ed von Test", e.getField("author"));
 
         // Calling parse again will return the same result
@@ -215,7 +214,7 @@ public class BibtexParserTest {
 
         Assert.assertNotSame(e.getId(), e2.getId());
 
-        for (String field : e.getAllFields()) {
+        for (String field : e.getFieldNames()) {
             if (!e.getField(field).equals(e2.getField(field))) {
                 Assert.fail("e and e2 differ in field " + field);
             }

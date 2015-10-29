@@ -29,15 +29,12 @@ import net.sf.jabref.model.entry.BibtexEntry;
  * new value. Old/new values can be null.
  */
 public class UndoableFieldChange extends AbstractUndoableEdit {
-
-    private static final long serialVersionUID = 1L;
+    private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
     
     private final BibtexEntry entry;
     private final String field;
     private final String oldValue;
     private final String newValue;
-    
-    private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
 
 
     public UndoableFieldChange(BibtexEntry entry, String field,

@@ -359,7 +359,7 @@ public class XMPUtilTest {
                     Arrays.asList("bibtexkey", "booktitle",
                     "owner", "timestamp", "url", "year"));
 
-            Assert.assertEquals(expectedFields, x.getAllFields());
+            Assert.assertEquals(expectedFields, x.getFieldNames());
         }
         // First set:
         prefs.putBoolean("useXmpPrivacyFilter", true);
@@ -375,7 +375,7 @@ public class XMPUtilTest {
         List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
         Assert.assertEquals(1, l.size());
         BibtexEntry x = l.get(0);
-        Set<String> ts = x.getAllFields();
+        Set<String> ts = x.getFieldNames();
         Assert.assertEquals(8, ts.size());
 
         ts.contains("bibtextype");
@@ -875,7 +875,7 @@ public class XMPUtilTest {
         Assert.assertEquals(expected.getCiteKey(), actual.getCiteKey());
         Assert.assertEquals(expected.getType(), actual.getType());
 
-        for (String field : expected.getAllFields()) {
+        for (String field : expected.getFieldNames()) {
 
             if (field.toLowerCase().equals("author")
                     || field.toLowerCase().equals("editor")) {
@@ -890,8 +890,8 @@ public class XMPUtilTest {
             }
         }
 
-        Assert.assertEquals(expected.getAllFields().size(),
-                actual.getAllFields().size());
+        Assert.assertEquals(expected.getFieldNames().size(),
+                actual.getFieldNames().size());
     }
 
     /**

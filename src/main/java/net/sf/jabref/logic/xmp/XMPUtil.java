@@ -243,7 +243,7 @@ public class XMPUtil {
         }
 
         // Return null if no values were found
-        return !entry.getAllFields().isEmpty() ? entry : null;
+        return !entry.getFieldNames().isEmpty() ? entry : null;
     }
 
     /**
@@ -439,7 +439,7 @@ public class XMPUtil {
             }
         }
 
-        return !entry.getAllFields().isEmpty() ? entry : null;
+        return !entry.getFieldNames().isEmpty() ? entry : null;
     }
 
     /**
@@ -609,7 +609,7 @@ public class XMPUtil {
 
         // Set all the values including key and entryType
 
-        for (String field : entry.getAllFields()) {
+        for (String field : entry.getFieldNames()) {
 
             if (useXmpPrivacyFilter && filters.contains(field)) {
                 continue;
@@ -998,7 +998,7 @@ public class XMPUtil {
                 Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 
         // Set all the values including key and entryType
-        Set<String> fields = entry.getAllFields();
+        Set<String> fields = entry.getFieldNames();
 
         for (String field : fields) {
 

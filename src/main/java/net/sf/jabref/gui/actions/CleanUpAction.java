@@ -46,6 +46,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.util.Util;
 
 public class CleanUpAction extends AbstractWorker {
@@ -118,6 +119,40 @@ public class CleanUpAction extends AbstractWorker {
         String origValue = entry.getField(fieldName);
         compound.addEdit(new UndoableFieldChange(entry, fieldName, origValue, ""));
         entry.setField(fieldName, "");
+    }
+
+    /**
+     * Converts to BibLatex format
+     */
+    public static void convertToBiblatex(BibtexEntry entry, NamedCompound ce) {
+        for (Map.Entry<String, String> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
+            String oldFieldName = alias.getKey();
+            String newFieldName = alias.getValue();
+            String oldValue = entry.getField(oldFieldName);
+            String newValue = entry.getField(newFieldName);
+            if ((oldValue != null) && (!oldValue.isEmpty()) && (newValue == null)) {
+                // There is content in the old field and no value in the new, so just copy
+                entry.setField(newFieldName, oldValue);
+                ce.addEdit(new UndoableFieldChange(entry, newFieldName, null, oldValue));
+
+                entry.setField(oldFieldName, null);
+                ce.addEdit(new UndoableFieldChange(entry, oldFieldName, oldValue, null));
+            }
+        }
+
+        // Dates: create date out of year and month, save it and delete old fields
+        if ((entry.getField("date") == null) || (entry.getField("date").isEmpty())) {
+            String newDate = entry.getFieldOrAlias("date");
+            String oldYear = entry.getField("year");
+            String oldMonth = entry.getField("month");
+            entry.setField("date", newDate);
+            entry.setField("year", null);
+            entry.setField("month", null);
+
+            ce.addEdit(new UndoableFieldChange(entry, "date", null, newDate));
+            ce.addEdit(new UndoableFieldChange(entry, "year", oldYear, null));
+            ce.addEdit(new UndoableFieldChange(entry, "month", oldMonth, null));
+        }
     }
 
     private void initOptionsPanel() {
@@ -319,7 +354,7 @@ public class CleanUpAction extends AbstractWorker {
                 doConvertUnicode(entry, ce);
             }
             if (choiceConvertToBiblatex) {
-                doConvertToBiblatex(entry, ce);
+                convertToBiblatex(entry, ce);
             }
 
             ce.end();
@@ -669,19 +704,12 @@ public class CleanUpAction extends AbstractWorker {
         // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted
         newValue = newValue.replace("$$", "").replaceAll("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{", "$1");
         // Move numbers, +, -, /, and brackets into equations
-        // System.err.println(newValue);
         newValue = newValue.replaceAll("(([^$]|\\\\\\$)*)\\$", "$1@@"); // Replace $, but not \$ with @@
-        // System.err.println(newValue);
         newValue = newValue.replaceAll("([^@]*)@@([^@]*)@@", "$1\\$$2@@"); // Replace every other @@ with $
-        // System.err.println(newValue);
         //newValue = newValue.replaceAll("([0-9\\(\\.]+) \\$","\\$$1\\\\ "); // Move numbers followed by a space left of $ inside the equation, e.g., 0.35 $\mu$m
-        // System.err.println(newValue);
         newValue = newValue.replaceAll("([0-9\\(\\.]+[ ]?[-+/]?[ ]?)\\$", "\\$$1"); // Move numbers, possibly with operators +, -, or /,  left of $ into the equation
-        // System.err.println(newValue);
         newValue = newValue.replaceAll("@@([ ]?[-+/]?[ ]?[0-9\\)\\.]+)", " $1@@"); // Move numbers right of @@ into the equation
-        // System.err.println(newValue);
         newValue = newValue.replace("@@", "$"); // Replace all @@ with $
-        // System.err.println(newValue);
         newValue = newValue.replace("  ", " "); // Clean up
         newValue = newValue.replace("$$", "");
         newValue = newValue.replace(" )$", ")$");
@@ -692,40 +720,4 @@ public class CleanUpAction extends AbstractWorker {
         }
     }
 
-    /**
-     * Converts to BibLatex format
-     */
-    private static void doConvertToBiblatex(BibtexEntry entry, NamedCompound ce) {
-
-        for (Map.Entry<String, String> alias : BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.entrySet()) {
-            String oldFieldName = alias.getKey();
-            String newFieldName = alias.getValue();
-            String oldValue = entry.getField(oldFieldName);
-            String newValue = entry.getField(newFieldName);
-            if ((oldValue != null) && (!oldValue.isEmpty()) && (newValue == null))
-            {
-                // There is content in the old field and no value in the new, so just copy
-                entry.setField(newFieldName, oldValue);
-                ce.addEdit(new UndoableFieldChange(entry, newFieldName, null, oldValue));
-
-                entry.setField(oldFieldName, null);
-                ce.addEdit(new UndoableFieldChange(entry, oldFieldName, oldValue, null));
-            }
-        }
-
-        // Dates: create date out of year and month, save it and delete old fields
-        if ((entry.getField("date") == null) || (entry.getField("date").isEmpty()))
-        {
-            String newDate = entry.getFieldOrAlias("date");
-            String oldYear = entry.getField("year");
-            String oldMonth = entry.getField("month");
-            entry.setField("date", newDate);
-            entry.setField("year", null);
-            entry.setField("month", null);
-
-            ce.addEdit(new UndoableFieldChange(entry, "date", null, newDate));
-            ce.addEdit(new UndoableFieldChange(entry, "year", oldYear, null));
-            ce.addEdit(new UndoableFieldChange(entry, "month", oldMonth, null));
-        }
-    }
 }

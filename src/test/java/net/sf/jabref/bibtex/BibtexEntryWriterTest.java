@@ -80,8 +80,8 @@ public class BibtexEntryWriterTest {
 
         BibtexEntry entry = entries.iterator().next();
         Assert.assertEquals("test", entry.getCiteKey());
-        Assert.assertEquals(5, entry.getAllFields().size());
-        Set<String> fields = entry.getAllFields();
+        Assert.assertEquals(5, entry.getFieldNames().size());
+        Set<String> fields = entry.getFieldNames();
         Assert.assertTrue(fields.contains("author"));
         Assert.assertEquals("Foo Bar", entry.getField("author"));
 
@@ -109,8 +109,8 @@ public class BibtexEntryWriterTest {
 
         BibtexEntry entry = entries.iterator().next();
         Assert.assertEquals("test", entry.getCiteKey());
-        Assert.assertEquals(4, entry.getAllFields().size());
-        Set<String> fields = entry.getAllFields();
+        Assert.assertEquals(4, entry.getFieldNames().size());
+        Set<String> fields = entry.getFieldNames();
         Assert.assertTrue(fields.contains("month"));
         Assert.assertEquals("#mar#", entry.getField("month"));
 

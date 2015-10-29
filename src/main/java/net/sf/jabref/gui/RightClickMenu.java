@@ -372,7 +372,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private boolean isFieldSetForSelectedEntry(String fieldname) {
         if (panel.mainTable.getSelectedRowCount() == 1) {
             BibtexEntry entry = panel.mainTable.getSelected().get(0);
-            if (entry.getAllFields().contains(fieldname)) {
+            if (entry.getFieldNames().contains(fieldname)) {
                 return true;
             } else {
                 return false;

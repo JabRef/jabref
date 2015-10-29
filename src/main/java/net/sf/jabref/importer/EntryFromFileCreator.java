@@ -188,7 +188,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     }
 
     void addEntryDataToEntry(BibtexEntry entry, BibtexEntry e) {
-        for (String field : e.getAllFields()) {
+        for (String field : e.getFieldNames()) {
             appendToField(entry, field, e.getField(field));
         }
     }

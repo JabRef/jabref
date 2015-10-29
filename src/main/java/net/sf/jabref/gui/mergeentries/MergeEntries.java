@@ -107,8 +107,8 @@ public class MergeEntries {
      */
     private void initialize() {
 
-        joint = new TreeSet<>(one.getAllFields());
-        joint.addAll(two.getAllFields());
+        joint = new TreeSet<>(one.getFieldNames());
+        joint.addAll(two.getFieldNames());
 
         // Remove field starting with __
         TreeSet<String> toberemoved = new TreeSet<>();

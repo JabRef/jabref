@@ -36,7 +36,7 @@ class IncrementalSearcher {
 
     public boolean search(String pattern, BibtexEntry bibtexEntry) {
         hitInField = null;
-        return searchFields(bibtexEntry.getAllFields(), bibtexEntry, pattern);
+        return searchFields(bibtexEntry.getFieldNames(), bibtexEntry, pattern);
     }
 
     private boolean searchFields(Set<String> fields, BibtexEntry bibtexEntry,
