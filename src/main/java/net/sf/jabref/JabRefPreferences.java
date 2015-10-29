@@ -282,7 +282,6 @@ public class JabRefPreferences {
     public static final String IMPORT_INSPECTION_DIALOG_WIDTH = "importInspectionDialogWidth";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
-    public static final String FILECHOOSER_DISABLE_RENAME = "filechooserDisableRename";
     public static final String USE_NATIVE_FILE_DIALOG_ON_MAC = "useNativeFileDialogOnMac";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
@@ -738,7 +737,6 @@ public class JabRefPreferences {
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
         defaults.put(USE_NATIVE_FILE_DIALOG_ON_MAC, Boolean.FALSE);
-        defaults.put(FILECHOOSER_DISABLE_RENAME, Boolean.TRUE);
 
         defaults.put(LAST_USED_EXPORT, null);
         defaults.put(SIDE_PANE_WIDTH, -1);

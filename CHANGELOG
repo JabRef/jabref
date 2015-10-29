@@ -1,5 +1,6 @@
 [master]
     - Removes options to set PDF and PS directories per .bib database as the general options have also been deleted.
+    - Removes option to disable renaming in FileChooser dialogs.
     - Removes option to hide the BibTeX Code tab in the entry editor.
     - Changes the old integrity check by improving the code base (+tests) and converting it to a simple issues table
     - Removes option to set a custom icon for the external file types. This is not possible anymore with the new icon font.

@@ -544,8 +544,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void init() {
         tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
 
-        UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME));
-
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
         // glassPane.setVisible(true);
