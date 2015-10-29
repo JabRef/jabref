@@ -66,12 +66,8 @@ public class DatabasePropertiesDialog extends JDialog {
     private final JButton cancel;
     private final JTextField fileDir = new JTextField(40);
     private final JTextField fileDirIndv = new JTextField(40);
-    private final JTextField pdfDir = new JTextField(40);
-    private final JTextField psDir = new JTextField(40);
     private String oldFileVal = "";
     private String oldFileIndvVal = "";
-    private String oldPdfVal = "";
-    private String oldPsVal = ""; // Remember old values to see if they are changed.
     private SaveOrderConfig oldSaveOrderConfig;
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
@@ -112,12 +108,8 @@ public class DatabasePropertiesDialog extends JDialog {
 
         JButton browseFile = new JButton(Localization.lang("Browse"));
         JButton browseFileIndv = new JButton(Localization.lang("Browse"));
-        JButton browsePdf = new JButton(Localization.lang("Browse"));
-        JButton browsePs = new JButton(Localization.lang("Browse"));
         browseFile.addActionListener(BrowseAction.buildForDir(parent, fileDir));
         browseFileIndv.addActionListener(BrowseAction.buildForDir(parent, fileDirIndv));
-        browsePdf.addActionListener(BrowseAction.buildForDir(parent, pdfDir));
-        browsePs.addActionListener(BrowseAction.buildForDir(parent, psDir));
 
         setupSortOrderConfiguration();
 
@@ -135,12 +127,6 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.add(Localization.lang("User-specific file directory")).xy(1, 7);
         builder.add(fileDirIndv).xy(3, 7);
         builder.add(browseFileIndv).xy(5, 7);
-        builder.add(Localization.lang("PDF directory")).xy(1, 9);
-        builder.add(pdfDir).xy(3, 9);
-        builder.add(browsePdf).xy(5, 9);
-        builder.add(Localization.lang("PS directory")).xy(1, 11);
-        builder.add(psDir).xy(3, 11);
-        builder.add(browsePs).xy(5, 11);
 
         builder.addSeparator(Localization.lang("Save sort order")).xyw(1, 13, 5);
         builder.add(saveAsConfiguredGlobally).xyw(1, 15, 5);
@@ -371,26 +357,6 @@ public class DatabasePropertiesDialog extends JDialog {
             oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting normally if reading from ordinary setting
         }
 
-        Vector<String> pdfD = metaData.getData("pdfDirectory");
-        if (pdfD == null) {
-            pdfDir.setText("");
-        } else {
-            // Better be a little careful about how many entries the Vector has:
-            if (pdfD.size() >= 1) {
-                pdfDir.setText((pdfD.get(0)).trim());
-            }
-        }
-
-        Vector<String> psD = metaData.getData("psDirectory");
-        if (psD == null) {
-            psDir.setText("");
-        } else {
-            // Better be a little careful about how many entries the Vector has:
-            if (psD.size() >= 1) {
-                psDir.setText((psD.get(0)).trim());
-            }
-        }
-
         Vector<String> prot = metaData.getData(Globals.PROTECTED_FLAG_META);
         if (prot == null) {
             protect.setSelected(false);
@@ -402,8 +368,6 @@ public class DatabasePropertiesDialog extends JDialog {
 
         // Store original values to see if they get changed:
         oldFileVal = fileDir.getText();
-        oldPdfVal = pdfDir.getText();
-        oldPsVal = psDir.getText();
         oldProtectVal = protect.isSelected();
     }
 
@@ -453,24 +417,6 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL));
         }
 
-        dir = new Vector<>(1);
-        text = pdfDir.getText().trim();
-        if (!text.isEmpty()) {
-            dir.add(text);
-            metaData.putData("pdfDirectory", dir);
-        } else {
-            metaData.remove("pdfDirectory");
-        }
-
-        dir = new Vector<>(1);
-        text = psDir.getText().trim();
-        if (!text.isEmpty()) {
-            dir.add(text);
-            metaData.putData("psDirectory", dir);
-        } else {
-            metaData.remove("psDirectory");
-        }
-
         if (protect.isSelected()) {
             dir = new Vector<>(1);
             dir.add("true");
@@ -493,8 +439,6 @@ public class DatabasePropertiesDialog extends JDialog {
         boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
                 || !oldFileVal.equals(fileDir.getText())
                 || !oldFileIndvVal.equals(fileDirIndv.getText())
-                || !oldPdfVal.equals(pdfDir.getText())
-                || !oldPsVal.equals(psDir.getText())
                 || (oldProtectVal != protect.isSelected());
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:
