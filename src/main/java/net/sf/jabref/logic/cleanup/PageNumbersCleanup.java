@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.cleanup;
 
-import net.sf.jabref.logic.formatter.FieldFormatters;
-import net.sf.jabref.logic.formatter.PageNumbersFormatter;
+import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
@@ -24,7 +23,7 @@ public class PageNumbersCleanup {
         final String field = "pages";
 
         String value = entry.getField(field);
-        String newValue = FieldFormatters.PAGE_NUMBERS.format(value);
+        String newValue = BibtexFieldFormatters.PAGE_NUMBERS.format(value);
         entry.setField(field, newValue);
     }
 }

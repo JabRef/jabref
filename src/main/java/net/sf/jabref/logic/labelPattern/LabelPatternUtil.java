@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -32,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
-import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.util.Util;
 
 /**
@@ -830,7 +830,6 @@ public class LabelPatternUtil {
                     && ss.charAt(piv) != '-') {
                 current.append(ss.charAt(piv));
                 piv++;
-                //System.out.println(".. "+piv+" '"+current.toString()+"'");
             }
             piv++;
             // Check if it is ok:
@@ -838,7 +837,7 @@ public class LabelPatternUtil {
             if (word.isEmpty()) {
                 continue;
             }
-            for (String smallWord: CaseChangers.SMALLER_WORDS) {
+            for (String smallWord: Word.SMALLER_WORDS) {
                 if (word.equalsIgnoreCase(smallWord)) {
                     continue mainl;
                 }
