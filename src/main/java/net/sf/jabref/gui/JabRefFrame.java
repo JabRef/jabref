@@ -339,7 +339,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY));
-    private final AbstractAction copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, Localization.menuTitle("Copy \\cite{BibTeX key}"),
+    private final AbstractAction copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, Localization.menuTitle(
+            "Copy \\cite{BibTeX key}"),
             prefs.getKey(KeyBinds.COPY_CITE_BIB_TE_X_KEY));
     private final AbstractAction copyKeyAndTitle = new GeneralAction(Actions.COPY_KEY_AND_TITLE,
             Localization.menuTitle("Copy BibTeX key and title"),
@@ -376,7 +377,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.TOGGLE_GROUPS_INTERFACE),
             IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon());
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group"));
-    private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang("Remove from group"));
+    private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang(
+            "Remove from group"));
     private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group"));
 
 
@@ -428,7 +430,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Open SPIRES entry"),
             prefs.getKey(KeyBinds.OPEN_SPIRES_ENTRY));
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK,
-            Localization.menuTitle("Find duplicates"));
+            Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcon.FIND_DUPLICATES.getIcon());
     private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
             Localization.menuTitle("New entry from plain text"),
             prefs.getKey(KeyBinds.NEW_FROM_PLAIN_TEXT));
@@ -437,8 +439,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction customExpAction = new CustomizeExportsAction();
     private final AbstractAction customImpAction = new CustomizeImportsAction();
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
-    AbstractAction exportToClipboard = new GeneralAction("exportToClipboard",
-            Localization.menuTitle("Export selected entries to clipboard"), IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon());
+    private final AbstractAction exportToClipboard = new GeneralAction("exportToClipboard",
+            Localization.menuTitle("Export selected entries to clipboard"),
+            IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getIcon());
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
             Localization.lang("Synchronize file links"),
             Globals.prefs.getKey(KeyBinds.SYNCHRONIZE_FILES));
@@ -491,7 +494,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.RESOLVE_DUPLICATE_BIB_TE_X_KEYS));
 
     private final AbstractAction sendAsEmail = new GeneralAction(Actions.SEND_AS_EMAIL,
-            Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon());
+            Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getIcon());
 
     final MassSetFieldAction massSetField = new MassSetFieldAction(this);
     final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
@@ -514,13 +517,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private SearchManager searchManager;
 
     public GroupSelector groupSelector;
-
-    // The menus for importing/appending other formats
-    private final JMenu importMenu = JabRefFrame.subMenu("Import into current database");
-    private final JMenu importNewMenu = JabRefFrame.subMenu("Import into new database");
-    private final JMenu exportMenu = JabRefFrame.subMenu("Export");
-    JMenu customExportMenu = JabRefFrame.subMenu("Custom export");
-    private final JMenu newDatabaseMenu = JabRefFrame.subMenu("New database");
 
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey("New entry"));
@@ -1188,14 +1184,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    /**
-     * Refresh import menus.
-     */
-    public void setUpImportMenus() {
-        setUpImportMenu(importMenu, false);
-        setUpImportMenu(importNewMenu, true);
-    }
-
     private void fillMenu() {
         //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         mb.setBorder(null);
@@ -1211,11 +1199,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JMenu newSpec = JabRefFrame.subMenu("New entry...");
         JMenu helpMenu = JabRefFrame.subMenu("Help");
 
-        setUpImportMenus();
-
-        newDatabaseMenu.add(newDatabaseAction);
-        newDatabaseMenu.add(newSubDatabaseAction);
-
         file.add(newDatabaseAction);
         file.add(open); //opendatabaseaction
         file.add(mergeDatabaseAction);
@@ -1225,8 +1208,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(saveSelectedAs);
         file.add(saveSelectedAsPlain);
         file.addSeparator();
-        //file.add(importMenu);
-        //file.add(importNewMenu);
         file.add(importNew);
         file.add(importCurrent);
         file.add(exportAll);
@@ -1581,7 +1562,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
                 selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
                 makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
-                incrementalSearch, replaceAll, importMenu, exportMenu, sendAsEmail, downloadFullText, writeXmpAction,
+                incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
                 openPdf, openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
@@ -1748,6 +1729,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     class SelectKeysAction extends AbstractAction {
         public SelectKeysAction() {
             super(Localization.lang("Customize key bindings"));
+            this.putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.KEY_BINDINGS.getSmallIcon());
         }
 
         @Override
@@ -1899,39 +1881,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     diag.toFront();
                 }
             });
-    }
-
-    private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {
-        importMenu.removeAll();
-
-        // Add a menu item for autodetecting import format:
-        importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_));
-
-        // Add custom importers
-        importMenu.addSeparator();
-
-        SortedSet<ImportFormat> customImporters = Globals.importFormatReader.getCustomImportFormats();
-        JMenu submenu = new JMenu(Localization.lang("Custom importers"));
-        submenu.setMnemonic(KeyEvent.VK_S);
-
-        // Put in all formatters registered in ImportFormatReader:
-        for (ImportFormat imFo : customImporters) {
-            submenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_, imFo));
-        }
-
-        if (!customImporters.isEmpty()) {
-            submenu.addSeparator();
-        }
-
-        submenu.add(customImpAction);
-
-        importMenu.add(submenu);
-        importMenu.addSeparator();
-
-        // Put in all formatters registered in ImportFormatReader:
-        for (ImportFormat imFo : Globals.importFormatReader.getBuiltInInputFormats()) {
-            importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_, imFo));
-        }
     }
 
     public FileHistory getFileHistory() {

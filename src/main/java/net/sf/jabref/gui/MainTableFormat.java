@@ -192,23 +192,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         return false;
     }
 
-    private Object modifyIconForMultipleLinks(JLabel label) {
-        Icon icon = label.getIcon();
-        BufferedImage bufImg = new BufferedImage(
-                icon.getIconWidth(),
-                icon.getIconHeight(),
-                BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bufImg.createGraphics();
-        // paint the Icon to the BufferedImage.
-        icon.paintIcon(null, g, 0, 0);
-        // add the letter "m" in the bottom right corner
-        g.setColor(Color.BLACK);
-        g.setFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 12));
-        g.drawString("m", bufImg.getWidth() - g.getFontMetrics().stringWidth("m"), bufImg.getHeight());
-        g.dispose();
-        return new JLabel(new ImageIcon(bufImg));
-    }
-
     @Override
     public Object getColumnValue(BibtexEntry be, int col) {
         Object o = null;
@@ -231,7 +214,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 o = FileListTableModel.getFirstLabel(be.getField(Globals.FILE_FIELD));
 
                 if (fieldCount[1] > 1) {
-                    o = modifyIconForMultipleLinks((JLabel) o);
+                    o = new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
                 }
 
                 // Handle priority column special
@@ -260,7 +243,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 o = GUIGlobals.getTableIcon(iconType[hasField]);
 
                 if (fieldCount[1] > 1) {
-                    o = modifyIconForMultipleLinks((JLabel) o);
+                    o = new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
                 }
             }
         } else {

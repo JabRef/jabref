@@ -199,7 +199,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         setupSourcePanel();
         add(tabbed, BorderLayout.CENTER);
         tabbed.addChangeListener(tabListener);
-        if (prefs.getBoolean(JabRefPreferences.SHOW_SOURCE) && prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
+        if (prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
             tabbed.setSelectedIndex(sourceIndex);
         }
 
@@ -299,11 +299,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
 
         srcPanel.setName(Localization.lang("BibTeX source"));
-        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_SOURCE)) {
-            tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel,
-                    Localization.lang("Show/edit BibTeX source"));
-            tabs.add(srcPanel);
-        }
+        tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel,
+                Localization.lang("Show/edit BibTeX source"));
+        tabs.add(srcPanel);
         sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
         srcPanel.setFocusCycleRoot(true);
     }

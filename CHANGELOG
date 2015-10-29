@@ -1,4 +1,5 @@
 [master]
+    - Removes option to hide the BibTeX Code tab in the entry editor.
     - Changes the old integrity check by improving the code base (+tests) and converting it to a simple issues table
     - Removes option to set a custom icon for the external file types. This is not possible anymore with the new icon font.
     - Added combo box in MassSetFieldAction to simplify selecting the correct field name
