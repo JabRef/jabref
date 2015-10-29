@@ -1644,6 +1644,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+    public void editEntryByKeyAndFocusField(String bibtexKey, String fieldName) {
+        BibtexEntry[] entries = database.getEntriesByKey(bibtexKey);
+        if (entries.length == 1) {
+            mainTable.setSelected(mainTable.findEntry(entries[0]));
+            selectionListener.editSignalled();
+            EntryEditor editor = getEntryEditor(entries[0]);
+            editor.setFocusToField(fieldName);
+            new FocusRequester(editor);
+        }
+    }
+
     public void updateTableFont() {
         mainTable.updateFont();
     }

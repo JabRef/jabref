@@ -13,11 +13,9 @@ public class Localization {
 
     public static final String RESOURCE_PREFIX = "l10n/JabRef";
     public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
-    public static final String INTEGRITY_RESOURCE_PREFIX = "l10n/IntegrityMessage";
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
-    private static ResourceBundle intMessages;
 
     public static void setLanguage(String language) {
         Locale locale = new Locale(language);
@@ -25,7 +23,6 @@ public class Localization {
         try {
             messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
             menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-            intMessages = ResourceBundle.getBundle(INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
 
             // silent fallback to system locale when bundle is not found
             if(!messages.getLocale().equals(locale)) {
@@ -37,7 +34,6 @@ public class Localization {
             locale = new Locale("en");
             messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
             menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-            intMessages = ResourceBundle.getBundle(INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
         } finally {
             // Set consistent VM locales
             Locale.setDefault(locale);
@@ -50,7 +46,7 @@ public class Localization {
      *
      * @param resBundle the ResourceBundle to use
      * @param idForErrorMessage output when translation is not found
-     * @param key the key to lookup in resBundle
+ö     * @param key the key to lookup in resBundle
      * @param params a list of Strings to replace %0, %1, ...
      * @return
      */
@@ -123,8 +119,5 @@ public class Localization {
         return translate(menuTitles, "menu item", key, params);
     }
 
-    public static String getIntegrityMessage(String key, String... params) {
-        return translate(menuTitles, "integrity message", key, params);
-    }
 }
 

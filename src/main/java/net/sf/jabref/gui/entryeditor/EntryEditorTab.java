@@ -66,17 +66,20 @@ class EntryEditorTab {
 
     private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
 
+    private final String tabTitle;
+
     public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
-                          boolean addKeyField, boolean compressed, String name) {
+            boolean addKeyField, boolean compressed, String tabTitle) {
         if (fields != null) {
             this.fields = fields.toArray(new String[fields.size()]);
         } else {
-            this.fields = new String[]{};
+            this.fields = new String[] {};
         }
 
         this.parent = parent;
+        this.tabTitle = tabTitle;
 
-        setupPanel(frame, panel, addKeyField, compressed, name);
+        setupPanel(frame, panel, addKeyField, compressed, tabTitle);
 
         /*
          * The following line makes sure focus cycles inside tab instead of
@@ -247,6 +250,12 @@ class EntryEditorTab {
         activeField = fieldEditor;
     }
 
+    public void setActive(String fieldName) {
+        if (editors.containsKey(fieldName)) {
+            activeField = editors.get(fieldName);
+        }
+    }
+
     public FieldEditor getActive() {
         return activeField;
     }
@@ -337,6 +346,10 @@ class EntryEditorTab {
 
     public EntryEditor getParent() {
         return parent;
+    }
+
+    public String getTabTitle() {
+        return tabTitle;
     }
 
     /**
