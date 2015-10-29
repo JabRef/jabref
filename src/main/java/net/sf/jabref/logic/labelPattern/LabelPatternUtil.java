@@ -31,9 +31,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
-import net.sf.jabref.model.entry.AuthorList.Author;
 import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
-import net.sf.jabref.logic.util.strings.CaseChangers;
+import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.util.Util;
 
 /**

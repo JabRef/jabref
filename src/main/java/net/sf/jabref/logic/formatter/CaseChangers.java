@@ -15,7 +15,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.logic.util.strings;
+package net.sf.jabref.logic.formatter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -235,14 +235,7 @@ public class CaseChangers {
 
     }
 
-    public interface CaseChanger {
-
-        String getName();
-
-        String changeCase(String input);
-    }
-
-    public static class LowerCaseChanger implements CaseChanger {
+    public static class LowerCaseChanger implements Formatter {
 
         @Override
         public String getName() {
@@ -253,7 +246,7 @@ public class CaseChangers {
          * Converts all characters of the string to lower case, but does not change words starting with "{"
          */
         @Override
-        public String changeCase(String input) {
+        public String format(String input) {
             Title title = new Title(input);
 
             title.getWords().stream().forEach(Word::toLowerCase);
@@ -262,7 +255,7 @@ public class CaseChangers {
         }
     }
 
-    public static class UpperCaseChanger implements CaseChanger {
+    public static class UpperCaseChanger implements Formatter {
 
         @Override
         public String getName() {
@@ -273,7 +266,7 @@ public class CaseChangers {
          * Converts all characters of the given string to upper case, but does not change words starting with "{"
          */
         @Override
-        public String changeCase(String input) {
+        public String format(String input) {
             Title title = new Title(input);
 
             title.getWords().stream().forEach(Word::toUpperCase);
@@ -282,7 +275,7 @@ public class CaseChangers {
         }
     }
 
-    public static class UpperFirstCaseChanger implements CaseChanger {
+    public static class UpperFirstCaseChanger implements Formatter {
 
         @Override
         public String getName() {
@@ -293,8 +286,8 @@ public class CaseChangers {
          * Converts the first character of the first word of the given string to a upper case (and the remaining characters of the first word to lower case), but does not change anything if word starts with "{"
          */
         @Override
-        public String changeCase(String input) {
-            Title title = new Title(LOWER.changeCase(input));
+        public String format(String input) {
+            Title title = new Title(LOWER.format(input));
 
             title.getWords().stream().findFirst().ifPresent(Word::toUpperFirst);
 
@@ -302,7 +295,7 @@ public class CaseChangers {
         }
     }
 
-    public static class UpperEachFirstCaseChanger implements CaseChanger {
+    public static class UpperEachFirstCaseChanger implements Formatter {
 
         @Override
         public String getName() {
@@ -313,7 +306,7 @@ public class CaseChangers {
          * Converts the first character of each word of the given string to a upper case (and all others to lower case), but does not change words starting with "{"
          */
         @Override
-        public String changeCase(String input) {
+        public String format(String input) {
             Title title = new Title(input);
 
             title.getWords().stream().forEach(Word::toUpperFirst);
@@ -322,7 +315,7 @@ public class CaseChangers {
         }
     }
 
-    public static class TitleCaseChanger implements CaseChanger {
+    public static class TitleCaseChanger implements Formatter {
 
         @Override
         public String getName() {
@@ -335,7 +328,7 @@ public class CaseChangers {
          * Does not change words starting with "{"
          */
         @Override
-        public String changeCase(String input) {
+        public String format(String input) {
             Title title = new Title(input);
 
             title.getWords().stream().filter(Word::isSmallerWord).forEach(Word::toLowerCase);
@@ -360,5 +353,5 @@ public class CaseChangers {
     public static final UpperEachFirstCaseChanger UPPER_EACH_FIRST = new UpperEachFirstCaseChanger();
     public static final TitleCaseChanger TITLE = new TitleCaseChanger();
 
-    public static final List<CaseChanger> ALL = Arrays.asList(CaseChangers.LOWER, CaseChangers.UPPER, CaseChangers.UPPER_FIRST, CaseChangers.UPPER_EACH_FIRST, CaseChangers.TITLE);
+    public static final List<Formatter> ALL = Arrays.asList(CaseChangers.LOWER, CaseChangers.UPPER, CaseChangers.UPPER_FIRST, CaseChangers.UPPER_EACH_FIRST, CaseChangers.TITLE);
 }
