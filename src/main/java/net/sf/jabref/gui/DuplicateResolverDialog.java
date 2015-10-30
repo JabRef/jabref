@@ -22,8 +22,6 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
@@ -186,23 +184,16 @@ public class DuplicateResolverDialog extends JDialog {
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 
-        setLocation(Globals.prefs.getInt(JabRefPreferences.DUPLICATES_POS_X), Globals.prefs.getInt(JabRefPreferences.DUPLICATES_POS_Y));
-        setSize(Globals.prefs.getInt(JabRefPreferences.DUPLICATES_SIZE_X), Globals.prefs.getInt(JabRefPreferences.DUPLICATES_SIZE_Y));
-
+        GUIGlobals.setDialogSize(this, "duplicates");
         both.requestFocus();
 
     }
 
 
     private void savePosition() {
-        Point p = getLocation();
-        Dimension d = getSize();
-        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_POS_X, p.x);
-        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_POS_Y, p.y);
-        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_SIZE_X, d.width);
-        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_SIZE_Y, d.height);
+        GUIGlobals.storeDialogSize(this, "duplicates");
     }
-    
+
     public boolean isBlocking() {
         return block;
     }

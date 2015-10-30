@@ -18,9 +18,11 @@ package net.sf.jabref.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Point;
 import java.util.*;
 
 import javax.swing.JLabel;
+import javax.swing.JDialog;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -196,10 +198,24 @@ public class GUIGlobals {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
         if (middle.equals("en/")) {
-            middle = ""; // english in base help dir.
+            middle = ""; // English in base help dir.
         }
 
         return GUIGlobals.helpPre + middle;
+    }
+
+    public static void setDialogSize(JDialog dialog, String name) {
+        dialog.setLocation(Globals.prefs.getInt(name + "PosX"), Globals.prefs.getInt(name + "PosY"));
+        dialog.setSize(Globals.prefs.getInt(name + "SizeX"), Globals.prefs.getInt(name + "SizeY"));
+    }
+
+    public static void storeDialogSize(JDialog dialog, String name) {
+        Point p = dialog.getLocation();
+        Dimension d = dialog.getSize();
+        Globals.prefs.putInt(name + "PosX", p.x);
+        Globals.prefs.putInt(name + "PosY", p.y);
+        Globals.prefs.putInt(name + "SizeX", d.width);
+        Globals.prefs.putInt(name + "SizeY", d.height);
     }
 
     /**

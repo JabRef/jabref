@@ -15,7 +15,6 @@
  */
 package net.sf.jabref.gui.mergeentries;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -23,9 +22,8 @@ import javax.swing.*;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -131,10 +129,7 @@ public class MergeEntriesDialog extends JDialog {
 
         pack();
 
-        setLocation(Globals.prefs.getInt(JabRefPreferences.MERGEENTRIES_POS_X),
-                Globals.prefs.getInt(JabRefPreferences.MERGEENTRIES_POS_Y));
-        setSize(Globals.prefs.getInt(JabRefPreferences.MERGEENTRIES_SIZE_X),
-                Globals.prefs.getInt(JabRefPreferences.MERGEENTRIES_SIZE_Y));
+        GUIGlobals.setDialogSize(this, "mergeEntries");
 
         // Show what we've got
         setVisible(true);
@@ -173,11 +168,6 @@ public class MergeEntriesDialog extends JDialog {
     }
 
     private void savePosition() {
-        Point p = getLocation();
-        Dimension d = getSize();
-        Globals.prefs.putInt(JabRefPreferences.MERGEENTRIES_POS_X, p.x);
-        Globals.prefs.putInt(JabRefPreferences.MERGEENTRIES_POS_Y, p.y);
-        Globals.prefs.putInt(JabRefPreferences.MERGEENTRIES_SIZE_X, d.width);
-        Globals.prefs.putInt(JabRefPreferences.MERGEENTRIES_SIZE_Y, d.height);
+        GUIGlobals.storeDialogSize(this, "mergeEntries");
     }
 }

@@ -18,10 +18,8 @@ package net.sf.jabref.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -67,7 +65,6 @@ class StringDialog extends JDialog {
     private final BibtexDatabase base;
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private final JabRefPreferences prefs;
     private Object[] strings;
 
     JLabel lab;
@@ -80,7 +77,6 @@ class StringDialog extends JDialog {
         this.frame = frame;
         this.panel = panel;
         this.base = base;
-        this.prefs = prefs;
 
         sortStrings();
 
@@ -104,8 +100,7 @@ class StringDialog extends JDialog {
             }
         });
 
-        setLocation(prefs.getInt(JabRefPreferences.STRINGS_POS_X), prefs.getInt(JabRefPreferences.STRINGS_POS_Y));
-        setSize(prefs.getInt(JabRefPreferences.STRINGS_SIZE_X), prefs.getInt(JabRefPreferences.STRINGS_SIZE_Y));
+        GUIGlobals.setDialogSize(this, "strings");
 
         JPanel pan = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
@@ -344,12 +339,7 @@ class StringDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             panel.stringsClosing();
             dispose();
-            Point p = getLocation();
-            Dimension d = getSize();
-            prefs.putInt(JabRefPreferences.STRINGS_POS_X, p.x);
-            prefs.putInt(JabRefPreferences.STRINGS_POS_Y, p.y);
-            prefs.putInt(JabRefPreferences.STRINGS_SIZE_X, d.width);
-            prefs.putInt(JabRefPreferences.STRINGS_SIZE_Y, d.height);
+            GUIGlobals.storeDialogSize(this.parent, "strings");
         }
     }
 
