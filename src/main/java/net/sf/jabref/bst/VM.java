@@ -42,13 +42,13 @@ import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
 /**
- * 
+ *
  * A Bibtex Virtual machine that can execute .bst files.
- * 
+ *
  * Documentation can be found in the original bibtex distribution:
- * 
- * http://texcatalogue.sarovar.org/entries/bibtex.html#Download
- * 
+ *
+ * https://www.ctan.org/pkg/bibtex
+ *
  */
 
 public class VM implements Warn {
