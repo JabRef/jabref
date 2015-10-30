@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -336,21 +337,27 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         return false;
     }
 
-    private static BibtexEntry downloadEntryBibTeX(String ID, boolean abs) {
+    private static BibtexEntry downloadEntryBibTeX(String ID, boolean downloadAbstract) {
         try {
             URL url = new URL(ACMPortalFetcher.startUrl + ACMPortalFetcher.bibtexUrl + ID + ACMPortalFetcher.bibtexUrlEnd);
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            ParserResult result = BibtexParser.parse(in);
-            in.close();
-            Collection<BibtexEntry> item = result.getDatabase().getEntries();
-            if (item.isEmpty()) {
+            URLConnection connection = url.openConnection();
+
+            // set user-agent to avoid being blocked as a crawler
+            connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
+            Collection<BibtexEntry> items = null;
+            try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                items = BibtexParser.parse(in).getDatabase().getEntries();
+            } catch (IOException e) {
+                LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);
+            }
+            if (items == null || items.isEmpty()) {
                 return null;
             }
-            BibtexEntry entry = item.iterator().next();
+            BibtexEntry entry = items.iterator().next();
             Thread.sleep(ACMPortalFetcher.WAIT_TIME);//wait between requests or you will be blocked by ACM
 
             // get abstract
-            if (abs) {
+            if (downloadAbstract) {
                 url = new URL(ACMPortalFetcher.startUrl + ACMPortalFetcher.abstractUrl + ID);
                 String page = Util.getResults(url);
                 Matcher absM = ACMPortalFetcher.absPattern.matcher(page);
@@ -361,7 +368,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             }
 
             return entry;
-
         } catch (NoSuchElementException e) {
             LOGGER.info("Bad Bibtex record read at: " + ACMPortalFetcher.bibtexUrl + ID + ACMPortalFetcher.bibtexUrlEnd,
                     e);
