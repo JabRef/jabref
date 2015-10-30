@@ -77,7 +77,15 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
     }
 
     public BibtexEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
-        DOI doi = new DOI(doiStr);
+        DOI doi;
+        try {
+            doi = new DOI(doiStr);
+        } catch (IllegalArgumentException e) {
+            status.showMessage(Localization.lang("Invalid DOI: '%0'.", doiStr),
+                    Localization.lang("Get BibTeX entry from DOI"),
+                    JOptionPane.INFORMATION_MESSAGE);
+            return null;
+        }
 
         // Send the request
 
