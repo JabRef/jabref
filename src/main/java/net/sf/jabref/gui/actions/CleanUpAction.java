@@ -410,19 +410,9 @@ public class CleanUpAction extends AbstractWorker {
             String newValue = BibtexFieldFormatters.SUPERSCRIPTS.format(oldValue);
             // undo action
             if(!oldValue.equals(newValue)) {
+                entry.setField(name, newValue);
                 ce.addEdit(new UndoableFieldChange(entry, name, oldValue, newValue));
             }
-        }
-
-        final String field = "booktitle";
-        String oldValue = entry.getField(field);
-        if (oldValue == null) {
-            return;
-        }
-        String newValue = oldValue.replaceAll(" (\\d+)(st|nd|rd|th) ", " $1\\\\textsuperscript{$2} ");
-        if (!oldValue.equals(newValue)) {
-            entry.setField(field, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
         }
     }
 
