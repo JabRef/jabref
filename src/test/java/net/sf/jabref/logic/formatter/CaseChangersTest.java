@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.util;
+package net.sf.jabref.logic.formatter;
 
 import net.sf.jabref.logic.formatter.CaseChangers;
 import org.junit.Assert;

@@ -52,7 +52,6 @@ public class SaveDatabaseAction extends AbstractWorker {
 
 
     public SaveDatabaseAction(BasePanel panel) {
-
         this.panel = panel;
         this.frame = panel.frame();
     }
