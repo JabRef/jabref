@@ -42,6 +42,8 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.cleanup.PageNumbersCleanup;
+import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
+import net.sf.jabref.logic.formatter.bibtexfields.SuperscriptFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.DOI;
@@ -402,6 +404,16 @@ public class CleanUpAction extends AbstractWorker {
      * Converts the text in 1st, 2nd, ... to real superscripts by wrapping in \textsuperscript{st}, ...
      */
     private static void doCleanUpSuperscripts(BibtexEntry entry, NamedCompound ce) {
+        for(String name: entry.getFieldNames()) {
+            String oldValue = entry.getField(name);
+            // run formatter
+            String newValue = BibtexFieldFormatters.SUPERSCRIPTS.format(oldValue);
+            // undo action
+            if(!oldValue.equals(newValue)) {
+                ce.addEdit(new UndoableFieldChange(entry, name, oldValue, newValue));
+            }
+        }
+
         final String field = "booktitle";
         String oldValue = entry.getField(field);
         if (oldValue == null) {
