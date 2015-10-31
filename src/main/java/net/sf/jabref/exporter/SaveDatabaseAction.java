@@ -28,8 +28,11 @@ import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
-
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -50,6 +53,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     private boolean cancelled;
     private boolean fileLockedError;
 
+    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
 
     public SaveDatabaseAction(BasePanel panel) {
         this.panel = panel;
@@ -98,7 +102,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                             if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
                                 // TODO: GUI handling of the situation when the externally modified file keeps being locked.
-                                System.err.println("File locked, this will be trouble.");
+                                LOGGER.error("File locked, this will be trouble.");
                             }
 
                             ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getFile());
@@ -209,8 +213,8 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                 if (!AutoSaveManager.deleteAutoSaveFile(panel)) {
                     //System.out.println("Deletion of autosave file failed");
-                }/* else
-                    System.out.println("Deleted autosave file (if it existed)");*/
+                } /* else
+                     System.out.println("Deleted autosave file (if it existed)");*/
                 // (Only) after a successful save the following
                 // statement marks that the base is unchanged
                 // since last save:
@@ -288,7 +292,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
-                Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"), 
+                Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"),
                         Localization.lang("Save database"),
                         JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS, encoding);
                 if (choice != null) {

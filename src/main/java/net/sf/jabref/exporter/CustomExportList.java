@@ -18,6 +18,9 @@ package net.sf.jabref.exporter;
 import java.util.Comparator;
 import java.util.TreeMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.Globals;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -38,6 +41,8 @@ public class CustomExportList {
     private final SortedList<String[]> sorted;
     private final TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
     private Object[] array;
+
+    private static final Log LOGGER = LogFactory.getLog(CustomExportList.class);
 
 
     public CustomExportList(Comparator<String[]> comp) {
@@ -71,7 +76,8 @@ public class CustomExportList {
                 list.add(s);
             } else {
                 String customExportFormat = Globals.prefs.get("customExportFormat" + i);
-                System.out.println(Localization.lang("Error initializing custom export format from string '%0'", customExportFormat));
+                LOGGER.error(Localization.lang("Error initializing custom export format from string '%0'",
+                        customExportFormat));
             }
             i++;
         }

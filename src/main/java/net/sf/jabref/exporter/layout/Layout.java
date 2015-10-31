@@ -16,6 +16,10 @@
 package net.sf.jabref.exporter.layout;
 
 import java.util.Vector;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -30,6 +34,7 @@ public class Layout {
 
     private final ArrayList<String> missingFormatters = new ArrayList<>();
 
+    private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
     public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception {
         StringInt si;
@@ -55,8 +60,8 @@ public class Layout {
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        System.out.println(blockStart + '\n' + si.s);
-                        System.out.println("Nested field entries are not implemented !!!");
+                        LOGGER.debug(blockStart + '\n' + si.s);
+                        LOGGER.warn("Nested field entries are not implemented !!!");
                         Thread.dumpStack();
                     }
                 }
@@ -71,7 +76,7 @@ public class Layout {
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        System.out.println("Nested field entries are not implemented !!!");
+                        LOGGER.warn("Nested field entries are not implemented !!!");
                         Thread.dumpStack();
                     }
                 }

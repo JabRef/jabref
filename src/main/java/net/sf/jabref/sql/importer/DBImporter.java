@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General public static License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,6 +21,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -35,9 +38,9 @@ import net.sf.jabref.sql.SQLUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
- * 
+ *
  * @author ifsteinm.
- * 
+ *
  *         Jan 20th Abstract Class to provide main features to import entries
  *         from a DB. To insert a new DB it is necessary to extend this class
  *         and add the DB name the enum available at
@@ -45,9 +48,11 @@ import net.sf.jabref.logic.util.strings.StringUtil;
  *         class and its subclasses import database, entries and related stuff
  *         from a DB to bib. Each exported database is imported as a new JabRef
  *         (bib) database, presented on a new tab
- * 
+ *
  */
 public abstract class DBImporter extends DBImporterExporter {
+
+    private static final Log LOGGER = LogFactory.getLog(DBImporter.class);
 
     private final ArrayList<String> columnsNotConsideredForEntries = new ArrayList<String>(
             Arrays.asList("cite_key", "entry_types_id", "database_id",
@@ -57,7 +62,7 @@ public abstract class DBImporter extends DBImporterExporter {
     /**
      * Given a DBStrings it connects to the DB and returns the
      * java.sql.Connection object
-     * 
+     *
      * @param dbstrings
      *            The DBStrings to use to make the connection
      * @return java.sql.Connection to the DB chosen
@@ -67,7 +72,7 @@ public abstract class DBImporter extends DBImporterExporter {
             throws Exception;
 
     /**
-     * 
+     *
      * @param conn
      *            Connection object to the database
      * @return A ResultSet with column name for the entries table
@@ -78,7 +83,7 @@ public abstract class DBImporter extends DBImporterExporter {
 
     /**
      * Worker method to perform the import from a database
-     * 
+     *
      * @param keySet
      *            The set of IDs of the entries to export.
      * @param dbs
@@ -177,12 +182,12 @@ public abstract class DBImporter extends DBImporterExporter {
 
     /**
      * Look up the group type name from the type ID in the database.
-     * 
+     *
      * @param groupId
      *            The database's groups id
      * @param conn
      *            The database connection
-     * 
+     *
      * @return The name (JabRef type id) of the group type.
      * @throws SQLException
      */
@@ -214,7 +219,7 @@ public abstract class DBImporter extends DBImporterExporter {
                 group = new ExplicitGroup(rsGroups.getString("label"),
                         GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(KeywordGroup.ID)) {
-                System.out.println("Keyw: "
+                LOGGER.info("Keyw: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new KeywordGroup(rsGroups.getString("label"),
                         StringUtil.unquote(rsGroups.getString("search_field"), '\\'),
@@ -223,7 +228,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         rsGroups.getBoolean("reg_exp"),
                         GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(SearchGroup.ID)) {
-                System.out.println("Search: "
+                LOGGER.info("Search: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new SearchGroup(rsGroups.getString("label"),
                         StringUtil.unquote(rsGroups.getString("search_expression"),

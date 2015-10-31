@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,6 +26,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
 import java.nio.charset.UnsupportedCharsetException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class used to handle safe storage to disk.
@@ -58,6 +61,7 @@ public class SaveSession {
     private final boolean useLockFile;
     private final VerifyingWriter writer;
 
+    private static final Log LOGGER = LogFactory.getLog(SaveSession.class);
 
     public SaveSession(File file, String encoding, boolean backup) throws IOException, UnsupportedCharsetException {
         this.file = file;
@@ -107,8 +111,7 @@ public class SaveSession {
 
                     }
                 } catch (IOException ex) {
-                    System.err.println("Error when creating lock file");
-                    ex.printStackTrace();
+                    LOGGER.error("Error when creating lock file");
                 }
             }
 
@@ -147,8 +150,7 @@ public class SaveSession {
         try {
             out.close();
         } catch (IOException ex) {
-            System.err.println("Error when creating lock file");
-            ex.printStackTrace();
+            LOGGER.error("Error when creating lock file");
         }
         lock.deleteOnExit();
         return false;

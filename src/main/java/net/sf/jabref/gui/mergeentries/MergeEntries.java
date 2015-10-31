@@ -24,6 +24,9 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -71,6 +74,8 @@ public class MergeEntries {
     private String[] jointStrings;
     private final JPanel mergePanel = new JPanel();
     private final JPanel mainPanel = new JPanel();
+
+    private static final Log LOGGER = LogFactory.getLog(Globals.class);
 
 
     /**
@@ -335,7 +340,7 @@ public class MergeEntries {
         try {
             new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
-            System.err.println(Localization.lang("Error in entry" + ": " + ex.getMessage()));
+            LOGGER.error(Localization.lang("Error in entry" + ": " + ex.getMessage()));
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);
@@ -418,7 +423,7 @@ public class MergeEntries {
         try {
             new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
-            System.err.println(Localization.lang("Error in entry" + ": " + ex.getMessage()));
+            LOGGER.error(Localization.lang("Error in entry" + ": " + ex.getMessage()));
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);

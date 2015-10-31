@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -53,8 +53,6 @@ import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
 public class EntryTableTransferHandler extends TransferHandler {
-
-    private static final long serialVersionUID = 1L;
 
     private final MainTable entryTable;
 
@@ -116,9 +114,9 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     /**
      * This method is called when stuff is drag to the component.
-     * 
+     *
      * Imports the dropped URL or plain text as a new entry in the current database.
-     * 
+     *
      */
     @Override
     public boolean importData(JComponent comp, Transferable t) {
@@ -196,16 +194,16 @@ public class EntryTableTransferHandler extends TransferHandler {
             }
 
         } catch (IOException ioe) {
-            System.err.println("failed to read dropped data: " + ioe);
+            LOGGER.error("Failed to read dropped data: " + ioe);
         } catch (UnsupportedFlavorException ufe) {
-            System.err.println("drop type error: " + ufe);
+            LOGGER.error("Drop type error: " + ufe);
         }
 
         // all supported flavors failed
-        System.err.println("can't transfer input: ");
+        LOGGER.info("Can't transfer input: ");
         DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
-            System.out.println("  " + inflav);
+            LOGGER.info("  " + inflav);
         }
 
         return false;
@@ -213,7 +211,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     /**
      * This method is called to query whether the transfer can be imported.
-     * 
+     *
      * Will return true for urls, strings, javaFileLists
      */
     @Override
@@ -251,7 +249,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             }
             // We have an icon column:
             if (res == MainTableFormat.FILE) {
-                System.out.println("dragging file");
+                LOGGER.info("Dragging file");
                 draggingFile = true;
             }
         }
@@ -352,7 +350,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     /**
      * Handle a String describing a set of files or URLs dragged into JabRef.
-     * 
+     *
      * @param s String describing a set of files or URLs dragged into JabRef
      * @param dropRow The row in the table where the files were dragged.
      * @return success status for the operation
@@ -366,7 +364,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     /**
      * Handle a List containing File objects for a set of files to import.
-     * 
+     *
      * @param files A List containing File instances pointing to files.
      * @param dropRow @param dropRow The row in the table where the files were dragged.
      * @return success status for the operation
@@ -401,7 +399,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     /**
      * Take a set of filenames. Those with names indicating bib files are opened as such if possible. All other files we
      * will attempt to import into the current database.
-     * 
+     *
      * @param fileNames The names of the files to open.
      * @param dropRow success status for the operation
      */
@@ -415,7 +413,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             String extension = "";
             ExternalFileType fileType = null;
             int index = fileName.lastIndexOf('.');
-            if (index >= 0 && index < fileName.length()) {
+            if ((index >= 0) && (index < fileName.length())) {
                 extension = fileName.substring(index + 1).toLowerCase();
                 fileType = Globals.prefs.getExternalFileTypeByExt(extension);
             }
@@ -423,7 +421,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 File f = new File(fileName);
                 try {
                     ParserResult pr = OpenDatabaseAction.loadDatabase(f, encoding);
-                    if (pr == null || pr == ParserResult.INVALID_FORMAT) {
+                    if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                         notBibFiles.add(fileName);
                     } else {
                         openAction.addNewDatabase(pr, f, true);
@@ -441,7 +439,7 @@ public class EntryTableTransferHandler extends TransferHandler {
              *
              * TODO we should offer an option to highlight the row the user is on too.
              */
-            if (fileType != null && dropRow >= 0) {
+            if ((fileType != null) && (dropRow >= 0)) {
 
                 /*
                  * TODO: need to signal if this is a local or autodownloaded
@@ -466,12 +464,12 @@ public class EntryTableTransferHandler extends TransferHandler {
             					c = null;
             					frame.output(Globals.lang("No XMP metadata found in " + fileNames[i]));
             				}
-            
+
             				if (c != null && c.size() > 0) {
             					Iterator it = c.iterator();
-            
+
             					BasePanel panel = frame.basePanel();
-            
+
             					if (panel == null) {
             						// // Create a new, empty, database.
             						BibtexDatabase database = new BibtexDatabase();
@@ -480,14 +478,14 @@ public class EntryTableTransferHandler extends TransferHandler {
             						frame.output(Globals.lang("New database created."));
             						panel = frame.basePanel();
             					}
-            
+
             					BibtexDatabase database = frame.basePanel().database();
-            
+
             					NamedCompound ce = new NamedCompound(Glbals.lang("Drop PDF"));
-            
+
             					while (it.hasNext()) {
             						BibtexEntry e = (BibtexEntry) it.next();
-            
+
             						try {
             							e.setId(Util.next());
             							database.insertEntry(e);
@@ -496,7 +494,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             							// Should not happen?
             						}
             					}
-            
+
             					ce.end();
             					panel.undoManager.addEdit(ce);
             					panel.markBaseChanged();

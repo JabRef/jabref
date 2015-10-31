@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.format.NameFormatter;
@@ -47,11 +50,14 @@ class LayoutEntry {
     private final String classPrefix;
 
     private ArrayList<String> invalidFormatter;
-    
-    // used at highlighting in preview area. 
+
+    // used at highlighting in preview area.
     // Color chosen similar to JTextComponent.getSelectionColor(), which is
-    // used at highlighting words at the editor 
+    // used at highlighting words at the editor
     public static final String HIGHLIGHT_COLOR = "#3399FF";
+
+    private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
+
 
     public LayoutEntry(StringInt si, String classPrefix_) throws Exception {
         type = si.i;
@@ -61,7 +67,7 @@ class LayoutEntry {
             text = si.s;
         } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             text = si.s.trim();
-        } else if (si.i == LayoutHelper.IS_FIELD_START || si.i == LayoutHelper.IS_FIELD_END) {
+        } else if ((si.i == LayoutHelper.IS_FIELD_START) || (si.i == LayoutHelper.IS_FIELD_END)) {
         } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
             Vector<String> v = new Vector<String>();
             WSITools.tokenize(v, si.s, "\n");
@@ -102,22 +108,22 @@ class LayoutEntry {
         blockEnd = si.s;
 
         if (!blockStart.equals(blockEnd)) {
-            System.err.println("Field start and end entry must be equal.");
+            LOGGER.warn("Field start and end entry must be equal.");
         }
 
         type = layoutType;
         text = si.s;
 
-        for (int i = 1; i < parsedEntries.size() - 1; i++) {
+        for (int i = 1; i < (parsedEntries.size() - 1); i++) {
             si = parsedEntries.get(i);
 
             // System.out.println("PARSED-ENTRY: "+si.s+"="+si.i);
-            if (si.i == LayoutHelper.IS_LAYOUT_TEXT || si.i == LayoutHelper.IS_SIMPLE_FIELD) {
-            } else if (si.i == LayoutHelper.IS_FIELD_START
-                    || si.i == LayoutHelper.IS_GROUP_START) {
+            if ((si.i == LayoutHelper.IS_LAYOUT_TEXT) || (si.i == LayoutHelper.IS_SIMPLE_FIELD)) {
+            } else if ((si.i == LayoutHelper.IS_FIELD_START)
+                    || (si.i == LayoutHelper.IS_GROUP_START)) {
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
-            } else if (si.i == LayoutHelper.IS_FIELD_END || si.i == LayoutHelper.IS_GROUP_END) {
+            } else if ((si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_END)) {
                 if (blockStart.equals(si.s)) {
                     blockEntries.add(si);
                     if (si.i == LayoutHelper.IS_GROUP_END) {
@@ -128,7 +134,7 @@ class LayoutEntry {
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
-                    System.out.println("Nested field entries are not implemented !!!");
+                    LOGGER.warn("Nested field entries are not implemented !!!");
                 }
             } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
             }
@@ -212,9 +218,9 @@ class LayoutEntry {
                 }
             }
 
-            if (field == null
-                    || type == LayoutHelper.IS_GROUP_START && field.equalsIgnoreCase(LayoutHelper
-                            .getCurrentGroup())) {
+            if ((field == null)
+                    || ((type == LayoutHelper.IS_GROUP_START) && field.equalsIgnoreCase(LayoutHelper
+                            .getCurrentGroup()))) {
                 return null;
             } else {
                 if (type == LayoutHelper.IS_GROUP_START) {
@@ -228,7 +234,7 @@ class LayoutEntry {
                     fieldText = layoutEntries[i].doLayout(bibtex, database);
 
                     if (fieldText == null) {
-                        if (i + 1 < layoutEntries.length) {
+                        if ((i + 1) < layoutEntries.length) {
                             if (layoutEntries[i + 1].doLayout(bibtex, database).trim().isEmpty()) {
                                 i++;
                                 previousSkipped = true;
@@ -242,8 +248,8 @@ class LayoutEntry {
                         if (previousSkipped) {
                             int eol = 0;
 
-                            while (eol < fieldText.length()
-                                    && (fieldText.charAt(eol) == '\n' || fieldText.charAt(eol) == '\r')) {
+                            while ((eol < fieldText.length())
+                                    && ((fieldText.charAt(eol) == '\n') || (fieldText.charAt(eol) == '\r'))) {
                                 eol++;
                             }
 
@@ -257,7 +263,7 @@ class LayoutEntry {
                             /*
                              * if fieldText is not null and the bibtexentry is marked
                              * as a searchhit, try to highlight the searched words
-                             * 
+                             *
                             */
                             if (bibtex.isSearchHit()) {
                                 sb.append(highlightWords(fieldText, wordsToHighlight));
@@ -323,7 +329,7 @@ class LayoutEntry {
     // added section - begin (arudert)
     /**
      * Do layout for general formatters (no bibtex-entry fields).
-     * 
+     *
      * @param database
      *            Bibtex Database
      * @return
@@ -334,10 +340,10 @@ class LayoutEntry {
         } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
             throw new UnsupportedOperationException(
                     "bibtex entry fields not allowed in begin or end layout");
-        } else if (type == LayoutHelper.IS_FIELD_START || type == LayoutHelper.IS_GROUP_START) {
+        } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_GROUP_START)) {
             throw new UnsupportedOperationException(
                     "field and group starts not allowed in begin or end layout");
-        } else if (type == LayoutHelper.IS_FIELD_END || type == LayoutHelper.IS_GROUP_END) {
+        } else if ((type == LayoutHelper.IS_FIELD_END) || (type == LayoutHelper.IS_GROUP_END)) {
             throw new UnsupportedOperationException(
                     "field and group ends not allowed in begin or end layout");
         } else if (type == LayoutHelper.IS_OPTION_FIELD) {
@@ -396,7 +402,7 @@ class LayoutEntry {
     /**
      * Return an array of LayoutFormatters found in the given formatterName
      * string (in order of appearance).
-     * 
+     *
      */
     private static LayoutFormatter[] getOptionalLayout(String formatterName, String classPrefix) {
 
@@ -463,18 +469,18 @@ class LayoutEntry {
         return invalidFormatter;
     }
 
-    /** 
-     * Will return the text that was called by the method with HTML tags 
+    /**
+     * Will return the text that was called by the method with HTML tags
      * to highlight each word the user has searched for and will skip
      * the highlight process if the first Char isn't a letter or a digit.
-     * 
+     *
      * This check is a quick hack to avoid highlighting of HTML tags
-     * It does not always work, but it does its job mostly  
-     * 
+     * It does not always work, but it does its job mostly
+     *
      * @param text This is a String in which we search for different words
      * @param toHighlight List of all words which must be highlighted
-     * 
-     * @return String that was called by the method, with HTML Tags if a word was found 
+     *
+     * @return String that was called by the method, with HTML Tags if a word was found
      */
     private String highlightWords(String text, ArrayList<String> toHighlight) {
         if (toHighlight == null) {

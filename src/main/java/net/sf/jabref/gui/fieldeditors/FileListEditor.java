@@ -280,7 +280,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(),
                         type != null ? type : entry.getType());
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Cannot open selected file: " + e.getMessage());
             }
         }
     }
@@ -466,7 +466,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         try {
             def.download(this);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Cannot download: " + ex.getMessage());
         }
     }
 

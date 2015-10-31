@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -39,6 +39,9 @@ package net.sf.jabref.exporter.layout;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * JabRef helper methods.
  *
@@ -46,6 +49,9 @@ import java.util.Vector;
  */
 public class WSITools
 {
+
+    private static final Log LOGGER = LogFactory.getLog(WSITools.class);
+
 
     private WSITools()
     {
@@ -92,7 +98,7 @@ public class WSITools
     public static boolean tokenize(Vector<String> vcr, String s, String delimstr,
             int limit)
     {
-        System.out.println("Warning: tokenize \"" + s + '"');
+        LOGGER.warn("Tokenize \"" + s + '"');
         vcr.clear();
         s = s + '\n';
 
