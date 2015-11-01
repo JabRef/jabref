@@ -58,6 +58,7 @@ import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.undo.*;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIGlobals;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
 import net.sf.jabref.importer.fetcher.SPIRESFetcher;
@@ -477,8 +478,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for opening the preamble editor
         actions.put(Actions.EDIT_PREAMBLE, (BaseAction) () -> {
             if (preambleEditor == null) {
-                PreambleEditor form = new PreambleEditor(frame, BasePanel.this, database, Globals.prefs);
-                Util.placeDialog(form, frame);
+                PreambleEditor form = new PreambleEditor
+                        (frame, BasePanel.this, database, Globals.prefs);
+                PositionWindow.placeDialog(form, frame);
                 form.setVisible(true);
                 preambleEditor = form;
             } else {
@@ -531,7 +533,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                     // show connection dialog
                     DBConnectDialog dbd = new DBConnectDialog(frame(), dbs);
-                    Util.placeDialog(dbd, BasePanel.this);
+                    PositionWindow.placeDialog(dbd, BasePanel.this);
                     dbd.setVisible(true);
 
                     connectToDB = dbd.getConnectToDB();
@@ -604,7 +606,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, (BaseAction) () -> {
             FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(frame, frame, BasePanel.this);
-            Util.placeDialog(dialog, frame);
+            PositionWindow.placeDialog(dialog, frame);
             dialog.setVisible(true);
         });
 
@@ -1214,7 +1216,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void action() {
                 // get Type of new entry
                 EntryTypeDialog etd = new EntryTypeDialog(frame);
-                Util.placeDialog(etd, BasePanel.this);
+                PositionWindow.placeDialog(etd, BasePanel.this);
                 etd.setVisible(true);
                 BibtexEntryType tp = etd.getChoice();
                 if (tp == null) {
@@ -1224,7 +1226,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String id = IdGenerator.next();
                 BibtexEntry bibEntry = new BibtexEntry(id, tp);
                 TextInputDialog tidialog = new TextInputDialog(frame, BasePanel.this, "import", true, bibEntry);
-                Util.placeDialog(tidialog, BasePanel.this);
+                PositionWindow.placeDialog(tidialog, BasePanel.this);
                 tidialog.setVisible(true);
 
                 if (tidialog.okPressed()) {
@@ -1336,9 +1338,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.SWITCH_PREVIEW, (BaseAction) selectionListener::switchPreview);
 
         actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
-            ContentSelectorDialog2 csd = new ContentSelectorDialog2(frame, frame, BasePanel.this, false, metaData,
-                    null);
-            Util.placeDialog(csd, frame);
+            ContentSelectorDialog2 csd = new ContentSelectorDialog2
+                    (frame, frame, BasePanel.this, false, metaData, null);
+            PositionWindow.placeDialog(csd, frame);
             csd.setVisible(true);
         });
 
@@ -1505,7 +1507,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Find out what type is wanted.
             EntryTypeDialog etd = new EntryTypeDialog(frame);
             // We want to center the dialog, to make it look nicer.
-            Util.placeDialog(etd, frame);
+            PositionWindow.placeDialog(etd, frame);
             etd.setVisible(true);
             type = etd.getChoice();
         }

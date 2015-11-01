@@ -89,6 +89,7 @@ import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.gui.util.IconComparator;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -1100,7 +1101,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(
                             ImportInspectionDialog.this, other, first,
                             DuplicateResolverDialog.INSPECTION);
-                    net.sf.jabref.util.Util.placeDialog(diag, ImportInspectionDialog.this);
+                    PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
                     if (diag.getSelected() == DuplicateResolverDialog.KEEP_UPPER) {
@@ -1148,7 +1149,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 if (other != null) {
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(
                             ImportInspectionDialog.this, first, other, DuplicateResolverDialog.DUPLICATE_SEARCH);
-                    net.sf.jabref.util.Util.placeDialog(diag, ImportInspectionDialog.this);
+                    PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
                     int answer = diag.getSelected();
@@ -1374,7 +1375,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // buttons:
             AttachFileDialog diag = new AttachFileDialog(ImportInspectionDialog.this, metaData,
                     entry, fileType);
-            net.sf.jabref.util.Util.placeDialog(diag, ImportInspectionDialog.this);
+            PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
             diag.setVisible(true);
             // After the dialog has closed, if it wasn't cancelled, list the
             // field:

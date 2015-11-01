@@ -37,7 +37,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
@@ -202,7 +202,7 @@ public class FileListEntryEditor {
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
-        Util.placeDialog(diag, frame);
+        PositionWindow.placeDialog(diag, frame);
         diag.addWindowListener(new WindowAdapter() {
 
             @Override

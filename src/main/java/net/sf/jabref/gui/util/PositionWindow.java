@@ -26,6 +26,7 @@ import net.sf.jabref.Globals;
 
 public class PositionWindow {
 
+    // Strings for the corresponding preferences
     public static final String MERGEENTRIES = "mergeEntries";
     public static final String DUPLICATES = "duplicates";
     public static final String STRINGS = "strings";
@@ -34,6 +35,8 @@ public class PositionWindow {
 
     public static void setWindowPosition(Window window, String name) {
 
+        // The actual preference strings ends with the following suffices
+        // There might be a better way to do this.
         String prefSizeX = name + "SizeX";
         String prefSizeY = name + "SizeY";
         String prefPosX = name + "PosX";
@@ -98,5 +101,13 @@ public class PositionWindow {
         Globals.prefs.putInt(name + "PosY", p.y);
         Globals.prefs.putInt(name + "SizeX", d.width);
         Globals.prefs.putInt(name + "SizeY", d.height);
+    }
+
+    /**
+     * This method sets the location of a Dialog such that it is centered with regard to another window, but not outside
+     * the screen on the left and the top.
+     */
+    public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
+        diag.setLocationRelativeTo(win);
     }
 }

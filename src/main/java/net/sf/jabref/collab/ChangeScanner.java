@@ -36,6 +36,7 @@ import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.bibtex.DuplicateCheck;
@@ -45,7 +46,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.util.Util;
 
 public class ChangeScanner implements Runnable {
 
@@ -138,7 +138,7 @@ public class ChangeScanner implements Runnable {
                 @Override
                 public void run() {
                     ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
-                    Util.placeDialog(dial, frame);
+                    PositionWindow.placeDialog(dial, frame);
                     dial.setVisible(true); // dial.show(); -> deprecated since 1.5
                     fup.scanResultsResolved(dial.isOkPressed());
                     if (dial.isOkPressed()) {

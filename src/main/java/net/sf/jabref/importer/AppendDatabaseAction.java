@@ -34,6 +34,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -64,7 +65,7 @@ public class AppendDatabaseAction implements BaseAction {
 
         filesToOpen.clear();
         final MergeDialog md = new MergeDialog(frame, Localization.lang("Append database"), true);
-        Util.placeDialog(md, panel);
+        PositionWindow.placeDialog(md, panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
             String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),

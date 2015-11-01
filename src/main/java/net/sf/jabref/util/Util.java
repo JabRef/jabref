@@ -103,14 +103,6 @@ public class Util {
 
 
     /**
-     * This method sets the location of a Dialog such that it is centered with regard to another window, but not outside
-     * the screen on the left and the top.
-     */
-    public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
-        diag.setLocationRelativeTo(win);
-    }
-
-    /**
      * This method translates a field or string from Bibtex notation, with possibly text contained in " " or { }, and
      * string references, concatenated by '#' characters, into Bibkeeper notation, where string references are enclosed
      * in a pair of '#' characters.

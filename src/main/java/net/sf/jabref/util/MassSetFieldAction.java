@@ -32,6 +32,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.util.PositionWindow;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -215,7 +216,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         }
         cancelled = true;
         prepareDialog(entries.length > 0);
-        Util.placeDialog(diag, frame);
+        PositionWindow.placeDialog(diag, frame);
         diag.setVisible(true);
         if (cancelled) {
             return;

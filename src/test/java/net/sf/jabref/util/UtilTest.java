@@ -5,6 +5,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.util.DOI;
@@ -72,7 +73,7 @@ public class UtilTest {
         Container c = new JWindow();
         c.setBounds(100, 200, 100, 50);
 
-        net.sf.jabref.util.Util.placeDialog(d, c);
+        PositionWindow.placeDialog(d, c);
         Assert.assertEquals(125, d.getX());
         Assert.assertEquals(200, d.getY());
 
@@ -80,7 +81,7 @@ public class UtilTest {
         c.setBounds(0, 0, 100, 100);
         d.setSize(200, 200);
 
-        net.sf.jabref.util.Util.placeDialog(d, c);
+        PositionWindow.placeDialog(d, c);
         Assert.assertEquals(0, d.getX());
         Assert.assertEquals(0, d.getY());
     }

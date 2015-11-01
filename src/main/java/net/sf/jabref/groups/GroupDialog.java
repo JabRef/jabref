@@ -26,6 +26,7 @@ import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
@@ -254,7 +255,7 @@ class GroupDialog extends JDialog {
         setResizable(false);
         updateComponents();
         setLayoutForSelectedGroup();
-        Util.placeDialog(this, jabrefFrame);
+        PositionWindow.placeDialog(this, jabrefFrame);
 
         // add listeners
         ItemListener radioButtonItemListener = new ItemListener() {

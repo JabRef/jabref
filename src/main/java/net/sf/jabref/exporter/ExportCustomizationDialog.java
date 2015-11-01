@@ -30,12 +30,12 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIGlobals;
+import net.sf.jabref.gui.util.PositionWindow;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 /**
  * <p>Title: </p>
@@ -171,7 +171,7 @@ public class ExportCustomizationDialog extends JDialog {
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(buttons, BorderLayout.SOUTH);
         pack();
-        Util.placeDialog(this, frame);
+        PositionWindow.placeDialog(this, frame);
         new FocusRequester(table);
     }
 

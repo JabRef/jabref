@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.Globals;
@@ -106,7 +107,7 @@ public class DbImportAction extends AbstractWorker {
 
             // show connection dialog
             dbd = new DBConnectDialog(frame, dbs);
-            Util.placeDialog(dbd, frame);
+            PositionWindow.placeDialog(dbd, frame);
             dbd.setVisible(true);
 
             connectToDB = dbd.getConnectToDB();

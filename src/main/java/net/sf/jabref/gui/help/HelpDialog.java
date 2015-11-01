@@ -27,8 +27,8 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.util.GUIGlobals;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 /**
  *
@@ -92,7 +92,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 
     public void showPage(String url, Class<?> resourceOwner) {
         if (!isVisible()) {
-            Util.placeDialog(this, frame);
+            PositionWindow.placeDialog(this, frame);
             content.reset();
             back.setEnabled(false);
             setVisible(true);

@@ -92,7 +92,6 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.util.ManageKeywordsAction;
 import net.sf.jabref.util.MassSetFieldAction;
-
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import osx.macadapter.MacAdapter;
@@ -722,7 +721,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                 output(Localization.lang("Opening preferences..."));
                 if (prefsDialog == null) {
                     prefsDialog = new PreferencesDialog(JabRefFrame.this, jabRef);
-                    net.sf.jabref.util.Util.placeDialog(prefsDialog, JabRefFrame.this);
+                    PositionWindow.placeDialog(prefsDialog, JabRefFrame.this);
                 } else {
                     prefsDialog.setValues();
                 }
@@ -1684,7 +1683,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             KeyBindingsDialog d = new KeyBindingsDialog(new HashMap<>(prefs.getKeyBindings()), prefs.getDefaultKeys());
             d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             d.pack(); //setSize(300,500);
-            net.sf.jabref.util.Util.placeDialog(d, JabRefFrame.this);
+            PositionWindow.placeDialog(d, JabRefFrame.this);
             d.setVisible(true);
             if (d.getAction()) {
                 prefs.setNewKeyBindings(d.getNewKeyBindings());
@@ -1822,7 +1821,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                             openInNew);
                     diag.addEntries(entries);
                     diag.entryListComplete();
-                    net.sf.jabref.util.Util.placeDialog(diag, JabRefFrame.this);
+                    PositionWindow.placeDialog(diag, JabRefFrame.this);
                     diag.setVisible(true);
                     diag.toFront();
                 }
@@ -2159,7 +2158,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         @Override
         public void actionPerformed(ActionEvent e) {
             JDialog dl = new EntryCustomizationDialog2(JabRefFrame.this);
-            net.sf.jabref.util.Util.placeDialog(dl, JabRefFrame.this);
+            PositionWindow.placeDialog(dl, JabRefFrame.this);
             dl.setVisible(true);
         }
     }
@@ -2173,7 +2172,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         @Override
         public void actionPerformed(ActionEvent e) {
             GenFieldsCustomizer gf = new GenFieldsCustomizer(JabRefFrame.this);
-            net.sf.jabref.util.Util.placeDialog(gf, JabRefFrame.this);
+            PositionWindow.placeDialog(gf, JabRefFrame.this);
             gf.setVisible(true);
 
         }
@@ -2194,7 +2193,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                 propertiesDialog = new DatabasePropertiesDialog(JabRefFrame.this);
             }
             propertiesDialog.setPanel(basePanel());
-            net.sf.jabref.util.Util.placeDialog(propertiesDialog, JabRefFrame.this);
+            PositionWindow.placeDialog(propertiesDialog, JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }
 
@@ -2219,7 +2218,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                 // BibtexKeyPatternDialog allows for updating content based on currently selected panel
                 bibtexKeyPatternDialog.setPanel(basePanel());
             }
-            net.sf.jabref.util.Util.placeDialog(bibtexKeyPatternDialog, JabRefFrame.this);
+            PositionWindow.placeDialog(bibtexKeyPatternDialog, JabRefFrame.this);
             bibtexKeyPatternDialog.setVisible(true);
         }
 
