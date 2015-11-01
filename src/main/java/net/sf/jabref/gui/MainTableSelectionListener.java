@@ -30,6 +30,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibtexEntry;

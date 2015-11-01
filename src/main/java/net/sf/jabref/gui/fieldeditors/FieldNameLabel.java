@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
-import net.sf.jabref.gui.GUIGlobals;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -24,6 +22,8 @@ import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+
+import net.sf.jabref.gui.util.GUIGlobals;
 
 public class FieldNameLabel extends JLabel {
 

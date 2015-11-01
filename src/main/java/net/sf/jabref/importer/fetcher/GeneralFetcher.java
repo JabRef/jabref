@@ -40,6 +40,8 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 

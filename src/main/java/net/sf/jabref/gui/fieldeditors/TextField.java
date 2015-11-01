@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.actions.Actions;
@@ -23,7 +22,7 @@ import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.model.entry.Util;
-
+import net.sf.jabref.gui.util.GUIGlobals;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 

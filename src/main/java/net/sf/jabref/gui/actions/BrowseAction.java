@@ -15,9 +15,9 @@
 */
 package net.sf.jabref.gui.actions;
 
-import net.sf.jabref.gui.FocusRequester;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;

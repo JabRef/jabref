@@ -17,15 +17,12 @@ package net.sf.jabref.gui;
 
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -54,6 +51,9 @@ import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.GUIGlobals;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -620,55 +620,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     private void positionWindowOnScreen() {
         if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-
-            int sizeX = prefs.getInt(JabRefPreferences.SIZE_X);
-            int sizeY = prefs.getInt(JabRefPreferences.SIZE_Y);
-            int posX = prefs.getInt(JabRefPreferences.POS_X);
-            int posY = prefs.getInt(JabRefPreferences.POS_Y);
-
-            //
-            // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
-            //
-            // Do not put a window outside the screen if the preference values are wrong.
-            //
-            // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
-            // googled on forums.java.sun.com graphicsenvironment second screen java
-            //
-            if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length >= 1) {
-                Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
-                        .getDefaultConfiguration().getBounds();
-                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-
-                // Make sure we are not above or to the left of the screen bounds:
-                if (posX < bounds.x) {
-                    posX = bounds.x;
-                }
-                if (posY < bounds.y) {
-                    posY = bounds.y;
-                }
-
-                int height = (int) dim.getHeight();
-                int width = (int) dim.getWidth();
-
-                if ((posX + sizeX) > width) {
-                    if (sizeX <= width) {
-                        posX = width - sizeX;
-                    } else {
-                        posX = prefs.getIntDefault(JabRefPreferences.POS_X);
-                        sizeX = prefs.getIntDefault(JabRefPreferences.SIZE_X);
-                    }
-                }
-
-                if ((posY + sizeY) > height) {
-                    if (sizeY <= height) {
-                        posY = height - sizeY;
-                    } else {
-                        posY = prefs.getIntDefault(JabRefPreferences.POS_Y);
-                        sizeY = prefs.getIntDefault(JabRefPreferences.SIZE_Y);
-                    }
-                }
-            }
-            setBounds(posX, posY, sizeX, sizeY);
+            PositionWindow.setWindowPosition(this, PositionWindow.MAINWINDOW);
         }
     }
 
@@ -806,10 +758,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         if (basePanel() != null) {
             basePanel().saveDividerLocation();
         }
-        prefs.putInt(JabRefPreferences.POS_X, JabRefFrame.this.getLocation().x);
-        prefs.putInt(JabRefPreferences.POS_Y, JabRefFrame.this.getLocation().y);
-        prefs.putInt(JabRefPreferences.SIZE_X, JabRefFrame.this.getSize().width);
-        prefs.putInt(JabRefPreferences.SIZE_Y, JabRefFrame.this.getSize().height);
+        PositionWindow.storeWindowPosition(this, PositionWindow.MAINWINDOW);
+
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 

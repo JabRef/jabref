@@ -87,6 +87,8 @@ import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.util.GUIGlobals;
+import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

@@ -30,6 +30,7 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;

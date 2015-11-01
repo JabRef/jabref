@@ -74,6 +74,8 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
 import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.util.GUIGlobals;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

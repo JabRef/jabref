@@ -53,6 +53,8 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
+import net.sf.jabref.gui.util.GUIGlobals;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
@@ -99,8 +101,6 @@ class StringDialog extends JDialog {
                 return super.accept(c) && (c instanceof StringTable);
             }
         });
-
-        GUIGlobals.setDialogSize(this, "strings");
 
         JPanel pan = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
@@ -154,6 +154,7 @@ class StringDialog extends JDialog {
         } else {
             setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
         }
+        PositionWindow.setWindowPosition(this, PositionWindow.STRINGS);
     }
 
 
@@ -339,7 +340,7 @@ class StringDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             panel.stringsClosing();
             dispose();
-            GUIGlobals.storeDialogSize(this.parent, "strings");
+            PositionWindow.storeWindowPosition(this.parent, PositionWindow.STRINGS);
         }
     }
 

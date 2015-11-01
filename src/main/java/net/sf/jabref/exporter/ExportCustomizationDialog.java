@@ -25,11 +25,11 @@ import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.FocusRequester;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.GUIGlobals;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import ca.odell.glazedlists.gui.TableFormat;

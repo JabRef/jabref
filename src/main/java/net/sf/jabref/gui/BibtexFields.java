@@ -37,6 +37,7 @@ import java.util.HashSet;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.io.TXMLReader;

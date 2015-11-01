@@ -13,27 +13,27 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Point;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JLabel;
-import javax.swing.JDialog;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.external.ExternalFileType;
-
-import net.sf.jabref.gui.help.HelpDialog;
-import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.SidePaneManager;
+import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -204,19 +204,6 @@ public class GUIGlobals {
         return GUIGlobals.helpPre + middle;
     }
 
-    public static void setDialogSize(JDialog dialog, String name) {
-        dialog.setLocation(Globals.prefs.getInt(name + "PosX"), Globals.prefs.getInt(name + "PosY"));
-        dialog.setSize(Globals.prefs.getInt(name + "SizeX"), Globals.prefs.getInt(name + "SizeY"));
-    }
-
-    public static void storeDialogSize(JDialog dialog, String name) {
-        Point p = dialog.getLocation();
-        Dimension d = dialog.getSize();
-        Globals.prefs.putInt(name + "PosX", p.x);
-        Globals.prefs.putInt(name + "PosY", p.y);
-        Globals.prefs.putInt(name + "SizeX", d.width);
-        Globals.prefs.putInt(name + "SizeY", d.height);
-    }
 
     /**
      * Perform initializations that are only used in graphical mode. This is to prevent

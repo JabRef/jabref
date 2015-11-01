@@ -29,6 +29,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.FocusRequester;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.l10n.Localization;

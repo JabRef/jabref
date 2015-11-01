@@ -35,6 +35,7 @@ import com.jgoodies.looks.Options;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 

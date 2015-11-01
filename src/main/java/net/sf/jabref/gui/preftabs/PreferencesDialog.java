@@ -43,8 +43,8 @@ import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.util.GUIGlobals;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.CustomEntryTypesManager;

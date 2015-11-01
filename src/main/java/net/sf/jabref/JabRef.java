@@ -57,6 +57,8 @@ import net.sf.jabref.importer.*;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.logging.CacheableHandler;

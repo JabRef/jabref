@@ -22,11 +22,11 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 

@@ -23,12 +23,11 @@ import java.util.TreeSet;
 import javax.swing.*;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -87,7 +86,6 @@ public class MergeEntryDOIDialog extends JDialog {
         panel.output(Localization.lang("Opening dialog"));
         // Start setting up the dialog
         init();
-        Util.placeDialog(this, this.frame);
     }
 
     /**
@@ -145,7 +143,7 @@ public class MergeEntryDOIDialog extends JDialog {
 
         pack();
 
-        GUIGlobals.setDialogSize(this, "mergeEntries");
+        PositionWindow.setWindowPosition(this, PositionWindow.MERGEENTRIES);
         // Show what we've got
         setVisible(true);
 
@@ -195,7 +193,7 @@ public class MergeEntryDOIDialog extends JDialog {
     }
 
     private void savePosition() {
-        GUIGlobals.storeDialogSize(this, "mergeEntries");
+        PositionWindow.storeWindowPosition(this, PositionWindow.MERGEENTRIES);
     }
 
 }

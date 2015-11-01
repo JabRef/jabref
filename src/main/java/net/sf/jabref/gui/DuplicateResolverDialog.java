@@ -23,8 +23,8 @@ import javax.swing.*;
 
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 // created by : ?
 //
@@ -59,13 +59,11 @@ public class DuplicateResolverDialog extends JDialog {
     public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
         init(one, two, type);
-        Util.placeDialog(this, frame);
     }
 
     public DuplicateResolverDialog(JDialog frame, BibtexEntry one, BibtexEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
         init(one, two, type);
-        Util.placeDialog(this, frame);
     }
 
     private void init(BibtexEntry one, BibtexEntry two, int type) {
@@ -184,14 +182,14 @@ public class DuplicateResolverDialog extends JDialog {
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 
-        GUIGlobals.setDialogSize(this, "duplicates");
+        PositionWindow.setWindowPosition(this, PositionWindow.DUPLICATES);
         both.requestFocus();
 
     }
 
 
     private void savePosition() {
-        GUIGlobals.storeDialogSize(this, "duplicates");
+        PositionWindow.storeWindowPosition(this, PositionWindow.DUPLICATES);
     }
 
     public boolean isBlocking() {

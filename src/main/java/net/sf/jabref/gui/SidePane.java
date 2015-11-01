@@ -22,6 +22,8 @@ import javax.swing.Box;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import net.sf.jabref.gui.util.GUIGlobals;
+
 /**
  * The side pane is displayed at the right side of JabRef and shows instances of
  * SidePaneComponents, for instance the GroupSelector, or the SearchManager.

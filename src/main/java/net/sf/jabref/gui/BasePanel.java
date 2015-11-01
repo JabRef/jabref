@@ -56,6 +56,8 @@ import net.sf.jabref.gui.labelPattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.undo.*;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
 import net.sf.jabref.importer.fetcher.SPIRESFetcher;
@@ -489,7 +491,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.EDIT_STRINGS, (BaseAction) () -> {
             if (stringDialog == null) {
                 StringDialog form = new StringDialog(frame, BasePanel.this, database, Globals.prefs);
-                Util.placeDialog(form, frame);
                 form.setVisible(true);
                 stringDialog = form;
             } else {

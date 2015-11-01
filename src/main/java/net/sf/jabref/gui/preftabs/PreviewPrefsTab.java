@@ -26,11 +26,11 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 

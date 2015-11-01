@@ -17,7 +17,7 @@ package net.sf.jabref.exporter;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.util.strings.StringUtil;
 

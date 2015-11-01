@@ -21,13 +21,12 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.util.PositionWindow;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -59,7 +58,6 @@ public class MergeEntriesDialog extends JDialog {
 
         // Start setting up the dialog
         init(panel.getSelectedEntries());
-        Util.placeDialog(this, this.frame);
     }
 
     /**
@@ -129,7 +127,7 @@ public class MergeEntriesDialog extends JDialog {
 
         pack();
 
-        GUIGlobals.setDialogSize(this, "mergeEntries");
+        PositionWindow.setWindowPosition(this, PositionWindow.MERGEENTRIES);
 
         // Show what we've got
         setVisible(true);
@@ -168,6 +166,6 @@ public class MergeEntriesDialog extends JDialog {
     }
 
     private void savePosition() {
-        GUIGlobals.storeDialogSize(this, "mergeEntries");
+        PositionWindow.storeWindowPosition(this, PositionWindow.MERGEENTRIES);
     }
 }
