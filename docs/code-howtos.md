@@ -14,7 +14,7 @@ If the logging event is caused by an exception, please add the exception to the 
 
     catch (Exception e) {
        LOGGER.warn("Warning text.", e);
-    ...
+       ...
     }
 
 ## Drag and Drop
