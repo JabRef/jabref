@@ -5,7 +5,6 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.util.DOI;
@@ -16,9 +15,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.swing.*;
-
-import java.awt.*;
 import java.io.StringReader;
 import java.util.*;
 import java.util.List;
@@ -63,27 +59,6 @@ public class UtilTest {
         Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a.bib"));
         Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a"));
         Assert.assertEquals("a.bb.bib", StringUtil.makeBibtexExtension("a.bb"));
-    }
-
-    @Test
-    @Ignore
-    public void testPlaceDialog() {
-        Dialog d = new JDialog();
-        d.setSize(50, 50);
-        Container c = new JWindow();
-        c.setBounds(100, 200, 100, 50);
-
-        PositionWindow.placeDialog(d, c);
-        Assert.assertEquals(125, d.getX());
-        Assert.assertEquals(200, d.getY());
-
-        // Test upper left corner
-        c.setBounds(0, 0, 100, 100);
-        d.setSize(200, 200);
-
-        PositionWindow.placeDialog(d, c);
-        Assert.assertEquals(0, d.getX());
-        Assert.assertEquals(0, d.getY());
     }
 
     @Test
