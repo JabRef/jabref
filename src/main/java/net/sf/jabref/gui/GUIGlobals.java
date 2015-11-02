@@ -57,7 +57,7 @@ public class GUIGlobals {
 
     // Size of help window.
     public static final Dimension
-            helpSize = new Dimension(700, 600);
+            helpSize = new Dimension(750, 600);
     public static final Dimension aboutSize = new Dimension(600, 265);
     public static Double zoomLevel = 1.0;
 
