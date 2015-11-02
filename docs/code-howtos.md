@@ -10,6 +10,13 @@ In old verisons of JabRef, there was `Utils.showQuickErrorDialog` to output exce
 JabRef uses the logging facade [Apache Commons Logging](http://commons.apache.org/proper/commons-logging/).
 All log messages are passed internally to Java's [java.util.logging](http://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html) which handles any filterting, formatting and writing of log messages. 
 
+If the logging event is caused by an exception, please add the exception to the log message as: 
+
+    catch (Exception e) {
+       LOGGER.warn("Warning text.", e);
+    ...
+    }
+
 ## Drag and Drop
 
 `net.sf.jabref.external.DroppedFileHandler.handleDroppedfile(String, ExternalFileType, boolean, BibtexEntry) FileListEditor` sets a `TransferHandler` inherited from `FileListEditorTransferHandler`. There, at `importData`, a `DroppedFileHandler` is instantiated and `handleDroppedfile` called. 
