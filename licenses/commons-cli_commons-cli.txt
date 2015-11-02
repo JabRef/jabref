@@ -5,7 +5,8 @@ This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
 
-Information about the Apache license is available at http://www.apache.org/licenses/.
+Information about the Apache license is available at
+http://www.apache.org/licenses/.
 
 Verbatim copy of the Apache License:
 
