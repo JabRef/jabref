@@ -117,7 +117,7 @@ public class JabRefCLI {
         return cl.getOptionValue("exportMatches");
     }
 
-    private Options getOptions() {
+    private static Options getOptions() {
         Options options = new Options();
 
         // boolean options
@@ -212,7 +212,7 @@ public class JabRefCLI {
         formatter.printHelp("jabref [OPTIONS] [BIBTEX_FILE]\n\nOptions:", header, getOptions(), footer, true);
     }
 
-    private String getVersionInfo() {
+    private static String getVersionInfo() {
         return String.format("JabRef %s", Globals.BUILD_INFO.getVersion());
     }
 

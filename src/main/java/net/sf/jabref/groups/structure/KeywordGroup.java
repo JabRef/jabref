@@ -76,7 +76,7 @@ public class KeywordGroup extends AbstractGroup {
                     "Internal error: KeywordGroup cannot be created from \""
                             + s
                             + "\". "
-                            + "Please report this on www.sf.net/projects/jabref");
+                    + "Please report this on https://github.com/JabRef/jabref/issues");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(KeywordGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
@@ -343,7 +343,7 @@ public class KeywordGroup extends AbstractGroup {
             // succeeded in creating _this_ instance!
             System.err.println("Internal error: Exception " + t
                     + " in KeywordGroup.deepCopy(). "
-                    + "Please report this on www.sf.net/projects/jabref");
+                    + "Please report this on https://github.com/JabRef/jabref/issues");
             return null;
         }
     }

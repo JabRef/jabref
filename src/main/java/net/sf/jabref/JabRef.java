@@ -160,7 +160,7 @@ public class JabRef {
         openWindow(loaded);
     }
 
-    private void setupLogHandlerForErrorConsole() {
+    private static void setupLogHandlerForErrorConsole() {
         Globals.handler = new CacheableHandler();
         ((Jdk14Logger)LOGGER).getLogger().addHandler(Globals.handler);
     }
@@ -177,8 +177,6 @@ public class JabRef {
             cli.printUsage();
             return null; // TODO replace with optional one day
         }
-
-        boolean commandMode = cli.isDisableGui() || cli.isFetcherEngine();
 
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
@@ -217,8 +215,8 @@ public class JabRef {
         }
 
         // Vector to put imported/loaded database(s) in.
-        Vector<ParserResult> loaded = new Vector<ParserResult>();
-        Vector<String> toImport = new Vector<String>();
+        Vector<ParserResult> loaded = new Vector<>();
+        Vector<String> toImport = new Vector<>();
         if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
@@ -488,7 +486,7 @@ public class JabRef {
      * @return A parser result containing the entries fetched or null if an
      *         error occurred.
      */
-    private ParserResult fetch(String fetchCommand) {
+    private static ParserResult fetch(String fetchCommand) {
 
         if ((fetchCommand == null) || !fetchCommand.contains(":") ||
                 (fetchCommand.split(":").length != 2)) {
@@ -531,7 +529,7 @@ public class JabRef {
         return new ParserResult(result);
     }
 
-    private void setLookAndFeel() {
+    private static void setLookAndFeel() {
         try {
             String lookFeel;
             String systemLnF = UIManager.getSystemLookAndFeelClassName();
@@ -668,9 +666,9 @@ public class JabRef {
         // Add all loaded databases to the frame:
 
         boolean first = true;
-        List<File> postponed = new ArrayList<File>();
-        List<ParserResult> failed = new ArrayList<ParserResult>();
-        List<ParserResult> toOpenTab = new ArrayList<ParserResult>();
+        List<File> postponed = new ArrayList<>();
+        List<ParserResult> failed = new ArrayList<>();
+        List<ParserResult> toOpenTab = new ArrayList<>();
         if (!loaded.isEmpty()) {
             for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
                 ParserResult pr = i.next();

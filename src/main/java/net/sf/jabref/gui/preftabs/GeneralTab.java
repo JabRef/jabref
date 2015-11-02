@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,7 +16,6 @@
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
@@ -32,7 +31,6 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -50,8 +50,8 @@ public class AutosaveStartupPrompter implements Runnable {
     @Override
     public void run() {
         boolean first = frame.baseCount() == 0;
-        List<ParserResult> loaded = new ArrayList<ParserResult>();
-        Map<ParserResult, Integer> location = new HashMap<ParserResult, Integer>();
+        List<ParserResult> loaded = new ArrayList<>();
+        Map<ParserResult, Integer> location = new HashMap<>();
         for (File file : files) {
             File fileToLoad = file;
             boolean tryingAutosave;
@@ -73,7 +73,7 @@ public class AutosaveStartupPrompter implements Runnable {
             ParserResult pr = null;
             while (!done) {
                 pr = JabRef.openBibFile(fileToLoad.getPath(), true);
-                if (pr != null && !pr.isInvalid()) {
+                if ((pr != null) && !pr.isInvalid()) {
                     loaded.add(pr);
                     BasePanel panel = frame.addTab(pr.getDatabase(), file,
                             pr.getMetaData(), pr.getEncoding(), first);
@@ -108,7 +108,7 @@ public class AutosaveStartupPrompter implements Runnable {
                 }
             }
 
-            if (pr != null && !pr.isInvalid()) {
+            if ((pr != null) && !pr.isInvalid()) {
                 if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP) && pr.hasWarnings()) {
                     String[] wrns = pr.warnings();
                     StringBuilder wrn = new StringBuilder();
@@ -128,7 +128,7 @@ public class AutosaveStartupPrompter implements Runnable {
 
         /*for (int i = 0; i < loaded.size(); i++) {
             ParserResult pr = loaded.get(i);
-            
+
         }*/
 
     }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -96,7 +96,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                         new ExplicitGroup(Localization.lang("Automatically created groups"),
                                 GroupHierarchyType.INCLUDING));
                 Set<String> hs = null;
-                String field = field();
+                String field1 = field();
                 if (keywords.isSelected()) {
                     if (nd.isSelected()) {
                         hs = Util
@@ -113,17 +113,17 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     List<String> fields = new ArrayList<>(2);
                     fields.add("author");
                     hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
-                    field = "author";
+                    field1 = "author";
                 }
                 else if (editors.isSelected()) {
                     List<String> fields = new ArrayList<>(2);
                     fields.add("editor");
                     hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
-                    field = "editor";
+                    field1 = "editor";
                 }
 
                 for (String keyword : hs) {
-                    KeywordGroup group = new KeywordGroup(keyword, field,
+                    KeywordGroup group = new KeywordGroup(keyword, field1,
                             keyword, false, false, GroupHierarchyType.INDEPENDENT);
                     autoGroupsRoot.add(new GroupTreeNode(group));
                 }

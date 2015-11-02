@@ -37,7 +37,6 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
@@ -194,7 +193,7 @@ class FileTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
-    private ButtonGroup createRadioBg(Iterable<String> radioButtonLabels) {
+    private static ButtonGroup createRadioBg(Iterable<String> radioButtonLabels) {
         ButtonGroup buttonGroup = new ButtonGroup();
         for (String _s : radioButtonLabels) {
             JRadioButton _rb = new JRadioButton(_s);
@@ -204,7 +203,7 @@ class FileTab extends JPanel implements PrefsTab {
         return buttonGroup;
     }
 
-    private int getBgValue(ButtonGroup buttonGroup) {
+    private static int getBgValue(ButtonGroup buttonGroup) {
         int index = 0;
         for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
             if (buttons.nextElement().isSelected()) {
@@ -217,7 +216,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     }
 
-    private void setBgSelected(ButtonGroup buttonGroup, int buttonIndex) {
+    private static void setBgSelected(ButtonGroup buttonGroup, int buttonIndex) {
         int currentIndex = 0;
 
         for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
@@ -238,7 +237,8 @@ class FileTab extends JPanel implements PrefsTab {
     //        fieldOrderStyle=getBgValue(bgFieldOrderStyle);
     //    }
 
-    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup, JTextField textField) {
+    private static void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup,
+            JTextField textField) {
         //for LWang_AdjustableFieldOrder
 
         for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {

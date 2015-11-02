@@ -57,11 +57,9 @@ public class InspecImporter extends ImportFormat {
      * Check whether the source is in the correct format for this importer.
      */
     @Override
-    public boolean isRecognizedFormat(InputStream stream)
-            throws IOException {
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
         // Our strategy is to look for the "PY <year>" line.
-        BufferedReader in =
-                new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         //Pattern pat1 = Pattern.compile("PY:  \\d{4}");
         Pattern pat1 = Pattern.compile("Record.*INSPEC.*");
 
@@ -82,26 +80,25 @@ public class InspecImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
-     * objects.
+     * Parse the entries in the source, and return a List of BibtexEntry objects.
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
-        while ((str = in.readLine()) != null) {
-            if (str.length() < 2) {
-                continue;
-            }
-            if (str.indexOf("Record") == 0) {
-                sb.append("__::__").append(str);
-            } else {
-                sb.append("__NEWFIELD__").append(str);
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            while ((str = in.readLine()) != null) {
+                if (str.length() < 2) {
+                    continue;
+                }
+                if (str.indexOf("Record") == 0) {
+                    sb.append("__::__").append(str);
+                } else {
+                    sb.append("__NEWFIELD__").append(str);
+                }
             }
         }
-        in.close();
         String[] entries = sb.toString().split("__::__");
         String Type = "";
         HashMap<String, String> h = new HashMap<>();
@@ -122,9 +119,7 @@ public class InspecImporter extends ImportFormat {
                     h.put("year", frest);
                 } else if (f3.equals("AU")) {
                     h.put("author",
-                            AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(
-                                    ";", " and "))
-                            );
+                            AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(";", " and ")));
                 } else if (f3.equals("AB")) {
                     h.put("abstract", frest);
                 } else if (f3.equals("ID")) {
@@ -153,16 +148,14 @@ public class InspecImporter extends ImportFormat {
                     frest = frest.trim();
                     if (frest.equals("Journal-Paper")) {
                         Type = "article";
-                    } else if (frest.equals("Conference-Paper")
-                            || frest.equals("Conference-Paper; Journal-Paper")) {
+                    } else if (frest.equals("Conference-Paper") || frest.equals("Conference-Paper; Journal-Paper")) {
                         Type = "inproceedings";
                     } else {
                         Type = frest.replaceAll(" ", "");
                     }
                 }
             }
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
-                    .getEntryType(Type)); // id assumes an existing database so don't
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes.getEntryType(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(h);
 

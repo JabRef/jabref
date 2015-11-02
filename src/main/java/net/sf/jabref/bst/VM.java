@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -122,7 +122,7 @@ public class VM implements Warn {
     private VM(CommonTree tree) {
         this.tree = tree;
 
-        this.buildInFunctions = new HashMap<String, BstFunction>(37);
+        this.buildInFunctions = new HashMap<>(37);
 
         buildInFunctions.put(">", new BstFunction() {
 
@@ -598,7 +598,7 @@ public class VM implements Warn {
              * The |built_in| function {\.{preamble\$}} pushes onto the stack
              * the concatenation of all the \.{preamble} strings read from the
              * database files. (or the empty string if there where none)
-             * 
+             *
              * @PREAMBLE strings read from the database files.
              */
             @Override
@@ -740,7 +740,7 @@ public class VM implements Warn {
              * precisely, a "special character", defined in Section 4) counts as
              * a single text character, even if it's missing its matching right
              * brace, and where braces don't count as text characters.
-             * 
+             *
              * From BibTeXing: For the purposes of counting letters in labels,
              * BibTEX considers everything contained inside the braces as a
              * single letter.
@@ -948,8 +948,8 @@ public class VM implements Warn {
 
         if (o2 instanceof String) {
 
-            if ((context != null) && context.strings.containsKey(name)) {
-                context.strings.put(name, (String) o2);
+            if ((context != null) && context.localStrings.containsKey(name)) {
+                context.localStrings.put(name, (String) o2);
                 return true;
             }
 
@@ -961,8 +961,8 @@ public class VM implements Warn {
 
         }
 
-        if ((context != null) && context.integers.containsKey(name)) {
-            context.integers.put(name, (Integer) o2);
+        if ((context != null) && context.localIntegers.containsKey(name)) {
+            context.localIntegers.put(name, (Integer) o2);
             return true;
         }
 
@@ -991,7 +991,7 @@ public class VM implements Warn {
         reset();
 
         { // Create entries
-            entries = new Vector<BstEntry>(bibtex.size());
+            entries = new Vector<>(bibtex.size());
             ListIterator<BstEntry> i = entries.listIterator();
             for (BibtexEntry entry : bibtex) {
                 i.add(new BstEntry(entry));
@@ -1017,7 +1017,7 @@ public class VM implements Warn {
                 execute(child);
                 break;
             case BstParser.SORT:
-                sort(child);
+                sort();
                 break;
             case BstParser.ITERATE:
                 iterate(child);
@@ -1045,16 +1045,16 @@ public class VM implements Warn {
 
         entries = null;
 
-        strings = new HashMap<String, String>();
+        strings = new HashMap<>();
 
-        integers = new HashMap<String, Integer>();
+        integers = new HashMap<>();
         integers.put("entry.max$", Integer.MAX_VALUE);
         integers.put("global.max$", Integer.MAX_VALUE);
 
-        functions = new HashMap<String, BstFunction>();
+        functions = new HashMap<>();
         functions.putAll(buildInFunctions);
 
-        stack = new Stack<Object>();
+        stack = new Stack<>();
     }
 
     /**
@@ -1062,7 +1062,7 @@ public class VM implements Warn {
      * list. It has no arguments. If a database entry doesn't have a value for a
      * field (and probably no database entry will have a value for every field),
      * that field variable is marked as missing for the entry.
-     * 
+     *
      * We use null for the missing entry designator.
      */
     private void read() {
@@ -1092,7 +1092,7 @@ public class VM implements Warn {
      * override any definition you define using this command. If you want to
      * define a string the user can't touch, use the FUNCTION command, which has
      * a compatible syntax.
-     * 
+     *
      * @param child
      */
     private void macro(Tree child) {
@@ -1148,7 +1148,7 @@ public class VM implements Warn {
             String name = t.getChild(i).getText();
 
             for (BstEntry entry : entries) {
-                entry.integers.put(name, 0);
+                entry.localIntegers.put(name, 0);
             }
         }
         // Strings
@@ -1158,11 +1158,11 @@ public class VM implements Warn {
         for (int i = 0; i < t.getChildCount(); i++) {
             String name = t.getChild(i).getText();
             for (BstEntry entry : entries) {
-                entry.strings.put(name, null);
+                entry.localStrings.put(name, null);
             }
         }
         for (BstEntry entry : entries) {
-            entry.strings.put("sort.key$", null);
+            entry.localStrings.put("sort.key$", null);
         }
     }
 
@@ -1185,17 +1185,16 @@ public class VM implements Warn {
     }
 
     /**
-     * Sorts the entry list using the values of the string entry variable
-     * sort.key$. It has no arguments.
-     * 
-     * @param child
+     * Sorts the entry list using the values of the string entry variable sort.key$. It has no arguments.
+     *
+     * @param
      */
-    private void sort(Tree child) {
+    private void sort() {
         Collections.sort(entries, new Comparator<BstEntry>() {
 
             @Override
             public int compare(BstEntry o1, BstEntry o2) {
-                return (o1.strings.get("sort.key$")).compareTo(o2.strings
+                return (o1.localStrings.get("sort.key$")).compareTo(o2.localStrings
                         .get("sort.key$"));
             }
         });
@@ -1217,24 +1216,24 @@ public class VM implements Warn {
 
     public class StackFunction implements BstFunction {
 
-        final Tree tree;
+        final Tree localTree;
 
 
         public Tree getTree() {
-            return tree;
+            return localTree;
         }
 
         public StackFunction(Tree stack) {
             // assert stack.getType() == Bst.STACK;
-            tree = stack;
+            localTree = stack;
         }
 
         @Override
         public void execute(BstEntry context) {
 
-            for (int i = 0; i < tree.getChildCount(); i++) {
+            for (int i = 0; i < localTree.getChildCount(); i++) {
 
-                Tree c = tree.getChild(i);
+                Tree c = localTree.getChild(i);
                 try {
 
                     switch (c.getType()) {
@@ -1281,12 +1280,12 @@ public class VM implements Warn {
                 stack.push(context.fields.get(name));
                 return;
             }
-            if (context.strings.containsKey(name)) {
-                stack.push(context.strings.get(name));
+            if (context.localStrings.containsKey(name)) {
+                stack.push(context.localStrings.get(name));
                 return;
             }
-            if (context.integers.containsKey(name)) {
-                stack.push(context.integers.get(name));
+            if (context.localIntegers.containsKey(name)) {
+                stack.push(context.localIntegers.get(name));
                 return;
             }
         }
@@ -1309,8 +1308,8 @@ public class VM implements Warn {
 
     private void function(Tree child) {
         String name = child.getChild(0).getText();
-        Tree stack = child.getChild(1);
-        functions.put(name, new StackFunction(stack));
+        Tree localStack = child.getChild(1);
+        functions.put(name, new StackFunction(localStack));
 
     }
 
@@ -1320,7 +1319,7 @@ public class VM implements Warn {
      * entry.max$ and global.max$, used for limiting the lengths of string vari-
      * ables. You may have any number of these commands, but a variable's
      * declaration must precede its use.
-     * 
+     *
      * @param child
      */
     private void integers(Tree child) {
@@ -1337,7 +1336,7 @@ public class VM implements Warn {
      * Declares global string variables. It has one argument, a list of variable
      * names. You may have any number of these commands, but a variable's
      * declaration must precede its use.
-     * 
+     *
      * @param child
      */
     private void strings(Tree child) {
@@ -1360,11 +1359,11 @@ public class VM implements Warn {
 
         final BibtexEntry entry;
 
-        final Map<String, String> strings = new HashMap<String, String>();
+        final Map<String, String> localStrings = new HashMap<>();
 
-        final Map<String, String> fields = new HashMap<String, String>();
+        final Map<String, String> fields = new HashMap<>();
 
-        final Map<String, Integer> integers = new HashMap<String, Integer>();
+        final Map<String, Integer> localIntegers = new HashMap<>();
 
 
         public Map<String, String> getFields() {
@@ -1379,13 +1378,13 @@ public class VM implements Warn {
 
     private Vector<BstEntry> entries;
 
-    private Map<String, String> strings = new HashMap<String, String>();
+    private Map<String, String> strings = new HashMap<>();
 
-    private Map<String, Integer> integers = new HashMap<String, Integer>();
+    private Map<String, Integer> integers = new HashMap<>();
 
-    private Map<String, BstFunction> functions = new HashMap<String, BstFunction>();
+    private Map<String, BstFunction> functions = new HashMap<>();
 
-    private Stack<Object> stack = new Stack<Object>();
+    private Stack<Object> stack = new Stack<>();
 
 
     private void push(Integer integer) {

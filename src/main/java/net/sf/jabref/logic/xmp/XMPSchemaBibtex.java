@@ -104,7 +104,6 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> getBagList(String bagName) {
         return super.getBagList(makeProperty(bagName));
     }
@@ -120,7 +119,6 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> getSequenceList(String seqName) {
         return super.getSequenceList(makeProperty(seqName));
     }

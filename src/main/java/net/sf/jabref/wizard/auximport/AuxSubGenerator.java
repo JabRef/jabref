@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2004 R. Nagel
-Copyright (C) 2015 T. Denkinger
+Copyright (C) 2015 T. Denkinger, JabRef Contributors
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -80,8 +80,8 @@ public class AuxSubGenerator {
 
 
     public AuxSubGenerator(BibtexDatabase refDBase) {
-        mySet = new HashSet<String>(20);
-        notFoundList = new Vector<String>();
+        mySet = new HashSet<>(20);
+        notFoundList = new Vector<>();
         db = refDBase;
     }
 
@@ -147,7 +147,7 @@ public class AuxSubGenerator {
         BufferedReader br = null;
 
         // filelist, used for nested aux files
-        Vector<String> fileList = new Vector<String>(5);
+        Vector<String> fileList = new Vector<>(5);
         fileList.add(filename);
 
         // get the file path
@@ -199,12 +199,10 @@ public class AuxSubGenerator {
                             // could be an comma separated list of keys
                             String[] keys = str.split(",");
                             if (keys != null) {
-                                int keyCount = keys.length;
                                 for (String dummyStr : keys) {
                                     if (dummyStr != null) {
                                         // delete all unnecessary blanks and save key into an set
                                         mySet.add(dummyStr.trim());
-                                        //                System.out.println("found " +str +" in AUX") ;
                                     }
                                 }
                             }
@@ -224,8 +222,8 @@ public class AuxSubGenerator {
                             }
                         }
                     }
-                } // line != null
-                else {
+                } else {
+                    // line != null
                     weiter = false;
                 }
             }
@@ -236,6 +234,7 @@ public class AuxSubGenerator {
                     br.close();
                     nestedAuxCounter++;
                 } catch (IOException ignored) {
+                    // Ignored
                 }
             }
 
@@ -267,7 +266,7 @@ public class AuxSubGenerator {
                 // we don't already have in our list of entries to include. If so,
                 // pull in that entry as well:
                 String crossref = entry.getField("crossref");
-                if (crossref != null && !mySet.contains(crossref)) {
+                if ((crossref != null) && !mySet.contains(crossref)) {
                     BibtexEntry refEntry = db.getEntryByKey(crossref);
                     /**
                      * [ 1717849 ] Patch for aux import by Kai Eckert
@@ -300,12 +299,11 @@ public class AuxSubGenerator {
      * @param auxDB The database to insert into.
      * @param entry The entry to insert a copy of.
      */
-    private void insertEntry(BibtexDatabase auxDB, BibtexEntry entry) {
+    private static void insertEntry(BibtexDatabase bibDB, BibtexEntry entry) {
 
         BibtexEntry clonedEntry = (BibtexEntry) entry.clone();
         clonedEntry.setId(IdGenerator.next());
-        auxDB.insertEntry(clonedEntry);
-
+        bibDB.insertEntry(clonedEntry);
     }
 
     /**

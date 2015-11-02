@@ -377,7 +377,7 @@ public class AuthorList {
                             von_start = tokens.size() - AuthorList.TOKEN_GROUP_LENGTH;
                             break;
                         }
-                    } else if (last_start < 0 && tokenCase) {
+                    } else if ((last_start < 0) && tokenCase) {
                         last_start = tokens.size() - AuthorList.TOKEN_GROUP_LENGTH;
                         break;
                     }
@@ -399,12 +399,11 @@ public class AuthorList {
         int von_part_end = 0;
         int last_part_end = 0;
         int jr_part_end = 0;
-        boolean jrAsFirstname = false;
         if (comma_first < 0) { // no commas
             if (von_start < 0) { // no 'von part'
                 last_part_end = tokens.size();
                 last_part_start = tokens.size() - AuthorList.TOKEN_GROUP_LENGTH;
-                int index = tokens.size() - 2 * AuthorList.TOKEN_GROUP_LENGTH + AuthorList.OFFSET_TOKEN_TERM;
+                int index = (tokens.size() - (2 * AuthorList.TOKEN_GROUP_LENGTH)) + AuthorList.OFFSET_TOKEN_TERM;
                 if (index > 0) {
                     Character ch = (Character) tokens.elementAt(index);
                     if (ch == '-') {
@@ -462,7 +461,7 @@ public class AuthorList {
             }
         }
 
-        if (first_part_start == -1 && last_part_start == -1 && von_part_start != -1) {
+        if ((first_part_start == -1) && (last_part_start == -1) && (von_part_start != -1)) {
             // There is no first or last name, but we have a von part. This is likely
             // to indicate a single-entry name without an initial capital letter, such
             // as "unknown".
@@ -508,7 +507,7 @@ public class AuthorList {
         }
         start += AuthorList.TOKEN_GROUP_LENGTH;
         while (start < end) {
-            result.append(tokens.get(start - AuthorList.TOKEN_GROUP_LENGTH + AuthorList.OFFSET_TOKEN_TERM));
+            result.append(tokens.get((start - AuthorList.TOKEN_GROUP_LENGTH) + AuthorList.OFFSET_TOKEN_TERM));
             result.append((String) tokens.get(start + offset));
             if (dotAfter) {
                 result.append('.');
@@ -549,7 +548,7 @@ public class AuthorList {
         tokenStart = tokenEnd;
         while (tokenStart < original.length()) {
             char c = original.charAt(tokenStart);
-            if (!(c == '~' || c == '-' || Character.isWhitespace(c))) {
+            if (!((c == '~') || (c == '-') || Character.isWhitespace(c))) {
                 break;
             }
             tokenStart++;
@@ -578,10 +577,10 @@ public class AuthorList {
                     braces_level--;
                 }
             }
-            if (first_letter_is_found && tokenAbbr < 0 && braces_level == 0) {
+            if (first_letter_is_found && (tokenAbbr < 0) && (braces_level == 0)) {
                 tokenAbbr = tokenEnd;
             }
-            if (!first_letter_is_found && current_backslash < 0 && Character.isLetter(c)) {
+            if (!first_letter_is_found && (current_backslash < 0) && Character.isLetter(c)) {
                 if (braces_level == 0) {
                     tokenCase = Character.isUpperCase(c);
                 } else {
@@ -592,7 +591,7 @@ public class AuthorList {
                 }
                 first_letter_is_found = true;
             }
-            if (current_backslash >= 0 && !Character.isLetter(c)) {
+            if ((current_backslash >= 0) && !Character.isLetter(c)) {
                 if (!first_letter_is_found) {
                     String tex_cmd_name = original.substring(current_backslash + 1, tokenEnd);
                     if (AuthorList.TEX_NAMES.contains(tex_cmd_name)) {
@@ -606,7 +605,7 @@ public class AuthorList {
                 current_backslash = tokenEnd;
             }
             if (braces_level == 0) {
-                if (c == ',' || c == '~' || c == '-' || Character.isWhitespace(c)) {
+                if ((c == ',') || (c == '~') || (c == '-') || Character.isWhitespace(c)) {
                     break;
                 }
             }
@@ -620,7 +619,7 @@ public class AuthorList {
         if (tokenAbbr < 0) {
             tokenAbbr = tokenEnd;
         }
-        if (tokenEnd < original.length() && original.charAt(tokenEnd) == '-') {
+        if ((tokenEnd < original.length()) && (original.charAt(tokenEnd) == '-')) {
             tokenTerm = '-';
         }
         if (original.substring(tokenStart, tokenEnd).equalsIgnoreCase("and")) {
@@ -710,12 +709,12 @@ public class AuthorList {
         if (size() > 0) {
             result.append(getAuthor(0).getLastOnly());
             int i = 1;
-            while (i < size() - 1) {
+            while (i < (size() - 1)) {
                 result.append(", ");
                 result.append(getAuthor(i).getLastOnly());
                 i++;
             }
-            if (size() > 2 && oxfordComma) {
+            if ((size() > 2) && oxfordComma) {
                 result.append(',');
             }
             if (size() > 1) {
@@ -761,12 +760,12 @@ public class AuthorList {
         if (size() > 0) {
             result.append(getAuthor(0).getLastFirst(abbreviate));
             int i = 1;
-            while (i < size() - 1) {
+            while (i < (size() - 1)) {
                 result.append(", ");
                 result.append(getAuthor(i).getLastFirst(abbreviate));
                 i++;
             }
-            if (size() > 2 && oxfordComma) {
+            if ((size() > 2) && oxfordComma) {
                 result.append(',');
             }
             if (size() > 1) {
@@ -871,12 +870,12 @@ public class AuthorList {
         if (size() > 0) {
             result.append(getAuthor(0).getFirstLast(abbr));
             int i = 1;
-            while (i < size() - 1) {
+            while (i < (size() - 1)) {
                 result.append(", ");
                 result.append(getAuthor(i).getFirstLast(abbr));
                 i++;
             }
-            if (size() > 2 && oxfordComma) {
+            if ((size() > 2) && oxfordComma) {
                 result.append(',');
             }
             if (size() > 1) {
@@ -908,7 +907,7 @@ public class AuthorList {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (authors == null ? 0 : authors.hashCode());
+        result = (prime * result) + (authors == null ? 0 : authors.hashCode());
         return result;
     }
 
@@ -1002,15 +1001,15 @@ public class AuthorList {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result
+            result = (prime * result)
                     + (firstAbbr == null ? 0 : firstAbbr.hashCode());
-            result = prime * result
+            result = (prime * result)
                     + (firstPart == null ? 0 : firstPart.hashCode());
-            result = prime * result
+            result = (prime * result)
                     + (jrPart == null ? 0 : jrPart.hashCode());
-            result = prime * result
+            result = (prime * result)
                     + (lastPart == null ? 0 : lastPart.hashCode());
-            result = prime * result
+            result = (prime * result)
                     + (vonPart == null ? 0 : vonPart.hashCode());
             return result;
         }
@@ -1065,7 +1064,7 @@ public class AuthorList {
         /**
          * @return true if the brackets in s are properly paired
          */
-        private boolean properBrackets(String s) {
+        private static boolean properBrackets(String s) {
             // nested construct is there, check for "proper" nesting
             int i = 0;
             int level = 0;
@@ -1097,7 +1096,7 @@ public class AuthorList {
          * * {Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin
          * * Vall{\'e}e Poussin -> Vall{\'e}e Poussin
          */
-        private String removeStartAndEndBraces(String name) {
+        private static String removeStartAndEndBraces(String name) {
             if (name == null) {
                 return null;
             }
@@ -1113,7 +1112,7 @@ public class AuthorList {
                         // quick solution (which we don't do: just remove first "{" and last "}"
                         // however, it might be that s is like {A}bbb{c}, where braces may not be removed
 
-                        // inner 
+                        // inner
                         String inner = s.substring(1, s.length() - 1);
 
                         if (inner.contains("}")) {
@@ -1283,7 +1282,7 @@ public class AuthorList {
                 res.append(", ");
                 res.append(firstAbbr);
             }
-            while (res.length() > 0 && res.charAt(0) == '{') {
+            while ((res.length() > 0) && (res.charAt(0) == '{')) {
                 res.deleteCharAt(0);
             }
             return res.toString();

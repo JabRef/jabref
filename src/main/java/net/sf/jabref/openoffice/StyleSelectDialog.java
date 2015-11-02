@@ -501,7 +501,7 @@ class StyleSelectDialog {
         prevEntry.setField("journal", "BibTeX journal");
         prevEntry.setField("publisher", "JabRef publishing");
         prevEntry.setField("address", "Trondheim");
-        prevEntry.setField("www", "http://jabref.sf.net");
+        prevEntry.setField("www", "https://github.com/JabRef");
     }
 
 

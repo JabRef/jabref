@@ -35,7 +35,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Preference Tab for XMP.
- * 
+ *
  * Allows the user to enable and configure the XMP privacy filter.
  */
 class XmpPrefsTab extends JPanel implements PrefsTab {
@@ -49,7 +49,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox privacyFilterCheckBox = new JCheckBox(
             Localization.lang("Do not write the following fields to XMP Metadata:"));
 
-    private final Vector<Object> tableRows = new Vector<Object>(10);
+    private final Vector<Object> tableRows = new Vector<>(10);
 
 
     /**
@@ -199,7 +199,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
                 return;
             }
             for (int i = 0; i < rows.length; i++) {
-                if (rows[i] + i < tableRows.size()) {
+                if ((rows[i] + i) < tableRows.size()) {
                     tableRows.add(rows[i] + i, "");
                 }
             }
@@ -231,7 +231,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     /**
      * Store changes to table preferences. This method is called when the user
      * clicks Ok.
-     * 
+     *
      */
     @Override
     public void storeSettings() {
@@ -244,9 +244,9 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
         // Now we need to make sense of the contents the user has made to the
         // table setup table. This needs to be done either if changes were made, or
-        // if the checkbox is checked and no field values have been stored previously: 
+        // if the checkbox is checked and no field values have been stored previously:
         if (tableChanged ||
-                privacyFilterCheckBox.isSelected() && !Globals.prefs.hasKey(JabRefPreferences.XMP_PRIVACY_FILTERS)) {
+                (privacyFilterCheckBox.isSelected() && !Globals.prefs.hasKey(JabRefPreferences.XMP_PRIVACY_FILTERS))) {
 
             // First we remove all rows with empty names.
             for (int i = tableRows.size() - 1; i >= 0; i--) {

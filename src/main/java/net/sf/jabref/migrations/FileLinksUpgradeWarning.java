@@ -111,7 +111,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         b.add(new JLabel("<html>" + Localization.lang("This database was written using an older version of JabRef.") + "<br>"
                 + Localization.lang("The current version features a new way of handling links to external files.<br>To take advantage of this, your links must be changed into the new format, and<br>JabRef must be configured to show the new links.") + "<p>"
                 + Localization.lang("Do you want JabRef to do the following operations?") + "</html>")).xy(1, row);
-        
+
         if (offerChangeSettings) {
             b.appendRows("2dlu, p");
             row += 2;
@@ -142,7 +142,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         b.add(doNotShowDialog).xy(1, row+2);
 
         message.add(b.build());
-        
+
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 message, Localization.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
         if (doNotShowDialog.isSelected()) {
@@ -163,7 +163,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @return true if at least one of the given fields is set in at least one entry,
      *  false otherwise.
      */
-    private boolean linksFound(BibtexDatabase database, String[] fields) {
+    private static boolean linksFound(BibtexDatabase database, String[] fields) {
         for (BibtexEntry entry : database.getEntries()) {
             for (String field : fields) {
                 if (entry.getField(field) != null) {
@@ -180,7 +180,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @param pr
      * @param fileDir The path to the file directory to set, or null if it should not be set.
      */
-    private void makeChanges(BasePanel panel, ParserResult pr, boolean upgradePrefs,
+    private static void makeChanges(BasePanel panel, ParserResult pr, boolean upgradePrefs,
                              boolean upgradeDatabase, String fileDir) {
 
         if (upgradeDatabase) {
@@ -217,7 +217,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         }
     }
 
-    private boolean showsFileInGenFields() {
+    private static boolean showsFileInGenFields() {
         boolean found = false;
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         outer: for (int i = 0; i < tabList.getTabCount(); i++) {

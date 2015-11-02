@@ -1,8 +1,21 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.model.entry.BibtexEntry;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +36,7 @@ public class SuperscriptFormatter implements Formatter {
      * 1st Conf. Cloud Computing -> 1\textsuperscript{st} Conf. Cloud Computing
      * </example>
      */
+    @Override
     public String format(String value) {
         // find possible superscripts on word boundaries
         final Pattern pattern = Pattern.compile("\\b(\\d+)(st|nd|rd|th)\\b", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
@@ -30,7 +44,7 @@ public class SuperscriptFormatter implements Formatter {
         final String replace = "$1\\\\textsuperscript{$2}";
 
         // nothing to do
-        if (value == null || value.isEmpty()) {
+        if ((value == null) || value.isEmpty()) {
             return value;
         }
 
