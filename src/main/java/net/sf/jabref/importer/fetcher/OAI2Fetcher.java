@@ -37,6 +37,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -49,6 +51,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Christian Kopf
  */
 public class OAI2Fetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(OAI2Fetcher.class);
 
     private static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
 
@@ -118,10 +122,8 @@ public class OAI2Fetcher implements EntryFetcher {
         try {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             saxParser = parserFactory.newSAXParser();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
+        } catch (ParserConfigurationException | SAXException e) {
+            LOGGER.error("Error creating SAXParser for OAI2Fetcher", e);
         }
     }
 
@@ -149,7 +151,8 @@ public class OAI2Fetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        return "http://" + oai2Host + "/" + oai2Script + "?" + "verb=GetRecord" + "&identifier=" + oai2PrefixIdentifier + identifier + "&metadataPrefix=" + oai2MetaDataPrefix;
+        return "http://" + oai2Host + "/" + oai2Script + "?" + "verb=GetRecord" + "&identifier=" + oai2PrefixIdentifier
+                + identifier + "&metadataPrefix=" + oai2MetaDataPrefix;
     }
 
     /**
@@ -226,17 +229,16 @@ public class OAI2Fetcher implements EntryFetcher {
 
             return be;
         } catch (IOException e) {
-            status.showMessage(Localization.lang(
-                    "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url)
+                    + "\n\n" + e, getKeyName(), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
-            status.showMessage(Localization.lang(
-                    "An SAXException ocurred while parsing '%0':", new String[]{url})
-                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("An SAXException ocurred while parsing '%0':", url)
+                    + "\n\n" + e.getMessage(), getKeyName(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            status.showMessage(Localization.lang(
-                    "An Error occurred while fetching from OAI2 source (%0):", new String[]{url})
-                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("An Error occurred while fetching from OAI2 source (%0):", url)
+                    + "\n\n" + e.getMessage()
+                    + "\n\n" + Localization.lang("Note: A full text search is currently not supported for %0", getKeyName()),
+                    getKeyName(), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -249,7 +251,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     @Override
     public String getKeyName() {
-        return oai2ArchiveName;
+        return Localization.lang(oai2ArchiveName);
     }
 
     @Override
@@ -317,8 +319,8 @@ public class OAI2Fetcher implements EntryFetcher {
 
             return true;
         } catch (Exception e) {
-            status.setStatus(Localization.lang("Error while fetching from OAI2") + ": " + e.getMessage());
-            e.printStackTrace();
+            status.setStatus(Localization.lang("Error while fetching from OAI2"));
+            LOGGER.error("Error whil fetching from OAI2", e);
         }
         return false;
     }
