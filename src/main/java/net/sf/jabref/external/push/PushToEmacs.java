@@ -110,49 +110,49 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
             }
 
             com[com.length - 1] = OS.WINDOWS ?
-                    // Windows gnuclient escaping:
-                    // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
-                    // so cmd receives: (insert \"\\cite{Blah2001}\")
-                    // so emacs receives: (insert "\cite{Blah2001}")
-                    prefix.concat("\\\"\\" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
-                        // Linux gnuclient escaping:
-                        // java string: "(insert \"\\\\cite{Blah2001}\")"
-                        // so sh receives: (insert "\\cite{Blah2001}")
-                        // so emacs receives: (insert "\cite{Blah2001}")
-                        prefix.concat("\"" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
+            // Windows gnuclient escaping:
+            // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
+            // so cmd receives: (insert \"\\cite{Blah2001}\")
+            // so emacs receives: (insert "\cite{Blah2001}")
+            prefix.concat("\\\"\\" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
+            // Linux gnuclient escaping:
+            // java string: "(insert \"\\\\cite{Blah2001}\")"
+            // so sh receives: (insert "\\cite{Blah2001}")
+            // so emacs receives: (insert "\cite{Blah2001}")
+            prefix.concat("\"" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
 
-                    final Process p = Runtime.getRuntime().exec(com);
+            final Process p = Runtime.getRuntime().exec(com);
 
-                    Runnable errorListener = new Runnable() {
+            Runnable errorListener = new Runnable() {
 
-                        @Override
-                        public void run() {
-                            try (InputStream out = p.getErrorStream()) {
-                                //                    try {
-                                //                    	if (out.available() <= 0)
-                                //                    		out = p.getInputStream();
-                                //                    } catch (Exception e) {
-                                //                    }
-                                int c;
-                                StringBuilder sb = new StringBuilder();
-                                try {
-                                    while ((c = out.read()) != -1) {
-                                        sb.append((char) c);
-                                    }
-                                } catch (IOException e) {
-                                    LOGGER.warn("Could not read from stderr.");
-                                }
-                                // Error stream has been closed. See if there were any errors:
-                                if (!sb.toString().trim().isEmpty()) {
-                                    LOGGER.warn("Push to Emacs error: " + sb);
-                                    couldNotConnect = true;
-                                }
-                            } catch (IOException e) {
-                                LOGGER.warn("File problem.", e);
+                @Override
+                public void run() {
+                    try (InputStream out = p.getErrorStream()) {
+                        //                    try {
+                        //                    	if (out.available() <= 0)
+                        //                    		out = p.getInputStream();
+                        //                    } catch (Exception e) {
+                        //                    }
+                        int c;
+                        StringBuilder sb = new StringBuilder();
+                        try {
+                            while ((c = out.read()) != -1) {
+                                sb.append((char) c);
                             }
+                        } catch (IOException e) {
+                            LOGGER.warn("Could not read from stderr.", e);
                         }
-                    };
-                    JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
+                        // Error stream has been closed. See if there were any errors:
+                        if (!sb.toString().trim().isEmpty()) {
+                            LOGGER.warn("Push to Emacs error: " + sb);
+                            couldNotConnect = true;
+                        }
+                    } catch (IOException e) {
+                        LOGGER.warn("File problem.", e);
+                    }
+                }
+            };
+            JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
         } catch (IOException excep) {
             couldNotCall = true;
         }

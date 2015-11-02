@@ -219,7 +219,7 @@ public abstract class DBImporter extends DBImporterExporter {
                 group = new ExplicitGroup(rsGroups.getString("label"),
                         GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(KeywordGroup.ID)) {
-                LOGGER.info("Keyw: "
+                LOGGER.debug("Keyw: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new KeywordGroup(rsGroups.getString("label"),
                         StringUtil.unquote(rsGroups.getString("search_field"), '\\'),
@@ -228,7 +228,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         rsGroups.getBoolean("reg_exp"),
                         GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(SearchGroup.ID)) {
-                LOGGER.info("Search: "
+                LOGGER.debug("Search: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new SearchGroup(rsGroups.getString("label"),
                         StringUtil.unquote(rsGroups.getString("search_expression"),

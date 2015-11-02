@@ -45,7 +45,7 @@ class SearchManagerNoGUI {
     }
 
     public BibtexDatabase getDBfromMatches() {
-        LOGGER.info("search term: " + searchTerm);
+        LOGGER.debug("Search term: " + searchTerm);
         if (specifiedYears()) {
             searchTerm = fieldYear();
         }

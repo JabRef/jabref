@@ -88,7 +88,7 @@ class BstWrapper {
             if (!indices.isEmpty()) {
                 endIndices.add(m.start());
             }
-            LOGGER.info(m.start() + "  " + m.end());
+            LOGGER.debug(m.start() + "  " + m.end());
             String tag = m.group();
             String key = tag.substring(9, tag.length() - 1);
             indices.add(m.end());

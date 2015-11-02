@@ -331,7 +331,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 entries.put(link, preview);
                 return true;
             }
-            LOGGER.warn("Citation Unmatched " + Integer.toString(entryNumber));
+            LOGGER.warn("Citation unmatched " + Integer.toString(entryNumber));
             return false;
         }
         return false;
@@ -350,7 +350,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             } catch (IOException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);
             }
-            if (items == null || items.isEmpty()) {
+            if ((items == null) || items.isEmpty()) {
                 return null;
             }
             BibtexEntry entry = items.iterator().next();
@@ -408,8 +408,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         String substring = page.substring(ind, Math.min(ind + 42, page.length()));
         Matcher m = pattern.matcher(substring);
         if (!m.find()) {
-            LOGGER.info("Unmatched!");
-            LOGGER.info(substring);
+            LOGGER.info("Unmatched! " + substring);
         } else {
             try {
                 // get rid of ,

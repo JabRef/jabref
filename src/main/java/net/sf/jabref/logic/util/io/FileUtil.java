@@ -200,7 +200,7 @@ public class FileUtil {
                 try {
                     name = name.replaceAll("/", "\\\\");
                 } catch (StringIndexOutOfBoundsException exc) {
-                    LOGGER.error("An internal Java error was caused by the entry " + "\"" + name + "\"");
+                    LOGGER.error("An internal Java error was caused by the entry " + "\"" + name + "\"", exc);
                 }
             } else {
                 name = name.replaceAll("\\\\", "/");

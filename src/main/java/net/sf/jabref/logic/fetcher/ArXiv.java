@@ -76,7 +76,7 @@ public class ArXiv implements FullTextFinder {
                     }
                 }
             } catch(UnirestException | ParserConfigurationException | SAXException e) {
-                LOGGER.warn("arXiv API request failed: " + e.getMessage());
+                LOGGER.warn("arXiv API request failed: " + e.getMessage(), e);
             }
         }
         // TODO: title search

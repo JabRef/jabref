@@ -42,7 +42,9 @@ public class RemoteListenerClient {
                 protocol.close();
             }
         } catch (Exception e) {
-            LOGGER.debug("could not send args " + StringUtil.join(args, ", ") + " to the server at port " + remoteServerPort, e);
+            LOGGER.debug(
+                    "Could not send args " + StringUtil.join(args, ", ") + " to the server at port " + remoteServerPort,
+                    e);
             return false;
         }
     }

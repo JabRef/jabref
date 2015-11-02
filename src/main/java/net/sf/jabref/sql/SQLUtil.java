@@ -335,7 +335,6 @@ public class SQLUtil {
         stmnt.executeQuery(qry);
         SQLWarning warn = stmnt.getWarnings();
         if (warn != null) {
-
             LOGGER.warn(warn);
         }
         return stmnt;

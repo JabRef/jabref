@@ -59,7 +59,7 @@ class TextAnalyzer {
             year = clean(cand[0]);
             int pos = text.indexOf(year);
             usedParts.add(new Substring("year", pos, pos + year.length()));
-            LOGGER.info("Guessing 'year': '" + year + "'");
+            LOGGER.debug("Guessing 'year': '" + year + "'");
         } else if (cand.length > 1) {
             // More than one four-digit numbers, so we look for one giving a reasonable year:
 
@@ -90,7 +90,7 @@ class TextAnalyzer {
                 year = clean(cand[good]);
                 int pos = text.indexOf(year);
                 usedParts.add(new Substring("year", pos, pos + year.length()));
-                LOGGER.info("Guessing 'year': '" + year + "'");
+                LOGGER.debug("Guessing 'year': '" + year + "'");
             }
         }
 
@@ -102,7 +102,7 @@ class TextAnalyzer {
             pages = clean(cand[0].replaceAll("-|( - )", "--"));
             int pos = text.indexOf(cand[0]);
             usedParts.add(new Substring("pages", pos, pos + year.length()));
-            LOGGER.info("Guessing 'pages': '" + pages + "'");
+            LOGGER.debug("Guessing 'pages': '" + pages + "'");
         } else if (cand.length > 1) {
             int found = -1;
             for (int i = 0; i < cand.length; i++) {
@@ -118,7 +118,7 @@ class TextAnalyzer {
             if (found >= 0) {
                 pages = clean(cand[found].replaceAll("-|( - )", "--"));
                 int pos = text.indexOf(cand[found]);
-                LOGGER.info("Guessing 'pages': '" + pages + "'");
+                LOGGER.debug("Guessing 'pages': '" + pages + "'");
                 usedParts.add(new Substring("pages", pos, pos + pages.length()));
             }
         }
@@ -134,7 +134,7 @@ class TextAnalyzer {
             int pos = cand[0].lastIndexOf(' ');
             if (pos > 0) {
                 volume = clean(cand[0].substring(pos + 1));
-                LOGGER.info("Guessing 'volume': '" + volume + "'");
+                LOGGER.debug("Guessing 'volume': '" + volume + "'");
                 journal = clean(cand[0].substring(0, pos));
                 //Util.pr("guessing 'journal': '" + journal + "'");
                 pos = journal.lastIndexOf(' ');
@@ -146,7 +146,7 @@ class TextAnalyzer {
                 }
                 pos = text.indexOf(journal);
                 usedParts.add(new Substring("journal", pos, pos + journal.length()));
-                LOGGER.info("Guessing 'journal': '" + journal + "'");
+                LOGGER.debug("Guessing 'journal': '" + journal + "'");
             }
             //Util.pr("Journal? '"+cand[0]+"'");
         } else {
@@ -160,7 +160,7 @@ class TextAnalyzer {
         for (Substring usedPart : usedParts) {
             ss = usedPart;
             if ((ss.begin() - piv) > 10) {
-                LOGGER.info("... " + text.substring(piv, ss.begin()));
+                LOGGER.debug("... " + text.substring(piv, ss.begin()));
                 free.add(clean(text.substring(piv, ss.begin())));
             }
             piv = ss.end();
@@ -168,9 +168,9 @@ class TextAnalyzer {
         if ((text.length() - piv) > 10) {
             free.add(clean(text.substring(piv)));
         }
-        LOGGER.info("Free parts:");
+        LOGGER.debug("Free parts:");
         for (String s : free) {
-            LOGGER.info(": '" + s + "'");
+            LOGGER.debug(": '" + s + "'");
         }
     }
 

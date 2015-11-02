@@ -148,7 +148,7 @@ public class UrlDragDrop implements DropTargetListener {
         try {
             dtURL = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            LOGGER.warn("Could not find DropTargetDropEvent class", e);
+            LOGGER.warn("Could not find DropTargetDropEvent class.", e);
         }
         try {
             URL url = (URL) tsf.getTransferData(dtURL);
@@ -183,7 +183,7 @@ public class UrlDragDrop implements DropTargetListener {
                     editor.updateField(feditor);
 
                 } catch (IOException ioex) {
-                    LOGGER.error("Error while downloading file", ioex);
+                    LOGGER.error("Error while downloading file.", ioex);
                     JOptionPane.showMessageDialog(editor,
                             Localization.lang("File download"),
                             Localization.lang("Error while downloading file:"
@@ -195,9 +195,9 @@ public class UrlDragDrop implements DropTargetListener {
             return;
         } catch (UnsupportedFlavorException nfe) {
             // not an URL then...
-            LOGGER.warn("Could not parse URL", nfe);
+            LOGGER.warn("Could not parse URL.", nfe);
         } catch (IOException ioex) {
-            LOGGER.warn("Could not perform drage and drop", ioex);
+            LOGGER.warn("Could not perform drag and drop.", ioex);
         }
 
         try {
@@ -221,9 +221,9 @@ public class UrlDragDrop implements DropTargetListener {
             JOptionPane.showMessageDialog(editor,
                     Localization.lang("Operation not supported"),
                     Localization.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
-            LOGGER.warn("Could not perform drage and drop", nfe);
+            LOGGER.warn("Could not perform drag and drop.", nfe);
         } catch (IOException ioex) {
-            LOGGER.warn("Could not perform drage and drop", ioex);
+            LOGGER.warn("Could not perform drag and drop.", ioex);
         }
 
     }

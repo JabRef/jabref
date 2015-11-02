@@ -50,7 +50,7 @@ public class AbbreviationParser {
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            LOGGER.warn("Could not read journal list from file " + file.getAbsolutePath());
+            LOGGER.warn("Could not read journal list from file " + file.getAbsolutePath(), e);
         }
     }
     /**

@@ -86,8 +86,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         catch (IOException excep) {
             couldNotCall = true;
 
+            // @formatter:off
             LOGGER.warn(Localization.lang("Error") + ": "
-                    + Localization.lang("Could not call executable") + " '" + commandPath + "'.");
+                    + Localization.lang("Could not call executable") + " '"
+                    + commandPath + "'.", excep);
+            // @formatter:on
         }
     }
 

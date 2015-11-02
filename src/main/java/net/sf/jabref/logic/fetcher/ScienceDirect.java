@@ -61,7 +61,7 @@ public class ScienceDirect implements FullTextFinder {
                     pdfLink = Optional.of(new URL(request + "?httpAccept=application/pdf"));
                 }
             } catch(UnirestException e) {
-                LOGGER.warn("Elsevier API request failed: " + e.getMessage());
+                LOGGER.warn("Elsevier API request failed: " + e.getMessage(), e);
             }
         }
 

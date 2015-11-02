@@ -112,7 +112,7 @@ public class DOI {
             return uri;
         } catch(URISyntaxException e) {
             // should never happen
-            LOGGER.error(doi + " could not be encoded as URI.");
+            LOGGER.error(doi + " could not be encoded as URI.", e);
             return null;
         }
     }
