@@ -85,9 +85,9 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.compiler.problem.redundantSpecificationOfTypeArguments=warning
         org.eclipse.jdt.core.compiler.problem.redundantSuperinterface=ignore
         org.eclipse.jdt.core.compiler.problem.reportMethodCanBePotentiallyStatic=ignore
-        org.eclipse.jdt.core.compiler.problem.reportMethodCanBeStatic=warning
+        org.eclipse.jdt.core.compiler.problem.reportMethodCanBeStatic=ignore
         org.eclipse.jdt.core.compiler.problem.specialParameterHidingField=disabled
-        org.eclipse.jdt.core.compiler.problem.staticAccessReceiver=warning
+        org.eclipse.jdt.core.compiler.problem.staticAccessReceiver=ignore
         org.eclipse.jdt.core.compiler.problem.suppressOptionalErrors=disabled
         org.eclipse.jdt.core.compiler.problem.suppressWarnings=enabled
         org.eclipse.jdt.core.compiler.problem.syntacticNullAnalysisForFields=disabled
