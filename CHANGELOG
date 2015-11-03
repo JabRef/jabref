@@ -1,4 +1,5 @@
 [master]
+    - Feature: Search DOAJ, Directory of Open Access Journals
     - Removes options to set PDF and PS directories per .bib database as the general options have also been deleted.
     - Removes option to hide the BibTeX Code tab in the entry editor.
     - Changes the old integrity check by improving the code base (+tests) and converting it to a simple issues table

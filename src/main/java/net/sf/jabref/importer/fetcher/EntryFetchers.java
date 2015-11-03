@@ -42,6 +42,7 @@ public class EntryFetchers {
         entryFetchers.add(new SPIRESFetcher());
         entryFetchers.add(new ACMPortalFetcher());
         entryFetchers.add(new GoogleScholarFetcher());
+        entryFetchers.add(new DOAJFetcher());
     }
 
     public List<EntryFetcher> getEntryFetchers() {
