@@ -41,15 +41,19 @@ public class BibJSONConverter {
         entry.setType(BibtexEntryType.getType("article"));
 
         // Authors
-        JSONArray authors = bibJsonEntry.getJSONArray("author");
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < authors.length(); i++) {
-            sb.append(authors.getJSONObject(i).getString("name"));
-            if (i < (authors.length() - 1)) {
-                sb.append(" and ");
+        if (bibJsonEntry.has("author")) {
+            JSONArray authors = bibJsonEntry.getJSONArray("author");
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < authors.length(); i++) {
+                sb.append(authors.getJSONObject(i).getString("name"));
+                if (i < (authors.length() - 1)) {
+                    sb.append(" and ");
+                }
             }
+            entry.setField("author", sb.toString());
+        } else {
+            LOGGER.info("No author found.");
         }
-        entry.setField("author", sb.toString());
 
         // Direct accessible fields
         for (String field : singleFieldStrings) {
@@ -69,18 +73,26 @@ public class BibJSONConverter {
         }
 
         // Journal
-        JSONObject journal = bibJsonEntry.getJSONObject("journal");
-        entry.setField("journal", journal.getString("title"));
-        for (String field : journalSingleFieldStrings) {
-            if (journal.has(field)) {
-                entry.setField(field, journal.getString(field));
+        if (bibJsonEntry.has("journal")) {
+            JSONObject journal = bibJsonEntry.getJSONObject("journal");
+            // Journal title
+            if (journal.has("title")) {
+                entry.setField("journal", journal.getString("title"));
+                // Other journal related fields
+                for (String field : journalSingleFieldStrings) {
+                    if (journal.has(field)) {
+                        entry.setField(field, journal.getString(field));
+                    }
+                }
             }
+        } else {
+            LOGGER.info("No journal information found.");
         }
 
         // Keywords
         if (bibJsonEntry.has("keywords")) {
             JSONArray keywords = bibJsonEntry.getJSONArray("keywords");
-            sb = new StringBuffer();
+            StringBuffer sb = new StringBuffer();
             for (int i = 0; i < keywords.length(); i++) {
                 if (!keywords.isNull(i)) {
                     sb.append(keywords.getString(i));
@@ -90,7 +102,6 @@ public class BibJSONConverter {
                 }
             }
             entry.setField("keywords", sb.toString());
-
         }
 
         // Identifiers
@@ -100,6 +111,10 @@ public class BibJSONConverter {
                 String type = identifiers.getJSONObject(i).getString("type");
                 if (type.equals("doi")) {
                     entry.setField("doi", identifiers.getJSONObject(i).getString("id"));
+                } else if (type.equals("pissn")) {
+                    entry.setField("issn", identifiers.getJSONObject(i).getString("id"));
+                } else if (type.equals("eissn")) {
+                    entry.setField("issn", identifiers.getJSONObject(i).getString("id"));
                 }
             }
         }

@@ -15,10 +15,12 @@
 */
 package net.sf.jabref.importer.fetcher;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -29,13 +31,15 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibJSONConverter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
-
 
 public class DOAJFetcher implements EntryFetcher {
 
-    final String searchURL = "https://doaj.org/api/v1/search/articles/";
+    private final String searchURL = "https://doaj.org/api/v1/search/articles/";
     private static final Log LOGGER = LogFactory.getLog(DOAJFetcher.class);
+    private final int maxPerPage = 100;
+    private boolean shouldContinue;
 
 
     public DOAJFetcher() {
@@ -44,28 +48,60 @@ public class DOAJFetcher implements EntryFetcher {
 
     @Override
     public void stopFetching() {
-        // TODO Auto-generated method stub
-
+        shouldContinue = false;
     }
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-        HttpResponse<JsonNode> jsonResponse;
+        shouldContinue = true;
         try {
-            jsonResponse = Unirest.get(searchURL + query + "?pageSize=100").header("accept", "application/json").asJson();
+            status.setStatus(Localization.lang("Searching DOAJ..."));
+            HttpResponse<JsonNode> jsonResponse;
+            jsonResponse = Unirest.get(searchURL + query + "?pageSize=1").header("accept", "application/json").asJson();
             JSONObject jo = jsonResponse.getBody().getObject();
-            int pagesize = jo.getInt("pageSize");
             int hits = jo.getInt("total");
-            for (int i = 0; i < (pagesize > hits ? hits : pagesize); i++) {
-                JSONObject bibJsonEntry = jo.getJSONArray("results").getJSONObject(i).getJSONObject("bibjson");
-                BibtexEntry entry = BibJSONConverter.BibJSONtoBibtex(bibJsonEntry);
-                inspector.addEntry(entry);
+            int numberToFetch = 0;
+            while (true) {
+                String strCount = JOptionPane.showInputDialog(Localization.lang("References found") + ": " + hits + "  "
+                        + Localization.lang("Number of references to fetch?"), Integer.toString(hits));
+
+                if (strCount == null) {
+                    status.setStatus(Localization.lang("DOAJ search canceled"));
+                    return false;
+                }
+
+                try {
+                    numberToFetch = Integer.parseInt(strCount.trim());
+                    break;
+                } catch (RuntimeException ex) {
+                    status.showMessage(Localization.lang("Please enter a valid number"));
+                }
+            }
+
+            for (int page = 1; ((page - 1) * maxPerPage) <= numberToFetch; page++) {
+                if (!shouldContinue) {
+                    break;
+                }
+
+                int noToFetch = Math.min(maxPerPage, numberToFetch - ((page - 1) * maxPerPage));
+                jsonResponse = Unirest.get(searchURL + query + "?page=" + page + "&pageSize=" + noToFetch)
+                        .header("accept", "application/json").asJson();
+                jo = jsonResponse.getBody().getObject();
+                if (jo.has("results")) {
+                    JSONArray results = jo.getJSONArray("results");
+                    for (int i = 0; i < results.length(); i++) {
+                        JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
+                        BibtexEntry entry = BibJSONConverter.BibJSONtoBibtex(bibJsonEntry);
+                        inspector.addEntry(entry);
+                    }
+                }
             }
             return true;
         } catch (UnirestException e) {
             LOGGER.warn("Problem searching DOAJ", e);
             return false;
         }
+
     }
 
     @Override
