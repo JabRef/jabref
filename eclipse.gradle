@@ -421,8 +421,8 @@ tasks.eclipse.doFirst {
             cleanup.add_serial_version_id=false
             cleanup.always_use_blocks=true
             cleanup.always_use_parentheses_in_expressions=true
-            cleanup.always_use_this_for_non_static_field_access=true
-            cleanup.always_use_this_for_non_static_method_access=true
+            cleanup.always_use_this_for_non_static_field_access=false
+            cleanup.always_use_this_for_non_static_method_access=false
             cleanup.convert_functional_interfaces=false
             cleanup.convert_to_enhanced_for_loop=false
             cleanup.correct_indentation=true
@@ -484,8 +484,8 @@ tasks.eclipse.doFirst {
             sp_cleanup.add_serial_version_id=false
             sp_cleanup.always_use_blocks=true
             sp_cleanup.always_use_parentheses_in_expressions=true
-            sp_cleanup.always_use_this_for_non_static_field_access=true
-            sp_cleanup.always_use_this_for_non_static_method_access=true
+            sp_cleanup.always_use_this_for_non_static_field_access=false
+            sp_cleanup.always_use_this_for_non_static_method_access=false
             sp_cleanup.convert_functional_interfaces=false
             sp_cleanup.convert_to_enhanced_for_loop=false
             sp_cleanup.correct_indentation=false
