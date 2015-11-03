@@ -484,7 +484,7 @@ public class CleanUpAction extends AbstractWorker {
     private static void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
         String oldValue = entry.getField("pages");
         // not set
-        if(oldValue == null) {
+        if (oldValue == null) {
             return;
         }
         // run formatter
@@ -492,7 +492,7 @@ public class CleanUpAction extends AbstractWorker {
         // new value
         String newValue = entry.getField("pages");
         // undo action
-        if(!oldValue.equals(newValue)) {
+        if (!oldValue.equals(newValue)) {
             ce.addEdit(new UndoableFieldChange(entry, "pages", oldValue, newValue));
         }
     }
