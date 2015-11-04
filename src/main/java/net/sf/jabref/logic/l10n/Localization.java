@@ -58,7 +58,7 @@ public class Localization {
             }
         } catch (MissingResourceException ex) {
             LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
-                    + Locale.getDefault(), ex);
+                    + Locale.getDefault());
         }
         if (translation == null) {
             translation = key;
