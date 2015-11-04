@@ -61,42 +61,55 @@ public class DOAJFetcher implements EntryFetcher {
             JSONObject jo = jsonResponse.getBody().getObject();
             int hits = jo.getInt("total");
             int numberToFetch = 0;
-            while (true) {
-                String strCount = JOptionPane.showInputDialog(Localization.lang("References found") + ": " + hits + "  "
-                        + Localization.lang("Number of references to fetch?"), Integer.toString(hits));
+            if (hits > 0) {
+                if (hits > maxPerPage) {
+                    while (true) {
+                        String strCount = JOptionPane
+                                .showInputDialog(
+                                        Localization.lang("References found") + ": " + hits + "  "
+                                                + Localization.lang("Number of references to fetch?"),
+                                        Integer.toString(hits));
 
-                if (strCount == null) {
-                    status.setStatus(Localization.lang("DOAJ search canceled"));
-                    return false;
+                        if (strCount == null) {
+                            status.setStatus(Localization.lang("DOAJ search canceled"));
+                            return false;
+                        }
+
+                        try {
+                            numberToFetch = Integer.parseInt(strCount.trim());
+                            break;
+                        } catch (RuntimeException ex) {
+                            status.showMessage(Localization.lang("Please enter a valid number"));
+                        }
+                    }
+                } else {
+                    numberToFetch = hits;
                 }
 
-                try {
-                    numberToFetch = Integer.parseInt(strCount.trim());
-                    break;
-                } catch (RuntimeException ex) {
-                    status.showMessage(Localization.lang("Please enter a valid number"));
-                }
-            }
+                for (int page = 1; ((page - 1) * maxPerPage) <= numberToFetch; page++) {
+                    if (!shouldContinue) {
+                        break;
+                    }
 
-            for (int page = 1; ((page - 1) * maxPerPage) <= numberToFetch; page++) {
-                if (!shouldContinue) {
-                    break;
-                }
-
-                int noToFetch = Math.min(maxPerPage, numberToFetch - ((page - 1) * maxPerPage));
-                jsonResponse = Unirest.get(searchURL + query + "?page=" + page + "&pageSize=" + noToFetch)
-                        .header("accept", "application/json").asJson();
-                jo = jsonResponse.getBody().getObject();
-                if (jo.has("results")) {
-                    JSONArray results = jo.getJSONArray("results");
-                    for (int i = 0; i < results.length(); i++) {
-                        JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                        BibtexEntry entry = BibJSONConverter.BibJSONtoBibtex(bibJsonEntry);
-                        inspector.addEntry(entry);
+                    int noToFetch = Math.min(maxPerPage, numberToFetch - ((page - 1) * maxPerPage));
+                    jsonResponse = Unirest.get(searchURL + query + "?page=" + page + "&pageSize=" + noToFetch)
+                            .header("accept", "application/json").asJson();
+                    jo = jsonResponse.getBody().getObject();
+                    if (jo.has("results")) {
+                        JSONArray results = jo.getJSONArray("results");
+                        for (int i = 0; i < results.length(); i++) {
+                            JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
+                            BibtexEntry entry = BibJSONConverter.BibJSONtoBibtex(bibJsonEntry);
+                            inspector.addEntry(entry);
+                        }
                     }
                 }
+                return true;
+            } else {
+                status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
+                        Localization.lang("Search DOAJ"), JOptionPane.INFORMATION_MESSAGE);
+                return false;
             }
-            return true;
         } catch (UnirestException e) {
             LOGGER.warn("Problem searching DOAJ", e);
             return false;
@@ -106,19 +119,17 @@ public class DOAJFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return "DOAJ (Directory of Open Access Journals";
+        return "DOAJ (Directory of Open Access Journals)";
     }
 
     @Override
     public String getKeyName() {
-        // TODO Auto-generated method stub
-        return null;
+        return "DOAJ";
     }
 
     @Override
     public String getHelpPage() {
-        // TODO Auto-generated method stub
-        return null;
+        return "DOAJHelp.html";
     }
 
     @Override

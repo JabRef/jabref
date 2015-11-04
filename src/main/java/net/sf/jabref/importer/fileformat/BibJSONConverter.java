@@ -45,9 +45,13 @@ public class BibJSONConverter {
             JSONArray authors = bibJsonEntry.getJSONArray("author");
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < authors.length(); i++) {
-                sb.append(authors.getJSONObject(i).getString("name"));
-                if (i < (authors.length() - 1)) {
-                    sb.append(" and ");
+                if (authors.getJSONObject(i).has("name")) {
+                    sb.append(authors.getJSONObject(i).getString("name"));
+                    if (i < (authors.length() - 1)) {
+                        sb.append(" and ");
+                    }
+                } else {
+                    LOGGER.info("Empty author name.");
                 }
             }
             entry.setField("author", sb.toString());
