@@ -160,7 +160,7 @@ public class JabRef {
         openWindow(loaded);
     }
 
-    private static void setupLogHandlerForErrorConsole() {
+    private void setupLogHandlerForErrorConsole() {
         Globals.handler = new CacheableHandler();
         ((Jdk14Logger)LOGGER).getLogger().addHandler(Globals.handler);
     }
@@ -486,7 +486,7 @@ public class JabRef {
      * @return A parser result containing the entries fetched or null if an
      *         error occurred.
      */
-    private static ParserResult fetch(String fetchCommand) {
+    private ParserResult fetch(String fetchCommand) {
 
         if ((fetchCommand == null) || !fetchCommand.contains(":") ||
                 (fetchCommand.split(":").length != 2)) {
@@ -529,7 +529,7 @@ public class JabRef {
         return new ParserResult(result);
     }
 
-    private static void setLookAndFeel() {
+    private void setLookAndFeel() {
         try {
             String lookFeel;
             String systemLnF = UIManager.getSystemLookAndFeelClassName();

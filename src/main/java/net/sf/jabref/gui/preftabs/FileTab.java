@@ -193,7 +193,7 @@ class FileTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
-    private static ButtonGroup createRadioBg(Iterable<String> radioButtonLabels) {
+    private ButtonGroup createRadioBg(Iterable<String> radioButtonLabels) {
         ButtonGroup buttonGroup = new ButtonGroup();
         for (String _s : radioButtonLabels) {
             JRadioButton _rb = new JRadioButton(_s);
@@ -203,7 +203,7 @@ class FileTab extends JPanel implements PrefsTab {
         return buttonGroup;
     }
 
-    private static int getBgValue(ButtonGroup buttonGroup) {
+    private int getBgValue(ButtonGroup buttonGroup) {
         int index = 0;
         for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
             if (buttons.nextElement().isSelected()) {
@@ -216,7 +216,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     }
 
-    private static void setBgSelected(ButtonGroup buttonGroup, int buttonIndex) {
+    private void setBgSelected(ButtonGroup buttonGroup, int buttonIndex) {
         int currentIndex = 0;
 
         for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
@@ -237,7 +237,7 @@ class FileTab extends JPanel implements PrefsTab {
     //        fieldOrderStyle=getBgValue(bgFieldOrderStyle);
     //    }
 
-    private static void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup,
+    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup,
             JTextField textField) {
         //for LWang_AdjustableFieldOrder
 

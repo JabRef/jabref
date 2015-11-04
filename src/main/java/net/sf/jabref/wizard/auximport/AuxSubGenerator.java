@@ -299,7 +299,7 @@ public class AuxSubGenerator {
      * @param auxDB The database to insert into.
      * @param entry The entry to insert a copy of.
      */
-    private static void insertEntry(BibtexDatabase bibDB, BibtexEntry entry) {
+    private void insertEntry(BibtexDatabase bibDB, BibtexEntry entry) {
 
         BibtexEntry clonedEntry = (BibtexEntry) entry.clone();
         clonedEntry.setId(IdGenerator.next());

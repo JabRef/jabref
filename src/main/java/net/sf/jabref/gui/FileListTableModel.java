@@ -208,7 +208,7 @@ public class FileListTableModel extends AbstractTableModel {
         return entry.getType().getIconLabel();
     }
 
-    private static FileListEntry decodeEntry(ArrayList<String> contents, boolean deduceUnknownType) {
+    private FileListEntry decodeEntry(ArrayList<String> contents, boolean deduceUnknownType) {
         ExternalFileType type = Globals.prefs.getExternalFileTypeByName
                 (getElementIfAvailable(contents, 2));
 
@@ -238,7 +238,7 @@ public class FileListTableModel extends AbstractTableModel {
                 type);
     }
 
-    private static String getElementIfAvailable(ArrayList<String> contents, int index) {
+    private String getElementIfAvailable(ArrayList<String> contents, int index) {
         if (index < contents.size()) {
             return contents.get(index);
         } else {
@@ -280,7 +280,7 @@ public class FileListTableModel extends AbstractTableModel {
         return sb.append("</html>").toString();
     }
 
-    private static String encodeEntry(FileListEntry entry) {
+    private String encodeEntry(FileListEntry entry) {
         String type = entry.getType() != null ? entry.getType().getName() : "";
         return StringUtil.encodeString(entry.getDescription()) + ':' + StringUtil.encodeString(entry.getLink()) + ':' + StringUtil.encodeString(type);
     }

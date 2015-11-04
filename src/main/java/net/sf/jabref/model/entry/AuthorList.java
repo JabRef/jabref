@@ -1064,7 +1064,7 @@ public class AuthorList {
         /**
          * @return true if the brackets in s are properly paired
          */
-        private static boolean properBrackets(String s) {
+        private boolean properBrackets(String s) {
             // nested construct is there, check for "proper" nesting
             int i = 0;
             int level = 0;
@@ -1096,7 +1096,7 @@ public class AuthorList {
          * * {Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin
          * * Vall{\'e}e Poussin -> Vall{\'e}e Poussin
          */
-        private static String removeStartAndEndBraces(String name) {
+        private String removeStartAndEndBraces(String name) {
             if (name == null) {
                 return null;
             }

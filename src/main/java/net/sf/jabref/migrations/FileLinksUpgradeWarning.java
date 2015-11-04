@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -163,7 +163,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @return true if at least one of the given fields is set in at least one entry,
      *  false otherwise.
      */
-    private static boolean linksFound(BibtexDatabase database, String[] fields) {
+    private boolean linksFound(BibtexDatabase database, String[] fields) {
         for (BibtexEntry entry : database.getEntries()) {
             for (String field : fields) {
                 if (entry.getField(field) != null) {
@@ -180,7 +180,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @param pr
      * @param fileDir The path to the file directory to set, or null if it should not be set.
      */
-    private static void makeChanges(BasePanel panel, ParserResult pr, boolean upgradePrefs,
+    private void makeChanges(BasePanel panel, ParserResult pr, boolean upgradePrefs,
                              boolean upgradeDatabase, String fileDir) {
 
         if (upgradeDatabase) {
@@ -217,7 +217,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         }
     }
 
-    private static boolean showsFileInGenFields() {
+    private boolean showsFileInGenFields() {
         boolean found = false;
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         outer: for (int i = 0; i < tabList.getTabCount(); i++) {
