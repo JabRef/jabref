@@ -111,7 +111,7 @@ public class SaveSession {
 
                     }
                 } catch (IOException ex) {
-                    LOGGER.error("Error when creating lock file");
+                    LOGGER.error("Error when creating lock file.", ex);
                 }
             }
 
@@ -150,7 +150,7 @@ public class SaveSession {
         try {
             out.close();
         } catch (IOException ex) {
-            LOGGER.error("Error when creating lock file");
+            LOGGER.error("Error when creating lock file.", ex);
         }
         lock.deleteOnExit();
         return false;

@@ -183,13 +183,12 @@ public class FileActions {
             session = new SaveSession(file, encoding, backup);
         } catch (Throwable e) {
             if (encoding != null) {
-                LOGGER.error("Error from encoding: '" + encoding + "' Len: " + encoding.length());
+                LOGGER.error("Error from encoding: '" + encoding + "' Len: " + encoding.length(), e);
             }
             // we must catch all exceptions to be able notify users that
             // saving failed, no matter what the reason was
             // (and they won't just quit JabRef thinking
             // everything worked and loosing data)
-            e.printStackTrace();
             throw new SaveException(e.getMessage());
         }
 

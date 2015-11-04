@@ -171,7 +171,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             status.showMessage(Localization.lang("Connection to IEEEXplore failed"), Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             status.showMessage(Localization.lang(e.getMessage()), Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
-            LOGGER.warn("Search IEEEXplore: " + e.getMessage());
+            LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
         }
         return false;
     }

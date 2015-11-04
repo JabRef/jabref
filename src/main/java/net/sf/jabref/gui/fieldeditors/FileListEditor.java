@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -265,7 +265,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
                             Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.warn("File permission error while deleting: " + file.toPath());
+                    LOGGER.warn("File permission error while deleting: " + file.toPath(), ex);
                 }
             }
         });
@@ -280,7 +280,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(),
                         type != null ? type : entry.getType());
             } catch (IOException e) {
-                LOGGER.warn("Cannot open selected file: " + e.getMessage());
+                LOGGER.warn("Cannot open selected file.", e);
             }
         }
     }
@@ -466,7 +466,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         try {
             def.download(this);
         } catch (IOException ex) {
-            LOGGER.warn("Cannot download: " + ex.getMessage());
+            LOGGER.warn("Cannot download.", ex);
         }
     }
 

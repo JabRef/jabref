@@ -166,7 +166,7 @@ public class ChangeScanner implements Runnable {
                             false, false, panel.getEncoding(), true);
                     ss.commit();
                 } catch (SaveException ex) {
-                    LOGGER.warn("Problem updating tmp file after accepting external changes");
+                    LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
                 }
 
             }

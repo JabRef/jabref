@@ -152,7 +152,7 @@ class HelpContent extends JTextPane {
             setPageOnly(new URL(resource.toString() + '#' + reference));
 
         } catch (IOException ex) {
-            LOGGER.warn("Problem when finding help files: " + ex.getMessage());
+            LOGGER.warn("Problem when finding help files.", ex);
         }
 
         forw.removeAllElements();

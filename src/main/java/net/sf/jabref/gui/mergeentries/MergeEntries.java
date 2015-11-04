@@ -340,7 +340,7 @@ public class MergeEntries {
         try {
             new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
-            LOGGER.error(Localization.lang("Error in entry" + ": " + ex.getMessage()));
+            LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);
@@ -423,7 +423,7 @@ public class MergeEntries {
         try {
             new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
-            LOGGER.error(Localization.lang("Error in entry" + ": " + ex.getMessage()));
+            LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);
