@@ -273,7 +273,7 @@ public class LabelPatternUtil {
         String rest = null;
 
         for (int index = 0; index < parts.length; index++) {
-            List<String> part = new ArrayList<String>();
+            List<String> part = new ArrayList<>();
 
             // Cleanup: remove unnecessary words.
             for (String k : parts[index].replaceAll("\\{[A-Z]+\\}", "").split("[ \\-_]")) {
@@ -394,7 +394,7 @@ public class LabelPatternUtil {
      */
     public static ArrayList<String> split(String labelPattern) {
         // A holder for fields of the entry to be used for the key
-        ArrayList<String> fieldList = new ArrayList<String>();
+        ArrayList<String> fieldList = new ArrayList<>();
 
         // Before we do anything, we add the parameter to the ArrayLIst
         fieldList.add(labelPattern);
@@ -413,12 +413,12 @@ public class LabelPatternUtil {
      *
      * The given database is used to avoid duplicate keys.
      *
-     * @param database a <code>BibtexDatabase</code>
+     * @param dBase a <code>BibtexDatabase</code>
      * @param entry a <code>BibtexEntry</code>
      * @return modified Bibtexentry
      */
-    public static BibtexEntry makeLabel(MetaData metaData, BibtexDatabase database, BibtexEntry entry) {
-        LabelPatternUtil.database = database;
+    public static BibtexEntry makeLabel(MetaData metaData, BibtexDatabase dBase, BibtexEntry entry) {
+        LabelPatternUtil.database = dBase;
         ArrayList<String> typeList;
         String key;
         StringBuilder stringBuilder = new StringBuilder();

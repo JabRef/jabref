@@ -1,5 +1,6 @@
 /*
  Copyright (C) 2004 R. Nagel
+ Copyright (C) 2015 JabRef Contributors.
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -75,8 +76,6 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.EditorKit;
@@ -197,6 +196,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         try {
             doc.insertString(0, "", doc.getStyle("regular"));
         } catch (Exception ignored) {
+            // Ignored
         }
 
         OverlayPanel testPanel = new OverlayPanel(textPane,
@@ -363,30 +363,30 @@ public class TextInputDialog extends JDialog implements ActionListener {
         sourcePanel.add(paneScrollPane, BorderLayout.CENTER);
     }
 
-    private void addStylesToDocument(StyledDocument doc) {
+    private void addStylesToDocument(StyledDocument document) {
         //Initialize some styles.
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
-        Style regular = doc.addStyle("regular", def);
+        Style regular = document.addStyle("regular", def);
         StyleConstants.setFontFamily(def, "SansSerif");
         StyleConstants.setFontSize(def, 12);
 
-        Style s = doc.addStyle("oldused", regular);
+        Style s = document.addStyle("oldused", regular);
         StyleConstants.setItalic(s, true);
         StyleConstants.setForeground(s, Color.blue);
 
-        s = doc.addStyle("used", regular);
+        s = document.addStyle("used", regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s, Color.blue);
 
-        s = doc.addStyle("marked", regular);
+        s = document.addStyle("marked", regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s, Color.red);
 
-        s = doc.addStyle("small", regular);
+        s = document.addStyle("small", regular);
         StyleConstants.setFontSize(s, 10);
 
-        s = doc.addStyle("large", regular);
+        s = document.addStyle("large", regular);
         StyleConstants.setFontSize(s, 16);
     }
 
@@ -504,6 +504,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored) {
+            // Ignored
         }
 
         fieldList.clearSelection();
@@ -535,13 +536,15 @@ public class TextInputDialog extends JDialog implements ActionListener {
             if (data != null) {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();
-                if (selEnd - selStart > 0) {
+                if ((selEnd - selStart) > 0) {
                     textPane.replaceSelection("");
                 }
                 int cPos = textPane.getCaretPosition();
                 try {
                     doc.insertString(cPos, data, doc.getStyle("regular"));
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                    // Ignored
+                }
             }
         }
     }
@@ -566,9 +569,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
                             eKit.read(fis, doc, 0);
                             doc.setLogicalStyle(0, doc.getStyle("regular"));
                         }
-                    }   
+                    }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                // Ignored
+            }
         }
     }
 
@@ -590,7 +595,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {}
+        public void actionPerformed(ActionEvent e) {
+            // Do nothing
+        }
     }
 
     class FieldListSelectionHandler implements ListSelectionListener {

@@ -18,9 +18,15 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Insets;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
@@ -113,7 +119,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         // We need a listener on showSource to enable and disable the source panel-related choices:
         emacsMode.addChangeListener(event -> emacsRebindCtrlF.setEnabled(emacsMode.isSelected()));
 
-        
+
         autoCompFields = new JTextField(40);
         // We need a listener on autoComplete to enable and disable the
         // autoCompFields text field:
@@ -137,10 +143,10 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder.add(emacsMode, cc.xy(2, 9));
         builder.add(emacsRebindCtrlA, cc.xy(2, 11));
         builder.add(emacsRebindCtrlF, cc.xy(2, 13));
-        
+
         builder.addSeparator(Localization.lang("Autocompletion options"), cc.xyw(1, 15, 5));
         builder.add(autoComplete, cc.xy(2, 19));
-        
+
         DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
         JLabel label = new JLabel(Localization.lang("Use autocompletion for the following fields")+":");
 
@@ -155,12 +161,12 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder.add(autoCompFF, cc.xy(2,24));
         builder.add(autoCompLF, cc.xy(2,25));
         builder.add(autoCompBoth, cc.xy(2,26));
-        
+
         builder.addSeparator(Localization.lang("Treatment of first names"), cc.xyw(2, 28, 4));
         builder.add(firstNameModeAbbr, cc.xy(2,29));
         builder.add(firstNameModeFull, cc.xy(2,30));
         builder.add(firstNameModeBoth, cc.xy(2,31));
-        
+
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
@@ -260,17 +266,17 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
         // We need to remove all entry editors from cache if the source panel setting
         // or the autocompletion settings have been changed:
-        if (oldAutoComplete != autoComplete.isSelected()
+        if ((oldAutoComplete != autoComplete.isSelected())
                 || !oldAutoCompFields.equals(autoCompFields.getText()) ||
-                oldAutoCompFF != autoCompFF.isSelected() || oldAutoCompLF != autoCompLF.isSelected() ||
-                oldAutoCompFModeAbbr != firstNameModeAbbr.isSelected() ||
-                oldAutoCompFModeFull != firstNameModeFull.isSelected()) {
+                (oldAutoCompFF != autoCompFF.isSelected()) || (oldAutoCompLF != autoCompLF.isSelected()) ||
+                (oldAutoCompFModeAbbr != firstNameModeAbbr.isSelected()) ||
+                (oldAutoCompFModeFull != firstNameModeFull.isSelected())) {
             for (int j = 0; j < frame.getTabbedPane().getTabCount(); j++) {
                 BasePanel bp = (BasePanel) frame.getTabbedPane().getComponentAt(j);
                 bp.entryEditors.clear();
             }
         }
-        // the autocompleter has to be updated to the new min length to complete 
+        // the autocompleter has to be updated to the new min length to complete
         AutoCompleterFactory.SHORTEST_TO_COMPLETE = (Integer) shortestToComplete.getValue();
     }
 

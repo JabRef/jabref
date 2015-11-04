@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -24,7 +24,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JViewport;
+import javax.swing.TransferHandler;
 import javax.swing.plaf.TableUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
@@ -53,16 +59,16 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 
 /**
  * The central table which displays the bibtex entries.
- * 
+ *
  * User: alver
  * Date: Oct 12, 2005
  * Time: 10:29:39 PM
- * 
+ *
  */
 public class MainTable extends JTable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private final MainTableFormat tableFormat;
     private final BasePanel panel;
     private final SortedList<BibtexEntry> sortedForMarking;
@@ -93,7 +99,7 @@ public class MainTable extends JTable {
     private static final int OTHER = 3;
     private static final int BOOLEAN = 4;
     public static final int ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
-    
+
     private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     static {
@@ -112,13 +118,13 @@ public class MainTable extends JTable {
         this.panel = panel;
         // This SortedList has a Comparator controlled by the TableComparatorChooser
         // we are going to install, which responds to user sorting selctions:
-        sortedForTable = new SortedList<BibtexEntry>(list, null);
+        sortedForTable = new SortedList<>(list, null);
         // This SortedList applies afterwards, and floats marked entries:
-        sortedForMarking = new SortedList<BibtexEntry>(sortedForTable, null);
+        sortedForMarking = new SortedList<>(sortedForTable, null);
         // This SortedList applies afterwards, and can float search hits:
-        sortedForSearch = new SortedList<BibtexEntry>(sortedForMarking, null);
+        sortedForSearch = new SortedList<>(sortedForMarking, null);
         // This SortedList applies afterwards, and can float grouping hits:
-        sortedForGrouping = new SortedList<BibtexEntry>(sortedForSearch, null);
+        sortedForGrouping = new SortedList<>(sortedForSearch, null);
 
         searchMatcher = null;
         groupMatcher = null;
@@ -324,7 +330,7 @@ public class MainTable extends JTable {
         cm.getColumn(0).setPreferredWidth(ncWidth);
         for (int i = 1; i < tableFormat.padleft; i++) {
 
-            // Check if the Column is an extended RankingColumn (and not a compact-ranking column) 
+            // Check if the Column is an extended RankingColumn (and not a compact-ranking column)
             // If this is the case, set a certain Column-width,
             // because the RankingIconColumn needs some more width
             if (tableFormat.isRankingColumn(i)) {
@@ -364,7 +370,7 @@ public class MainTable extends JTable {
     }
 
     private List<Boolean> getCurrentSortOrder() {
-        List<Boolean> order = new ArrayList<Boolean>();
+        List<Boolean> order = new ArrayList<>();
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
         for (Integer i : sortCols) {
             order.add(comparatorChooser.isColumnReverse(i));
@@ -374,7 +380,7 @@ public class MainTable extends JTable {
 
     private List<String> getCurrentSortFields() {
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
-        List<String> fields = new ArrayList<String>();
+        List<String> fields = new ArrayList<>();
         for (Integer i : sortCols) {
             String name = tableFormat.getColumnType(i);
             if (name != null) {
@@ -390,7 +396,6 @@ public class MainTable extends JTable {
      * columns, but this is where the Comparators are defined. Also, the ComparatorChooser
      * is initialized with the sort order defined in Preferences.
      */
-    @SuppressWarnings("unchecked")
     private void setupComparatorChooser() {
         // First column:
         List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
@@ -505,7 +510,7 @@ public class MainTable extends JTable {
 
     /**
      * Use with caution! If you modify an entry in the table, the selection changes
-     * 
+     *
      * You can avoid it with
      *   <code>.getSelected().getReadWriteLock().writeLock().lock()</code>
      *   and then <code>.unlock()</code>
@@ -714,7 +719,6 @@ public class MainTable extends JTable {
      * @param index The column number.
      * @return The Comparator, or null if none is set.
      */
-    @SuppressWarnings("unchecked")
     public Comparator<BibtexEntry> getComparatorForColumn(int index) {
         List<Comparator> l = comparatorChooser.getComparatorsForColumn(index);
         return l.isEmpty() ? null : l.get(0);

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -32,7 +32,7 @@ public class HelpAction extends MnemonicAwareAction {
 
     private final HelpDialog diag;
 
-    private Class resourceOwner;
+    private Class<?> resourceOwner;
 
     private String helpFile;
 
@@ -74,7 +74,7 @@ public class HelpAction extends MnemonicAwareAction {
         this.helpFile = helpFile;
     }
 
-    public void setResourceOwner(Class resourceOwner) {
+    public void setResourceOwner(Class<?> resourceOwner) {
         this.resourceOwner = resourceOwner;
     }
 

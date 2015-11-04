@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -30,7 +30,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
- * 
+ *
  * This is a non-modal help Dialog. The contents of the help is specified by
  * calling showPage().
  */
@@ -89,7 +89,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
         showPage(url, JabRef.class);
     }
 
-    public void showPage(String url, Class resourceOwner) {
+    public void showPage(String url, Class<?> resourceOwner) {
         if (!isVisible()) {
             Util.placeDialog(this, frame);
             content.reset();

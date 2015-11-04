@@ -43,7 +43,6 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.cleanup.PageNumbersCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
-import net.sf.jabref.logic.formatter.bibtexfields.SuperscriptFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.DOI;

@@ -68,8 +68,9 @@ class LayoutEntry {
         } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             text = si.s.trim();
         } else if ((si.i == LayoutHelper.IS_FIELD_START) || (si.i == LayoutHelper.IS_FIELD_END)) {
+            // Do nothing
         } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
-            Vector<String> v = new Vector<String>();
+            Vector<String> v = new Vector<>();
             WSITools.tokenize(v, si.s, "\n");
 
             if (v.size() == 1) {
@@ -84,7 +85,7 @@ class LayoutEntry {
                         String notFound = ((NotFoundFormatter) anOption).getNotFound();
 
                         if (invalidFormatter == null) {
-                            invalidFormatter = new ArrayList<String>();
+                            invalidFormatter = new ArrayList<>();
                         }
                         invalidFormatter.add(notFound);
                     }
@@ -100,7 +101,7 @@ class LayoutEntry {
         String blockEnd;
         StringInt si;
         Vector<StringInt> blockEntries = null;
-        Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>();
+        Vector<LayoutEntry> tmpEntries = new Vector<>();
         LayoutEntry le;
         si = parsedEntries.get(0);
         blockStart = si.s;
@@ -119,9 +120,10 @@ class LayoutEntry {
 
             // System.out.println("PARSED-ENTRY: "+si.s+"="+si.i);
             if ((si.i == LayoutHelper.IS_LAYOUT_TEXT) || (si.i == LayoutHelper.IS_SIMPLE_FIELD)) {
+                // Do nothing
             } else if ((si.i == LayoutHelper.IS_FIELD_START)
                     || (si.i == LayoutHelper.IS_GROUP_START)) {
-                blockEntries = new Vector<StringInt>();
+                blockEntries = new Vector<>();
                 blockStart = si.s;
             } else if ((si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_END)) {
                 if (blockStart.equals(si.s)) {
@@ -137,6 +139,7 @@ class LayoutEntry {
                     LOGGER.warn("Nested field entries are not implemented !!!");
                 }
             } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+                // Do nothing
             }
 
             // else if (si.i == LayoutHelper.IS_OPTION_FIELD_PARAM)
@@ -158,7 +161,7 @@ class LayoutEntry {
             // Note if one of the entries has an invalid formatter:
             if (layoutEntries[i].isInvalidFormatter()) {
                 if (invalidFormatter == null) {
-                    invalidFormatter = new ArrayList<String>(1);
+                    invalidFormatter = new ArrayList<>(1);
                 }
                 invalidFormatter.addAll(layoutEntries[i].getInvalidFormatters());
             }
@@ -408,7 +411,7 @@ class LayoutEntry {
 
         ArrayList<String[]> formatterStrings = Util.parseMethodsCalls(formatterName);
 
-        ArrayList<LayoutFormatter> results = new ArrayList<LayoutFormatter>(formatterStrings.size());
+        ArrayList<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
 
         Map<String, String> userNameFormatter = NameFormatterTab.getNameFormatters();
 
@@ -440,6 +443,7 @@ class LayoutEntry {
                 results.add(f);
                 continue;
             } catch (Exception ignored) {
+                // Ignored
             }
 
             // Then check whether this is a user defined formatter
@@ -470,12 +474,10 @@ class LayoutEntry {
     }
 
     /**
-     * Will return the text that was called by the method with HTML tags
-     * to highlight each word the user has searched for and will skip
-     * the highlight process if the first Char isn't a letter or a digit.
+     * Will return the text that was called by the method with HTML tags to highlight each word the user has searched
+     * for and will skip the highlight process if the first Char isn't a letter or a digit.
      *
-     * This check is a quick hack to avoid highlighting of HTML tags
-     * It does not always work, but it does its job mostly
+     * This check is a quick hack to avoid highlighting of HTML tags It does not always work, but it does its job mostly
      *
      * @param text This is a String in which we search for different words
      * @param toHighlight List of all words which must be highlighted
