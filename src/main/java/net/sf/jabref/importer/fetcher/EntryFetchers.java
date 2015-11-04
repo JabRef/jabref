@@ -44,6 +44,7 @@ public class EntryFetchers {
         entryFetchers.add(new ACMPortalFetcher());
         entryFetchers.add(new GoogleScholarFetcher());
         entryFetchers.add(new DOAJFetcher());
+        entryFetchers.add(new SpringerFetcher());
     }
 
     public List<EntryFetcher> getEntryFetchers() {
