@@ -86,6 +86,7 @@ public class DOAJFetcher implements EntryFetcher {
                     numberToFetch = hits;
                 }
 
+                int fetched = 0; // Keep track of number of items fetched for the progress bar
                 for (int page = 1; ((page - 1) * maxPerPage) <= numberToFetch; page++) {
                     if (!shouldContinue) {
                         break;
@@ -101,6 +102,8 @@ public class DOAJFetcher implements EntryFetcher {
                             JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
                             BibtexEntry entry = BibJSONConverter.BibJSONtoBibtex(bibJsonEntry);
                             inspector.addEntry(entry);
+                            fetched++;
+                            inspector.setProgress(fetched, numberToFetch);
                         }
                     }
                 }
