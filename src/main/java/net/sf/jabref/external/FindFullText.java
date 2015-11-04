@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.fetcher.*;
 import net.sf.jabref.logic.net.URLDownload;
 
@@ -20,7 +19,8 @@ import net.sf.jabref.logic.net.URLDownload;
  * Utility class for trying to resolve URLs to full-text PDF for articles.
  */
 public class FindFullText {
-    private final List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
+
+    private final List<FullTextFinder> finders = new ArrayList<>();
 
     public FindFullText() {
         // Ordering is important, authorities first!
@@ -50,7 +50,7 @@ public class FindFullText {
                     // javax.net.ssl.SSLProtocolException: handshake alert:  unrecognized_name
                     // http://stackoverflow.com/questions/7615645/ssl-handshake-alert-unrecognized-name-error-since-upgrade-to-java-1-7-0
                     String mimeType = new URLDownload(result.get()).determineMimeType();
-                    if (mimeType != null && mimeType.toLowerCase().equals("application/pdf")) {
+                    if ((mimeType != null) && mimeType.toLowerCase().equals("application/pdf")) {
                         return Optional.of(result.get());
                     } else {
                         // TODO log
@@ -83,7 +83,7 @@ public class FindFullText {
             int responseCode = huc.getResponseCode();
             String location = huc.getHeaderField("location");
             huc.disconnect();
-            if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM && redirectCount < 5) {
+            if ((responseCode == HttpURLConnection.HTTP_MOVED_TEMP) || ((responseCode == HttpURLConnection.HTTP_MOVED_PERM) && (redirectCount < 5))) {
                 try {
                     URL newUrl = new URL(location);
                     return resolveRedirects(newUrl, redirectCount + 1);

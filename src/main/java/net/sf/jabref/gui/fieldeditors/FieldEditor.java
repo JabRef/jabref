@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -22,7 +22,6 @@ import java.awt.Container;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.event.UndoableEditListener;
 
 /**
  * FieldEditors is a common interface between the TextField and TextArea.
@@ -61,7 +60,7 @@ public interface FieldEditor {
     /**
      * Sets the given text on the current field editor and marks this text
      * editor as modified.
-     * 
+     *
      * @param newText
      */
     void setText(String newText);
@@ -84,7 +83,7 @@ public interface FieldEditor {
 
     /**
      * normally implemented in JTextArea and JTextField
-     * 
+     *
      * @return
      */
     String getSelectedText();

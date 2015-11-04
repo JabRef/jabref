@@ -42,7 +42,7 @@ public class JabRefDesktop {
             File file = FileUtil.expandFilename(link, dir);
 
             // Check that the file exists:
-            if (file == null || !file.exists()) {
+            if ((file == null) || !file.exists()) {
                 throw new IOException(Localization.lang("File not found") + " (" + fieldName + "): '" + link + "'.");
             }
             link = file.getCanonicalPath();
@@ -54,7 +54,7 @@ public class JabRefDesktop {
                     fieldName = "pdf";
                     // @formatter:off
                 } else if (split[split.length - 1].equalsIgnoreCase("ps")
-                        || split.length >= 3 && split[split.length - 2].equalsIgnoreCase("ps")) {
+                        || ((split.length >= 3) && split[split.length - 2].equalsIgnoreCase("ps"))) {
                     // @formatter:on
                     fieldName = "ps";
                 }
@@ -223,7 +223,7 @@ public class JabRefDesktop {
         }
 
         // Check if we have arrived at a file type, and either an http link or an existing file:
-        if ((httpLink || file.exists()) && fileType != null) {
+        if ((httpLink || file.exists()) && (fileType != null)) {
             // Open the file:
             String filePath = httpLink ? link : file.getPath();
             openExternalFilePlatformIndependent(fileType, filePath);
@@ -245,13 +245,13 @@ public class JabRefDesktop {
         if (OS.OS_X) {
             // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
             // @formatter:off
-            String[] cmd = fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty() ?
+            String[] cmd = (fileType.getOpenWith() != null) && !fileType.getOpenWith().isEmpty() ?
                     new String[] {"/usr/bin/open", "-a", fileType.getOpenWith(), filePath} :
                     new String[] {"/usr/bin/open", filePath};
             // @formatter:on
             Runtime.getRuntime().exec(cmd);
         } else if (OS.WINDOWS) {
-            if (fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty()) {
+            if ((fileType.getOpenWith() != null) && !fileType.getOpenWith().isEmpty()) {
                 // Application is specified. Use it:
                 openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
             } else {
@@ -260,7 +260,7 @@ public class JabRefDesktop {
         } else {
             // Use the given app if specified, and the universal "xdg-open" otherwise:
             String[] openWith;
-            if (fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty()) {
+            if ((fileType.getOpenWith() != null) && !fileType.getOpenWith().isEmpty()) {
                 openWith = fileType.getOpenWith().split(" ");
             } else {
                 openWith = new String[] {"xdg-open"};
@@ -323,7 +323,7 @@ public class JabRefDesktop {
             editor.setVisible(true);
             if (editor.okPressed()) {
                 // Get the old list of types, add this one, and update the list in prefs:
-                List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
+                List<ExternalFileType> fileTypes = new ArrayList<>();
                 ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
                 Collections.addAll(fileTypes, oldTypes);
                 fileTypes.add(newType);

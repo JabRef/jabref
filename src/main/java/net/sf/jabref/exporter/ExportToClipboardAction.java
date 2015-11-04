@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -128,7 +128,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
             BibtexEntry[] bes = panel.getSelectedEntries();
-            HashSet<String> entries = new HashSet<String>(bes.length);
+            HashSet<String> entries = new HashSet<>(bes.length);
             for (BibtexEntry be : bes) {
                 entries.add(be.getId());
             }
@@ -147,6 +147,7 @@ public class ExportToClipboardAction extends AbstractWorker {
 
                 @Override
                 public void lostOwnership(Clipboard clipboard, Transferable content) {
+                    // Do nothing
                 }
             };
             //StringSelection ss = new StringSelection(sw.toString());

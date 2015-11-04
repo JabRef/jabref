@@ -50,7 +50,7 @@ public class ExplicitGroup extends AbstractGroup {
                     "Internal error: ExplicitGroup cannot be created from \""
                             + s
                             + "\". "
-                            + "Please report this on www.sf.net/projects/jabref");
+                    + "Please report this on https://github.com/JabRef/jabref/issues");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);

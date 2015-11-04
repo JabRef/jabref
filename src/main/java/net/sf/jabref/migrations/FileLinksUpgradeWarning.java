@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -111,7 +111,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         b.add(new JLabel("<html>" + Localization.lang("This database was written using an older version of JabRef.") + "<br>"
                 + Localization.lang("The current version features a new way of handling links to external files.<br>To take advantage of this, your links must be changed into the new format, and<br>JabRef must be configured to show the new links.") + "<p>"
                 + Localization.lang("Do you want JabRef to do the following operations?") + "</html>")).xy(1, row);
-        
+
         if (offerChangeSettings) {
             b.appendRows("2dlu, p");
             row += 2;
@@ -142,7 +142,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         b.add(doNotShowDialog).xy(1, row+2);
 
         message.add(b.build());
-        
+
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 message, Localization.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
         if (doNotShowDialog.isSelected()) {

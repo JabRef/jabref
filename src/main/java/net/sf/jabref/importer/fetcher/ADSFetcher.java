@@ -82,7 +82,7 @@ public class ADSFetcher implements EntryFetcher {
             /* Query ADS and load the results into the BibtexDatabase */
             status.setStatus(Localization.lang("Processing ") + key);
             BibtexDatabase bd = importADSEntries(key, status);
-            if (bd != null && bd.getEntryCount() > 0) {
+            if ((bd != null) && (bd.getEntryCount() > 0)) {
                 /* Add the entry to the inspection dialog */
                 for (BibtexEntry entry : bd.getEntries()) {
                     importADSAbstract(key, entry, status);
@@ -100,6 +100,7 @@ public class ADSFetcher implements EntryFetcher {
 
     @Override
     public void stopFetching() {
+        // Do nothing
     }
 
     private BibtexDatabase importADSEntries(String key, OutputPrinter status) {

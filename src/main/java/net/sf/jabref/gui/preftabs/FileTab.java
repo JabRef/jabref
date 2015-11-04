@@ -37,7 +37,6 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
@@ -238,7 +237,8 @@ class FileTab extends JPanel implements PrefsTab {
     //        fieldOrderStyle=getBgValue(bgFieldOrderStyle);
     //    }
 
-    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup, JTextField textField) {
+    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup,
+            JTextField textField) {
         //for LWang_AdjustableFieldOrder
 
         for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {

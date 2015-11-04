@@ -478,7 +478,6 @@ public class FileActions {
      * (such as the exportDatabase call), we do not wish to use the
      * global preference of saving in standard order.
      */
-    @SuppressWarnings("unchecked")
     public static List<BibtexEntry> getSortedEntries(BibtexDatabase database, MetaData metaData, Set<String> keySet, boolean isSaveOperation) {
         boolean inOriginalOrder;
         if (isSaveOperation) {

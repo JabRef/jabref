@@ -81,7 +81,7 @@ public class FromAuxDialog
     private final JButton cancelButton = new JButton();
     private final JButton parseButton = new JButton();
 
-    private final JComboBox<String> dbChooser = new JComboBox<String>();
+    private final JComboBox<String> dbChooser = new JComboBox<>();
     private JTextField auxFileField;
 
     private JList<String> notFoundList;
@@ -199,7 +199,7 @@ public class FromAuxDialog
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
         browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parent));
-        notFoundList = new JList<String>();
+        notFoundList = new JList<>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         //listScrollPane.setPreferredSize(new Dimension(250, 120));
         statusInfos = new JTextArea("", 5, 20);
@@ -264,7 +264,7 @@ public class FromAuxDialog
         String auxName = auxFileField.getText();
 
         if (auxName != null) {
-            if (refBase != null && !auxName.isEmpty()) {
+            if ((refBase != null) && !auxName.isEmpty()) {
                 auxParser.clear();
                 notFoundList.setListData(auxParser.generate(auxName, refBase));
 

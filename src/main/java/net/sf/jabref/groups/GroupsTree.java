@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -75,7 +75,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
     private GroupTreeNode dragNode;
 
-    private final GroupTreeCellRenderer cellRenderer = new GroupTreeCellRenderer();
+    private final GroupTreeCellRenderer localCellRenderer = new GroupTreeCellRenderer();
 
 
     /**
@@ -93,7 +93,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         // Eliminates right mouse clicks as valid actions
         dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
         new DropTarget(this, this);
-        setCellRenderer(cellRenderer);
+        setCellRenderer(localCellRenderer);
         setFocusable(false);
         setToggleClickCount(0);
         ToolTipManager.sharedInstance().registerComponent(this);
@@ -120,8 +120,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
         final GroupTreeNode target = (GroupTreeNode) path
                 .getLastPathComponent();
-        if (target == null || dragNode.isNodeDescendant(target)
-                || dragNode == target) {
+        if ((target == null) || dragNode.isNodeDescendant(target)
+                || (dragNode == target)) {
             dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
             return;
         }
@@ -190,9 +190,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
 
         // auto open
-        if (Math.abs(cursor.x - idlePoint.x) < GroupsTree.idleMargin
-                && Math.abs(cursor.y - idlePoint.y) < GroupsTree.idleMargin) {
-            if (currentTime - idleStartTime >= GroupsTree.idleTimeToExpandNode) {
+        if ((Math.abs(cursor.x - idlePoint.x) < GroupsTree.idleMargin)
+                && (Math.abs(cursor.y - idlePoint.y) < GroupsTree.idleMargin)) {
+            if ((currentTime - idleStartTime) >= GroupsTree.idleTimeToExpandNode) {
                 if (path != null) {
                     expandPath(path);
                 }
@@ -203,14 +203,14 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
 
         // autoscrolling
-        if (currentTime - GroupsTree.lastDragAutoscroll < GroupsTree.minAutoscrollInterval) {
+        if ((currentTime - GroupsTree.lastDragAutoscroll) < GroupsTree.minAutoscrollInterval) {
             return;
         }
         final Rectangle r = getVisibleRect();
-        final boolean scrollUp = cursor.y - r.y < GroupsTree.dragScrollActivationMargin;
-        final boolean scrollDown = r.y + r.height - cursor.y < GroupsTree.dragScrollActivationMargin;
-        final boolean scrollLeft = cursor.x - r.x < GroupsTree.dragScrollActivationMargin;
-        final boolean scrollRight = r.x + r.width - cursor.x < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollUp = (cursor.y - r.y) < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollDown = ((r.y + r.height) - cursor.y) < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollLeft = (cursor.x - r.x) < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollRight = ((r.x + r.width) - cursor.x) < GroupsTree.dragScrollActivationMargin;
         if (scrollUp) {
             r.translate(0, -GroupsTree.dragScrollDistance);
         } else if (scrollDown) {
@@ -346,13 +346,13 @@ public class GroupsTree extends JTree implements DragSourceListener,
      * Refresh paths that may have become invalid due to node movements within
      * the tree. This method creates new paths to the last path components
      * (which must still exist) of the specified paths.
-     * 
+     *
      * @param paths
      *            Paths that may have become invalid.
      * @return Refreshed paths that are all valid.
      */
     public Enumeration<TreePath> refreshPaths(Enumeration<TreePath> paths) {
-        Vector<TreePath> freshPaths = new Vector<TreePath>();
+        Vector<TreePath> freshPaths = new Vector<>();
         while (paths.hasMoreElements()) {
             freshPaths.add(new TreePath(
                     ((DefaultMutableTreeNode) paths.nextElement()
@@ -365,7 +365,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
      * Refresh paths that may have become invalid due to node movements within
      * the tree. This method creates new paths to the last path components
      * (which must still exist) of the specified paths.
-     * 
+     *
      * @param paths
      *            Paths that may have become invalid.
      * @return Refreshed paths that are all valid.
@@ -381,25 +381,25 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
     /** Highlights the specified cell or disables highlight if cell == null */
     private void setHighlight1Cell(Object cell) {
-        cellRenderer.setHighlight1Cell(cell);
+        localCellRenderer.setHighlight1Cell(cell);
         repaint();
     }
 
     /** Highlights the specified cells or disables highlight if cells == null */
     public void setHighlight2Cells(Object[] cells) {
-        cellRenderer.setHighlight2Cells(cells);
+        localCellRenderer.setHighlight2Cells(cells);
         repaint();
     }
 
     /** Highlights the specified cells or disables highlight if cells == null */
     public void setHighlight3Cells(Object[] cells) {
-        cellRenderer.setHighlight3Cells(cells);
+        localCellRenderer.setHighlight3Cells(cells);
         repaint();
     }
 
     /** Highlights the specified cell or disables highlight if cell == null */
     public void setHighlightBorderCell(GroupTreeNode node) {
-        cellRenderer.setHighlightBorderCell(node);
+        localCellRenderer.setHighlightBorderCell(node);
         repaint();
     }
 

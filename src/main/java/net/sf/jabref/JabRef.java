@@ -178,8 +178,6 @@ public class JabRef {
             return null; // TODO replace with optional one day
         }
 
-        boolean commandMode = cli.isDisableGui() || cli.isFetcherEngine();
-
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
             String value = cli.getPreferencesReset();
@@ -217,8 +215,8 @@ public class JabRef {
         }
 
         // Vector to put imported/loaded database(s) in.
-        Vector<ParserResult> loaded = new Vector<ParserResult>();
-        Vector<String> toImport = new Vector<String>();
+        Vector<ParserResult> loaded = new Vector<>();
+        Vector<String> toImport = new Vector<>();
         if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
@@ -668,9 +666,9 @@ public class JabRef {
         // Add all loaded databases to the frame:
 
         boolean first = true;
-        List<File> postponed = new ArrayList<File>();
-        List<ParserResult> failed = new ArrayList<ParserResult>();
-        List<ParserResult> toOpenTab = new ArrayList<ParserResult>();
+        List<File> postponed = new ArrayList<>();
+        List<ParserResult> failed = new ArrayList<>();
+        List<ParserResult> toOpenTab = new ArrayList<>();
         if (!loaded.isEmpty()) {
             for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
                 ParserResult pr = i.next();

@@ -67,7 +67,7 @@ public class SearchGroup extends AbstractGroup {
             throw new Exception(
                     "Internal error: SearchGroup cannot be created from \"" + s
                             + "\". "
-                            + "Please report this on www.sf.net/projects/jabref");
+                    + "Please report this on https://github.com/JabRef/jabref/issues");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(SearchGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
@@ -162,14 +162,14 @@ public class SearchGroup extends AbstractGroup {
         SearchGroup other = (SearchGroup) o;
         return name.equals(other.name)
                 && searchExpression.equals(other.searchExpression)
-                && caseSensitive == other.caseSensitive
-                && regExp == other.regExp
-                && getHierarchicalContext() == other.getHierarchicalContext();
+                && (caseSensitive == other.caseSensitive)
+                && (regExp == other.regExp)
+                && (getHierarchicalContext() == other.getHierarchicalContext());
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
      *      net.sf.jabref.BibtexEntry)
      */
@@ -193,7 +193,7 @@ public class SearchGroup extends AbstractGroup {
             // succeeded in creating _this_ instance!
             System.err.println("Internal error: Exception " + t
                     + " in SearchGroup.deepCopy(). "
-                    + "Please report this on www.sf.net/projects/jabref");
+                    + "Please report this on https://github.com/JabRef/jabref/issues");
             return null;
         }
     }

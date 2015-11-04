@@ -57,10 +57,10 @@ import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
  * Initial Version:
- * 
+ *
  * @author alver
  * @version Date: May 7, 2005 Time: 7:17:42 PM
- * 
+ *
  */
 public class ExternalFilePanel extends JPanel {
 
@@ -236,7 +236,7 @@ public class ExternalFilePanel extends JPanel {
         String dir = editor.getText();
         String retVal;
 
-        if (directory == null || !new File(dir).isAbsolute()) {
+        if ((directory == null) || !new File(dir).isAbsolute()) {
             if (directory != null) {
                 dir = directory;
             } else {
@@ -250,7 +250,7 @@ public class ExternalFilePanel extends JPanel {
             File newFile = new File(chosenFile);
             String position = newFile.getParent();
 
-            if (directory != null && position.startsWith(directory)) {
+            if ((directory != null) && position.startsWith(directory)) {
                 // Construct path relative to pdf base dir
                 String relPath = position.substring(directory.length(), position.length()) + File.separator + newFile.getName();
 
@@ -277,7 +277,7 @@ public class ExternalFilePanel extends JPanel {
         final String res = JOptionPane.showInputDialog(parent,
                 Localization.lang("Enter URL to download"));
 
-        if (res == null || res.trim().isEmpty()) {
+        if ((res == null) || res.trim().isEmpty()) {
             return;
         }
 
@@ -294,8 +294,8 @@ public class ExternalFilePanel extends JPanel {
 
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
-            public String getPlannedFileName(String res) {
-                String suffix = off.getSuffix(res);
+            public String getPlannedFileName(String result) {
+                String suffix = off.getSuffix(result);
                 if (suffix == null) {
                     suffix = '.' + fieldName.toLowerCase();
                 }
@@ -306,16 +306,16 @@ public class ExternalFilePanel extends JPanel {
                 } else {
                     plannedName = JOptionPane.showInputDialog(parent,
                             Localization.lang("BibTeX key not set. Enter a name for the downloaded file"));
-                    if (plannedName != null && !off.accept(plannedName)) {
+                    if ((plannedName != null) && !off.accept(plannedName)) {
                         plannedName += suffix;
                     }
                 }
 
                 /*
                  * [ 1548875 ] download pdf produces unsupported filename
-                 * 
+                 *
                  * http://sourceforge.net/tracker/index.php?func=detail&aid=1548875&group_id=92314&atid=600306
-                 * 
+                 *
                  */
                 if (OS.WINDOWS) {
                     plannedName = plannedName.replaceAll(
@@ -388,7 +388,7 @@ public class ExternalFilePanel extends JPanel {
                      * Check if we should update the editor text field, or
                      * update the target entry directly:
                      */
-                    if (entryEditor == null || entryEditor.getEntry() != targetEntry) {
+                    if ((entryEditor == null) || (entryEditor.getEntry() != targetEntry)) {
                         /*
                          * Editor has probably changed to show a different
                          * entry. So we must update the target entry directly
@@ -403,10 +403,10 @@ public class ExternalFilePanel extends JPanel {
                          * Need to set the fieldEditor first before running
                          * updateField-Action, because otherwise we might get a
                          * race condition.
-                         * 
+                         *
                          * (Hopefully a) Fix for: [ 1545601 ] downloading pdf
                          * corrupts pdf field text
-                         * 
+                         *
                          * http://sourceforge.net/tracker/index.php?func=detail&aid=1545601&group_id=92314&atid=600306
                          */
                         fieldEditor.setText(textToSet);
@@ -440,7 +440,7 @@ public class ExternalFilePanel extends JPanel {
      * Creates a Runnable that searches the external file directory for the given
      * field name, including subdirectories, and looks for files named after the
      * current entry's bibtex key.
-     * 
+     *
      * @param fieldName
      *            The field to set.
      * @param editor
@@ -449,7 +449,7 @@ public class ExternalFilePanel extends JPanel {
      */
     public Runnable autoSetFile(final String fieldName, final FieldEditor editor) {
         Object o = getKey();
-        if (o == null || Globals.prefs.get(fieldName + "Directory") == null) {
+        if ((o == null) || (Globals.prefs.get(fieldName + "Directory") == null)) {
             output(Localization.lang("You must set both BibTeX key and %0 directory", fieldName
                     .toUpperCase())
                     + '.');
@@ -471,7 +471,7 @@ public class ExternalFilePanel extends JPanel {
                  *
                  * JabRef-directory.
                  */
-                LinkedList<String> list = new LinkedList<String>();
+                LinkedList<String> list = new LinkedList<>();
                 String[] dirs = metaData.getFileDirectory(fieldName);
                 Collections.addAll(list, dirs);
 

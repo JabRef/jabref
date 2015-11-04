@@ -187,6 +187,7 @@ public class FileListEntryEditor {
 
             @Override
             public void removeUpdate(DocumentEvent documentEvent) {
+                // Do nothing
             }
 
             @Override

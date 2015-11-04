@@ -836,7 +836,7 @@ public class HTMLConverter implements LayoutFormatter {
             int c = text.charAt(i);
 
             if (c == '<') {
-                i = readTag(text, sb, i);
+                i = readTag(text, i);
             } else {
                 sb.append((char) c);
             }
@@ -918,11 +918,10 @@ public class HTMLConverter implements LayoutFormatter {
         } else return position; // Don't do anything.
     }*/
 
-    private int readTag(String text, StringBuffer sb, int position) {
+    private int readTag(String text, int position) {
         // Have just read the < character that starts the tag.
         int index = text.indexOf('>', position);
         if ((index > position) && ((index - position) < MAX_TAG_LENGTH)) {
-            //System.out.println("Removed tag: "+text.substring(position, index));
             return index; // Just skip the tag.
         } else {
             return position; // Don't do anything.

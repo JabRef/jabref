@@ -1,4 +1,4 @@
-/*  Copyright (C) 2013 JabRef contributors.
+/*  Copyright (C) 2013-2015 JabRef contributors.
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -60,15 +60,15 @@ class FileSortTab extends JPanel implements PrefsTab {
     private final JRadioButton exportInOriginalOrder;
     private final JRadioButton exportInTableOrder;
     private final JRadioButton exportInSpecifiedOrder;
-    private JCheckBox exportPriDesc;
-    private JCheckBox exportSecDesc;
-    private JCheckBox exportTerDesc;
-    private JTextField exportPriField;
-    private JTextField exportSecField;
-    private JTextField exportTerField;
-    private JComboBox<String> exportPriSort;
-    private JComboBox<String> exportSecSort;
-    private JComboBox<String> exportTerSort;
+    private final JCheckBox exportPriDesc;
+    private final JCheckBox exportSecDesc;
+    private final JCheckBox exportTerDesc;
+    private final JTextField exportPriField;
+    private final JTextField exportSecField;
+    private final JTextField exportTerField;
+    private final JComboBox<String> exportPriSort;
+    private final JComboBox<String> exportSecSort;
+    private final JComboBox<String> exportTerSort;
 
 
     public FileSortTab(JabRefPreferences prefs) {
@@ -108,7 +108,7 @@ class FileSortTab extends JPanel implements PrefsTab {
             saveInTableOrder.addActionListener(listener);
             saveInSpecifiedOrder.addActionListener(listener);
 
-            ArrayList<String> fieldNames = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+            ArrayList<String> fieldNames = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
             fieldNames.add(BibtexEntry.KEY_FIELD);
             Collections.sort(fieldNames);
             String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
@@ -228,7 +228,7 @@ class FileSortTab extends JPanel implements PrefsTab {
         exportInTableOrder.addActionListener(listener);
         exportInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> fieldNames = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        ArrayList<String> fieldNames = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
         fieldNames.add(BibtexEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);

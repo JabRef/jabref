@@ -134,7 +134,7 @@ public class ExternalFileTypeEditor extends JDialog {
         add.addActionListener(new AddListener());
         remove.addActionListener(new RemoveListener());
         edit.addActionListener(editListener);
-        fileTypes = new ArrayList<ExternalFileType>();
+        fileTypes = new ArrayList<>();
         setValues();
 
         tableModel = new FileTypeTableModel();
@@ -275,7 +275,8 @@ public class ExternalFileTypeEditor extends JDialog {
 
 
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(JTable tab, Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
             lab.setText(null);
             lab.setIcon((Icon) value);
             return lab;
