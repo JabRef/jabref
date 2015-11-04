@@ -25,8 +25,6 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
-
 import net.sf.jabref.*;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.util.date.MonthUtil;
@@ -210,7 +208,7 @@ public class BibtexEntry {
     public String getFieldOrAlias(String name) {
         String fieldValue = getField(name);
 
-        if (fieldValue != null && !fieldValue.isEmpty()) {
+        if ((fieldValue != null) && !fieldValue.isEmpty()) {
             return fieldValue;
         }
 
@@ -254,7 +252,7 @@ public class BibtexEntry {
 
                 @Override
                 public Date parse(String source, ParsePosition pos) {
-                    if (source.length() - pos.getIndex() == FORMAT1.length()) {
+                    if ((source.length() - pos.getIndex()) == FORMAT1.length()) {
                         return sdf1.parse(source, pos);
                     }
                     return sdf2.parse(source, pos);
@@ -269,7 +267,7 @@ public class BibtexEntry {
                     return Integer.toString(calendar.get(Calendar.YEAR));
                 }
                 if (name.equals("month")) {
-                    return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0			
+                    return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0
                 }
             } catch (ParseException e) {
                 // So not a date with year and month, try just to parse years
@@ -283,7 +281,7 @@ public class BibtexEntry {
                         return Integer.toString(calendar.get(Calendar.YEAR));
                     }
                 } catch (ParseException e2) {
-                    LOGGER.warn("Could not parse entry " + name, e);
+                    LOGGER.warn("Could not parse entry " + name, e2);
                     return null; // Date field not in valid format
                 }
             }
@@ -386,7 +384,7 @@ public class BibtexEntry {
     boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
         for (String field : fields) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
-            if (value != null && !value.isEmpty()) {
+            if ((value != null) && !value.isEmpty()) {
                 return true;
             }
         }
@@ -462,7 +460,7 @@ public class BibtexEntry {
             }
         }
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
-        if (maxCharacters <= 0 || text.length() <= maxCharacters) {
+        if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
             return text;
         }
         return text.substring(0, maxCharacters + 1) + "...";

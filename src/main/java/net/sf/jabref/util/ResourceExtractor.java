@@ -43,7 +43,7 @@ public class ResourceExtractor implements Worker {
     private final URL resource;
     private final Component parent;
     private final File destination;
-    
+
     private static final Log LOGGER = LogFactory.getLog(ResourceExtractor.class);
 
 
@@ -61,7 +61,7 @@ public class ResourceExtractor implements Worker {
         try {
             ud.downloadToFile(destination);
         } catch (IOException ex) {
-            LOGGER.info("Error extracting resource: " + ex.getMessage());
+            LOGGER.info("Error extracting resource.", ex);
         }
     }
 }

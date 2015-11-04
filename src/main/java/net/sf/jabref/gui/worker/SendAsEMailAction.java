@@ -84,7 +84,7 @@ public class SendAsEMailAction extends AbstractWorker {
             try {
                 bibtexEntryWriter.write(entry, sw);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Problem creating Bibtex file for mailing.", e);
             }
         }
 
@@ -118,8 +118,8 @@ public class SendAsEMailAction extends AbstractWorker {
         try {
             uriMailTo = new URI("mailto", mailTo, null);
         } catch (URISyntaxException e1) {
-            e1.printStackTrace();
             message = Localization.lang("Error creating email");
+            LOGGER.warn(message, e1);
             return;
         }
 
@@ -127,8 +127,8 @@ public class SendAsEMailAction extends AbstractWorker {
         try {
             desktop.mail(uriMailTo);
         } catch (IOException e) {
-            e.printStackTrace();
             message = Localization.lang("Error creating email");
+            LOGGER.warn(message, e);
             return;
         }
 

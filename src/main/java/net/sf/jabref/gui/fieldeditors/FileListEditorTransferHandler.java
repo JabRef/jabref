@@ -43,19 +43,19 @@ import net.sf.jabref.groups.EntryTableTransferHandler;
 class FileListEditorTransferHandler extends TransferHandler {
 
     private static final long serialVersionUID = 1L;
-    
+
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
     private final JabRefFrame frame;
     private final EntryContainer entryContainer;
     private final TransferHandler textTransferHandler;
     private DroppedFileHandler droppedFileHandler;
-    
+
     private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
 
 
     /**
-     * 
+     *
      * @param frame
      * @param entryContainer
      * @param textTransferHandler is an instance of javax.swing.plaf.basic.BasicTextUI.TextTransferHandler. That class is not visible. Therefore, we have to "cheat"
@@ -104,7 +104,7 @@ class FileListEditorTransferHandler extends TransferHandler {
 
             if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
-                System.out.println("URL: " + dropLink);
+                LOGGER.debug("URL: " + dropLink);
             }
 
             // This is used when one or more files are pasted from the file manager
@@ -143,16 +143,16 @@ class FileListEditorTransferHandler extends TransferHandler {
             }
 
         } catch (IOException ioe) {
-            LOGGER.warn("failed to read dropped data: " + ioe);
+            LOGGER.warn("Failed to read dropped data. ", ioe);
         } catch (UnsupportedFlavorException ufe) {
-            LOGGER.warn("drop type error: " + ufe);
+            LOGGER.warn("Drop type error. ", ufe);
         }
 
         // all supported flavors failed
-        StringBuilder logMessage = new StringBuilder("can't transfer input: ");
+        StringBuilder logMessage = new StringBuilder("Cannot transfer input:");
         DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
-            logMessage.append("  " + inflav);
+            logMessage.append(" " + inflav);
         }
         LOGGER.warn(logMessage.toString());
 

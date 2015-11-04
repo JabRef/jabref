@@ -26,6 +26,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.FileActions;
 import net.sf.jabref.exporter.SaveException;
@@ -57,6 +60,8 @@ public class ChangeScanner implements Runnable {
 
     private BibtexDatabase inTemp;
     private MetaData mdInTemp;
+
+    private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
 
 
     /**
@@ -161,7 +166,7 @@ public class ChangeScanner implements Runnable {
                             false, false, panel.getEncoding(), true);
                     ss.commit();
                 } catch (SaveException ex) {
-                    System.out.println("Problem updating tmp file after accepting external changes");
+                    LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
                 }
 
             }

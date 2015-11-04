@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -30,7 +30,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.XMLChars;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -66,6 +67,7 @@ class MODSEntry {
 
     private final boolean CHARFORMAT = false;
 
+    private static final Log LOGGER = LogFactory.getLog(MODSEntry.class);
 
     private MODSEntry() {
         extensionFields = new HashMap<>();
@@ -304,8 +306,7 @@ class MODSEntry {
             return mods;
         } catch (Exception e)
         {
-            System.out.println("Exception caught..." + e);
-            e.printStackTrace();
+            LOGGER.warn("Exception caught...", e);
             throw new Error(e);
         }
         // return result;

@@ -63,7 +63,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         panel = panel_;
         metaData = metaData_;
 
-        // Are multiple entries selected? 
+        // Are multiple entries selected?
         boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
 
         // If only one entry is selected, get a reference to it for adapting the menu.
@@ -102,7 +102,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         } else if (be != null) {
             String marked = be.getField(BibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
-            if (marked == null || marked.isEmpty()) {
+            if ((marked == null) || marked.isEmpty()) {
                 add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
                 add(markSpecific);
             } else {
@@ -225,7 +225,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     }
 
     /**
-     * Remove all types from the menu. 
+     * Remove all types from the menu.
      * Then cycle through all available values, and add them.
      */
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
@@ -412,7 +412,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             try {
                 panel.runCommand(command);
             } catch (Throwable ex) {
-                LOGGER.debug("Could not execute command " + command, ex);
+                LOGGER.debug("Could not execute command " + command + ".", ex);
             }
         }
     }

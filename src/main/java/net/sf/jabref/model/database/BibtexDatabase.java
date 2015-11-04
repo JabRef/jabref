@@ -319,21 +319,21 @@ public class BibtexDatabase {
      * Take the given collection of BibtexEntry and resolve any string
      * references.
      *
-     * @param entries A collection of BibtexEntries in which all strings of the form
+     * @param ent A collection of BibtexEntries in which all strings of the form
      *                #xxx# will be resolved against the hash map of string
      *                references stored in the databasee.
      * @param inPlace If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
      * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
-    public List<BibtexEntry> resolveForStrings(Collection<BibtexEntry> entries, boolean inPlace) {
+    public List<BibtexEntry> resolveForStrings(Collection<BibtexEntry> ent, boolean inPlace) {
 
-        if (entries == null) {
+        if (ent == null) {
             throw new IllegalArgumentException("entries must not be null");
         }
 
-        List<BibtexEntry> results = new ArrayList<>(entries.size());
+        List<BibtexEntry> results = new ArrayList<>(ent.size());
 
-        for (BibtexEntry entry : entries) {
+        for (BibtexEntry entry : ent) {
             results.add(this.resolveForStrings(entry, inPlace));
         }
         return results;
@@ -466,7 +466,7 @@ public class BibtexDatabase {
     // if the newkey already exists and is not the same as oldkey it will give a warning
     // else it will add the newkey to the to set and remove the oldkey
     private boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey) {
-        // Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
+        // LOGGER.debug(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
         boolean duplicate;
         if (oldKey == null) {// this is a new entry so don't bother removing oldKey
@@ -495,9 +495,9 @@ public class BibtexDatabase {
     }
 
     /**
-     * Returns the number of occurences of the given key in this database.
+     * Returns the number of occurrences of the given key in this database.
      */
-    public int getNumberOfKeyOccurences(String key) {
+    public int getNumberOfKeyOccurrences(String key) {
         Object o = allKeys.get(key);
         if (o == null) {
             return 0;
@@ -544,8 +544,8 @@ public class BibtexDatabase {
     }
 
     private void fireDatabaseChanged(DatabaseChangeEvent e) {
-        for (DatabaseChangeListener listener : changeListeners) {
-            listener.databaseChanged(e);
+        for (DatabaseChangeListener tmpListener : changeListeners) {
+            tmpListener.databaseChanged(e);
         }
     }
 

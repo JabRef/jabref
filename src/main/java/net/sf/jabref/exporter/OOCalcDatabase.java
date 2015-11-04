@@ -26,11 +26,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.jabref.exporter.layout.format.GetOpenOfficeType;
 import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import net.sf.jabref.exporter.layout.format.RemoveWhitespace;
-
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -46,6 +48,9 @@ import ca.odell.glazedlists.SortedList;
 class OOCalcDatabase {
 
     private final Collection<BibtexEntry> entries;
+
+    private static final Log LOGGER = LogFactory.getLog(OOCalcDatabase.class);
+
 
     public OOCalcDatabase(BibtexDatabase bibtex, Set<String> keySet) {
         // Make a list of comparators for sorting the entries:
@@ -201,8 +206,7 @@ class OOCalcDatabase {
 
             result.appendChild(collection);
         } catch (Exception e) {
-            System.out.println("Exception caught..." + e);
-            e.printStackTrace();
+            LOGGER.warn("Exception caught...", e);
         }
         return result;
     }

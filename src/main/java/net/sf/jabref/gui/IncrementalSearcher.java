@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,11 +20,15 @@ import net.sf.jabref.JabRefPreferences;
 
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 class IncrementalSearcher {
 
     private final JabRefPreferences prefs;
     private String hitInField;
 
+    private static final Log LOGGER = LogFactory.getLog(IncrementalSearcher.class);
 
     public IncrementalSearcher(JabRefPreferences prefs) {
         this.prefs = prefs;
@@ -46,7 +50,7 @@ class IncrementalSearcher {
 
             for (String field : fields) {
                 try {
-                    /*Globals.logger("Searching field '"+fields[i].toString()
+                    /* LOGGER.debug("Searching field '"+fields[i].toString()
                     	       +"' for '"
                     	       +pattern.toString()+"'.");*/
                     if (bibtexEntry.getField(field) != null) {
@@ -66,7 +70,7 @@ class IncrementalSearcher {
                         }
                     }
                 } catch (Throwable t) {
-                    System.err.println("Searching error: " + t);
+                    LOGGER.error("Searching error.", t);
                 }
             }
         }

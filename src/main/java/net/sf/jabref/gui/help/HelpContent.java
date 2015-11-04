@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 class HelpContent extends JTextPane {
 
-    private static final Log log = LogFactory.getLog(HelpContent.class);
+    private static final Log LOGGER = LogFactory.getLog(HelpContent.class);
 
     private final JScrollPane pane;
 
@@ -146,13 +146,13 @@ class HelpContent extends JTextPane {
             // If still not available print a warning
             if (resource == null) {
                 // TODO show warning to user
-                HelpContent.log.error("Could not find html-help for file '" + file + "'.");
+                HelpContent.LOGGER.error("Could not find html-help for file '" + file + "'.");
                 return;
             }
             setPageOnly(new URL(resource.toString() + '#' + reference));
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Problem when finding help files.", ex);
         }
 
         forw.removeAllElements();

@@ -109,7 +109,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
                                 sb.append((char) c);
                             }
                         } catch (IOException e) {
-                            LOGGER.warn("Could not read from stderr.");
+                            LOGGER.warn("Could not read from stderr.", e);
                         }
                         // Error stream has been closed. See if there were any errors:
                         if (!sb.toString().trim().isEmpty()) {

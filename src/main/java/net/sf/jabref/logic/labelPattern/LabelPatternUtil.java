@@ -479,7 +479,7 @@ public class LabelPatternUtil {
         }
 
         String oldKey = entry.getCiteKey();
-        int occurrences = LabelPatternUtil.database.getNumberOfKeyOccurences(key);
+        int occurrences = LabelPatternUtil.database.getNumberOfKeyOccurrences(key);
 
         if (oldKey != null && oldKey.equals(key))
          {
@@ -508,7 +508,7 @@ public class LabelPatternUtil {
             }
 
             String moddedKey = key + LabelPatternUtil.getAddition(number);
-            occurrences = LabelPatternUtil.database.getNumberOfKeyOccurences(moddedKey);
+            occurrences = LabelPatternUtil.database.getNumberOfKeyOccurrences(moddedKey);
 
             if (oldKey != null && oldKey.equals(moddedKey)) {
                 occurrences--;
@@ -518,7 +518,7 @@ public class LabelPatternUtil {
                 number++;
                 moddedKey = key + LabelPatternUtil.getAddition(number);
 
-                occurrences = LabelPatternUtil.database.getNumberOfKeyOccurences(moddedKey);
+                occurrences = LabelPatternUtil.database.getNumberOfKeyOccurrences(moddedKey);
                 if (oldKey != null && oldKey.equals(moddedKey)) {
                     occurrences--;
                 }

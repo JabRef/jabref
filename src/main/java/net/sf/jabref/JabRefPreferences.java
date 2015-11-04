@@ -409,7 +409,7 @@ public class JabRefPreferences {
                 importPreferences("jabref.xml");
             }
         } catch (IOException e) {
-            LOGGER.info("Could not import preferences from jabref.xml:" + e.getLocalizedMessage(), e);
+            LOGGER.info("Could not import preferences from jabref.xml: " + e.getLocalizedMessage(), e);
         }
 
         // load user preferences

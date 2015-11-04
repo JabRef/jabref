@@ -23,6 +23,9 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.BibtexFields;
 
 /**
@@ -44,6 +47,7 @@ public class SQLUtil {
 
     private static ArrayList<String> allFields;
 
+    private static final Log LOGGER = LogFactory.getLog(SQLUtil.class);
 
     private SQLUtil() {
     }
@@ -312,7 +316,7 @@ public class SQLUtil {
         stmnt.execute(qry);
         SQLWarning warn = stmnt.getWarnings();
         if (warn != null) {
-            System.err.println(warn);
+            LOGGER.warn(warn);
         }
         stmnt.close();
     }
@@ -331,8 +335,7 @@ public class SQLUtil {
         stmnt.executeQuery(qry);
         SQLWarning warn = stmnt.getWarnings();
         if (warn != null) {
-
-            System.err.println(warn);
+            LOGGER.warn(warn);
         }
         return stmnt;
     }

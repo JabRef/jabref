@@ -3,7 +3,6 @@ package net.sf.jabref.logic.l10n;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.nio.charset.Charset;
 import java.util.*;
 
 public class Localization {
@@ -29,7 +28,8 @@ public class Localization {
                 LOGGER.warn("Bundle for locale <" + locale + "> not found. Falling back to system locale <" + defaultLocale + ">");
             }
         } catch(MissingResourceException e) {
-            LOGGER.warn("Bundle for locale <" + locale + "> not found. Fallback to system locale <" + defaultLocale + "> failed, using locale <en> instead");
+            LOGGER.warn("Bundle for locale <" + locale + "> not found. Fallback to system locale <" + defaultLocale
+                    + "> failed, using locale <en> instead", e);
 
             locale = new Locale("en");
             messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
@@ -42,11 +42,11 @@ public class Localization {
     }
 
     /**
-     * In the translation, %c is translated to ":", %e is translated to "=", %<anythingelse> to <anythingelse>, %0, ... %9 to the respective params given
+     * In the translation, %c is translated to ":", %e is translated to "=", %<anythingelse> to <anythingelse>, %0, ...
+     * %9 to the respective params given
      *
      * @param resBundle the ResourceBundle to use
-     * @param idForErrorMessage output when translation is not found
-ö     * @param key the key to lookup in resBundle
+     * @param idForErrorMessage output when translation is not found ö * @param key the key to lookup in resBundle
      * @param params a list of Strings to replace %0, %1, ...
      * @return
      */
@@ -57,14 +57,15 @@ public class Localization {
                 translation = resBundle.getString(key.replaceAll(" ", "_"));
             }
         } catch (MissingResourceException ex) {
-            LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale " + Locale.getDefault());
+            LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
+                    + Locale.getDefault());
         }
         if (translation == null) {
             translation = key;
         }
 
         // replace %0, %1, ...
-        if (translation != null && !translation.isEmpty()) {
+        if ((translation != null) && !translation.isEmpty()) {
             // also done if no params are given
             //  Then, %c is translated to ":", %e is translated to "=", ...
             translation = translation.replaceAll("_", " ");
@@ -82,7 +83,7 @@ public class Localization {
                         b = false;
                         try {
                             int index = Integer.parseInt(String.valueOf(c));
-                            if (params != null && index >= 0 && index <= params.length) {
+                            if ((params != null) && (index >= 0) && (index <= params.length)) {
                                 sb.append(params[index]);
                             }
                         } catch (NumberFormatException e) {

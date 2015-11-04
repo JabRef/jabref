@@ -29,7 +29,6 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -41,17 +40,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.Vector;
-import java.util.stream.Collectors;
-
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableColumn;
-
 import net.sf.jabref.*;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -62,8 +56,6 @@ import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
-import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
@@ -158,6 +150,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                 selectionModel.addListSelectionListener(new ListSelectionListener() {
 
+                    @Override
                     public void valueChanged(ListSelectionEvent e) {
                         if (!e.getValueIsAdjusting()) {
                             String citeKey = (String) model[table.getSelectedRow()][0];
@@ -622,7 +615,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             try {
                 new MacAdapter().registerMacEvents(this);
             } catch (Exception e) {
-                LOGGER.fatal("could not interface with Mac OS X methods", e);
+                LOGGER.fatal("Could not interface with Mac OS X methods.", e);
             }
         }
     }
@@ -694,7 +687,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             output(Localization.lang("External viewer called") + '.');
         } catch (IOException ex) {
             output(Localization.lang("Error") + ": " + ex.getMessage());
-            LOGGER.debug("Could not open browser", ex);
+            LOGGER.debug("Could not open browser.", ex);
         }
     }
 

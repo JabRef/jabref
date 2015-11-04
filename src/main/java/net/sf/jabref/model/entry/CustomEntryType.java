@@ -78,8 +78,8 @@ public class CustomEntryType extends BibtexEntryType {
         }
     }
 
-    private void parseRequiredFields(String required) {
-        String[] parts = required.split(";");
+    private void parseRequiredFields(String req) {
+        String[] parts = req.split(";");
         parseRequiredFields(parts);
     }
 
@@ -196,12 +196,12 @@ public class CustomEntryType extends BibtexEntryType {
         StringBuilder sb = new StringBuilder();
         int reqSetsPiv = 0;
         for (int i = 0; i < required.length; i++) {
-            if (reqSets == null || reqSetsPiv == reqSets.length) {
+            if ((reqSets == null) || (reqSetsPiv == reqSets.length)) {
                 sb.append(required[i]);
             } else if (required[i].equals(reqSets[reqSetsPiv][0])) {
                 for (int j = 0; j < reqSets[reqSetsPiv].length; j++) {
                     sb.append(reqSets[reqSetsPiv][j]);
-                    if (j < reqSets[reqSetsPiv].length - 1) {
+                    if (j < (reqSets[reqSetsPiv].length - 1)) {
                         sb.append('/');
                     }
                 }
@@ -211,7 +211,7 @@ public class CustomEntryType extends BibtexEntryType {
             } else {
                 sb.append(required[i]);
             }
-            if (i < required.length - 1) {
+            if (i < (required.length - 1)) {
                 sb.append(';');
             }
 
@@ -229,7 +229,7 @@ public class CustomEntryType extends BibtexEntryType {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < optional.length; i++) {
             sb.append(optional[i]);
-            if (i < optional.length - 1) {
+            if (i < (optional.length - 1)) {
                 sb.append(';');
             }
         }

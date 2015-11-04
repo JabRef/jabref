@@ -27,6 +27,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
@@ -52,6 +55,8 @@ public class FileActions {
 
     private static final Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     private static BibtexString.Type previousStringType;
+
+    private static final Log LOGGER = LogFactory.getLog(FileActions.class);
 
 
     private static void writePreamble(Writer fw, String preamble) throws IOException {
@@ -178,13 +183,12 @@ public class FileActions {
             session = new SaveSession(file, encoding, backup);
         } catch (Throwable e) {
             if (encoding != null) {
-                System.err.println("Error from encoding: '" + encoding + "' Len: " + encoding.length());
+                LOGGER.error("Error from encoding: '" + encoding + "' Len: " + encoding.length(), e);
             }
             // we must catch all exceptions to be able notify users that
             // saving failed, no matter what the reason was
             // (and they won't just quit JabRef thinking
             // everything worked and loosing data)
-            e.printStackTrace();
             throw new SaveException(e.getMessage());
         }
 

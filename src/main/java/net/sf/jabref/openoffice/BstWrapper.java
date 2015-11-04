@@ -21,6 +21,8 @@ import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.FormatChars;
 import net.sf.jabref.bst.VM;
 import org.antlr.runtime.RecognitionException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +42,7 @@ class BstWrapper {
     private final LayoutFormatter formatter = new FormatChars();
     private VM vm;
 
+    private static final Log LOGGER = LogFactory.getLog(BstWrapper.class);
 
     public BstWrapper() {
 
@@ -85,7 +88,7 @@ class BstWrapper {
             if (!indices.isEmpty()) {
                 endIndices.add(m.start());
             }
-            System.out.println(m.start() + "  " + m.end());
+            LOGGER.debug(m.start() + "  " + m.end());
             String tag = m.group();
             String key = tag.substring(9, tag.length() - 1);
             indices.add(m.end());

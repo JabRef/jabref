@@ -1,28 +1,19 @@
-/*
+/*  Copyright (C) 2005-2015 JabRef contributors.
  Copyright (C) 2005 Andreas Rudert, based on ExportCustomizationDialog by ??
 
- All programs in this directory and
- subdirectories are published under the GNU General Public License as
- described below.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or (at
- your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- USA
-
- Further information about the GNU GPL is available at:
- http://www.gnu.org/copyleft/gpl.ja.html
-  Copyright (C) 2005-2014 JabRef contributors.
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package net.sf.jabref.importer;
 
@@ -67,7 +58,7 @@ public class ImportCustomizationDialog extends JDialog {
     private JTable customImporterTable;
     private final JabRefPreferences prefs = Globals.prefs;
     private final ImportCustomizationDialog importCustomizationDialog;
-    
+
     private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
 
@@ -86,12 +77,12 @@ public class ImportCustomizationDialog extends JDialog {
 
     /**
      * Converts a path relative to a base-path into a class name.
-     * 
+     *
      * @param basePath  base path
      * @param path  path that includes base-path as a prefix
      * @return  class name
      */
-    private String pathToClass(File basePath, File path) {
+    private static String pathToClass(File basePath, File path) {
         String className = null;
         // remove leading basepath from path
         while (!path.equals(basePath)) {
@@ -108,7 +99,7 @@ public class ImportCustomizationDialog extends JDialog {
 
     /**
      * Adds an importer to the model that underlies the custom importers.
-     * 
+     *
      * @param importer  importer
      */
     void addOrReplaceImporter(CustomImportList.Importer importer) {
@@ -118,7 +109,7 @@ public class ImportCustomizationDialog extends JDialog {
     }
 
     /**
-     * 
+     *
      * @param frame_
      * @throws HeadlessException
      */
@@ -166,29 +157,24 @@ public class ImportCustomizationDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 String basePath = FileDialogs.getNewFile(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".zip,.jar",
                         Localization.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
-                ZipFile zipFile = null;
+
                 if (basePath != null) {
-                    try {
-                        zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ);
+                    try (ZipFile zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ)) {
+                        ZipFileChooser zipFileChooser = new ZipFileChooser(importCustomizationDialog, zipFile);
+                        zipFileChooser.setVisible(true);
+                        customImporterTable.revalidate();
+                        customImporterTable.repaint(10);
                     } catch (IOException exc) {
-                        LOGGER.info("Could not open Zip-archive: \n" + exc.getMessage(), exc);
+                        LOGGER.info("Could not open Zip-archive.", exc);
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not open %0", basePath)
                                 + "\n" + Localization.lang("Have you chosen the correct package path?"));
                         return;
                     } catch (NoClassDefFoundError exc) {
-                        exc.printStackTrace();
+                        LOGGER.info("Could not instantiate Zip-archive reader.", exc);
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", basePath)
                                 + "\n" + Localization.lang("Have you chosen the correct package path?"));
                     }
                 }
-
-                if (zipFile != null) {
-                    ZipFileChooser zipFileChooser = new ZipFileChooser(importCustomizationDialog, zipFile);
-                    zipFileChooser.setVisible(true);
-                    customImporterTable.revalidate();
-                    customImporterTable.repaint(10);
-                }
-
             }
         });
         addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.\nThe Zip-archive need not be on the classpath of JabRef."));
