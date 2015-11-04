@@ -28,7 +28,10 @@ public class BibJSONConverter {
 
     private static final Log LOGGER = LogFactory.getLog(BibJSONConverter.class);
 
+    // Fields that are directly accessible at the top level BibJson object
     private static final String[] singleFieldStrings = new String[] {"year", "title", "abstract", "month"};
+
+    // Fields that are accessible in the journal part of the BibJson object
     private static final String[] journalSingleFieldStrings = new String[] {"publisher", "number", "volume"};
 
 
@@ -82,11 +85,13 @@ public class BibJSONConverter {
             // Journal title
             if (journal.has("title")) {
                 entry.setField("journal", journal.getString("title"));
-                // Other journal related fields
-                for (String field : journalSingleFieldStrings) {
-                    if (journal.has(field)) {
-                        entry.setField(field, journal.getString(field));
-                    }
+            } else {
+                LOGGER.info("No journal title found.");
+            }
+            // Other journal related fields
+            for (String field : journalSingleFieldStrings) {
+                if (journal.has(field)) {
+                    entry.setField(field, journal.getString(field));
                 }
             }
         } else {
@@ -127,9 +132,13 @@ public class BibJSONConverter {
         if (bibJsonEntry.has("link")) {
             JSONArray links = bibJsonEntry.getJSONArray("link");
             for (int i = 0; i < links.length(); i++) {
-                String type = links.getJSONObject(i).getString("type");
-                if (type.equals("fulltext")) {
-                    entry.setField("url", links.getJSONObject(i).getString("url"));
+                if (links.getJSONObject(i).has("type")) {
+                    String type = links.getJSONObject(i).getString("type");
+                    if (type.equals("fulltext")) {
+                        if (links.getJSONObject(i).has("url")) {
+                            entry.setField("url", links.getJSONObject(i).getString("url"));
+                        }
+                    }
                 }
             }
         }
