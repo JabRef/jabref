@@ -1186,8 +1186,6 @@ public class VM implements Warn {
 
     /**
      * Sorts the entry list using the values of the string entry variable sort.key$. It has no arguments.
-     *
-     * @param
      */
     private void sort() {
         Collections.sort(entries, new Comparator<BstEntry>() {

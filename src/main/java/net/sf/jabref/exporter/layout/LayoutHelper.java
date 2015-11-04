@@ -282,9 +282,6 @@ public class LayoutHelper {
         return null;
     }
 
-    /**
-     *
-     */
     private void parseField() throws IOException, StringIndexOutOfBoundsException {
         int c;
         StringBuffer buffer = null;

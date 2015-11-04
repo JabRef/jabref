@@ -90,9 +90,8 @@ public class AuxSubGenerator {
     }
 
     /**
-     * parseAuxFile
-     * read the Aux file and fill up some intern data structures.
-     * Nested aux files (latex \\include) supported!
+     * parseAuxFile read the Aux file and fill up some intern data structures. Nested aux files (latex \\include)
+     * supported!
      *
      * @param filename String : Path to LatexAuxFile
      * @return boolean, true = no error occurs
@@ -132,12 +131,12 @@ public class AuxSubGenerator {
         Matcher matcher;
 
         // while condition
-        boolean weiter;
+        boolean cont;
 
         // return value -> default: no error
         boolean back = true;
 
-        // fileopen status
+        // file open status
         boolean loopFileOpen;
 
         // the important tag
@@ -146,7 +145,7 @@ public class AuxSubGenerator {
         // input-file-buffer
         BufferedReader br = null;
 
-        // filelist, used for nested aux files
+        // file list, used for nested aux files
         Vector<String> fileList = new Vector<>(5);
         fileList.add(filename);
 
@@ -169,23 +168,23 @@ public class AuxSubGenerator {
             try {
                 //        System.out.println("read #"+fName +"#") ;
                 br = new BufferedReader(new FileReader(fName));
-                weiter = true;
+                cont = true;
                 loopFileOpen = true;
             } catch (FileNotFoundException fnfe) {
                 System.out.println("Cannot locate input file! " + fnfe.getMessage());
                 // System.exit( 0 ) ;
                 back = false;
-                weiter = false;
+                cont = false;
                 loopFileOpen = false;
             }
 
-            while (weiter) {
+            while (cont) {
                 String line;
                 try {
                     line = br.readLine();
                 } catch (IOException ioe) {
                     line = null;
-                    weiter = false;
+                    cont = false;
                 }
 
                 if (line != null) {
@@ -216,19 +215,19 @@ public class AuxSubGenerator {
                         if (end > start) {
                             String str = path + line.substring(index + 8, end);
 
-                            // if filename already in filelist
+                            // if filename already in file list
                             if (!fileList.contains(str)) {
-                                fileList.add(str); // insert file into filelist
+                                fileList.add(str); // insert file into file list
                             }
                         }
                     }
                 } else {
                     // line != null
-                    weiter = false;
+                    cont = false;
                 }
             }
 
-            if (loopFileOpen) // only close, if open sucessful
+            if (loopFileOpen) // only close, if open successful
             {
                 try {
                     br.close();
@@ -245,15 +244,14 @@ public class AuxSubGenerator {
     }
 
     /**
-     * resolveTags
-     * Try to find an equivalent bibtex entry into reference database for all keys
-     * (found in aux file). This methode will fill up some intern data structures.....
+     * resolveTags Try to find an equivalent bibtex entry into reference database for all keys (found in aux file). This
+     * method will fill up some intern data structures.....
      */
     private void resolveTags() {
         auxDB = new BibtexDatabase();
         notFoundList.clear();
 
-        // forall bibtex keys (found in aux-file) try to find an equivalent
+        // for all bibtex keys (found in aux-file) try to find an equivalent
         // entry into reference database
         for (String str : mySet) {
             BibtexEntry entry = db.getEntryByKey(str);
@@ -296,7 +294,8 @@ public class AuxSubGenerator {
 
     /**
      * Insert a clone of the given entry. The clone is given a new unique ID.
-     * @param auxDB The database to insert into.
+     *
+     * @param bibDB The database to insert into.
      * @param entry The entry to insert a copy of.
      */
     private void insertEntry(BibtexDatabase bibDB, BibtexEntry entry) {
@@ -307,8 +306,7 @@ public class AuxSubGenerator {
     }
 
     /**
-     * generate
-     * Shortcut methode for easy generation.
+     * generate Shortcut method for easy generation.
      *
      * @param auxFileName String
      * @param bibDB BibtexDatabase - reference database
@@ -343,15 +341,15 @@ public class AuxSubGenerator {
     }
 
     /**
-     * Query the number of extra entries pulled in due to crossrefs from other
-     * entries.
+     * Query the number of extra entries pulled in due to crossrefs from other entries.
+     *
      * @return The number of additional entries pulled in due to crossref
      */
     public final int getCrossreferencedEntriesCount() {
         return crossreferencedEntriesCount;
     }
 
-    /** reset all used datastructures */
+    /** reset all used data structures */
     public final void clear() {
         mySet.clear();
         notFoundList.clear();
@@ -359,13 +357,14 @@ public class AuxSubGenerator {
         // db = null ;  ???
     }
 
-    /** returns a vector off all not resolved bibtex entries found in auxfile */
+    /** returns a vector off all not resolved bibtex entries found in aux file */
     public Vector<String> getNotFoundList() {
         return notFoundList;
     }
 
-    /** returns the number of nested aux files, read by the last call of
-     *  generate method */
+    /**
+     * returns the number of nested aux files, read by the last call of generate method
+     */
     public int getNestedAuxCounter() {
         return this.nestedAuxCounter;
     }

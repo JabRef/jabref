@@ -41,8 +41,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
- * Dialog for creating or modifying groups. Operates directly on the Vector
- * containing group information.
+ * Dialog for creating or modifying groups. Operates directly on the Vector containing group information.
  */
 class AutoGroupDialog extends JDialog implements CaretListener {
 
@@ -51,31 +50,25 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JTextField deliminator = new JTextField(60);
     JLabel nf = new JLabel(Localization.lang("Field to group by") + ":");
     JLabel nr = new JLabel(Localization.lang("Characters to ignore") + ":");
-    private final JRadioButton
-    keywords = new JRadioButton(Localization.lang("Generate groups from keywords in a BibTeX field"));
+    private final JRadioButton keywords = new JRadioButton(
+            Localization.lang("Generate groups from keywords in a BibTeX field"));
     private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
     private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
     private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
     private final JButton ok = new JButton(Localization.lang("Ok"));
-    private boolean ok_pressed;
     private final GroupTreeNode m_groupsRoot;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final GroupSelector gs;
-    private String oldRemove;
-    private String oldField;
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
 
     /**
-     * @param groupsRoot
-     *            The original set of groups, which is required as undo
-     *            information when all groups are cleared.
+     * @param groupsRoot The original set of groups, which is required as undo information when all groups are cleared.
      */
-    public AutoGroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel,
-            GroupSelector groupSelector, GroupTreeNode groupsRoot,
-            String defaultField, String defaultRemove, String defaultDeliminator) {
+    public AutoGroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel, GroupSelector groupSelector,
+            GroupTreeNode groupsRoot, String defaultField, String defaultRemove, String defaultDeliminator) {
         super(jabrefFrame, Localization.lang("Automatically create groups"), true);
         frame = jabrefFrame;
         gs = groupSelector;
@@ -89,49 +82,42 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                ok_pressed = true;
                 dispose();
 
-                GroupTreeNode autoGroupsRoot = new GroupTreeNode(
-                        new ExplicitGroup(Localization.lang("Automatically created groups"),
-                                GroupHierarchyType.INCLUDING));
+                GroupTreeNode autoGroupsRoot = new GroupTreeNode(new ExplicitGroup(
+                        Localization.lang("Automatically created groups"), GroupHierarchyType.INCLUDING));
                 Set<String> hs = null;
-                String field1 = field();
+                String fieldText = field.getText();
                 if (keywords.isSelected()) {
                     if (nd.isSelected()) {
-                        hs = Util
-                                .findDeliminatedWordsInField(panel.getDatabase(),
-                                        field().toLowerCase().trim(), deliminator
-                                        .getText());
+                        hs = Util.findDeliminatedWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
+                                deliminator.getText());
                     } else {
-                        hs = Util.findAllWordsInField(panel.getDatabase(),
-                                field().toLowerCase().trim(), remove());
+                        hs = Util.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
+                                remove.getText());
 
                     }
-                }
-                else if (authors.isSelected()) {
+                } else if (authors.isSelected()) {
                     List<String> fields = new ArrayList<>(2);
                     fields.add("author");
                     hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
-                    field1 = "author";
-                }
-                else if (editors.isSelected()) {
+                    fieldText = "author";
+                } else if (editors.isSelected()) {
                     List<String> fields = new ArrayList<>(2);
                     fields.add("editor");
                     hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
-                    field1 = "editor";
+                    fieldText = "editor";
                 }
 
                 for (String keyword : hs) {
-                    KeywordGroup group = new KeywordGroup(keyword, field1,
-                            keyword, false, false, GroupHierarchyType.INDEPENDENT);
+                    KeywordGroup group = new KeywordGroup(keyword, fieldText, keyword, false, false,
+                            GroupHierarchyType.INDEPENDENT);
                     autoGroupsRoot.add(new GroupTreeNode(group));
                 }
 
                 m_groupsRoot.add(autoGroupsRoot);
                 NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate groups"));
-                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
-                        gs, m_groupsRoot, autoGroupsRoot,
+                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(gs, m_groupsRoot, autoGroupsRoot,
                         UndoableAddOrRemoveGroup.ADD_NODE);
                 undo.setRevalidate(true);
                 ce.addEdit(undo);
@@ -170,8 +156,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         keywords.setSelected(true);
 
         FormBuilder b = FormBuilder.create();
-        b.layout(new FormLayout
-                ("left:20dlu, 4dlu, left:pref, 4dlu, fill:60dlu", "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p"));
+        b.layout(new FormLayout("left:20dlu, 4dlu, left:pref, 4dlu, fill:60dlu",
+                "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p"));
         b.add(keywords).xyw(1, 1, 5);
         b.add(Localization.lang("Field to group by") + ":").xy(3, 3);
         b.add(field).xy(5, 3);
@@ -191,83 +177,15 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         bb.addButton(cancel);
         bb.addGlue();
 
-        // Layout starts here.
-        /*main.setLayout(gbl);
-        opt.setLayout(gbl);
-        main.setBorder(BorderFactory.createTitledBorder(BorderFactory
-                .createEtchedBorder(), Globals.lang("Group properties")));
-        // Main panel:
-        con.weightx = 0;
-        con.gridwidth = 1;
-        con.insets = new Insets(3, 5, 3, 5);
-        con.anchor = GridBagConstraints.EAST;
-        con.fill = GridBagConstraints.NONE;
-        con.gridx = 0;
-        con.gridy = 0;
-        gbl.setConstraints(nf, con);
-        main.add(nf);
-        con.gridy = 1;
-        gbl.setConstraints(nr, con);
-        main.add(nr);
-        con.gridy = 2;
-        gbl.setConstraints(nd, con);
-        main.add(nd);
-        con.weightx = 1;
-        con.anchor = GridBagConstraints.WEST;
-        con.fill = GridBagConstraints.HORIZONTAL;
-        con.gridy = 0;
-        con.gridx = 1;
-        gbl.setConstraints(field, con);
-        main.add(field);
-        con.gridy = 1;
-        gbl.setConstraints(remove, con);
-        main.add(remove);
-        con.gridy = 2;
-        gbl.setConstraints(deliminator, con);
-        main.add(deliminator);
-        // Option buttons:
-        con.gridx = GridBagConstraints.RELATIVE;
-        con.gridy = GridBagConstraints.RELATIVE;
-        con.weightx = 1;
-        con.gridwidth = 1;
-        con.anchor = GridBagConstraints.EAST;
-        con.fill = GridBagConstraints.NONE;
-        gbl.setConstraints(ok, con);
-        opt.add(ok);
-        con.anchor = GridBagConstraints.WEST;
-        con.gridwidth = GridBagConstraints.REMAINDER;
-        gbl.setConstraints(cancel, con);
-        opt.add(cancel);*/
-
         main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         opt.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(b.getPanel(), BorderLayout.CENTER);
         getContentPane().add(opt, BorderLayout.SOUTH);
-        // pack();
+
         updateComponents();
         pack();
         Util.placeDialog(this, frame);
-    }
-
-    public boolean okPressed() {
-        return ok_pressed;
-    }
-
-    public String oldField() {
-        return oldField;
-    }
-
-    public String oldRemove() {
-        return oldRemove;
-    }
-
-    private String field() {
-        return field.getText();
-    }
-
-    private String remove() {
-        return remove.getText();
     }
 
     @Override
