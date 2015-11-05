@@ -119,8 +119,8 @@ public class CleanUpAction extends AbstractWorker {
 
     private static void removeFieldValue(BibtexEntry entry, String fieldName, NamedCompound compound) {
         String origValue = entry.getField(fieldName);
-        compound.addEdit(new UndoableFieldChange(entry, fieldName, origValue, ""));
-        entry.setField(fieldName, "");
+        compound.addEdit(new UndoableFieldChange(entry, fieldName, origValue, null));
+        entry.setField(fieldName, null);
     }
 
     /**
