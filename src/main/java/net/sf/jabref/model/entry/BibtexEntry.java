@@ -316,8 +316,7 @@ public class BibtexEntry {
     public void setField(String name, String value) {
 
         if (BibtexEntry.ID_FIELD.equals(name)) {
-            throw new IllegalArgumentException("The field name '" + name +
-                    "' is reserved");
+            throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
 
         String oldValue = fields.get(name);

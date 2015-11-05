@@ -430,7 +430,7 @@ public class CleanUpAction extends AbstractWorker {
 
             Optional<DOI> doi = DOI.build(doiFieldValue);
 
-            if(doi.isPresent()) {
+            if (doi.isPresent()) {
                 String newValue = doi.get().getDOI();
                 if (!doiFieldValue.equals(newValue)) {
                     ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
@@ -584,7 +584,7 @@ public class CleanUpAction extends AbstractWorker {
             //Create new Path based on old Path and new filename
             File expandedOldFile = FileUtil.expandFilename(realOldFilename, panel.metaData().getFileDirectory(Globals.FILE_FIELD));
             if (expandedOldFile.getParent() == null) {
-                // something went wrong. Just skipt his entry
+                // something went wrong. Just skip this entry
                 continue;
             }
             String newPath = expandedOldFile.getParent().concat(System.getProperty("file.separator")).concat(newFilename);
