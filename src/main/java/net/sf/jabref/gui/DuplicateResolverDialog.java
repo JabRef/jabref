@@ -113,10 +113,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_UPPER;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(KEEP_UPPER);
             }
         });
 
@@ -124,10 +121,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_LOWER;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(KEEP_LOWER);
             }
         });
 
@@ -135,10 +129,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_BOTH;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(KEEP_BOTH);
             }
         });
 
@@ -146,10 +137,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_MERGE;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(KEEP_MERGE);
             }
         });
 
@@ -158,10 +146,7 @@ public class DuplicateResolverDialog extends JDialog {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    status = DuplicateResolverDialog.AUTOREMOVE_EXACT;
-                    block = false;
-                    savePosition();
-                    dispose();
+                    buttonPressed(AUTOREMOVE_EXACT);
                 }
             });
         }
@@ -170,10 +155,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.BREAK;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(BREAK);
             }
         });
 
@@ -188,8 +170,11 @@ public class DuplicateResolverDialog extends JDialog {
     }
 
 
-    private void savePosition() {
+    private void buttonPressed(int button) {
+        status = button;
+        block = false;
         PositionWindow.storeWindowPosition(this, PositionWindow.DUPLICATES);
+        dispose();
     }
 
     public boolean isBlocking() {

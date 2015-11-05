@@ -146,8 +146,6 @@ public class MergeEntriesDialog extends JDialog {
         if (button.equals("cancel")) {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));
-
-            dispose();
         } else if (button.equals("replace")) {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
@@ -160,12 +158,9 @@ public class MergeEntriesDialog extends JDialog {
             ce.end();
             panel.undoManager.addEdit(ce);
             panel.output(Localization.lang("Merged entries"));
-            savePosition();
-            dispose();
         }
-    }
-
-    private void savePosition() {
+        // Save dialog position
         PositionWindow.storeWindowPosition(this, PositionWindow.MERGEENTRIES);
+        dispose();
     }
 }
