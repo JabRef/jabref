@@ -409,8 +409,7 @@ class OOBibBase {
         else if (style.isNumberEntries()) {
             // We need to sort the reference marks according to the sorting of the bibliographic
             // entries:
-            SortedMap<BibtexEntry, BibtexDatabase> newMap =
- new TreeMap<>(entryComparator);
+            SortedMap<BibtexEntry, BibtexDatabase> newMap = new TreeMap<>(entryComparator);
             for (Map.Entry<BibtexEntry, BibtexDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
                 newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
             }
@@ -828,8 +827,7 @@ class OOBibBase {
             entries = getSortedEntriesFromSortedRefMarks(names, entries, linkSourceBase);
         }
         else {
-            SortedMap<BibtexEntry, BibtexDatabase> newMap =
- new TreeMap<>(entryComparator);
+            SortedMap<BibtexEntry, BibtexDatabase> newMap = new TreeMap<>(entryComparator);
             for (Map.Entry<BibtexEntry, BibtexDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
                 newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
             }
