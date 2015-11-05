@@ -37,16 +37,15 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class ColorSetupPanel extends JPanel {
 
-    private static final long serialVersionUID = -4634367444666144966L;
     private static final int ICON_WIDTH = 30;
     private static final int ICON_HEIGHT = 20;
-    private final ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
+    private final ArrayList<ColorButton> buttons = new ArrayList<>();
 
 
     public ColorSetupPanel() {
 
         FormLayout layout = new FormLayout
-                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref", 
+                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref",
                         "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
         FormBuilder builder = FormBuilder.create().layout(layout);
 

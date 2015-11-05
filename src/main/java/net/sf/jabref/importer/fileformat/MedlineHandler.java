@@ -32,7 +32,7 @@ class MedlineHandler extends DefaultHandler
 {
 
     private static final HTMLConverter htmlConverter = new HTMLConverter();
-    private final ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+    private final ArrayList<BibtexEntry> bibitems = new ArrayList<>();
     private boolean inTitle;
     private boolean inYear;
     private boolean inJournal;
@@ -90,8 +90,8 @@ class MedlineHandler extends DefaultHandler
     private String minorTopics = "";
     private String language = "";
     private String pst = "";
-    private final ArrayList<String> authors = new ArrayList<String>();
-    private final TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
+    private final ArrayList<String> authors = new ArrayList<>();
+    private final TreeSet<String> descriptors = new TreeSet<>(); // To gather keywords
     int rowNum;
 
     private static final String KEYWORD_SEPARATOR = "; ";
@@ -402,7 +402,7 @@ class MedlineHandler extends DefaultHandler
         else if (localName.equals("Author")) {
             // forename sometimes has initials with " " in middle: is pattern [A-Z] [A-Z]
             // when above is the case replace it with initials
-            if (forename.length() == 3 && forename.charAt(1) == ' ') {
+            if ((forename.length() == 3) && (forename.charAt(1) == ' ')) {
                 forename = initials;
             }
 
@@ -569,9 +569,9 @@ class MedlineHandler extends DefaultHandler
 
     // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added fixPageRange method
     //   Convert medline page ranges from short form to full form.
-    //   Medline reports page ranges in a shorthand format. 
+    //   Medline reports page ranges in a shorthand format.
     //   The last page is reported using only the digits which
-    //   differ from the first page. 
+    //   differ from the first page.
     //      i.e. 12345-51 refers to the actual range 12345-12351
     private String fixPageRange(String pageRange) {
         int minusPos = pageRange.indexOf('-');

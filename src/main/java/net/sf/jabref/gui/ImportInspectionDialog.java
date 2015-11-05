@@ -537,7 +537,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * one another, and, if they are destined for an existing database, with
      * respect to existing keys in the database.
      */
-    private void generateKeys(boolean addColumn) {
+    private void generateKeys() {
         entries.getReadWriteLock().writeLock().lock();
 
         BibtexDatabase database;
@@ -713,7 +713,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // If "Generate keys" is checked, generate keys unless it's already
             // been done:
             if (autoGenerate.isSelected() && !generatedKeys) {
-                generateKeys(false);
+                generateKeys();
             }
             // Remember the choice until next time:
             Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION, autoGenerate.isSelected());
@@ -764,7 +764,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                                             Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
                                             Localization.lang("Add to group"), JOptionPane.YES_NO_OPTION);
                             if (answer == JOptionPane.YES_OPTION) {
-                                generateKeys(false);
+                                generateKeys();
                             } else {
                                 groupingCanceled = true;
                             }
@@ -872,7 +872,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             generate.setEnabled(false);
             generatedKeys = true; // To prevent the button from getting
             // enabled again.
-            generateKeys(true); // Generate the keys.
+            generateKeys(); // Generate the keys.
         }
     }
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,21 +15,29 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.*;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
@@ -87,7 +95,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         useRegExpComboBox = new JRadioButton(Localization.lang("Use Regular Expression Search"));
         ItemListener regExpListener = new ItemListener() {
 
-            
+
             @Override
             public void itemStateChanged(ItemEvent e) {
                 regExpTextField.setEditable(useRegExpComboBox.isSelected());
@@ -114,9 +122,9 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.append(pan);
         /**
          * Fix for [ 1749613 ] About translation
-         * 
+         *
          * https://sourceforge.net/tracker/index.php?func=detail&aid=1749613&group_id=92314&atid=600306
-         * 
+         *
          * Cannot really use %0 to refer to the file type, since this ruins translation.
          */
         JLabel lab = new JLabel(Localization.lang("Main file directory") + ':');

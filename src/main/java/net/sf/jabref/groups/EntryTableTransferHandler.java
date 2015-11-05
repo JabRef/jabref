@@ -287,9 +287,9 @@ public class EntryTableTransferHandler extends TransferHandler {
         }
         File tmpfile = java.io.File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
-        FileWriter fw = new FileWriter(tmpfile);
-        fw.write(dropStr);
-        fw.close();
+        try (FileWriter fw = new FileWriter(tmpfile)) {
+            fw.write(dropStr);
+        }
 
         // System.out.println("importing from " + tmpfile.getAbsolutePath());
 
@@ -310,7 +310,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     public static List<File> getFilesFromDraggedFilesString(String s) {
         // Split into lines:
         String[] lines = s.replaceAll("\r", "").split("\n");
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         for (String line1 : lines) {
             String line = line1;
 
@@ -406,7 +406,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     private void loadOrImportFiles(String[] fileNames, int dropRow) {
 
         OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
-        ArrayList<String> notBibFiles = new ArrayList<String>();
+        ArrayList<String> notBibFiles = new ArrayList<>();
         String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         for (String fileName : fileNames) {
             // Find the file's extension, if any:

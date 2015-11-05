@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -33,33 +33,32 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
- * 
+ *
  * This class allows to access the Slac INSPIRE database. It is just a port of
  * the original SPIRES Fetcher.
- * 
+ *
  * It can either be a GeneralFetcher to pose requests to the database or fetch
  * individual entries.
- * 
+ *
  * @author Fedor Bezrukov
  * @author Sheer El-Showk
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class INSPIREFetcher implements EntryFetcher {
 
     private static final String INSPIRE_HOST = "inspirehep.net";
 
+
     /**
      * Construct the query URL
      *
-     * NOTE: we truncate at 1000 returned entries but its likely INSPIRE returns
-     * fewer anyway.  This shouldn't be a problem since users should probably do
-     * more specific searches.
-     * 
-     * @param key
-     *            The key of the OAI2 entry that the url should poitn to.
-     * 
+     * NOTE: we truncate at 1000 returned entries but its likely INSPIRE returns fewer anyway. This shouldn't be a
+     * problem since users should probably do more specific searches.
+     *
+     * @param key The key of the OAI2 entry that the url should point to.
+     *
      * @return a String denoting the query URL
      */
     private String constructUrl(String key) {
@@ -84,7 +83,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
     /**
      * Constructs a INSPIRE query url from slaccitation field
-     * 
+     *
      * @param slaccitation
      * @return query string
      *
@@ -108,7 +107,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
     /**
      * Construct an INSPIRE query url from eprint field
-     * 
+     *
      * @param eprint
      * @return query string
      *
@@ -128,12 +127,11 @@ public class INSPIREFetcher implements EntryFetcher {
     }*/
 
     /**
-     * Import an entry from an OAI2 archive. The BibtexEntry provided has to
-     * have the field OAI2_IDENTIFIER_FIELD set to the search string.
-     * 
-     * @param key
-     *            The OAI2 key to fetch from ArXiv.
-     * @return The imnported BibtexEntry or null if none.
+     * Import an entry from an OAI2 archive. The BibtexEntry provided has to have the field OAI2_IDENTIFIER_FIELD set to
+     * the search string.
+     *
+     * @param key The OAI2 key to fetch from ArXiv.
+     * @return The imported BibtexEntry or null if none.
      */
     private BibtexDatabase importInspireEntries(String key, OutputPrinter frame) {
         String url = constructUrl(key);
@@ -198,18 +196,9 @@ public class INSPIREFetcher implements EntryFetcher {
     public String getTitle() {
         return Localization.menuTitle("Fetch INSPIRE");
     }
-
-    /*
-     * @see net.sf.jabref.gui.ImportInspectionDialog.CallBack
-     */
-    public void cancelled() {
-    }
-
-    public void done(int entriesImported) {
-    }
-
     @Override
     public void stopFetching() {
+        // Do nothing
     }
 
     /*

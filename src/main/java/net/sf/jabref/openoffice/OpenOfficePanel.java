@@ -66,7 +66,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         } catch (NoSuchMethodError ex) {
             OpenOfficePanel.postLayoutSupported = false;
         } catch (Exception ignore) {
-
+            // Ignored
         }
 
     }
@@ -127,8 +127,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         OpenOfficePanel.selectDocument.setToolTipText(Localization.lang("Select Writer document"));
         OpenOfficePanel.update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         OpenOfficePanel.update.setToolTipText(Localization.lang("Sync OO bibliography"));
-        String defExecutable;
-        String defJarsDir;
         if (OS.WINDOWS) {
             Globals.prefs.putDefaultValue("ooPath", "C:\\Program Files\\OpenOffice.org 3");
             Globals.prefs.putDefaultValue("ooExecutablePath", "C:\\Program Files\\OpenOffice.org 2.3\\program\\soffice.exe");
@@ -165,13 +163,13 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         return comp;
     }
 
-    public void init(JabRefFrame frame, SidePaneManager manager) {
-        OpenOfficePanel.frame = frame;
-        this.manager = manager;
-        comp = new OOPanel(manager, IconTheme.getImage("openoffice"), Localization.lang("OpenOffice"));
+    public void init(JabRefFrame jrFrame, SidePaneManager spManager) {
+        OpenOfficePanel.frame = jrFrame;
+        this.manager = spManager;
+        comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), Localization.lang("OpenOffice"));
         try {
             initPanel();
-            manager.register(getName(), comp);
+            spManager.register(getName(), comp);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -469,7 +467,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     private java.util.List<BibtexDatabase> getBaseList() {
-        java.util.List<BibtexDatabase> databases = new ArrayList<BibtexDatabase>();
+        java.util.List<BibtexDatabase> databases = new ArrayList<>();
         if (Globals.prefs.getBoolean("useAllOpenBases")) {
             for (int i = 0; i < OpenOfficePanel.frame.baseCount(); i++) {
                 databases.add(OpenOfficePanel.frame.baseAt(i).database());
@@ -653,22 +651,23 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     // The methods addFile and associated final Class[] parameters were gratefully copied from
     // anthony_miguel @ http://forum.java.sun.com/thread.jsp?forum=32&thread=300557&tstart=0&trange=15
-    private static final Class[] parameters = new Class[] {URL.class};
+    private static final Class<?>[] parameters = new Class[] {URL.class};
 
 
     private static void addURL(URL[] u) throws IOException {
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Class<URLClassLoader> sysclass = URLClassLoader.class;
+        try (URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader()) {
+            Class<URLClassLoader> sysclass = URLClassLoader.class;
 
-        try {
-            Method method = sysclass.getDeclaredMethod("addURL", OpenOfficePanel.parameters);
-            method.setAccessible(true);
-            for (URL anU : u) {
-                method.invoke(sysloader, anU);
+            try {
+                Method method = sysclass.getDeclaredMethod("addURL", OpenOfficePanel.parameters);
+                method.setAccessible(true);
+                for (URL anU : u) {
+                    method.invoke(sysloader, anU);
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+                throw new IOException("Error, could not add URL to system classloader");
             }
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new IOException("Error, could not add URL to system classloader");
         }
     }
 
@@ -681,7 +680,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     private void showConnectDialog() {
         dialogOkPressed = false;
-        final JDialog diag = new JDialog(OpenOfficePanel.frame, Localization.lang("Set connection parameters"), true);
+        final JDialog cDiag = new JDialog(OpenOfficePanel.frame, Localization.lang("Set connection parameters"), true);
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
         ooPath.setText(Globals.prefs.get("ooPath"));
@@ -722,7 +721,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             public void actionPerformed(ActionEvent event) {
                 updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText(),
                         true);
-                diag.dispose();
+                cDiag.dispose();
             }
         };
 
@@ -736,14 +735,14 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText(),
                         true);
                 dialogOkPressed = true;
-                diag.dispose();
+                cDiag.dispose();
             }
         });
         cancel.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                diag.dispose();
+                cDiag.dispose();
             }
         });
         bb.addGlue();
@@ -753,11 +752,11 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         bb.addGlue();
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
-        diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-        diag.pack();
-        diag.setLocationRelativeTo(OpenOfficePanel.frame);
-        diag.setVisible(true);
+        cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
+        cDiag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+        cDiag.pack();
+        cDiag.setLocationRelativeTo(OpenOfficePanel.frame);
+        cDiag.setVisible(true);
 
     }
 
@@ -827,10 +826,9 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
               */
             BasePanel panel = OpenOfficePanel.frame.basePanel();
             final BibtexDatabase database = panel.database();
-            Map<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<BibtexEntry, BibtexDatabase>();
+            Map<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<>();
             if (panel != null) {
                 BibtexEntry[] e = panel.getSelectedEntries();
-                ArrayList<BibtexEntry> el = new ArrayList<BibtexEntry>();
                 for (BibtexEntry anE : e) {
                     entries.put(anE, database);
                 }
@@ -867,7 +865,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             final BibtexDatabase database = panel.database();
             if (panel != null) {
                 BibtexEntry[] entries = panel.getSelectedEntries();
-                ArrayList<BibtexEntry> el = new ArrayList<BibtexEntry>();
+                ArrayList<BibtexEntry> el = new ArrayList<>();
                 Collections.addAll(el, entries);
 
                 BstWrapper wrapper = new BstWrapper();
@@ -1051,7 +1049,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     @Override
     public void operationCompleted(BasePanel basePanel) {
-
+        // Do nothing
     }
 
     @Override

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -73,7 +73,7 @@ class OOBibBase {
     private XMultiServiceFactory mxDocFactory;
     private XTextDocument mxDoc;
     private XText text;
-    private XDesktop xDesktop;
+    private final XDesktop xDesktop;
     private XTextViewCursorSupplier xViewCursorSupplier;
     private XComponent xCurrentComponent;
     private XComponentLoader xComponentLoader;
@@ -84,7 +84,7 @@ class OOBibBase {
     private final AuthorYearTitleComparator entryComparator = new AuthorYearTitleComparator();
     private final YearAuthorTitleComparator yearAuthorTitleComparator = new YearAuthorTitleComparator();
 
-    private final HashMap<String, String> uniquefiers = new HashMap<String, String>();
+    private final HashMap<String, String> uniquefiers = new HashMap<>();
 
     private String[] sortedReferenceMarks;
 
@@ -192,7 +192,7 @@ class OOBibBase {
     }
 
     private List<XTextDocument> getTextDocuments() throws Exception {
-        List<XTextDocument> res = new ArrayList<XTextDocument>();
+        List<XTextDocument> res = new ArrayList<>();
         XEnumerationAccess enumA = xDesktop.getComponents();
         XEnumeration e = enumA.createEnumeration();
 
@@ -247,7 +247,6 @@ class OOBibBase {
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(
                 XReferenceMarksSupplier.class, xCurrentComponent);
         XNameAccess nameAccess = supplier.getReferenceMarks();
-        String[] names;
         sortedReferenceMarks = getSortedReferenceMarks(nameAccess);
     }
 
@@ -381,7 +380,7 @@ class OOBibBase {
     public String[] getJabRefReferenceMarks(XNameAccess nameAccess) {
         String[] names = nameAccess.getElementNames();
         // Remove all reference marks that don't look like JabRef citations:
-        ArrayList<String> tmp = new ArrayList<String>();
+        ArrayList<String> tmp = new ArrayList<>();
         for (String name : names) {
             if (citePattern.matcher(name).find()) {
                 tmp.add(name);
@@ -395,7 +394,7 @@ class OOBibBase {
             Exception {
 
         List<String> cited = findCitedKeys();
-        HashMap<String, BibtexDatabase> linkSourceBase = new HashMap<String, BibtexDatabase>();
+        HashMap<String, BibtexDatabase> linkSourceBase = new HashMap<>();
         Map<BibtexEntry, BibtexDatabase> entries = findCitedEntries(databases, cited, linkSourceBase);
 
         XNameAccess nameAccess = getReferenceMarks();
@@ -411,7 +410,7 @@ class OOBibBase {
             // We need to sort the reference marks according to the sorting of the bibliographic
             // entries:
             SortedMap<BibtexEntry, BibtexDatabase> newMap =
-                    new TreeMap<BibtexEntry, BibtexDatabase>(entryComparator);
+ new TreeMap<>(entryComparator);
             for (Map.Entry<BibtexEntry, BibtexDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
                 newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
             }
@@ -430,7 +429,7 @@ class OOBibBase {
         }
 
         // Remove all reference marks that don't look like JabRef citations:
-        ArrayList<String> tmp = new ArrayList<String>();
+        ArrayList<String> tmp = new ArrayList<>();
         for (String name : names) {
             if (citePattern.matcher(name).find()) {
                 tmp.add(name);
@@ -438,7 +437,7 @@ class OOBibBase {
         }
         names = tmp.toArray(new String[tmp.size()]);
 
-        HashMap<String, Integer> numbers = new HashMap<String, Integer>();
+        HashMap<String, Integer> numbers = new HashMap<>();
         //HashMap<S
         int lastNum = 0;
         // First compute citation markers for all citations:
@@ -480,7 +479,7 @@ class OOBibBase {
                     for (int j = 0; j < keys.length; j++) {
                         normCitMarkers[i][j] = cEntries[j].getCiteKey();
                         sb.append(cEntries[j].getCiteKey());
-                        if (j < keys.length - 1) {
+                        if (j < (keys.length - 1)) {
                             sb.append(',');
                         }
                     }
@@ -563,17 +562,17 @@ class OOBibBase {
         if (!style.isBibtexKeyCiteMarkers() && !style.isNumberEntries()) {
             // See if there are duplicate citations marks referring to different entries. If so, we need to
             // use uniquefiers:
-            HashMap<String, List<String>> refKeys = new HashMap<String, List<String>>();
-            HashMap<String, List<Integer>> refNums = new HashMap<String, List<Integer>>();
+            HashMap<String, List<String>> refKeys = new HashMap<>();
+            HashMap<String, List<Integer>> refNums = new HashMap<>();
             for (int i = 0; i < citMarkers.length; i++) {
                 String[] markers = normCitMarkers[i]; // compare normalized markers, since the actual markers can be different
                 for (int j = 0; j < markers.length; j++) {
                     String marker = markers[j];
                     if (!refKeys.containsKey(marker)) {
-                        List<String> l = new ArrayList<String>(1);
+                        List<String> l = new ArrayList<>(1);
                         l.add(bibtexKeys[i][j]);
                         refKeys.put(marker, l);
-                        List<Integer> l2 = new ArrayList<Integer>(1);
+                        List<Integer> l2 = new ArrayList<>(1);
                         l2.add(i);
                         refNums.put(marker, l2);
                     }
@@ -604,7 +603,7 @@ class OOBibBase {
 
             // Finally, go through all citation markers, and update those referring to entries in our current list:
             int maxAuthorsFirst = style.getIntCitProperty("MaxAuthorsFirst");
-            HashSet<String> seenBefore = new HashSet<String>();
+            HashSet<String> seenBefore = new HashSet<>();
             for (int j = 0; j < bibtexKeys.length; j++) {
                 boolean needsChange = false;
                 int[] firstLimAuthors = new int[bibtexKeys[j].length];
@@ -619,7 +618,7 @@ class OOBibBase {
                         seenBefore.add(bibtexKeys[j][k]);
                     }
                     String uniq = uniquefiers.get(bibtexKeys[j][k]);
-                    if (uniq != null && uniq.length() >= 0) {
+                    if ((uniq != null) && (uniq.length() >= 0)) {
                         needsChange = true;
                         BibtexDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
                         if (database != null) {
@@ -680,7 +679,7 @@ class OOBibBase {
             text.removeTextContent(bm);
 
             insertReferenceMark(names[i], citMarkers[i], cursor, types[i] != OOBibBase.INVISIBLE_CIT, style);
-            if (hadBibSection && getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null) {
+            if (hadBibSection && (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
                 cursor.collapseToEnd();
@@ -688,7 +687,7 @@ class OOBibBase {
                 insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
                 /* The following is for resetting the paragraph format, but should probably
                    not be done.
-                   
+
                 XParagraphCursor parCursor =
                     (XParagraphCursor)UnoRuntime.queryInterface(
                     java.lang.Class.forName("com.sun.star.text.XParagraphCursor"), cursor);
@@ -708,7 +707,7 @@ class OOBibBase {
             }
         }
 
-        ArrayList<String> unresolvedKeys = new ArrayList<String>();
+        ArrayList<String> unresolvedKeys = new ArrayList<>();
         for (BibtexEntry entry : entries.keySet()) {
             if (entry instanceof UndefinedBibtexEntry) {
                 String key = ((UndefinedBibtexEntry) entry).getKey();
@@ -775,7 +774,7 @@ class OOBibBase {
 
             positions[i] = findPosition(tvc, r);
         }
-        TreeSet<ComparableMark> set = new TreeSet<ComparableMark>();
+        TreeSet<ComparableMark> set = new TreeSet<>();
         for (int i = 0; i < positions.length; i++) {
             set.add(new ComparableMark(names[i], positions[i]));
         }
@@ -818,7 +817,7 @@ class OOBibBase {
     public void rebuildBibTextSection(List<BibtexDatabase> databases, OOBibStyle style)
             throws Exception {
         List<String> cited = findCitedKeys();
-        HashMap<String, BibtexDatabase> linkSourceBase = new HashMap<String, BibtexDatabase>();
+        HashMap<String, BibtexDatabase> linkSourceBase = new HashMap<>();
         Map<BibtexEntry, BibtexDatabase> entries = findCitedEntries
                 (databases, cited, linkSourceBase);
 
@@ -830,7 +829,7 @@ class OOBibBase {
         }
         else {
             SortedMap<BibtexEntry, BibtexDatabase> newMap =
-                    new TreeMap<BibtexEntry, BibtexDatabase>(entryComparator);
+ new TreeMap<>(entryComparator);
             for (Map.Entry<BibtexEntry, BibtexDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
                 newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
             }
@@ -856,7 +855,7 @@ class OOBibBase {
     private LinkedHashMap<BibtexEntry, BibtexDatabase> findCitedEntries
             (List<BibtexDatabase> databases, List<String> keys,
              HashMap<String, BibtexDatabase> linkSourceBase) {
-        LinkedHashMap<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<BibtexEntry, BibtexDatabase>();
+        LinkedHashMap<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<>();
         for (String key : keys) {
             boolean found = false;
             for (BibtexDatabase database : databases) {
@@ -882,7 +881,7 @@ class OOBibBase {
                 XReferenceMarksSupplier.class, xCurrentComponent);
         XNameAccess xNamedMarks = supplier.getReferenceMarks();
         String[] names = xNamedMarks.getElementNames();
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
         for (String name1 : names) {
             Object bookmark = xNamedMarks.getByName(name1);
             XTextContent xTextContent = UnoRuntime.queryInterface(
@@ -905,8 +904,8 @@ class OOBibBase {
              HashMap<String, BibtexDatabase> linkSourceBase)
                     throws BibtexEntryNotFoundException {
 
-        LinkedHashMap<BibtexEntry, BibtexDatabase> newList = new LinkedHashMap<BibtexEntry, BibtexDatabase>();
-        HashMap<BibtexEntry, BibtexEntry> adaptedEntries = new HashMap<BibtexEntry, BibtexEntry>();
+        LinkedHashMap<BibtexEntry, BibtexDatabase> newList = new LinkedHashMap<>();
+        HashMap<BibtexEntry, BibtexEntry> adaptedEntries = new HashMap<>();
         for (String name : names) {
             Matcher m = citePattern.matcher(name);
             if (m.find()) {
@@ -950,7 +949,7 @@ class OOBibBase {
      * @return The list of bibtex keys encoded in the name.
      */
     public List<String> parseRefMarkName(String name) {
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
         Matcher m = citePattern.matcher(name);
         if (m.find()) {
             String[] keystring = m.group(2).split(",");
@@ -999,7 +998,7 @@ class OOBibBase {
         for (int i = 0; i < charBefore; i++) {
             try {
                 cursor.goLeft((short) 1, true);
-                if (i >= charBefore - flex && Character.isWhitespace(cursor.getString().charAt(0))) {
+                if ((i >= (charBefore - flex)) && Character.isWhitespace(cursor.getString().charAt(0))) {
                     break;
                 }
             } catch (Exception ex) {
@@ -1009,10 +1008,10 @@ class OOBibBase {
         int length = cursor.getString().length();
         int added = length - citPart.length();
         cursor.collapseToStart();
-        for (int i = 0; i < charAfter + length; i++) {
+        for (int i = 0; i < (charAfter + length); i++) {
             try {
                 cursor.goRight((short) 1, true);
-                if (i >= charAfter + length - flex) {
+                if (i >= ((charAfter + length) - flex)) {
                     String strNow = cursor.getString();
                     if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {
                         break;
@@ -1036,7 +1035,7 @@ class OOBibBase {
             throws UndefinedParagraphFormatException, Exception {
         // If we don't have numbered entries, we need to sort the entries before adding them:
         if (!style.isSortByPosition()) {
-            Map<BibtexEntry, BibtexDatabase> newMap = new TreeMap<BibtexEntry, BibtexDatabase>(entryComparator);
+            Map<BibtexEntry, BibtexDatabase> newMap = new TreeMap<>(entryComparator);
             for (BibtexEntry entry : entries.keySet()) {
                 newMap.put(entry, entries.get(entry));
             }
@@ -1058,7 +1057,7 @@ class OOBibBase {
             try {
                 layout.setPostFormatter(OOUtil.postformatter);
             } catch (NoSuchMethodError ignore) {
-
+                // Ignored
             }
             OOUtil.insertFullReferenceAtCurrentLocation(text, cursor, layout, parFormat, entry,
                     entries.get(entry), uniquefiers.get(entry.getCiteKey()));
@@ -1126,7 +1125,6 @@ class OOBibBase {
     private void clearBibTextSectionContent2() throws Exception {
 
         // Check if the section exists:
-        boolean exists = false;
         XTextSectionsSupplier supp = UnoRuntime.queryInterface(
                 XTextSectionsSupplier.class, mxDoc);
         try {
@@ -1161,7 +1159,7 @@ class OOBibBase {
         XTextCursor mxDocCursor = text.createTextCursorByRange(range.getEnd());
         mxDocCursor.goRight((short) 1, true);
         boolean couldExpand = true;
-        while (couldExpand && compare.compareRegionEnds(mxDocCursor, rangeEnd) > 0) {
+        while (couldExpand && (compare.compareRegionEnds(mxDocCursor, rangeEnd) > 0)) {
             couldExpand = mxDocCursor.goRight((short) 1, true);
         }
         // Finally, clear the bibliography:
@@ -1208,7 +1206,7 @@ class OOBibBase {
                                      OOBibStyle style)
             throws Exception {
 
-        // Check if there is "page info" stored for this citation. If so, insert it into 
+        // Check if there is "page info" stored for this citation. If so, insert it into
         // the citation text before inserting the citation:
         String pageInfo = getCustomProperty(name);
         if (pageInfo != null) {
@@ -1364,7 +1362,7 @@ class OOBibBase {
 
         int piv = 0;
         boolean madeModifications = false;
-        while (piv < names.length - 1) {
+        while (piv < (names.length - 1)) {
             XTextRange r1 = UnoRuntime.queryInterface
                     (XTextContent.class, nameAccess.getByName(names[piv])).getAnchor().getEnd();
             XTextRange r2 = UnoRuntime.queryInterface
@@ -1377,12 +1375,12 @@ class OOBibBase {
             XTextCursor mxDocCursor = r1.getText().createTextCursorByRange(r1);
             mxDocCursor.goRight((short) 1, true);
             boolean couldExpand = true;
-            while (couldExpand && compare.compareRegionEnds(mxDocCursor, r2) > 0) {
+            while (couldExpand && (compare.compareRegionEnds(mxDocCursor, r2) > 0)) {
                 couldExpand = mxDocCursor.goRight((short) 1, true);
             }
             String text = mxDocCursor.getString();
             // Check if the string contains no line breaks and only whitespace:
-            if (text.indexOf('\n') == -1 && text.trim().isEmpty()) {
+            if ((text.indexOf('\n') == -1) && text.trim().isEmpty()) {
 
                 // If we are supposed to set character format for citations, test this before
                 // making any changes. This way we can throw an exception before any reference
@@ -1404,7 +1402,7 @@ class OOBibBase {
                 keys.addAll(parseRefMarkName(names[piv + 1]));
                 removeReferenceMark(names[piv]);
                 removeReferenceMark(names[piv + 1]);
-                ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+                ArrayList<BibtexEntry> entries = new ArrayList<>();
                 for (String key : keys) {
                     for (BibtexDatabase database : databases) {
                         BibtexEntry entry = database.getEntryByKey(key);
