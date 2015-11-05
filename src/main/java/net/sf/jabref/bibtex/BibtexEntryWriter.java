@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
+import com.google.common.base.Strings;
+
 public class BibtexEntryWriter {
 
     /**
@@ -312,7 +314,9 @@ public class BibtexEntryWriter {
      */
     private boolean writeField(BibtexEntry entry, Writer out, String name, boolean prependWhiteSpace) throws IOException {
         String field = entry.getField(name);
-        if (field != null || includeEmptyFields) {
+        // only write field if is is not empty or if empty fields should be included
+        // the first condition mirrors mirror behavior of com.jgoodies.common.base.Strings.isNotBlank(str)
+        if (!Strings.nullToEmpty(field).trim().isEmpty() || includeEmptyFields) {
             if (prependWhiteSpace) {
                 out.write(',' + Globals.NEWLINE);
             }
