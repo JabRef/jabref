@@ -1620,11 +1620,9 @@ public class JabRefPreferences {
     public void exportPreferences(String filename) throws IOException {
         File f = new File(filename);
         try (OutputStream os = new FileOutputStream(f)) {
-            try {
-                prefs.exportSubtree(os);
-            } catch (BackingStoreException ex) {
-                throw new IOException(ex);
-            }
+            prefs.exportSubtree(os);
+        } catch (BackingStoreException ex) {
+            throw new IOException(ex);
         }
     }
 
@@ -1636,11 +1634,9 @@ public class JabRefPreferences {
     public void importPreferences(String filename) throws IOException {
         File f = new File(filename);
         try (InputStream is = new FileInputStream(f)) {
-            try {
-                Preferences.importPreferences(is);
-            } catch (InvalidPreferencesFormatException ex) {
-                throw new IOException(ex);
-            }
+            Preferences.importPreferences(is);
+        } catch (InvalidPreferencesFormatException ex) {
+            throw new IOException(ex);
         }
     }
 
@@ -1658,7 +1654,7 @@ public class JabRefPreferences {
      * ONLY FOR TESTING!
      *
      * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
-     * 
+     *
      * @param owPrefs
      */
     void overwritePreferences(JabRefPreferences owPrefs) {

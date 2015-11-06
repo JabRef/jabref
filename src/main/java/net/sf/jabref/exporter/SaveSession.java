@@ -69,9 +69,14 @@ public class SaveSession {
         useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
         this.backup = backup;
         this.encoding = encoding;
-        try (FileOutputStream fos = new FileOutputStream(tmp)) {
-            writer = new VerifyingWriter(fos, encoding);
-        }
+	/* Using 
+	   try (FileOutputStream fos = new FileOutputStream(tmp)) {
+	       writer = new VerifyingWriter(fos, encoding);
+	   }
+	   doesn't work since fos is closed after assigning write, 
+	   leading to that fos may never be closed at all
+	 */
+        writer = new VerifyingWriter(new FileOutputStream(tmp), encoding);
     }
 
     public VerifyingWriter getWriter() {
