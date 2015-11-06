@@ -247,7 +247,7 @@ public class BibtexParser {
                         } else {
                             // FIXME: user comments are simply dropped
                             // at least, we log that we ignored the comment
-                            LOGGER.info(Localization.lang("Dropped comment from database") + ":" + comment);
+                            LOGGER.info("Dropped comment from database: " + comment);
                         }
                     } else {
                         // The entry type was not recognized. This may mean that

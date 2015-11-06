@@ -55,6 +55,7 @@ class SearchManagerNoGUI {
                 Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
 
         if (!searchRule.validateSearchStrings(searchTerm)) {
+            // String also in SearchManager.java
             LOGGER.warn(Localization.lang("Search failed: illegal search expression"));
             return base;
         }

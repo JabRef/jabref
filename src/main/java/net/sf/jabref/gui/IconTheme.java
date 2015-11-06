@@ -16,7 +16,6 @@
 
 package net.sf.jabref.gui;
 
-import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -287,7 +286,7 @@ public class IconTheme {
                 result.put(key, value);
             }
         } catch (IOException e) {
-            LOGGER.warn(Localization.lang("Unable to read default icon theme."), e);
+            LOGGER.warn("Unable to read default icon theme.", e);
         }
         return result;
     }

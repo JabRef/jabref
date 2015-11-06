@@ -786,6 +786,7 @@ public class JabRef {
     }
 
     public static ParserResult openBibFile(String name, boolean ignoreAutosave) {
+        // String in OpenDatabaseAction.java
         LOGGER.info(Localization.lang("Opening") + ": " + name);
         File file = new File(name);
         if (!file.exists()) {
