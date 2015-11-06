@@ -432,8 +432,7 @@ class ManageJournalsPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             String chosen;
-            chosen = JOptionPane.showInputDialog(Localization.lang("Choose the URL to download. The default value points to a list provided by the JabRef developers."),
-                    "http://jabref.sf.net/journals/journal_abbreviations_general.txt");
+            chosen = JOptionPane.showInputDialog(Localization.lang("Choose the URL to download."), "");
             if (chosen == null) {
                 return;
             }
