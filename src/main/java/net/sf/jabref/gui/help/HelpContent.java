@@ -63,20 +63,7 @@ class HelpContent extends JTextPane {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 String link = e.getDescription();
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    lastStatusUpdateWasALink = false;
-                    // Handles Anchors
-                    if (link.startsWith("#")) {
-                        scrollToReference(link.substring(1));
-                    } else {
-                        if (link.startsWith("http")) {
-                            //  open all external URLs externally
-                            JabRef.jrf.openBrowser(link);
-                        } else {
-                            // nothing has to be done: JTextFrame handles internal links by itself
-                        }
-                    }
-                } else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
                     // show the link in the status bar - similar to Firefox behavior
                     JabRef.jrf.setStatus(link);
                     lastStatusUpdateWasALink = true;
@@ -95,7 +82,7 @@ class HelpContent extends JTextPane {
         if (!history.empty()) {
             URL prev = (history.pop());
             forw.push(getPage());
-            setPageOnly(prev);
+            setPageOnly(prev, null);
         }
         return !history.empty();
     }
@@ -104,7 +91,7 @@ class HelpContent extends JTextPane {
         if (!forw.empty()) {
             URL next = (forw.pop());
             history.push(getPage());
-            setPageOnly(next);
+            setPageOnly(next, null);
         }
         return !forw.empty();
     }
@@ -121,39 +108,35 @@ class HelpContent extends JTextPane {
         // Check for anchor
         int indexOf = filename.indexOf('#');
         String file;
-        String reference;
+        String anchorName = null;
 
         if (indexOf != -1) {
             file = filename.substring(0, indexOf);
-            reference = filename.substring(indexOf + 1);
+            anchorName = filename.substring(indexOf + 1);
         } else {
             file = filename;
-            reference = "";
         }
 
         String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
 
         URL old = getPage();
-        try {
-            // First check in specified language
-            URL resource = resourceOwner.getResource(GUIGlobals.helpPre + middle + file);
 
-            // If not available fallback to english
-            if (resource == null) {
-                resource = resourceOwner.getResource(GUIGlobals.helpPre + file);
-            }
+        // First check in specified language
+        URL resource = resourceOwner.getResource(GUIGlobals.helpPre + middle + file);
 
-            // If still not available print a warning
-            if (resource == null) {
-                // TODO show warning to user
-                HelpContent.LOGGER.error("Could not find html-help for file '" + file + "'.");
-                return;
-            }
-            setPageOnly(new URL(resource.toString() + '#' + reference));
-
-        } catch (IOException ex) {
-            LOGGER.warn("Problem when finding help files.", ex);
+        // If not available fallback to english
+        if (resource == null) {
+            resource = resourceOwner.getResource(GUIGlobals.helpPre + file);
         }
+
+        // If still not available print a warning
+        if (resource == null) {
+            // TODO show warning to user
+            HelpContent.LOGGER.error("Could not find html-help for file '" + file + "'.");
+            return;
+        }
+
+        setPageOnly(resource, anchorName);
 
         forw.removeAllElements();
         if (old != null) {
@@ -167,18 +150,35 @@ class HelpContent extends JTextPane {
      */
     @Override
     public void setPage(URL url) {
-        File f = new File(url.getPath());
-        setPage(f.getName(), JabRef.class);
+        if ("file".equals(url.getProtocol())) {
+            // Creating file by url.toString() and using file.getName() preserves anchors
+            File file = new File(url.toString());
+            setPage(file.getName(), JabRef.class);
+        } else {
+            //  open all external URLs externally
+            JabRef.jrf.openBrowser(url.toString());
+        }
     }
 
-    private void setPageOnly(URL url) {
+    private void setPageOnly(URL baseUrl, String anchorName) {
         try {
-            super.setPage(url);
-        } catch (IOException ex) {
-            if (url == null) {
-                System.out.println("Error: Help file not set");
+            URL url;
+            if(anchorName!=null) {
+                url = new URL(baseUrl.toString()+"#"+anchorName);
             } else {
-                System.out.println("Error: Help file not found '" + url.getFile() + '\'');
+                url = baseUrl;
+            }
+            super.setPage(url);
+            // if anchor is present - scroll to it
+            String stringUrl = url.toString();
+            if (stringUrl.contains("#")) {
+                scrollToReference(stringUrl.substring(stringUrl.indexOf("#")));
+            }
+        } catch (IOException ex) {
+            if (baseUrl == null) {
+                LOGGER.error("Error: Help file not set");
+            } else {
+                LOGGER.error("Error: Help file not found '" + baseUrl.getFile() + '\'');
             }
         }
     }
@@ -186,12 +186,5 @@ class HelpContent extends JTextPane {
     public JComponent getPane() {
         return pane;
     }
-
-    /*public void paintComponent(Graphics g) {
-    	Graphics2D g2 = (Graphics2D) g;
-    	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    	g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-    	super.paintComponent(g2);
-    }*/
 
 }
