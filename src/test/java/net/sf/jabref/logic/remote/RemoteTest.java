@@ -85,7 +85,7 @@ public class RemoteTest {
                     try {
                         socket.accept().getOutputStream().write("whatever".getBytes());
                     } catch (IOException e) {
-
+                        // Ignored
                     }
                 }
             }.start();

@@ -172,8 +172,6 @@ class KeyBindingsDialog extends JDialog {
                 }
             }
             // second key cannot be a modifiers
-            //if ( evt.isActionKey()) {
-            //Util.pr(code);
             if ( //code.equals("Escape")
             code.equals("Tab")
                     || code.equals("Backspace")
@@ -185,7 +183,6 @@ class KeyBindingsDialog extends JDialog {
                     || code.equals("Alt")) {
                 return;
             }
-            //}
             String newKey;
             if (!mod.equals("")) {
                 newKey = mod.toLowerCase().replaceAll("\\+", " ") + " " + code;
@@ -194,7 +191,7 @@ class KeyBindingsDialog extends JDialog {
                 newKey = code;
             }
             keyTF.setText(newKey);
-            //find which key is selected and set its value int the bindHM
+            //find which key is selected and set its value in the bindHM
             String selectedFunction = table.getOriginalName(selRow);
             table.setValueAt(newKey, selRow, 1);
             table.revalidate();

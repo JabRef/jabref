@@ -44,15 +44,14 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData,
-            final String file, final String encoding, Set<String> keySet) throws Exception {
+    public void performExport(final BibtexDatabase database, final MetaData metaData, final String file,
+            final String encoding, Set<String> keySet) throws Exception {
         OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, keySet);
     }
 
     private static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {
-        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
-        try {
+        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
 
             //addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");
@@ -82,24 +81,20 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             OpenDocumentSpreadsheetCreator.addResourceFile("meta.xml", "/resource/ods/meta.xml", out);
 
             OpenDocumentSpreadsheetCreator.addResourceFile("META-INF/manifest.xml", "/resource/ods/manifest.xml", out);
-
-            //zipEntry = new ZipEntry()
-
-        } finally {
-            out.close();
         }
     }
 
-    private static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database, Set<String> keySet) throws Exception {
+    private static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database, Set<String> keySet)
+            throws Exception {
 
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("opendocument", null);
         OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(tmpFile, database, keySet);
 
         // Then add the content to the zip file:
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile));
-        OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
-
+        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
+            OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
+        }
         // Delete the temporary file:
         tmpFile.delete();
     }

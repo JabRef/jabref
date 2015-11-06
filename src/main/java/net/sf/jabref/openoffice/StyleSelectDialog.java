@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -125,8 +125,8 @@ class StyleSelectDialog {
         init(initSelection);
     }
 
-    private void init(String initSelection) {
-        this.initSelection = initSelection;
+    private void init(String inSelection) {
+        this.initSelection = inSelection;
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(useDefaultAuthoryear);
@@ -588,14 +588,14 @@ class StyleSelectDialog {
             JScrollPane sp = new JScrollPane(ta);
             sp.setPreferredSize(new Dimension(700, 500));
             dd.getContentPane().add(sp, BorderLayout.CENTER);
-            JButton ok = new JButton(Localization.lang("Ok"));
+            JButton okButton = new JButton(Localization.lang("Ok"));
             ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
-            bb.addButton(ok);
+            bb.addButton(okButton);
             bb.addGlue();
             bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             dd.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-            ok.addActionListener(new ActionListener() {
+            okButton.addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {

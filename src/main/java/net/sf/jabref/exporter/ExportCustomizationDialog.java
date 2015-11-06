@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -127,7 +127,8 @@ public class ExportCustomizationDialog extends JDialog {
 
         JButton help = new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp).getIconButton();
 
-        EventTableModel<String[]> tableModel = new EventTableModel<String[]>(Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
+        EventTableModel<String[]> tableModel = new EventTableModel<>(Globals.prefs.customExports.getSortedList(),
+                new ExportTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_0_WIDTH);

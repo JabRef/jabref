@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,7 +15,12 @@
 */
 package net.sf.jabref.bst;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class BibtexCaseChanger {
+
+    private static final Log LOGGER = LogFactory.getLog(BibtexCaseChanger.class);
 
     // stores whether the char before the current char was a colon
     private boolean prevColon = true;
@@ -129,17 +134,17 @@ public class BibtexCaseChanger {
         return sb.toString();
     }
 
-    private int decrBraceLevel(String string, int braceLevel) {
-        if (braceLevel == 0) {
+    private int decrBraceLevel(String string, int bLevel) {
+        if (bLevel == 0) {
             BibtexCaseChanger.complain(string);
         } else {
-            braceLevel--;
+            bLevel--;
         }
-        return braceLevel;
+        return bLevel;
     }
 
     static void complain(String s) {
-        System.out.println("Warning -- String is not brace-balanced: " + s);
+        LOGGER.warn("String is not brace-balanced: " + s);
     }
 
     static void checkBrace(String s, int braceLevel) {
@@ -157,7 +162,7 @@ public class BibtexCaseChanger {
      * special character. In general, this code will do reasonably well if there
      * is other stuff, too, between braces, but it doesn't try to do anything
      * special with |colon|s.
-     * 
+     *
      * @param c
      * @param i the current position. It points to the opening brace
      * @param format
@@ -195,7 +200,7 @@ public class BibtexCaseChanger {
      * Convert the given string according to the format character (title, lower,
      * up) and append the result to the stringBuffer, return the updated
      * position.
-     * 
+     *
      * @param c
      * @param pos
      * @param s

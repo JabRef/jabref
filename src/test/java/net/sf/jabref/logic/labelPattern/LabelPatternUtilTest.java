@@ -62,9 +62,8 @@ public class LabelPatternUtilTest {
     }
 
     /**
-     * Test for https://sourceforge.net/forum/message.php?msg_id=4498555
-     * Test the Labelmaker and all kind of accents
-     * Á á Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
+     * Test for https://sourceforge.net/forum/message.php?msg_id=4498555 Test the Labelmaker and all kind of accents Á á
+     * Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
      */
     @Test
     public void testMakeLabelAndCheckLegalKeys() {
@@ -106,8 +105,7 @@ public class LabelPatternUtilTest {
     }
 
     /**
-     * Test the Labelmaker and with accent grave
-     * Chars to test: "ÀÈÌÒÙ";
+     * Test the Labelmaker and with accent grave Chars to test: "ÀÈÌÒÙ";
      */
     @Test
     public void testMakeLabelAndCheckLegalKeysAccentGrave() {
@@ -180,13 +178,11 @@ public class LabelPatternUtilTest {
         expectedResult = "DdHhLlLlMmNnRrRrSsTt";
         assertEquals(expectedResult, Util.checkLegalKey(accents));
 
-        String totest = "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    " +
-                "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ" +
-                " Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   " +
-                "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ" +
-                "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ   " +
-                "Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   " +
-                "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   ";
+        String totest = "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    "
+                + "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ"
+                + " Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   " + "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ"
+                + "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ   " + "Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   "
+                + "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   ";
         String expectedResults = "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYyAeaeEeIiOeoeUeueYy" +
                 "AaEeIiNnOoUuYyCcGgKkLlNnRrSsTt" +
                 "AaCcDdEeIiLlNnOoRrSsTtUuZz" +
@@ -215,7 +211,7 @@ public class LabelPatternUtilTest {
             LabelPatternUtil.firstAuthor(null);
             Assert.fail();
         } catch (NullPointerException ignored) {
-
+            // Ignored
         }
     }
 
@@ -247,7 +243,7 @@ public class LabelPatternUtilTest {
             LabelPatternUtil.authIniN(null, 3);
             Assert.fail();
         } catch (NullPointerException ignored) {
-
+            // Ignored
         }
     }
 
@@ -338,7 +334,7 @@ public class LabelPatternUtilTest {
     public void authN_MThrowsNPE() {
         LabelPatternUtil.authN_M(null, 2, 4);
     }
-    
+
     /**
      * Tests [authForeIni]
      */
@@ -537,7 +533,7 @@ public class LabelPatternUtilTest {
             LabelPatternUtil.firstPage(null);
             Assert.fail();
         } catch (NullPointerException ignored) {
-
+            // Ignored
         }
     }
 
@@ -555,7 +551,7 @@ public class LabelPatternUtilTest {
             LabelPatternUtil.lastPage(null);
             Assert.fail();
         } catch (NullPointerException ignored) {
-
+            // Ignored
         }
     }
 

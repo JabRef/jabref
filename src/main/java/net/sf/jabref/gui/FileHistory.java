@@ -133,7 +133,6 @@ public class FileHistory extends JMenu implements ActionListener {
         String name = ((JMenuItem) e.getSource()).getText();
         int pos = name.indexOf(" ");
         name = name.substring(pos + 1);
-        //Util.pr("'"+name+"'");
         final File fileToOpen = new File(name);
 
         if (!fileToOpen.exists()) {

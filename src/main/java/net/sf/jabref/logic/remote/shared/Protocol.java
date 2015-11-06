@@ -39,7 +39,7 @@ public class Protocol {
         int c;
         StringBuilder result = new StringBuilder();
         try {
-            while ((c = in.read()) != '\0' && c >= 0) {
+            while (((c = in.read()) != '\0') && (c >= 0)) {
                 result.append((char) c);
             }
         } catch (SocketTimeoutException ex) {
@@ -52,16 +52,19 @@ public class Protocol {
         try {
             in.close();
         } catch (IOException ignored) {
+            // Ignored
         }
 
         try {
             out.close();
         } catch (IOException ignored) {
+            // Ignored
         }
 
         try {
             socket.close();
         } catch (IOException ignored) {
+            // Ignored
         }
     }
 }
