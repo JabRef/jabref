@@ -401,7 +401,7 @@ public class JabRef {
             }
         }
 
-        //Util.pr(": Finished export");
+        LOGGER.debug(": Finished export");
 
         if (cli.isPreferencesExport()) {
             try {
@@ -660,7 +660,7 @@ public class JabRef {
                 new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY), Globals.prefs.getInt(JabRefPreferences.FONT_STYLE),
                         Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
 
-        //Util.pr(": Initializing frame");
+        LOGGER.debug(": Initializing frame");
         JabRef.jrf = new JabRefFrame(this);
 
         // Add all loaded databases to the frame:
@@ -770,7 +770,7 @@ public class JabRef {
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
         }
 
-        //Util.pr(": Finished adding panels");
+        LOGGER.debug(": Finished adding panels");
 
         // If any database loading was postponed due to an autosave, schedule them
         // for handing now:

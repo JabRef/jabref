@@ -2092,8 +2092,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         if (!currentFiles.contains(names[i])) {
                             File file = new File(names[i]);
                             if (file.exists()) {
-                                //Util.pr("Opening last edited file:"
-                                //+fileToOpen.getName());
+                                LOGGER.debug("Opening last edited file:" + file.getName());
                                 open.openIt(file, i == 0);
                             }
                         }
@@ -2115,7 +2114,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public ChangeTabAction(boolean next) {
             putValue(Action.NAME, next ? Localization.menuTitle("Next tab") : Localization.menuTitle("Previous tab"));
             this.next = next;
-            //Util.pr(""+prefs.getKey("Next tab"));
             putValue(Action.ACCELERATOR_KEY,
                     next ? prefs.getKey("Next tab") : prefs.getKey("Previous tab"));
         }
@@ -2156,7 +2154,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            //Util.pr(Globals.focusListener.getFocused().toString());
+            LOGGER.debug(Globals.focusListener.getFocused().toString());
             JComponent source = Globals.focusListener.getFocused();
             try {
                 source.getActionMap().get(command).actionPerformed(new ActionEvent(source, 0, command));

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -22,6 +22,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
@@ -32,6 +35,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 
 class EntryChange extends Change {
 
+    private static final Log LOGGER = LogFactory.getLog(EntryChange.class);
 
     public EntryChange(BibtexEntry memEntry, BibtexEntry tmpEntry, BibtexEntry diskEntry) {
         super();
@@ -50,10 +54,10 @@ class EntryChange extends Change {
         // in the same way. Check for this, too.
         boolean modificationsAgree = DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1;
 
-        //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
-        //        +" Modifications agree: "+modificationsAgree);
+        LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally
+                + " Modifications agree: " + modificationsAgree);
 
-        TreeSet<String> allFields = new TreeSet<String>();
+        TreeSet<String> allFields = new TreeSet<>();
         allFields.addAll(memEntry.getFieldNames());
         allFields.addAll(tmpEntry.getFieldNames());
         allFields.addAll(diskEntry.getFieldNames());
@@ -63,18 +67,16 @@ class EntryChange extends Change {
             String tmp = tmpEntry.getField(field);
             String disk = diskEntry.getField(field);
 
-            if (tmp != null && disk != null) {
+            if ((tmp != null) && (disk != null)) {
                 if (!tmp.equals(disk)) {
                     // Modified externally.
                     add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
                 }
-            } else if (tmp == null && disk != null && !disk.isEmpty() || disk == null && tmp != null && !tmp.isEmpty()
-                    && mem != null && !mem.isEmpty()) {
+            } else if (((tmp == null) && (disk != null) && !disk.isEmpty()) || ((disk == null) && (tmp != null) && !tmp.isEmpty()
+                    && (mem != null) && !mem.isEmpty())) {
                 // Added externally.
                 add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
             }
-
-            //Util.pr("Field: "+fld.next());
         }
     }
 
@@ -82,7 +84,6 @@ class EntryChange extends Change {
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         boolean allAccepted = true;
 
-        @SuppressWarnings("unchecked")
         Enumeration<Change> e = children();
         for (; e.hasMoreElements();) {
             Change c = e.nextElement();
@@ -133,16 +134,16 @@ class EntryChange extends Change {
             text.append("<FONT SIZE=10>");
             text.append("<H2>").append(Localization.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
 
-            if (onDisk != null && !onDisk.isEmpty()) {
+            if ((onDisk != null) && !onDisk.isEmpty()) {
                 text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + ' ').append(onDisk);
             } else {
                 text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
             }
 
-            if (inMem != null && !inMem.isEmpty()) {
+            if ((inMem != null) && !inMem.isEmpty()) {
                 text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + ' ').append(inMem);
             }
-            if (onTmp != null && !onTmp.isEmpty()) {
+            if ((onTmp != null) && !onTmp.isEmpty()) {
                 text.append("<H3>").append(Localization.lang("Current tmp value")).append(":</H3>" + ' ').append(onTmp);
             } else {
                 // No value in memory.

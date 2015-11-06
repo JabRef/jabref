@@ -246,7 +246,7 @@ public class BibtexEntry {
 
 
                 @Override
-                public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
+                public StringBuffer format(Date dDate, StringBuffer toAppendTo, FieldPosition fieldPosition) {
                     throw new UnsupportedOperationException();
                 }
 
@@ -362,13 +362,13 @@ public class BibtexEntry {
      * database argument is given, this method will try to look up missing fields in
      * entries linked by the "crossref" field, if any.
      *
-     * @param fields   An array of field names to be checked.
+     * @param allFields   An array of field names to be checked.
      * @param database The database in which to look up crossref'd entries, if any. This
      *                 argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    boolean allFieldsPresent(String[] fields, BibtexDatabase database) {
-        for (String field : fields) {
+    boolean allFieldsPresent(String[] allFields, BibtexDatabase database) {
+        for (String field : allFields) {
             if (BibtexDatabase.getResolvedField(field, this, database) == null) {
                 return false;
             }
@@ -376,12 +376,12 @@ public class BibtexEntry {
         return true;
     }
 
-    boolean allFieldsPresent(List<String> fields, BibtexDatabase database) {
-        return allFieldsPresent(fields.toArray(new String[0]), database);
+    boolean allFieldsPresent(List<String> allFields, BibtexDatabase database) {
+        return allFieldsPresent(allFields.toArray(new String[0]), database);
     }
 
-    boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
-        for (String field : fields) {
+    boolean atLeastOnePresent(String[] oneFields, BibtexDatabase database) {
+        for (String field : oneFields) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
             if ((value != null) && !value.isEmpty()) {
                 return true;

@@ -1776,7 +1776,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // if there is an entry editor open.
         /*splitPane.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
                 protected boolean accept(Component c) {
-                    Util.pr("jaa");
                     if (showing == null)
                         return super.accept(c);
                     else
@@ -1869,7 +1868,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             selectEntries(bes, 0);
 
     //long toc = System.currentTimeMillis();
-    //	Util.pr("Refresh took: "+(toc-tic)+" ms");
+    //	LOGGER.debug("Refresh took: "+(toc-tic)+" ms");
     } */
 
     public void updatePreamble() {
@@ -2529,7 +2528,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //  return;
         //}
         // to bad timing. If not, we'll handle it on the next polling.
-        //Util.pr("File '"+file.getPath()+"' has been modified.");
+        //LOGGER.debug("File '"+file.getPath()+"' has been modified.");
         updatedExternally = true;
 
         final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this, BasePanel.this.getFile());

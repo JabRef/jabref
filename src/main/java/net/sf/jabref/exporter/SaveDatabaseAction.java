@@ -82,17 +82,12 @@ public class SaveDatabaseAction extends AbstractWorker {
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, opts, opts[0]);
                 // @formatter:on
-                //  int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
-                // +"Are you sure you want to save?"), Globals.lang("File updated externally"),
-                // JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
                 if (answer == JOptionPane.CANCEL_OPTION) {
                     cancelled = true;
                     return;
                 }
                 else if (answer == JOptionPane.YES_OPTION) {
-                    //try {
-
                     cancelled = true;
 
                     JabRefExecutorService.INSTANCE.execute(new Runnable() {
@@ -194,10 +189,6 @@ public class SaveDatabaseAction extends AbstractWorker {
             else {
                 // Now save the database:
                 success = saveDatabase(panel.getFile(), false, panel.getEncoding());
-
-                //Util.pr("Testing resolve string... BasePanel line 237");
-                //Util.pr("Resolve aq: "+database.resolveString("aq"));
-                //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
 
                 try {
                     Globals.fileUpdateMonitor.updateTimeStamp(panel.getFileMonitorHandle());

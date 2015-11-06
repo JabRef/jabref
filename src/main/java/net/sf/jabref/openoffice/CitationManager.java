@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -42,8 +42,8 @@ class CitationManager {
     private final OOBibBase ooBase;
     private final JDialog diag;
     private final EventList<CitEntry> list;
-    private JTable table;
-    private EventTableModel<CitEntry> tableModel;
+    private final JTable table;
+    private final EventTableModel<CitEntry> tableModel;
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
@@ -52,7 +52,7 @@ class CitationManager {
         diag = new JDialog(frame, Localization.lang("Manage citations"), true);
         this.ooBase = ooBase;
 
-        list = new BasicEventList<CitEntry>();
+        list = new BasicEventList<>();
         XNameAccess nameAccess = ooBase.getReferenceMarks();
         String[] names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
@@ -61,7 +61,7 @@ class CitationManager {
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
-        tableModel = new EventTableModel<CitEntry>(list, new CitEntryFormat());
+        tableModel = new EventTableModel<>(list, new CitEntryFormat());
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -143,7 +143,7 @@ class CitationManager {
             StringBuilder sb = new StringBuilder();
             for (int j = 0; j < keys.size(); j++) {
                 sb.append(keys.get(j));
-                if (j < keys.size() - 1) {
+                if (j < (keys.size() - 1)) {
                     sb.append(", ");
                 }
             }
@@ -151,8 +151,8 @@ class CitationManager {
         }
 
         public boolean pageInfoChanged() {
-            if (pageInfo != null && origPageInfo == null
-                    || pageInfo == null && origPageInfo != null) {
+            if (((pageInfo != null) && (origPageInfo == null))
+                    || ((pageInfo == null) && (origPageInfo != null))) {
                 return true;
             }
             if (pageInfo != null) {
@@ -202,7 +202,7 @@ class CitationManager {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+            if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
                 int row = table.rowAtPoint(e.getPoint());
                 if (row >= 0) {
                     SingleCitDialog scd = new SingleCitDialog(list.get(row));
@@ -216,11 +216,11 @@ class CitationManager {
 
     class SingleCitDialog {
 
-        final JDialog diag;
+        final JDialog singleCiteDialog;
         final JTextField pageInfo = new JTextField(20);
         final JLabel title;
-        final JButton ok = new JButton(Localization.lang("Ok"));
-        final JButton cancel = new JButton(Localization.lang("Cancel"));
+        final JButton okButton = new JButton(Localization.lang("Ok"));
+        final JButton cancelButton = new JButton(Localization.lang("Cancel"));
         final CitEntry _entry;
 
 
@@ -229,7 +229,7 @@ class CitationManager {
             title = new JLabel(entry.context);
             pageInfo.setText(entry.pageInfo);
 
-            diag = new JDialog(CitationManager.this.diag, Localization.lang("Citation"), true);
+            singleCiteDialog = new JDialog(CitationManager.this.diag, Localization.lang("Citation"), true);
 
             DefaultFormBuilder b = new DefaultFormBuilder(
                     new FormLayout("left:pref, 4dlu, left:150dlu", ""));
@@ -238,15 +238,15 @@ class CitationManager {
             b.append(Localization.lang("Extra information (e.g. page number)"));
             b.append(pageInfo);
             b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            diag.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
+            singleCiteDialog.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
 
             ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
-            bb.addButton(ok);
-            bb.addButton(cancel);
+            bb.addButton(okButton);
+            bb.addButton(cancelButton);
             bb.addGlue();
             bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            diag.add(bb.getPanel(), BorderLayout.SOUTH);
+            singleCiteDialog.add(bb.getPanel(), BorderLayout.SOUTH);
 
             Action okAction = new AbstractAction() {
 
@@ -258,19 +258,19 @@ class CitationManager {
                         _entry.pageInfo = null;
                     }
                     tableModel.fireTableDataChanged();
-                    diag.dispose();
+                    singleCiteDialog.dispose();
                 }
             };
-            ok.addActionListener(okAction);
+            okButton.addActionListener(okAction);
 
             Action cancelAction = new AbstractAction() {
 
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    diag.dispose();
+                    singleCiteDialog.dispose();
                 }
             };
-            cancel.addActionListener(cancelAction);
+            cancelButton.addActionListener(cancelAction);
 
             b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
                     (Globals.prefs.getKey("Close dialog"), "close");
@@ -279,9 +279,9 @@ class CitationManager {
         }
 
         public void showDialog() {
-            diag.pack();
-            diag.setLocationRelativeTo(diag.getParent());
-            diag.setVisible(true);
+            singleCiteDialog.pack();
+            singleCiteDialog.setLocationRelativeTo(singleCiteDialog.getParent());
+            singleCiteDialog.setVisible(true);
         }
     }
 }

@@ -68,7 +68,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Generic class which activates Emacs keybindings for java input {@link
  * JTextComponent}s.
- * 
+ *
  * The inner class actions can also be used independently.
  */
 public class EmacsKeyBindings
@@ -230,8 +230,8 @@ public class EmacsKeyBindings
 
     /**
      * Loads the emacs keybindings for all common <code>JTextComponent</code>s.
-     * 
-     * The shared keymap instances of the concrete subclasses of 
+     *
+     * The shared keymap instances of the concrete subclasses of
      * {@link JTextComponent} are fed with the keybindings.
      *
      * The original keybindings are stored in a backup array.
@@ -346,9 +346,9 @@ public class EmacsKeyBindings
 
     /**
      * This action kills the next word.
-     * 
+     *
      * It removes the next word on the right side of the cursor from the active
-     * text component and adds it to the clipboard. 
+     * text component and adds it to the clipboard.
      */
     @SuppressWarnings("serial")
     public static class KillWordAction extends TextAction
@@ -380,8 +380,8 @@ public class EmacsKeyBindings
 
     /**
      * This action kills the previous word.
-     * 
-     * It removes the previous word on the left side of the cursor from the 
+     *
+     * It removes the previous word on the left side of the cursor from the
      * active text component and adds it to the clipboard.
      */
     @SuppressWarnings("serial")
@@ -492,7 +492,7 @@ public class EmacsKeyBindings
 
 
     /**
-     * This actin kills text up to the end of the current line and stores it in 
+     * This actin kills text up to the end of the current line and stores it in
      * the killring.
      */
     @SuppressWarnings("serial")
@@ -512,7 +512,7 @@ public class EmacsKeyBindings
                 try {
                     int start = jtc.getCaretPosition();
                     int end = Utilities.getRowEnd(jtc, start);
-                    if (start == end && jtc.isEditable()) {
+                    if ((start == end) && jtc.isEditable()) {
                         Document doc = jtc.getDocument();
                         doc.remove(end, 1);
                     }
@@ -557,7 +557,7 @@ public class EmacsKeyBindings
 
         public static boolean isMarked(JTextComponent jt)
         {
-            return SetMarkCommandAction.jtc == jt && SetMarkCommandAction.position != -1;
+            return (SetMarkCommandAction.jtc == jt) && (SetMarkCommandAction.position != -1);
         }
 
         public static void reset()
@@ -601,6 +601,7 @@ public class EmacsKeyBindings
                     KillRing.getInstance().add(jtc.getText(YankAction.start, YankAction.end));
                     KillRing.getInstance().setCurrentTextComponent(jtc);
                 } catch (Exception ignored) {
+                    // Ignored
                 }
             }
         }
@@ -645,13 +646,13 @@ public class EmacsKeyBindings
      * Manages all killed (cut) text pieces in a ring which is accessible
      * through {@link YankPopAction}.
      * <p>
-     * Also provides an unmodifiable copy of all cut pieces. 
+     * Also provides an unmodifiable copy of all cut pieces.
      */
     public static class KillRing
     {
 
         private JTextComponent jtc;
-        private final LinkedList<String> ring = new LinkedList<String>();
+        private final LinkedList<String> ring = new LinkedList<>();
         Iterator<String> iter = ring.iterator();
 
         private static final KillRing instance = new KillRing();
@@ -675,7 +676,7 @@ public class EmacsKeyBindings
         /**
          * Adds text to the front of the kill ring.
          * <p>
-         * Deviating from the Emacs implementation we make sure the 
+         * Deviating from the Emacs implementation we make sure the
          * exact same text is not somewhere else in the ring.
          */
         void add(String text)

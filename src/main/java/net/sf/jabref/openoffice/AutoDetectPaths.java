@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -136,7 +136,7 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            if (unoil != null && jurt != null) {
+            if ((unoil != null) && (jurt != null)) {
                 Globals.prefs.put("ooUnoilPath", unoil.getPath());
                 Globals.prefs.put("ooJurtPath", jurt.getPath());
                 return true;
@@ -175,7 +175,7 @@ public class AutoDetectPaths extends AbstractWorker {
                 if (fileSearchCancelled) {
                     return false;
                 }
-                if (unoil != null && jurt != null) {
+                if ((unoil != null) && (jurt != null)) {
                     Globals.prefs.put("ooUnoilPath", unoil.getPath());
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
@@ -207,14 +207,14 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            if (inUsr != null && inOpt == null) {
+            if ((inUsr != null) && (inOpt == null)) {
                 return setupPreferencesForOO(usrRoot, inUsr);
             }
-            else if (inOpt != null && inUsr == null) {
+            else if ((inOpt != null) && (inUsr == null)) {
                 Globals.prefs.put("ooExecutablePath", new File(inOpt, "soffice.bin").getPath());
                 File unoil = findFileDir(new File("/opt"), "unoil.jar");
                 File jurt = findFileDir(new File("/opt"), "jurt.jar");
-                if (unoil != null && jurt != null) {
+                if ((unoil != null) && (jurt != null)) {
                     Globals.prefs.put("ooUnoilPath", unoil.getPath());
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
@@ -262,7 +262,7 @@ public class AutoDetectPaths extends AbstractWorker {
         if (fileSearchCancelled) {
             return false;
         }
-        if (unoil != null && jurt != null) {
+        if ((unoil != null) && (jurt != null)) {
             Globals.prefs.put("ooUnoilPath", unoil.getPath());
             Globals.prefs.put("ooJurtPath", jurt.getPath());
             return true;
@@ -278,7 +278,7 @@ public class AutoDetectPaths extends AbstractWorker {
      *   find the Program files dir in localized Windows installations.
      */
     private static java.util.List<File> findProgramFilesDir() {
-        List<File> dirList = new ArrayList<File>();
+        List<File> dirList = new ArrayList<>();
         File root = new File("C:\\");
         File[] dirs = root.listFiles(new FileFilter() {
 
@@ -339,9 +339,9 @@ public class AutoDetectPaths extends AbstractWorker {
         return result;
     }
 
-    public JDialog showProgressDialog(JDialog parent, String title, String message, boolean includeCancelButton) {
+    public JDialog showProgressDialog(JDialog progressParent, String title, String message, boolean includeCancelButton) {
         fileSearchCancelled = false;
-        final JDialog prog;
+        final JDialog progressDialog;
         JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(new ActionListener() {
@@ -352,21 +352,21 @@ public class AutoDetectPaths extends AbstractWorker {
                 ((JButton) event.getSource()).setEnabled(false);
             }
         });
-        prog = new JDialog(parent, title, false);
+        progressDialog = new JDialog(progressParent, title, false);
         bar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         bar.setIndeterminate(true);
         if (includeCancelButton) {
-            prog.add(cancel, BorderLayout.SOUTH);
+            progressDialog.add(cancel, BorderLayout.SOUTH);
         }
-        prog.add(new JLabel(message), BorderLayout.NORTH);
-        prog.add(bar, BorderLayout.CENTER);
-        prog.pack();
-        prog.setLocationRelativeTo(null);//parent);
+        progressDialog.add(new JLabel(message), BorderLayout.NORTH);
+        progressDialog.add(bar, BorderLayout.CENTER);
+        progressDialog.pack();
+        progressDialog.setLocationRelativeTo(null);//parent);
         //SwingUtilities.invokeLater(new Runnable() {
         //    public void run() {
-        prog.setVisible(true);
+        progressDialog.setVisible(true);
         //    }
         //});
-        return prog;
+        return progressDialog;
     }
 }

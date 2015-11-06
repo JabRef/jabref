@@ -169,9 +169,6 @@ class PreventDraggingJTableHeader extends JTableHeader {
             // found the element in the view ...
             // ... and check if it should not be dragged
             if ((col.getModelIndex() == mColIndex) && (c <= toIndex)) {
-                // Util.pr("prevented! viewIndex = " + c + " modelIndex = "
-                // + mColIndex + " toIndex = " + toIndex);
-
                 // prevent dragging (move it back ...)
                 table.getColumnModel().moveColumn(toIndex, toIndex + 1);
                 return; // we are done now
