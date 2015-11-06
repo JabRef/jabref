@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -34,11 +34,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Customized UI component for pushing to external applications. Has a selection popup
- * menu to change the selected external application.
- * This class implements the ActionListener interface. When actionPerformed() is
- * invoked, the currently selected PushToApplication is activated. The actionPerformed()
- * method can be called with a null argument.
+ * Customized UI component for pushing to external applications. Has a selection popup menu to change the selected
+ * external application. This class implements the ActionListener interface. When actionPerformed() is invoked, the
+ * currently selected PushToApplication is activated. The actionPerformed() method can be called with a null argument.
  */
 public class PushToApplicationButton implements ActionListener {
 
@@ -56,9 +54,10 @@ public class PushToApplicationButton implements ActionListener {
     private final JPopupMenu optPopup = new JPopupMenu();
     private final JMenuItem settings = new JMenuItem(Localization.lang("Settings"));
 
-    public PushToApplicationButton(JabRefFrame frame, List<PushToApplication> pushActions) {
-        this.frame = frame;
-        this.pushActions = pushActions;
+
+    public PushToApplicationButton(JabRefFrame frameJR, List<PushToApplication> pushActionsList) {
+        frame = frameJR;
+        pushActions = pushActionsList;
         init();
     }
 
@@ -68,19 +67,18 @@ public class PushToApplicationButton implements ActionListener {
 
         menuButton = new JButton(PushToApplicationButton.ARROW_ICON);
         menuButton.setMargin(new Insets(0, 0, 0, 0));
-        menuButton.setPreferredSize(new Dimension(menuButton.getIcon().getIconWidth(),
-                menuButton.getIcon().getIconHeight()));
+        menuButton.setPreferredSize(
+                new Dimension(menuButton.getIcon().getIconWidth(), menuButton.getIcon().getIconHeight()));
         menuButton.addActionListener(new MenuButtonActionListener());
         menuButton.setToolTipText(Localization.lang("Select external application"));
         pushButton = new JButton();
-        if (Globals.prefs.hasKey("pushToApplication")) {
-            String appSelected = Globals.prefs.get("pushToApplication");
-            for (int i = 0; i < pushActions.size(); i++) {
-                PushToApplication toApp = pushActions.get(i);
-                if (toApp.getName().equals(appSelected)) {
-                    selected = i;
-                    break;
-                }
+
+        // Set the last used external application
+        String appSelected = Globals.prefs.get(Globals.prefs.PUSH_TO_APPLICATION);
+        for (int i = 0; i < pushActions.size(); i++) {
+            if (pushActions.get(i).getApplicationName().equals(appSelected)) {
+                selected = i;
+                break;
             }
         }
 
@@ -92,7 +90,6 @@ public class PushToApplicationButton implements ActionListener {
         comp.setOpaque(false);
         comp.add(pushButton, BorderLayout.CENTER);
         comp.add(menuButton, BorderLayout.EAST);
-        //comp.setBorder(BorderFactory.createLineBorder(Color.gray));
         comp.setMaximumSize(comp.getPreferredSize());
 
         optPopup.add(settings);
@@ -119,8 +116,7 @@ public class PushToApplicationButton implements ActionListener {
         popup = new JPopupMenu();
         int j = 0;
         for (PushToApplication application : pushActions) {
-            JMenuItem item = new JMenuItem(application.getApplicationName(),
-                    application.getIcon());
+            JMenuItem item = new JMenuItem(application.getApplicationName(), application.getIcon());
             item.setToolTipText(application.getTooltip());
             item.addActionListener(new PopupItemActionListener(j));
             popup.add(item);
@@ -130,22 +126,26 @@ public class PushToApplicationButton implements ActionListener {
 
     /**
      * Update the PushButton to default to the given application.
+     *
      * @param i The List index of the application to default to.
      */
     private void setSelected(int i) {
-        this.selected = i;
+        selected = i;
         PushToApplication toApp = pushActions.get(i);
         pushButton.setIcon(toApp.getIcon());
         pushButton.setToolTipText(toApp.getTooltip());
         pushButton.setPreferredSize(buttonDim);
 
-        Globals.prefs.put("pushToApplication", toApp.getName());
+        // Store the last used application
+        Globals.prefs.put(Globals.prefs.PUSH_TO_APPLICATION, toApp.getApplicationName());
+
         mAction.setTitle(toApp.getApplicationName());
         mAction.setIcon(toApp.getIcon());
     }
 
     /**
      * Get the toolbar component for the push button.
+     *
      * @return The component.
      */
     public Component getComponent() {
@@ -172,8 +172,8 @@ public class PushToApplicationButton implements ActionListener {
 
     static class BooleanHolder {
 
-        public BooleanHolder(boolean value) {
-            this.value = value;
+        public BooleanHolder(boolean val) {
+            value = val;
         }
 
 
@@ -223,8 +223,6 @@ public class PushToApplicationButton implements ActionListener {
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
 
-            private static final long serialVersionUID = -4839826710086306753L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
@@ -251,8 +249,8 @@ public class PushToApplicationButton implements ActionListener {
         private final int index;
 
 
-        public PopupItemActionListener(int index) {
-            this.index = index;
+        public PopupItemActionListener(int idx) {
+            index = idx;
         }
 
         @Override
@@ -280,8 +278,6 @@ public class PushToApplicationButton implements ActionListener {
     }
 
     class MenuAction extends MnemonicAwareAction {
-
-        private static final long serialVersionUID = -4339280220347418559L;
 
         public MenuAction() {
             putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Push to application"));
