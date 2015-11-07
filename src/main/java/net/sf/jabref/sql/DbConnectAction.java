@@ -28,9 +28,9 @@ import java.awt.event.ActionEvent;
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 27, 2008 Time: 6:05:13 PM To
  * change this template use File | Settings | File Templates.
- * 
+ *
  * Jan 20th Adjusted to accomodate changes on SQL Exporter module by ifsteinm
- * 
+ *
  */
 public class DbConnectAction implements BaseAction {
 
@@ -91,12 +91,10 @@ public class DbConnectAction implements BaseAction {
                 String errorMessage = SQLUtil.getExceptionMessage(ex);
                 dbs.isConfigValid(false);
 
-                String preamble = "Could not connect to SQL database for the following reason:";
-                panel.frame().output(
-                        Localization.lang(preamble) + "  " + errorMessage);
+                String preamble = Localization.lang("Could not connect to SQL database for the following reason:");
+                panel.frame().output(preamble + "  " + errorMessage);
 
-                JOptionPane.showMessageDialog(panel.frame(),
-                        Localization.lang(preamble) + '\n' + errorMessage,
+                JOptionPane.showMessageDialog(panel.frame(), preamble + '\n' + errorMessage,
                         Localization.lang("Connect to SQL database"),
                         JOptionPane.ERROR_MESSAGE);
             } finally {

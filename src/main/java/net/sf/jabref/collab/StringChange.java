@@ -33,7 +33,6 @@ import net.sf.jabref.gui.undo.UndoableStringChange;
 
 class StringChange extends Change {
 
-    private static final long serialVersionUID = 1L;
     private final BibtexString string;
     private final String mem;
     private final String disk;
@@ -47,8 +46,8 @@ class StringChange extends Change {
 
 
     public StringChange(BibtexString string, BibtexString tmpString, String label, String mem, String disk) {
+        super(Localization.lang("Modified string") + ": '" + label + '\'');
         this.tmpString = tmpString;
-        name = Localization.lang("Modified string") + ": '" + label + '\'';
         this.string = string;
         this.label = label;
         this.mem = mem;

@@ -170,6 +170,11 @@ public class DbImportAction extends AbstractWorker {
                                     frame.output(Localization.lang("Importing cancelled"));
                                 }
                             }
+<<<<<<< HEAD
+=======
+                            frame.output(Localization.lang("%0 databases will be imported",
+                                    Integer.toString(databases.size())));
+>>>>>>> Fixed a number of false positive translation strings and cleaned up some parts related to translations
                         } else {
                             JOptionPane.showMessageDialog(frame,
                                     Localization.lang("There are no available databases to be imported"),
@@ -178,7 +183,7 @@ public class DbImportAction extends AbstractWorker {
                     }
                 }
             } catch (Exception ex) {
-                String preamble = "Could not import from SQL database for the following reason:";
+                String preamble = Localization.lang("Could not import from SQL database for the following reason:");
                 String errorMessage = SQLUtil.getExceptionMessage(ex);
                 dbs.isConfigValid(false);
                 JOptionPane.showMessageDialog(frame, Localization.lang(preamble) + '\n' + errorMessage,

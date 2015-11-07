@@ -305,8 +305,11 @@ public class JabRefDesktop {
             String link, UnknownExternalFileType fileType) throws IOException {
 
         String cancelMessage = Localization.lang("Unable to open file.");
+        // @formatter:off
         String[] options = new String[] {Localization.lang("Define '%0'", fileType.getName()),
-                Localization.lang("Change file type"), Localization.lang("Cancel")};
+                Localization.lang("Change file type"),
+                Localization.lang("Cancel")};
+        // @formatter:on
         String defOption = options[0];
         int answer = JOptionPane.showOptionDialog(frame, Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
                         fileType.getName()),

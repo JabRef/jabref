@@ -161,7 +161,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return col == 0 ? Localization.lang("Field name") : Localization.lang("Column width");
+                // @formatter:off
+                return col == 0 ? Localization.lang("Field name") :
+                    Localization.lang("Column width");
+                // @formatter:on
             }
 
             @Override

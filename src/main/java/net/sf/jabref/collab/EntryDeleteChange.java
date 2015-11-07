@@ -26,6 +26,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -41,7 +42,7 @@ class EntryDeleteChange extends Change {
 
 
     public EntryDeleteChange(BibtexEntry memEntry, BibtexEntry tmpEntry) {
-        super("Deleted entry");
+        super(Localization.lang("Deleted entry"));
         this.memEntry = memEntry;
         this.tmpEntry = tmpEntry;
 

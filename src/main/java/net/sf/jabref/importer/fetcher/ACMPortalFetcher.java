@@ -170,7 +170,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             status.showMessage(Localization.lang("Connection to ACM Portal failed"),
                     Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang(e.getMessage()),
+            status.showMessage(e.getMessage(),
                     Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }

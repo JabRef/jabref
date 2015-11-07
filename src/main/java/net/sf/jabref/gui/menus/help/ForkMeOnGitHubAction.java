@@ -41,7 +41,8 @@ public class ForkMeOnGitHubAction extends AbstractAction {
             JabRefDesktop.openBrowser("https://github.com/JabRef/jabref");
         } catch (IOException ex) {
             ex.printStackTrace();
-            JabRef.jrf.basePanel().output(Localization.lang("Could not open browser.") + " " + Localization.lang("Please open http://github.com/JabRef/jabref manually."));
+            JabRef.jrf.basePanel().output(Localization.lang("Could not open browser.") + " "
+                    + Localization.lang("Please open http://github.com/JabRef/jabref manually."));
         }
     }
 }

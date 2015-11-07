@@ -54,8 +54,11 @@ public class GroupAddRemoveDialog implements BaseAction {
         selection = panel.getSelectedEntries();
 
         final JDialog diag = new JDialog(panel.frame(),
-                Localization.lang(add ? (move ? "Move to group" : "Add to group")
-                        : "Remove from group"), true);
+                // @formatter:off
+                (add ? (move ? Localization.lang("Move to group") :
+                    Localization.lang("Add to group")) :
+                    Localization.lang("Remove from group")), true);
+                // formatter:on
         ok = new JButton(Localization.lang("Ok"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         tree = new JTree(groups);

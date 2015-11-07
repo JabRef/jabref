@@ -369,7 +369,7 @@ public class PdfImporter {
                 new FocusRequester(panel.getEntryEditor(be));
                 return be;
             } catch (KeyCollisionException ex) {
-                LOGGER.info("Key collision occured", ex);
+                LOGGER.info("Key collision occurred", ex);
             }
         }
         return null;

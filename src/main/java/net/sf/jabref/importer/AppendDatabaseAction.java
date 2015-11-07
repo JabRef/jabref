@@ -112,7 +112,8 @@ public class AppendDatabaseAction implements BaseAction {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog
                 (panel, ex.getMessage(),
-                        "Open database", JOptionPane.ERROR_MESSAGE);
+ Localization.lang("Open database"),
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }

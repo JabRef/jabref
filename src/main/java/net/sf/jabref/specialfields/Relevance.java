@@ -29,9 +29,12 @@ public class Relevance extends SpecialField {
 
     private Relevance() {
         ArrayList<SpecialFieldValue> values = new ArrayList<>();
+        // @formatter:off
         // action directly set by JabRefFrame
         // DO NOT TRANSLATE "relevant" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Localization.lang("Toggle relevance"), IconTheme.JabRefIcon.RELEVANCE.getSmallIcon(), Localization.lang("Toggle relevance")));
+        values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Localization.lang("Toggle relevance"), IconTheme.JabRefIcon.RELEVANCE.getSmallIcon(),
+                Localization.lang("Toggle relevance")));
+        // @formatter:on
         this.setValues(values);
         TEXT_DONE_PATTERN = "Toggled relevance for %0 entries";
     }

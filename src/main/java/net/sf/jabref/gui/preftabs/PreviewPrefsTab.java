@@ -51,9 +51,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final JButton testButton2 = new JButton(Localization.lang("Test"));
     private final JButton defaultButton2 = new JButton(Localization.lang("Default"));
 
-
     private final JPanel pdfPreviewPanel = new JPanel(new BorderLayout());
-
 
     private final JCheckBox pdfPreview = new JCheckBox(Localization.lang("Enable PDF preview"));
     private final JPanel firstPanel = new JPanel();
@@ -157,7 +155,8 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
             public void actionPerformed(ActionEvent e) {
                 String tmp = layout1.getText().replaceAll("\n", "__NEWLINE__");
                 PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_0);
-                layout1.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
+                layout1.setText(
+                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
                 PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_0, tmp);
             }
         });
@@ -167,7 +166,8 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
             public void actionPerformed(ActionEvent e) {
                 String tmp = layout2.getText().replaceAll("\n", "__NEWLINE__");
                 PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_1);
-                layout2.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
+                layout2.setText(
+                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
                 PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_1, tmp);
             }
         });
@@ -178,13 +178,18 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
             public void actionPerformed(ActionEvent e) {
                 PreviewPrefsTab.getTestEntry();
                 try {
-                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(), layout1.getText());
+                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
+                            layout1.getText());
                     testPanel.setPreferredSize(new Dimension(800, 350));
                     JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"),
                             JOptionPane.PLAIN_MESSAGE);
                 } catch (StringIndexOutOfBoundsException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage() + '\n' + Localization.lang("Look at stderr for details") + '.', Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            Localization.lang("Parsing error") + ": "
+                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage() + '\n'
+                                    + Localization.lang("Look at stderr for details") + '.',
+                            Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -195,13 +200,18 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
             public void actionPerformed(ActionEvent e) {
                 PreviewPrefsTab.getTestEntry();
                 try {
-                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(), layout2.getText());
+                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
+                            layout2.getText());
                     testPanel.setPreferredSize(new Dimension(800, 350));
-                    JOptionPane.showMessageDialog(null, new JScrollPane(testPanel),
-                            Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Localization.lang("Preview"),
+                            JOptionPane.PLAIN_MESSAGE);
                 } catch (StringIndexOutOfBoundsException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Parsing error: illegal backslash expression.\n" + ex.getMessage() + "\nLook at stderr for details.", "Parsing error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane
+                            .showMessageDialog(null,
+                                    "Parsing error: illegal backslash expression.\n" + ex.getMessage()
+                                            + "\nLook at stderr for details.",
+                                    "Parsing error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -213,14 +223,10 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         }
         PreviewPrefsTab.entry = new BibtexEntry(IdGenerator.next(), BibtexEntryType.getType("article"));
         PreviewPrefsTab.entry.setField(BibtexEntry.KEY_FIELD, "conceicao1997");
-        PreviewPrefsTab.entry
-                .setField(
-                        "author",
-                        "Luis E. C. Conceic{\\~a}o and Terje van der Meeren and Johan A. J. Verreth and M S. Evjen and D. F. Houlihan and H. J. Fyhn");
-        PreviewPrefsTab.entry
-                .setField(
-                        "title",
-                        "Amino acid metabolism and protein turnover in larval turbot (Scophthalmus maximus) fed natural zooplankton or Artemia");
+        PreviewPrefsTab.entry.setField("author",
+                "Luis E. C. Conceic{\\~a}o and Terje van der Meeren and Johan A. J. Verreth and M S. Evjen and D. F. Houlihan and H. J. Fyhn");
+        PreviewPrefsTab.entry.setField("title",
+                "Amino acid metabolism and protein turnover in larval turbot (Scophthalmus maximus) fed natural zooplankton or Artemia");
         PreviewPrefsTab.entry.setField("year", "1997");
         PreviewPrefsTab.entry.setField("journal", "Marine Biology");
         PreviewPrefsTab.entry.setField("month", "January");
@@ -229,31 +235,28 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         PreviewPrefsTab.entry.setField("pdf", "conceicao1997.pdf");
         PreviewPrefsTab.entry.setField("pages", "255--265");
         PreviewPrefsTab.entry.setField("keywords", "energetics, artemia, metabolism, amino acid, turbot");
-        PreviewPrefsTab.entry.setField("url",
-                "http://ejournals.ebsco.com/direct.asp?ArticleID=TYY4NT82XA9H7R8PFPPV");
-        PreviewPrefsTab.entry
-                .setField(
-                        "abstract",
-                        "Abstract The present paper studied the influence of different food regimes "
-                                + "on the free amino acid (FAA) pool, the rate of protein turnover, the flux of amino acids, and "
-                                + "their relation to growth of larval turbot (Scophthalmus maximus L.) from first feeding until "
-                                + "metamorphosis. The amino acid profile of protein was stable during the larval period although "
-                                + "some small, but significant, differences were found. Turbot larvae had proteins which were rich "
-                                + "in leucine and aspartate, and poor in glutamate, suggesting a high leucine requirement. The "
-                                + "profile of the FAA pool was highly variable and quite different from the amino acid profile in "
-                                + "protein. The proportion of essential FAA decreased with development. High contents of free tyrosine "
-                                + "and phenylalanine were found on Day 3, while free taurine was present at high levels throughout "
-                                + "the experimental period. Larval growth rates were positively correlated with taurine levels, "
-                                + "suggesting a dietary dependency for taurine and/or sulphur amino acids.\n\nReduced growth rates in "
-                                + "Artemia-fed larvae were associated with lower levels of free methionine, indicating that this diet "
-                                + "is deficient in methionine for turbot larvae. Leucine might also be limiting turbot growth as the "
-                                + "different diet organisms had lower levels of this amino acid in the free pool than was found in the "
-                                + "larval protein. A previously presented model was used to describe the flux of amino acids in growing "
-                                + "turbot larvae. The FAA pool was found to be small and variable. It was estimated that the daily dietary "
-                                + "amino acid intake might be up to ten times the larval FAA pool. In addition, protein synthesis and "
-                                + "protein degradation might daily remove and return, respectively, the equivalent of up to 20 and 10 "
-                                + "times the size of the FAA pool. In an early phase (Day 11) high growth rates were associated with a "
-                                + "relatively low protein turnover, while at a later stage (Day 17), a much higher turnover was observed.");
+        PreviewPrefsTab.entry.setField("url", "http://ejournals.ebsco.com/direct.asp?ArticleID=TYY4NT82XA9H7R8PFPPV");
+        PreviewPrefsTab.entry.setField("abstract",
+                "Abstract The present paper studied the influence of different food regimes "
+                        + "on the free amino acid (FAA) pool, the rate of protein turnover, the flux of amino acids, and "
+                        + "their relation to growth of larval turbot (Scophthalmus maximus L.) from first feeding until "
+                        + "metamorphosis. The amino acid profile of protein was stable during the larval period although "
+                        + "some small, but significant, differences were found. Turbot larvae had proteins which were rich "
+                        + "in leucine and aspartate, and poor in glutamate, suggesting a high leucine requirement. The "
+                        + "profile of the FAA pool was highly variable and quite different from the amino acid profile in "
+                        + "protein. The proportion of essential FAA decreased with development. High contents of free tyrosine "
+                        + "and phenylalanine were found on Day 3, while free taurine was present at high levels throughout "
+                        + "the experimental period. Larval growth rates were positively correlated with taurine levels, "
+                        + "suggesting a dietary dependency for taurine and/or sulphur amino acids.\n\nReduced growth rates in "
+                        + "Artemia-fed larvae were associated with lower levels of free methionine, indicating that this diet "
+                        + "is deficient in methionine for turbot larvae. Leucine might also be limiting turbot growth as the "
+                        + "different diet organisms had lower levels of this amino acid in the free pool than was found in the "
+                        + "larval protein. A previously presented model was used to describe the flux of amino acids in growing "
+                        + "turbot larvae. The FAA pool was found to be small and variable. It was estimated that the daily dietary "
+                        + "amino acid intake might be up to ten times the larval FAA pool. In addition, protein synthesis and "
+                        + "protein degradation might daily remove and return, respectively, the equivalent of up to 20 and 10 "
+                        + "times the size of the FAA pool. In an early phase (Day 11) high growth rates were associated with a "
+                        + "relatively low protein turnover, while at a later stage (Day 17), a much higher turnover was observed.");
         return PreviewPrefsTab.entry;
     }
 

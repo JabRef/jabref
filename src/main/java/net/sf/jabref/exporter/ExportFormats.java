@@ -162,7 +162,10 @@ public class ExportFormats {
             public ExportAction(JabRefFrame frame, boolean selectedOnly) {
                 this.frame = frame;
                 this.selectedOnly = selectedOnly;
-                putValue(Action.NAME, selectedOnly ? Localization.menuTitle("Export selected entries") : Localization.menuTitle("Export"));
+                // @formatter:off
+                putValue(Action.NAME, selectedOnly ? Localization.menuTitle("Export selected entries") :
+                    Localization.menuTitle("Export"));
+                // @formatter:on
             }
 
             @Override
@@ -186,9 +189,9 @@ public class ExportFormats {
                     file = new File(path);
                     if (file.exists()) {
                         // Warn that the file exists:
-                        if (JOptionPane.showConfirmDialog(frame, '\'' + file.getName() + "' "
-                                + Localization.lang("exists. Overwrite file?"), Localization.lang("Export"),
-                                JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                        if (JOptionPane.showConfirmDialog(frame,
+                                '\'' + file.getName() + "' " + Localization.lang("exists. Overwrite file?"),
+                                Localization.lang("Export"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
                             return;
                         }
                     }

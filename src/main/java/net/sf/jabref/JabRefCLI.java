@@ -130,13 +130,15 @@ public class JabRefCLI {
         // @formatter:off
         options.addOption(Option.builder("i").
                 longOpt("import").
-                desc(String.format("%s: %s[,import format]", Localization.lang("Import file"), Localization.lang("filename"))).
+                desc(String.format("%s: %s[,import format]", Localization.lang("Import file"),
+                        Localization.lang("filename"))).
                 hasArg().
                 argName("FILE").build());
 
         options.addOption(Option.builder("o").
                 longOpt("output").
-                desc(String.format("%s: %s[,export format]", Localization.lang("Output or export file"), Localization.lang("filename"))).
+                desc(String.format("%s: %s[,export format]", Localization.lang("Output or export file"),
+                        Localization.lang("filename"))).
                 hasArg().
                 argName("FILE").
                 build());
@@ -163,7 +165,9 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("a").
                 longOpt("aux").
-                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Subdatabase from aux"), Localization.lang("file"), Localization.lang("new"))).
+                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Subdatabase from aux"),
+                        Localization.lang("file"),
+                        Localization.lang("new"))).
                 hasArg().
                 argName("FILE").
                 build());
@@ -221,6 +225,11 @@ public class JabRefCLI {
     }
 
     public static String getExportMatchesSyntax() {
-        return String.format("[%s]searchTerm,outputFile: %s[,%s]", Localization.lang("field"), Localization.lang("file"), Localization.lang("exportFormat"));
+        // @formatter:off
+        return String.format("[%s]searchTerm,outputFile: %s[,%s]",
+                Localization.lang("field"),
+                Localization.lang("file"),
+                Localization.lang("exportFormat"));
+        // @formatter:on
     }
 }

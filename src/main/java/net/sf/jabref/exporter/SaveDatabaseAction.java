@@ -279,7 +279,10 @@ public class SaveDatabaseAction extends AbstractWorker {
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
+                    // @formatter:off
+                    new String[] {Localization.lang("Save"), tryDiff,
+                            Localization.lang("Cancel")}, tryDiff);
+                    // @formatter:on
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.

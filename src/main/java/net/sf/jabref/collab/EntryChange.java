@@ -41,9 +41,9 @@ class EntryChange extends Change {
         super();
         String key = tmpEntry.getCiteKey();
         if (key == null) {
-            name = "Modified entry";
+            name = Localization.lang("Modified entry");
         } else {
-            name = "Modified entry: '" + key + '\'';
+            name = Localization.lang("Modified entry") + ": '" + key + '\'';
         }
 
         // We know that tmpEntry is not equal to diskEntry. Check if it has been modified
@@ -122,9 +122,9 @@ class EntryChange extends Change {
 
 
         public FieldChange(String field, BibtexEntry memEntry, BibtexEntry tmpEntry, String inMem, String onTmp, String onDisk) {
+            super(field);
             entry = memEntry;
             this.tmpEntry = tmpEntry;
-            name = field;
             this.field = field;
             this.inMem = inMem;
             this.onTmp = onTmp;

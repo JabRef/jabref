@@ -80,14 +80,12 @@ import org.apache.commons.logging.LogFactory;
 /**
  * The whole UI component holding the groups tree and the buttons
  */
-public class GroupSelector extends SidePaneComponent implements
-TreeSelectionListener, ActionListener {
+public class GroupSelector extends SidePaneComponent implements TreeSelectionListener, ActionListener {
 
     private static final Log LOGGER = LogFactory.getLog(GroupSelector.class);
 
     private final JButton newButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
-    private final JButton refresh = new JButton(
-            IconTheme.JabRefIcon.REFRESH.getSmallIcon());
+    private final JButton refresh = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
     private final JButton autoGroup = new JButton(IconTheme.JabRefIcon.AUTO_GROUP.getSmallIcon());
     private final JButton openset = new JButton(Localization.lang("Settings"));
     Color bgColor = Color.white;
@@ -101,8 +99,7 @@ TreeSelectionListener, ActionListener {
     private final JRadioButtonMenuItem grayOut;
     private final JRadioButtonMenuItem andCb = new JRadioButtonMenuItem(Localization.lang("Intersection"), true);
     private final JRadioButtonMenuItem floatCb = new JRadioButtonMenuItem(Localization.lang("Float"), true);
-    private final JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Localization.lang("Inverted"),
-            false);
+    private final JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Localization.lang("Inverted"), false);
     private final JCheckBoxMenuItem select = new JCheckBoxMenuItem(Localization.lang("Select matches"), false);
     private final JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
             Localization.lang("Highlight overlapping groups")); // JZTODO lyrics
@@ -110,15 +107,17 @@ TreeSelectionListener, ActionListener {
             Localization.lang("Show number of elements contained in each group"));
     private final JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
             Localization.lang("Automatically assign new entry to selected groups"));
-    private final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Localization.lang("Edit Group Membership"), false);
-    private final Border editModeBorder = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED),
-            "Edit mode", TitledBorder.RIGHT, TitledBorder.TOP, Font.getFont("Default"), Color.RED);
+    private final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Localization.lang("Edit Group Membership"),
+            false);
+    private final Border editModeBorder = BorderFactory.createTitledBorder(
+            BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED), "Edit mode", TitledBorder.RIGHT, TitledBorder.TOP,
+            Font.getFont("Default"), Color.RED);
     private boolean editModeIndicator;
 
 
     /**
-     * The first element for each group defines which field to use for the
-     * quicksearch. The next two define the name and regexp for the group.
+     * The first element for each group defines which field to use for the quicksearch. The next two define the name and
+     * regexp for the group.
      */
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
         super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
@@ -157,8 +156,7 @@ TreeSelectionListener, ActionListener {
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING,
-                        showOverlappingGroups.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING, showOverlappingGroups.isSelected());
                 if (!showOverlappingGroups.isSelected()) {
                     groupsTree.setHighlight2Cells(null);
                 }
@@ -189,8 +187,7 @@ TreeSelectionListener, ActionListener {
             highlCb.setSelected(true);
             floatCb.setSelected(false);
         }
-        JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Localization.lang("Union"),
-                false);
+        JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Localization.lang("Union"), false);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS)) {
             andCb.setSelected(true);
             orCb.setSelected(false);
@@ -203,7 +200,8 @@ TreeSelectionListener, ActionListener {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS, showNumberOfElements.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS,
+                        showNumberOfElements.isSelected());
                 if (groupsTree != null) {
                     groupsTree.invalidate();
                     groupsTree.validate();
@@ -256,7 +254,8 @@ TreeSelectionListener, ActionListener {
                     // settings.setVisible(false);
                 } else {
                     JButton src = (JButton) e.getSource();
-                    showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
+                    showNumberOfElements
+                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
                     autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
                     settings.show(src, 0, openset.getHeight());
                 }
@@ -274,7 +273,8 @@ TreeSelectionListener, ActionListener {
                 GroupSelector.this.revalidate();
                 GroupSelector.this.repaint();
                 Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
-                LOGGER.info("Height: " + GroupSelector.this.getHeight() + "; Preferred height: " + GroupSelector.this.getPreferredSize().getHeight());
+                LOGGER.info("Height: " + GroupSelector.this.getHeight() + "; Preferred height: "
+                        + GroupSelector.this.getPreferredSize().getHeight());
             }
         });
         JButton reduce = new JButton(IconTheme.JabRefIcon.REMOVE_ROW.getSmallIcon());
@@ -314,7 +314,8 @@ TreeSelectionListener, ActionListener {
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
-        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.groupsHelp, Localization.lang("Help on groups")).getIconButton();
+        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.groupsHelp, Localization.lang("Help on groups"))
+                .getIconButton();
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);
         autoGroup.setPreferredSize(butDim);
@@ -344,10 +345,8 @@ TreeSelectionListener, ActionListener {
         grayOut.addActionListener(this);
         newButton.setToolTipText(Localization.lang("New group"));
         refresh.setToolTipText(Localization.lang("Refresh view"));
-        andCb.setToolTipText(Localization.lang("Display only entries belonging to all selected"
-                + " groups."));
-        orCb.setToolTipText(Localization.lang("Display all entries belonging to one or more "
-                + "of the selected groups."));
+        andCb.setToolTipText(Localization.lang("Display only entries belonging to all selected groups."));
+        orCb.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
         autoGroup.setToolTipText(Localization.lang("Automatically create groups for database."));
         invCb.setToolTipText(Localization.lang("Show entries *not* in group selection"));
         showOverlappingGroups.setToolTipText( // JZTODO lyrics
@@ -396,8 +395,7 @@ TreeSelectionListener, ActionListener {
         groupsTree = new GroupsTree(this);
         groupsTree.addTreeSelectionListener(this);
         groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
-        JScrollPane sp = new JScrollPane(groupsTree,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        JScrollPane sp = new JScrollPane(groupsTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         revalidateGroups();
         con.gridwidth = GridBagConstraints.REMAINDER;
@@ -447,8 +445,7 @@ TreeSelectionListener, ActionListener {
         updateBorder(editModeIndicator);
         definePopup();
         NodeAction moveNodeUpAction = new MoveNodeUpAction();
-        moveNodeUpAction.putValue(Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK));
+        moveNodeUpAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK));
         NodeAction moveNodeDownAction = new MoveNodeDownAction();
         moveNodeDownAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK));
@@ -514,11 +511,9 @@ TreeSelectionListener, ActionListener {
                 if (node.isRoot()) {
                     return;
                 }
-                if ((e.getClickCount() == 2)
-                        && (e.getButton() == MouseEvent.BUTTON1)) { // edit
+                if ((e.getClickCount() == 2) && (e.getButton() == MouseEvent.BUTTON1)) { // edit
                     editGroupAction.actionPerformed(null); // dummy event
-                } else if ((e.getClickCount() == 1)
-                        && (e.getButton() == MouseEvent.BUTTON1)) {
+                } else if ((e.getClickCount() == 1) && (e.getButton() == MouseEvent.BUTTON1)) {
                     annotationEvent(node);
                 }
             }
@@ -584,20 +579,18 @@ TreeSelectionListener, ActionListener {
                 removeGroupAndSubgroupsPopupAction.setEnabled(true);
                 removeGroupKeepSubgroupsPopupAction.setEnabled(true);
             }
-            expandSubtreePopupAction.setEnabled(groupsTree.isCollapsed(path)
-                    || groupsTree.hasCollapsedDescendant(path));
-            collapseSubtreePopupAction.setEnabled(groupsTree.isExpanded(path)
-                    || groupsTree.hasExpandedDescendant(path));
+            expandSubtreePopupAction
+                    .setEnabled(groupsTree.isCollapsed(path) || groupsTree.hasCollapsedDescendant(path));
+            collapseSubtreePopupAction
+                    .setEnabled(groupsTree.isExpanded(path) || groupsTree.hasExpandedDescendant(path));
             sortSubmenu.setEnabled(!node.isLeaf());
             removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
             moveNodeUpPopupAction.setEnabled(node.canMoveUp());
             moveNodeDownPopupAction.setEnabled(node.canMoveDown());
             moveNodeLeftPopupAction.setEnabled(node.canMoveLeft());
             moveNodeRightPopupAction.setEnabled(node.canMoveRight());
-            moveSubmenu.setEnabled(moveNodeUpPopupAction.isEnabled()
-                    || moveNodeDownPopupAction.isEnabled()
-                    || moveNodeLeftPopupAction.isEnabled()
-                    || moveNodeRightPopupAction.isEnabled());
+            moveSubmenu.setEnabled(moveNodeUpPopupAction.isEnabled() || moveNodeDownPopupAction.isEnabled()
+                    || moveNodeLeftPopupAction.isEnabled() || moveNodeRightPopupAction.isEnabled());
             moveNodeUpPopupAction.setNode(node);
             moveNodeDownPopupAction.setNode(node);
             moveNodeLeftPopupAction.setNode(node);
@@ -605,8 +598,7 @@ TreeSelectionListener, ActionListener {
             // add/remove entries to/from group
             BibtexEntry[] selection = frame.basePanel().getSelectedEntries();
             if (selection.length > 0) {
-                if (node.getGroup().supportsAdd() && !node.getGroup().
-                        containsAll(selection)) {
+                if (node.getGroup().supportsAdd() && !node.getGroup().containsAll(selection)) {
                     addToGroup.setNode(node);
                     addToGroup.setBasePanel(panel);
                     addToGroup.setEnabled(true);
@@ -614,8 +606,7 @@ TreeSelectionListener, ActionListener {
                     moveToGroup.setBasePanel(panel);
                     moveToGroup.setEnabled(true);
                 }
-                if (node.getGroup().supportsRemove() && node.getGroup().
-                        containsAny(selection)) {
+                if (node.getGroup().supportsRemove() && node.getGroup().containsAny(selection)) {
                     removeFromGroup.setNode(node);
                     removeFromGroup.setBasePanel(panel);
                     removeFromGroup.setEnabled(true);
@@ -735,9 +726,8 @@ TreeSelectionListener, ActionListener {
             return; // ignore this event
         }
         final TreePath[] selection = groupsTree.getSelectionPaths();
-        if ((selection == null)
-                || (selection.length == 0)
-                || ((selection.length == 1) && (((GroupTreeNode) selection[0].getLastPathComponent()).getGroup() instanceof AllEntriesGroup))) {
+        if ((selection == null) || (selection.length == 0) || ((selection.length == 1)
+                && (((GroupTreeNode) selection[0].getLastPathComponent()).getGroup() instanceof AllEntriesGroup))) {
             panel.stopShowingGroup();
             panel.mainTable.stopShowingFloatGrouping();
             if (showOverlappingGroups.isSelected()) {
@@ -756,7 +746,8 @@ TreeSelectionListener, ActionListener {
     }
 
     private void updateSelections() {
-        final SearchRuleSet searchRules = SearchRuleSets.build(andCb.isSelected() ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
+        final SearchRuleSet searchRules = SearchRuleSets
+                .build(andCb.isSelected() ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
         TreePath[] selection = groupsTree.getSelectionPaths();
 
         for (TreePath aSelection : selection) {
@@ -775,6 +766,7 @@ TreeSelectionListener, ActionListener {
                 select.isSelected());
         search.start();*/
     }
+
 
     class GroupingWorker extends AbstractWorker {
 
@@ -826,22 +818,20 @@ TreeSelectionListener, ActionListener {
 
 
     /**
-     * Revalidate the groups tree (e.g. after the data stored in the model has
-     * been changed) and set the specified selection and expansion state.
+     * Revalidate the groups tree (e.g. after the data stored in the model has been changed) and set the specified
+     * selection and expansion state.
      */
-    public void revalidateGroups(TreePath[] selectionPaths,
-            Enumeration<TreePath> expandedNodes) {
+    public void revalidateGroups(TreePath[] selectionPaths, Enumeration<TreePath> expandedNodes) {
         revalidateGroups(selectionPaths, expandedNodes, null);
     }
 
     /**
-     * Revalidate the groups tree (e.g. after the data stored in the model has
-     * been changed) and set the specified selection and expansion state.
+     * Revalidate the groups tree (e.g. after the data stored in the model has been changed) and set the specified
+     * selection and expansion state.
      *
      * @param node If this is non-null, the view is scrolled to make it visible.
      */
-    private void revalidateGroups(TreePath[] selectionPaths,
-            Enumeration<TreePath> expandedNodes, GroupTreeNode node) {
+    private void revalidateGroups(TreePath[] selectionPaths, Enumeration<TreePath> expandedNodes, GroupTreeNode node) {
         groupsTreeModel.reload();
         groupsTree.clearSelection();
         if (selectionPaths != null) {
@@ -860,16 +850,16 @@ TreeSelectionListener, ActionListener {
     }
 
     /**
-     * Revalidate the groups tree (e.g. after the data stored in the model has
-     * been changed) and maintain the current selection and expansion state.
+     * Revalidate the groups tree (e.g. after the data stored in the model has been changed) and maintain the current
+     * selection and expansion state.
      */
     public void revalidateGroups() {
         revalidateGroups(null);
     }
 
     /**
-     * Revalidate the groups tree (e.g. after the data stored in the model has
-     * been changed) and maintain the current selection and expansion state.
+     * Revalidate the groups tree (e.g. after the data stored in the model has been changed) and maintain the current
+     * selection and expansion state.
      *
      * @param node If this is non-null, the view is scrolled to make it visible.
      */
@@ -889,17 +879,15 @@ TreeSelectionListener, ActionListener {
                 GroupTreeNode newNode = new GroupTreeNode(newGroup);
                 groupsRoot.add(newNode);
                 revalidateGroups();
-                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
-                        GroupSelector.this, groupsRoot, newNode,
+                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot, newNode,
                         UndoableAddOrRemoveGroup.ADD_NODE);
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
-                frame.output(Localization.lang("Created_group_\"%0\".",
-                        newGroup.getName()));
+                frame.output(Localization.lang("Created_group_\"%0\".", newGroup.getName()));
             }
         } else if (e.getSource() == autoGroup) {
-            AutoGroupDialog gd = new AutoGroupDialog(frame, panel,
-                    GroupSelector.this, groupsRoot, Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD), " .,", ",");
+            AutoGroupDialog gd = new AutoGroupDialog(frame, panel, GroupSelector.this, groupsRoot,
+                    Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD), " .,", ",");
             gd.setVisible(true); // gd.show(); -> deprecated since 1.5
             // gd does the operation itself
         } else if (e.getSource() instanceof JCheckBox) {
@@ -934,10 +922,9 @@ TreeSelectionListener, ActionListener {
     }
 
     /**
-     * Adds the specified node as a child of the current root. The group
-     * contained in <b>newGroups </b> must not be of type AllEntriesGroup, since
-     * every tree has exactly one AllEntriesGroup (its root). The <b>newGroups
-     * </b> are inserted directly, i.e. they are not deepCopy()'d.
+     * Adds the specified node as a child of the current root. The group contained in <b>newGroups </b> must not be of
+     * type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups </b> are
+     * inserted directly, i.e. they are not deepCopy()'d.
      */
     public void addGroups(GroupTreeNode newGroups, CompoundEdit ce) {
         // paranoia: ensure that there are never two instances of AllEntriesGroup
@@ -945,8 +932,8 @@ TreeSelectionListener, ActionListener {
             return; // this should be impossible anyway
         }
         groupsRoot.add(newGroups);
-        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this,
-                groupsRoot, newGroups, UndoableAddOrRemoveGroup.ADD_NODE);
+        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this, groupsRoot, newGroups,
+                UndoableAddOrRemoveGroup.ADD_NODE);
         ce.addEdit(undo);
     }
 
@@ -969,10 +956,8 @@ TreeSelectionListener, ActionListener {
         }
 
         /**
-         * Returns the node to use in this action. If a node has been
-         * set explicitly (via setNode), it is returned. Otherwise, the first
-         * node in the current selection is returned. If all this fails, null
-         * is returned.
+         * Returns the node to use in this action. If a node has been set explicitly (via setNode), it is returned.
+         * Otherwise, the first node in the current selection is returned. If all this fails, null is returned.
          */
         public GroupTreeNode getNodeToUse() {
             if (m_node != null) {
@@ -1022,8 +1007,7 @@ TreeSelectionListener, ActionListener {
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
                 AbstractUndoableEdit undoAddPreviousEntries = gd.getUndoForAddPreviousEntries();
-                UndoableModifyGroup undo = new UndoableModifyGroup(
-                        GroupSelector.this, groupsRoot, node, newGroup);
+                UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
                 node.setGroup(newGroup);
                 revalidateGroups(node);
                 // Store undo information.
@@ -1037,8 +1021,7 @@ TreeSelectionListener, ActionListener {
                     panel.undoManager.addEdit(nc);
                 }
                 panel.markBaseChanged();
-                frame.output(Localization.lang("Modified group \"%0\".",
-                        newGroup.getName()));
+                frame.output(Localization.lang("Modified group \"%0\".", newGroup.getName()));
             }
         }
     }
@@ -1064,17 +1047,14 @@ TreeSelectionListener, ActionListener {
             } else {
                 ((GroupTreeNode) node.getParent()).insert(newNode, node.getParent().getIndex(node) + 1);
             }
-            UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
-                    GroupSelector.this, groupsRoot, newNode,
+            UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot, newNode,
                     UndoableAddOrRemoveGroup.ADD_NODE);
             revalidateGroups();
-            groupsTree.expandPath(new TreePath(
-                    (node != null ? node : groupsRoot).getPath()));
+            groupsTree.expandPath(new TreePath((node != null ? node : groupsRoot).getPath()));
             // Store undo information.
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
-            frame.output(Localization.lang("Added group \"%0\".",
-                    newGroup.getName()));
+            frame.output(Localization.lang("Added group \"%0\".", newGroup.getName()));
         }
     }
 
@@ -1095,16 +1075,14 @@ TreeSelectionListener, ActionListener {
             final AbstractGroup newGroup = gd.getResultingGroup();
             final GroupTreeNode newNode = new GroupTreeNode(newGroup);
             node.add(newNode);
-            UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
-                    GroupSelector.this, groupsRoot, newNode,
+            UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot, newNode,
                     UndoableAddOrRemoveGroup.ADD_NODE);
             revalidateGroups();
             groupsTree.expandPath(new TreePath(node.getPath()));
             // Store undo information.
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
-            frame.output(Localization.lang("Added group \"%0\".",
-                    newGroup.getName()));
+            frame.output(Localization.lang("Added group \"%0\".", newGroup.getName()));
         }
     }
 
@@ -1118,20 +1096,18 @@ TreeSelectionListener, ActionListener {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = getNodeToUse();
             final AbstractGroup group = node.getGroup();
-            int conf = JOptionPane.showConfirmDialog(frame, Localization.lang("Remove group \"%0\" and its subgroups?", group.getName()),
-                    Localization.lang("Remove group and subgroups"),
-                    JOptionPane.YES_NO_OPTION);
+            int conf = JOptionPane.showConfirmDialog(frame,
+                    Localization.lang("Remove group \"%0\" and its subgroups?", group.getName()),
+                    Localization.lang("Remove group and subgroups"), JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
-                final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
-                        GroupSelector.this, groupsRoot, node,
+                final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot, node,
                         UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
                 node.removeFromParent();
                 revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
-                frame.output(Localization.lang("Removed group \"%0\" and its subgroups.",
-                        group.getName()));
+                frame.output(Localization.lang("Removed group \"%0\" and its subgroups.", group.getName()));
             }
         }
     }
@@ -1146,20 +1122,18 @@ TreeSelectionListener, ActionListener {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = getNodeToUse();
             final AbstractGroup group = node.getGroup();
-            int conf = JOptionPane.showConfirmDialog(frame, Localization.lang("Remove all subgroups of \"%0\"?", group.getName()),
-                    Localization.lang("Remove all subgroups"),
-                    JOptionPane.YES_NO_OPTION);
+            int conf = JOptionPane.showConfirmDialog(frame,
+                    Localization.lang("Remove all subgroups of \"%0\"?", group.getName()),
+                    Localization.lang("Remove all subgroups"), JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
-                final UndoableModifySubtree undo = new UndoableModifySubtree(
-                        GroupSelector.this, getGroupTreeRoot(), node,
-                        "Remove all subgroups");
+                final UndoableModifySubtree undo = new UndoableModifySubtree(GroupSelector.this, getGroupTreeRoot(),
+                        node, "Remove all subgroups");
                 node.removeAllChildren();
                 revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
-                frame.output(Localization.lang("Removed all subgroups of group \"%0\".",
-                        group.getName()));
+                frame.output(Localization.lang("Removed all subgroups of group \"%0\".", group.getName()));
             }
         }
     }
@@ -1174,24 +1148,22 @@ TreeSelectionListener, ActionListener {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = getNodeToUse();
             final AbstractGroup group = node.getGroup();
-            int conf = JOptionPane.showConfirmDialog(frame, Localization.lang("Remove group \"%0\"?", group.getName()), Localization.lang("Remove group"), JOptionPane.YES_NO_OPTION);
+            int conf = JOptionPane.showConfirmDialog(frame, Localization.lang("Remove group \"%0\"?", group.getName()),
+                    Localization.lang("Remove group"), JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
-                final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
-                        GroupSelector.this, groupsRoot, node,
+                final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot, node,
                         UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
                 final GroupTreeNode parent = (GroupTreeNode) node.getParent();
                 final int childIndex = parent.getIndex(node);
                 node.removeFromParent();
                 while (node.getChildCount() > 0) {
-                    parent.insert((GroupTreeNode) node.getFirstChild(),
-                            childIndex);
+                    parent.insert((GroupTreeNode) node.getFirstChild(), childIndex);
                 }
                 revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
-                frame.output(Localization.lang("Removed group \"%0\".",
-                        group.getName()));
+                frame.output(Localization.lang("Removed group \"%0\".", group.getName()));
             }
         }
     }
@@ -1211,8 +1183,8 @@ TreeSelectionListener, ActionListener {
         @Override
         public void actionPerformed(ActionEvent ae) {
             final GroupTreeNode node = getNodeToUse();
-            final UndoableModifySubtree undo = new UndoableModifySubtree(
-                    GroupSelector.this, getGroupTreeRoot(), node, Localization.lang("sort subgroups"));
+            final UndoableModifySubtree undo = new UndoableModifySubtree(GroupSelector.this, getGroupTreeRoot(), node,
+                    Localization.lang("sort subgroups"));
             groupsTree.sort(node, false);
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
@@ -1229,8 +1201,8 @@ TreeSelectionListener, ActionListener {
         @Override
         public void actionPerformed(ActionEvent ae) {
             final GroupTreeNode node = getNodeToUse();
-            final UndoableModifySubtree undo = new UndoableModifySubtree(
-                    GroupSelector.this, getGroupTreeRoot(), node, Localization.lang("sort subgroups"));
+            final UndoableModifySubtree undo = new UndoableModifySubtree(GroupSelector.this, getGroupTreeRoot(), node,
+                    Localization.lang("sort subgroups"));
             groupsTree.sort(node, true);
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged(); // JZTODO lyrics
@@ -1344,8 +1316,7 @@ TreeSelectionListener, ActionListener {
         }
         AbstractUndoableEdit undo;
         if (!node.canMoveUp() || ((undo = node.moveUp(GroupSelector.this)) == null)) {
-            frame.output(Localization.lang(
-                    "Cannot move group \"%0\" up.", node.getGroup().getName()));
+            frame.output(Localization.lang("Cannot move group \"%0\" up.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state (not really needed when
@@ -1369,8 +1340,7 @@ TreeSelectionListener, ActionListener {
         }
         AbstractUndoableEdit undo;
         if (!node.canMoveDown() || ((undo = node.moveDown(GroupSelector.this)) == null)) {
-            frame.output(Localization.lang(
-                    "Cannot move group \"%0\" down.", node.getGroup().getName()));
+            frame.output(Localization.lang("Cannot move group \"%0\" down.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state (not really needed when
@@ -1394,8 +1364,7 @@ TreeSelectionListener, ActionListener {
         }
         AbstractUndoableEdit undo;
         if (!node.canMoveLeft() || ((undo = node.moveLeft(GroupSelector.this)) == null)) {
-            frame.output(Localization.lang(
-                    "Cannot move group \"%0\" left.", node.getGroup().getName()));
+            frame.output(Localization.lang("Cannot move group \"%0\" left.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state
@@ -1418,8 +1387,7 @@ TreeSelectionListener, ActionListener {
         }
         AbstractUndoableEdit undo;
         if (!node.canMoveRight() || ((undo = node.moveRight(GroupSelector.this)) == null)) {
-            frame.output(Localization.lang(
-                    "Cannot move group \"%0\" right.", node.getGroup().getName()));
+            frame.output(Localization.lang("Cannot move group \"%0\" right.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state
@@ -1430,8 +1398,8 @@ TreeSelectionListener, ActionListener {
     }
 
     /**
-     * Concludes the moving of a group tree node by storing the specified
-     * undo information, marking the change, and setting the status line.
+     * Concludes the moving of a group tree node by storing the specified undo information, marking the change, and
+     * setting the status line.
      *
      * @param undo Undo information for the move operation.
      * @param node The node that has been moved.
@@ -1439,14 +1407,13 @@ TreeSelectionListener, ActionListener {
     public void concludeMoveGroup(AbstractUndoableEdit undo, GroupTreeNode node) {
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
-        frame.output(Localization.lang("Moved group \"%0\".",
-                node.getGroup().getName()));
+        frame.output(Localization.lang("Moved group \"%0\".", node.getGroup().getName()));
     }
 
     public void concludeAssignment(AbstractUndoableEdit undo, GroupTreeNode node, int assignedEntries) {
         if (undo == null) {
             frame.output(Localization.lang("The group \"%0\" already contains the selection.",
-                    new String[]{node.getGroup().getName()}));
+                    new String[] {node.getGroup().getName()}));
             return;
         }
         panel.undoManager.addEdit(undo);
@@ -1456,8 +1423,8 @@ TreeSelectionListener, ActionListener {
         if (assignedEntries == 1) {
             frame.output(Localization.lang("Assigned 1 entry to group \"%0\".", groupName));
         } else {
-            frame.output(Localization.lang("Assigned %0 entries to group \"%1\".",
-                    String.valueOf(assignedEntries), groupName));
+            frame.output(Localization.lang("Assigned %0 entries to group \"%1\".", String.valueOf(assignedEntries),
+                    groupName));
         }
     }
 
@@ -1494,12 +1461,10 @@ TreeSelectionListener, ActionListener {
         }
 
         // auto show/hide groups interface
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW)
-                && !groupsRoot.isLeaf()) { // groups were defined
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW) && !groupsRoot.isLeaf()) { // groups were defined
             frame.sidePaneManager.show("groups");
             frame.groupToggle.setSelected(true);
-        } else if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE)
-                && groupsRoot.isLeaf()) { // groups were not defined
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE) && groupsRoot.isLeaf()) { // groups were not defined
             frame.sidePaneManager.hide("groups");
             frame.groupToggle.setSelected(false);
         }
@@ -1511,8 +1476,8 @@ TreeSelectionListener, ActionListener {
     }
 
     /**
-     * Highlight all groups that contain any/all of the specified entries.
-     * If entries is null or has zero length, highlight is cleared.
+     * Highlight all groups that contain any/all of the specified entries. If entries is null or has zero length,
+     * highlight is cleared.
      */
     public void showMatchingGroups(BibtexEntry[] entries, boolean requireAll) {
         if ((entries == null) || (entries.length == 0)) { // nothing selected
@@ -1521,7 +1486,7 @@ TreeSelectionListener, ActionListener {
             return;
         }
         Vector<GroupTreeNode> vec = new Vector<>();
-        for (Enumeration<GroupTreeNode> e = groupsRoot.preorderEnumeration(); e.hasMoreElements(); ) {
+        for (Enumeration<GroupTreeNode> e = groupsRoot.preorderEnumeration(); e.hasMoreElements();) {
             GroupTreeNode node = e.nextElement();
             AbstractGroup group = node.getGroup();
             int i;
@@ -1553,12 +1518,11 @@ TreeSelectionListener, ActionListener {
     }
 
     /**
-     * Show groups that, if selected, would show at least one
-     * of the entries found in the specified search.
+     * Show groups that, if selected, would show at least one of the entries found in the specified search.
      */
     private void showOverlappingGroups(List<BibtexEntry> matches) { //DatabaseSearch search) {
         List<GroupTreeNode> nodes = new ArrayList<>();
-        for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
+        for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements();) {
             GroupTreeNode node = e.nextElement();
             SearchRule rule = node.getSearchRule();
             for (BibtexEntry match : matches) {

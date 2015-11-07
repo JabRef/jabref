@@ -70,7 +70,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -528,7 +527,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class PasteAction extends BasicAction {
         public PasteAction() {
-            super("Paste", "Paste from clipboard", IconTheme.JabRefIcon.PASTE.getIcon());
+            // @formatter:off
+            super(Localization.lang("Paste"),
+                    Localization.lang("Paste from clipboard"),
+                    IconTheme.JabRefIcon.PASTE.getIcon());
+            // @formatter:on
         }
 
         @Override
@@ -552,7 +555,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class LoadAction extends BasicAction {
         public LoadAction() {
-            super("Open", "Open_file", IconTheme.JabRefIcon.OPEN.getIcon());
+            // @formatter:off
+            super(Localization.lang("Open"),
+                    Localization.lang("Open file"),
+                    IconTheme.JabRefIcon.OPEN.getIcon());
+            // @formatter:on
         }
 
         @Override
@@ -580,7 +587,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class ClearAction extends BasicAction {
         public ClearAction() {
-            super("Clear", "Clear_inputarea", IconTheme.JabRefIcon.NEW.getIcon());
+            // @formatter:off
+            super(Localization.lang("Clear"),
+                    Localization.lang("Clear inputarea"),
+                    IconTheme.JabRefIcon.NEW.getIcon());
+            // @formatter:on
         }
 
         @Override
@@ -591,7 +602,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class MenuHeaderAction extends BasicAction {
         public MenuHeaderAction() {
-            super("Edit");
+            super(Localization.lang("Edit"));
             this.setEnabled(false);
         }
 
@@ -711,24 +722,26 @@ class PopupListener extends MouseAdapter {
 
 abstract class BasicAction extends AbstractAction {
     public BasicAction(String text, String description, Icon icon) {
-        super(Localization.lang(text), icon);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
+        super(text, icon);
+        putValue(Action.SHORT_DESCRIPTION, description);
     }
 
+    /* TODO: Not used. Will comment out for a while for possible later removal
     public BasicAction(String text, String description, URL icon, KeyStroke key) {
         super(Localization.lang(text), new ImageIcon(icon));
         putValue(Action.ACCELERATOR_KEY, key);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
-    }
+    } */
 
     public BasicAction(String text) {
-        super(Localization.lang(text));
+        super(text);
     }
-
+    /* TODO: Not used. Will comment out for a while for possible later removal
     public BasicAction(String text, KeyStroke key) {
         super(Localization.lang(text));
         putValue(Action.ACCELERATOR_KEY, key);
     }
+    */
 
     @Override
     public abstract void actionPerformed(ActionEvent e);
