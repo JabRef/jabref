@@ -475,7 +475,6 @@ public class RepecNepImporter extends ImportFormat {
             message += e.getMessage();
             LOGGER.error(message, e);
             if (!(e instanceof IOException)) {
-                e.printStackTrace();
                 e = new IOException(message);
             }
             throw (IOException) e;

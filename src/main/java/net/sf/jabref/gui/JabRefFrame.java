@@ -685,7 +685,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             output(Localization.lang("External viewer called") + '.');
         } catch (IOException ex) {
             output(Localization.lang("Error") + ": " + ex.getMessage());
-            LOGGER.debug("Could not open browser.", ex);
+            LOGGER.debug("Cannot open browser.", ex);
         }
     }
 

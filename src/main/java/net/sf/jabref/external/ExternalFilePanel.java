@@ -210,8 +210,7 @@ public class ExternalFilePanel extends JPanel {
                             Localization.lang("Error writing XMP to file: %0", e.getLocalizedMessage()),
                             Localization.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
                     // String above and below
-                    LOGGER.info(Localization.lang("Error writing XMP to file: %0", finalFile
-                            .getAbsolutePath()), e);
+                    LOGGER.info("Error writing XMP to file: " + finalFile.getAbsolutePath(), e);
                     output(Localization.lang("Error writing XMP to file: %0", finalFile.getName()));
 
                 } catch (TransformerException e) {

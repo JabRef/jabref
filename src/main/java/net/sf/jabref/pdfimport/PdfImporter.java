@@ -211,7 +211,7 @@ public class PdfImporter {
 
                     if ((localRes == null) || localRes.isEmpty()) {
                         // import failed -> generate default entry
-                        LOGGER.info(Localization.lang("Import failed"));
+                        LOGGER.info("Import failed");
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -241,7 +241,7 @@ public class PdfImporter {
                         in = new FileInputStream(file);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        LOGGER.info(Localization.lang("Import failed"), e);
+                        LOGGER.info("Import failed", e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -251,7 +251,7 @@ public class PdfImporter {
                         localRes = contentImporter.importEntries(in, status);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        LOGGER.info(Localization.lang("Import failed"), e);
+                        LOGGER.info("Import failed", e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
