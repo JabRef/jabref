@@ -205,8 +205,10 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         private static final long serialVersionUID = 1L;
 
         public PrintAction() {
-            super(Localization.lang("Print Preview"), IconTheme.JabRefIcon.PRINTED.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print Preview"));
+            super(Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getIcon());
+
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print entry preview"));
+            putValue(Action.ACCELERATOR_KEY, JabRefPreferences.getInstance().getKey(KeyBinds.PRINT_ENTRY_PREVIEW));
         }
 
         //DocumentPrinter printerService;
@@ -304,7 +306,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         im.put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
-        im.put(prefs.getKey("Print entry preview"), "print");
+        im.put(prefs.getKey(KeyBinds.PRINT_ENTRY_PREVIEW), "print");
         am.put("print", printAction);
 
         tlb.setFloatable(false);

@@ -87,6 +87,7 @@ public class KeyBinds {
     public static final String PASTE = "Paste";
     public static final String PREAMBLE_EDITOR_STORE_CHANGES = "Preamble editor, store changes";
     public static final String PREVIOUS_TAB = "Previous tab";
+    public static final String PRINT_ENTRY_PREVIEW = "Print entry preview";
     public static final String PUSH_TO_APPLICATION = "Push to application";
     public static final String QUIT_JAB_REF = "Quit JabRef";
     public static final String REDO = "Redo";
@@ -213,6 +214,7 @@ public class KeyBinds {
         keyBindMap.put(FILE_LIST_EDITOR_MOVE_ENTRY_UP, "ctrl UP");
         keyBindMap.put(FILE_LIST_EDITOR_MOVE_ENTRY_DOWN, "ctrl DOWN");
         keyBindMap.put(HIDE_SHOW_TOOLBAR, "ctrl alt T");
+        keyBindMap.put(PRINT_ENTRY_PREVIEW, "alt P");
     }
 
     public String get(String key) {
