@@ -25,6 +25,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.container.XNameAccess;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -42,8 +43,8 @@ class CitationManager {
     private final OOBibBase ooBase;
     private final JDialog diag;
     private final EventList<CitEntry> list;
-    private JTable table;
-    private EventTableModel<CitEntry> tableModel;
+    private final JTable table;
+    private final EventTableModel<CitEntry> tableModel;
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
@@ -101,7 +102,7 @@ class CitationManager {
         cancel.addActionListener(cancelAction);
 
         bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                (Globals.prefs.getKey("Close dialog"), "close");
+                (Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(600);
@@ -143,7 +144,7 @@ class CitationManager {
             StringBuilder sb = new StringBuilder();
             for (int j = 0; j < keys.size(); j++) {
                 sb.append(keys.get(j));
-                if (j < keys.size() - 1) {
+                if (j < (keys.size() - 1)) {
                     sb.append(", ");
                 }
             }
@@ -151,8 +152,8 @@ class CitationManager {
         }
 
         public boolean pageInfoChanged() {
-            if (pageInfo != null && origPageInfo == null
-                    || pageInfo == null && origPageInfo != null) {
+            if (((pageInfo != null) && (origPageInfo == null))
+                    || ((pageInfo == null) && (origPageInfo != null))) {
                 return true;
             }
             if (pageInfo != null) {
@@ -202,7 +203,7 @@ class CitationManager {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+            if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
                 int row = table.rowAtPoint(e.getPoint());
                 if (row >= 0) {
                     SingleCitDialog scd = new SingleCitDialog(list.get(row));
@@ -273,7 +274,7 @@ class CitationManager {
             cancel.addActionListener(cancelAction);
 
             b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                    (Globals.prefs.getKey("Close dialog"), "close");
+                    (Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
             b.getPanel().getActionMap().put("close", cancelAction);
 
         }

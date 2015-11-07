@@ -20,6 +20,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.search.SearchRules;
@@ -299,7 +300,7 @@ public class SearchManager extends SidePaneComponent
 
         setContentContainer(main);
 
-        searchField.getInputMap().put(Globals.prefs.getKey("Repeat incremental search"),
+        searchField.getInputMap().put(Globals.prefs.getKey(KeyBinds.REPEAT_INCREMENTAL_SEARCH),
                 "repeat");
 
         searchField.getActionMap().put("repeat", new AbstractAction() {
@@ -311,7 +312,7 @@ public class SearchManager extends SidePaneComponent
                 }
             }
         });
-        searchField.getInputMap().put(Globals.prefs.getKey("Clear search"), "escape");
+        searchField.getInputMap().put(Globals.prefs.getKey(KeyBinds.CLEAR_SEARCH), "escape");
         searchField.getActionMap().put("escape", new AbstractAction() {
 
             @Override

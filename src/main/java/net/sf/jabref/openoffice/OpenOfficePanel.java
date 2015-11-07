@@ -26,6 +26,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -459,7 +460,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         content.add(b.getPanel(), BorderLayout.CENTER);
 
         OpenOfficePanel.frame.getTabbedPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.prefs.getKey("Refresh OO"), "Refresh OO");
+                .put(Globals.prefs.getKey(KeyBinds.REFRESH_OO), "Refresh OO");
         OpenOfficePanel.frame.getTabbedPane().getActionMap().put("Refresh OO", updateAction);
 
         //diag.pack();

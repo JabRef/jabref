@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.gui;
 
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 
 import java.awt.BorderLayout;
@@ -99,7 +100,7 @@ public class MergeDialog extends JDialog {
         // Key bindings:
         ActionMap am = jPanel1.getActionMap();
         InputMap im = jPanel1.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs.getKey("Close dialog"), "close");
+        im.put(parent.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             @Override

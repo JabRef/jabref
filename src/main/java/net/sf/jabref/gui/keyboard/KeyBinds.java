@@ -33,7 +33,6 @@ public class KeyBinds {
     public static final String CLOSE_DATABASE = "Close database";
     public static final String CLOSE_DIALOG = "Close dialog";
     public static final String CLOSE_ENTRY_EDITOR = "Close entry editor";
-    public static final String CLOSE_PREAMBLE_EDITOR = "Close preamble editor";
     public static final String COPY = "Copy";
     public static final String COPY_BIB_TE_X_KEY = "Copy BibTeX key";
     public static final String COPY_BIB_TE_X_KEY_AND_TITLE = "Copy BibTeX key and title";
@@ -107,8 +106,6 @@ public class KeyBinds {
     public static final String SEARCH_SCIENCE_DIRECT = "Search ScienceDirect";
     public static final String SELECT_ALL = "Select all";
     public static final String STRING_DIALOG_ADD_STRING = "String dialog, add string";
-    public static final String STRING_DIALOG_MOVE_STRING_DOWN = "String dialog, move string down";
-    public static final String STRING_DIALOG_MOVE_STRING_UP = "String dialog, move string up";
     public static final String STRING_DIALOG_REMOVE_STRING = "String dialog, remove string";
     public static final String SWITCH_PREVIEW_LAYOUT = "Switch preview layout";
     public static final String SYNCHRONIZE_FILES = "Synchronize files";
@@ -153,12 +150,11 @@ public class KeyBinds {
         keyBindMap.put(INCREMENTAL_SEARCH, "ctrl shift F");
         keyBindMap.put(REPEAT_INCREMENTAL_SEARCH, "ctrl shift F");
         keyBindMap.put(CLOSE_DIALOG, "ESCAPE");
-        keyBindMap.put(CLOSE_ENTRY_EDITOR, "ESCAPE");
-        keyBindMap.put(CLOSE_PREAMBLE_EDITOR, "ESCAPE");
         keyBindMap.put(BACK_HELP_DIALOG, "LEFT");
         keyBindMap.put(FORWARD_HELP_DIALOG, "RIGHT");
         keyBindMap.put(PREAMBLE_EDITOR_STORE_CHANGES, "alt S");
         keyBindMap.put(CLEAR_SEARCH, "ESCAPE");
+        keyBindMap.put(CLOSE_ENTRY_EDITOR, "ESCAPE");
         keyBindMap.put(ENTRY_EDITOR_NEXT_PANEL, "ctrl TAB");//"ctrl PLUS");//"shift Right");
         keyBindMap.put(ENTRY_EDITOR_PREVIOUS_PANEL, "ctrl shift TAB");//"ctrl MINUS");
         keyBindMap.put(ENTRY_EDITOR_NEXT_PANEL_2, "ctrl PLUS");//"ctrl PLUS");//"shift Right");
@@ -168,8 +164,6 @@ public class KeyBinds {
         keyBindMap.put(ENTRY_EDITOR_STORE_FIELD, "alt S");
         keyBindMap.put(STRING_DIALOG_ADD_STRING, "ctrl N");
         keyBindMap.put(STRING_DIALOG_REMOVE_STRING, "shift DELETE");
-        keyBindMap.put(STRING_DIALOG_MOVE_STRING_UP, "ctrl UP");
-        keyBindMap.put(STRING_DIALOG_MOVE_STRING_DOWN, "ctrl DOWN");
         keyBindMap.put(SAVE_SESSION, "F11");
         keyBindMap.put(LOAD_SESSION, "F12");
         keyBindMap.put(COPY_CITE_BIB_TE_X_KEY, "ctrl K");

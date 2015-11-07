@@ -21,6 +21,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -220,7 +221,7 @@ public class PushToApplicationButton implements ActionListener {
         // Key bindings:
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             private static final long serialVersionUID = -4839826710086306753L;
@@ -281,10 +282,8 @@ public class PushToApplicationButton implements ActionListener {
 
     class MenuAction extends MnemonicAwareAction {
 
-        private static final long serialVersionUID = -4339280220347418559L;
-
         public MenuAction() {
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Push to application"));
+            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.PUSH_TO_APPLICATION));
         }
 
         public void setTitle(String appName) {

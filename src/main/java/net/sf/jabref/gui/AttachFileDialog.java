@@ -31,6 +31,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextField;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -137,7 +138,7 @@ public class AttachFileDialog extends JDialog {
         };
 
         cancel.addActionListener(cancelListener);
-        editor.getTextComponent().getInputMap().put(Globals.prefs.getKey("Close dialog"), "close");
+        editor.getTextComponent().getInputMap().put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         editor.getTextComponent().getActionMap().put("close", cancelListener);
 
         FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref", "");
