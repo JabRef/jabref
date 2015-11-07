@@ -36,6 +36,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -136,7 +137,6 @@ import osx.macadapter.MacAdapter;
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
-
     private static final long serialVersionUID = 1L;
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
@@ -149,7 +149,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     // The sidepane manager takes care of populating the sidepane. 
     public SidePaneManager sidePaneManager;
-
+    
     public SearchBar searchBar;
 
     public JTabbedPane tabbedPane; // initialized at constructor
@@ -158,11 +158,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
 
-
     class ToolBar extends JToolBar {
 
         private static final long serialVersionUID = 1L;
-
 
         void addAction(Action a) {
             JButton b = new JButton(a);
@@ -183,7 +181,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final GridBagConstraints con = new GridBagConstraints();
 
     final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
-    private final JLabel statusLabel = new JLabel(Localization.lang("Status") + ':', SwingConstants.LEFT);
+    private final JLabel statusLabel = new JLabel(
+            Localization.lang("Status")
+                    + ':', SwingConstants.LEFT);
     private final JProgressBar progressBar = new JProgressBar();
 
     private final FileHistory fileHistory = new FileHistory(prefs, this);
@@ -209,23 +209,47 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JToggleButton highlightAll;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
-    private final AbstractAction close = new CloseDatabaseAction();
+    private final AbstractAction
+            close = new CloseDatabaseAction();
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
     private final AbstractAction newDatabaseAction = new NewDatabaseAction(this);
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction integrityCheckAction = new IntegrityCheckAction(this);
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
-    private final AbstractAction help = new HelpAction("JabRef help", helpDiag, GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"), prefs.getKey("Help"));
-    private final AbstractAction contents = new HelpAction("Help contents", helpDiag, GUIGlobals.helpContents, Localization.lang("Help contents"), IconTheme.getImage("helpContents"));
-    private final AbstractAction about = new HelpAction("About JabRef", helpDiag, GUIGlobals.aboutPage, Localization.lang("About JabRef"), IconTheme.getImage("about"));
-    private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, "Edit entry", Localization.lang("Edit entry"), prefs.getKey(KeyBinds.EDIT_ENTRY), IconTheme.getImage("edit"));
-    private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE, "Focus entry table", Localization.lang("Move the keyboard focus to the entry table"), prefs.getKey(KeyBinds.FOCUS_ENTRY_TABLE));
-    private final AbstractAction save = new GeneralAction(Actions.SAVE, "Save database", Localization.lang("Save database"), prefs.getKey(KeyBinds.SAVE_DATABASE), IconTheme.getImage("save"));
-    private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS, "Save database as ...", Localization.lang("Save database as ..."), prefs.getKey(KeyBinds.SAVE_DATABASE_AS), IconTheme.getImage("saveAs"));
+    private final AbstractAction help = new HelpAction("JabRef help", helpDiag,
+            GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
+            prefs.getKey("Help"));
+    private final AbstractAction contents = new HelpAction("Help contents", helpDiag,
+            GUIGlobals.helpContents, Localization.lang("Help contents"),
+            IconTheme.getImage("helpContents"));
+    private final AbstractAction about = new HelpAction("About JabRef", helpDiag,
+            GUIGlobals.aboutPage, Localization.lang("About JabRef"),
+            IconTheme.getImage("about"));
+    private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, "Edit entry",
+            Localization.lang("Edit entry"),
+            prefs.getKey(KeyBinds.EDIT_ENTRY),
+            IconTheme.getImage("edit"));
+    private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE, "Focus entry table",
+            Localization.lang("Move the keyboard focus to the entry table"),
+            prefs.getKey(KeyBinds.FOCUS_ENTRY_TABLE));
+    private final AbstractAction save = new GeneralAction(Actions.SAVE, "Save database",
+            Localization.lang("Save database"),
+            prefs.getKey(KeyBinds.SAVE_DATABASE),
+            IconTheme.getImage("save"));
+    private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS, "Save database as ...",
+            Localization.lang("Save database as ..."),
+            prefs.getKey(KeyBinds.SAVE_DATABASE_AS),
+            IconTheme.getImage("saveAs"));
     private final AbstractAction saveAll = new SaveAllAction(JabRefFrame.this);
-    private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS, "Save selected as ...", Localization.lang("Save selected as ..."), IconTheme.getImage("saveAs"));
-    private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN, "Save selected as plain BibTeX ...", Localization.lang("Save selected as plain BibTeX ..."), IconTheme.getImage("saveAs"));
+    private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
+            "Save selected as ...",
+            Localization.lang("Save selected as ..."),
+            IconTheme.getImage("saveAs"));
+    private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
+            "Save selected as plain BibTeX ...",
+            Localization.lang("Save selected as plain BibTeX ..."),
+            IconTheme.getImage("saveAs"));
     private final AbstractAction exportAll = ExportFormats.getExportAction(this, false);
     private final AbstractAction exportSelected = ExportFormats.getExportAction(this, true);
     private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
@@ -233,102 +257,209 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public final AbstractAction nextTab = new ChangeTabAction(true);
     public final AbstractAction prevTab = new ChangeTabAction(false);
     private final AbstractAction sortTabs = new SortTabsAction(this);
-    private final AbstractAction undo = new GeneralAction(Actions.UNDO, "Undo", Localization.lang("Undo"), prefs.getKey(KeyBinds.UNDO), IconTheme.getImage("undo"));
-    private final AbstractAction redo = new GeneralAction(Actions.REDO, "Redo", Localization.lang("Redo"), prefs.getKey(KeyBinds.REDO), IconTheme.getImage("redo"));
-    final AbstractAction forward = new GeneralAction(Actions.FORWARD, "Forward", Localization.lang("Forward"), prefs.getKey(KeyBinds.FORWARD), IconTheme.getImage("right"));
-    final AbstractAction back = new GeneralAction(Actions.BACK, "Back", Localization.lang("Back"), prefs.getKey(KeyBinds.BACK), IconTheme.getImage("left"));
-    private final AbstractAction delete = new GeneralAction(Actions.DELETE, "Delete", Localization.lang("Delete"), prefs.getKey(KeyBinds.DELETE), IconTheme.getImage("delete"));
+    private final AbstractAction undo = new GeneralAction(Actions.UNDO, "Undo", Localization.lang("Undo"),
+            prefs.getKey(KeyBinds.UNDO),
+            IconTheme.getImage("undo"));
+    private final AbstractAction redo = new GeneralAction(Actions.REDO, "Redo", Localization.lang("Redo"),
+            prefs.getKey(KeyBinds.REDO),
+            IconTheme.getImage("redo"));
+    final AbstractAction forward = new GeneralAction(Actions.FORWARD, "Forward", Localization.lang("Forward"),
+            prefs.getKey(KeyBinds.FORWARD), IconTheme.getImage("right"));
+    final AbstractAction back = new GeneralAction(Actions.BACK, "Back", Localization.lang("Back"),
+            prefs.getKey(KeyBinds.BACK), IconTheme.getImage("left"));
+    private final AbstractAction delete = new GeneralAction(Actions.DELETE, "Delete", Localization.lang("Delete"),
+            prefs.getKey(KeyBinds.DELETE),
+            IconTheme.getImage("delete"));
     private final AbstractAction copy = new EditAction(Actions.COPY, IconTheme.getImage("copy"));
     private final AbstractAction paste = new EditAction(Actions.PASTE, IconTheme.getImage("paste"));
     private final AbstractAction cut = new EditAction(Actions.CUT, IconTheme.getImage("cut"));
-    private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, "Mark entries", Localization.lang("Mark entries"), prefs.getKey(KeyBinds.MARK_ENTRIES), IconTheme.getImage("markEntries"));
-    private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES, "Unmark entries", Localization.lang("Unmark entries"), prefs.getKey(KeyBinds.UNMARK_ENTRIES), IconTheme.getImage("unmarkEntries"));
+    private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, "Mark entries",
+            Localization.lang("Mark entries"),
+            prefs.getKey(KeyBinds.MARK_ENTRIES),
+            IconTheme.getImage("markEntries"));
+    private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES, "Unmark entries",
+            Localization.lang("Unmark entries"),
+            prefs.getKey(KeyBinds.UNMARK_ENTRIES),
+            IconTheme.getImage("unmarkEntries"));
     private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, "Unmark all");
-    private final AbstractAction toggleRelevance = new GeneralAction(Relevance.getInstance().getValues().get(0).getActionName(), Relevance.getInstance().getValues().get(0).getMenuString(), Relevance.getInstance().getValues().get(0).getToolTipText(), IconTheme.getImage(Relevance.getInstance().getValues().get(0).getActionName()));
-    private final AbstractAction toggleQualityAssured = new GeneralAction(Quality.getInstance().getValues().get(0).getActionName(), Quality.getInstance().getValues().get(0).getMenuString(), Quality.getInstance().getValues().get(0).getToolTipText(), IconTheme.getImage(Quality.getInstance().getValues().get(0).getActionName()));
-    private final AbstractAction togglePrinted = new GeneralAction(Printed.getInstance().getValues().get(0).getActionName(), Printed.getInstance().getValues().get(0).getMenuString(), Printed.getInstance().getValues().get(0).getToolTipText(), IconTheme.getImage(Printed.getInstance().getValues().get(0).getActionName()));
+    private final AbstractAction toggleRelevance = new GeneralAction(
+            Relevance.getInstance().getValues().get(0).getActionName(),
+            Relevance.getInstance().getValues().get(0).getMenuString(),
+            Relevance.getInstance().getValues().get(0).getToolTipText(),
+            IconTheme.getImage(Relevance.getInstance().getValues().get(0).getActionName()));
+    private final AbstractAction toggleQualityAssured = new GeneralAction(
+            Quality.getInstance().getValues().get(0).getActionName(),
+            Quality.getInstance().getValues().get(0).getMenuString(),
+            Quality.getInstance().getValues().get(0).getToolTipText(),
+            IconTheme.getImage(Quality.getInstance().getValues().get(0).getActionName()));
+    private final AbstractAction togglePrinted = new GeneralAction(
+            Printed.getInstance().getValues().get(0).getActionName(),
+            Printed.getInstance().getValues().get(0).getMenuString(),
+            Printed.getInstance().getValues().get(0).getToolTipText(),
+            IconTheme.getImage(Printed.getInstance().getValues().get(0).getActionName()));
     private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS, "Manage content selectors");
     private final AbstractAction saveSessionAction = new SaveSessionAction();
     public final AbstractAction loadSessionAction = new LoadSessionAction();
-    private final AbstractAction incrementalSearch = new GeneralAction(Actions.INC_SEARCH, "Incremental search", Localization.lang("Start incremental search"), prefs.getKey(KeyBinds.INCREMENTAL_SEARCH), IconTheme.getImage("incSearch"));
-    private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, "Search", Localization.lang("Search"), prefs.getKey(KeyBinds.SEARCH), IconTheme.getImage("search"));
-    private final AbstractAction toggleSearch = new GeneralAction(Actions.TOGGLE_SEARCH, "Search", Localization.lang("Toggle search panel"), IconTheme.getImage("toggleSearch"));
+    private final AbstractAction incrementalSearch = new GeneralAction(Actions.INC_SEARCH, "Incremental search",
+            Localization.lang("Start incremental search"),
+            prefs.getKey(KeyBinds.INCREMENTAL_SEARCH),
+            IconTheme.getImage("incSearch"));
+    private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, "Search", Localization.lang("Search"),
+            prefs.getKey(KeyBinds.SEARCH),
+            IconTheme.getImage("search"));
+    private final AbstractAction toggleSearch = new GeneralAction(Actions.TOGGLE_SEARCH, "Search",
+            Localization.lang("Toggle search panel"),IconTheme.getImage("toggleSearch"));
 
-    private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, "Copy BibTeX key", prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY));
+    private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, "Copy BibTeX key",
+            prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY));
     private final AbstractAction//"Put a BibTeX reference to the selected entries on the clipboard",
-    copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, "Copy \\cite{BibTeX key}",
-    //"Put a BibTeX reference to the selected entries on the clipboard",
-    prefs.getKey(KeyBinds.COPY_CITE_BIB_TE_X_KEY));
-    private final AbstractAction copyKeyAndTitle = new GeneralAction(Actions.COPY_KEY_AND_TITLE, "Copy BibTeX key and title", prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY_AND_TITLE));
-    private final AbstractAction mergeDatabaseAction = new GeneralAction(Actions.MERGE_DATABASE, "Append database", Localization.lang("Append contents from a BibTeX database into the currently viewed database"), IconTheme.getImage("open"));
-    private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, "Select all", prefs.getKey(KeyBinds.SELECT_ALL));
-    private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL, "Replace string", prefs.getKey(KeyBinds.REPLACE_STRING));
+            copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, "Copy \\cite{BibTeX key}",
+            //"Put a BibTeX reference to the selected entries on the clipboard",
+            prefs.getKey(KeyBinds.COPY_CITE_BIB_TE_X_KEY));
+    private final AbstractAction copyKeyAndTitle = new GeneralAction(Actions.COPY_KEY_AND_TITLE,
+            "Copy BibTeX key and title",
+            prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY_AND_TITLE));
+    private final AbstractAction mergeDatabaseAction = new GeneralAction(Actions.MERGE_DATABASE,
+            "Append database",
+            Localization.lang("Append contents from a BibTeX database into the currently viewed database"),
+            IconTheme.getImage("open"));
+    private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, "Select all",
+            prefs.getKey(KeyBinds.SELECT_ALL));
+    private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL, "Replace string",
+            prefs.getKey(KeyBinds.REPLACE_STRING));
 
-    private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE, "Edit preamble", Localization.lang("Edit preamble"), prefs.getKey(KeyBinds.EDIT_PREAMBLE), IconTheme.getImage("editPreamble"));
-    private final AbstractAction editStrings = new GeneralAction(Actions.EDIT_STRINGS, "Edit strings", Localization.lang("Edit strings"), prefs.getKey(KeyBinds.EDIT_STRINGS), IconTheme.getImage("editStrings"));
+    private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE, "Edit preamble",
+            Localization.lang("Edit preamble"),
+            prefs.getKey(KeyBinds.EDIT_PREAMBLE),
+            IconTheme.getImage("editPreamble"));
+    private final AbstractAction editStrings = new GeneralAction(Actions.EDIT_STRINGS, "Edit strings",
+            Localization.lang("Edit strings"),
+            prefs.getKey(KeyBinds.EDIT_STRINGS),
+            IconTheme.getImage("editStrings"));
     private final AbstractAction toggleToolbar = new AbstractAction("Hide/show toolbar") {
-
         {
             putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.HIDE_SHOW_TOOLBAR));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Hide/show toolbar"));
         }
-
         @Override
         public void actionPerformed(ActionEvent e) {
             tlb.setVisible(!tlb.isVisible());
-        }
-    };
-    private final AbstractAction toggleGroups = new GeneralAction(Actions.TOGGLE_GROUPS, "Toggle groups interface", Localization.lang("Toggle groups interface"), prefs.getKey(KeyBinds.TOGGLE_GROUPS_INTERFACE), IconTheme.getImage("toggleGroups"));
-    private final AbstractAction togglePreview = new GeneralAction(Actions.TOGGLE_PREVIEW, "Toggle entry preview", Localization.lang("Toggle entry preview"), prefs.getKey(KeyBinds.TOGGLE_ENTRY_PREVIEW), IconTheme.getImage("togglePreview"));
-    private final AbstractAction toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY, "Highlight groups matching any selected entry", Localization.lang("Highlight groups matching any selected entry"), IconTheme.getImage("groupsHighlightAny"));
-    private final AbstractAction toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL, "Highlight groups matching all selected entries", Localization.lang("Highlight groups matching all selected entries"), IconTheme.getImage("groupsHighlightAll"));
-    final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW, "Switch preview layout", prefs.getKey(KeyBinds.SWITCH_PREVIEW_LAYOUT));
-    private final AbstractAction makeKeyAction = new GeneralAction(Actions.MAKE_KEY, "Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), prefs.getKey(KeyBinds.AUTOGENERATE_BIB_TE_X_KEYS), IconTheme.getImage("makeKey"));
+        }};
+    private final AbstractAction toggleGroups = new GeneralAction(Actions.TOGGLE_GROUPS,
+            "Toggle groups interface",
+            Localization.lang("Toggle groups interface"),
+            prefs.getKey(KeyBinds.TOGGLE_GROUPS_INTERFACE),
+            IconTheme.getImage("toggleGroups"));
+    private final AbstractAction togglePreview = new GeneralAction(Actions.TOGGLE_PREVIEW,
+            "Toggle entry preview",
+            Localization.lang("Toggle entry preview"),
+            prefs.getKey(KeyBinds.TOGGLE_ENTRY_PREVIEW),
+            IconTheme.getImage("togglePreview"));
+    private final AbstractAction toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
+            "Highlight groups matching any selected entry",
+            Localization.lang("Highlight groups matching any selected entry"),
+            IconTheme.getImage("groupsHighlightAny"));
+    private final AbstractAction toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
+            "Highlight groups matching all selected entries",
+            Localization.lang("Highlight groups matching all selected entries"),
+            IconTheme.getImage("groupsHighlightAll"));
+    final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
+            "Switch preview layout",
+            prefs.getKey(KeyBinds.SWITCH_PREVIEW_LAYOUT));
+    private final AbstractAction makeKeyAction = new GeneralAction(Actions.MAKE_KEY, "Autogenerate BibTeX keys",
+            Localization.lang("Autogenerate BibTeX keys"),
+            prefs.getKey(KeyBinds.AUTOGENERATE_BIB_TE_X_KEYS),
+            IconTheme.getImage("makeKey"));
 
-    private final AbstractAction writeXmpAction = new GeneralAction(Actions.WRITE_XMP, "Write XMP-metadata to PDFs", Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."), prefs.getKey(KeyBinds.WRITE_XMP));
+    private final AbstractAction writeXmpAction = new GeneralAction(Actions.WRITE_XMP, "Write XMP-metadata to PDFs",
+            Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
+            prefs.getKey(KeyBinds.WRITE_XMP));
 
-    private final AbstractAction openFolder = new GeneralAction(Actions.OPEN_FOLDER, "Open folder", Localization.lang("Open folder"), prefs.getKey(KeyBinds.OPEN_FOLDER));
-    private final AbstractAction openFile = new GeneralAction(Actions.OPEN_EXTERNAL_FILE, "Open file", Localization.lang("Open file"), prefs.getKey(KeyBinds.OPEN_FILE), IconTheme.getImage("openExternalFile"));
-    private final AbstractAction openPdf = new GeneralAction(Actions.OPEN_FILE, "Open PDF or PS", Localization.lang("Open PDF or PS"), prefs.getKey(KeyBinds.OPEN_PDF_OR_PS), IconTheme.getImage("openFile"));
-    private final AbstractAction openUrl = new GeneralAction(Actions.OPEN_URL, "Open URL or DOI", Localization.lang("Open URL or DOI"), prefs.getKey(KeyBinds.OPEN_URL_OR_DOI), IconTheme.getImage("openUrl"));
-    private final AbstractAction openSpires = new GeneralAction(Actions.OPEN_SPIRES, "Open SPIRES entry", Localization.lang("Open SPIRES entry"), prefs.getKey(KeyBinds.OPEN_SPIRES_ENTRY));
+    private final AbstractAction openFolder = new GeneralAction(Actions.OPEN_FOLDER, "Open folder",
+            Localization.lang("Open folder"),
+            prefs.getKey(KeyBinds.OPEN_FOLDER));
+    private final AbstractAction openFile = new GeneralAction(Actions.OPEN_EXTERNAL_FILE, "Open file",
+            Localization.lang("Open file"),
+            prefs.getKey(KeyBinds.OPEN_FILE),
+            IconTheme.getImage("openExternalFile"));
+    private final AbstractAction openPdf = new GeneralAction(Actions.OPEN_FILE, "Open PDF or PS",
+            Localization.lang("Open PDF or PS"),
+            prefs.getKey(KeyBinds.OPEN_PDF_OR_PS),
+            IconTheme.getImage("openFile"));
+    private final AbstractAction openUrl = new GeneralAction(Actions.OPEN_URL, "Open URL or DOI",
+            Localization.lang("Open URL or DOI"),
+            prefs.getKey(KeyBinds.OPEN_URL_OR_DOI),
+            IconTheme.getImage("openUrl"));
+    private final AbstractAction openSpires = new GeneralAction(Actions.OPEN_SPIRES, "Open SPIRES entry",
+            Localization.lang("Open SPIRES entry"),
+            prefs.getKey(KeyBinds.OPEN_SPIRES_ENTRY));
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK, "Find duplicates");
-    private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT, "New entry from plain text", prefs.getKey(KeyBinds.NEW_FROM_PLAIN_TEXT));
+    private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
+            "New entry from plain text",
+            prefs.getKey(KeyBinds.NEW_FROM_PLAIN_TEXT));
 
     private final AbstractAction customExpAction = new CustomizeExportsAction();
     private final AbstractAction customImpAction = new CustomizeImportsAction();
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
     AbstractAction exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard");
-    private final AbstractAction autoSetPdf = new GeneralAction(Actions.AUTO_SET_PDF, Localization.lang("Synchronize %0 links", "PDF"), prefs.getKey(KeyBinds.SYNCHRONIZE_PDF));
-    private final AbstractAction autoSetPs = new GeneralAction(Actions.AUTO_SET_PS, Localization.lang("Synchronize %0 links", "PS"), prefs.getKey(KeyBinds.SYNCHRONIZE_PS));
-    private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE, Localization.lang("Synchronize file links"), Globals.prefs.getKey(KeyBinds.SYNCHRONIZE_FILES));
+    private final AbstractAction autoSetPdf = new GeneralAction(Actions.AUTO_SET_PDF,
+            Localization.lang("Synchronize %0 links", "PDF"),
+            prefs.getKey(KeyBinds.SYNCHRONIZE_PDF));
+    private final AbstractAction autoSetPs = new GeneralAction(Actions.AUTO_SET_PS,
+            Localization.lang("Synchronize %0 links", "PS"),
+            prefs.getKey(KeyBinds.SYNCHRONIZE_PS));
+    private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
+            Localization.lang("Synchronize file links"),
+            Globals.prefs.getKey(KeyBinds.SYNCHRONIZE_FILES));
 
-    private final AbstractAction abbreviateMedline = new GeneralAction(Actions.ABBREVIATE_MEDLINE, "Abbreviate journal names (MEDLINE)", Localization.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)"));
-    private final AbstractAction abbreviateIso = new GeneralAction(Actions.ABBREVIATE_ISO, "Abbreviate journal names (ISO)", Localization.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"), Globals.prefs.getKey(KeyBinds.ABBREVIATE));
+    private final AbstractAction abbreviateMedline = new GeneralAction(Actions.ABBREVIATE_MEDLINE, "Abbreviate journal names (MEDLINE)",
+            Localization.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)"));
+    private final AbstractAction abbreviateIso = new GeneralAction(Actions.ABBREVIATE_ISO, "Abbreviate journal names (ISO)",
+            Localization.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"),
+            Globals.prefs.getKey(KeyBinds.ABBREVIATE));
 
-    private final AbstractAction unabbreviate = new GeneralAction(Actions.UNABBREVIATE, "Unabbreviate journal names", Localization.lang("Unabbreviate journal names of the selected entries"), Globals.prefs.getKey(KeyBinds.UNABBREVIATE));
+    private final AbstractAction unabbreviate = new GeneralAction(Actions.UNABBREVIATE, "Unabbreviate journal names",
+            Localization.lang("Unabbreviate journal names of the selected entries"),
+            Globals.prefs.getKey(KeyBinds.UNABBREVIATE));
     private final AbstractAction manageJournals = new ManageJournalsAction(this);
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
     private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.streamEavesdropper, Globals.handler);
 
-    private final AbstractAction dbConnect = new GeneralAction(Actions.DB_CONNECT, "Connect to external SQL database", Localization.lang("Connect to external SQL database"), IconTheme.getImage("dbConnect"));
+    private final AbstractAction dbConnect = new GeneralAction(Actions.DB_CONNECT, "Connect to external SQL database",
+            Localization.lang("Connect to external SQL database"),
+            IconTheme.getImage("dbConnect"));
 
-    private final AbstractAction dbExport = new GeneralAction(Actions.DB_EXPORT, "Export to external SQL database", Localization.lang("Export to external SQL database"), IconTheme.getImage("dbExport"));
+    private final AbstractAction dbExport = new GeneralAction(Actions.DB_EXPORT, "Export to external SQL database",
+            Localization.lang("Export to external SQL database"),
+            IconTheme.getImage("dbExport"));
 
-    private final AbstractAction Cleanup = new GeneralAction(Actions.CLEANUP, "Cleanup entries", Localization.lang("Cleanup entries"), prefs.getKey(KeyBinds.CLEANUP), IconTheme.getImage("cleanupentries"));
+    private final AbstractAction Cleanup = new GeneralAction(Actions.CLEANUP, "Cleanup entries",
+            Localization.lang("Cleanup entries"),
+            prefs.getKey(KeyBinds.CLEANUP),
+            IconTheme.getImage("cleanupentries"));
 
-    private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES, "Merge entries", Localization.lang("Merge entries"), IconTheme.getImage("mergeentries"));
+    private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES, "Merge entries",
+            Localization.lang("Merge entries"),
+            IconTheme.getImage("mergeentries"));
 
     private final AbstractAction dbImport = new DbImportAction(this).getAction();
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
-    private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS, "Resolve duplicate BibTeX keys", Localization.lang("Find and remove duplicate BibTeX keys"), prefs.getKey(KeyBinds.RESOLVE_DUPLICATE_BIB_TE_X_KEYS));
+    private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS, "Resolve duplicate BibTeX keys",
+            Localization.lang("Find and remove duplicate BibTeX keys"),
+            prefs.getKey(KeyBinds.RESOLVE_DUPLICATE_BIB_TE_X_KEYS));
 
     final MassSetFieldAction massSetField = new MassSetFieldAction(this);
     final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
 
-    private final GeneralAction findUnlinkedFiles = new GeneralAction(FindUnlinkedFilesDialog.ACTION_COMMAND, FindUnlinkedFilesDialog.ACTION_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION, prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION), IconTheme.getImage("toggleSearch"));
+    private final GeneralAction findUnlinkedFiles = new GeneralAction(
+            FindUnlinkedFilesDialog.ACTION_COMMAND,
+            FindUnlinkedFilesDialog.ACTION_TITLE,
+            FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
+            prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION),
+            IconTheme.getImage("toggleSearch")
+    );
 
     private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
 
@@ -350,8 +481,25 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey("New entry"));
-    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[] {new NewEntryAction(this, "article", prefs.getKey("New article")), new NewEntryAction(this, "book", prefs.getKey("New book")), new NewEntryAction(this, "phdthesis", prefs.getKey("New phdthesis")), new NewEntryAction(this, "inbook", prefs.getKey("New inbook")), new NewEntryAction(this, "mastersthesis", prefs.getKey("New mastersthesis")), new NewEntryAction(this, "proceedings", prefs.getKey("New proceedings")), new NewEntryAction(this, "inproceedings"), new NewEntryAction(this, "conference"), new NewEntryAction(this, "incollection"), new NewEntryAction(this, "booklet"), new NewEntryAction(this, "manual"), new NewEntryAction(this, "techreport"), new NewEntryAction(this, "unpublished", prefs.getKey("New unpublished")), new NewEntryAction(this, "misc"), new NewEntryAction(this, "other")
-    };
+    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[]
+            {
+                    new NewEntryAction(this, "article", prefs.getKey("New article")),
+                    new NewEntryAction(this, "book", prefs.getKey("New book")),
+                    new NewEntryAction(this, "phdthesis", prefs.getKey("New phdthesis")),
+                    new NewEntryAction(this, "inbook", prefs.getKey("New inbook")),
+                    new NewEntryAction(this, "mastersthesis", prefs.getKey("New mastersthesis")),
+                    new NewEntryAction(this, "proceedings", prefs.getKey("New proceedings")),
+                    new NewEntryAction(this, "inproceedings"),
+                    new NewEntryAction(this, "conference"),
+                    new NewEntryAction(this, "incollection"),
+                    new NewEntryAction(this, "booklet"),
+                    new NewEntryAction(this, "manual"),
+                    new NewEntryAction(this, "techreport"),
+                    new NewEntryAction(this, "unpublished",
+                            prefs.getKey("New unpublished")),
+                    new NewEntryAction(this, "misc"),
+                    new NewEntryAction(this, "other")
+            };
 
 
     public JabRefFrame(JabRef jabRef) {
@@ -405,8 +553,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             /*
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             GraphicsDevice[] gs = ge.getScreenDevices();
-            
-            
+
+
             // Get size of each screen
             for (int i=0; i<gs.length; i++) {
                 DisplayMode dm = gs[i].getDisplayMode();
@@ -425,7 +573,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             //
             if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length == 1) {
 
-                Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDefaultConfiguration().getBounds();
+                Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
+                        .getDefaultConfiguration().getBounds();
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
                 // Make sure we are not above or to the left of the screen bounds:
@@ -441,7 +590,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                 //if (posX < )
 
-                if ((posX + sizeX) > width) {
+                if (posX + sizeX > width) {
                     if (sizeX <= width) {
                         posX = width - sizeX;
                     } else {
@@ -450,7 +599,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     }
                 }
 
-                if ((posY + sizeY) > height) {
+                if (posY + sizeY > height) {
                     if (sizeY <= height) {
                         posY = height - sizeY;
                     } else {
@@ -479,10 +628,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 BasePanel bp = basePanel();
                 if (bp != null) {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-                    searchToggle.setSelected(searchBar.isVisible());
-                    previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
-                    highlightAny.setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY));
-                    highlightAll.setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL));
+					searchToggle.setSelected(searchBar.isVisible());
+					previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
+                    highlightAny
+                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY));
+                    highlightAll
+                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL));
                     Globals.focusListener.setFocused(bp.mainTable);
                     setWindowTitle();
                     // Update search autocompleter with information for the correct database:
@@ -501,7 +652,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             try {
                 new MacAdapter().registerMacEvents(this);
             } catch (Exception e) {
-                JabRefFrame.LOGGER.fatal("could not interface with Mac OS X methods", e);
+                LOGGER.fatal("could not interface with Mac OS X methods", e);
             }
         }
     }
@@ -539,7 +690,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Check if the file is already open.
         for (int i = 0; i < this.getTabbedPane().getTabCount(); i++) {
             BasePanel bp = this.baseAt(i);
-            if ((bp.getFile() != null) && bp.getFile().equals(file)) {
+            if (bp.getFile() != null && bp.getFile().equals(file)) {
                 //The file is already opened, so just raising its tab.
                 this.getTabbedPane().setSelectedComponent(bp);
                 return;
@@ -563,9 +714,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // General info dialog.  The MacAdapter calls this method when "About"
     // is selected from the application menu.
     public void about() {
-        JDialog about = new JDialog(JabRefFrame.this, Localization.lang("About JabRef"), true);
+        JDialog about = new JDialog(JabRefFrame.this, Localization.lang("About JabRef"),
+                true);
         JEditorPane jp = new JEditorPane();
-        JScrollPane sp = new JScrollPane(jp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane
+                (jp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jp.setEditable(false);
         try {
             jp.setPage(GUIGlobals.class.getResource("/help/About.html"));//GUIGlobals.aboutPage);
@@ -575,7 +729,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                 @Override
                 public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent e) {
-                    if (e.getEventType() == javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) {
+                    if (e.getEventType()
+                            == javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) {
                         try {
                             ((JEditorPane) e.getSource()).setPage(e.getURL());
                         } catch (IOException ignored) {
@@ -589,7 +744,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             about.setVisible(true);
         } catch (IOException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(JabRefFrame.this, "Could not load file 'About.html'", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(JabRefFrame.this, "Could not load file 'About.html'",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
 
     }
@@ -631,8 +787,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * <p>
      * FIXME: Currently some threads remain and therefore hinder JabRef to be closed properly
      *
-     * @param filenames the file names of all currently opened files - used for storing them if prefs openLastEdited is
-     *            set to true
+     * @param filenames the file names of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
     private void tearDownJabRef(Vector<String> filenames) {
         JabRefExecutorService.INSTANCE.shutdownEverything();
@@ -681,11 +836,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.autoSaveManager.clearAutoSaves();
         }
 
-        // Let the search interface store changes to prefs.
-        searchBar.updatePrefs();
+		// Let the search interface store changes to prefs.
+		searchBar.updatePrefs();
 
         prefs.flush();
-
+		
         // hide systray because the JVM can only shut down when no systray icon is shown
         if (sysTray != null) {
             sysTray.hide();
@@ -703,8 +858,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     /**
-     * General info dialog. The MacAdapter calls this method when "Quit" is selected from the application menu, Cmd-Q is
-     * pressed, or "Quit" is selected from the Dock. The function returns a boolean indicating if quitting is ok or not.
+     * General info dialog.  The MacAdapter calls this method when "Quit"
+     * is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
+     * The function returns a boolean indicating if quitting is ok or not.
      * <p>
      * Non-OSX JabRef calls this when choosing "Quit" from the menu
      * <p>
@@ -721,9 +877,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (baseAt(i).isBaseChanged()) {
                     tabbedPane.setSelectedIndex(i);
-                    int answer = JOptionPane.showConfirmDialog(JabRefFrame.this, Localization.lang("Database has changed. Do you " + "want to save before closing?"), Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
+                    int answer = JOptionPane.showConfirmDialog
+                            (JabRefFrame.this, Localization.lang
+                                            ("Database has changed. Do you "
+                                                    + "want to save before closing?"),
+                                    Localization.lang("Save before closing"),
+                                    JOptionPane.YES_NO_CANCEL_OPTION);
 
-                    if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
+                    if (answer == JOptionPane.CANCEL_OPTION ||
+                            answer == JOptionPane.CLOSED_OPTION) {
                         return false;
                     }
                     if (answer == JOptionPane.YES_OPTION) {
@@ -777,7 +939,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         setProgressBarVisible(false);
 
-        pushExternalButton = new PushToApplicationButton(this, PushToApplicationButton.applications);
+        pushExternalButton = new PushToApplicationButton(this,
+                PushToApplicationButton.applications);
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);
@@ -806,7 +969,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
           empt.setBackground(GUIGlobals.lightGray);
           gbl.setConstraints(empt, con);
                getContentPane().add(empt);
-        
+
           con.insets = new Insets(1,0,1,1);
           con.anchor = GridBagConstraints.EAST;
           con.weightx = 0;
@@ -826,21 +989,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         con.weighty = 1;
         gbl.setConstraints(contentPane, con);
         getContentPane().add(contentPane);
-
+        
         JPanel main = new JPanel();
-        main.setLayout(new OverlayLayout(main));
+        main.setLayout( new OverlayLayout(main) );
         searchBar = new SearchBar(this);
         searchBar.setAlignmentX(1.0f);
-        searchBar.setAlignmentY(0.0f);
+        searchBar.setAlignmentY(0.0f);  
         searchBar.setMaximumSize(new Dimension(200, 25));
         main.add(searchBar);
         setSearchBarVisible(Globals.prefs.getBoolean(JabRefPreferences.SEARCH_BAR_VISIBLE));
         tabbedPane.setAlignmentX(1.0f);
         tabbedPane.setAlignmentY(0.0f);
         main.add(tabbedPane);
-
-        UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
-
+        
+        UIManager.put("TabbedPane.contentBorderInsets", new Insets(0,0,0,0));
+        
         contentPane.setRightComponent(main);
         contentPane.setLeftComponent(sidePaneManager.getPanel());
         sidePaneManager.updateView();
@@ -915,10 +1078,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void markActiveBasePanel() {
         int now = tabbedPane.getSelectedIndex();
         int len = tabbedPane.getTabCount();
-        if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
+        if (lastTabbedPanelSelectionIndex > -1 && lastTabbedPanelSelectionIndex < len) {
             tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, GUIGlobals.inActiveTabbed);
         }
-        if ((now > -1) && (now < len)) {
+        if (now > -1 && now < len) {
             tabbedPane.setForegroundAt(now, GUIGlobals.activeTabbed);
         }
         lastTabbedPanelSelectionIndex = now;
@@ -953,11 +1116,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
 
     class GeneralAction extends MnemonicAwareAction {
-
         private final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
         private final String command;
-
 
         public GeneralAction(String command, String text) {
             this.command = command;
@@ -1004,16 +1165,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public void actionPerformed(ActionEvent e) {
             if (tabbedPane.getTabCount() > 0) {
                 try {
-                    ((BasePanel) tabbedPane.getSelectedComponent()).runCommand(command);
+                    ((BasePanel) tabbedPane.getSelectedComponent())
+                            .runCommand(command);
                 } catch (Throwable ex) {
                     ex.printStackTrace();
                 }
             } else {
-                LOGGER.info("Action '" + command + "' must be disabled when no database is open.");
+                    LOGGER.info("Action '" + command + "' must be disabled when no database is open.");
             }
         }
     }
-
 
     /**
      * Refresh import menus.
@@ -1412,17 +1573,28 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions = new LinkedList<>();
-        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch, makeKeyAction, normalSearch, incrementalSearch, replaceAll, importMenu, exportMenu,
-        /* openSpires wasn't being supported so no point in supporting
-         * openInspire */
-        openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/togglePreview, dupliCheck, /*strictDupliCheck,*/highlightAll, highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords, closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs, toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected, importCurrent, saveAll, dbConnect, dbExport, focusTable));
+        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors,
+                mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, saveSelectedAsPlain, undo,
+                redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
+                selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
+                makeKeyAction, normalSearch,
+                incrementalSearch, replaceAll, importMenu, exportMenu,
+                /* openSpires wasn't being supported so no point in supporting
+                 * openInspire */
+                openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/togglePreview, dupliCheck, /*strictDupliCheck,*/highlightAll,
+                highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
+                closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
+                toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
+                abbreviateMedline, unabbreviate, exportAll, exportSelected,
+                importCurrent, saveAll, dbConnect, dbExport, focusTable));
 
         openDatabaseOnlyActions.addAll(fetcherActions);
 
         openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
 
         severalDatabasesOnlyActions = new LinkedList<>();
-        severalDatabasesOnlyActions.addAll(Arrays.asList(nextTab, prevTab, sortTabs));
+        severalDatabasesOnlyActions.addAll(Arrays
+                .asList(nextTab, prevTab, sortTabs));
 
         tabbedPane.addChangeListener(new ChangeListener() {
 
@@ -1435,10 +1607,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     /**
-     * Takes a list of Object and calls the method setEnabled on them, depending on whether it is an Action or a
-     * Component.
+     * Takes a list of Object and calls the method setEnabled on them, depending on whether it is an Action or a Component.
      *
-     * @param list List that should contain Actions and Components.
+     * @param list    List that should contain Actions and Components.
      * @param enabled
      */
     private static void setEnabled(List<Object> list, boolean enabled) {
@@ -1475,8 +1646,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     /**
-     * This method causes all open BasePanels to set up their tables anew. When called from PrefsDialog3, this updates
-     * to the new settings.
+     * This method causes all open BasePanels to set up their tables
+     * anew. When called from PrefsDialog3, this updates to the new
+     * settings.
      */
     public void setupAllTables() {
         // This action can be invoked without an open database, so
@@ -1520,24 +1692,26 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
                 // This also happens internally at basepanel to ensure consistency
-                title = title + '*';
+                title = title + '*'; 
             }
         } else {
             title = file.getName();
         }
-
+        
         // We use html here to get some padding around the title
         // There are no closing tags since we would otherwise run in a bug 
         // see https://sourceforge.net/p/jabref/bugs/1293/
         tabbedPane.add(htmlPadding + title, bp);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file != null ? file.getAbsolutePath() : null);
+        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1,
+                file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
         }
     }
 
     /**
-     * Signal closing of the current tab. Standard warnings will be given if the database has been changed.
+     * Signal closing of the current tab. Standard warnings will be given if the
+     * database has been changed.
      */
     public void closeCurrentTab() {
         closeDatabaseAction.actionPerformed(null);
@@ -1552,7 +1726,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
 
     class SelectKeysAction extends AbstractAction {
-
         public SelectKeysAction() {
             super(Localization.lang("Customize key bindings"));
         }
@@ -1566,7 +1739,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             d.setVisible(true);
             if (d.getAction()) {
                 prefs.setNewKeyBindings(d.getNewKeyBindings());
-                JOptionPane.showMessageDialog(JabRefFrame.this, Localization.lang("Your new key bindings have been stored.") + '\n' + Localization.lang("You must restart JabRef for the new key " + "bindings to work properly."), Localization.lang("Key bindings changed"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog
+                        (JabRefFrame.this,
+                                Localization.lang("Your new key bindings have been stored.") + '\n'
+                                        + Localization.lang("You must restart JabRef for the new key "
+                                        + "bindings to work properly."),
+                                Localization.lang("Key bindings changed"),
+                                JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -1575,7 +1754,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * The action concerned with closing the window.
      */
     class CloseAction extends MnemonicAwareAction {
-
         public CloseAction() {
             putValue(Action.NAME, "Quit");
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Quit JabRef"));
@@ -1588,13 +1766,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-
     // The action for closing the current database and leaving the window open.
     private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
 
-
     class CloseDatabaseAction extends MnemonicAwareAction {
-
         public CloseDatabaseAction() {
             super(IconTheme.getImage("close"));
             putValue(Action.NAME, "Close database");
@@ -1612,8 +1787,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
 
             if (basePanel().isBaseChanged()) {
-                int answer = JOptionPane.showConfirmDialog(JabRefFrame.this, Localization.lang("Database has changed. Do you want to save before closing?"), Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
-                if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
+                int answer = JOptionPane.showConfirmDialog(JabRefFrame.this,
+                        Localization.lang("Database has changed. Do you want to save before closing?"),
+                        Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
+                if (answer == JOptionPane.CANCEL_OPTION || answer == JOptionPane.CLOSED_OPTION) {
                     close = false; // The user has cancelled.
                 }
                 if (answer == JOptionPane.YES_OPTION) {
@@ -1657,12 +1834,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-
     // The action for opening the preferences dialog.
     private final AbstractAction showPrefs = new ShowPrefsAction();
 
-
-    class ShowPrefsAction extends MnemonicAwareAction {
+    class ShowPrefsAction
+            extends MnemonicAwareAction {
 
         public ShowPrefsAction() {
             super(IconTheme.getImage("preferences"));
@@ -1678,26 +1854,31 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
 
     /**
-     * This method does the job of adding imported entries into the active database, or into a new one. It shows the
-     * ImportInspectionDialog if preferences indicate it should be used. Otherwise it imports directly.
+     * This method does the job of adding imported entries into the active
+     * database, or into a new one. It shows the ImportInspectionDialog if
+     * preferences indicate it should be used. Otherwise it imports directly.
      *
-     * @param panel The BasePanel to add to.
-     * @param entries The entries to add.
-     * @param filename Name of the file where the import came from.
+     * @param panel     The BasePanel to add to.
+     * @param entries   The entries to add.
+     * @param filename  Name of the file where the import came from.
      * @param openInNew Should the entries be imported into a new database?
      */
-    private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries, String filename, final boolean openInNew) {
+    private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries,
+                                    String filename, final boolean openInNew) {
         /*
          * Use the import inspection dialog if it is enabled in preferences, and
          * (there are more than one entry or the inspection dialog is also
          * enabled for single entries):
          */
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) && (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE) || (entries.size() > 1))) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
+                (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE) || entries.size() > 1)) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this, panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+                    ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
+                            panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"),
+                            openInNew);
                     diag.addEntries(entries);
                     diag.entryListComplete();
                     // On the one hand, the following statement could help at issues when JabRef is minimized to the systray
@@ -1712,7 +1893,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         } else {
             JabRefFrame.this.addBibEntries(entries, filename, openInNew);
-            if ((panel != null) && (entries.size() == 1)) {
+            if (panel != null && entries.size() == 1) {
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
@@ -1727,24 +1908,30 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * Adds the entries to the database, possibly checking for duplicates first.
      *
-     * @param filename If non-null, a message is printed to the status line describing how many entries were imported,
-     *            and from which file. If null, the message will not be printed.
-     * @param intoNew Determines if the entries will be put in a new database or in the current one.
+     * @param filename If non-null, a message is printed to the status line describing
+     *                 how many entries were imported, and from which file. If null, the message will not
+     *                 be printed.
+     * @param intoNew  Determines if the entries will be put in a new database or in the current
+     *                 one.
      */
-    private int addBibEntries(List<BibtexEntry> bibentries, String filename, boolean intoNew) {
-        if ((bibentries == null) || bibentries.isEmpty()) {
+    private int addBibEntries(List<BibtexEntry> bibentries, String filename,
+                              boolean intoNew) {
+        if (bibentries == null || bibentries.isEmpty()) {
 
             // No entries found. We need a message for this.
-            JOptionPane.showMessageDialog(JabRefFrame.this, Localization.lang("No entries found. Please make sure you are " + "using the correct import filter."), Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(JabRefFrame.this, Localization.lang("No entries found. Please make sure you are "
+                            + "using the correct import filter."), Localization.lang("Import failed"),
+                    JOptionPane.ERROR_MESSAGE);
             return 0;
         }
 
         int addedEntries = 0;
 
         // Set owner and timestamp fields:
-        Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER), Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
+        Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
+                Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
 
-        if (intoNew || (tabbedPane.getTabCount() == 0)) {
+        if (intoNew || tabbedPane.getTabCount() == 0) {
             // Import into new database.
             BibtexDatabase database = new BibtexDatabase();
             for (BibtexEntry entry : bibentries) {
@@ -1766,7 +1953,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             bp.markBaseChanged();
             tabbedPane.setSelectedComponent(bp);
             if (filename != null) {
-                output(Localization.lang("Imported database") + " '" + filename + "' " + Localization.lang("with") + ' ' + database.getEntryCount() + ' ' + Localization.lang("entries into new database") + '.');
+                output(Localization.lang("Imported database") + " '" + filename + "' " +
+                        Localization.lang("with") + ' ' +
+                        database.getEntryCount() + ' ' +
+                        Localization.lang("entries into new database") + '.');
             }
         } else {
             // Import into current database.
@@ -1775,20 +1965,24 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             int oldCount = database.getEntryCount();
             NamedCompound ce = new NamedCompound(Localization.lang("Import entries"));
 
-            mainLoop: for (BibtexEntry entry : bibentries) {
+            mainLoop:
+            for (BibtexEntry entry : bibentries) {
                 boolean dupli = false;
                 // Check for duplicates among the current entries:
                 for (String s : database.getKeySet()) {
                     BibtexEntry existingEntry = database.getEntryById(s);
-                    if (DuplicateCheck.isDuplicate(entry, existingEntry)) {
-                        DuplicateResolverDialog drd = new DuplicateResolverDialog(JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
+                    if (DuplicateCheck.isDuplicate(entry, existingEntry
+                    )) {
+                        DuplicateResolverDialog drd = new DuplicateResolverDialog
+                                (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
                         drd.setVisible(true);
                         int res = drd.getSelected();
                         if (res == DuplicateResolverDialog.KEEP_LOWER) {
                             dupli = true;
                         } else if (res == DuplicateResolverDialog.KEEP_UPPER) {
                             database.removeEntry(existingEntry.getId());
-                            ce.addEdit(new UndoableRemoveEntry(database, existingEntry, basePanel));
+                            ce.addEdit(new UndoableRemoveEntry
+                                    (database, existingEntry, basePanel));
                         } else if (res == DuplicateResolverDialog.BREAK) {
                             break mainLoop;
                         }
@@ -1800,7 +1994,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                     entry.setId(IdGenerator.next());
                     database.insertEntry(entry);
-                    ce.addEdit(new UndoableInsertEntry(database, entry, basePanel));
+                    ce.addEdit(new UndoableInsertEntry
+                            (database, entry, basePanel));
                     addedEntries++;
 
                 }
@@ -1810,7 +2005,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 basePanel.undoManager.addEdit(ce);
                 basePanel.markBaseChanged();
                 if (filename != null) {
-                    output(Localization.lang("Imported database") + " '" + filename + "' " + Localization.lang("with") + ' ' + (database.getEntryCount() - oldCount) + ' ' + Localization.lang("entries into new database") + '.');
+                    output(Localization.lang("Imported database") + " '" + filename + "' " +
+                            Localization.lang("with") + ' ' +
+                            (database.getEntryCount() - oldCount) + ' ' +
+                            Localization.lang("entries into new database") + '.');
                 }
             }
 
@@ -1882,18 +2080,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     /**
-     * This method reverts the cursor to normal, and stops blocking input to the JFrame's contents. There are no adverse
-     * effects of calling this method redundantly.
+     * This method reverts the cursor to normal, and stops blocking input to the JFrame's contents.
+     * There are no adverse effects of calling this method redundantly.
      */
     public void unblock() {
         getGlassPane().setVisible(false);
     }
 
     /**
-     * Set the visibility of the progress bar in the right end of the status line at the bottom of the frame.
+     * Set the visibility of the progress bar in the right end of the
+     * status line at the bottom of the frame.
      * <p>
-     * If not called on the event dispatch thread, this method uses SwingUtilities.invokeLater() to do the actual
-     * operation on the EDT.
+     * If not called on the event dispatch thread, this method uses
+     * SwingUtilities.invokeLater() to do the actual operation on the EDT.
      */
     public void setProgressBarVisible(final boolean visible) {
         if (SwingUtilities.isEventDispatchThread()) {
@@ -1912,8 +2111,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * Sets the current value of the progress bar.
      * <p>
-     * If not called on the event dispatch thread, this method uses SwingUtilities.invokeLater() to do the actual
-     * operation on the EDT.
+     * If not called on the event dispatch thread, this method uses
+     * SwingUtilities.invokeLater() to do the actual operation on the EDT.
      */
     public void setProgressBarValue(final int value) {
         if (SwingUtilities.isEventDispatchThread()) {
@@ -1933,8 +2132,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * Sets the indeterminate status of the progress bar.
      * <p>
-     * If not called on the event dispatch thread, this method uses SwingUtilities.invokeLater() to do the actual
-     * operation on the EDT.
+     * If not called on the event dispatch thread, this method uses
+     * SwingUtilities.invokeLater() to do the actual operation on the EDT.
      */
     public void setProgressBarIndeterminate(final boolean value) {
         if (SwingUtilities.isEventDispatchThread()) {
@@ -1952,11 +2151,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     /**
-     * Sets the maximum value of the progress bar. Always call this method before using the progress bar, to set a
-     * maximum value appropriate to the task at hand.
+     * Sets the maximum value of the progress bar. Always call this method
+     * before using the progress bar, to set a maximum value appropriate to
+     * the task at hand.
      * <p>
-     * If not called on the event dispatch thread, this method uses SwingUtilities.invokeLater() to do the actual
-     * operation on the EDT.
+     * If not called on the event dispatch thread, this method uses
+     * SwingUtilities.invokeLater() to do the actual operation on the EDT.
      */
     public void setProgressBarMaximum(final int value) {
         if (SwingUtilities.isEventDispatchThread()) {
@@ -1974,7 +2174,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
-    class SaveSessionAction extends MnemonicAwareAction {
+    class SaveSessionAction
+            extends MnemonicAwareAction {
 
         public SaveSessionAction() {
             super(IconTheme.getImage("save"));
@@ -1992,7 +2193,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                     if (tabbedPane.getTitleAt(i).equals(GUIGlobals.untitledTitle)) {
                         tabbedPane.setSelectedIndex(i);
-                        int answer = JOptionPane.showConfirmDialog(JabRefFrame.this, Localization.lang("This untitled database must be saved first to be " + "included in the saved session. Save now?"), Localization.lang("Save database"), JOptionPane.YES_NO_OPTION);
+                        int answer = JOptionPane.showConfirmDialog
+                                (JabRefFrame.this, Localization.lang
+                                                ("This untitled database must be saved first to be "
+                                                        + "included in the saved session. Save now?"),
+                                        Localization.lang("Save database"),
+                                        JOptionPane.YES_NO_OPTION);
                         if (answer == JOptionPane.YES_OPTION) {
                             // The user wants to save.
                             try {
@@ -2024,7 +2230,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public class LoadSessionAction extends MnemonicAwareAction {
 
         volatile boolean running;
-
 
         public LoadSessionAction() {
             super(IconTheme.getImage("loadSession"));
@@ -2069,7 +2274,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             }
                         }
                     }
-                    output(Localization.lang("Files opened") + ": " + (tabbedPane.getTabCount() - i0));
+                    output(Localization.lang("Files opened") + ": " +
+                            (tabbedPane.getTabCount() - i0));
                     running = false;
                 }
             });
@@ -2086,7 +2292,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.NAME, next ? "Next tab" : "Previous tab");
             this.next = next;
             //Util.pr(""+prefs.getKey("Next tab"));
-            putValue(Action.ACCELERATOR_KEY, next ? prefs.getKey("Next tab") : prefs.getKey("Previous tab"));
+            putValue(Action.ACCELERATOR_KEY,
+                    next ? prefs.getKey("Next tab") : prefs.getKey("Previous tab"));
         }
 
         @Override
@@ -2104,13 +2311,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     /**
-     * Class for handling general actions; cut, copy and paste. The focused component is kept track of by
-     * Globals.focusListener, and we call the action stored under the relevant name in its action map.
+     * Class for handling general actions; cut, copy and paste. The focused component is
+     * kept track of by Globals.focusListener, and we call the action stored under the
+     * relevant name in its action map.
      */
     class EditAction extends MnemonicAwareAction {
-
         private final String command;
-
 
         public EditAction(String command, ImageIcon icon) {
             super(icon);
@@ -2247,7 +2453,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent event) {
             int currentSize = GUIGlobals.CURRENTFONT.getSize();
-            GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(), currentSize + 1);
+            GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
+                    currentSize + 1);
             Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize + 1);
             for (int i = 0; i < baseCount(); i++) {
                 baseAt(i).updateTableFont();
@@ -2268,7 +2475,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (currentSize < 2) {
                 return;
             }
-            GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(), currentSize - 1);
+            GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
+                    currentSize - 1);
             Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize - 1);
             for (int i = 0; i < baseCount(); i++) {
                 baseAt(i).updateTableFont();
@@ -2314,7 +2522,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-
     private static class MyGlassPane extends JPanel {
 
         //ForegroundLabel infoLabel = new ForegroundLabel("Showing search");
@@ -2324,10 +2531,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             addMouseListener(new MouseAdapter() {
             });
             /*  infoLabel.setForeground(new Color(255, 100, 100, 124));
-            
+
               setLayout(new BorderLayout());
               add(infoLabel, BorderLayout.CENTER);*/
-            super.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            super.setCursor(
+                    Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         }
 
         // Override isOpaque() to prevent the glasspane from hiding the window contents:
@@ -2354,43 +2562,43 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     public SearchBar getSearchBar() {
-        return searchBar;
+  	  return searchBar;
     }
-
+    
     public void setSearchBarVisible(boolean visible) {
-        searchBar.setVisible(visible);
-        searchToggle.setSelected(visible);
-        if (visible) {
-            setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 250));
-        } else {
-            setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 2));
-        }
+  	  searchBar.setVisible(visible);
+  	  searchToggle.setSelected(visible);
+  	  if(visible)
+  		  setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 250));
+  	  else
+  		  setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 2));
     }
 
-    // Copied from org.pushingpixels.lafwidget.LafWidgetSupport
-    // http://jarvis.cs.ucdavis.edu/code_essence/functions/5829321
-    // We need to use reflection to change the tabAreaInsets since a TappedPaneUI does not provide an easier way to set this
-    private void setTabAreaInsets(JTabbedPane tabbedPane, Insets tabAreaInsets) {
-        TabbedPaneUI ui = tabbedPane.getUI();
-        if (ui instanceof BasicTabbedPaneUI) {
-            try {
-                Class<?> clazz = ui.getClass();
-                while (clazz != null) {
-                    try {
-                        Field fld = clazz.getDeclaredField("tabAreaInsets");
-                        if (fld != null) {
-                            fld.setAccessible(true);
-                            fld.set(ui, tabAreaInsets);
-                            return;
-                        }
-                    } catch (NoSuchFieldException nsfe) {
-                    }
-                    clazz = clazz.getSuperclass();
-                }
-            } catch (Throwable t) {
-                // ignore all fall through
-            }
-        }
-        throw new UnsupportedOperationException();
-    }
+
+  // Copied from org.pushingpixels.lafwidget.LafWidgetSupport
+  // http://jarvis.cs.ucdavis.edu/code_essence/functions/5829321
+  // We need to use reflection to change the tabAreaInsets since a TappedPaneUI does not provide an easier way to set this
+  private void setTabAreaInsets(JTabbedPane tabbedPane, Insets tabAreaInsets) {
+	  TabbedPaneUI ui = tabbedPane.getUI();
+	  if (ui instanceof BasicTabbedPaneUI) {
+		  try {
+			  Class<?> clazz = ui.getClass();
+			  while (clazz != null) {
+				  try {
+					  Field fld = clazz.getDeclaredField("tabAreaInsets");
+					  if (fld != null) {
+						  fld.setAccessible(true);
+						  fld.set(ui, tabAreaInsets);
+						  return;
+					  }
+				  } catch (NoSuchFieldException nsfe) {
+				  }
+				  clazz = clazz.getSuperclass();
+			  }
+		  } catch (Throwable t) {
+			  // ignore all fall through
+		  }
+	  }
+	  throw new UnsupportedOperationException();
+  }
 }

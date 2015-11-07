@@ -59,7 +59,6 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class JabRefPreferences {
-
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
 
     /**
@@ -342,11 +341,11 @@ public class JabRefPreferences {
     // modifications, in order to indicate a removed default file type:
     private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
-    private static final char[][] VALUE_DELIMITERS = new char[][] {{'"', '"'}, {'{', '}'}};
+    private static final char[][] VALUE_DELIMITERS = new char[][] { {'"', '"'}, {'{', '}'}};
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
-
+    
     private int SHORTCUT_MASK = -1;
 
     private final Preferences prefs;
@@ -554,7 +553,8 @@ public class JabRefPreferences {
 
         defaults.put(COLUMN_NAMES, "entrytype;author;title;year;journal;owner;timestamp;bibtexkey");
         defaults.put(COLUMN_WIDTHS, "75;280;400;60;100;100;100;100");
-        defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY, PersistenceTableColumnListener.DEFAULT_ENABLED);
+        defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
+                PersistenceTableColumnListener.DEFAULT_ENABLED);
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put(NUMBER_COL_WIDTH, GUIGlobals.NUMBER_COL_LENGTH);
@@ -622,7 +622,8 @@ public class JabRefPreferences {
         defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
         // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
-        defaults.put(GENERAL_FIELDS, "crossref;keywords;file;doi;url;urldate;" + "pdf;comment;owner");
+        defaults.put(GENERAL_FIELDS, "crossref;keywords;file;doi;url;urldate;"
+                + "pdf;comment;owner");
 
         defaults.put(HISTORY_SIZE, 8);
         defaults.put(FONT_STYLE, java.awt.Font.PLAIN);
@@ -697,12 +698,42 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_LABEL_PATTERN, "[auth][year]");
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
         defaults.put(ACTIVE_PREVIEW, 0);
-        defaults.put(PREVIEW_0, "<font face=\"arial\">" + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>" + "\\end{bibtexkey}</b><br>__NEWLINE__" + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__" + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} " + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__" + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__" + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__" + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-        // Include the booktitle field for @inproceedings, @proceedings, etc.
-        + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__" + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__" + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__" + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__" + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}" + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__" + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}" + "</dd>__NEWLINE__<p></p></font>");
-        defaults.put(PREVIEW_1, "<font face=\"arial\">" + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>" + "\\end{bibtexkey}</b><br>__NEWLINE__" + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__" + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} " + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__" + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__" + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__" + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-        // Include the booktitle field for @inproceedings, @proceedings, etc.
-        + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__" + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__" + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__" + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__" + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}" + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}" + "</dd>__NEWLINE__<p></p></font>");
+        defaults.put(PREVIEW_0, "<font face=\"arial\">"
+                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
+                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
+                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                // Include the booktitle field for @inproceedings, @proceedings, etc.
+                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
+                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
+                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
+                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
+                + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
+                + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
+                + "</dd>__NEWLINE__<p></p></font>");
+        defaults.put(PREVIEW_1, "<font face=\"arial\">"
+                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
+                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
+                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                // Include the booktitle field for @inproceedings, @proceedings, etc.
+                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
+                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
+                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
+                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}"
+                + "</dd>__NEWLINE__<p></p></font>");
 
         // TODO: Currently not possible to edit this setting:
         defaults.put(PREVIEW_PRINT_BUTTON, Boolean.FALSE);
@@ -836,7 +867,8 @@ public class JabRefPreferences {
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
-        defaults.put(CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;" + "comment;owner;timestamp");
+        defaults.put(CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;"
+                + "comment;owner;timestamp");
 
         // Entry editor tab 1:
         defaults.put(CUSTOM_TAB_FIELDS + "_def1", "abstract");
@@ -1092,8 +1124,8 @@ public class JabRefPreferences {
 
     /**
      * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences, but adapted for Mac
-     * users, with the Command key preferred instead of Control. TODO: Move to OS.java? Or replace with portable Java
-     * key codes, i.e. KeyEvent
+     * users, with the Command key preferred instead of Control.
+     * TODO: Move to OS.java? Or replace with portable Java key codes, i.e. KeyEvent
      */
     private KeyStroke getKeyForMac(KeyStroke ks) {
         if (ks == null) {
@@ -1246,7 +1278,8 @@ public class JabRefPreferences {
         String[] bindings = getStringArray("bindings");
 
         // Then set up the key bindings HashMap.
-        if (bindNames == null || bindings == null || bindNames.length != bindings.length) {
+        if (bindNames == null || bindings == null
+                || bindNames.length != bindings.length) {
             // Nothing defined in Preferences, or something is wrong.
             keyBinds = new KeyBinds();
             return;
@@ -1331,8 +1364,8 @@ public class JabRefPreferences {
     public CustomEntryType getCustomEntryType(int number) {
         String nr = "" + number;
         String name = get(JabRefPreferences.CUSTOM_TYPE_NAME + nr);
-        String[] req = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
-        String[] opt = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
+        String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
+        String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
         String[] priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
         if (name == null) {
             return null;
@@ -1425,7 +1458,8 @@ public class JabRefPreferences {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : externalFileTypes) {
-            if (type.getExtension() != null && filename.toLowerCase().endsWith(type.getExtension().toLowerCase())) {
+            if (type.getExtension() != null && filename.toLowerCase().
+                    endsWith(type.getExtension().toLowerCase())) {
                 if (type.getExtension().length() > longestFound) {
                     longestFound = type.getExtension().length();
                     foundType = type;

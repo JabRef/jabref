@@ -23,6 +23,7 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -58,7 +59,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     private MetaData metaData;
 
     /**
-     * If a database is set, the preview will attempt to resolve strings in the previewed entry using that database.
+     * If a database is set, the preview will attempt to resolve strings in the
+     * previewed entry using that database.
      */
     private BibtexDatabase database;
 
@@ -75,27 +77,41 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
 
     /**
-     * @param database (may be null) Optionally used to resolve strings.
-     * @param entry (may be null) If given this entry is shown otherwise you have to call setEntry to make something
-     *            visible.
-     * @param panel (may be null) If not given no toolbar is shown on the right hand side.
-     * @param metaData (must be given) Used for resolving pdf directories for links.
-     * @param layoutFile (must be given) Used for layout
+     * @param database
+     *            (may be null) Optionally used to resolve strings.
+     * @param entry
+     *            (may be null) If given this entry is shown otherwise you have
+     *            to call setEntry to make something visible.
+     * @param panel
+     *            (may be null) If not given no toolbar is shown on the right
+     *            hand side.
+     * @param metaData
+     *            (must be given) Used for resolving pdf directories for links.
+     * @param layoutFile
+     *            (must be given) Used for layout
      */
-    public PreviewPanel(BibtexDatabase database, BibtexEntry entry, BasePanel panel, MetaData metaData, String layoutFile) {
+    public PreviewPanel(BibtexDatabase database, BibtexEntry entry,
+            BasePanel panel, MetaData metaData, String layoutFile) {
         this(database, entry, panel, metaData, layoutFile, false);
     }
 
     /**
-     * @param database (may be null) Optionally used to resolve strings.
-     * @param entry (may be null) If given this entry is shown otherwise you have to call setEntry to make something
-     *            visible.
-     * @param panel (may be null) If not given no toolbar is shown on the right hand side.
-     * @param metaData (must be given) Used for resolving pdf directories for links.
-     * @param layoutFile (must be given) Used for layout
+     * @param database
+     *            (may be null) Optionally used to resolve strings.
+     * @param entry
+     *            (may be null) If given this entry is shown otherwise you have
+     *            to call setEntry to make something visible.
+     * @param panel
+     *            (may be null) If not given no toolbar is shown on the right
+     *            hand side.
+     * @param metaData
+     *            (must be given) Used for resolving pdf directories for links.
+     * @param layoutFile
+     *            (must be given) Used for layout
      * @param withPDFPreview if true, a PDF preview is included in the PreviewPanel
      */
-    public PreviewPanel(BibtexDatabase database, BibtexEntry entry, BasePanel panel, MetaData metaData, String layoutFile, boolean withPDFPreview) {
+    public PreviewPanel(BibtexDatabase database, BibtexEntry entry,
+            BasePanel panel, MetaData metaData, String layoutFile, boolean withPDFPreview) {
         this(panel, metaData, layoutFile, withPDFPreview);
         this.database = database;
         setEntry(entry);
@@ -103,9 +119,13 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     /**
      * 
-     * @param panel (may be null) If not given no toolbar is shown on the right hand side.
-     * @param metaData (must be given) Used for resolving pdf directories for links.
-     * @param layoutFile (must be given) Used for layout
+     * @param panel
+     *            (may be null) If not given no toolbar is shown on the right
+     *            hand side.
+     * @param metaData
+     *            (must be given) Used for resolving pdf directories for links.
+     * @param layoutFile
+     *            (must be given) Used for layout
      */
     public PreviewPanel(BasePanel panel, MetaData metaData, String layoutFile) {
         this(panel, metaData, layoutFile, false);
@@ -113,11 +133,15 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     /**
      * 
-     * @param panel (may be null) If not given no toolbar is shown on the right hand side.
-     * @param metaData (must be given) Used for resolving pdf directories for links.
-     * @param layoutFile (must be given) Used for layout
-     * @param withPDFPreview if true, a PDF preview is included in the PreviewPanel. The user can override this setting
-     *            by setting the config setting JabRefPreferences.PDF_PREVIEW to false.
+     * @param panel
+     *            (may be null) If not given no toolbar is shown on the right
+     *            hand side.
+     * @param metaData
+     *            (must be given) Used for resolving pdf directories for links.
+     * @param layoutFile
+     *            (must be given) Used for layout
+     * @param withPDFPreview if true, a PDF preview is included in the PreviewPanel. 
+     * The user can override this setting by setting the config setting JabRefPreferences.PDF_PREVIEW to false.
      */
     private PreviewPanel(BasePanel panel, MetaData metaData, String layoutFile, boolean withPDFPreview) {
         super(new BorderLayout(), true);
@@ -140,19 +164,23 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         }
 
         // Set up scroll pane for preview pane
-        scrollPane = new JScrollPane(previewPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane = new JScrollPane(previewPane,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(null);
 
         /*
          * If we have been given a panel and the preference option
          * previewPrintButton is set, show the tool bar
          */
-        if ((panel != null) && JabRefPreferences.getInstance().getBoolean(JabRefPreferences.PREVIEW_PRINT_BUTTON)) {
+        if (panel != null
+                && JabRefPreferences.getInstance().getBoolean(JabRefPreferences.PREVIEW_PRINT_BUTTON)) {
             add(createToolBar(), BorderLayout.LINE_START);
         }
 
         if (withPDFPreview) {
-            JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, pdfPreviewPanel);
+            JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                    scrollPane, pdfPreviewPanel);
             splitPane.setOneTouchExpandable(true);
 
             // int oneThird = panel.getWidth()/3;
@@ -177,7 +205,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         private static final long serialVersionUID = 1L;
 
-
         public PrintAction() {
             super(Localization.lang("Print Preview"), IconTheme.getImage("psSmall"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print Preview"));
@@ -201,7 +228,11 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
                     } catch (PrinterException e) {
 
                         // Inform the user... we don't know what to do.
-                        JOptionPane.showMessageDialog(PreviewPanel.this, Localization.lang("Could not print preview") + ".\n" + e.getMessage(), Localization.lang("Printing Entry Preview"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(PreviewPanel.this,
+                                Localization.lang("Could not print preview") + ".\n"
+                                        + e.getMessage(),
+                                Localization.lang("Printing Entry Preview"),
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 }
             });
@@ -223,7 +254,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     class CloseAction extends AbstractAction {
 
         private static final long serialVersionUID = 1L;
-
 
         public CloseAction() {
             super(Localization.lang("Close window"), IconTheme.getImage("close"));
@@ -301,7 +331,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
             private static final long serialVersionUID = 1L;
 
-
             @Override
             public Dimension getPreferredScrollableViewportSize() {
                 return getPreferredSize();
@@ -322,7 +351,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
                 if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
                         String address = hyperlinkEvent.getURL().toString();
-                        JabRefDesktop.openExternalViewer(PreviewPanel.this.metaData, address, "url");
+                        JabRefDesktop.openExternalViewer(PreviewPanel.this.metaData,
+                                address, "url");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -347,8 +377,10 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     private void readLayout() throws Exception {
-        StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
-        layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+        StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__",
+                "\n"));
+        layout = new LayoutHelper(sr)
+                .getLayoutFromText(Globals.FORMATTER_PACKAGE);
     }
 
     public void setLayout(Layout layout) {
@@ -409,11 +441,13 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     /**
-     * The PreviewPanel has registered itself as an event listener with the currently displayed BibtexEntry. If the
-     * entry changes, an event is received here, and we can update the preview immediately.
+     * The PreviewPanel has registered itself as an event listener with the
+     * currently displayed BibtexEntry. If the entry changes, an event is
+     * received here, and we can update the preview immediately.
      */
     @Override
-    public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+    public void vetoableChange(PropertyChangeEvent evt)
+            throws PropertyVetoException {
         // TODO updating here is not really necessary isn't it?
         // Only if we are visible.
         update();

@@ -153,7 +153,7 @@ class EntryEditorTab {
                 frame.getSearchBar().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
-
+            
             JComponent extra = parent.getExtra(fields[i], fieldEditor);
 
             // Add autocompleter listener, if required for this field:

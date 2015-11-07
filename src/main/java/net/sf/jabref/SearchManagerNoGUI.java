@@ -47,7 +47,9 @@ class SearchManagerNoGUI {
             searchTerm = fieldYear();
         }
 
-        SearchRule searchRule = SearchRules.getSearchRuleByQuery(searchTerm, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
+        SearchRule searchRule = SearchRules.getSearchRuleByQuery(searchTerm,
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
 
         if (!searchRule.validateSearchStrings(searchTerm)) {
             System.out.println(Localization.lang("Search failed: illegal search expression"));
@@ -86,7 +88,7 @@ class SearchManagerNoGUI {
         int year1 = Integer.parseInt(years[0]);
         int year2 = Integer.parseInt(years[1]);
 
-        if ((year1 < 2000) && (year2 >= 2000)) { //for 199.
+        if (year1 < 2000 && year2 >= 2000) { //for 199.
             regPt1 = "199+[" + years[0].substring(3, 4) + "-9]";
             reg1Set = true;
         } else {
@@ -98,7 +100,7 @@ class SearchManagerNoGUI {
                 // @formatter:on
             }
         }
-        if ((Integer.parseInt(years[1]) >= 2000) && (year1 < 2000)) { //for 200.
+        if (Integer.parseInt(years[1]) >= 2000 && year1 < 2000) { //for 200.
             regPt2 = "200+[0-" + years[1].substring(3, 4) + "]";
             reg2Set = true;
         } else {

@@ -536,7 +536,6 @@ public class SearchBar extends JPanel {
 
     /**
      * Sets the autocompleter used in the search field.
-     * 
      * @param searchCompleter the autocompleter
      */
     public void setAutoCompleter(AutoCompleter<String> searchCompleter) {
