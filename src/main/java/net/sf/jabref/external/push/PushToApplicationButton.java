@@ -55,9 +55,9 @@ public class PushToApplicationButton implements ActionListener {
     private final JMenuItem settings = new JMenuItem(Localization.lang("Settings"));
 
 
-    public PushToApplicationButton(JabRefFrame frameJR, List<PushToApplication> pushActionsList) {
-        frame = frameJR;
-        pushActions = pushActionsList;
+    public PushToApplicationButton(JabRefFrame frame, List<PushToApplication> pushActions) {
+        this.frame = frame;
+        this.pushActions = pushActions;
         init();
     }
 
