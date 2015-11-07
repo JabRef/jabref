@@ -50,6 +50,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
@@ -126,22 +127,22 @@ class StringDialog extends JDialog {
         JToolBar tlb = new JToolBar();
         InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = tlb.getActionMap();
-        im.put(prefs.getKey("String dialog, add string"), "add");
+        im.put(prefs.getKey(KeyBinds.STRING_DIALOG_ADD_STRING), "add");
         NewStringAction newStringAction = new NewStringAction(this);
         am.put("add", newStringAction);
-        im.put(prefs.getKey("String dialog, remove string"), "remove");
+        im.put(prefs.getKey(KeyBinds.STRING_DIALOG_REMOVE_STRING), "remove");
         RemoveStringAction removeStringAction = new RemoveStringAction(this);
         am.put("remove", removeStringAction);
-        im.put(prefs.getKey("Save database"), "save");
+        im.put(prefs.getKey(KeyBinds.SAVE_DATABASE), "save");
         am.put("save", saveAction);
-        im.put(prefs.getKey("Close dialog"), "close");
+        im.put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
-        im.put(prefs.getKey("Help"), "help");
+        im.put(prefs.getKey(KeyBinds.HELP), "help");
         am.put("help", helpAction);
-        im.put(prefs.getKey("Undo"), "undo");
+        im.put(prefs.getKey(KeyBinds.UNDO), "undo");
         UndoAction undoAction = new UndoAction();
         am.put("undo", undoAction);
-        im.put(prefs.getKey("Redo"), "redo");
+        im.put(prefs.getKey(KeyBinds.REDO), "redo");
         RedoAction redoAction = new RedoAction();
         am.put("redo", redoAction);
 
@@ -181,9 +182,9 @@ class StringDialog extends JDialog {
             cm.getColumn(0).setPreferredWidth(800);
             cm.getColumn(1).setPreferredWidth(2000);
             sp.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
-            getInputMap().put(frame.prefs.getKey("Close dialog"), "close");
+            getInputMap().put(frame.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
             getActionMap().put("close", closeAction);
-            getInputMap().put(frame.prefs.getKey("Help"), "help");
+            getInputMap().put(frame.prefs.getKey(KeyBinds.HELP), "help");
             getActionMap().put("help", helpAction);
         }
 

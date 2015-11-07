@@ -69,6 +69,7 @@ import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.OpenFileFilter;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
@@ -909,7 +910,7 @@ public class Util {
     public static void bindCloseDialogKeyToCancelAction(JRootPane rootPane, Action cancelAction) {
         InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = rootPane.getActionMap();
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
     }
 

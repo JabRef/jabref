@@ -38,6 +38,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -175,7 +176,7 @@ public class DatabasePropertiesDialog extends JDialog {
         };
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
         ok.addActionListener(new ActionListener() {

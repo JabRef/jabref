@@ -36,6 +36,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
@@ -175,7 +176,7 @@ public class FileListEntryEditor {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         link.getDocument().addDocumentListener(new DocumentListener() {

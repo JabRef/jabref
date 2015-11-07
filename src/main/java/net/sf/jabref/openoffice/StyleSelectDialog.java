@@ -68,6 +68,7 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -352,7 +353,7 @@ class StyleSelectDialog {
 
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", cancelListener);
         im.put(KeyStroke.getKeyStroke("ENTER"), "enterOk");
         am.put("enterOk", okListener);

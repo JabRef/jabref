@@ -2,6 +2,7 @@ package net.sf.jabref.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.gui.actions.BaseAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.groups.*;
@@ -31,7 +32,7 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     private final BasePanel panel;
     private final boolean add;
-    private boolean move;
+    private final boolean move;
     private BibtexEntry[] selection;
     private JTree tree;
     private JButton ok;
@@ -62,7 +63,7 @@ public class GroupAddRemoveDialog implements BaseAction {
         tree.setVisibleRowCount(22);
 
         //        tree.setPreferredSize(new Dimension(200, tree.getPreferredSize().height));
-        //      The scrollbar appears when the preferred size of a component is greater than the size of the viewport. If one hard coded the preferred size, it will never change according to the expansion/collapse. Thus the scrollbar cannot appear accordingly. 
+        //      The scrollbar appears when the preferred size of a component is greater than the size of the viewport. If one hard coded the preferred size, it will never change according to the expansion/collapse. Thus the scrollbar cannot appear accordingly.
         //tree.setSelectionModel(new VetoableTreeSelectionModel());
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.addTreeSelectionListener(new SelectionListener());
@@ -123,7 +124,7 @@ public class GroupAddRemoveDialog implements BaseAction {
         // Key bindings:
         ActionMap am = sp.getActionMap();
         InputMap im = sp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             @Override

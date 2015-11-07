@@ -20,6 +20,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -298,7 +299,6 @@ public class SynchronizeFileField extends AbstractWorker {
 
     static class OptionsDialog extends JDialog {
 
-        private static final long serialVersionUID = 1909919286125256934L;
         final JRadioButton autoSetUnset;
         final JRadioButton autoSetAll;
         final JRadioButton autoSetNone;
@@ -325,8 +325,6 @@ public class SynchronizeFileField extends AbstractWorker {
 
             Action closeAction = new AbstractAction() {
 
-                private static final long serialVersionUID = -8834440705768095070L;
-
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     dispose();
@@ -337,7 +335,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
             InputMap im = cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
             ActionMap am = cancel.getActionMap();
-            im.put(Globals.prefs.getKey("Close dialog"), "close");
+            im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
             am.put("close", closeAction);
 
             autoSetUnset = new JRadioButton(Localization.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);

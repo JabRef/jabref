@@ -37,6 +37,7 @@ import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -116,7 +117,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     /**
-     * 
+     *
      * @param panel
      *            (may be null) If not given no toolbar is shown on the right
      *            hand side.
@@ -130,7 +131,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     /**
-     * 
+     *
      * @param panel
      *            (may be null) If not given no toolbar is shown on the right
      *            hand side.
@@ -138,7 +139,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      *            (must be given) Used for resolving pdf directories for links.
      * @param layoutFile
      *            (must be given) Used for layout
-     * @param withPDFPreview if true, a PDF preview is included in the PreviewPanel. 
+     * @param withPDFPreview if true, a PDF preview is included in the PreviewPanel.
      * The user can override this setting by setting the config setting JabRefPreferences.PDF_PREVIEW to false.
      */
     private PreviewPanel(BasePanel panel, MetaData metaData, String layoutFile, boolean withPDFPreview) {
@@ -171,7 +172,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
          * If we have been given a panel and the preference option
          * previewPrintButton is set, show the tool bar
          */
-        if (panel != null
+        if ((panel != null)
                 && JabRefPreferences.getInstance().getBoolean(JabRefPreferences.PREVIEW_PRINT_BUTTON)) {
             add(createToolBar(), BorderLayout.LINE_START);
         }
@@ -300,7 +301,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         ActionMap am = tlb.getActionMap();
         InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        im.put(prefs.getKey("Close entry preview"), "close");
+        im.put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
         im.put(prefs.getKey("Print entry preview"), "print");

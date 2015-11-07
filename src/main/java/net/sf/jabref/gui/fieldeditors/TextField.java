@@ -201,7 +201,7 @@ public class TextField extends JTextField implements FieldEditor {
         });
 
         // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.prefs.getKey("Undo"), "Undo");
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
         getActionMap().put("Redo", new AbstractAction("Redo") {
@@ -219,6 +219,6 @@ public class TextField extends JTextField implements FieldEditor {
         });
 
         // Bind the redo action to ctl-Y
-        getInputMap().put(Globals.prefs.getKey("Redo"), "Redo");
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.REDO), "Redo");
     }
 }
