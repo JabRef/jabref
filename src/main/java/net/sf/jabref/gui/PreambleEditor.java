@@ -104,7 +104,7 @@ class PreambleEditor extends JDialog {
         // Set up key bindings and focus listener for the FieldEditor.
         ta.getInputMap().put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         ta.getActionMap().put("close", closeAction);
-        ta.getInputMap().put(prefs.getKey("Preamble editor, store changes"), "store");
+        ta.getInputMap().put(prefs.getKey(KeyBinds.PREAMBLE_EDITOR_STORE_CHANGES), "store");
         ta.getActionMap().put("store", storeFieldAction);
 
         ta.getInputMap().put(prefs.getKey(KeyBinds.UNDO), "undo");

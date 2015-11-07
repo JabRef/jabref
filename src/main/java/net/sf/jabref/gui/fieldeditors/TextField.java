@@ -186,7 +186,7 @@ public class TextField extends JTextField implements FieldEditor {
         });
 
         // Create an undo action and add it to the text component
-        getActionMap().put("Undo", new AbstractAction("Undo") {
+        getActionMap().put("Undo", new AbstractAction(Actions.UNDO) {
 
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -204,7 +204,7 @@ public class TextField extends JTextField implements FieldEditor {
         getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
-        getActionMap().put("Redo", new AbstractAction("Redo") {
+        getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
 
             @Override
             public void actionPerformed(ActionEvent evt) {

@@ -67,17 +67,17 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
         ActionMap am = tlb.getActionMap();
         im.put(bf.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", new CloseAction());
-        im.put(bf.prefs().getKey("Back, help dialog"), "left");
+        im.put(bf.prefs().getKey(KeyBinds.BACK_HELP_DIALOG), "left");
         am.put("left", back);
-        im.put(bf.prefs().getKey("Forward, help dialog"), "right");
+        im.put(bf.prefs().getKey(KeyBinds.FORWARD_HELP_DIALOG), "right");
         am.put("right", forward);
 
         // Set shortkeys for back and forward specifically for the EditorPane.
         im = content.getInputMap(JComponent.WHEN_FOCUSED);
         am = content.getActionMap();
-        im.put(bf.prefs().getKey("Back, help dialog"), "left");
+        im.put(bf.prefs().getKey(KeyBinds.BACK_HELP_DIALOG), "left");
         am.put("left", back);
-        im.put(bf.prefs().getKey("Forward, help dialog"), "right");
+        im.put(bf.prefs().getKey(KeyBinds.FORWARD_HELP_DIALOG), "right");
         am.put("right", forward);
 
         getContentPane().add(tlb, BorderLayout.NORTH);

@@ -77,39 +77,37 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         });
 
         // Create an undo action and add it to the text component
-        getActionMap().put("Undo",
-                new AbstractAction("Undo") {
+        getActionMap().put("Undo", new AbstractAction(Actions.UNDO) {
 
-                    @Override
-                    public void actionPerformed(ActionEvent evt) {
-                        try {
-                            if (undo.canUndo()) {
-                                undo.undo();
-                            }
-                        } catch (CannotUndoException ignored) {
-                    // Ignored
-                        }
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    if (undo.canUndo()) {
+                        undo.undo();
                     }
-                });
+                } catch (CannotUndoException ignored) {
+                    // Ignored
+                }
+            }
+        });
 
         // Bind the undo action to ctl-Z
         getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
-        getActionMap().put("Redo",
-                new AbstractAction("Redo") {
+        getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
 
-                    @Override
-                    public void actionPerformed(ActionEvent evt) {
-                        try {
-                            if (undo.canRedo()) {
-                                undo.redo();
-                            }
-                        } catch (CannotRedoException ignored) {
-                    // Ignored
-                        }
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    if (undo.canRedo()) {
+                        undo.redo();
                     }
-                });
+                } catch (CannotRedoException ignored) {
+                    // Ignored
+                }
+            }
+        });
 
         // Bind the redo action to ctrl-Y
         boolean bind = true;
