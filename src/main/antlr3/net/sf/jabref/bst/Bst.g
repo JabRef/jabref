@@ -88,7 +88,7 @@ fragment NUMERAL
 	: ('0'..'9');
 	
 WS
-	: (' '|'\t'|'\n')+ {_channel=99;} ;
+	: (' '|'\t'|'\n'|'\r')+ {_channel=99;} ;
 	
 LINE_COMMENT
     : '%' ~('\n'|'\r')* '\r'? '\n' {_channel=99;}

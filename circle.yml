@@ -10,15 +10,20 @@ dependencies:
     - chmod +x launch4j/launch4j
     - wget http://nsis.sourceforge.net/mediawiki/images/5/54/WinShell.zip
     - unzip WinShell.zip
-    - sudo cp Plugins/x86-unicode/WinShell.dll /usr/share/nsis/Plugins/
+    - sudo cp Plugins/x86-ansi/WinShell.dll /usr/share/nsis/Plugins/
   override:
-    - TERM=dumb ./gradlew dependencies
+    - TERM=dumb ./gradlew getdeps
 
 test:
   override:
     - TERM=dumb ./gradlew test
   post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    - TERM=dumb ./gradlew jacocoTestReport coveralls
+    - bash <(curl -s https://codecov.io/bash)
     - TERM=dumb export PATH=$PATH:`pwd`/launch4j && ./gradlew -Pdev=true -PnsisExec="/usr/bin/makensis" release --stacktrace
+    - timeout 580 scripts/upload-to-gett.sh || exit 0
 
 general:
   artifacts:

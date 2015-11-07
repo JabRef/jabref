@@ -39,7 +39,7 @@ public abstract class AbstractWorker implements Worker, CallBack {
     }
 
     public void init() throws Throwable {
-
+        // Do nothing
     }
 
     /**
@@ -64,5 +64,6 @@ public abstract class AbstractWorker implements Worker, CallBack {
      */
     @Override
     public void update() {
+        // Do nothing, see above
     }
 }

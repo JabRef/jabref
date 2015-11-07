@@ -28,7 +28,7 @@
 package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.exporter.layout.LayoutFormatter;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.journals.Abbreviations;
 
 /**
  * JournalAbbreviator formats the given text in an abbreviated form
@@ -49,6 +49,6 @@ public class JournalAbbreviator implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        return Globals.journalAbbrev.getIsoAbbreviation(fieldText).orElse(fieldText);
+        return Abbreviations.journalAbbrev.getIsoAbbreviation(fieldText).orElse(fieldText);
     }
 }

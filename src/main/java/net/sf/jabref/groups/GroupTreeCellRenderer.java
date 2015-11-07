@@ -17,10 +17,7 @@ package net.sf.jabref.groups;
 
 import java.awt.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import net.sf.jabref.gui.IconTheme;
@@ -32,8 +29,7 @@ import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
- * Renders a GroupTreeNode using its group's getName() method, rather that its
- * toString() method.
+ * Renders a GroupTreeNode using its group's getName() method, rather that its toString() method.
  *
  * @author jzieren
  */
@@ -47,41 +43,37 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private Object[] highlight3Cells;
     private Object highlightBorderCell;
 
-    private static final ImageIcon
-            groupRefiningIcon = IconTheme.getImage("groupRefining");
-    private static final ImageIcon groupIncludingIcon = IconTheme.getImage("groupIncluding");
-    private static final ImageIcon groupRegularIcon = null;
+    private static final Icon groupRefiningIcon = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
+    private static final Icon groupIncludingIcon = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
+    private static final Icon groupRegularIcon = null;
 
 
     @Override
-    public Component getTreeCellRendererComponent(JTree tree, Object value,
-            boolean selected, boolean expanded, boolean leaf, int row,
-            boolean hasFocus) {
-        if (value == highlight1Cell)
-         {
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
+            int row, boolean tmpHasFocus) {
+        if (value == highlight1Cell) {
             selected = true; // show as selected
+        } else {
+            selected = sel;
         }
-        Component c = super.getTreeCellRendererComponent(tree, value, selected,
-                expanded, leaf, row, hasFocus);
+        Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, tmpHasFocus);
         // this is sometimes called from deep within somewhere, with a dummy
         // value (probably for layout etc.), so we've got to check here!
         if (!(value instanceof GroupTreeNode)) {
             return c;
         }
         AbstractGroup group = ((GroupTreeNode) value).getGroup();
-        if (group == null || !(c instanceof JLabel))
-         {
+        if ((group == null) || !(c instanceof JLabel)) {
             return c; // sanity check
         }
         JLabel label = (JLabel) c;
 
-        if (highlightBorderCell != null && highlightBorderCell == value) {
+        if ((highlightBorderCell != null) && (highlightBorderCell == value)) {
             label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         } else {
             label.setBorder(BorderFactory.createEmptyBorder());
         }
-        boolean italics = Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)
-                && group.isDynamic();
+        boolean italics = Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) && group.isDynamic();
         boolean red = false;
         if (highlight2Cells != null) {
             for (Object highlight2Cell : highlight2Cells) {
@@ -120,7 +112,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
             if (group instanceof ExplicitGroup) {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
-            } else if (group instanceof KeywordGroup || group instanceof SearchGroup) {
+            } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
                 for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()) {
                     if (group.contains(entry)) {
@@ -171,34 +163,31 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * For use when dragging: The sepcified cell is always rendered as selected.
+     * For use when dragging: The specified cell is always rendered as selected.
      *
-     * @param cell
-     *            The cell over which the user is currently dragging.
+     * @param cell The cell over which the user is currently dragging.
      */
     void setHighlight1Cell(Object cell) {
         this.highlight1Cell = cell;
     }
 
     /**
-     * Highlights the specified cells (in red), or disables highlight if cells ==
-     * null.
+     * Highlights the specified cells (in red), or disables highlight if cells == null.
      */
     void setHighlight2Cells(Object[] cells) {
         this.highlight2Cells = cells;
     }
 
     /**
-     * Highlights the specified cells (by unterlining), or disables highlight if
-     * cells == null.
+     * Highlights the specified cells (by underlining), or disables highlight if cells == null.
      */
     void setHighlight3Cells(Object[] cells) {
         this.highlight3Cells = cells;
     }
 
     /**
-     * Highlights the specified cells (by drawing a border around it),
-     * or disables highlight if highlightBorderCell == null.
+     * Highlights the specified cells (by drawing a border around it), or disables highlight if highlightBorderCell ==
+     * null.
      */
     void setHighlightBorderCell(Object highlightBorderCell) {
         this.highlightBorderCell = highlightBorderCell;

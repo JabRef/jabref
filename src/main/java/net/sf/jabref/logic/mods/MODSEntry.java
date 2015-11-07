@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -30,7 +30,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.XMLChars;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -66,10 +67,11 @@ class MODSEntry {
 
     private final boolean CHARFORMAT = false;
 
+    private static final Log LOGGER = LogFactory.getLog(MODSEntry.class);
 
     private MODSEntry() {
-        extensionFields = new HashMap<String, String>();
-        handledExtensions = new HashSet<String>();
+        extensionFields = new HashMap<>();
+        handledExtensions = new HashSet<>();
 
     }
 
@@ -138,7 +140,7 @@ class MODSEntry {
 
     private void populateExtensionFields(BibtexEntry e) {
 
-        for (String field : e.getAllFields()) {
+        for (String field : e.getFieldNames()) {
             String value = e.getField(field);
             field = MODSEntry.BIBTEX + field;
             extensionFields.put(field, value);
@@ -146,7 +148,7 @@ class MODSEntry {
     }
 
     private List<PersonName> getAuthors(String authors) {
-        List<PersonName> result = new LinkedList<PersonName>();
+        List<PersonName> result = new LinkedList<>();
         LayoutFormatter chars = new XMLChars();
 
         if (!authors.contains(" and ")) {
@@ -171,7 +173,7 @@ class MODSEntry {
     }
 
     /* construct a MODS date object */
-    private String getDate(BibtexEntry bibtex) {
+    private static String getDate(BibtexEntry bibtex) {
         String result = "";
         if (bibtex.getField("year") != null) {
             result += bibtex.getField("year");
@@ -184,7 +186,7 @@ class MODSEntry {
     }
 
     // must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
-    private String getMODSgenre(BibtexEntry bibtex) {
+    private static String getMODSgenre(BibtexEntry bibtex) {
         /**
          * <pre> String result; if (bibtexType.equals("Mastersthesis")) result =
          * "theses"; else result = "conference publication"; // etc... </pre>
@@ -304,8 +306,7 @@ class MODSEntry {
             return mods;
         } catch (Exception e)
         {
-            System.out.println("Exception caught..." + e);
-            e.printStackTrace();
+            LOGGER.warn("Exception caught...", e);
             throw new Error(e);
         }
         // return result;
@@ -318,28 +319,28 @@ class MODSEntry {
      * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
      * standard</a>. This method will return an empty
      * String if the input is null or empty.
-     * 
+     *
      * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
      *
      * @param in The String whose non-valid characters we want to remove.
      * @return The in String, stripped of non-valid characters.
      */
-    private String stripNonValidXMLCharacters(String in) {
+    private static String stripNonValidXMLCharacters(String in) {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if (in == null || in != null && in.isEmpty())
+        if ((in == null) || ((in != null) && in.isEmpty()))
          {
             return ""; // vacancy test.
         }
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
-            if (current == 0x9 ||
-                    current == 0xA ||
-                    current == 0xD ||
-                    current >= 0x20 && current <= 0xD7FF ||
-                    current >= 0xE000 && current <= 0xFFFD ||
-                    current >= 0x10000 && current <= 0x10FFFF) {
+            if ((current == 0x9) ||
+                    (current == 0xA) ||
+                    (current == 0xD) ||
+                    ((current >= 0x20) && (current <= 0xD7FF)) ||
+                    ((current >= 0xE000) && (current <= 0xFFFD)) ||
+                    ((current >= 0x10000) && (current <= 0x10FFFF))) {
                 out.append(current);
             }
         }
@@ -348,7 +349,7 @@ class MODSEntry {
 
     /*
      * render as XML
-     * 
+     *
      */
     @Override
     public String toString() {

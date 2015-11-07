@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.journals;
 
 import java.awt.BorderLayout;
@@ -36,13 +36,13 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -66,13 +66,13 @@ class ManageJournalsPanel extends JPanel {
     private final JTextField nameTf = new JTextField();
     private final JTextField newNameTf = new JTextField();
     private final JTextField abbrTf = new JTextField();
-    private final List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
+    private final List<ExternalFileEntry> externals = new ArrayList<>(); // To hold references to external journal lists.
     private final JDialog dialog;
     private final JRadioButton newFile = new JRadioButton(Localization.lang("New file"));
     private final JRadioButton oldFile = new JRadioButton(Localization.lang("Existing file"));
 
-    private final JButton add = new JButton(IconTheme.getImage("add"));
-    private final JButton remove = new JButton(IconTheme.getImage("remove"));
+    private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
+    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {
@@ -84,56 +84,54 @@ class ManageJournalsPanel extends JPanel {
         group.add(newFile);
         group.add(oldFile);
         addExtPan.setLayout(new BorderLayout());
-        JButton addExt = new JButton(IconTheme.getImage("add"));
+        JButton addExt = new JButton(IconTheme.JabRefIcon.ADD.getIcon());
         addExtPan.add(addExt, BorderLayout.EAST);
         addExtPan.setToolTipText(Localization.lang("Add"));
         //addExtPan.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:200dlu:grow, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
-                "pref, pref, pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref");//150dlu");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-
-        CellConstraints cc = new CellConstraints();
+                        "pref, pref, pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref");//150dlu");
+        FormBuilder builder = FormBuilder.create().layout(layout);
 
         /*JLabel description = new JLabel("<HTML>"+Glbals.lang("JabRef can switch journal names between "
             +"abbreviated and full form. Since it knows only a limited number of journal names, "
             +"you may need to add your own definitions.")+"</HTML>");*/
-        builder.addSeparator(Localization.lang("Built-in journal list"), cc.xyw(2, 1, 6));
+        builder.addSeparator(Localization.lang("Built-in journal list")).xyw(2, 1, 6);
         JLabel description = new JLabel("<HTML>" + Localization.lang("JabRef includes a built-in list of journal abbreviations.")
-                + "<br>" + Localization.lang("You can add additional journal names by setting up a personal journal list,<br>as "
+        + "<br>" + Localization.lang("You can add additional journal names by setting up a personal journal list,<br>as "
                 + "well as linking to external journal lists.") + "</HTML>");
         description.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-        builder.add(description, cc.xyw(2, 2, 6));
+        builder.add(description).xyw(2, 2, 6);
         JButton viewBuiltin = new JButton(Localization.lang("View"));
-        builder.add(viewBuiltin, cc.xy(7, 2));
-        builder.addSeparator(Localization.lang("Personal journal list"), cc.xyw(2, 3, 6));
+        builder.add(viewBuiltin).xy(7, 2);
+        builder.addSeparator(Localization.lang("Personal journal list")).xyw(2, 3, 6);
 
-        //builder.add(description, cc.xyw(2,1,6));
-        builder.add(newFile, cc.xy(3, 4));
-        builder.add(newNameTf, cc.xy(5, 4));
+        //builder.add(description).xyw(2,1,6));
+        builder.add(newFile).xy(3, 4);
+        builder.add(newNameTf).xy(5, 4);
         JButton browseNew = new JButton(Localization.lang("Browse"));
-        builder.add(browseNew, cc.xy(7, 4));
-        builder.add(oldFile, cc.xy(3, 5));
-        builder.add(personalFile, cc.xy(5, 5));
+        builder.add(browseNew).xy(7, 4);
+        builder.add(oldFile).xy(3, 5);
+        builder.add(personalFile).xy(5, 5);
         //BrowseAction action = new BrowseAction(personalFile, false);
         //JButton browse = new JButton(Globals.lang("Browse"));
         //browse.addActionListener(action);
         JButton browseOld = new JButton(Localization.lang("Browse"));
-        builder.add(browseOld, cc.xy(7, 5));
+        builder.add(browseOld).xy(7, 5);
 
         userPanel.setLayout(new BorderLayout());
         //builtInTable = new JTable(Globals.journalAbbrev.getTableModel());
-        builder.add(userPanel, cc.xyw(2, 6, 4));
+        builder.add(userPanel).xyw(2, 6, 4);
         ButtonStackBuilder butBul = new ButtonStackBuilder();
         butBul.addButton(add);
         butBul.addButton(remove);
 
         butBul.addGlue();
-        builder.add(butBul.getPanel(), cc.xy(7, 6));
+        builder.add(butBul.getPanel()).xy(7, 6);
 
-        builder.addSeparator(Localization.lang("External files"), cc.xyw(2, 8, 6));
+        builder.addSeparator(Localization.lang("External files")).xyw(2, 8, 6);
         externalFilesPanel.setLayout(new BorderLayout());
-        //builder.add(/*new JScrollPane(*/externalFilesPanel/*)*/, cc.xyw(2,8,6));
+        //builder.add(/*new JScrollPane(*/externalFilesPanel/*)*/).xyw(2,8,6);
 
         setLayout(new BorderLayout());
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));//createMatteBorder(1,1,1,1,Color.green));
@@ -146,7 +144,8 @@ class ManageJournalsPanel extends JPanel {
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addUnrelatedGap();
-        JButton help = new JButton(Localization.lang("Help"));
+
+        JButton help = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.journalAbbrHelp, IconTheme.JabRefIcon.HELP.getSmallIcon()).getIconButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -158,13 +157,12 @@ class ManageJournalsPanel extends JPanel {
 
         // Set up panel for editing a single journal, to be used in a dialog box:
         FormLayout layout2 = new FormLayout
-                ("right:pref, 4dlu, fill:180dlu", "");
-        DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        builder2.append(Localization.lang("Journal name"));
-        builder2.append(nameTf);
-        builder2.nextLine();
-        builder2.append(Localization.lang("ISO abbreviation"));
-        builder2.append(abbrTf);
+                ("right:pref, 4dlu, fill:180dlu", "p, 2dlu, p");
+        FormBuilder builder2 = FormBuilder.create().layout(layout2);
+        builder2.add(Localization.lang("Journal name")).xy(1, 1);
+        builder2.add(nameTf).xy(3, 1);
+        builder2.add(Localization.lang("ISO abbreviation")).xy(1, 3);
+        builder2.add(abbrTf).xy(3, 3);
         journalEditPanel = builder2.getPanel();
 
         viewBuiltin.addActionListener(new ActionListener() {
@@ -172,8 +170,8 @@ class ManageJournalsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
-                abbr.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
-                JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
+                abbr.readJournalListFromResource(Abbreviations.JOURNALS_FILE_BUILTIN);
+                JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Abbreviations.journalAbbrev));
                 JScrollPane pane = new JScrollPane(table);
                 JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
             }
@@ -226,7 +224,6 @@ class ManageJournalsPanel extends JPanel {
                 }
             }
         });
-        help.addActionListener(new HelpAction(GUIGlobals.helpDiag, GUIGlobals.journalAbbrHelp));
 
         AbstractAction cancelAction = new AbstractAction() {
 
@@ -280,16 +277,17 @@ class ManageJournalsPanel extends JPanel {
 
     private void buildExternalsPanel() {
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("fill:pref:grow", ""));
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("fill:pref:grow", "p"));
+        int row = 1;
         for (ExternalFileEntry efe : externals) {
-            builder.append(efe.getPanel());
-            builder.nextLine();
+            builder.add(efe.getPanel()).xy(1, row);
+            builder.appendRows("2dlu, p");
+            row += 2;
         }
-        builder.append(Box.createVerticalGlue());
-        builder.nextLine();
-        builder.append(addExtPan);
-        builder.nextLine();
-        builder.append(Box.createVerticalGlue());
+        builder.add(Box.createVerticalGlue()).xy(1,row);
+        builder.appendRows("2dlu, p, 2dlu, p");
+        builder.add(addExtPan).xy(1, row+2);
+        builder.add(Box.createVerticalGlue()).xy(1, row+2);
 
         //builder.getPanel().setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.green));
         //externalFilesPanel.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
@@ -306,7 +304,7 @@ class ManageJournalsPanel extends JPanel {
 
     private void setupExternals() {
         String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if (externalFiles == null || externalFiles.length == 0) {
+        if ((externalFiles == null) || (externalFiles.length == 0)) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
         } else {
@@ -345,13 +343,13 @@ class ManageJournalsPanel extends JPanel {
         if (newFile.isSelected()) {
             if (!newNameTf.getText().isEmpty()) {
                 f = new File(newNameTf.getText());
-                return !f.exists() || JOptionPane.showConfirmDialog
+                return !f.exists() || (JOptionPane.showConfirmDialog
                         (this, "'" + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
                                 Localization.lang("Store journal abbreviations"), JOptionPane.OK_CANCEL_OPTION)
-                == JOptionPane.OK_OPTION;
+                        == JOptionPane.OK_OPTION);
             } else {
                 if (tableModel.getRowCount() > 0) {
-                    JOptionPane.showMessageDialog(this, Localization.lang("You must choose a file name to store journal abbreviations"),
+                    JOptionPane.showMessageDialog(this, Localization.lang("You must choose a filename to store journal abbreviations"),
                             Localization.lang("Store journal abbreviations"), JOptionPane.ERROR_MESSAGE);
                     return false;
                 } else {
@@ -369,8 +367,8 @@ class ManageJournalsPanel extends JPanel {
             if (!newNameTf.getText().isEmpty()) {
                 f = new File(newNameTf.getText());
             }// else {
-             //    return; // Nothing to do.
-             //}
+            //    return; // Nothing to do.
+            //}
         } else {
             f = new File(personalFile.getText());
         }
@@ -379,29 +377,16 @@ class ManageJournalsPanel extends JPanel {
             if (!f.exists()) {
                 throw new FileNotFoundException(f.getAbsolutePath());
             }
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter(f, false);
+            try (FileWriter fw = new FileWriter(f, false)) {
                 for (JournalEntry entry : tableModel.getJournals()) {
                     fw.write(entry.name);
                     fw.write(" = ");
                     fw.write(entry.abbreviation);
                     fw.write(Globals.NEWLINE);
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
-
-            } finally {
-                if (fw != null) {
-                    try {
-                        fw.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
-
             String filename = f.getPath();
             if (filename.equals("")) {
                 filename = null;
@@ -410,7 +395,7 @@ class ManageJournalsPanel extends JPanel {
         }
 
         // Store the list of external files set up:
-        ArrayList<String> extFiles = new ArrayList<String>();
+        ArrayList<String> extFiles = new ArrayList<>();
         for (ExternalFileEntry efe : externals) {
             if (!efe.getValue().equals("")) {
                 extFiles.add(efe.getValue());
@@ -423,7 +408,7 @@ class ManageJournalsPanel extends JPanel {
             Globals.prefs.putStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, list);
         }
 
-        Globals.initializeJournalNames();
+        Abbreviations.initializeJournalNames(Globals.prefs);
 
         // Update the autocompleter for the "journal" field in all base panels,
         // so added journal names are available:
@@ -494,8 +479,8 @@ class ManageJournalsPanel extends JPanel {
                         JFileChooser.OPEN_DIALOG, false);
             }
             if (chosen != null) {
-                File newFile = new File(chosen);
-                comp.setText(newFile.getPath());
+                File nFile = new File(chosen);
+                comp.setText(nFile.getPath());
             }
         }
     }
@@ -511,7 +496,7 @@ class ManageJournalsPanel extends JPanel {
         }
 
         public void setJournals(SortedSet<Abbreviation> journals) {
-            this.journals = new ArrayList<JournalEntry>();
+            this.journals = new ArrayList<>();
             for (Abbreviation abbreviation : journals) {
                 this.journals.add(new JournalEntry(abbreviation.getName(), abbreviation.getIsoAbbreviation()));
             }
@@ -621,7 +606,7 @@ class ManageJournalsPanel extends JPanel {
         private final JTextField tf;
         private final JButton browse = new JButton(Localization.lang("Browse"));
         private final JButton view = new JButton(Localization.lang("Preview"));
-        private final JButton clear = new JButton(IconTheme.getImage("delete"));
+        private final JButton clear = new JButton(IconTheme.JabRefIcon.DELETE.getIcon());
         private final JButton download = new JButton(Localization.lang("Download"));
 
 
@@ -641,13 +626,13 @@ class ManageJournalsPanel extends JPanel {
             browse.addActionListener(browseA);
             DownloadAction da = new DownloadAction(tf);
             download.addActionListener(da);
-            DefaultFormBuilder builder = new DefaultFormBuilder
-                    (new FormLayout("fill:pref:grow, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-            builder.append(tf);
-            builder.append(browse);
-            builder.append(download);
-            builder.append(view);
-            builder.append(clear);
+            FormBuilder builder = FormBuilder.create().
+                    layout(new FormLayout("fill:pref:grow, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, fill:pref", "p"));
+            builder.add(tf).xy(1, 1);
+            builder.add(browse).xy(3, 1);
+            builder.add(download).xy(5, 1);
+            builder.add(view).xy(7, 1);
+            builder.add(clear).xy(9, 1);
 
             pan = builder.getPanel();
 
@@ -658,7 +643,8 @@ class ManageJournalsPanel extends JPanel {
                     try {
                         JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
                         abbr.readJournalListFromFile(new File(tf.getText()));
-                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
+
+                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbr));
                         JScrollPane pane = new JScrollPane(table);
                         JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
                     } catch (FileNotFoundException ex) {

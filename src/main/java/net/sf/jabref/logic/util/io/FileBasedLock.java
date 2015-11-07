@@ -26,6 +26,7 @@ public class FileBasedLock {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException ignored) {
+                // Ignored
             }
         }
         return true;

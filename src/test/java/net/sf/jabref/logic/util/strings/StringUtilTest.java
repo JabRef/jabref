@@ -1,18 +1,29 @@
 package net.sf.jabref.logic.util.strings;
 
-import junit.framework.Assert;
-import org.junit.Test;
-
 import static org.junit.Assert.*;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+
 public class StringUtilTest {
+    @BeforeClass
+    public static void loadPreferences() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
+
     @Test
     public void testUnifyLineBreaks() throws Exception {
         // Mac < v9
-        Assert.assertEquals("\n", StringUtil.unifyLineBreaks("\r"));
+        String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r");
+        assertEquals(Globals.NEWLINE, result);
         // Windows
-        Assert.assertEquals("\n", StringUtil.unifyLineBreaks("\r\n"));
+        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r\n");
+        assertEquals(Globals.NEWLINE, result);
         // Unix
-        Assert.assertEquals("\n", StringUtil.unifyLineBreaks("\n"));
+        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\n");
+        assertEquals(Globals.NEWLINE, result);
     }
 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,6 +18,9 @@ package net.sf.jabref;
 import java.util.Collection;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
@@ -34,6 +37,7 @@ class SearchManagerNoGUI {
     private final BibtexDatabase database;
     private BibtexDatabase base;
 
+    private static final Log LOGGER = LogFactory.getLog(SearchManagerNoGUI.class);
 
     public SearchManagerNoGUI(String term, BibtexDatabase dataBase) {
         searchTerm = term;
@@ -41,8 +45,7 @@ class SearchManagerNoGUI {
     }
 
     public BibtexDatabase getDBfromMatches() {
-        int hits = 0;
-        System.out.println("search term: " + searchTerm);
+        LOGGER.debug("Search term: " + searchTerm);
         if (specifiedYears()) {
             searchTerm = fieldYear();
         }
@@ -52,17 +55,16 @@ class SearchManagerNoGUI {
                 Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
 
         if (!searchRule.validateSearchStrings(searchTerm)) {
-            System.out.println(Localization.lang("Search failed: illegal search expression"));
+            LOGGER.warn(Localization.lang("Search failed: illegal search expression"));
             return base;
         }
 
         Collection<BibtexEntry> entries = database.getEntries();
-        Vector<BibtexEntry> matchEntries = new Vector<BibtexEntry>();
+        Vector<BibtexEntry> matchEntries = new Vector<>();
         for (BibtexEntry entry : entries) {
             boolean hit = searchRule.applyRule(searchTerm, entry);
             entry.setSearchHit(hit);
             if (hit) {
-                hits++;
                 matchEntries.add(entry);
             }
         }
@@ -88,7 +90,7 @@ class SearchManagerNoGUI {
         int year1 = Integer.parseInt(years[0]);
         int year2 = Integer.parseInt(years[1]);
 
-        if (year1 < 2000 && year2 >= 2000) { //for 199.
+        if ((year1 < 2000) && (year2 >= 2000)) { //for 199.
             regPt1 = "199+[" + years[0].substring(3, 4) + "-9]";
             reg1Set = true;
         } else {
@@ -100,7 +102,7 @@ class SearchManagerNoGUI {
                 // @formatter:on
             }
         }
-        if (Integer.parseInt(years[1]) >= 2000 && year1 < 2000) { //for 200.
+        if ((Integer.parseInt(years[1]) >= 2000) && (year1 < 2000)) { //for 200.
             regPt2 = "200+[0-" + years[1].substring(3, 4) + "]";
             reg2Set = true;
         } else {

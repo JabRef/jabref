@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,7 +16,7 @@
 package net.sf.jabref.gui;
 
 import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -38,39 +39,45 @@ public class ColorSetupPanel extends JPanel {
 
     private static final int ICON_WIDTH = 30;
     private static final int ICON_HEIGHT = 20;
-    private final ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
+    private final ArrayList<ColorButton> buttons = new ArrayList<>();
 
 
     public ColorSetupPanel() {
 
         FormLayout layout = new FormLayout
-                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref", "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref",
+                        "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+        FormBuilder builder = FormBuilder.create().layout(layout);
 
-        buttons.add(new ColorButton("tableText", Localization.lang("Table text color")));
-        buttons.add(new ColorButton("markedEntryBackground0", Localization.lang("Marking color %0", "1")));
-        buttons.add(new ColorButton("tableBackground", Localization.lang("Table background color")));
-        buttons.add(new ColorButton("markedEntryBackground1", Localization.lang("Marking color %0", "2")));
-        buttons.add(new ColorButton("tableReqFieldBackground", Localization.lang("Background color for required fields")));
-        buttons.add(new ColorButton("markedEntryBackground2", Localization.lang("Marking color %0", "3")));
-        buttons.add(new ColorButton("tableOptFieldBackground", Localization.lang("Background color for optional fields")));
-        buttons.add(new ColorButton("markedEntryBackground3", Localization.lang("Marking color %0", "4")));
-        buttons.add(new ColorButton("incompleteEntryBackground", Localization.lang("Color for marking incomplete entries")));
-        buttons.add(new ColorButton("markedEntryBackground4", Localization.lang("Marking color %0", "5")));
-        buttons.add(new ColorButton("gridColor", Localization.lang("Table grid color")));
-        buttons.add(new ColorButton("markedEntryBackground5", Localization.lang("Import marking color")));
+        buttons.add(new ColorButton(JabRefPreferences.TABLE_TEXT, Localization.lang("Table text color")));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND0, Localization.lang("Marking color %0", "1")));
+        buttons.add(new ColorButton(JabRefPreferences.TABLE_BACKGROUND, Localization.lang("Table background color")));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND1, Localization.lang("Marking color %0", "2")));
+        buttons.add(new ColorButton(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND, Localization.lang("Background color for required fields")));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND2, Localization.lang("Marking color %0", "3")));
+        buttons.add(new ColorButton(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND, Localization.lang("Background color for optional fields")));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND3, Localization.lang("Marking color %0", "4")));
+        buttons.add(new ColorButton(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND, Localization.lang("Color for marking incomplete entries")));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND4, Localization.lang("Marking color %0", "5")));
+        buttons.add(new ColorButton(JabRefPreferences.GRID_COLOR, Localization.lang("Table grid color")));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND5, Localization.lang("Import marking color")));
 
-        buttons.add(new ColorButton("fieldEditorTextColor", Localization.lang("Entry editor font color")));
-        buttons.add(new ColorButton("validFieldBackgroundColor", Localization.lang("Entry editor background color")));
-        buttons.add(new ColorButton("activeFieldEditorBackgroundColor", Localization.lang("Entry editor active background color")));
-        buttons.add(new ColorButton("invalidFieldBackgroundColor", Localization.lang("Entry editor invalid field color")));
+        buttons.add(new ColorButton(JabRefPreferences.FIELD_EDITOR_TEXT_COLOR, Localization.lang("Entry editor font color")));
+        buttons.add(new ColorButton(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR, Localization.lang("Entry editor background color")));
+        buttons.add(new ColorButton(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, Localization.lang("Entry editor active background color")));
+        buttons.add(new ColorButton(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR, Localization.lang("Entry editor invalid field color")));
 
+        int rowcnt = 0;
+        int col = 0;
+        int row;
         for (ColorButton but : buttons) {
-            builder.append(but);
-            builder.append(but.getDefaultButton());
-            builder.append(but.getName());
+            row = (2*(rowcnt/2)) + 1; // == 2*floor(rowcnt/2) + 1
+            builder.add((JButton)but).xy((6*col)+1, row);
+            builder.add(but.getDefaultButton()).xy((6*col)+3, row);
+            builder.add(but.getName()).xy((6*col)+5, row);
             but.addActionListener(new ColorButtonListener(but));
-
+            col = 1-col;  // Change 0 -> 1 -> 0 ...
+            rowcnt++;
         }
 
         setLayout(new BorderLayout());
@@ -118,6 +125,7 @@ public class ColorSetupPanel extends JPanel {
      */
     class ColorButton extends JButton implements Icon {
 
+        private static final long serialVersionUID = -1974112633706382299L;
         private Color color = Color.white;
         private final String key;
         private final String name;

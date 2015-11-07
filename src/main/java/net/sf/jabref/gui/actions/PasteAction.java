@@ -18,7 +18,8 @@ public class PasteAction extends AbstractAction {
 
         putValue(Action.NAME, Localization.lang("Paste from clipboard"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
-        putValue(Action.SMALL_ICON, IconTheme.getImage("paste"));
+        putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.PASTE.getSmallIcon());
+        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.PASTE.getIcon());
     }
 
     @Override

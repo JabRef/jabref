@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012, 2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -56,8 +56,10 @@ public class FreeCiteImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
-        String text = new Scanner(in).useDelimiter("\\A").next();
-        return importEntries(text, status);
+        try(Scanner scan = new Scanner(in)) {
+            String text = scan.useDelimiter("\\A").next();
+            return importEntries(text, status);
+        }
     }
 
     public List<BibtexEntry> importEntries(String text, OutputPrinter status) {
@@ -101,13 +103,13 @@ public class FreeCiteImporter extends ImportFormat {
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
 
-        List<BibtexEntry> res = new ArrayList<BibtexEntry>();
+        List<BibtexEntry> res = new ArrayList<>();
 
         XMLInputFactory factory = XMLInputFactory.newInstance();
         try {
             XMLStreamReader parser = factory.createXMLStreamReader(conn.getInputStream());
             while (parser.hasNext()) {
-                if (parser.getEventType() == XMLStreamConstants.START_ELEMENT
+                if ((parser.getEventType() == XMLStreamConstants.START_ELEMENT)
                         && parser.getLocalName().equals("citation")) {
                     parser.nextTag();
 
@@ -117,8 +119,8 @@ public class FreeCiteImporter extends ImportFormat {
                     // fallback type
                     BibtexEntryType type = BibtexEntryTypes.INPROCEEDINGS;
 
-                    while (!(parser.getEventType() == XMLStreamConstants.END_ELEMENT
-                    && parser.getLocalName().equals("citation"))) {
+                    while (!((parser.getEventType() == XMLStreamConstants.END_ELEMENT)
+                            && parser.getLocalName().equals("citation"))) {
                         if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
                             String ln = parser.getLocalName();
                             if (ln.equals("authors")) {
@@ -128,7 +130,7 @@ public class FreeCiteImporter extends ImportFormat {
                                 while (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
                                     // author is directly nested below authors
                                     assert parser.getLocalName()
-                                            .equals("author");
+                                    .equals("author");
 
                                     String author = parser.getElementText();
                                     if (sb.length() == 0) {
@@ -192,7 +194,7 @@ public class FreeCiteImporter extends ImportFormat {
                     if (noteSB.length() > 0) {
                         String note = e.getField("note");
                         if (note != null) {
-                            // "note" could have been set during the parsing as FreeCite also returns "note" 
+                            // "note" could have been set during the parsing as FreeCite also returns "note"
                             note = note.concat(Globals.NEWLINE).concat(noteSB.toString());
                         } else {
                             note = noteSB.toString();

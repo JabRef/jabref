@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -306,7 +306,7 @@ class GroupDialog extends JDialog {
                             .trim(), m_kgSearchTerm.getText().trim(),
                             m_kgCaseSensitive.isSelected(), m_kgRegExp
                             .isSelected(), getContext());
-                    if ((m_editedGroup instanceof ExplicitGroup || m_editedGroup instanceof SearchGroup)
+                    if (((m_editedGroup instanceof ExplicitGroup) || (m_editedGroup instanceof SearchGroup))
                             && m_resultingGroup.supportsAdd()) {
                         addPreviousEntries();
                     }
@@ -485,7 +485,7 @@ class GroupDialog extends JDialog {
         if (i == JOptionPane.NO_OPTION) {
             return;
         }
-        Vector<BibtexEntry> vec = new Vector<BibtexEntry>();
+        Vector<BibtexEntry> vec = new Vector<>();
         for (BibtexEntry entry : m_basePanel.database().getEntries()) {
             if (m_editedGroup.contains(entry)) {
                 vec.add(entry);
@@ -510,7 +510,7 @@ class GroupDialog extends JDialog {
         m_description.setText("<html>" + description + "</html>");
     }
 
-    private String formatRegExException(String regExp, Exception e) {
+    private static String formatRegExException(String regExp, Exception e) {
         String[] sa = e.getMessage().split("\\n");
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < sa.length; ++i) {
@@ -530,7 +530,7 @@ class GroupDialog extends JDialog {
         }
         int lastNewline = s.lastIndexOf("<br>");
         int hat = s.lastIndexOf("^");
-        if (lastNewline >= 0 && hat >= 0 && hat > lastNewline) {
+        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
             return s.substring(0, lastNewline + 4)
                     + s.substring(lastNewline + 4).replaceAll(" ", "&nbsp;");
         }

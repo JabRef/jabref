@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
@@ -26,13 +26,12 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.gui.BibtexFields;
 
 /**
  * Importer for COPAC format.
- * 
+ *
  * Documentation can be found online at:
- * 
+ *
  * http://copac.ac.uk/faq/#format
  */
 public class CopacImporter extends ImportFormat {
@@ -47,7 +46,7 @@ public class CopacImporter extends ImportFormat {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
     @Override
@@ -90,7 +89,7 @@ public class CopacImporter extends ImportFormat {
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
-        List<String> entries = new LinkedList<String>();
+        List<String> entries = new LinkedList<>();
 
         // Preprocess entries
         String str;
@@ -122,13 +121,13 @@ public class CopacImporter extends ImportFormat {
             entries.add(sb.toString());
         }
 
-        List<BibtexEntry> results = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> results = new LinkedList<>();
 
         for (String entry : entries) {
 
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
-            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
                     BibtexEntryTypes.BOOK);
 
             String[] lines = entry.split("\n");
@@ -170,7 +169,7 @@ public class CopacImporter extends ImportFormat {
         return results;
     }
 
-    private void setOrAppend(BibtexEntry b, String field, String value, String separator) {
+    private static void setOrAppend(BibtexEntry b, String field, String value, String separator) {
         String o = b.getField(field);
         if (o != null) {
             b.setField(field, o + separator + value);

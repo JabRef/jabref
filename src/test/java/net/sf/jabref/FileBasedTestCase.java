@@ -25,11 +25,11 @@ public class FileBasedTestCase {
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
-        oldUseRegExp = Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY);
+        oldUseRegExp = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY);
         oldAutoLinkExcatKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
         oldPdfDirectory = Globals.prefs.get("pdfDirectory");
 
-        Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, false);
+        Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
         Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, false);
 
         database = BibtexTestData.getBibtexDatabase();
@@ -107,7 +107,7 @@ public class FileBasedTestCase {
     public void tearDown() {
         FileBasedTestHelper.deleteRecursive(root);
         Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, oldAutoLinkExcatKeyOnly);
-        Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, oldUseRegExp);
+        Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, oldUseRegExp);
         Globals.prefs.put("pdfDirectory", oldPdfDirectory);
         // TODO: This is not a great way to do this, sure ;-)
     }

@@ -1,12 +1,10 @@
 package net.sf.jabref;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +19,9 @@ public class TestIconsProperties {
 
     @Test
     public void testExistenceOfIconImagesReferencedFromIconsProperties() throws IOException {
-        String folder = "src/main/resources/images/crystal_16";
+        String folder = "src/main/resources/images/external";
         String iconsProperties = "Icons.properties";
-        String iconsPropertiesPath = folder + "/" + iconsProperties;
+        String iconsPropertiesPath = "src/main/resources/images/" + iconsProperties;
 
         // load properties
         Properties properties = new Properties();
@@ -49,7 +47,7 @@ public class TestIconsProperties {
         List<String> fileNamesInFolder = Files.list(Paths.get(folder)).map(p -> p.getFileName().toString()).collect(Collectors.toList());
         fileNamesInFolder.removeAll(imagesReferencedFromProperties);
 
-        assertEquals("Images are in the folder that are unused", "[Icons.properties]", fileNamesInFolder.toString());
+        assertEquals("Images are in the folder that are unused", "[red.png]", fileNamesInFolder.toString());
     }
 
 }

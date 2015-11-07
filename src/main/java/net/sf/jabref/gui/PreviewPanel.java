@@ -42,7 +42,7 @@ import net.sf.jabref.gui.search.SearchTextListener;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 
 /**
  * Displays an BibtexEntry using the given layout format.
@@ -206,7 +206,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         private static final long serialVersionUID = 1L;
 
         public PrintAction() {
-            super(Localization.lang("Print Preview"), IconTheme.getImage("psSmall"));
+            super(Localization.lang("Print Preview"), IconTheme.JabRefIcon.PRINTED.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print Preview"));
         }
 
@@ -256,7 +256,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         private static final long serialVersionUID = 1L;
 
         public CloseAction() {
-            super(Localization.lang("Close window"), IconTheme.getImage("close"));
+            super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
         }
 

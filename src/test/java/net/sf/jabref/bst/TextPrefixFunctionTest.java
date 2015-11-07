@@ -18,7 +18,7 @@ public class TextPrefixFunctionTest {
         assertPrefix("Ulric", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot");
     }
 
-    private void assertPrefix(final String string, final String string2) {
+    private static void assertPrefix(final String string, final String string2) {
         Assert.assertEquals(string, BibtexTextPrefix.textPrefix(5, string2, new Warn() {
 
             @Override

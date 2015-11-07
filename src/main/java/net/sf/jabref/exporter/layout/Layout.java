@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,6 +16,10 @@
 package net.sf.jabref.exporter.layout;
 
 import java.util.Vector;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +33,13 @@ public class Layout {
 
     private final LayoutEntry[] layoutEntries;
 
-    private final ArrayList<String> missingFormatters = new ArrayList<String>();
+    private final ArrayList<String> missingFormatters = new ArrayList<>();
 
+    private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
     public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception {
         StringInt si;
-        Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>(parsedEntries.size());
+        Vector<LayoutEntry> tmpEntries = new Vector<>(parsedEntries.size());
 
         Vector<StringInt> blockEntries = null;
         LayoutEntry le;
@@ -42,40 +47,42 @@ public class Layout {
 
         for (StringInt parsedEntry : parsedEntries) {
             si = parsedEntry;
-
-            if (si.i == LayoutHelper.IS_LAYOUT_TEXT || si.i == LayoutHelper.IS_SIMPLE_FIELD) {
+            // TODO: Rewrite using switch
+            if ((si.i == LayoutHelper.IS_LAYOUT_TEXT) || (si.i == LayoutHelper.IS_SIMPLE_FIELD)) {
+                // Do nothing
             } else if (si.i == LayoutHelper.IS_FIELD_START) {
-                blockEntries = new Vector<StringInt>();
+                blockEntries = new Vector<>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_FIELD_END) {
-                if (blockStart != null && blockEntries != null) {
+                if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        System.out.println(blockStart + '\n' + si.s);
-                        System.out.println("Nested field entries are not implemented !!!");
+                        LOGGER.debug(blockStart + '\n' + si.s);
+                        LOGGER.warn("Nested field entries are not implemented !!!");
                         Thread.dumpStack();
                     }
                 }
             } else if (si.i == LayoutHelper.IS_GROUP_START) {
-                blockEntries = new Vector<StringInt>();
+                blockEntries = new Vector<>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_GROUP_END) {
-                if (blockStart != null && blockEntries != null) {
+                if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        System.out.println("Nested field entries are not implemented !!!");
+                        LOGGER.warn("Nested field entries are not implemented !!!");
                         Thread.dumpStack();
                     }
                 }
             } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+                // Do nothing
             }
 
             if (blockEntries == null) {
@@ -157,9 +164,9 @@ public class Layout {
                 if (previousSkipped) {
                     int eol = 0;
 
-                    while (eol < fieldText.length() &&
-                            (fieldText.charAt(eol) == '\n' ||
-                                    fieldText.charAt(eol) == '\r')) {
+                    while ((eol < fieldText.length()) &&
+                            ((fieldText.charAt(eol) == '\n') ||
+                                    (fieldText.charAt(eol) == '\r'))) {
                         eol++;
                     }
 

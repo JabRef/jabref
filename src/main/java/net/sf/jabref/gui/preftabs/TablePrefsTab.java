@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -63,14 +63,14 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private final JTextField secField;
     private final JTextField terField;
     private final JTextField numericFields;
-    private final JComboBox priSort;
-    private final JComboBox secSort;
-    private final JComboBox terSort;
+    private final JComboBox<String> priSort;
+    private final JComboBox<String> secSort;
+    private final JComboBox<String> terSort;
 
 
     /**
      * Customization of external program paths.
-     * 
+     *
      * @param prefs
      *            a <code>JabRefPreferences</code> value
      */
@@ -80,18 +80,18 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         /**
          * Added Bibtexkey to combobox.
-         * 
+         *
          * [ 1540646 ] default sort order: bibtexkey
-         * 
+         *
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
          */
-        Vector<String> fieldNames = new Vector<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        Vector<String> fieldNames = new Vector<>(Arrays.asList(BibtexFields.getAllFieldNames()));
         fieldNames.add(BibtexEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-        priSort = new JComboBox(allPlusKey);
-        secSort = new JComboBox(allPlusKey);
-        terSort = new JComboBox(allPlusKey);
+        priSort = new JComboBox<>(allPlusKey);
+        secSort = new JComboBox<>(allPlusKey);
+        terSort = new JComboBox<>(allPlusKey);
 
         autoResizeMode = new JCheckBox(Localization.lang("Fit table horizontally on screen"));
 
@@ -241,11 +241,11 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         autoResizeMode
-                .setSelected(prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS);
+        .setSelected(prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-        priField.setText(prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD));
-        secField.setText(prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD));
-        terField.setText(prefs.get(JabRefPreferences.TERTIARY_SORT_FIELD));
+        priField.setText(prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD));
+        secField.setText(prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD));
+        terField.setText(prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD));
         priSort.setSelectedIndex(0);
         secSort.setSelectedIndex(0);
         terSort.setSelectedIndex(0);
@@ -266,9 +266,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         } else {
             noAbbrNames.setSelected(true);
         }
-        priDesc.setSelected(prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING));
-        secDesc.setSelected(prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING));
-        terDesc.setSelected(prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING));
+        priDesc.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING));
+        secDesc.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING));
+        terDesc.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING));
 
         floatMarked.setSelected(prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
@@ -288,7 +288,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     /**
      * Store changes to table preferences. This method is called when the user
      * clicks Ok.
-     * 
+     *
      */
     @Override
     public void storeSettings() {
@@ -301,12 +301,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         prefs.putInt(JabRefPreferences.AUTO_RESIZE_MODE,
                 autoResizeMode.isSelected() ? JTable.AUTO_RESIZE_ALL_COLUMNS : JTable.AUTO_RESIZE_OFF);
-        prefs.putBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING, priDesc.isSelected());
-        prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, secDesc.isSelected());
-        prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, terDesc.isSelected());
-        prefs.put(JabRefPreferences.PRIMARY_SORT_FIELD, priField.getText().toLowerCase().trim());
-        prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, secField.getText().toLowerCase().trim());
-        prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, terField.getText().toLowerCase().trim());
+        prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, priDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, secDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, terDesc.isSelected());
+        prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, priField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, secField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, terField.getText().toLowerCase().trim());
 
         prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
         // updatefont
@@ -316,9 +316,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         if (newVal.isEmpty()) {
             newVal = null;
         }
-        if (newVal != null && oldVal == null
-                || newVal == null && oldVal != null
-                || newVal != null && !newVal.equals(oldVal)) {
+        if (((newVal != null) && (oldVal == null))
+                || ((newVal == null) && (oldVal != null))
+                || ((newVal != null) && !newVal.equals(oldVal))) {
             prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
             BibtexFields.setNumericFieldsFromPrefs();
         }

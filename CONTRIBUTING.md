@@ -21,6 +21,7 @@ Ensure your code is formatted according the JabRef formatting guidelines.
 These are provided as Eclipse formatting configuration in [formatter_settings.xml](ide-settings/formatter_settings.xml).
 Ensure that JabRef's code cleanup settings are activated.
 Import [cleanup_settings.xml](ide-settings/cleanup_settings.xml).
+When you use Eclipse, the required config is generated automatically by `gradlew eclipse`.
 You can also run `gradlew format` to let the [Gradle Format plugin](https://github.com/youribonnaffe/gradle-format-plugin) do the formatting.
 
 
@@ -28,6 +29,8 @@ You can also run `gradlew format` to let the [Gradle Format plugin](https://gith
 You should edit the [CHANGELOG](CHANGELOG) located in the root directory of the JabRef source.
 Add a line with your changes and your name.
 Nicknames are OK.
+
+If you did internal refactorings or improvements not visible to the user (e.g., UI, .bib file), then you don't need to put an entry there.
 
 
 ### Author credits
@@ -59,6 +62,8 @@ gets
  *  Copyright (C) 2015 Stefan Jauch
 ```
 
+Please, **do not add yourself at `@authors`**.
+We have track this information in the header only.
 
 ### Write a good commit message
 See [good commit message] or [commit guidelines section of Pro Git].
@@ -74,6 +79,31 @@ In case you do not have time to add a test case, we nevertheless ask you to run 
 Please try to use a version available at jCenter and add it to `build.gradle`.
 In any case, describe the library at [external-libraries.txt](external-libraries.txt).
 We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)).
+Also add a txt file stating the license in `libraries/`.
+It is used at `gradlew processResources` to generate the About.html files.
+You can see the result in `build\resources\main\help\en\About.html` or when clicking Help -> About.
+
+
+### When making an architectural decision
+In case you add a library or do mayor code rewrites, we ask you to document your decision.
+Recommended reading: http://www.infoq.com/articles/sustainable-architectural-design-decisions
+
+Template:
+```
+In the context of <use case/user story u>,
+facing <concern c>
+we decided for <option o>
+and neglected <other options>,
+to achieve <system qualities/desired consequences>,
+accepting <downside d/undesired consequences>.
+because <additional rationale>.
+```
+
+
+### When adding a new Localization.lang entry
+Run `python scripts/syncLang.py -s` to search for new untranslated strings.
+If everything is OK, run `python scripts/syncLang.py -s -u` to update `JabRef_en.properties`.
+
 
 
 ### Create a pull request

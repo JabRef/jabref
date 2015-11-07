@@ -49,17 +49,20 @@ class BibTeXMLHandler extends DefaultHandler {
 
     // SAX parsing methods
 
+    @SuppressWarnings("unused")
     public void doctypeDecl(String name, String publicId,
             String systemId) {
+        // Do nothing
     }
 
     @Override
     public void startDocument() {
-        bibitems = new ArrayList<BibtexEntry>();
+        bibitems = new ArrayList<>();
     }
 
     @Override
     public void endDocument() {
+        // Empty method
     }
 
     @Override

@@ -3,58 +3,71 @@ package net.sf.jabref.logic.l10n;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.nio.charset.Charset;
 import java.util.*;
 
 public class Localization {
     private static final Log LOGGER = LogFactory.getLog(Localization.class);
 
-    private static final String RESOURCE_PREFIX = "l10n/JabRef";
-    private static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
-    private static final String INTEGRITY_RESOURCE_PREFIX = "l10n/IntegrityMessage";
+    private static final Locale defaultLocale = Locale.getDefault();
+
+    public static final String RESOURCE_PREFIX = "l10n/JabRef";
+    public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
-    private static ResourceBundle intMessages;
 
-    public static void setLanguage(String language, String country) {
-        Locale locale = new Locale(language, country);
+    public static void setLanguage(String language) {
+        Locale locale = new Locale(language);
 
-        messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-        menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-        intMessages = ResourceBundle.getBundle(INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+        try {
+            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
 
-        // these checks are required as when the requested resource bundle is NOT found, the default locale is used as a fallback silently.
-        if(!messages.getLocale().equals(locale)) {
-            LOGGER.warn("tried loading <" + RESOURCE_PREFIX + "> for locale <" + locale + "> but had to fall back on default locale <" + Locale.getDefault() + ">");
+            // silent fallback to system locale when bundle is not found
+            if(!messages.getLocale().equals(locale)) {
+                LOGGER.warn("Bundle for locale <" + locale + "> not found. Falling back to system locale <" + defaultLocale + ">");
+            }
+        } catch(MissingResourceException e) {
+            LOGGER.warn("Bundle for locale <" + locale + "> not found. Fallback to system locale <" + defaultLocale
+                    + "> failed, using locale <en> instead", e);
+
+            locale = new Locale("en");
+            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+        } finally {
+            // Set consistent VM locales
+            Locale.setDefault(locale);
+            javax.swing.JComponent.setDefaultLocale(locale);
         }
-
-        if(!menuTitles.getLocale().equals(locale)) {
-            LOGGER.warn("tried loading <" + MENU_RESOURCE_PREFIX + "> for locale <" + locale + "> but had to fall back on default locale <" + Locale.getDefault() + ">");
-        }
-
-        if(!intMessages.getLocale().equals(locale)) {
-            LOGGER.warn("tried loading <" + INTEGRITY_RESOURCE_PREFIX + "> for locale <" + locale + "> but had to fall back on default locale <" + Locale.getDefault() + ">");
-        }
-
-        Locale.setDefault(locale);
-        javax.swing.JComponent.setDefaultLocale(locale);
     }
 
-    public static String lang(String key, String... params) {
+    /**
+     * In the translation, %c is translated to ":", %e is translated to "=", %<anythingelse> to <anythingelse>, %0, ...
+     * %9 to the respective params given
+     *
+     * @param resBundle the ResourceBundle to use
+     * @param idForErrorMessage output when translation is not found ö * @param key the key to lookup in resBundle
+     * @param params a list of Strings to replace %0, %1, ...
+     * @return
+     */
+    private static String translate(ResourceBundle resBundle, String idForErrorMessage, String key, String... params) {
         String translation = null;
         try {
-            if (messages != null) {
-                translation = messages.getString(key.replaceAll(" ", "_"));
+            if (resBundle != null) {
+                translation = resBundle.getString(key.replaceAll(" ", "_"));
             }
         } catch (MissingResourceException ex) {
-            LOGGER.warn("Warning: could not get translation for \"" + key + "\" for locale " + Locale.getDefault());
+            LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
+                    + Locale.getDefault());
         }
         if (translation == null) {
             translation = key;
         }
 
-        if (translation != null && !translation.isEmpty()) {
+        // replace %0, %1, ...
+        if ((translation != null) && !translation.isEmpty()) {
+            // also done if no params are given
+            //  Then, %c is translated to ":", %e is translated to "=", ...
             translation = translation.replaceAll("_", " ");
             StringBuffer sb = new StringBuffer();
             boolean b = false;
@@ -70,7 +83,7 @@ public class Localization {
                         b = false;
                         try {
                             int index = Integer.parseInt(String.valueOf(c));
-                            if (params != null && index >= 0 && index <= params.length) {
+                            if ((params != null) && (index >= 0) && (index <= params.length)) {
                                 sb.append(params[index]);
                             }
                         } catch (NumberFormatException e) {
@@ -95,42 +108,17 @@ public class Localization {
         return key;
     }
 
+    public static String lang(String key, String... params) {
+        return translate(messages, "message", key, params);
+    }
+
     public static String lang(String key) {
         return lang(key, (String[]) null);
     }
 
-    public static String menuTitle(String key) {
-        String translation = null;
-        try {
-            if (messages != null) {
-                translation = menuTitles.getString(key.replaceAll(" ", "_"));
-            }
-        } catch (MissingResourceException ex) {
-            translation = key;
-        }
-        if (translation != null && !translation.isEmpty()) {
-            return translation.replaceAll("_", " ");
-        } else {
-            return key;
-        }
+    public static String menuTitle(String key, String... params) {
+        return translate(menuTitles, "menu item", key, params);
     }
 
-    public static String getIntegrityMessage(String key) {
-        String translation = null;
-        try {
-            if (intMessages != null) {
-                translation = intMessages.getString(key);
-            }
-        } catch (MissingResourceException ex) {
-            translation = key;
-
-            LOGGER.warn("Warning: could not get menu item translation for \"" + key + "\"");
-        }
-        if (translation != null && !translation.isEmpty()) {
-            return translation;
-        } else {
-            return key;
-        }
-    }
 }
 

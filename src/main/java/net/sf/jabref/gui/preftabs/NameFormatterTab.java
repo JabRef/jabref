@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -47,7 +47,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     public static Map<String, String> getNameFormatters() {
 
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
 
         String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
         String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
@@ -77,7 +77,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     private int rowCount = -1;
 
-    private final Vector<TableRow> tableRows = new Vector<TableRow>(10);
+    private final Vector<TableRow> tableRows = new Vector<>(10);
 
 
     static class TableRow {
@@ -104,7 +104,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     /**
      * Tab to create custom Name Formatters
-     * 
+     *
      */
     public NameFormatterTab(HelpDialog helpDialog) {
         setLayout(new BorderLayout());
@@ -199,7 +199,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         toolBar.add(new AddRowAction());
         toolBar.add(new DeleteRowAction());
         toolBar.add(new HelpAction(helpDialog, GUIGlobals.nameFormatterHelp,
-                "Help on Name Formatting", IconTheme.getImage("helpSmall")));
+                Localization.lang("Help on Name Formatting"), IconTheme.JabRefIcon.HELP.getIcon()));
 
         tabPanel.add(toolBar, BorderLayout.EAST);
 
@@ -241,7 +241,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", IconTheme.getImage("remove"));
+            super("Delete row", IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -274,7 +274,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", IconTheme.getImage("add"));
+            super("Add row", IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 
@@ -289,8 +289,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 return;
             }
             for (int i = 0; i < rows.length; i++) {
-                if (rows[i] + i - 1 < tableRows.size()) {
-                    tableRows.add(Math.max(0, rows[i] + i - 1), new TableRow());
+                if (((rows[i] + i) - 1) < tableRows.size()) {
+                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow());
                 }
             }
             rowCount += rows.length;
@@ -307,7 +307,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     /**
      * Store changes to table preferences. This method is called when the user
      * clicks Ok.
-     * 
+     *
      */
     @Override
     public void storeSettings() {

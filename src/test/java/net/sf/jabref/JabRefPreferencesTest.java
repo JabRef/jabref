@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,10 +13,13 @@ public class JabRefPreferencesTest {
 
     private JabRefPreferences prefs;
 
+    private JabRefPreferences backup;
+
 
     @Before
     public void setUp() {
         prefs = JabRefPreferences.getInstance();
+        backup = prefs;
     }
 
     @Test
@@ -27,11 +31,14 @@ public class JabRefPreferencesTest {
 
         String expected = "editor";
         String actual = prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD);
-        
-        //clean up preferences to default state
-        prefs.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "author");
 
         assertEquals(expected, actual);
+    }
+
+    @After
+    public void tearDown() {
+        //clean up preferences to default state
+        prefs.overwritePreferences(backup);
     }
 
 }

@@ -1,5 +1,6 @@
 /*
  Copyright (C) 2004 R. Nagel
+ Copyright (C) 2015 JabRef Contributors.
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -71,37 +72,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.EditorKit;
@@ -112,14 +86,13 @@ import javax.swing.text.StyledDocument;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
-import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -133,8 +106,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private final JPanel buttons = new JPanel();
     private final JPanel rawPanel = new JPanel();
     private final JPanel sourcePanel = new JPanel();
-    private final IntegrityMessagePanel warnPanel;
-    private JList fieldList;
+    private JList<String> fieldList;
     private JRadioButton overRadio;
 
     private final BibtexEntry entry;
@@ -144,8 +116,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private JTextPane textPane;
     private JTextArea preview;
 
-    private final boolean inputChanged; // input changed, fired by insert buttons
-
     private final TagToMarkedTextStore marked;
 
     private final JabRefFrame _frame;
@@ -154,9 +124,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal, BibtexEntry bibEntry) {
         super(frame, title, modal);
-
-        warnPanel = new IntegrityMessagePanel(panel);
-        inputChanged = true; // for a first validCheck
 
         _frame = frame;
 
@@ -193,21 +160,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
         initSourcePanel();
 
         JTabbedPane tabbed = new JTabbedPane();
-        tabbed.addChangeListener(
-                new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e)
-                    {
-                        if (inputChanged)
-                        {
-                            warnPanel.updateView(entry);
-                        }
-                    }
-                });
 
         tabbed.add(rawPanel, Localization.lang("Raw_source"));
         tabbed.add(sourcePanel, Localization.lang("BibTeX_source"));
-        tabbed.add(warnPanel, Localization.lang("Messages_and_Hints"));
 
         // Panel Layout
         panel1.setLayout(new BorderLayout());
@@ -241,6 +196,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         try {
             doc.insertString(0, "", doc.getStyle("regular"));
         } catch (Exception ignored) {
+            // Ignored
         }
 
         OverlayPanel testPanel = new OverlayPanel(textPane,
@@ -294,7 +250,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         //inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
         inputPanel.setMinimumSize(new Dimension(10, 10));
 
-        fieldList = new JList(getAllFields());
+        fieldList = new JList<>(getAllFields());
         fieldList.setCellRenderer(new SimpleCellRenderer(fieldList.getFont()));
         ListSelectionModel listSelectionModel = fieldList.getSelectionModel();
         listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -407,35 +363,35 @@ public class TextInputDialog extends JDialog implements ActionListener {
         sourcePanel.add(paneScrollPane, BorderLayout.CENTER);
     }
 
-    private void addStylesToDocument(StyledDocument doc) {
+    private void addStylesToDocument(StyledDocument document) {
         //Initialize some styles.
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
-        Style regular = doc.addStyle("regular", def);
+        Style regular = document.addStyle("regular", def);
         StyleConstants.setFontFamily(def, "SansSerif");
         StyleConstants.setFontSize(def, 12);
 
-        Style s = doc.addStyle("oldused", regular);
+        Style s = document.addStyle("oldused", regular);
         StyleConstants.setItalic(s, true);
         StyleConstants.setForeground(s, Color.blue);
 
-        s = doc.addStyle("used", regular);
+        s = document.addStyle("used", regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s, Color.blue);
 
-        s = doc.addStyle("marked", regular);
+        s = document.addStyle("marked", regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s, Color.red);
 
-        s = doc.addStyle("small", regular);
+        s = document.addStyle("small", regular);
         StyleConstants.setFontSize(s, 10);
 
-        s = doc.addStyle("large", regular);
+        s = document.addStyle("large", regular);
         StyleConstants.setFontSize(s, 16);
     }
 
     private void insertTextForTag() {
-        String type = (String) fieldList.getSelectedValue();
+        String type = fieldList.getSelectedValue();
         if (type != null) {
             String txt = textPane.getSelectedText();
 
@@ -548,18 +504,19 @@ public class TextInputDialog extends JDialog implements ActionListener {
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored) {
+            // Ignored
         }
 
         fieldList.clearSelection();
     }
 
     private String[] getAllFields() {
-        ArrayList<String> f = new ArrayList<String>();
-        String[] req = entry.getRequiredFields();
-        String[] opt = entry.getOptionalFields();
+        ArrayList<String> f = new ArrayList<>();
+        List<String> req = entry.getRequiredFields();
+        List<String> opt = entry.getOptionalFields();
         String[] allFields = BibtexFields.getAllFieldNames();
-        Collections.addAll(f, req);
-        Collections.addAll(f, opt);
+        f.addAll(req);
+        f.addAll(opt);
         for (String allField : allFields) {
             if (!f.contains(allField)) {
                 f.add(allField);
@@ -570,7 +527,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class PasteAction extends BasicAction {
         public PasteAction() {
-            super("Paste", "Paste from clipboard", IconTheme.getImage("paste"));
+            super("Paste", "Paste from clipboard", IconTheme.JabRefIcon.PASTE.getIcon());
         }
 
         @Override
@@ -579,20 +536,22 @@ public class TextInputDialog extends JDialog implements ActionListener {
             if (data != null) {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();
-                if (selEnd - selStart > 0) {
+                if ((selEnd - selStart) > 0) {
                     textPane.replaceSelection("");
                 }
                 int cPos = textPane.getCaretPosition();
                 try {
                     doc.insertString(cPos, data, doc.getStyle("regular"));
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                    // Ignored
+                }
             }
         }
     }
 
     class LoadAction extends BasicAction {
         public LoadAction() {
-            super("Open", "Open_file", IconTheme.getImage("open"));
+            super("Open", "Open_file", IconTheme.JabRefIcon.OPEN.getIcon());
         }
 
         @Override
@@ -606,17 +565,21 @@ public class TextInputDialog extends JDialog implements ActionListener {
                     doc.remove(0, doc.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {
-                        eKit.read(new FileInputStream(newFile), doc, 0);
-                        doc.setLogicalStyle(0, doc.getStyle("regular"));
+                        try(FileInputStream fis = new FileInputStream(newFile)) {
+                            eKit.read(fis, doc, 0);
+                            doc.setLogicalStyle(0, doc.getStyle("regular"));
+                        }
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                // Ignored
+            }
         }
     }
 
     class ClearAction extends BasicAction {
         public ClearAction() {
-            super("Clear", "Clear_inputarea", IconTheme.getImage("new"));
+            super("Clear", "Clear_inputarea", IconTheme.JabRefIcon.NEW.getIcon());
         }
 
         @Override
@@ -632,7 +595,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {}
+        public void actionPerformed(ActionEvent e) {
+            // Do nothing
+        }
     }
 
     class FieldListSelectionHandler implements ListSelectionListener {
@@ -648,11 +613,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
                 if (!isAdjusting) {
                     if (lastIndex > -1) {
-                        String tag1 = (String) fieldList.getModel().getElementAt(lastIndex);
+                        String tag1 = fieldList.getModel().getElementAt(lastIndex);
                         marked.setStyleForTag(tag1, "used", doc);
                     }
 
-                    String tag2 = (String) fieldList.getModel().getElementAt(index);
+                    String tag2 = fieldList.getModel().getElementAt(index);
                     marked.setStyleForTag(tag2, "marked", doc);
 
                     lastIndex = index;
@@ -666,8 +631,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
     class SimpleCellRenderer extends DefaultListCellRenderer {
         private final Font baseFont;
         private final Font usedFont;
-        private final ImageIcon okIcon = IconTheme.getImage("complete");
-        private final ImageIcon needIcon = IconTheme.getImage("wrong");
+        private final Icon okIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
+        private final Icon needIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
 
         public SimpleCellRenderer(Font normFont) {
             baseFont = normFont;
@@ -679,7 +644,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
          */
         @Override
         public Component getListCellRendererComponent(
-                JList list,
+                JList<?> list,
                 Object value, // value to display
                 int index, // cell index
                 boolean iss, // is the cell selected
@@ -744,7 +709,7 @@ class PopupListener extends MouseAdapter {
 }
 
 abstract class BasicAction extends AbstractAction {
-    public BasicAction(String text, String description, ImageIcon icon) {
+    public BasicAction(String text, String description, Icon icon) {
         super(Localization.lang(text), icon);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
     }

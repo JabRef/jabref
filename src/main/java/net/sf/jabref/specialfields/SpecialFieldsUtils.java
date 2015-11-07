@@ -34,13 +34,10 @@ public class SpecialFieldsUtils {
     public static final String FIELDNAME_PRINTED = "printed";
 
     public static final String PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
-    public static final Boolean PREF_SPECIALFIELDSENABLED_DEFAULT = Boolean.FALSE;
+    public static final Boolean PREF_SPECIALFIELDSENABLED_DEFAULT = Boolean.TRUE;
 
     public static final String PREF_SHOWCOLUMN_RANKING = "showRankingColumn";
     public static final Boolean PREF_SHOWCOLUMN_RANKING_DEFAULT = Boolean.TRUE;
-
-    public static final String PREF_RANKING_COMPACT = "compactRankingColumn";
-    public static final Boolean PREF_RANKING_COMPACT_DEFAULT = Boolean.TRUE;
 
     public static final String PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
     public static final Boolean PREF_SHOWCOLUMN_PRIORITY_DEFAULT = Boolean.FALSE;
@@ -57,11 +54,14 @@ public class SpecialFieldsUtils {
     public static final String PREF_SHOWCOLUMN_PRINTED = "showPrintedColumn";
     public static final Boolean PREF_SHOWCOLUMN_PRINTED_DEFAULT = Boolean.FALSE;
 
+    // The choice between PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS and PREF_SERIALIZESPECIALFIELDS is mutually exclusive
+    // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled 
     public static final String PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
-    public static final Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.FALSE;
+    public static final Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.TRUE;
 
+    // The choice between PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS and PREF_SERIALIZESPECIALFIELDS is mutually exclusive
     public static final String PREF_SERIALIZESPECIALFIELDS = "serializeSpecialFields";
-    public static final Boolean PREF_SERIALIZESPECIALFIELDS_DEFAULT = Boolean.TRUE;
+    public static final Boolean PREF_SERIALIZESPECIALFIELDS_DEFAULT = Boolean.FALSE;
 
 
     /****************************************************/

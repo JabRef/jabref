@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
@@ -212,7 +212,7 @@ class ReplaceStringDialog extends JDialog {
         int counter = 0;
         if (allFields()) {
 
-            for (String s : be.getAllFields()) {
+            for (String s : be.getFieldNames()) {
                 if (!s.equals(BibtexEntry.KEY_FIELD)) {
                     counter += replaceField(be, s, ce);
                 }
@@ -228,8 +228,8 @@ class ReplaceStringDialog extends JDialog {
         return counter;
     }
 
-    private int replaceField(BibtexEntry be, String field, NamedCompound ce) {
-        Object o = be.getField(field);
+    private int replaceField(BibtexEntry be, String fieldname, NamedCompound ce) {
+        Object o = be.getField(fieldname);
         if (o == null) {
             return 0;
         }
@@ -247,8 +247,8 @@ class ReplaceStringDialog extends JDialog {
         }
         sb.append(txt.substring(piv));
         String newStr = sb.toString();
-        be.setField(field, newStr);
-        ce.addEdit(new UndoableFieldChange(be, field, txt, newStr));
+        be.setField(fieldname, newStr);
+        ce.addEdit(new UndoableFieldChange(be, fieldname, txt, newStr));
         return counter;
     }
 }

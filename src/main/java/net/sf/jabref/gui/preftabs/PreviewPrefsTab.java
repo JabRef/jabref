@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -27,7 +27,6 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.id.IdGenerator;
@@ -44,9 +43,24 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final JTextArea layout1 = new JTextArea("", 1, 1);
     private final JTextArea layout2 = new JTextArea("", 1, 1);
 
-    JButton help;
+    private final JButton help = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.previewHelp,
+            Localization.lang("Help on Preview Settings")).getIconButton();
+
+    private final JButton testButton = new JButton(Localization.lang("Test"));
+    private final JButton defaultButton = new JButton(Localization.lang("Default"));
+    private final JButton testButton2 = new JButton(Localization.lang("Test"));
+    private final JButton defaultButton2 = new JButton(Localization.lang("Default"));
+
+
+    private final JPanel pdfPreviewPanel = new JPanel(new BorderLayout());
+
 
     private final JCheckBox pdfPreview = new JCheckBox(Localization.lang("Enable PDF preview"));
+    private final JPanel firstPanel = new JPanel();
+    private final JScrollPane firstScrollPane = new JScrollPane(layout1);
+
+    private final JPanel secondPanel = new JPanel();
+    private final JScrollPane secondScrollPane = new JScrollPane(layout2);
 
     private static BibtexEntry entry;
 
@@ -54,15 +68,12 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
     public PreviewPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
 
-        JPanel firstPanel = new JPanel();
         GridBagLayout layout = new GridBagLayout();
         firstPanel.setLayout(layout);
-        JPanel secondPanel = new JPanel();
         secondPanel.setLayout(layout);
 
         setLayout(layout);
-        JLabel lab;
-        lab = new JLabel(Localization.lang("Preview") + " 1");
+        JLabel lab = new JLabel(Localization.lang("Preview") + " 1");
         GridBagConstraints layoutConstraints = new GridBagConstraints();
         layoutConstraints.anchor = GridBagConstraints.WEST;
         layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -72,7 +83,6 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         layoutConstraints.insets = new Insets(2, 2, 2, 2);
         layout.setConstraints(lab, layoutConstraints);
         layoutConstraints.weighty = 1;
-        JScrollPane firstScrollPane = new JScrollPane(layout1);
         layout.setConstraints(firstScrollPane, layoutConstraints);
         firstPanel.add(firstScrollPane);
         layoutConstraints.weighty = 0;
@@ -80,40 +90,35 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         layoutConstraints.weightx = 0;
         layoutConstraints.fill = GridBagConstraints.NONE;
         layoutConstraints.anchor = GridBagConstraints.WEST;
-        JButton testButton = new JButton(Localization.lang("Test"));
         layout.setConstraints(testButton, layoutConstraints);
         firstPanel.add(testButton);
-        JButton defaultButton = new JButton(Localization.lang("Default"));
         layout.setConstraints(defaultButton, layoutConstraints);
         firstPanel.add(defaultButton);
         layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        JPanel pan = new JPanel();
+        JPanel newPan = new JPanel();
         layoutConstraints.weightx = 1;
-        layout.setConstraints(pan, layoutConstraints);
-        firstPanel.add(pan);
+        layout.setConstraints(newPan, layoutConstraints);
+        firstPanel.add(newPan);
         lab = new JLabel(Localization.lang("Preview") + " 2");
         layout.setConstraints(lab, layoutConstraints);
         // p2.add(lab);
         layoutConstraints.weighty = 1;
         layoutConstraints.fill = GridBagConstraints.BOTH;
-        JScrollPane secondScrollPane = new JScrollPane(layout2);
         layout.setConstraints(secondScrollPane, layoutConstraints);
         secondPanel.add(secondScrollPane);
         layoutConstraints.weighty = 0;
         layoutConstraints.weightx = 0;
         layoutConstraints.fill = GridBagConstraints.NONE;
         layoutConstraints.gridwidth = 1;
-        JButton testButton2 = new JButton(Localization.lang("Test"));
         layout.setConstraints(testButton2, layoutConstraints);
         secondPanel.add(testButton2);
-        JButton defaultButton2 = new JButton(Localization.lang("Default"));
         layout.setConstraints(defaultButton2, layoutConstraints);
         secondPanel.add(defaultButton2);
         layoutConstraints.gridwidth = 1;
-        pan = new JPanel();
+        newPan = new JPanel();
         layoutConstraints.weightx = 1;
-        layout.setConstraints(pan, layoutConstraints);
-        secondPanel.add(pan);
+        layout.setConstraints(newPan, layoutConstraints);
+        secondPanel.add(newPan);
 
         layoutConstraints.weightx = 1;
         layoutConstraints.weighty = 0;
@@ -137,15 +142,10 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         add(secondPanel);
 
         // PDF Preview button
-        JPanel pdfPreviewPanel = new JPanel(new BorderLayout());
         pdfPreviewPanel.add(pdfPreview, BorderLayout.WEST);
 
-        { // Help Button
-            HelpAction helpAction = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.previewHelp,
-                    Localization.lang("Help on Preview Settings"), IconTheme.getImage("helpSmall"));
-            JButton help = helpAction.getIconButton();
-            pdfPreviewPanel.add(help, BorderLayout.EAST);
-        }
+        // Help Button
+        pdfPreviewPanel.add(help, BorderLayout.EAST);
 
         layoutConstraints.weighty = 0;
         layout.setConstraints(pdfPreviewPanel, layoutConstraints);

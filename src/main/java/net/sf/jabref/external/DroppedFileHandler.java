@@ -23,7 +23,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -37,8 +36,7 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
@@ -89,17 +87,15 @@ public class DroppedFileHandler {
 
         FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref", "bottom:14pt,pref,pref,pref,pref");
         layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout, optionsPanel);
-        builder.border(Borders.DIALOG);
-        CellConstraints cc = new CellConstraints();
-
-        builder.add(linkInPlace, cc.xyw(1, 1, 4));
-        builder.add(destDirLabel, cc.xyw(1, 2, 4));
-        builder.add(copyRadioButton, cc.xyw(2, 3, 3));
-        builder.add(moveRadioButton, cc.xyw(2, 4, 3));
-        builder.add(renameCheckBox, cc.xyw(2, 5, 1));
-        builder.add(renameToTextBox, cc.xyw(4, 5, 1));
-
+        FormBuilder builder = FormBuilder.create().layout(layout);
+        
+        builder.add(linkInPlace).xyw(1, 1, 4);
+        builder.add(destDirLabel).xyw(1, 2, 4);
+        builder.add(copyRadioButton).xyw(2, 3, 3);
+        builder.add(moveRadioButton).xyw(2, 4, 3);
+        builder.add(renameCheckBox).xyw(2, 5, 1);
+        builder.add(renameToTextBox).xyw(4, 5, 1);
+        optionsPanel.add(builder.getPanel());
     }
 
     /**
@@ -139,7 +135,6 @@ public class DroppedFileHandler {
 
         // Show dialog
         boolean newEntry = false;
-        String citeKey = entry.getCiteKey();
         if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database())) {
             return;
         }
@@ -153,7 +148,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -185,7 +180,6 @@ public class DroppedFileHandler {
 
         // Show dialog
         boolean newEntry = false;
-        String citeKey = entry.getCiteKey();
         if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database())) {
             return;
         }
@@ -199,7 +193,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -229,7 +223,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
         } else {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
@@ -314,7 +308,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
         } else {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
@@ -349,10 +343,9 @@ public class DroppedFileHandler {
     //
     private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
                                                  BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
-        String citeKey = entry.getCiteKey();
-
+       
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
-        String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
             if (new File(dirs[i]).exists()) {
@@ -447,7 +440,7 @@ public class DroppedFileHandler {
     private void doLink(BibtexEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+        String oldValue = entry.getField(Globals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
         if (oldValue != null) {
             tm.setContent(oldValue);
@@ -456,7 +449,7 @@ public class DroppedFileHandler {
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
-            String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+            String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
             String absFilename = !new File(filename).isAbsolute() && dirs.length > 0 ?
                     FileUtil.expandFilename(filename, dirs).getAbsolutePath() : filename;
 
@@ -475,9 +468,9 @@ public class DroppedFileHandler {
 
         tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
         String newValue = tm.getStringRepresentation();
-        UndoableFieldChange edit = new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD,
+        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD,
                 oldValue, newValue);
-        entry.setField(GUIGlobals.FILE_FIELD, newValue);
+        entry.setField(Globals.FILE_FIELD, newValue);
 
         if (edits == null) {
             panel.undoManager.addEdit(edit);
@@ -498,7 +491,7 @@ public class DroppedFileHandler {
      */
     private boolean doMove(String fileName, ExternalFileType fileType, String destFilename,
                            NamedCompound edits) {
-        String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
             if (new File(dirs[i]).exists()) {
@@ -547,7 +540,7 @@ public class DroppedFileHandler {
     private boolean doCopy(String fileName, ExternalFileType fileType, String toFile,
                            NamedCompound edits) {
 
-        String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
             if (new File(dirs[i]).exists()) {

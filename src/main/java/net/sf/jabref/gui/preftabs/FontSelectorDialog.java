@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.preftabs;
 
 /*
@@ -126,8 +126,6 @@ import javax.swing.event.ListSelectionListener;
 
 class FontSelector extends JButton {
 
-    private static final long serialVersionUID = 7745223550102664896L;
-
     private static final String PLAIN = "plain";
     private static final String BOLD = "bold";
     private static final String BOLD_ITALIC = "bold-italic";
@@ -200,8 +198,6 @@ class FontSelector extends JButton {
 
 public class FontSelectorDialog extends JDialog {
 
-    private static final long serialVersionUID = -8670346696048738055L;
-
     private static final String PLAIN = "plain";
     private static final String BOLD = "bold";
     private static final String BOLD_ITALIC = "bold-italic";
@@ -221,14 +217,14 @@ public class FontSelectorDialog extends JDialog {
         JPanel familyPanel = createTextFieldAndListPanel(
                 Localization.lang("Font Family"),
                 familyField = new JTextField(),
-                familyList = new JList(getFontList()));
+                familyList = new JList<>(getFontList()));
         listPanel.add(familyPanel);
 
         String[] sizes = {"9", "10", "12", "14", "16", "18", "24"};
         JPanel sizePanel = createTextFieldAndListPanel(
                 Localization.lang("Font Size"),
                 sizeField = new JTextField(),
-                sizeList = new JList(sizes));
+                sizeList = new JList<>(sizes));
         listPanel.add(sizePanel);
 
         String[] styles = {FontSelectorDialog.PLAIN, FontSelectorDialog.BOLD, FontSelectorDialog.ITALIC, FontSelectorDialog.BOLD_ITALIC};
@@ -236,7 +232,7 @@ public class FontSelectorDialog extends JDialog {
         JPanel stylePanel = createTextFieldAndListPanel(
                 Localization.lang("Font Style"),
                 styleField = new JTextField(),
-                styleList = new JList(styles));
+                styleList = new JList<>(styles));
         styleField.setEditable(false);
         listPanel.add(stylePanel);
 
@@ -245,7 +241,7 @@ public class FontSelectorDialog extends JDialog {
         sizeList.setSelectedValue(String.valueOf(font.getSize()), true);
         sizeField.setText(String.valueOf(font.getSize()));
         styleList.setSelectedIndex(font.getStyle());
-        styleField.setText((String) styleList.getSelectedValue());
+        styleField.setText(styleList.getSelectedValue());
 
         ListHandler listHandler = new ListHandler();
         familyList.addListSelectionListener(listHandler);
@@ -270,8 +266,8 @@ public class FontSelectorDialog extends JDialog {
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint
-                        (RenderingHints.KEY_ANTIALIASING,
-                                RenderingHints.VALUE_ANTIALIAS_ON);
+                (RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
                 super.paint(g2);
             }
 
@@ -340,11 +336,11 @@ public class FontSelectorDialog extends JDialog {
     // private members
     private boolean isOK;
     private final JTextField familyField;
-    private final JList familyList;
+    private final JList<String> familyList;
     private final JTextField sizeField;
-    private final JList sizeList;
+    private final JList<String> sizeList;
     private final JTextField styleField;
-    private final JList styleList;
+    private final JList<String> styleList;
     private final JLabel preview;
     private final JButton ok;
     private final JButton cancel;
@@ -358,13 +354,13 @@ public class FontSelectorDialog extends JDialog {
 
     // [pending] from GeneralCustomizer :
     // GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()
-    private String[] getFontList() {
+    private static String[] getFontList() {
         try {
             Class<?> GEClass = Class.forName("java.awt.GraphicsEnvironment");
             Object GEInstance = GEClass.getMethod("getLocalGraphicsEnvironment").invoke(null);
 
             String[] nameArray = (String[]) GEClass.getMethod("getAvailableFontFamilyNames").invoke(GEInstance);
-            Vector<String> nameVector = new Vector<String>(nameArray.length);
+            Vector<String> nameVector = new Vector<>(nameArray.length);
 
             for (int i = 0, j; i < nameArray.length; i++) {
                 for (j = 0; j < FontSelectorDialog.HIDEFONTS.length; j++) {
@@ -386,7 +382,7 @@ public class FontSelectorDialog extends JDialog {
         }
     }
 
-    private JPanel createTextFieldAndListPanel(String label, JTextField textField, JList list) {
+    private static JPanel createTextFieldAndListPanel(String label, JTextField textField, JList<String> list) {
         GridBagLayout layout = new GridBagLayout();
         JPanel panel = new JPanel(layout);
 
@@ -456,19 +452,19 @@ public class FontSelectorDialog extends JDialog {
         {
             Object source = evt.getSource();
             if (source == familyList) {
-                String family = (String) familyList.getSelectedValue();
+                String family = familyList.getSelectedValue();
                 if (family != null) {
                     familyField.setText(family);
                 }
             }
             else if (source == sizeList) {
-                String size = (String) sizeList.getSelectedValue();
+                String size = sizeList.getSelectedValue();
                 if (size != null) {
                     sizeField.setText(size);
                 }
             }
             else if (source == styleList) {
-                String style = (String) styleList.getSelectedValue();
+                String style = styleList.getSelectedValue();
                 if (style != null) {
                     styleField.setText(style);
                 }
@@ -481,5 +477,5 @@ public class FontSelectorDialog extends JDialog {
             Font font = new FontSelectorDialog(null,new Font("Times",Font.PLAIN,12)).getSelectedFont();
 
         }
-    */
+     */
 }

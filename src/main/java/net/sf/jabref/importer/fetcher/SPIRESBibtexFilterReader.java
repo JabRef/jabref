@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,19 +21,19 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
- * 
+ *
  * Warning -- it is not a generic filter, only read is implemented!
- * 
+ *
  * @author Fedor Bezrukov
- * 
+ *
  * @version $Id$
- * 
+ *
  * TODO: Fix grammar in bibtex entries -- it ma return invalid bibkeys (with space)
- * 
+ *
  */
 class SPIRESBibtexFilterReader extends FilterReader {
 
-    private final BufferedReader in;
+    private final BufferedReader inBR;
 
     private String line;
     private int pos;
@@ -42,7 +42,7 @@ class SPIRESBibtexFilterReader extends FilterReader {
 
     SPIRESBibtexFilterReader(Reader _in) {
         super(_in);
-        in = new BufferedReader(_in);
+        inBR = new BufferedReader(_in);
         pos = -1;
         pre = false;
     }
@@ -50,13 +50,13 @@ class SPIRESBibtexFilterReader extends FilterReader {
     private String readpreLine() throws IOException {
         String l;
         do {
-            l = in.readLine();
+            l = inBR.readLine();
             if (l == null) {
                 return null;
             }
             if (l.equals("<pre>")) {
                 pre = true;
-                l = in.readLine();
+                l = inBR.readLine();
             }
             if (l.equals("</pre>")) {
                 pre = false;
@@ -65,7 +65,7 @@ class SPIRESBibtexFilterReader extends FilterReader {
         return l;
     }
 
-    private String fixBibkey(String in) {
+    private static String fixBibkey(String in) {
         if (in == null) {
             return null;
         }

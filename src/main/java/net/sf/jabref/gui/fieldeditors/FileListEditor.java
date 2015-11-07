@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -22,7 +22,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -40,15 +42,17 @@ import javax.swing.TransferHandler;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.*;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,8 +60,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Created by Morten O. Alver 2007.02.22
  */
-public class FileListEditor extends JTable implements FieldEditor,
-        DownloadExternalFile.DownloadCallback {
+public class FileListEditor extends JTable implements FieldEditor, DownloadExternalFile.DownloadCallback {
 
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
@@ -72,9 +75,8 @@ public class FileListEditor extends JTable implements FieldEditor,
     private final JButton auto;
     private final JPopupMenu menu = new JPopupMenu();
 
-
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
-            EntryEditor entryEditor) {
+                          EntryEditor entryEditor) {
         this.frame = frame;
         this.metaData = metaData;
         this.fieldName = fieldName;
@@ -87,13 +89,13 @@ public class FileListEditor extends JTable implements FieldEditor,
         setTableHeader(null);
         addMouseListener(new TableClickListener());
 
-        JButton add = new JButton(IconTheme.getImage("add"));
+        JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
         add.setToolTipText(Localization.lang("New file link (INSERT)"));
-        JButton remove = new JButton(IconTheme.getImage("remove"));
+        JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
         remove.setToolTipText(Localization.lang("Remove file link (DELETE)"));
-        JButton up = new JButton(IconTheme.getImage("up"));
+        JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
 
-        JButton down = new JButton(IconTheme.getImage("down"));
+        JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
         auto = new JButton(Localization.lang("Auto"));
         JButton download = new JButton(Localization.lang("Download"));
         add.setMargin(new Insets(0, 0, 0, 0));
@@ -142,14 +144,14 @@ public class FileListEditor extends JTable implements FieldEditor,
                 downloadFile();
             }
         });
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout
                 ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
-        builder.append(up);
-        builder.append(add);
-        builder.append(auto);
-        builder.append(down);
-        builder.append(remove);
-        builder.append(download);
+        builder.add(up).xy(1, 1);
+        builder.add(add).xy(3, 1);
+        builder.add(auto).xy(5, 1);
+        builder.add(down).xy(1, 2);
+        builder.add(remove).xy(3, 2);
+        builder.add(download).xy(5, 2);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
@@ -239,6 +241,35 @@ public class FileListEditor extends JTable implements FieldEditor,
         JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move to file directory"));
         menu.add(moveToFileDir);
         moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
+
+        JMenuItem deleteFile = new JMenuItem(Localization.lang("Delete local file"));
+        menu.add(deleteFile);
+        deleteFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = getSelectedRow();
+                // no selection
+                if (row == -1) {
+                    return;
+                }
+
+                FileListEntry entry = tableModel.getEntry(row);
+                // null if file does not exist
+                File file = FileUtil.expandFilename(metaData, entry.getLink());
+
+                // transactional delete and unlink
+                try {
+                    if(file != null) {
+                        Files.delete(file.toPath());
+                    }
+                    removeEntries();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
+                            Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("File permission error while deleting: " + file.toPath(), ex);
+                }
+            }
+        });
     }
 
     private void openSelectedFile() {
@@ -250,7 +281,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                 JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(),
                         type != null ? type : entry.getType());
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Cannot open selected file.", e);
             }
         }
     }
@@ -368,7 +399,8 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     /**
      * Open an editor for this entry.
-     * @param entry The entry to edit.
+     *
+     * @param entry      The entry to edit.
      * @param openBrowse True to indicate that a Browse dialog should be immediately opened.
      * @return true if the edit was accepted, false if it was cancelled.
      */
@@ -388,23 +420,30 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     public void autoSetLinks() {
         auto.setEnabled(false);
-        BibtexEntry entry = entryEditor.getEntry();
-        JDialog diag = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
 
+        BibtexEntry entry = entryEditor.getEntry();
+
+        // filesystem lookup
+        JDialog dialog = new JDialog(frame, true);
+        JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
+
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
                     frame.output(Localization.lang("Finished autosetting external links."));
                 } else {
                     frame.output(Localization.lang("Finished autosetting external links.")
                             + " " + Localization.lang("No files found."));
-                }
-            }
-        }, diag));
 
+                    // auto download file as no file found before
+                    frame.basePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
+                }
+                // reset
+                auto.setEnabled(true);
+            }
+        }, dialog));
     }
 
     /**
@@ -428,13 +467,14 @@ public class FileListEditor extends JTable implements FieldEditor,
         try {
             def.download(this);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Cannot download.", ex);
         }
     }
 
     /**
      * This is the callback method that the DownloadExternalFile class uses to report the result
      * of a download operation. This call may never come, if the user cancelled the operation.
+     *
      * @param file The FileListEntry linking to the resulting local file.
      */
     @Override
@@ -454,8 +494,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                     FileListEntry entry = tableModel.getEntry(row);
                     editListEntry(entry, false);
                 }
-            }
-            else if (e.isPopupTrigger()) {
+            } else if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
             }
         }
@@ -484,34 +523,26 @@ public class FileListEditor extends JTable implements FieldEditor,
     }
 
     @Override
-    public void undo() {
-    }
+    public void undo() {}
 
     @Override
-    public void redo() {
-    }
+    public void redo() {}
 
     @Override
-    public void setAutoCompleteListener(AutoCompleteListener listener) {
-    }
+    public void setAutoCompleteListener(AutoCompleteListener listener) {}
 
     @Override
-    public void clearAutoCompleteSuggestion() {
-    }
+    public void clearAutoCompleteSuggestion() {}
 
     @Override
-    public void setActiveBackgroundColor() {
-    }
+    public void setActiveBackgroundColor() {}
 
     @Override
-    public void setValidBackgroundColor() {
-    }
+    public void setValidBackgroundColor() {}
 
     @Override
-    public void setInvalidBackgroundColor() {
-    }
+    public void setInvalidBackgroundColor() {}
 
     @Override
-    public void updateFontColor() {
-    }
+    public void updateFontColor() {}
 }

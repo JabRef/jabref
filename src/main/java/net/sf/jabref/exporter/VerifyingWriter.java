@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.exporter;
 
 import java.io.IOException;
@@ -30,9 +30,9 @@ import java.util.TreeSet;
  */
 public class VerifyingWriter extends OutputStreamWriter {
 
-    private CharsetEncoder encoder;
+    private final CharsetEncoder encoder;
     private boolean couldEncodeAll = true;
-    private final TreeSet<Character> problemCharacters = new TreeSet<Character>();
+    private final TreeSet<Character> problemCharacters = new TreeSet<>();
 
 
     public VerifyingWriter(OutputStream out, String encoding)

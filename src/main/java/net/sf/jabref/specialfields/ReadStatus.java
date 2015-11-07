@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,12 +12,12 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -26,18 +26,20 @@ public class ReadStatus extends SpecialField {
 
     private static ReadStatus INSTANCE;
 
-    private final ImageIcon icon = IconTheme.getImage("readstatus");
+    private final Icon icon = IconTheme.JabRefIcon.READ_STATUS.getIcon();
 
 
     private ReadStatus() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<>();
         values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null, Localization.lang("No read status information")));
-        ImageIcon icon;
-        icon = IconTheme.getImage("readStatusRead");
+        Icon tmpicon;
+        tmpicon = IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
         // DO NOT TRANSLATE "read" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead", Localization.lang("Set read status to read"), icon, Localization.lang("Read status read")));
-        icon = IconTheme.getImage("readStatusSkimmed");
-        values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed", Localization.lang("Set read status to skimmed"), icon, Localization.lang("Read status skimmed")));
+        values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead",
+                Localization.lang("Set read status to read"), tmpicon, Localization.lang("Read status read")));
+        tmpicon = IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
+        values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed",
+                Localization.lang("Set read status to skimmed"), tmpicon, Localization.lang("Read status skimmed")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";
     }
@@ -55,7 +57,7 @@ public class ReadStatus extends SpecialField {
     }
 
     @Override
-    public ImageIcon getRepresentingIcon() {
+    public Icon getRepresentingIcon() {
         return this.icon;
     }
 

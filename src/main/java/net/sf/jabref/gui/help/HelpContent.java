@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.help;
 
 import java.io.File;
@@ -23,6 +23,7 @@ import java.util.Stack;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
@@ -32,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 class HelpContent extends JTextPane {
 
-    private static final Log log = LogFactory.getLog(HelpContent.class);
+    private static final Log LOGGER = LogFactory.getLog(HelpContent.class);
 
     private final JScrollPane pane;
 
@@ -48,31 +49,40 @@ class HelpContent extends JTextPane {
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.setDoubleBuffered(true);
         prefs = prefs_;
-        history = new Stack<URL>();
-        forw = new Stack<URL>();
+        history = new Stack<>();
+        forw = new Stack<>();
         setEditorKitForContentType("text/html", new MyEditorKit());
         setContentType("text/html");
         setText("");
         setEditable(false);
 
-        // Handles Anchors
-        final HyperlinkListener hyperLinkListener = new HyperlinkListener() {
+        addHyperlinkListener(new HyperlinkListener() {
+
+            private boolean lastStatusUpdateWasALink = false;
 
             @Override
-            public void hyperlinkUpdate(final HyperlinkEvent e) {
-                if (e.getDescription().startsWith("#")) {
-                    scrollToReference(e.getDescription().substring(1));
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                String link = e.getDescription();
+                if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+                    // show the link in the status bar - similar to Firefox behavior
+                    JabRef.jrf.setStatus(link);
+                    lastStatusUpdateWasALink = true;
+                } else {
+                    if (lastStatusUpdateWasALink) {
+                        // remove the link from the status bar
+                        JabRef.jrf.setStatus("");
+                        lastStatusUpdateWasALink = false;
+                    }
                 }
             }
-        };
-        addHyperlinkListener(hyperLinkListener);
+        });
     }
 
     public boolean back() {
         if (!history.empty()) {
             URL prev = (history.pop());
             forw.push(getPage());
-            setPageOnly(prev);
+            setPageOnly(prev, null);
         }
         return !history.empty();
     }
@@ -81,7 +91,7 @@ class HelpContent extends JTextPane {
         if (!forw.empty()) {
             URL next = (forw.pop());
             history.push(getPage());
-            setPageOnly(next);
+            setPageOnly(next, null);
         }
         return !forw.empty();
     }
@@ -91,48 +101,42 @@ class HelpContent extends JTextPane {
         history.removeAllElements();
     }
 
+    // .getResource is called at resourceOwner. This method is available at all Class objects
+    @SuppressWarnings("rawtypes")
     public void setPage(String filename, Class resourceOwner) {
 
         // Check for anchor
         int indexOf = filename.indexOf('#');
         String file;
-        String reference;
+        String anchorName = null;
 
         if (indexOf != -1) {
             file = filename.substring(0, indexOf);
-            reference = filename.substring(indexOf + 1);
+            anchorName = filename.substring(indexOf + 1);
         } else {
             file = filename;
-            reference = "";
         }
 
         String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
-        if (middle.equals("en/"))
-         {
-            middle = ""; // english in base help dir.
-        }
 
         URL old = getPage();
-        try {
-            // First check in specified language
-            URL resource = resourceOwner.getResource(GUIGlobals.helpPre + middle + file);
 
-            // If not available fallback to english
-            if (resource == null) {
-                resource = resourceOwner.getResource(GUIGlobals.helpPre + file);
-            }
+        // First check in specified language
+        URL resource = resourceOwner.getResource(GUIGlobals.helpPre + middle + file);
 
-            // If still not available print a warning
-            if (resource == null) {
-                // TODO show warning to user
-                HelpContent.log.error("Could not find html-help for file '" + file + "'.");
-                return;
-            }
-            setPageOnly(new URL(resource.toString() + '#' + reference));
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        // If not available fallback to english
+        if (resource == null) {
+            resource = resourceOwner.getResource(GUIGlobals.helpPre + file);
         }
+
+        // If still not available print a warning
+        if (resource == null) {
+            // TODO show warning to user
+            HelpContent.LOGGER.error("Could not find html-help for file '" + file + "'.");
+            return;
+        }
+
+        setPageOnly(resource, anchorName);
 
         forw.removeAllElements();
         if (old != null) {
@@ -146,18 +150,35 @@ class HelpContent extends JTextPane {
      */
     @Override
     public void setPage(URL url) {
-        File f = new File(url.getPath());
-        setPage(f.getName(), JabRef.class);
+        if ("file".equals(url.getProtocol())) {
+            // Creating file by url.toString() and using file.getName() preserves anchors
+            File file = new File(url.toString());
+            setPage(file.getName(), JabRef.class);
+        } else {
+            //  open all external URLs externally
+            JabRef.jrf.openBrowser(url.toString());
+        }
     }
 
-    private void setPageOnly(URL url) {
+    private void setPageOnly(URL baseUrl, String anchorName) {
         try {
-            super.setPage(url);
-        } catch (IOException ex) {
-            if (url == null) {
-                System.out.println("Error: Help file not set");
+            URL url;
+            if(anchorName!=null) {
+                url = new URL(baseUrl.toString()+"#"+anchorName);
             } else {
-                System.out.println("Error: Help file not found '" + url.getFile() + '\'');
+                url = baseUrl;
+            }
+            super.setPage(url);
+            // if anchor is present - scroll to it
+            String stringUrl = url.toString();
+            if (stringUrl.contains("#")) {
+                scrollToReference(stringUrl.substring(stringUrl.indexOf("#")));
+            }
+        } catch (IOException ex) {
+            if (baseUrl == null) {
+                LOGGER.error("Error: Help file not set");
+            } else {
+                LOGGER.error("Error: Help file not found '" + baseUrl.getFile() + '\'');
             }
         }
     }
@@ -165,12 +186,5 @@ class HelpContent extends JTextPane {
     public JComponent getPane() {
         return pane;
     }
-
-    /*public void paintComponent(Graphics g) {
-    	Graphics2D g2 = (Graphics2D) g;
-    	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    	g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-    	super.paintComponent(g2);
-    }*/
 
 }

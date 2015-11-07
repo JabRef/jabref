@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -27,19 +27,22 @@ import java.io.IOException;
 import java.io.FileOutputStream;
 import java.nio.charset.UnsupportedCharsetException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * Class used to handle safe storage to disk. 
- * 
+ * Class used to handle safe storage to disk.
+ *
  * Usage: create a SaveSession giving the file to save to, the
  * encoding, and whether to make a backup. The SaveSession will provide a Writer to store to, which actually
  * goes to a temporary file. The Writer keeps track of whether all characters could be saved, and if not,
  * which characters were not encodable.
- * 
+ *
  * After saving is finished, the client should close the Writer. If the save should be put into effect, call
  * commit(), otherwise call cancel(). When cancelling, the temporary file is simply deleted and the target
  * file remains unchanged. When committing, the temporary file is copied to the target file after making
  * a backup if requested and if the target file already existed, and finally the temporary file is deleted.
- * 
+ *
  * If committing fails, the temporary file will not be deleted.
  */
 public class SaveSession {
@@ -52,13 +55,13 @@ public class SaveSession {
     private static final String TEMP_SUFFIX = "save.bib";
 
     private final File file;
-    private File tmp;
-    File backupFile;
-    private String encoding;
+    private final File tmp;
+    private final String encoding;
     private boolean backup;
-    private boolean useLockFile;
-    private VerifyingWriter writer;
+    private final boolean useLockFile;
+    private final VerifyingWriter writer;
 
+    private static final Log LOGGER = LogFactory.getLog(SaveSession.class);
 
     public SaveSession(File file, String encoding, boolean backup) throws IOException, UnsupportedCharsetException {
         this.file = file;
@@ -108,8 +111,7 @@ public class SaveSession {
 
                     }
                 } catch (IOException ex) {
-                    System.err.println("Error when creating lock file");
-                    ex.printStackTrace();
+                    LOGGER.error("Error when creating lock file.", ex);
                 }
             }
 
@@ -148,8 +150,7 @@ public class SaveSession {
         try {
             out.close();
         } catch (IOException ex) {
-            System.err.println("Error when creating lock file");
-            ex.printStackTrace();
+            LOGGER.error("Error when creating lock file.", ex);
         }
         lock.deleteOnExit();
         return false;

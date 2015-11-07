@@ -31,11 +31,11 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     private String openWith;
     private String iconName;
     private String mimeType;
-    private ImageIcon icon;
+    private Icon icon;
     private final JLabel label = new JLabel();
 
     public ExternalFileType(String name, String extension, String mimeType,
-            String openWith, String iconName, ImageIcon icon) {
+            String openWith, String iconName, Icon icon) {
         label.setText(null);
         this.name = name;
         label.setToolTipText(this.name);
@@ -163,11 +163,11 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         return iconName;
     }
 
-    public ImageIcon getIcon() {
+    public Icon getIcon() {
         return icon;
     }
 
-    public void setIcon(ImageIcon icon) {
+    public void setIcon(Icon icon) {
         this.icon = icon;
         label.setIcon(this.icon);
     }

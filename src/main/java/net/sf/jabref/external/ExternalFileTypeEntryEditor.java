@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -30,7 +30,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -49,12 +49,14 @@ public class ExternalFileTypeEntryEditor {
     private final JTextField mimeType = new JTextField();
     private final JTextField application = new JTextField();
     private String selectedIcon;
-    private final JButton icon = new JButton(IconTheme.getImage("picture"));
+    private final JLabel icon = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));
     private final JRadioButton other = new JRadioButton("");
     final String emptyMessage = "<" + Localization.lang("Use default viewer") + ">";
+    private final String editFileTitle = Localization.lang("Edit file type");
+    private final String newFileTitle = Localization.lang("Add new file type");
     boolean applicationFieldEmpty;
 
     private ExternalFileType entry;
@@ -71,36 +73,33 @@ public class ExternalFileTypeEntryEditor {
         init(entry);
     }
 
-    private void init(ExternalFileType entry) {
-        this.entry = entry;
+    private void init(ExternalFileType inEntry) {
+        entry = inEntry;
         icon.setText(null);
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(useDefault);
         bg.add(other);
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
-                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""));
-        builder.append(Localization.lang("Icon"));
-        builder.append(icon);
-        builder.nextLine();
-        builder.append(Localization.lang("Name"));
-        builder.append(name);
-        builder.nextLine();
-        builder.append(Localization.lang("Extension"));
-        builder.append(extension);
-        builder.nextLine();
-        builder.append(Localization.lang("MIME type"));
-        builder.append(mimeType);
+        FormBuilder builder = FormBuilder.create();
+        builder.layout(new FormLayout
+                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p"));
+        builder.add(Localization.lang("Icon")).xy(1, 1);
+        builder.add(icon).xy(3,  1);
+        builder.add(Localization.lang("Name")).xy(1, 3);
+        builder.add(name).xy(3, 3);
+        builder.add(Localization.lang("Extension")).xy(1, 5);
+        builder.add(extension).xy(3, 5);
+        builder.add(Localization.lang("MIME type")).xy(1, 7);
+        builder.add(mimeType).xy(3, 7);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        builder.nextLine();
-        builder.append(Localization.lang("Application"));
+        builder.add(Localization.lang("Application")).xy(1, 9);
         JButton browseBut = new JButton(Localization.lang("Browse"));
         if (OS.WINDOWS) {
-            builder.append(useDefault);
-            builder.nextLine();
+            builder.add(useDefault).xy(3,9);
+            builder.appendRows("2dlu, p");
             JPanel p1 = new JPanel();
-            builder.append(p1);
+            builder.add(p1).xy(1,11);
             JPanel p2 = new JPanel();
             application.setPreferredSize(new Dimension(300, application.getPreferredSize().height));
             BorderLayout bl = new BorderLayout();
@@ -108,11 +107,11 @@ public class ExternalFileTypeEntryEditor {
             p2.setLayout(bl);
             p2.add(other, BorderLayout.WEST);
             p2.add(application, BorderLayout.CENTER);
-            builder.append(p2);
-            builder.append(browseBut);
+            builder.add(p2).xy(3, 11);
+            builder.add(browseBut).xy(5, 11);
         } else {
-            builder.append(application);
-            builder.append(browseBut);
+            builder.add(application).xy(3, 9);
+            builder.add(browseBut).xy(5, 9);
         }
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -138,27 +137,10 @@ public class ExternalFileTypeEntryEditor {
             }
         });
 
-        icon.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String initSel = ExternalFileTypeEntryEditor.this.entry.getIconName();
-                if (selectedIcon != null) {
-                    initSel = selectedIcon;
-                }
-                IconSelection ic = new IconSelection(diag, initSel);
-                ic.setVisible(true);
-                if (ic.isOkPressed()) {
-                    selectedIcon = ic.getSelectedIconKey();
-                    icon.setIcon(IconTheme.getImage(selectedIcon));
-                }
-                //JOptionPane.showMessageDialog(null, "Sorry, the icon can unfortunately not be changed in this version of JabRef");
-            }
-        });
-
         if (OS.WINDOWS) {
             application.getDocument().addDocumentListener(new DocumentListener() {
 
+                @SuppressWarnings("unused")
                 private void handle(DocumentEvent e) {
                     if (application.getText().isEmpty()) {
                         useDefault.setSelected(true);
@@ -184,16 +166,22 @@ public class ExternalFileTypeEntryEditor {
             });
         }
 
+        String title = editFileTitle;
+
+        if (entry.getName().isEmpty()) {
+            title = newFileTitle;
+        }
+
         if (dParent != null) {
-            diag = new JDialog(dParent, Localization.lang("Edit file type"), true);
+            diag = new JDialog(dParent, title, true);
         } else {
-            diag = new JDialog(fParent, Localization.lang("Edit file type"), true);
+            diag = new JDialog(fParent, title, true);
         }
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
 
-        BrowseListener browse = new BrowseListener(diag, application);
+        BrowseListener browse = new BrowseListener(application);
         browseBut.addActionListener(browse);
 
         if (dParent != null) {
@@ -209,6 +197,11 @@ public class ExternalFileTypeEntryEditor {
 
     public void setEntry(ExternalFileType entry) {
         this.entry = entry;
+        if(entry.getName().isEmpty()) {
+            diag.setTitle(newFileTitle);
+        } else {
+            diag.setTitle(editFileTitle);
+        }
         setValues(entry);
     }
 
@@ -233,30 +226,30 @@ public class ExternalFileTypeEntryEditor {
         selectedIcon = null;
     }
 
-    private void storeSettings(ExternalFileType entry) {
-        entry.setName(name.getText().trim());
-        entry.setMimeType(mimeType.getText().trim());
+    private void storeSettings(ExternalFileType fileTypeEntry) {
+        fileTypeEntry.setName(name.getText().trim());
+        fileTypeEntry.setMimeType(mimeType.getText().trim());
         // Set extension, but remove initial dot if user has added that:
         String ext = extension.getText().trim();
-        if (!ext.isEmpty() && ext.charAt(0) == '.') {
-            entry.setExtension(ext.substring(1));
+        if (!ext.isEmpty() && (ext.charAt(0) == '.')) {
+            fileTypeEntry.setExtension(ext.substring(1));
         } else {
-            entry.setExtension(ext);
+            fileTypeEntry.setExtension(ext);
         }
 
         if (selectedIcon != null) {
-            entry.setIconName(selectedIcon);
-            entry.setIcon(IconTheme.getImage(entry.getIconName()));
+            fileTypeEntry.setIconName(selectedIcon);
+            fileTypeEntry.setIcon(IconTheme.getImage(fileTypeEntry.getIconName()));
         }
         if (!OS.WINDOWS) {
-            entry.setOpenWith(application.getText().trim());
+            fileTypeEntry.setOpenWith(application.getText().trim());
         } else {
             // On Windows, store application as empty if the "Default" option is selected,
             // or if the application name is empty:
             if (useDefault.isSelected() || application.getText().trim().isEmpty()) {
-                entry.setOpenWith("");
+                fileTypeEntry.setOpenWith("");
             } else {
-                entry.setOpenWith(application.getText().trim());
+                fileTypeEntry.setOpenWith(application.getText().trim());
             }
         }
     }
@@ -271,7 +264,7 @@ public class ExternalFileTypeEntryEditor {
         private final JTextField comp;
 
 
-        public BrowseListener(JDialog parent, JTextField comp) {
+        public BrowseListener(JTextField comp) {
             this.comp = comp;
         }
 

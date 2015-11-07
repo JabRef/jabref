@@ -56,7 +56,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         setupUndoRedo();
         setupPasteListener();
     }
-    
+
     private void setupPasteListener() {
         //register "Paste" action
         getActionMap().put(Actions.PASTE, new PasteAction(this));
@@ -88,6 +88,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
                                 undo.undo();
                             }
                         } catch (CannotUndoException ignored) {
+                    // Ignored
                         }
                     }
                 });
@@ -106,6 +107,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
                                 undo.redo();
                             }
                         } catch (CannotRedoException ignored) {
+                    // Ignored
                         }
                     }
                 });
@@ -121,7 +123,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
             Keymap keymap = getKeymap();
             KeyStroke[] keys = keymap.getBoundKeyStrokes();
             int i = 0;
-            while (i < keys.length && !keys[i].equals(redoKey)) {
+            while ((i < keys.length) && !keys[i].equals(redoKey)) {
                 i++;
             }
             if (i < keys.length) {
@@ -136,7 +138,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 
     /**
      * Highlight words in the Textarea
-     * 
+     *
      * @param words to highlight
      */
     private void highLight(List<String> words) {
@@ -144,7 +146,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         Highlighter highlighter = getHighlighter();
         highlighter.removeAllHighlights();
 
-        if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
+        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
             return;
         }
         String content = getText();
@@ -178,7 +180,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 
     @Override
     public void searchText(List<String> words) {
-        // words have to be stored in class variable as 
+        // words have to be stored in class variable as
         // setText() makes use of them
 
         if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS)) {

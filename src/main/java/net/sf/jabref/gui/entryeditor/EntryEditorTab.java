@@ -67,17 +67,20 @@ class EntryEditorTab {
 
     private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
 
+    private final String tabTitle;
+
     public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
-                          boolean addKeyField, boolean compressed, String name) {
+            boolean addKeyField, boolean compressed, String tabTitle) {
         if (fields != null) {
             this.fields = fields.toArray(new String[fields.size()]);
         } else {
-            this.fields = new String[]{};
+            this.fields = new String[] {};
         }
 
         this.parent = parent;
+        this.tabTitle = tabTitle;
 
-        setupPanel(frame, panel, addKeyField, compressed, name);
+        setupPanel(frame, panel, addKeyField, compressed, tabTitle);
 
         /*
          * The following line makes sure focus cycles inside tab instead of
@@ -115,6 +118,9 @@ class EntryEditorTab {
         actionMap.put("prevtab", parent.frame.prevTab);
 
         panel.setName(title);
+        // Use the title for the scrollPane, too.
+        // This enables the correct execution of EntryEditor.setVisiblePanel(String name).
+        scrollPane.setName(title);
 
         int fieldsPerRow = compressed ? 2 : 1;
 
@@ -248,6 +254,12 @@ class EntryEditorTab {
         activeField = fieldEditor;
     }
 
+    public void setActive(String fieldName) {
+        if (editors.containsKey(fieldName)) {
+            activeField = editors.get(fieldName);
+        }
+    }
+
     public FieldEditor getActive() {
         return activeField;
     }
@@ -301,7 +313,12 @@ class EntryEditorTab {
         if(fieldEditor.getTextComponent() instanceof JTextComponent) {
             int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
             fieldEditor.setText(content);
-            ((JTextComponent) fieldEditor).setCaretPosition(initialCaretPosition);
+            int textLength = fieldEditor.getText().length();
+            if(initialCaretPosition<textLength) {
+                ((JTextComponent) fieldEditor).setCaretPosition(initialCaretPosition);
+            } else {
+                ((JTextComponent) fieldEditor).setCaretPosition(textLength);
+            }
         } else {
             fieldEditor.setText(content);
         }
@@ -333,6 +350,10 @@ class EntryEditorTab {
 
     public EntryEditor getParent() {
         return parent;
+    }
+
+    public String getTabTitle() {
+        return tabTitle;
     }
 
     /**

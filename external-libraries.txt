@@ -1,14 +1,33 @@
-This document lists the libraries used by JabRef.
+This document lists the fonts, icons, and libraries used by JabRef.
 This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
 
-Legend
-------
-License:
+# Legend
+
+## License
+
  * GPLv2+ means "GPLv2 or later"
  * GPLv2! means "exactly version 2.0 of GPL"
  * GPLv2  means, we haven't checked whether later options are allowed
  * similar for LGPL and other version of GPL
 
+
+# Fonts and Icons
+
+Id:      material-design-icons.font
+Project: Material Design Icons
+Version: v1.2.64
+URL:     https://materialdesignicons.com/
+License: SIL Open Font License, Version 1.1
+Note:    Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
+
+Id:      crystal.icons
+Project: Crystal Icons
+URL:     https://commons.wikimedia.org/wiki/Crystal_Clear
+License: LGPL
+Note:    Icons not available any more at the original page http://everaldo.com/crystal/
+
+
+# Libraries
 Id:      com.apple:AppleJavaExtensions
 Project: AppleJavaExtensions
 URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
@@ -49,6 +68,11 @@ Project: JGoodies Looks
 URL:     http://www.jgoodies.com/downloads/libraries/
 License: BSD
 
+Id:      com.mashape.unirest
+Project: Unirest for Java
+URL:     https://github.com/Mashape/unirest-java
+License: MIT
+
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/
@@ -79,6 +103,11 @@ Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
 License: Apache 2.0
 
+Id:      org.jsoup:jsoup
+Project: jsoup
+URL:     https://github.com/jhy/jsoup/
+License: MIT
+
 Id:      org.openoffice:juh
 Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
@@ -104,16 +133,18 @@ Project: SwingX
 URL:     https://swingx.java.net/
 License: LGPL 3.0
 
-Path:    org.postgresql:postgresql
+Id:      org.postgresql:postgresql
 Project: PostgreSQL JDBC Driver
 URL:     http://jdbc.postgresql.org/download.html
 License: BSD
 
+Id:      microba
 Path:    lib/microba.jar
 Project: Microba
 URL:     https://github.com/tdbear/microba
 License: BSD
 
+Id:      spin
 Path:    lib/spin.jar
 Project: Spin
 URL:     http://spin.sourceforge.net/
@@ -123,3 +154,5 @@ Path:    lib/JSplitButton_1.2.jar
 Project: jsplitbutton
 URL:     https://code.google.com/p/jsplitbutton/
 License: LGPL
+
+The last entry has to end with an empty line. Otherwise the entry is not present in About.html.

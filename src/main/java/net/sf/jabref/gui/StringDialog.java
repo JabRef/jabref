@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -48,12 +48,13 @@ import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
-import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
+import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -73,8 +74,7 @@ class StringDialog extends JDialog {
     private final HelpAction helpAction;
 
 
-    public StringDialog(JabRefFrame frame, BasePanel panel,
-            BibtexDatabase base, JabRefPreferences prefs) {
+    public StringDialog(JabRefFrame frame, BasePanel panel, BibtexDatabase base, JabRefPreferences prefs) {
         super(frame);
         this.frame = frame;
         this.panel = panel;
@@ -83,8 +83,7 @@ class StringDialog extends JDialog {
 
         sortStrings();
 
-        helpAction = new HelpAction
-                (frame.helpDiag, GUIGlobals.stringEditorHelp, "Help");
+        helpAction = new HelpAction(frame.helpDiag, GUIGlobals.stringEditorHelp, Localization.lang("Help"));
 
         addWindowListener(new WindowAdapter() {
 
@@ -100,7 +99,7 @@ class StringDialog extends JDialog {
 
             @Override
             protected boolean accept(Component c) {
-                return super.accept(c) && c instanceof StringTable;
+                return super.accept(c) && (c instanceof StringTable);
             }
         });
 
@@ -133,10 +132,8 @@ class StringDialog extends JDialog {
         im.put(prefs.getKey("String dialog, remove string"), "remove");
         RemoveStringAction removeStringAction = new RemoveStringAction(this);
         am.put("remove", removeStringAction);
-        //im.put(prefs.getKey("String dialog, move string up"), "up");
-        //am.put("up", stringUpAction);
-        //im.put(prefs.getKey("String dialog, move string down"), "down");
-        //am.put("down", stringDownAction);
+        im.put(prefs.getKey("Save database"), "save");
+        am.put("save", saveAction);
         im.put(prefs.getKey("Close dialog"), "close");
         am.put("close", closeAction);
         im.put(prefs.getKey("Help"), "help");
@@ -148,13 +145,8 @@ class StringDialog extends JDialog {
         RedoAction redoAction = new RedoAction();
         am.put("redo", redoAction);
 
-        //tlb.add(closeAction);
-        //tlb.addSeparator();
         tlb.add(newStringAction);
         tlb.add(removeStringAction);
-        tlb.addSeparator();
-        //tlb.add(stringUpAction);
-        //tlb.add(stringDownAction);
         tlb.addSeparator();
         tlb.add(helpAction);
         Container conPane = getContentPane();
@@ -164,9 +156,11 @@ class StringDialog extends JDialog {
         if (panel.getFile() != null) {
             setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " + panel.getFile().getName());
         } else {
-            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " + Localization.lang(GUIGlobals.untitledTitle));
+            // @formatter:off
+            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": "
+                    + Localization.lang(GUIGlobals.untitledTitle));
+            // @formatter:on
         }
-
     }
 
 
@@ -187,12 +181,10 @@ class StringDialog extends JDialog {
             cm.getColumn(0).setPreferredWidth(800);
             cm.getColumn(1).setPreferredWidth(2000);
             sp.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
-            // getInputMap().remove(GUIGlobals.exitDialog);
             getInputMap().put(frame.prefs.getKey("Close dialog"), "close");
             getActionMap().put("close", closeAction);
             getInputMap().put(frame.prefs.getKey("Help"), "help");
             getActionMap().put("help", helpAction);
-
         }
 
         public JComponent getPane() {
@@ -204,7 +196,7 @@ class StringDialog extends JDialog {
 
     private void sortStrings() {
         // Rebuild our sorted set of strings:
-        TreeSet<BibtexString> stringsSet = new TreeSet<BibtexString>(new BibtexStringComparator(false));
+        TreeSet<BibtexString> stringsSet = new TreeSet<>(new BibtexStringComparator(false));
         for (String s : base.getStringKeySet()) {
             stringsSet.add(base.getString(s));
         }
@@ -218,68 +210,52 @@ class StringDialog extends JDialog {
         table.repaint();
     }
 
+    public void saveDatabase() {
+        panel.runCommand(Actions.SAVE);
+    }
+
 
     class StringTableModel extends AbstractTableModel {
 
-        final BibtexDatabase base;
+        final BibtexDatabase tbase;
         final StringDialog parent;
 
 
         public StringTableModel(StringDialog parent, BibtexDatabase base) {
             this.parent = parent;
-            this.base = base;
+            this.tbase = base;
         }
 
         @Override
         public Object getValueAt(int row, int col) {
-            return col == 0 ?
-                    ((BibtexString) strings[row]).getName() :
-                    ((BibtexString) strings[row]).getContent();
+            return col == 0 ? ((BibtexString) strings[row]).getName() : ((BibtexString) strings[row]).getContent();
         }
 
         @Override
         public void setValueAt(Object value, int row, int col) {
-            //	    if (row >= base.getStringCount())
-            //	return; // After a Remove operation the program somehow
-            // thinks the user is still editing an entry,
-            // which might now be outside
             if (col == 0) {
                 // Change name of string.
                 if (!value.equals(((BibtexString) strings[row]).getName())) {
-                    if (base.hasStringLabel((String) value)) {
-                        JOptionPane.showMessageDialog(parent,
-                                Localization.lang("A string with that label "
-                                        + "already exists"),
-                                Localization.lang("Label"),
-                                JOptionPane.ERROR_MESSAGE);
+                    if (tbase.hasStringLabel((String) value)) {
+                        // @formatter:off
+                        JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label "
+                                + "already exists"),
+                                Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
                     } else if (((String) value).contains(" ")) {
-                        JOptionPane.showMessageDialog
-                                (parent,
-                                        Localization.lang("The label of the string can not contain spaces."),
-                                        Localization.lang("Label"),
-                                        JOptionPane.ERROR_MESSAGE);
-                    }
-                    else if (((String) value).contains("#")) {
-                        JOptionPane.showMessageDialog
-                                (parent,
-                                        Localization.lang("The label of the string can not contain the '#' character."),
-                                        Localization.lang("Label"),
-                                        JOptionPane.ERROR_MESSAGE);
-                    }
-                    else if (isNumber((String) value)) {
-                        JOptionPane.showMessageDialog
-                                (parent,
-                                        Localization.lang("The label of the string can not be a number."),
-                                        Localization.lang("Label"),
-                                        JOptionPane.ERROR_MESSAGE);
-                    }
-                    else {
+                        JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot contain spaces."),
+                                Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
+                    } else if (((String) value).contains("#")) {
+                        JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot contain the '#' character."),
+                                Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
+                    } else if (isNumber((String) value)) {
+                        JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot be a number."),
+                                Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
+                        // @formatter:on
+                    } else {
                         // Store undo information.
                         BibtexString subject = (BibtexString) strings[row];
-                        panel.undoManager.addEdit
-                                (new UndoableStringChange
-                                (panel, subject, true,
-                                        subject.getName(), (String) value));
+                        panel.undoManager.addEdit(
+                                new UndoableStringChange(panel, subject, true, subject.getName(), (String) value));
                         subject.setName((String) value);
                         panel.markBaseChanged();
                         refreshTable();
@@ -296,10 +272,8 @@ class StringDialog extends JDialog {
                         return;
                     }
                     // Store undo information.
-                    panel.undoManager.addEdit
-                            (new UndoableStringChange
-                            (panel, subject, false,
-                                    subject.getContent(), (String) value));
+                    panel.undoManager.addEdit(
+                            new UndoableStringChange(panel, subject, false, subject.getContent(), (String) value));
 
                     subject.setContent((String) value);
                     panel.markBaseChanged();
@@ -314,13 +288,15 @@ class StringDialog extends JDialog {
 
         @Override
         public int getRowCount() {
-            return strings.length; //base.getStringCount();
+            return strings.length;
         }
 
         @Override
         public String getColumnName(int col) {
-            return col == 0 ?
-                    Localization.lang("Name") : Localization.lang("Content");
+            // @formatter:off
+            return col == 0 ? Localization.lang("Name") :
+                Localization.lang("Content");
+            // @formatter:on
         }
 
         @Override
@@ -330,8 +306,8 @@ class StringDialog extends JDialog {
     }
 
 
-    private boolean isNumber(String name) {
-        // A pure integer number can not be used as a string label,
+    private static boolean isNumber(String name) {
+        // A pure integer number cannot be used as a string label,
         // since Bibtex will read it as a number.
         try {
             Integer.parseInt(name);
@@ -362,7 +338,6 @@ class StringDialog extends JDialog {
 
         public CloseAction(StringDialog parent) {
             super("Close window");
-            //, new ImageIcon(GUIGlobals.closeIconFile));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close dialog"));
             this.parent = parent;
         }
@@ -380,49 +355,42 @@ class StringDialog extends JDialog {
         }
     }
 
-
     class NewStringAction extends AbstractAction {
 
         final StringDialog parent;
 
 
         public NewStringAction(StringDialog parent) {
-            super("New string",
-                    IconTheme.getImage("add"));
+            super("New string", IconTheme.JabRefIcon.ADD.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("New string"));
             this.parent = parent;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String name =
-                    JOptionPane.showInputDialog(parent,
-                            Localization.lang("Please enter the string's label"));
+            String name = JOptionPane.showInputDialog(parent, Localization.lang("Please enter the string's label"));
             if (name == null) {
                 return;
             }
             if (isNumber(name)) {
-                JOptionPane.showMessageDialog
-                        (parent,
-                                Localization.lang("The label of the string can not be a number."),
-                                Localization.lang("Label"),
-                                JOptionPane.ERROR_MESSAGE);
+                // @formatter:off
+                JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot be a number."),
+                        Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
+                // @formatter:on
                 return;
             }
             if (name.contains("#")) {
-                JOptionPane.showMessageDialog
-                        (parent,
-                                Localization.lang("The label of the string can not contain the '#' character."),
-                                Localization.lang("Label"),
-                                JOptionPane.ERROR_MESSAGE);
+                // @formatter:off
+                JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot contain the '#' character."),
+                        Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
+                // @formatter:on
                 return;
             }
             if (name.contains(" ")) {
-                JOptionPane.showMessageDialog
-                        (parent,
-                                Localization.lang("The label of the string can not contain spaces."),
-                                Localization.lang("Label"),
-                                JOptionPane.ERROR_MESSAGE);
+                // @formatter:off
+                JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot contain spaces."),
+                        Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
+                // @formatter:on
                 return;
             }
             try {
@@ -430,45 +398,42 @@ class StringDialog extends JDialog {
                 BibtexString bs = new BibtexString(newId, name, "");
 
                 // Store undo information:
-                panel.undoManager.addEdit
-                        (new UndoableInsertString
-                        (panel, panel.database, bs));
+                panel.undoManager.addEdit(new UndoableInsertString(panel, panel.database, bs));
 
                 base.addString(bs);
                 refreshTable();
                 //		table.revalidate();
                 panel.markBaseChanged();
             } catch (KeyCollisionException ex) {
-                JOptionPane.showMessageDialog(parent,
-                        Localization.lang("A string with that label "
-                                + "already exists"),
-                        Localization.lang("Label"),
-                        JOptionPane.ERROR_MESSAGE);
+                // @formatter:off
+                JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label "
+                        + "already exists"),
+                        Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
+                // @formatter:on
             }
         }
     }
 
 
-    StoreContentAction storeContentAction = new StoreContentAction(this);
+    SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
 
 
-    static class StoreContentAction extends AbstractAction {
+    static class SaveDatabaseAction extends AbstractAction {
 
         final StringDialog parent;
 
 
-        public StoreContentAction(StringDialog parent) {
-            super("Store string",
-                    IconTheme.getImage("add"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Store string"));
+        public SaveDatabaseAction(StringDialog parent) {
+            super("Save database", IconTheme.JabRefIcon.SAVE.getIcon());
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save database"));
             this.parent = parent;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            parent.saveDatabase();
         }
     }
-
 
     class RemoveStringAction extends AbstractAction {
 
@@ -476,8 +441,7 @@ class StringDialog extends JDialog {
 
 
         public RemoveStringAction(StringDialog parent) {
-            super("Remove selected strings",
-                    IconTheme.getImage("remove"));
+            super("Remove selected strings", IconTheme.JabRefIcon.REMOVE.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Remove selected strings"));
             this.parent = parent;
         }
@@ -491,12 +455,13 @@ class StringDialog extends JDialog {
                 // keystroke. This makes the content hang on the screen.
                 assureNotEditing();
 
-                String msg = Localization.lang("Really delete the selected") + ' ' +
-                        (sel.length > 1 ? sel.length + " " + Localization.lang("entries")
-                                : Localization.lang("entry")) + '?';
+                // @formatter:off
+                String msg = Localization.lang("Really delete the selected") + ' '
+                        + (sel.length > 1 ? sel.length + " " + Localization.lang("entries")
+                        : Localization.lang("entry")) + '?';
                 int answer = JOptionPane.showConfirmDialog(parent, msg, Localization.lang("Delete strings"),
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE);
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                // @formatter:on
                 if (answer == JOptionPane.YES_OPTION) {
                     CompoundEdit ce = new CompoundEdit();
                     for (int i = sel.length - 1; i >= 0; i--) {
@@ -505,9 +470,7 @@ class StringDialog extends JDialog {
                         BibtexString subject = (BibtexString) strings[sel[i]];
 
                         // Store undo information:
-                        ce.addEdit(new UndoableRemoveString
-                                (panel, base,
-                                        subject));
+                        ce.addEdit(new UndoableRemoveString(panel, base, subject));
 
                         base.removeString(subject.getId());
                     }
@@ -516,116 +479,45 @@ class StringDialog extends JDialog {
 
                     //table.revalidate();
                     refreshTable();
-                    if (base.getStringCount() > 0)
-                     {
+                    if (base.getStringCount() > 0) {
                         table.setRowSelectionInterval(0, 0);
-                    //table.repaint();
-                    //panel.markBaseChanged();
                     }
                 }
             }
         }
     }
 
-
-    /*    StringUpAction stringUpAction = new StringUpAction();
-    class StringUpAction extends AbstractAction {
-    public StringUpAction() {
-        super("Move string up",
-    	  new ImageIcon(GUIGlobals.upIconFile));
-        putValue(SHORT_DESCRIPTION, Globals.lang("Move string up"));
-    }
-    public void actionPerformed(ActionEvent e) {
-        int[] sel = table.getSelectedRows();
-        if ((sel.length == 1) && (sel[0] > 0)) {
-
-    	// Make sure no cell is being edited, as caused by the
-    	// keystroke. This makes the content hang on the screen.
-    	assureNotEditing();
-    	// Store undo information:
-    	panel.undoManager.addEdit(new UndoableMoveString
-    				      (panel, base, sel[0], true));
-
-    	BibtexString bs = base.getString(sel[0]);
-    	base.removeString(sel[0]);
-    	try {
-    	    base.addString(bs, sel[0]-1);
-    	} catch (KeyCollisionException ex) {}
-    	table.revalidate();
-    	table.setRowSelectionInterval(sel[0]-1, sel[0]-1);
-    	table.repaint();
-    	panel.markBaseChanged();
-        }
-    }
-    }
-
-    StringDownAction stringDownAction = new StringDownAction();
-    class StringDownAction extends AbstractAction {
-    public StringDownAction() {
-        super("Move string down",
-    	  new ImageIcon(GUIGlobals.downIconFile));
-        putValue(SHORT_DESCRIPTION, Globals.lang("Move string down"));
-    }
-    public void actionPerformed(ActionEvent e) {
-        int[] sel = table.getSelectedRows();
-        if ((sel.length == 1) && (sel[0]+1 < base.getStringCount())) {
-
-    	// Make sure no cell is being edited, as caused by the
-    	// keystroke. This makes the content hang on the screen.
-    	assureNotEditing();
-
-
-    	// Store undo information:
-    	panel.undoManager.addEdit(new UndoableMoveString
-    				      (panel, base, sel[0], false));
-
-
-    	BibtexString bs = base.getString(sel[0]);
-    	base.removeString(sel[0]);
-    	try {
-    	    base.addString(bs, sel[0]+1);
-    	} catch (KeyCollisionException ex) {}
-    	table.revalidate();
-    	table.setRowSelectionInterval(sel[0]+1, sel[0]+1);
-    	table.repaint();
-    	panel.markBaseChanged();
-        }
-
-    }
-    }*/
-
-
     class UndoAction extends AbstractAction {
 
         public UndoAction() {
-            super("Undo", IconTheme.getImage("undo"));
+            super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Undo"));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                panel.runCommand("undo");
+                panel.runCommand(Actions.UNDO);
             } catch (Throwable ignored) {
+                // Ignore
             }
         }
     }
 
-
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
-            super("Undo", IconTheme.getImage("redo"));
+            super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Redo"));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                panel.runCommand("redo");
+                panel.runCommand(Actions.REDO);
             } catch (Throwable ignored) {
+                // Ignore
             }
         }
     }
-
 }

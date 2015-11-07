@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -20,7 +20,6 @@ import net.sf.jabref.exporter.layout.AbstractParamLayoutFormatter;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.GUIGlobals;
 
 import java.util.*;
 import java.io.File;
@@ -92,18 +91,18 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     private String fileType;
     private List<FormatEntry> format;
-    private final Map<String, String> replacements = new HashMap<String, String>();
+    private final Map<String, String> replacements = new HashMap<>();
 
 
     @Override
     public void setArgument(String arg) {
         String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
         format = parseFormatString(parts[0]);
-        if (parts.length > 1 && !parts[1].trim().isEmpty()) {
+        if ((parts.length > 1) && !parts[1].trim().isEmpty()) {
             fileType = parts[1];
         }
         if (parts.length > 2) {
-            for (int i = 2; i < parts.length - 1; i += 2) {
+            for (int i = 2; i < (parts.length - 1); i += 2) {
                 replacements.put(parts[i], parts[i + 1]);
             }
         }
@@ -124,7 +123,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             FileListEntry flEntry = tableModel.getEntry(i);
             // Use this entry if we don't discriminate on types, or if the type fits:
-            if (fileType == null || flEntry.getType().getName().toLowerCase().equals(fileType)) {
+            if ((fileType == null) || flEntry.getType().getName().toLowerCase().equals(fileType)) {
 
                 for (FormatEntry entry : format) {
                     switch (entry.getType()) {
@@ -147,7 +146,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         if (Globals.prefs.fileDirForDatabase != null) {
                             dirs = Globals.prefs.fileDirForDatabase;
                         } else {
-                            dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
+                            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + "Directory")};
                         }
 
                         File f = FileUtil.expandFilename(flEntry.getLink(), dirs);
@@ -187,7 +186,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             break;
                         }
                         int index = flEntry.getLink().lastIndexOf('.');
-                        if (index >= 0 && index < flEntry.getLink().length() - 1) {
+                        if ((index >= 0) && (index < (flEntry.getLink().length() - 1))) {
                             sb.append(replaceStrings(flEntry.getLink().substring(index + 1)));
                         }
                         break;
@@ -227,7 +226,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     private static final int RELATIVE_FILE_PATH = 6;
 
     // Define which escape sequences give what results:
-    private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<Character, Integer>();
+    private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<>();
 
     static {
         WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);
@@ -248,8 +247,8 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
      * @param format The marked-up string.
      * @return the resulting format entries.
      */
-    private List<FormatEntry> parseFormatString(String format) {
-        List<FormatEntry> l = new ArrayList<FormatEntry>();
+    private static List<FormatEntry> parseFormatString(String format) {
+        List<FormatEntry> l = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         boolean escaped = false;
         for (int i = 0; i < format.length(); i++) {

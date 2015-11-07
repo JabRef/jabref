@@ -1,19 +1,14 @@
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.fieldeditors.TextArea;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.testutils.TestUtils;
-
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
 
 /**
@@ -27,7 +22,6 @@ public class AutoCompleterTest {
     private static final String ENTIRE_FIELD = "journal";
 
     public static final String PATH_TO_TEST_BIBTEX = "src/test/resources/net/sf/jabref/bibtexFiles/test.bib";
-
 
     @Test
     public void testAutoCompleterFactory() {
@@ -140,43 +134,6 @@ public class AutoCompleterTest {
         Globals.prefs.putBoolean("autoCompFF", oldAutoCompFF);
         Globals.prefs.putBoolean("autoCompLF", oldAutoCompLF);
         Globals.prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, oldACFM);
-    }
-
-    @Test
-    @Ignore(value = "works on windows and ubuntu, but not on travis")
-    public void testEntryEditorForNameFieldAutoCompleter() {
-        // construct an EntryEditor ...
-        TestUtils.initJabRef();
-        BibtexEntry bibtexEntry = new BibtexEntry();
-        bibtexEntry.setField("author", "Brigitte Laurant");
-        FieldEditor authorTextField = new TextArea("author", "Hans Meiser");
-        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.basePanel(), bibtexEntry);
-        // perform action ...
-        editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
-        // test content of stored words in autocompleter ...
-        AutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleters().get("author");
-        Assert.assertTrue(autoCompleter.indexContainsWord("Hans Meiser"));
-        Assert.assertTrue(autoCompleter.indexContainsWord("Meiser, Hans"));
-
-        TestUtils.closeJabRef();
-    }
-
-    @Test
-    @Ignore(value = "works on windows and ubuntu, but not on travis")
-    public void testEntryEditorForFieldAnotherAutoCompleter() {
-        // construct an EntryEditor ...
-        TestUtils.initJabRef();
-        BibtexEntry bibtexEntry = new BibtexEntry();
-        bibtexEntry.setField("journal", "Testtext");
-        FieldEditor authorTextField = new TextArea("journal", "New Testtext");
-        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.basePanel(), bibtexEntry);
-        // perform action ...
-        editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
-        // test content of stored words in autocompleter ...
-        AutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleters().get("journal");
-        Assert.assertTrue(autoCompleter.indexContainsWord("New Testtext"));
-
-        TestUtils.closeJabRef();
     }
 
     private BibtexDatabase getDatabase() {

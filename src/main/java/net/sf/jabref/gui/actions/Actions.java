@@ -10,9 +10,8 @@ public class Actions {
     public static final String ADD_FILE_LINK = "addFileLink";
     public static final String ADD_TO_GROUP = "addToGroup";
     public static final String AUTO_SET_FILE = "autoSetFile";
-    public static final String AUTO_SET_PDF = "autoSetPdf";
-    public static final String AUTO_SET_PS = "autoSetPs";
     public static final String BACK = "back";
+    public static final String CHECK_INTEGRITY = "checkIntegrity";
     public static final String CLEANUP = "Cleanup";
     public static final String COPY = "copy";
     public static final String COPY_KEY = "copyKey";
@@ -22,6 +21,7 @@ public class Actions {
     public static final String DB_CONNECT = "dbConnect";
     public static final String DB_EXPORT = "dbExport";
     public static final String DELETE = "delete";
+    public static final String DOWNLOAD_FULL_TEXT = "downloadFullText";
     public static final String DUPLI_CHECK = "dupliCheck";
     public static final String EDIT = "edit";
     public static final String EDIT_PREAMBLE = "editPreamble";
@@ -35,6 +35,7 @@ public class Actions {
     public static final String MARK_ENTRIES = "markEntries";
     public static final String MERGE_DATABASE = "mergeDatabase";
     public static final String MERGE_ENTRIES = "mergeEntries";
+    public static final String MERGE_DOI = "mergeWithDOI";
     public static final String MOVE_TO_GROUP = "moveToGroup";
     public static final String OPEN_EXTERNAL_FILE = "openExternalFile";
     public static final String OPEN_FILE = "openFile";

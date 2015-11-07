@@ -32,7 +32,7 @@ import javax.swing.WindowConstants;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.logic.labelPattern.LabelPattern;
+import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -59,7 +59,7 @@ public class BibtexKeyPatternDialog extends JDialog {
     public void setPanel(BasePanel panel) {
         this.panel = panel;
         this.metaData = panel.metaData();
-        LabelPattern keypatterns = metaData.getLabelPattern();
+        AbstractLabelPattern keypatterns = metaData.getLabelPattern();
         labelPatternPanel.setValues(keypatterns);
     }
 
@@ -88,7 +88,7 @@ public class BibtexKeyPatternDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                metaData.setLabelPattern(labelPatternPanel.getLabelPattern());
+                metaData.setLabelPattern(labelPatternPanel.getLabelPatternAsDatabaseLabelPattern());
                 panel.markNonUndoableBaseChanged();
                 dispose();
             }

@@ -1,11 +1,13 @@
 # JabRef Development Version
 
-[![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=master)](https://travis-ci.org/JabRef/jabref)
+[![CircleCI](https://img.shields.io/circleci/project/JabRef/jabref.svg)](https://circleci.com/gh/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
-[![Coverage Status](https://coveralls.io/repos/JabRef/jabref/badge.svg)](https://coveralls.io/r/JabRef/jabref)
+[![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Donation](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?item_name=JabRef+Bibliography+Manager&cmd=_donations&lc=US&currency_code=EUR&business=jabrefmail%40gmail.com)
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=koppor&url=https%3A%2F%2Fgithub.com%2FJabRef%2Fjabref&title=JabRef&language=Java&tags=github&category=software)
+[![Download JabRef](https://img.shields.io/sourceforge/dw/jabref.svg)](http://sourceforge.net/projects/jabref/files/jabref/)
 
 This version is a development version. Features may not work as expected.
 
@@ -35,7 +37,7 @@ JabRef can be run as a command line application to convert from any import forma
 * Development mailing list: https://lists.sourceforge.net/lists/listinfo/jabref-devel
 * Development page: https://github.com/JabRef
 * Main git repository: https://github.com/JabRef/jabref
-* CI Servers: https://travis-ci.org/JabRef/jabref and https://circleci.com/gh/JabRef/jabref
+* CI Server: https://circleci.com/gh/JabRef/jabref
 * Open HUB page: https://www.openhub.net/p/jabref
 
 ### Bug Reports, Suggestions, Other Feedback
@@ -88,6 +90,7 @@ appear in your chosen languages.
 If you want a step-by-step tutorial, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
 
 To compile JabRef from source, you need a Java compiler supporting Java 1.8 and `JAVA_HOME` pointing to this JDK.
+You have to set `GRADLE_OPTS` to `-Dfile.encoding=UTF-8` as [gradle uses the JVM's platform encoding](https://discuss.gradle.org/t/is-there-a-way-to-tell-gradle-to-read-gradle-build-scripts-using-a-specified-encoding/7535).
 
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
@@ -106,8 +109,6 @@ To get a list of all targets, use `gradlew tasks`.
 release - Creates a release for all target platforms.
 releaseJar - Creates a Jar release.
 releaseMac - Creates an OSX release.
-releaseSourceTar - Creates a tar archive of the source code.
-releaseSourceZip - Creates a zip archive of the source code.
 releaseWindows - Creates a Windows executable and installer.
 ```
 
@@ -121,10 +122,10 @@ All binaries are created inside the directory `build/releases`.
 ### Releasing Developer Releases
 
 Run `gradlew -Pdev=true ANY_RELEASE_TASK` to execute any of the previously defined release tasks.
-The only difference is that the version contains the keyword *snapshot*, the *date*, and the *shortend git hash*.
+The only difference is that the version contains the keyword *snapshot*, the *date*, the *branch name*, and the *shortend git hash*.
 
 Normal: `JabRef--2.80dev.jar`
-With `-Pdev=true`: `JabRef--2.80dev--snapshot--2015-07-30--48a23d1.jar`
+With `-Pdev=true`: `JabRef-2.80dev--snapshot--2015-10-26--master--d7eb10c.jar`
 
 ## License
 

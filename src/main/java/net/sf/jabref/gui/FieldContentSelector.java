@@ -46,7 +46,7 @@ import net.sf.jabref.util.Util;
  */
 public class FieldContentSelector extends JComponent {
 
-    private final JComboBox comboBox;
+    private final JComboBox<String> comboBox;
 
     private final FieldEditor editor;
 
@@ -96,7 +96,7 @@ public class FieldContentSelector extends JComponent {
         this.action = action;
         this.delimiter = delimiter;
 
-        comboBox = new JComboBox() {
+        comboBox = new JComboBox<String>() {
 
             @Override
             public Dimension getPreferredSize() {

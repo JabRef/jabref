@@ -5,69 +5,32 @@
 </head>
 
 <body id="aboutpage">
-        <h1>JabRef 第 ${version} 版</h1>
+    <h1>JabRef 第 ${version} 版</h1>
 
-        <div id="logo">
-        <img src="../../images/JabRef-icon-48.png" alt="JabRef logo"/><br/>&copy; 2003-${year}
-        </div>
+    <div id="logo">
+    <img src="../../images/crystal_16/JabRef-icon-48.png" alt="JabRef logo"/><br/>&copy; 2003-${year}
+    </div>
 
-        <p>JabRefはフリーソフトウェアです。JabRefは、Free Software Foundationが公開しているGNU <a href="License.html">General Public License</a>のversion 2か、(お望みであれば)それよりも新しい版の下で自由に配布し修正することが可能です。</p>
+    <p>JabRefはフリーソフトウェアです。JabRefは、Free Software Foundationが公開している <a href="http://choosealicense.com/licenses/gpl-2.0/">GNU General Public License</a>のversion 2か、(お望みであれば)それよりも新しい版の下で自由に配布し修正することが可能です。</p>
 
-        <h2>Current developers:</h2>
-        <p>Simon Harrer,
-        Oliver Kopp,
-        Igor Steinmacher</p>
+    <p>メインホームページは<a href="http://www.jabref.org">http://www.jabref.org</a>にあり、メーリングリストや他のサポートリソースへのリンクもそこにあります。
+       ソースコードは、JabRefのGitHubページ<a href="https://github.com/JabRef/jabref">https://github.com/JabRef/jabref</a>にあります。</p>
 
-        <h2>Former developers:</h2>
-        <p>Morten O. Alver,
-        Nizar N. Batada,
-        Michel Baylac,
-        Kolja Brix,
-        Guillaume Gardey,
-        Oscar Gustafsson,
-        Cyrille d'Haese,
-        S M Mahbub Murshed,
-        Raik Nagel,
-        Christopher Oezbek,
-        Ellen Reitmayr,
-        Gert Renckens,
-        Andreas Rudert,
-        Michael Spiegel,
-        Ulrik Stervbo,
-        Joerg K. Wegner,
-        Michael Wrighton,
-        Egon Willighagen,
-        J&ouml;rg Zieren</p>
+    <h2>現在の開発者:</h2>
 
-        <h2>貢献者:</h2>
+    <p>下記の人々が<a href="https://github.com/orgs/JabRef/teams/developers">JabRef開発チーム</a>に属しており、JabRefの開発全体に関わっています。</p>
 
-        <p>${authors}</p>
+    <p>${developers}</p>
 
-        <h2>以下の方々に感謝します:</h2>
+    <h2>貢献者:</h2>
 
-        <p>Samin Muhammad Ridwanul Karim,
-        Stefan Robert</p>
+    <p>${authors}</p>
 
-        <h2>使用しているサードパーティ・ソフトウェア:</h2>
+    <h2>使用しているサードパーティ・ソフトウェア:</h2>
 
-        <p>JabRefは、JGoodies (<code>http://www.jgoodies.com</code>) がBSDライセンス (詳細については<code>http://www.opensource.org/licenses/bsd-license.html</code>を参照) の下で配布しているJGoodies Looks およびJGoodies Forms を使用しています。</p>
+    ${licenseInformation}
 
-        <p>また、<a href="../jgoodies.html">これらの条件</a>で配布されているKarsten Lentzschによる二つのクラス (SimpleInternalFrameおよびUIFSplitPane) も含まれています。</p>
-
-        <p>コマンドラインオプションは、RitOpt (<code>http://ritopt.sourceforge.net</code>) を使用して解析しています。RitOptは、GNU <a href="License.html">General Public License</a>, version 2の下で配布されています。</p>
-
-        <p>JabRefは、検索文字列の解釈にANTLR解析生成子を使用しています。ANTLRはパブリックドメイン・ソフトウェアです。ライセンス条項については、<code>http://www.antlr.org/license.html</code>をご覧ください。</p>
-
-        <p>JabRefは、表の表示とフィルタリングにGlazed Listsライブラリ (<code>http://publicobject.com/glazedlists</code>) を使用しています。これはLesser General Public Licenseの下で配布されています。</p>
-
-        <p>JabRefは、スレッディングライブラリSpin も使用しており、これはLesser General Public Licenseの下で配布されています。</p>
-
-        <p>Microbaライブラリ由来のいくつかのGUIコンポーネントが使用されており、これはBSDスタイルライセンスの下でライセンスされています。詳しい情報については<code>http://sourceforge.net/projects/microba/</code>をご覧ください。</p>
-
-        <p>大半のアイコンは、Everaldo (<code>http://www.everaldo.com</code>) によるCrystal Clearから採られています。これはLesser General Public Licenseの下で配布されています。</p>
-
-        <p>JabRefは、PDF取扱のために、FontBox、JempBoxおよびPDFBoxライブラリを使用しています。これらはApacheライセンスの下で配布されています。詳細は<code>http://pdfbox.apache.org</code>を参照してください。</p>
-
-        <p>Ubuntu版では、Unityグローバルメニューへの統合をサポートするために、JabRefは、Java Ayatanaを使用しています。詳細については、<code>http://code.google.com/p/java-swing-ayatana/</code>を参照してください。</p>
+    <h3>追加情報</h3>
+    <p>現在使用しているライブラリのリストは、<a href="https://github.com/JabRef/jabref/blob/master/external-libraries.txt">GitHubのexternal-libraries.txt</a>にも明記してあります。</p>
 </body>
 </html>

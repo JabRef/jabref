@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -38,7 +38,7 @@ public class AllEntriesGroup extends AbstractGroup {
             throw new Exception(
                     "Internal error: AllEntriesGroup cannot be created from \""
                             + s + "\". "
-                            + "Please report this on www.sf.net/projects/jabref");
+                    + "Please report this on https://github.com/JabRef/jabref/issues");
         }
         switch (version) {
         case 0:
@@ -132,5 +132,11 @@ public class AllEntriesGroup extends AbstractGroup {
     @Override
     public String getTypeId() {
         return AllEntriesGroup.ID;
+    }
+
+    @Override
+    public int hashCode() {
+        // TODO Auto-generated method stub
+        return super.hashCode();
     }
 }

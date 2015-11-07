@@ -1,12 +1,27 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.sf.jabref.importer;
 
 import java.io.File;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
@@ -19,10 +34,10 @@ import net.sf.jabref.gui.FileListTableModel;
  * other hand it provides the functionality to create a Bibtex entry out of a
  * file. The interface extends the java.io.FileFilter to inherit a common way of
  * defining file sets.
- * 
+ *
  * @author Dan&Nosh
  * @version 25.11.2008 | 23:39:03
- * 
+ *
  */
 public abstract class EntryFromFileCreator implements java.io.FileFilter {
 
@@ -33,7 +48,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
      * Constructor. <br>
      * Forces subclasses to provide an {@link ExternalFileType} instance, which
      * they build on.
-     * 
+     *
      * @param externalFileType
      */
     EntryFromFileCreator(ExternalFileType externalFileType) {
@@ -63,24 +78,24 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
 
     /**
      * Name of this import format.
-     * 
+     *
      * <p>
      * The name must be unique.
      * </p>
-     * 
+     *
      * @return format name, must be unique and not <code>null</code>
      */
     public abstract String getFormatName();
 
     /**
      * Create one BibtexEntry containing information regarding the given File.
-     * 
+     *
      * @param f
      * @param addPathTokensAsKeywords
      * @return
      */
     public BibtexEntry createEntry(File f, boolean addPathTokensAsKeywords) {
-        if (f == null || !f.exists()) {
+        if ((f == null) || !f.exists()) {
             return null;
         }
         BibtexEntry newEntry = createBibtexEntry(f);
@@ -109,11 +124,11 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     /**
      * Splits the path to the file and builds a keywords String in the format
      * that is used by Jabref.
-     * 
+     *
      * @param absolutePath
      * @return
      */
-    private String extractPathesToKeyWordsfield(String absolutePath) {
+    private static String extractPathesToKeyWordsfield(String absolutePath) {
         final int MIN_PATH_TOKEN_LENGTH = 4;
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(absolutePath, "" + File.separatorChar);
@@ -138,7 +153,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
         ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt(externalFileType.getFieldName());
 
-        String[] possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
         File shortenedFileName = FileUtil.shortenFileName(file, possibleFilePaths);
         FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.getPath(), fileType);
 
@@ -149,7 +164,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     }
 
     void appendToField(BibtexEntry entry, String field, String value) {
-        if (value == null || "".equals(value)) {
+        if ((value == null) || "".equals(value)) {
             return;
         }
         String oVal = entry.getField(field);
@@ -173,7 +188,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     }
 
     void addEntryDataToEntry(BibtexEntry entry, BibtexEntry e) {
-        for (String field : e.getAllFields()) {
+        for (String field : e.getFieldNames()) {
             appendToField(entry, field, e.getField(field));
         }
     }

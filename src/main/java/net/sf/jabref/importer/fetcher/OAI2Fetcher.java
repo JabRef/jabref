@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -37,18 +37,22 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * 
+ *
  * This class can be used to access any archive offering an OAI2 interface. By
  * default it will access ArXiv.org
- * 
+ *
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
  */
 public class OAI2Fetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(OAI2Fetcher.class);
 
     private static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
 
@@ -80,7 +84,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
 
     /**
-     * some archives - like ArXiv.org - might expect of you to wait some time 
+     * some archives - like ArXiv.org - might expect of you to wait some time
      */
     private boolean shouldWait() {
         return waitTime > 0;
@@ -93,8 +97,8 @@ public class OAI2Fetcher implements EntryFetcher {
 
 
     /**
-     * 
-     * 
+     *
+     *
      * @param oai2Host
      *            the host to query without leading http:// and without trailing /
      * @param oai2Script
@@ -118,16 +122,14 @@ public class OAI2Fetcher implements EntryFetcher {
         try {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             saxParser = parserFactory.newSAXParser();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
+        } catch (ParserConfigurationException | SAXException e) {
+            LOGGER.error("Error creating SAXParser for OAI2Fetcher", e);
         }
     }
 
     /**
      * Default Constructor. The archive queried will be ArXiv.org
-     * 
+     *
      */
     public OAI2Fetcher() {
         this(OAI2Fetcher.OAI2_ARXIV_HOST, OAI2Fetcher.OAI2_ARXIV_SCRIPT, OAI2Fetcher.OAI2_ARXIV_METADATAPREFIX,
@@ -136,10 +138,10 @@ public class OAI2Fetcher implements EntryFetcher {
 
     /**
      * Construct the query URL
-     * 
+     *
      * @param key
      *            The key of the OAI2 entry that the url should point to.
-     *            
+     *
      * @return a String denoting the query URL
      */
     public String constructUrl(String key) {
@@ -149,12 +151,13 @@ public class OAI2Fetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        return "http://" + oai2Host + "/" + oai2Script + "?" + "verb=GetRecord" + "&identifier=" + oai2PrefixIdentifier + identifier + "&metadataPrefix=" + oai2MetaDataPrefix;
+        return "http://" + oai2Host + "/" + oai2Script + "?" + "verb=GetRecord" + "&identifier=" + oai2PrefixIdentifier
+                + identifier + "&metadataPrefix=" + oai2MetaDataPrefix;
     }
 
     /**
      * Strip subcategories from ArXiv key.
-     * 
+     *
      * @param key The key to fix.
      * @return Fixed key.
      */
@@ -167,7 +170,7 @@ public class OAI2Fetcher implements EntryFetcher {
         int dot = key.indexOf('.');
         int slash = key.indexOf('/');
 
-        if (dot > -1 && dot < slash) {
+        if ((dot > -1) && (dot < slash)) {
             key = key.substring(0, dot) + key.substring(slash, key.length());
         }
 
@@ -183,14 +186,14 @@ public class OAI2Fetcher implements EntryFetcher {
     /**
      * Import an entry from an OAI2 archive. The BibtexEntry provided has to
      * have the field OAI2_IDENTIFIER_FIELD set to the search string.
-     * 
+     *
      * @param key
      *            The OAI2 key to fetch from ArXiv.
      * @return The imported BibtexEntry or null if none.
      */
     public BibtexEntry importOai2Entry(String key) {
         /**
-         * Fix for problem reported in mailing-list: 
+         * Fix for problem reported in mailing-list:
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
          */
         key = OAI2Fetcher.fixKey(key);
@@ -210,7 +213,7 @@ public class OAI2Fetcher implements EntryFetcher {
             saxParser.parse(inputStream, handlerBase);
 
             /* Correct line breaks and spacing */
-            for (String name : be.getAllFields()) {
+            for (String name : be.getFieldNames()) {
                 be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name)));
             }
 
@@ -226,17 +229,16 @@ public class OAI2Fetcher implements EntryFetcher {
 
             return be;
         } catch (IOException e) {
-            status.showMessage(Localization.lang(
-                    "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url)
+                    + "\n\n" + e, getKeyName(), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
-            status.showMessage(Localization.lang(
-                    "An SAXException ocurred while parsing '%0':", new String[]{url})
-                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("An SAXException ocurred while parsing '%0':", url)
+                    + "\n\n" + e.getMessage(), getKeyName(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            status.showMessage(Localization.lang(
-                    "An Error occurred while fetching from OAI2 source (%0):", new String[]{url})
-                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("An Error occurred while fetching from OAI2 source (%0):", url)
+                    + "\n\n" + e.getMessage()
+                    + "\n\n" + Localization.lang("Note: A full text search is currently not supported for %0", getKeyName()),
+                    getKeyName(), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -249,7 +251,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     @Override
     public String getKeyName() {
-        return oai2ArchiveName;
+        return Localization.lang(oai2ArchiveName);
     }
 
     @Override
@@ -260,13 +262,13 @@ public class OAI2Fetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle(getKeyName());
+        return Localization.menuTitle("Fetch ArXiv.org");
     }
 
     @Override
-    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
+    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter statusOP) {
 
-        this.status = status;
+        status = statusOP;
 
         try {
             shouldContinue = true;
@@ -281,12 +283,12 @@ public class OAI2Fetcher implements EntryFetcher {
                  * some archives - like arxive.org - might expect of you to wait
                  * some time
                  */
-                if (shouldWait() && lastCall != null) {
+                if (shouldWait() && (lastCall != null)) {
 
                     long elapsed = new Date().getTime() - lastCall.getTime();
 
                     while (elapsed < waitTime) {
-                        status.setStatus(Localization.lang("Waiting for ArXiv...") + (waitTime - elapsed) / 1000 + " s");
+                        status.setStatus(Localization.lang("Waiting for ArXiv...") + ((waitTime - elapsed) / 1000) + " s");
                         Thread.sleep(1000);
                         elapsed = new Date().getTime() - lastCall.getTime();
                     }
@@ -317,8 +319,8 @@ public class OAI2Fetcher implements EntryFetcher {
 
             return true;
         } catch (Exception e) {
-            status.setStatus(Localization.lang("Error while fetching from OAI2") + ": " + e.getMessage());
-            e.printStackTrace();
+            status.setStatus(Localization.lang("Error while fetching from OAI2"));
+            LOGGER.error("Error whil fetching from OAI2", e);
         }
         return false;
     }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -33,10 +33,9 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.Abbreviations;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -52,10 +51,9 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useDefault;
     private final JCheckBox useRemoteServer;
     private final JCheckBox useNativeFileDialogOnMac;
-    private final JCheckBox filechooserDisableRename;
     private final JCheckBox useIEEEAbrv;
     private final JCheckBox biblatexMode;
-    private final JComboBox className;
+    private final JComboBox<String> className;
     private final JTextField remoteServerPort;
     private String oldLnf = "";
     private boolean oldUseDef;
@@ -66,7 +64,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useCaseKeeperOnSearch;
     private final JCheckBox useUnitFormatterOnSearch;
     private final JabRef jabRef;
-    private RemotePreferences remotePreferences;
+    private final RemotePreferences remotePreferences;
 
 
     public AdvancedTab(JabRefPreferences prefs, HelpDialog diag, JabRef jabRef) {
@@ -74,36 +72,32 @@ class AdvancedTab extends JPanel implements PrefsTab {
         preferences = prefs;
         this.remotePreferences = new RemotePreferences(preferences);
 
-        HelpAction remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
-                IconTheme.getImage("helpSmall"));
         useDefault = new JCheckBox(Localization.lang("Use other look and feel"));
         useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useNativeFileDialogOnMac = new JCheckBox(Localization.lang("Use native file dialog"));
-        filechooserDisableRename = new JCheckBox(Localization.lang("Disable file renaming in non-native file dialog"));
         useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
         biblatexMode = new JCheckBox(Localization.lang("BibLaTeX mode"));
         remoteServerPort = new JTextField();
         String[] possibleLookAndFeels = {
-                "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel",
-                "com.sun.java.swing.plaf.windows.WindowsLookAndFeel",
-                "com.sun.java.swing.plaf.motif.MotifLookAndFeel",
-                "javax.swing.plaf.mac.MacLookAndFeel",
-                "com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
-                "javax.swing.plaf.metal.MetalLookAndFeel"
+                UIManager.getSystemLookAndFeelClassName(),
+                UIManager.getCrossPlatformLookAndFeelClassName(),
+                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
+                "com.jgoodies.looks.windows.WindowsLookAndFeel"
         };
         // Only list L&F which are available
-        List<String> lookAndFeels = new ArrayList<String>();
+        List<String> lookAndFeels = new ArrayList<>();
         for (String lf : possibleLookAndFeels) {
             try {
                 // Try to find L&F, throws exception if not successful
                 Class.forName(lf);
                 lookAndFeels.add(lf);
             } catch (ClassNotFoundException ignored) {
+                // Ignored
             }
         }
-        className = new JComboBox(lookAndFeels.toArray(new String[lookAndFeels.size()]));
+        className = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
         className.setEditable(true);
-        final JComboBox clName = className;
+        final JComboBox<String> clName = className;
         useDefault.addChangeListener(new ChangeListener() {
 
             @Override
@@ -117,7 +111,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu",//, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
-                "");
+                        "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
 
@@ -160,7 +154,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         JPanel p = new JPanel();
         p.add(useRemoteServer);
         p.add(remoteServerPort);
-        p.add(remoteHelp.getIconButton());
+        p.add(new HelpAction(diag, GUIGlobals.remoteHelp).getIconButton());
         builder.append(p);
 
         //if (Globals.OS_X) {
@@ -169,9 +163,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(useNativeFileDialogOnMac);
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(filechooserDisableRename);
         //}
         // IEEE
         builder.nextLine();
@@ -215,7 +206,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         oldPort = remotePreferences.getPort();
         remoteServerPort.setText(String.valueOf(oldPort));
         useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC));
-        filechooserDisableRename.setSelected(Globals.prefs.getBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME));
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV));
         oldBiblMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
         biblatexMode.setSelected(oldBiblMode);
@@ -229,23 +219,21 @@ class AdvancedTab extends JPanel implements PrefsTab {
         preferences.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !useDefault.isSelected());
         preferences.put(JabRefPreferences.WIN_LOOK_AND_FEEL, className.getSelectedItem().toString());
         preferences.putBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC, useNativeFileDialogOnMac.isSelected());
-        preferences.putBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME, filechooserDisableRename.isSelected());
-        UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
-        preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
-        if (useIEEEAbrv.isSelected()) {
-            Globals.journalAbbrev = new JournalAbbreviationRepository();
-            Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_IEEE_INTERNAL_LIST);
+
+        if(preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
+            preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
+            Abbreviations.initializeJournalNames(preferences);
         }
         storeRemoteSettings();
 
         preferences.putBoolean(JabRefPreferences.BIBLATEX_MODE, biblatexMode.isSelected());
 
-        if (useDefault.isSelected() == oldUseDef ||
+        if ((useDefault.isSelected() == oldUseDef) ||
                 !oldLnf.equals(className.getSelectedItem().toString())) {
             JOptionPane.showMessageDialog(null,
                     Localization.lang("You have changed the look and feel setting.")
-                            .concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                    .concat(" ")
+                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
                     Localization.lang("Changed look and feel settings"),
                     JOptionPane.WARNING_MESSAGE);
         }
@@ -253,8 +241,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
         if (biblatexMode.isSelected() != oldBiblMode) {
             JOptionPane.showMessageDialog(null,
                     Localization.lang("You have toggled the BibLaTeX mode.")
-                            .concat(" ")
-                            .concat("You must restart JabRef for this change to come into effect."),
+                    .concat(" ")
+                    .concat("You must restart JabRef for this change to come into effect."),
                     Localization.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
 
@@ -272,8 +260,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
                 if(remotePreferences.useRemoteServer()) {
                     JOptionPane.showMessageDialog(null,
                             Localization.lang("Remote server port")
-                                    .concat(" ")
-                                    .concat("You must restart JabRef for this change to come into effect."),
+                            .concat(" ")
+                            .concat("You must restart JabRef for this change to come into effect."),
                             Localization.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
                 }
             }
@@ -307,9 +295,9 @@ class AdvancedTab extends JPanel implements PrefsTab {
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
-                    (null, Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
-                            Localization.lang("Remote server port") + '\'', Localization.lang("Remote server port"),
-                            JOptionPane.ERROR_MESSAGE);
+            (null, Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
+                    Localization.lang("Remote server port") + '\'', Localization.lang("Remote server port"),
+                    JOptionPane.ERROR_MESSAGE);
             return false;
         }
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,14 +12,14 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 public abstract class SpecialField {
 
@@ -36,8 +36,8 @@ public abstract class SpecialField {
 
     void setValues(List<SpecialFieldValue> values) {
         this.values = values;
-        this.keywords = new ArrayList<String>();
-        this.map = new HashMap<String, SpecialFieldValue>();
+        this.keywords = new ArrayList<>();
+        this.map = new HashMap<>();
         for (SpecialFieldValue v : values) {
             if (v.getKeyword() != null) {
                 keywords.add(v.getKeyword());
@@ -62,7 +62,7 @@ public abstract class SpecialField {
 
     public abstract String getFieldName();
 
-    public abstract ImageIcon getRepresentingIcon();
+    public abstract Icon getRepresentingIcon();
 
     public abstract String getMenuString();
 

@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.sf.jabref.gui.keyboard;
 
 import net.sf.jabref.gui.FindUnlinkedFilesDialog;
@@ -53,7 +68,6 @@ public class KeyBinds {
     public static final String INCREMENTAL_SEARCH = "Incremental search";
     public static final String LOAD_SESSION = "Load session";
     public static final String MARK_ENTRIES = "Mark entries";
-    public static final String MINIMIZE_TO_SYSTEM_TRAY = "Minimize to system tray";
     public static final String NEW_ARTICLE = "New article";
     public static final String NEW_BOOK = "New book";
     public static final String NEW_ENTRY = "New entry";
@@ -75,8 +89,6 @@ public class KeyBinds {
     public static final String PREAMBLE_EDITOR_STORE_CHANGES = "Preamble editor, store changes";
     public static final String PREVIOUS_TAB = "Previous tab";
     public static final String PUSH_TO_APPLICATION = "Push to application";
-    public static final String PUSH_TO_LY_X = "Push to LyX";
-    public static final String PUSH_TO_WIN_EDT = "Push to WinEdt";
     public static final String QUIT_JAB_REF = "Quit JabRef";
     public static final String REDO = "Redo";
     public static final String REFRESH_OO = "Refresh OO";
@@ -100,8 +112,6 @@ public class KeyBinds {
     public static final String STRING_DIALOG_REMOVE_STRING = "String dialog, remove string";
     public static final String SWITCH_PREVIEW_LAYOUT = "Switch preview layout";
     public static final String SYNCHRONIZE_FILES = "Synchronize files";
-    public static final String SYNCHRONIZE_PDF = "Synchronize PDF";
-    public static final String SYNCHRONIZE_PS = "Synchronize PS";
     public static final String TOGGLE_ENTRY_PREVIEW = "Toggle entry preview";
     public static final String TOGGLE_GROUPS_INTERFACE = "Toggle groups interface";
     public static final String UNABBREVIATE = "Unabbreviate";
@@ -109,13 +119,11 @@ public class KeyBinds {
     public static final String UNMARK_ENTRIES = "Unmark entries";
     public static final String WRITE_XMP = "Write XMP";
 
-    private final HashMap<String, String> keyBindMap = new HashMap<String, String>();
+    private final HashMap<String, String> keyBindMap = new HashMap<>();
 
 
     public KeyBinds() {
         keyBindMap.put(PUSH_TO_APPLICATION, "ctrl L");
-        keyBindMap.put(PUSH_TO_LY_X, "ctrl L");
-        keyBindMap.put(PUSH_TO_WIN_EDT, "ctrl shift W");
         keyBindMap.put(QUIT_JAB_REF, "ctrl Q");
         keyBindMap.put(OPEN_DATABASE, "ctrl O");
         keyBindMap.put(SAVE_DATABASE, "ctrl S");
@@ -186,8 +194,6 @@ public class KeyBinds {
         keyBindMap.put(SEARCH_ADS, "ctrl shift F6");
         keyBindMap.put(NEW_FROM_PLAIN_TEXT, "ctrl shift N");
         keyBindMap.put(SYNCHRONIZE_FILES, "ctrl F4");
-        keyBindMap.put(SYNCHRONIZE_PDF, "shift F4");
-        keyBindMap.put(SYNCHRONIZE_PS, "ctrl shift F4");
         keyBindMap.put(FOCUS_ENTRY_TABLE, "ctrl shift E");
         keyBindMap.put(ABBREVIATE, "ctrl alt A");
         keyBindMap.put(UNABBREVIATE, "ctrl alt shift A");
@@ -212,7 +218,6 @@ public class KeyBinds {
         keyBindMap.put(REFRESH_OO, "ctrl alt O");
         keyBindMap.put(FILE_LIST_EDITOR_MOVE_ENTRY_UP, "ctrl UP");
         keyBindMap.put(FILE_LIST_EDITOR_MOVE_ENTRY_DOWN, "ctrl DOWN");
-        keyBindMap.put(MINIMIZE_TO_SYSTEM_TRAY, "ctrl alt W");
         keyBindMap.put(HIDE_SHOW_TOOLBAR, "ctrl alt T");
     }
 
@@ -221,7 +226,7 @@ public class KeyBinds {
     }
 
     public HashMap<String, String> getKeyBindings() {
-        return new HashMap<String, String>(Collections.unmodifiableMap(keyBindMap));
+        return new HashMap<>(Collections.unmodifiableMap(keyBindMap));
     }
 
     public void overwriteBindings(Map<String, String> newBindings) {

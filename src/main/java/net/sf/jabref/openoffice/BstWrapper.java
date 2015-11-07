@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.openoffice;
 
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -21,6 +21,8 @@ import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.FormatChars;
 import net.sf.jabref.bst.VM;
 import org.antlr.runtime.RecognitionException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +42,7 @@ class BstWrapper {
     private final LayoutFormatter formatter = new FormatChars();
     private VM vm;
 
+    private static final Log LOGGER = LogFactory.getLog(BstWrapper.class);
 
     public BstWrapper() {
 
@@ -75,24 +78,24 @@ class BstWrapper {
 
 
     private Map<String, String> parseResult(String result) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         // Look through for instances of \bibitem :
         Matcher m = BstWrapper.bibitemTag.matcher(result);
-        ArrayList<Integer> indices = new ArrayList<Integer>();
-        ArrayList<Integer> endIndices = new ArrayList<Integer>();
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<Integer> indices = new ArrayList<>();
+        ArrayList<Integer> endIndices = new ArrayList<>();
+        ArrayList<String> keys = new ArrayList<>();
         while (m.find()) {
             if (!indices.isEmpty()) {
                 endIndices.add(m.start());
             }
-            System.out.println(m.start() + "  " + m.end());
+            LOGGER.debug(m.start() + "  " + m.end());
             String tag = m.group();
             String key = tag.substring(9, tag.length() - 1);
             indices.add(m.end());
             keys.add(key);
         }
         int lastI = result.lastIndexOf("\\end{thebibliography}");
-        if (lastI > 0 && lastI > indices.get(indices.size() - 1)) {
+        if ((lastI > 0) && (lastI > indices.get(indices.size() - 1))) {
             endIndices.add(lastI);
         }
         for (int i = 0; i < keys.size(); i++) {

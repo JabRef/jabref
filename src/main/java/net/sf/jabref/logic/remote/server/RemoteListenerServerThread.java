@@ -38,7 +38,7 @@ public class RemoteListenerServerThread extends Thread {
     public void interrupt() {
         super.interrupt();
 
-        LOGGER.debug("interrupting " + this.getName());
+        LOGGER.debug("Interrupting " + this.getName());
         this.server.closeServerSocket();
     }
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.awt.event.*;
@@ -20,6 +20,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
@@ -62,7 +63,7 @@ class PreambleEditor extends JDialog {
 
             @Override
             protected boolean accept(Component c) {
-                return super.accept(c) && c instanceof FieldEditor;
+                return super.accept(c) && (c instanceof FieldEditor);
             }
         });
 
@@ -108,9 +109,9 @@ class PreambleEditor extends JDialog {
         ta.getActionMap().put("close", closeAction);
 
         ta.getInputMap().put(prefs.getKey("Undo"), "undo");
-        ta.getActionMap().put("undo", undoAction);
+        ta.getActionMap().put(Actions.UNDO, undoAction);
         ta.getInputMap().put(prefs.getKey("Redo"), "redo");
-        ta.getActionMap().put("redo", redoAction);
+        ta.getActionMap().put(Actions.REDO, redoAction);
 
         ta.addFocusListener(new FieldListener());
     }
@@ -123,9 +124,9 @@ class PreambleEditor extends JDialog {
     private class FieldListener extends FocusAdapter {
 
         /*
-        * Focus listener that fires the storeFieldAction when a TextArea
-        * loses focus.
-        */
+         * Focus listener that fires the storeFieldAction when a TextArea
+         * loses focus.
+         */
         @Override
         public void focusLost(FocusEvent e) {
             if (!e.isTemporary()) {
@@ -158,7 +159,7 @@ class PreambleEditor extends JDialog {
             if (toSet == null) {
                 set = base.getPreamble() != null;
             } else {
-                set = !(base.getPreamble() != null
+                set = !((base.getPreamble() != null)
                         && toSet.equals(base.getPreamble()));
             }
 
@@ -166,7 +167,7 @@ class PreambleEditor extends JDialog {
                 panel.undoManager.addEdit(new UndoablePreambleChange
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
-                if (toSet != null && !toSet.isEmpty()) {
+                if ((toSet != null) && !toSet.isEmpty()) {
                     ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
                     ed.setValidBackgroundColor();
                 } else {
@@ -189,15 +190,16 @@ class PreambleEditor extends JDialog {
     class UndoAction extends AbstractAction {
 
         public UndoAction() {
-            super("Undo", IconTheme.getImage("undo"));
+            super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Undo");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                panel.runCommand("undo");
+                panel.runCommand(Actions.UNDO);
             } catch (Throwable ignored) {
+                // Ignored
             }
         }
     }
@@ -209,15 +211,16 @@ class PreambleEditor extends JDialog {
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
-            super("Undo", IconTheme.getImage("redo"));
+            super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Redo");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                panel.runCommand("redo");
+                panel.runCommand(Actions.REDO);
             } catch (Throwable ignored) {
+                // Ignored
             }
         }
     }

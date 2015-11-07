@@ -18,7 +18,9 @@ package net.sf.jabref.model.entry;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -41,12 +43,20 @@ public class CustomEntryType extends BibtexEntryType {
 
     private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
+    public CustomEntryType(String name, List<String> required, List<String> priOpt, List<String> secOpt) {
+        this(name, required.toArray(new String[required.size()]), priOpt.toArray(new String[priOpt.size()]),
+                secOpt.toArray(new String[secOpt.size()]));
+    }
 
     public CustomEntryType(String name, String[] required, String[] priOpt, String[] secOpt) {
         this.name = StringUtil.capitalizeFirst(name);
         parseRequiredFields(required);
         this.priOpt = priOpt;
         optional = StringUtil.arrayConcat(priOpt, secOpt);
+    }
+
+    public CustomEntryType(String name, List<String> required, List<String> optional) {
+        this(name, required.toArray(new String[required.size()]), optional.toArray(new String[optional.size()]));
     }
 
     public CustomEntryType(String name, String[] required, String[] optional) {
@@ -68,8 +78,8 @@ public class CustomEntryType extends BibtexEntryType {
         }
     }
 
-    private void parseRequiredFields(String required) {
-        String[] parts = required.split(";");
+    private void parseRequiredFields(String req) {
+        String[] parts = req.split(";");
         parseRequiredFields(parts);
     }
 
@@ -96,28 +106,28 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     @Override
-    public String[] getOptionalFields() {
-        return optional;
+    public List<String> getOptionalFields() {
+        return Arrays.asList(optional);
     }
 
     @Override
-    public String[] getRequiredFields() {
-        return required;
+    public List<String> getRequiredFields() {
+        return Arrays.asList(required);
     }
 
     @Override
-    public String[] getPrimaryOptionalFields() {
-        return priOpt;
+    public List<String> getPrimaryOptionalFields() {
+        return Arrays.asList(priOpt);
     }
 
     @Override
-    public String[] getSecondaryOptionalFields() {
-        return StringUtil.getRemainder(optional, priOpt);
+    public List<String> getSecondaryOptionalFields() {
+        return Arrays.asList(StringUtil.getRemainder(optional, priOpt));
     }
 
     @Override
-    public String[] getRequiredFieldsForCustomization() {
-        return getRequiredFieldsString().split(";");
+    public List<String> getRequiredFieldsForCustomization() {
+        return Arrays.asList(getRequiredFieldsString().split(";"));
     }
 
     /**
@@ -186,12 +196,12 @@ public class CustomEntryType extends BibtexEntryType {
         StringBuilder sb = new StringBuilder();
         int reqSetsPiv = 0;
         for (int i = 0; i < required.length; i++) {
-            if (reqSets == null || reqSetsPiv == reqSets.length) {
+            if ((reqSets == null) || (reqSetsPiv == reqSets.length)) {
                 sb.append(required[i]);
             } else if (required[i].equals(reqSets[reqSetsPiv][0])) {
                 for (int j = 0; j < reqSets[reqSetsPiv].length; j++) {
                     sb.append(reqSets[reqSetsPiv][j]);
-                    if (j < reqSets[reqSetsPiv].length - 1) {
+                    if (j < (reqSets[reqSetsPiv].length - 1)) {
                         sb.append('/');
                     }
                 }
@@ -201,7 +211,7 @@ public class CustomEntryType extends BibtexEntryType {
             } else {
                 sb.append(required[i]);
             }
-            if (i < required.length - 1) {
+            if (i < (required.length - 1)) {
                 sb.append(';');
             }
 
@@ -219,7 +229,7 @@ public class CustomEntryType extends BibtexEntryType {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < optional.length; i++) {
             sb.append(optional[i]);
-            if (i < optional.length - 1) {
+            if (i < (optional.length - 1)) {
                 sb.append(';');
             }
         }

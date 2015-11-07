@@ -20,7 +20,6 @@ import com.jgoodies.looks.plastic.theme.SkyBluer;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,8 +33,10 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.nativeext.PinToTaskbar;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
@@ -61,26 +62,25 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
-import com.sun.jna.Native;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
-import com.sun.jna.WString;
-import com.sun.jna.ptr.PointerByReference;
-
 /**
  * JabRef Main Class - The application gets started here.
  */
 public class JabRef {
+    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
     public static JabRefFrame jrf;
 
     private static final int MAX_DIALOG_WARNINGS = 10;
-    
-    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
     private JabRefCLI cli;
 
     public void start(String[] args) {
+        // Native extensions
+        if (OS.isWindows7OrLater()) {
+            // activate pin to taskbar for Windows 7 and up
+            PinToTaskbar.enablePinToTaskbar();
+        }
+
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         if (prefs.getBoolean(JabRefPreferences.USE_PROXY)) {
@@ -103,12 +103,12 @@ public class JabRef {
         Globals.startBackgroundTasks();
         setupLogHandlerForErrorConsole();
         Globals.prefs = prefs;
-        setLanguage(prefs);
+        Localization.setLanguage(prefs.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
         /*
          * The Plug-in System is started automatically on the first call to
          * PluginCore.getManager().
-         * 
+         *
          * Plug-ins are activated on the first call to their getInstance method.
          */
 
@@ -121,7 +121,7 @@ public class JabRef {
         ExportFormats.initAllExports();
 
         // Read list(s) of journal names and abbreviations:
-        Globals.initializeJournalNames();
+        Abbreviations.initializeJournalNames(Globals.prefs);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
@@ -146,96 +146,24 @@ public class JabRef {
             }
         }
 
-        /*
-         * See if the user has a personal journal list set up. If so, add these
-         * journal names and abbreviations to the list:
-         */
-        String personalJournalList = prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
-        if (personalJournalList != null && !personalJournalList.isEmpty()) {
-            try {
-                Globals.journalAbbrev.readJournalListFromFile(new File(personalJournalList));
-            } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(null, Localization.lang("Journal file not found") + ": " + e.getMessage(), Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
-                Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, "");
-            }
-        }
-
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
-        if (OS.WINDOWS) {
-            // Set application user model id so that pinning JabRef to the Win7/8 taskbar works
-            // Based on http://stackoverflow.com/a/1928830
-            JabRef.setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.BUILD_INFO.getVersion());
-            //System.out.println(getCurrentProcessExplicitAppUserModelID());
-        }
-
         Vector<ParserResult> loaded = processArguments(args, true);
 
-        if (loaded == null || cli.isDisableGui() || cli.isShowVersion()) {
+        if ((loaded == null) || cli.isDisableGui() || cli.isShowVersion()) {
             JabRefExecutorService.INSTANCE.shutdownEverything();
             return;
         }
 
         openWindow(loaded);
     }
-    
+
     private void setupLogHandlerForErrorConsole() {
         Globals.handler = new CacheableHandler();
         ((Jdk14Logger)LOGGER).getLogger().addHandler(Globals.handler);
     }
-
-    private void setLanguage(JabRefPreferences prefs) {
-        String langStr = prefs.get(JabRefPreferences.LANGUAGE);
-        String[] parts = langStr.split("_");
-        String language;
-        String country;
-        if (parts.length == 1) {
-            language = langStr;
-            country = "";
-        }
-        else {
-            language = parts[0];
-            country = parts[1];
-        }
-
-        Localization.setLanguage(language, country);
-    }
-
-    // Do not use this code in release version, it contains some memory leaks
-    public static String getCurrentProcessExplicitAppUserModelID()
-    {
-        final PointerByReference r = new PointerByReference();
-
-        if (JabRef.GetCurrentProcessExplicitAppUserModelID(r).longValue() == 0)
-        {
-            final Pointer p = r.getValue();
-
-            return p.getString(0, true); // here we leak native memory by lazyness
-        }
-        return "N/A";
-    }
-
-    private static void setCurrentProcessExplicitAppUserModelID(final String appID)
-    {
-        if (JabRef.SetCurrentProcessExplicitAppUserModelID(new WString(appID)).longValue() != 0) {
-            throw new RuntimeException("unable to set current process explicit AppUserModelID to: " + appID);
-        }
-    }
-
-    private static native NativeLong GetCurrentProcessExplicitAppUserModelID(PointerByReference appID);
-
-    private static native NativeLong SetCurrentProcessExplicitAppUserModelID(WString appID);
-
-
-    static
-    {
-        if (OS.WINDOWS) {
-            Native.register("shell32");
-        }
-    }
-
 
     public Vector<ParserResult> processArguments(String[] args, boolean initialStartup) {
 
@@ -249,8 +177,6 @@ public class JabRef {
             cli.printUsage();
             return null; // TODO replace with optional one day
         }
-
-        boolean commandMode = cli.isDisableGui() || cli.isFetcherEngine();
 
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
@@ -289,9 +215,9 @@ public class JabRef {
         }
 
         // Vector to put imported/loaded database(s) in.
-        Vector<ParserResult> loaded = new Vector<ParserResult>();
-        Vector<String> toImport = new Vector<String>();
-        if (!cli.isBlank() && cli.getLeftOver().length > 0) {
+        Vector<ParserResult> loaded = new Vector<>();
+        Vector<String> toImport = new Vector<>();
+        if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // bib files to open. Other files, and files that could not be opened
@@ -302,12 +228,12 @@ public class JabRef {
                     pr = JabRef.openBibFile(aLeftOver, false);
                 }
 
-                if (pr == null || pr == ParserResult.INVALID_FORMAT) {
+                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
                     // been initiated by another instance through the remote
                     // listener, we will instead import it into the current database.
-                    // This will enable easy integration with web browers that can
+                    // This will enable easy integration with web browsers that can
                     // open a reference file in JabRef.
                     if (initialStartup) {
                         toImport.add(aLeftOver);
@@ -363,7 +289,7 @@ public class JabRef {
                 BibtexDatabase newBase = smng.getDBfromMatches(); //newBase contains only match entries
 
                 //export database
-                if (newBase != null && newBase.getEntryCount() > 0) {
+                if ((newBase != null) && (newBase.getEntryCount() > 0)) {
                     String formatName = null;
                     IExportFormat format;
 
@@ -450,7 +376,7 @@ public class JabRef {
                     }
                     MetaData metaData = pr.getMetaData();
                     metaData.setFile(theFile);
-                    Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                    Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(Globals.FILE_FIELD);
                     Globals.prefs.databaseFile = metaData.getFile();
                     System.out.println(Localization.lang("Exporting") + ": " + data[0]);
                     IExportFormat format = ExportFormats.getExportFormat(data[1]);
@@ -549,10 +475,10 @@ public class JabRef {
 
     /**
      * Run an entry fetcher from the command line.
-     * 
+     *
      * Note that this only works headlessly if the EntryFetcher does not show
      * any GUI.
-     * 
+     *
      * @param fetchCommand
      *            A string containing both the fetcher to use (id of
      *            EntryFetcherExtension minus Fetcher) and the search query,
@@ -562,8 +488,8 @@ public class JabRef {
      */
     private ParserResult fetch(String fetchCommand) {
 
-        if (fetchCommand == null || !fetchCommand.contains(":") ||
-                fetchCommand.split(":").length != 2) {
+        if ((fetchCommand == null) || !fetchCommand.contains(":") ||
+                (fetchCommand.split(":").length != 2)) {
             System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Localization.lang("The following fetchers are available:"));
             return null;
@@ -594,7 +520,7 @@ public class JabRef {
                 " " + Localization.lang("Please wait..."));
         Collection<BibtexEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
-        if (result == null || result.isEmpty()) {
+        if ((result == null) || result.isEmpty()) {
             System.out.println(Localization.lang(
                     "Query '%0' with fetcher '%1' did not return any results.", query, engine));
             return null;
@@ -649,7 +575,7 @@ public class JabRef {
             Double zoomLevel = null;
             while (keys.hasMoreElements()) {
                 Object key = keys.nextElement();
-                if (key instanceof String && ((String) key).endsWith(".font")) {
+                if ((key instanceof String) && ((String) key).endsWith(".font")) {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
                     if (zoomLevel == null) {
                         // zoomLevel not yet set, calculate it based on the first found font
@@ -666,10 +592,11 @@ public class JabRef {
     }
 
     private void openWindow(Vector<ParserResult> loaded) {
-        // Call the method performCompatibilityUpdate(), which does any
-        // necessary changes for users with a preference set from an older
-        // Jabref version.
-        PreferencesMigrations.performCompatibilityUpdate();
+        // Perform checks and changes for users with a preference set from an older
+        // JabRef version.
+        PreferencesMigrations.replaceAbstractField();
+        PreferencesMigrations.upgradeSortOrder();
+        PreferencesMigrations.upgradeFaultyEncodingStrings();
 
         // Set up custom or default icon theme:
         // This is now done at processArguments
@@ -687,7 +614,7 @@ public class JabRef {
         // Enabled since JabRef 2.11 beta 4
         System.setProperty("swing.aatext", "true");
         // Default is "on".
-        // "lcd" instead of "on" because of http://wiki.netbeans.org/FaqFontRendering and http://docs.oracle.com/javase/6/docs/technotes/guides/2d/flags.html#aaFonts 
+        // "lcd" instead of "on" because of http://wiki.netbeans.org/FaqFontRendering and http://docs.oracle.com/javase/6/docs/technotes/guides/2d/flags.html#aaFonts
         System.setProperty("awt.useSystemAAFontSettings", "lcd");
 
         // Set the Look & Feel for Swing.
@@ -698,7 +625,7 @@ public class JabRef {
         }
 
         // If the option is enabled, open the last edited databases, if any.
-        if (!cli.isBlank() && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED) && Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null) {
+        if (!cli.isBlank() && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED) && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
             // How to handle errors in the databases to open?
             String[] names = Globals.prefs.getStringArray(JabRefPreferences.LAST_EDITED);
             lastEdLoop: for (String name : names) {
@@ -707,7 +634,7 @@ public class JabRef {
                 for (int j = 0; j < loaded.size(); j++) {
                     ParserResult pr = loaded.elementAt(j);
 
-                    if (pr.getFile() != null && pr.getFile().equals(fileToOpen)) {
+                    if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
                         continue lastEdLoop;
                     }
                 }
@@ -739,9 +666,9 @@ public class JabRef {
         // Add all loaded databases to the frame:
 
         boolean first = true;
-        List<File> postponed = new ArrayList<File>();
-        List<ParserResult> failed = new ArrayList<ParserResult>();
-        List<ParserResult> toOpenTab = new ArrayList<ParserResult>();
+        List<File> postponed = new ArrayList<>();
+        List<ParserResult> failed = new ArrayList<>();
+        List<ParserResult> toOpenTab = new ArrayList<>();
         if (!loaded.isEmpty()) {
             for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
                 ParserResult pr = i.next();
@@ -837,7 +764,7 @@ public class JabRef {
         // Note that we have to check whether i does not go over baseCount().
         // This is because importToOpen might have been used, which adds to
         // loaded, but not to baseCount()
-        for (int i = 0; i < loaded.size() && i < JabRef.jrf.baseCount(); i++) {
+        for (int i = 0; (i < loaded.size()) && (i < JabRef.jrf.baseCount()); i++) {
             ParserResult pr = loaded.elementAt(i);
             BasePanel panel = JabRef.jrf.baseAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
@@ -902,7 +829,7 @@ public class JabRef {
             if (pr.hasWarnings()) {
                 String[] warn = pr.warnings();
                 for (String aWarn : warn) {
-                    System.out.println(Localization.lang("Warning") + ": " + aWarn);
+                    LOGGER.warn(aWarn);
                 }
 
             }
@@ -921,7 +848,7 @@ public class JabRef {
     private static ParserResult importFile(String argument) {
         String[] data = argument.split(",");
         try {
-            if (data.length > 1 && !"*".equals(data[1])) {
+            if ((data.length > 1) && !"*".equals(data[1])) {
                 System.out.println(Localization.lang("Importing") + ": " + data[0]);
                 try {
                     List<BibtexEntry> entries;
@@ -969,7 +896,7 @@ public class JabRef {
     }
 
     /**
-     * Will open a file (like importFile), but will also request JabRef to focus on this database 
+     * Will open a file (like importFile), but will also request JabRef to focus on this database
      * @param argument See importFile.
      * @return ParserResult with setToOpenTab(true)
      */

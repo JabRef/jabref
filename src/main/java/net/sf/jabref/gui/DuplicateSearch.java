@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 // created by : ?
 //
 // modified : r.nagel 2.09.2004
@@ -28,9 +28,10 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.worker.CallBack;
-import net.sf.jabref.logic.bibtex.DuplicateCheck;
+import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import spin.Spin;
@@ -39,7 +40,7 @@ public class DuplicateSearch implements Runnable {
 
     private final BasePanel panel;
     private BibtexEntry[] bes;
-    private final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
+    private final Vector<BibtexEntry[]> duplicates = new Vector<>();
 
 
     public DuplicateSearch(BasePanel bp) {
@@ -66,8 +67,9 @@ public class DuplicateSearch implements Runnable {
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st, "Searcher");
         int current = 0;
 
-        final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();
-        while (!st.finished() || current < duplicates.size())
+        final ArrayList<BibtexEntry> toRemove = new ArrayList<>();
+        final ArrayList<BibtexEntry> toAdd = new ArrayList<>();
+        while (!st.finished() || (current < duplicates.size()))
         {
 
             if (current >= duplicates.size())
@@ -80,6 +82,7 @@ public class DuplicateSearch implements Runnable {
                     {
                         duplicates.wait();
                     } catch (Exception ignored) {
+                        // Ignore
                     }
                 }
             } else // duplicates found
@@ -95,23 +98,22 @@ public class DuplicateSearch implements Runnable {
                             toRemove.add(be[1]);
                             duplicateCounter++;
                             continue;
-                        } else {
-                            askAboutExact = true;
                         }
+                        askAboutExact = true;
                     }
 
                     DuplicateCallBack cb = new DuplicateCallBack(panel.frame, be[0], be[1],
                             askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
-                                    DuplicateResolverDialog.DUPLICATE_SEARCH);
+                                DuplicateResolverDialog.DUPLICATE_SEARCH);
                     ((CallBack) Spin.over(cb)).update();
 
                     duplicateCounter++;
                     int answer = cb.getSelected();
-                    if (answer == DuplicateResolverDialog.KEEP_UPPER
-                            || answer == DuplicateResolverDialog.AUTOREMOVE_EXACT) {
+                    if ((answer == DuplicateResolverDialog.KEEP_UPPER)
+                            || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
                         toRemove.add(be[1]);
                         if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)
-                         {
+                        {
                             autoRemoveExactDuplicates = true; // Remember choice
                         }
                     } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
@@ -120,6 +122,10 @@ public class DuplicateSearch implements Runnable {
                         st.setFinished(); // thread killing
                         current = Integer.MAX_VALUE;
                         duplicateCounter--; // correct counter
+                    } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
+                        toRemove.add(be[0]);
+                        toRemove.add(be[1]);
+                        toAdd.add(cb.getMergedEntry());
                     }
                 }
             }
@@ -138,8 +144,17 @@ public class DuplicateSearch implements Runnable {
                     }
                     panel.markBaseChanged();
                 }
+                // and adding merged entries:
+                if (!toAdd.isEmpty()) {
+                    for (BibtexEntry entry : toAdd) {
+                        panel.database.insertEntry(entry);
+                        ce.addEdit(new UndoableInsertEntry(panel.database, entry, panel));
+                    }
+                    panel.markBaseChanged();
+                }
+
                 panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size()
-                        + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
+                + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
 
                 ce.end();
                 panel.undoManager.addEdit(ce);
@@ -157,8 +172,8 @@ public class DuplicateSearch implements Runnable {
 
         @Override
         public void run() {
-            for (int i = 0; i < bes.length - 1 && !finished; i++) {
-                for (int j = i + 1; j < bes.length && !finished; j++) {
+            for (int i = 0; (i < (bes.length - 1)) && !finished; i++) {
+                for (int j = i + 1; (j < bes.length) && !finished; j++) {
                     boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]);
 
                     // If (suspected) duplicates, add them to the duplicates vector.
@@ -197,6 +212,7 @@ public class DuplicateSearch implements Runnable {
         private final BibtexEntry one;
         private final BibtexEntry two;
         private final int dialogType;
+        private BibtexEntry merged;
 
 
         public DuplicateCallBack(JabRefFrame frame, BibtexEntry one, BibtexEntry two,
@@ -212,12 +228,17 @@ public class DuplicateSearch implements Runnable {
             return reply;
         }
 
+        public BibtexEntry getMergedEntry() {
+            return merged;
+        }
+
         @Override
         public void update() {
             diag = new DuplicateResolverDialog(frame, one, two, dialogType);
             diag.setVisible(true);
             diag.dispose();
             reply = diag.getSelected();
+            merged = diag.getMergedEntry();
         }
     }
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.logic.xmp;
 
 import java.io.*;
@@ -26,7 +26,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -49,18 +49,18 @@ import org.apache.pdfbox.pdmodel.common.PDMetadata;
 /**
  * XMPUtils provide support for reading and writing BibTex data as XMP-Metadata
  * in PDF-documents.
- * 
+ *
  * @author Christopher Oezbek <oezi@oezi.de>
- * 
+ *
  * TODO:
- * 
+ *
  * Synchronization
  */
 public class XMPUtil {
 
     /**
      * Convenience method for readXMP(File).
-     * 
+     *
      * @param filename
      *            The filename from which to open the file.
      * @return BibtexEntryies found in the PDF or an empty list
@@ -73,15 +73,15 @@ public class XMPUtil {
     /**
      * Try to write the given BibTexEntry in the XMP-stream of the given
      * PDF-file.
-     * 
+     *
      * Throws an IOException if the file cannot be read or written, so the user
      * can remove a lock or cancel the operation.
-     * 
+     *
      * The method will overwrite existing BibTeX-XMP-data, but keep other
      * existing metadata.
-     * 
+     *
      * This is a convenience method for writeXMP(File, BibtexEntry).
-     * 
+     *
      * @param filename
      *            The filename from which to open the file.
      * @param entry
@@ -102,44 +102,37 @@ public class XMPUtil {
 
     /**
      * Try to read the BibTexEntries from the XMP-stream of the given PDF-file.
-     * 
+     *
      * @param file
      *            The file to read from.
-     * 
+     *
      * @throws IOException
      *             Throws an IOException if the file cannot be read, so the user
      *             than remove a lock or cancel the operation.
      */
     public static List<BibtexEntry> readXMP(File file) throws IOException {
-        FileInputStream is = new FileInputStream(file);
-        try {
+        try (FileInputStream is = new FileInputStream(file)) {
             return XMPUtil.readXMP(is);
-        } finally {
-            is.close();
         }
     }
 
     /**
      * Try to read the given BibTexEntry from the XMP-stream of the given
      * inputstream containing a PDF-file.
-     * 
+     *
      * @param inputStream
      *            The inputstream to read from.
-     * 
+     *
      * @throws IOException
      *             Throws an IOException if the file cannot be read, so the user
      *             than remove a lock or cancel the operation.
      */
-    @SuppressWarnings("unchecked")
     public static List<BibtexEntry> readXMP(InputStream inputStream)
             throws IOException {
 
-        List<BibtexEntry> result = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> result = new LinkedList<>();
 
-        PDDocument document = null;
-
-        try {
-            document = PDDocument.load(inputStream);
+        try (PDDocument document = PDDocument.load(inputStream)) {
             if (document.isEncrypted()) {
                 throw new EncryptionNotSupportedException(
                         "Error: Cannot read metadata from encrypted document.");
@@ -182,10 +175,6 @@ public class XMPUtil {
                     result.add(entry);
                 }
             }
-        } finally {
-            if (document != null) {
-                document.close();
-            }
         }
 
         // return null, if no metadata was found
@@ -198,19 +187,18 @@ public class XMPUtil {
     /**
      * Helper function for retrieving a BibtexEntry from the
      * PDDocumentInformation in a PDF file.
-     * 
+     *
      * To understand how to get hold of a PDDocumentInformation have a look in
      * the test cases for XMPUtil.
-     * 
+     *
      * The BibtexEntry is build by mapping individual fields in the document
      * information (like author, title, keywords) to fields in a bibtex entry.
-     * 
+     *
      * @param di
      *            The document information from which to build a BibtexEntry.
-     * 
+     *
      * @return The bibtex entry found in the document information.
      */
-    @SuppressWarnings("unchecked")
     public static BibtexEntry getBibtexEntryFromDocumentInformation(
             PDDocumentInformation di) {
 
@@ -255,25 +243,24 @@ public class XMPUtil {
         }
 
         // Return null if no values were found
-        return !entry.getAllFields().isEmpty() ? entry : null;
+        return !entry.getFieldNames().isEmpty() ? entry : null;
     }
 
     /**
      * Helper function for retrieving a BibtexEntry from the DublinCore metadata
      * in a PDF file.
-     * 
+     *
      * To understand how to get hold of a XMPSchemaDublinCore have a look in the
      * test cases for XMPUtil.
-     * 
+     *
      * The BibtexEntry is build by mapping individual fields in the dublin core
      * (like creator, title, subject) to fields in a bibtex entry.
-     * 
+     *
      * @param dcSchema
      *            The document information from which to build a BibtexEntry.
-     * 
+     *
      * @return The bibtex entry found in the document information.
      */
-    @SuppressWarnings("unchecked")
     public static BibtexEntry getBibtexEntryFromDublinCore(
             XMPSchemaDublinCore dcSchema) {
 
@@ -323,13 +310,13 @@ public class XMPUtil {
          * Year + Month -> Date
          */
         List<String> dates = dcSchema.getSequenceList("dc:date");
-        if (dates != null && !dates.isEmpty()) {
+        if ((dates != null) && !dates.isEmpty()) {
             String date = dates.get(0).trim();
             Calendar c = null;
             try {
                 c = DateConverter.toCalendar(date);
             } catch (Exception ignored) {
-
+                // Ignored
             }
             if (c != null) {
                 entry.setField("year", String.valueOf(c.get(Calendar.YEAR)));
@@ -377,7 +364,7 @@ public class XMPUtil {
 
         /**
          * Relation -> bibtexkey
-         * 
+         *
          * We abuse the relationship attribute to store all other values in the
          * bibtex document
          */
@@ -442,7 +429,7 @@ public class XMPUtil {
          * Type -> Type
          */
         List<String> l = dcSchema.getTypes();
-        if (l != null && !l.isEmpty()) {
+        if ((l != null) && !l.isEmpty()) {
             s = l.get(0);
             if (s != null) {
                 BibtexEntryType type = BibtexEntryType.getStandardType(s);
@@ -452,21 +439,21 @@ public class XMPUtil {
             }
         }
 
-        return !entry.getAllFields().isEmpty() ? entry : null;
+        return !entry.getFieldNames().isEmpty() ? entry : null;
     }
 
     /**
      * Try to write the given BibTexEntry in the XMP-stream of the given
      * PDF-file.
-     * 
+     *
      * Throws an IOException if the file cannot be read or written, so the user
      * can remove a lock or cancel the operation.
-     * 
+     *
      * The method will overwrite existing BibTeX-XMP-data, but keep other
      * existing metadata.
-     * 
+     *
      * This is a convenience method for writeXMP(File, Collection).
-     * 
+     *
      * @param file
      *            The file to write to.
      * @param entry
@@ -482,16 +469,16 @@ public class XMPUtil {
      */
     public static void writeXMP(File file, BibtexEntry entry,
             BibtexDatabase database) throws IOException, TransformerException {
-        List<BibtexEntry> l = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> l = new LinkedList<>();
         l.add(entry);
         XMPUtil.writeXMP(file, l, database, true);
     }
 
     /**
      * Write the given BibtexEntries as XMP-metadata text to the given stream.
-     * 
+     *
      * The text that is written to the stream contains a complete XMP-document.
-     * 
+     *
      * @param bibtexEntries
      *            The BibtexEntries to write XMP-metadata for.
      * @param database
@@ -502,13 +489,13 @@ public class XMPUtil {
      *             Thrown if the bibtexEntries could not transformed to XMP.
      * @throws IOException
      *             Thrown if an IOException occured while writing to the stream.
-     * 
+     *
      * @see #toXMP(java.util.Collection, BibtexDatabase) if you don't need strings to be
      *      resolved.
      */
     private static void toXMP(Collection<BibtexEntry> bibtexEntries,
-                              BibtexDatabase database, OutputStream outputStream)
-            throws IOException, TransformerException {
+            BibtexDatabase database, OutputStream outputStream)
+                    throws IOException, TransformerException {
 
         if (database != null) {
             bibtexEntries = database.resolveForStrings(bibtexEntries, true);
@@ -529,11 +516,11 @@ public class XMPUtil {
      * Convenience method for toXMP(Collection<BibtexEntry>, BibtexDatabase,
      * OutputStream) returning a String containing the XMP-metadata of the given
      * collection of BibtexEntries.
-     * 
+     *
      * The resulting metadata string is wrapped as a complete XMP-document.
-     * 
+     *
      * @param bibtexEntries
-     *            The BibtexEntries to return XMP-metadata for. 
+     *            The BibtexEntries to return XMP-metadata for.
      * @param database
      *            maybenull An optional database which the given bibtex entries
      *            belong to, which will be used to resolve strings. If the
@@ -556,7 +543,7 @@ public class XMPUtil {
     /**
      * Will read the XMPMetadata from the given pdf file, closing the file
      * afterwards.
-     * 
+     *
      * @param inputStream
      *            The inputStream representing a PDF-file to read the
      *            XMPMetadata from.
@@ -564,23 +551,14 @@ public class XMPUtil {
      *         found.
      * @throws IOException
      */
-    private static XMPMetadata readRawXMP(InputStream inputStream)
-            throws IOException {
-        PDDocument document = null;
-
-        try {
-            document = PDDocument.load(inputStream);
+    private static XMPMetadata readRawXMP(InputStream inputStream) throws IOException {
+        try (PDDocument document = PDDocument.load(inputStream)) {
             if (document.isEncrypted()) {
-                throw new EncryptionNotSupportedException(
-                        "Error: Cannot read metadata from encrypted document.");
+                throw new EncryptionNotSupportedException("Error: Cannot read metadata from encrypted document.");
             }
 
             return XMPUtil.getXMPMetadata(document);
 
-        } finally {
-            if (document != null) {
-                document.close();
-            }
         }
     }
 
@@ -601,7 +579,7 @@ public class XMPUtil {
     /**
      * Will read the XMPMetadata from the given pdf file, closing the file
      * afterwards.
-     * 
+     *
      * @param file
      *            The file to read the XMPMetadata from.
      * @return The XMPMetadata object found in the file or null if none is
@@ -609,16 +587,13 @@ public class XMPUtil {
      * @throws IOException
      */
     public static XMPMetadata readRawXMP(File file) throws IOException {
-        FileInputStream is = new FileInputStream(file);
-        try {
+        try (FileInputStream is = new FileInputStream(file)) {
             return XMPUtil.readRawXMP(is);
-        } finally {
-            is.close();
         }
     }
 
     private static void writeToDCSchema(XMPSchemaDublinCore dcSchema,
-                                        BibtexEntry entry, BibtexDatabase database) {
+            BibtexEntry entry, BibtexDatabase database) {
 
         if (database != null) {
             entry = database.resolveForStrings(entry, false);
@@ -629,11 +604,12 @@ public class XMPUtil {
         boolean useXmpPrivacyFilter =
                 prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
         // Fields for which not to write XMP data later on:
-        TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
+        TreeSet<String> filters = new TreeSet<>(
+                Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 
         // Set all the values including key and entryType
 
-        for (String field : entry.getAllFields()) {
+        for (String field : entry.getFieldNames()) {
 
             if (useXmpPrivacyFilter && filters.contains(field)) {
                 continue;
@@ -644,16 +620,16 @@ public class XMPUtil {
 
                 /**
                  * Editor -> Contributor
-                 * 
+                 *
                  * Field: dc:contributor
-                 * 
+                 *
                  * Type: bag ProperName
-                 * 
+                 *
                  * Category: External
-                 * 
+                 *
                  * Description: Contributors to the resource (other than the
                  * authors).
-                 * 
+                 *
                  * Bibtex-Fields used: editor
                  */
 
@@ -669,24 +645,24 @@ public class XMPUtil {
 
             /**
              * ? -> Coverage
-             * 
+             *
              * Unmapped
-             * 
+             *
              * dc:coverage Text External The extent or scope of the resource.
              */
 
             /**
              * Author -> Creator
-             * 
+             *
              * Field: dc:creator
-             * 
+             *
              * Type: seq ProperName
-             * 
+             *
              * Category: External
-             * 
+             *
              * Description: The authors of the resource (listed in order of
              * precedence, if significant).
-             * 
+             *
              * Bibtex-Fields used: author
              */
             if (field.equals("author")) {
@@ -709,16 +685,16 @@ public class XMPUtil {
 
                 /**
                  * Year + Month -> Date
-                 * 
+                 *
                  * Field: dc:date
-                 * 
+                 *
                  * Type: seq Date
-                 * 
+                 *
                  * Category: External
-                 * 
+                 *
                  * Description: Date(s) that something interesting happened to
                  * the resource.
-                 * 
+                 *
                  * Bibtex-Fields used: year, month
                  */
                 String publicationDate = Util.getPublicationDate(entry);
@@ -729,16 +705,16 @@ public class XMPUtil {
             }
             /**
              * Abstract -> Description
-             * 
+             *
              * Field: dc:description
-             * 
+             *
              * Type: Lang Alt
-             * 
+             *
              * Category: External
-             * 
+             *
              * Description: A textual description of the content of the
              * resource. Multiple values may be present for different languages.
-             * 
+             *
              * Bibtex-Fields used: abstract
              */
             if (field.equals("abstract")) {
@@ -749,15 +725,15 @@ public class XMPUtil {
 
             /**
              * DOI -> identifier
-             * 
+             *
              * Field: dc:identifier
-             * 
+             *
              * Type: Text
-             * 
+             *
              * Category: External
-             * 
+             *
              * Description: Unique identifier of the resource.
-             * 
+             *
              * Bibtex-Fields used: doi
              */
             if (field.equals("doi")) {
@@ -768,24 +744,24 @@ public class XMPUtil {
 
             /**
              * ? -> Language
-             * 
+             *
              * Unmapped
-             * 
+             *
              * dc:language bag Locale Internal An unordered array specifying the
              * languages used in the resource.
              */
 
             /**
              * Publisher -> Publisher
-             * 
+             *
              * Field: dc:publisher
-             * 
+             *
              * Type: bag ProperName
-             * 
+             *
              * Category: External
-             * 
+             *
              * Description: Publishers.
-             * 
+             *
              * Bibtex-Fields used: doi
              */
             if (field.equals("publisher")) {
@@ -796,34 +772,34 @@ public class XMPUtil {
 
             /**
              * ? -> Rights
-             * 
+             *
              * Unmapped
-             * 
+             *
              * dc:rights Lang Alt External Informal rights statement, selected
              * by language.
              */
 
             /**
              * ? -> Source
-             * 
+             *
              * Unmapped
-             * 
+             *
              * dc:source Text External Unique identifier of the work from which
              * this resource was derived.
              */
 
             /**
              * Keywords -> Subject
-             * 
+             *
              * Field: dc:subject
-             * 
+             *
              * Type: bag Text
-             * 
+             *
              * Category: External
-             * 
+             *
              * Description: An unordered array of descriptive phrases or
              * keywords that specify the topic of the content of the resource.
-             * 
+             *
              * Bibtex-Fields used: doi
              */
             if (field.equals("keywords")) {
@@ -837,17 +813,17 @@ public class XMPUtil {
 
             /**
              * Title -> Title
-             * 
+             *
              * Field: dc:title
-             * 
+             *
              * Type: Lang Alt
-             * 
+             *
              * Category: External
-             * 
+             *
              * Description: The title of the document, or the name given to the
              * resource. Typically, it will be a name by which the resource is
              * formally known.
-             * 
+             *
              * Bibtex-Fields used: title
              */
             if (field.equals("title")) {
@@ -858,15 +834,15 @@ public class XMPUtil {
 
             /**
              * bibtextype -> relation
-             * 
+             *
              * Field: dc:relation
-             * 
+             *
              * Type: bag Text
-             * 
+             *
              * Category: External
-             * 
+             *
              * Description: Relationships to other documents.
-             * 
+             *
              * Bibtex-Fields used: bibtextype
              */
             /**
@@ -879,9 +855,9 @@ public class XMPUtil {
 
         /**
          * ? -> Format
-         * 
+         *
          * Unmapped
-         * 
+         *
          * dc:format MIMEType Internal The file format used when saving the
          * resource. Tools and applications should set this property to the save
          * format of the data. It may include appropriate qualifiers.
@@ -890,16 +866,16 @@ public class XMPUtil {
 
         /**
          * Type -> Type
-         * 
+         *
          * Field: dc:type
-         * 
+         *
          * Type: bag open Choice
-         * 
+         *
          * Category: External
-         * 
+         *
          * Description: A document type; for example, novel, poem, or working
          * paper.
-         * 
+         *
          * Bibtex-Fields used: title
          */
         Object o = entry.getType().getName();
@@ -910,9 +886,9 @@ public class XMPUtil {
 
     /**
      * Try to write the given BibTexEntry as a DublinCore XMP Schema
-     * 
+     *
      * Existing DublinCore schemas in the document are not modified.
-     * 
+     *
      * @param document
      *            The pdf document to write to.
      * @param entry
@@ -927,7 +903,7 @@ public class XMPUtil {
     public static void writeDublinCore(PDDocument document, BibtexEntry entry,
             BibtexDatabase database) throws IOException, TransformerException {
 
-        List<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        List<BibtexEntry> entries = new ArrayList<>();
         entries.add(entry);
 
         XMPUtil.writeDublinCore(document, entries, database);
@@ -935,9 +911,9 @@ public class XMPUtil {
 
     /**
      * Try to write the given BibTexEntries as DublinCore XMP Schemas
-     * 
+     *
      * Existing DublinCore schemas in the document are removed
-     * 
+     *
      * @param document
      *            The pdf document to write to.
      * @param entries
@@ -949,10 +925,9 @@ public class XMPUtil {
      * @throws IOException
      * @throws TransformerException
      */
-    @SuppressWarnings("unchecked")
     private static void writeDublinCore(PDDocument document,
-                                        Collection<BibtexEntry> entries, BibtexDatabase database)
-            throws IOException, TransformerException {
+            Collection<BibtexEntry> entries, BibtexDatabase database)
+                    throws IOException, TransformerException {
 
         if (database != null) {
             entries = database.resolveForStrings(entries, false);
@@ -992,10 +967,10 @@ public class XMPUtil {
     /**
      * Try to write the given BibTexEntry in the Document Information (the
      * properties of the pdf).
-     * 
+     *
      * Existing fields values are overriden if the bibtex entry has the
      * corresponding value set.
-     * 
+     *
      * @param document
      *            The pdf document to write to.
      * @param entry
@@ -1006,7 +981,7 @@ public class XMPUtil {
      *            database is null the strings will not be resolved.
      */
     private static void writeDocumentInformation(PDDocument document,
-                                                 BibtexEntry entry, BibtexDatabase database) {
+            BibtexEntry entry, BibtexDatabase database) {
 
         PDDocumentInformation di = document.getDocumentInformation();
 
@@ -1019,10 +994,11 @@ public class XMPUtil {
         boolean useXmpPrivacyFilter =
                 prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
         // Fields for which not to write XMP data later on:
-        TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
+        TreeSet<String> filters = new TreeSet<>(
+                Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 
         // Set all the values including key and entryType
-        Set<String> fields = entry.getAllFields();
+        Set<String> fields = entry.getFieldNames();
 
         for (String field : fields) {
 
@@ -1057,20 +1033,20 @@ public class XMPUtil {
             }
         }
         di
-                .setCustomMetadataValue("bibtex/entrytype", entry.getType()
-                        .getName());
+        .setCustomMetadataValue("bibtex/entrytype", entry.getType()
+                .getName());
     }
 
     /**
      * Try to write the given BibTexEntry in the XMP-stream of the given
      * PDF-file.
-     * 
+     *
      * Throws an IOException if the file cannot be read or written, so the user
      * can remove a lock or cancel the operation.
-     * 
+     *
      * The method will overwrite existing BibTeX-XMP-data, but keep other
      * existing metadata.
-     * 
+     *
      * @param file
      *            The file to write the entries to.
      * @param bibtexEntries
@@ -1086,7 +1062,6 @@ public class XMPUtil {
      * @throws IOException
      *             If the file could not be written to or could not be found.
      */
-    @SuppressWarnings("unchecked")
     public static void writeXMP(File file,
             Collection<BibtexEntry> bibtexEntries, BibtexDatabase database,
             boolean writePDFInfo) throws IOException, TransformerException {
@@ -1095,16 +1070,13 @@ public class XMPUtil {
             bibtexEntries = database.resolveForStrings(bibtexEntries, false);
         }
 
-        PDDocument document = null;
-
-        try {
-            document = PDDocument.load(file.getAbsoluteFile());
+        try (PDDocument document = PDDocument.load(file.getAbsoluteFile())) {
             if (document.isEncrypted()) {
                 throw new EncryptionNotSupportedException(
                         "Error: Cannot add metadata to encrypted document.");
             }
 
-            if (writePDFInfo && bibtexEntries.size() == 1) {
+            if (writePDFInfo && (bibtexEntries.size() == 1)) {
                 XMPUtil.writeDocumentInformation(document, bibtexEntries
                         .iterator().next(), null);
                 XMPUtil.writeDublinCore(document, bibtexEntries, null);
@@ -1152,16 +1124,12 @@ public class XMPUtil {
                         + e.getLocalizedMessage());
             }
 
-        } finally {
-            if (document != null) {
-                document.close();
-            }
         }
     }
 
     /**
      * Print usage information for the command line tool xmpUtil.
-     * 
+     *
      * @see XMPUtil#main(String[])
      */
     private static void usage() {
@@ -1173,20 +1141,20 @@ public class XMPUtil {
         System.out.println("Read from PDF and print raw XMP:");
         System.out.println("  xmpUtil -x <pdf>");
         System.out
-                .println("Write the entry in <bib> given by <key> to the PDF:");
+        .println("Write the entry in <bib> given by <key> to the PDF:");
         System.out.println("  xmpUtil <key> <bib> <pdf>");
         System.out.println("Write all entries in <bib> to the PDF:");
         System.out.println("  xmpUtil <bib> <pdf>");
         System.out.println("");
         System.out
-                .println("To report bugs visit http://jabref.sourceforge.net");
+        .println("To report bugs visit http://jabref.sourceforge.net");
     }
 
     /**
      * Command-line tool for working with XMP-data.
-     * 
+     *
      * Read or write XMP-metadata from or to pdf file.
-     * 
+     *
      * Usage:
      * <dl>
      * <dd>Read from PDF and print as bibtex:</dd>
@@ -1198,7 +1166,7 @@ public class XMPUtil {
      * <dd>Write all entries in BIB to the PDF:</dd>
      * <dt>xmpUtil BIB PDF</dt>
      * </dl>
-     * 
+     *
      * @param args
      *            Command line strings passed to utility.
      * @throws IOException
@@ -1207,7 +1175,7 @@ public class XMPUtil {
      *             If the given BibtexEntry is malformed.
      */
     public static void main(String[] args) throws IOException,
-            TransformerException {
+    TransformerException {
 
         // Don't forget to initialize the preferences
         if (Globals.prefs == null) {
@@ -1234,9 +1202,38 @@ public class XMPUtil {
 
             } else if (args[0].endsWith(".bib")) {
                 // Read from bib and write as XMP
+                try (FileReader fr = new FileReader(args[0])) {
+                    ParserResult result = BibtexParser.parse(fr);
+                    Collection<BibtexEntry> entries = result.getDatabase().getEntries();
 
+                    if (entries.isEmpty()) {
+                        System.err.println("Could not find BibtexEntry in " + args[0]);
+                    } else {
+                        System.out.println(XMPUtil.toXMP(entries, result.getDatabase()));
+                    }
+                }
+            } else {
+                XMPUtil.usage();
+            }
+            break;
+        case 2:
+            if (args[0].equals("-x") && args[1].endsWith(".pdf")) {
+                // Read from pdf and write as BibTex
+                XMPMetadata meta = XMPUtil.readRawXMP(new File(args[1]));
+
+                if (meta == null) {
+                    System.err
+                    .println("The given pdf does not contain any XMP-metadata.");
+                } else {
+                    XMLUtil.save(meta.getXMPDocument(), System.out, "UTF-8");
+                }
+                break;
+            }
+
+            if (args[0].endsWith(".bib") && args[1].endsWith(".pdf")) {
                 ParserResult result = BibtexParser
                         .parse(new FileReader(args[0]));
+
                 Collection<BibtexEntry> entries = result.getDatabase()
                         .getEntries();
 
@@ -1244,69 +1241,36 @@ public class XMPUtil {
                     System.err.println("Could not find BibtexEntry in "
                             + args[0]);
                 } else {
-                    System.out.println(XMPUtil.toXMP(entries, result
-                            .getDatabase()));
-                }
-
-            } else {
-                XMPUtil.usage();
-            }
-            break;
-            case 2:
-                if (args[0].equals("-x") && args[1].endsWith(".pdf")) {
-                    // Read from pdf and write as BibTex
-                    XMPMetadata meta = XMPUtil.readRawXMP(new File(args[1]));
-
-                    if (meta == null) {
-                        System.err
-                                .println("The given pdf does not contain any XMP-metadata.");
-                    } else {
-                        XMLUtil.save(meta.getXMPDocument(), System.out, "UTF-8");
-                    }
-                    break;
-                }
-
-                if (args[0].endsWith(".bib") && args[1].endsWith(".pdf")) {
-                    ParserResult result = BibtexParser
-                            .parse(new FileReader(args[0]));
-
-                    Collection<BibtexEntry> entries = result.getDatabase()
-                            .getEntries();
-
-                    if (entries.isEmpty()) {
-                        System.err.println("Could not find BibtexEntry in "
-                                + args[0]);
-                    } else {
-                        XMPUtil.writeXMP(new File(args[1]), entries, result
-                                .getDatabase(), false);
-                        System.out.println("XMP written.");
-                    }
-                    break;
-                }
-
-                XMPUtil.usage();
-                break;
-            case 3:
-                if (!args[1].endsWith(".bib") && !args[2].endsWith(".pdf")) {
-                    XMPUtil.usage();
-                    break;
-                }
-
-                ParserResult result = BibtexParser.parse(new FileReader(args[1]));
-
-                BibtexEntry e = result.getDatabase().getEntryByKey(args[0]);
-
-                if (e == null) {
-                    System.err.println("Could not find BibtexEntry " + args[0]
-                            + " in " + args[0]);
-                } else {
-                    XMPUtil.writeXMP(new File(args[2]), e, result.getDatabase());
-
+                    XMPUtil.writeXMP(new File(args[1]), entries, result
+                            .getDatabase(), false);
                     System.out.println("XMP written.");
                 }
                 break;
+            }
 
-            default:
+            XMPUtil.usage();
+            break;
+        case 3:
+            if (!args[1].endsWith(".bib") && !args[2].endsWith(".pdf")) {
+                XMPUtil.usage();
+                break;
+            }
+
+            ParserResult result = BibtexParser.parse(new FileReader(args[1]));
+
+            BibtexEntry e = result.getDatabase().getEntryByKey(args[0]);
+
+            if (e == null) {
+                System.err.println("Could not find BibtexEntry " + args[0]
+                        + " in " + args[0]);
+            } else {
+                XMPUtil.writeXMP(new File(args[2]), e, result.getDatabase());
+
+                System.out.println("XMP written.");
+            }
+            break;
+
+        default:
             XMPUtil.usage();
         }
     }
@@ -1314,10 +1278,10 @@ public class XMPUtil {
     /**
      * Will try to read XMP metadata from the given file, returning whether
      * metadata was found.
-     * 
+     *
      * Caution: This method is as expensive as it is reading the actual metadata
      * itself from the PDF.
-     * 
+     *
      * @param is
      *            The inputstream to read the PDF from.
      * @return whether a BibtexEntry was found in the given PDF.

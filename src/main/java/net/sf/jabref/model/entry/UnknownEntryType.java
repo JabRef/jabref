@@ -22,17 +22,15 @@ import net.sf.jabref.model.database.BibtexDatabase;
  * during bibtex parsing. The only known information is the type name.
  * This is useful if the bibtex file contains type definitions that are used
  * in the file - because the entries will be parsed before the type definitions
- * are found. In the meantime, the entries will be assigned an 
+ * are found. In the meantime, the entries will be assigned an
  * UnknownEntryType giving the name.
  */
 public class UnknownEntryType extends BibtexEntryType {
 
     private final String name;
-    private final String[] fields = new String[0];
 
-
-    public UnknownEntryType(String name_) {
-        name = name_;
+    public UnknownEntryType(String name) {
+        this.name = name;
     }
 
     @Override
@@ -40,15 +38,6 @@ public class UnknownEntryType extends BibtexEntryType {
         return name;
     }
 
-    @Override
-    public String[] getOptionalFields() {
-        return fields;
-    }
-
-    @Override
-    public String[] getRequiredFields() {
-        return fields;
-    }
 
     @Override
     public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.importer.ImportFormatReader;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import net.sf.jabref.gui.BibtexFields;
+
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
@@ -64,8 +64,8 @@ public class CsaImporter extends ImportFormat {
     private static final String MONS =
             "jan feb mar apr may jun jul aug sep oct nov dec";
     private static final String[] MONTHS =
-    {"January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"};
+        {"January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"};
 
 
     /**
@@ -95,7 +95,7 @@ public class CsaImporter extends ImportFormat {
     }
 
     // append to the "note" field
-    private void addNote(HashMap<String, String> hm, String note) {
+    private static void addNote(HashMap<String, String> hm, String note) {
 
         StringBuilder notebuf = new StringBuilder();
         if (hm.get("note") != null) {
@@ -107,7 +107,7 @@ public class CsaImporter extends ImportFormat {
     }
 
     // parse the date from the Source field
-    private String parseDate(HashMap<String, String> hm, String fstr) {
+    private static String parseDate(HashMap<String, String> hm, String fstr) {
 
         // find LAST matching date in string
         int match = -1;
@@ -133,11 +133,11 @@ public class CsaImporter extends ImportFormat {
         if (day == null) {
             day = pm.group(5);
         } else if (pm.group(5) != null)
-         {
+        {
             return fstr; // possible day found in two places
         }
 
-        if (day != null && !day.equals("0")) {
+        if ((day != null) && !day.equals("0")) {
             date.append(day);
             date.append(" ");
         } else {
@@ -148,7 +148,7 @@ public class CsaImporter extends ImportFormat {
         if (mon == null) {
             mon = pm.group(4);
         } else if (pm.group(4) != null)
-         {
+        {
             return fstr; // possible month found in two places
         }
 
@@ -172,7 +172,7 @@ public class CsaImporter extends ImportFormat {
         date.append(year);
 
         StringBuilder note = new StringBuilder();
-        if (day != null && !day.equals("0")) {
+        if ((day != null) && !day.equals("0")) {
             note.append("Source Date: ");
             note.append(date);
             note.append(".");
@@ -229,9 +229,9 @@ public class CsaImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
 
         BufferedReader in =
                 new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -242,7 +242,7 @@ public class CsaImporter extends ImportFormat {
         line = 1;
         str = readLine(in);
         while (true) {
-            if (str == null || str.isEmpty()) { // end of record
+            if ((str == null) || str.isEmpty()) { // end of record
                 if (!hm.isEmpty()) { // have a record
                     if (Type == null) {
                         addNote(hm, "Publication Type: [NOT SPECIFIED]");
@@ -252,14 +252,14 @@ public class CsaImporter extends ImportFormat {
 
                     // post-process Journal article
                     if (Type.equals("article") &&
-                            hm.get("booktitle") != null) {
+                            (hm.get("booktitle") != null)) {
                         String booktitle = hm.get("booktitle");
                         hm.remove("booktitle");
                         hm.put("journal", booktitle);
                     }
 
                     BibtexEntry b =
-                            new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
+                            new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
                                     BibtexEntryTypes.getEntryType(Type));
 
                     // create one here
@@ -270,7 +270,7 @@ public class CsaImporter extends ImportFormat {
                 hm.clear(); // ready for next record
                 first = true;
                 if (str == null)
-                 {
+                {
                     break; // end of file
                 }
                 str = readLine(in);
@@ -289,7 +289,7 @@ public class CsaImporter extends ImportFormat {
                 sb.setLength(0); // clear the buffer
                 while ((str = readLine(in)) != null) {
                     if (!str.startsWith("    "))
-                     {
+                    {
                         break; // nope
                     }
                     if (sb.length() > 0) {
@@ -338,11 +338,11 @@ public class CsaImporter extends ImportFormat {
                             Type = "inproceedings";
                             break;
                         } else if (type.equals("book monograph") &&
-                                Type == null) {
+                                (Type == null)) {
                             Type = "book";
                             break;
                         } else if (type.equals("report") &&
-                                Type == null) {
+                                (Type == null)) {
                             Type = "techreport";
                             break;
                         }
@@ -401,7 +401,7 @@ public class CsaImporter extends ImportFormat {
                         } else if (lines[ii].endsWith("]")) {
                             int len = lines[ii].length();
                             urls.append(lines[ii].substring(0, len - 1));
-                            if (ii < lines.length - 1) {
+                            if (ii < (lines.length - 1)) {
                                 urls.append("\n");
                             }
                         } else {
@@ -470,14 +470,14 @@ public class CsaImporter extends ImportFormat {
                     }
 
                     if (fstr.equals(""))
-                     {
+                    {
                         continue;
-                    //		    System.out.println("SOURCE: \"" + fstr + "\"");
+                        //		    System.out.println("SOURCE: \"" + fstr + "\"");
                     }
                 } else if (fabbr.equals("TI")) {
                     ftype = "title";
                 } else if (fabbr.equals("RE"))
-                 {
+                {
                     continue; // throw away References
                 }
 

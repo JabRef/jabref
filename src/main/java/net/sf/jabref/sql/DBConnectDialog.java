@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.sql;
 
 import java.awt.BorderLayout;
@@ -26,7 +26,7 @@ import javax.swing.*;
 import net.sf.jabref.Globals;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -38,7 +38,7 @@ import net.sf.jabref.logic.l10n.Localization;
 public class DBConnectDialog extends JDialog {
 
     // input fields
-    private final JComboBox cmbServerType = new JComboBox();
+    private final JComboBox<String> cmbServerType = new JComboBox<>();
     private final JTextField txtServerHostname = new JTextField(40);
     private final JTextField txtDatabase = new JTextField(40);
     private final JTextField txtUsername = new JTextField(40);
@@ -60,7 +60,7 @@ public class DBConnectDialog extends JDialog {
         dbStrings = dbs;
 
         // build collections of components
-        ArrayList<JLabel> lhs = new ArrayList<JLabel>();
+        ArrayList<JLabel> lhs = new ArrayList<>();
         JLabel lblServerType = new JLabel();
         lhs.add(lblServerType);
         JLabel lblServerHostname = new JLabel();
@@ -72,7 +72,7 @@ public class DBConnectDialog extends JDialog {
         JLabel lblPassword = new JLabel();
         lhs.add(lblPassword);
 
-        ArrayList<JComponent> rhs = new ArrayList<JComponent>();
+        ArrayList<JComponent> rhs = new ArrayList<>();
         rhs.add(cmbServerType);
         rhs.add(txtServerHostname);
         rhs.add(txtDatabase);
@@ -111,27 +111,22 @@ public class DBConnectDialog extends JDialog {
         pwdPassword.setText(dbStrings.getPassword());
 
         // construct dialog
-        DefaultFormBuilder builder = new DefaultFormBuilder(new
-                FormLayout("right:pref, 4dlu, fill:pref", ""));
+        FormBuilder builder = FormBuilder.create().layout(new
+                FormLayout("right:pref, 4dlu, fill:pref", "pref, 4dlu, pref, 4dlu, pref, 4dlu, pref, 4dlu, pref"));
 
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         // add labels and input fields
-        builder.append(lblServerType);
-        builder.append(cmbServerType);
-        builder.nextLine();
-        builder.append(lblServerHostname);
-        builder.append(txtServerHostname);
-        builder.nextLine();
-        builder.append(lblDatabase);
-        builder.append(txtDatabase);
-        builder.nextLine();
-        builder.append(lblUsername);
-        builder.append(txtUsername);
-        builder.nextLine();
-        builder.append(lblPassword);
-        builder.append(pwdPassword);
-        builder.nextLine();
+        builder.add(lblServerType).xy(1, 1);
+        builder.add(cmbServerType).xy(3, 1);
+        builder.add(lblServerHostname).xy(1, 3);
+        builder.add(txtServerHostname).xy(3, 3);
+        builder.add(lblDatabase).xy(1, 5);
+        builder.add(txtDatabase).xy(3, 5);
+        builder.add(lblUsername).xy(1, 7);
+        builder.add(txtUsername).xy(3, 7);
+        builder.add(lblPassword).xy(1, 9);
+        builder.add(pwdPassword).xy(3, 9);
 
         // add the panel to the CENTER of your dialog:
         getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
@@ -174,6 +169,8 @@ public class DBConnectDialog extends JDialog {
 
         AbstractAction cancelAction = new AbstractAction() {
 
+            private static final long serialVersionUID = 812282483921018251L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -193,7 +190,7 @@ public class DBConnectDialog extends JDialog {
     /**
      * Checks the user input, and ensures that required fields have entries
      *
-     * @return 
+     * @return
      *      Appropriate error message to be displayed to user
      */
     private String checkInput() {

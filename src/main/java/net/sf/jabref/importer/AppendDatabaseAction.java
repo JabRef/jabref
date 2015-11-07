@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer;
 
 import java.io.File;
@@ -28,6 +28,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -50,7 +51,7 @@ public class AppendDatabaseAction implements BaseAction {
 
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private final List<File> filesToOpen = new ArrayList<File>();
+    private final List<File> filesToOpen = new ArrayList<>();
 
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
@@ -94,7 +95,7 @@ public class AppendDatabaseAction implements BaseAction {
     }
 
     private void openIt(boolean importEntries, boolean importStrings,
-                        boolean importGroups, boolean importSelectorWords) {
+            boolean importGroups, boolean importSelectorWords) {
         if (filesToOpen.isEmpty()) {
             return;
         }
@@ -110,20 +111,20 @@ public class AppendDatabaseAction implements BaseAction {
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog
-                        (panel, ex.getMessage(),
-                                "Open database", JOptionPane.ERROR_MESSAGE);
+                (panel, ex.getMessage(),
+                        "Open database", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
     private static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr,
-                                        boolean importEntries, boolean importStrings,
-                                        boolean importGroups, boolean importSelectorWords)
-            throws KeyCollisionException {
+            boolean importEntries, boolean importStrings,
+            boolean importGroups, boolean importSelectorWords)
+                    throws KeyCollisionException {
 
         BibtexDatabase fromDatabase = pr.getDatabase();
-        ArrayList<BibtexEntry> appendedEntries = new ArrayList<BibtexEntry>();
-        ArrayList<BibtexEntry> originalEntries = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> appendedEntries = new ArrayList<>();
+        ArrayList<BibtexEntry> originalEntries = new ArrayList<>();
         BibtexDatabase database = panel.database();
         BibtexEntry originalEntry;
         NamedCompound ce = new NamedCompound(Localization.lang("Append database"));

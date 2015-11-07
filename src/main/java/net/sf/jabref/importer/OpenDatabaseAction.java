@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -32,6 +32,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -46,8 +47,6 @@ import org.apache.commons.logging.LogFactory;
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
-
-    private static final long serialVersionUID = 1L;
 
     private static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
 
@@ -71,10 +70,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
-        super(IconTheme.getImage("open"));
+        super(IconTheme.JabRefIcon.OPEN.getIcon());
         this.frame = frame;
         this.showDialog = showDialog;
-        putValue(Action.NAME, "Open database");
+        putValue(Action.NAME, Localization.menuTitle("Open database"));
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Open database"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX database"));
     }
@@ -118,7 +117,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel bp = frame.baseAt(i);
-                if (bp.getFile() != null && bp.getFile().equals(file)) {
+                if ((bp.getFile() != null) && bp.getFile().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
@@ -179,7 +178,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
 
     public void openIt(File file, boolean raisePanel) {
-        if (file != null && file.exists()) {
+        if ((file != null) && file.exists()) {
             File fileToLoad = file;
             frame.output(Localization.lang("Opening") + ": '" + file.getPath() + "'");
             boolean tryingAutosave = false;
@@ -212,8 +211,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 if (FileBasedLock.hasLockFile(file)) {
                     long modTime = FileBasedLock.getLockFileTimeStamp(file);
-                    if (modTime != -1 && System.currentTimeMillis() - modTime
-                            > SaveSession.LOCKFILE_CRITICAL_AGE) {
+                    if ((modTime != -1) && ((System.currentTimeMillis() - modTime)
+                            > SaveSession.LOCKFILE_CRITICAL_AGE)) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
                         int answer = JOptionPane.showConfirmDialog(null, "<html>" + Localization.lang("Error opening file")
                                 + " '" + fileName + "'. " + Localization.lang("File is locked by another JabRef instance.")
@@ -242,7 +241,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     errorMessage = ex.getMessage();
                     pr = null;
                 }
-                if (pr == null || pr == ParserResult.INVALID_FORMAT) {
+                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                     JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
                             Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
@@ -418,7 +417,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             while (keepon) {
                 c = reader.read();
-                if (piv == 0 && (c == '%' || Character.isWhitespace((char) c))) {
+                if ((piv == 0) && ((c == '%') || Character.isWhitespace((char) c))) {
                     offset++;
                 } else {
                     headerText.append((char) c);
@@ -441,7 +440,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         // keep reading
                     }
                     // If the next line starts with something like "% ", handle this:
-                    while ((c = reader.read()) == '%' || Character.isWhitespace((char) c)) {
+                    while (((c = reader.read()) == '%') || Character.isWhitespace((char) c)) {
                         // keep reading
                     }
                     // Then we must skip the "Encoding: ". We may already have read the first

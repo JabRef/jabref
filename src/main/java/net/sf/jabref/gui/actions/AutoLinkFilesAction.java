@@ -25,14 +25,15 @@ import net.sf.jabref.util.Util;
 public class AutoLinkFilesAction extends AbstractAction {
 
     public AutoLinkFilesAction() {
-        putValue(Action.SMALL_ICON, IconTheme.getImage("autoGroup"));
+        putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.AUTO_FILE_LINK.getSmallIcon());
+        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.AUTO_FILE_LINK.getIcon());
         putValue(Action.NAME, Localization.lang("Automatically set file links"));
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Automatically link files"));
     }
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> entries = new ArrayList<>();
         Collections.addAll(entries, JabRef.jrf.basePanel().getSelectedEntries());
         if (entries.isEmpty()) {
             JabRef.jrf.basePanel().output(Localization.lang("No entries selected."));

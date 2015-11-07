@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,15 +17,11 @@ package net.sf.jabref.gui.help;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -36,60 +32,49 @@ public class HelpAction extends MnemonicAwareAction {
 
     private final HelpDialog diag;
 
-    private Class resourceOwner;
+    private Class<?> resourceOwner;
 
     private String helpFile;
 
 
     public HelpAction(HelpDialog diag, String helpFile) {
-        super(IconTheme.getImage("help"));
-        putValue(Action.NAME, "Help");
-        this.diag = diag;
-        this.helpFile = helpFile;
+        this(diag, helpFile, Localization.lang("Help"), IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
-        super(IconTheme.getImage("help"));
-        putValue(Action.NAME, "Help");
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
-        this.diag = diag;
-        this.helpFile = helpFile;
+        this(diag, helpFile, tooltip, IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
-    public HelpAction(HelpDialog diag, String helpFile, String tooltip, ImageIcon iconFile) {
+    public HelpAction(HelpDialog diag, String helpFile, Icon iconFile) {
+        this(diag, helpFile, Localization.lang("Help"), iconFile);
+    }
+
+    public HelpAction(HelpDialog diag, String helpFile, String tooltip, Icon iconFile) {
         super(iconFile);
-        putValue(Action.NAME, "Help");
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
-        this.diag = diag;
-        this.helpFile = helpFile;
-    }
-
-    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip) {
-        super(IconTheme.getImage("help"));
-        putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
+        putValue(Action.NAME, Localization.menuTitle("Help"));
+        putValue(Action.SHORT_DESCRIPTION, tooltip);
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, KeyStroke key) {
-        super(IconTheme.getImage("help"));
+        super(IconTheme.JabRefIcon.HELP.getIcon());
         putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
+        putValue(Action.SHORT_DESCRIPTION, tooltip);
         putValue(Action.ACCELERATOR_KEY, key);
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
-    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, ImageIcon iconFile) {
+    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, Icon iconFile) {
         super(iconFile);
         putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
+        putValue(Action.SHORT_DESCRIPTION, tooltip);
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
-    public void setResourceOwner(Class resourceOwner) {
+    public void setResourceOwner(Class<?> resourceOwner) {
         this.resourceOwner = resourceOwner;
     }
 
@@ -97,6 +82,7 @@ public class HelpAction extends MnemonicAwareAction {
         JButton hlp = new JButton(this);
         hlp.setText(null);
         hlp.setPreferredSize(new Dimension(24, 24));
+        hlp.setToolTipText(getValue(Action.SHORT_DESCRIPTION).toString());
         return hlp;
     }
 

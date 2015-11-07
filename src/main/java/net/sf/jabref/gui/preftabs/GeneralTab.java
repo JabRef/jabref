@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +16,6 @@
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Insets;
 import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
@@ -33,7 +31,6 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
@@ -42,6 +39,8 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
+
+import static net.sf.jabref.logic.l10n.Languages.LANGUAGES;
 
 class GeneralTab extends JPanel implements PrefsTab {
 
@@ -55,8 +54,6 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JCheckBox confirmDelete;
     private final JCheckBox allowEditing;
     private final JCheckBox memoryStick;
-    private final JCheckBox useImportInspector;
-    private final JCheckBox useImportInspectorForSingle;
     private final JCheckBox inspectionWarnDupli;
     private final JCheckBox useTimeStamp;
     private final JCheckBox updateTimeStamp;
@@ -68,8 +65,8 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JTextField timeStampFormat;
     private final JTextField timeStampField;
     private final JabRefPreferences prefs;
-    private final JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray(new String[GUIGlobals.LANGUAGES.keySet().size()]));
-    private final JComboBox encodings = new JComboBox(Encodings.ENCODINGS);
+    private final JComboBox<String> language = new JComboBox<>(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
+    private final JComboBox<String> encodings = new JComboBox<>(Encodings.ENCODINGS);
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
@@ -103,33 +100,13 @@ class GeneralTab extends JPanel implements PrefsTab {
         enforceLegalKeys = new JCheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new JCheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
 
-        useImportInspector = new JCheckBox(Localization.lang("Display imported entries in an inspection window before they are added."));
-        useImportInspectorForSingle = new JCheckBox(Localization.lang("Use inspection window also when a single entry is imported."));
         markImportedEntries = new JCheckBox(Localization.lang("Mark entries imported into an existing database"));
         unmarkAllEntriesBeforeImporting = new JCheckBox(Localization.lang("Unmark all entries before importing new entries into an existing database"));
         defOwnerField = new JTextField();
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();
-        HelpAction ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
-                "Help", IconTheme.getImage("helpSmall"));
-        HelpAction timeStampHelp = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp, "Help",
-                IconTheme.getImage("helpSmall"));
         inspectionWarnDupli = new JCheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
 
-        Insets marg = new Insets(0, 12, 3, 0);
-        useImportInspectorForSingle.setMargin(marg);
-        inspectionWarnDupli.setMargin(marg);
-
-        // We need a listener on useImportInspector to enable and disable the
-        // import inspector related choices;
-        useImportInspector.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
-                inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
-            }
-        });
 
         FormLayout layout = new FormLayout
                 ("8dlu, 1dlu, left:170dlu, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref", "");
@@ -137,13 +114,7 @@ class GeneralTab extends JPanel implements PrefsTab {
 
         builder.appendSeparator(Localization.lang("General"));
         builder.nextLine();
-        builder.append(useImportInspector, 13);
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(useImportInspectorForSingle, 11);
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(inspectionWarnDupli, 11);
+        builder.append(inspectionWarnDupli, 13);
         builder.nextLine();
         builder.append(ctrlClick, 13);
         builder.nextLine();
@@ -163,9 +134,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton help = new JButton(ownerHelp);
-        help.setText(null);
-        help.setPreferredSize(new Dimension(24, 24));
+        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp).getIconButton();
         builder.append(help);
         builder.nextLine();
 
@@ -175,9 +144,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        help = new JButton(timeStampHelp);
-        help.setText(null);
-        help.setPreferredSize(new Dimension(24, 24));
+        help = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp).getIconButton();
         builder.append(help);
         builder.nextLine();
 
@@ -223,11 +190,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         defOwnerField.setText(prefs.get(JabRefPreferences.DEFAULT_OWNER));
         timeStampFormat.setText(prefs.get(JabRefPreferences.TIME_STAMP_FORMAT));
         timeStampField.setText(prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
-        useImportInspector.setSelected(prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG));
-        useImportInspectorForSingle.setSelected(prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE));
         inspectionWarnDupli.setSelected(prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
-        useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
-        inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
         markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
 
@@ -242,7 +205,7 @@ class GeneralTab extends JPanel implements PrefsTab {
 
         // Language choice
         int ilk = 0;
-        for (String lan : GUIGlobals.LANGUAGES.values()) {
+        for (String lan : LANGUAGES.values()) {
             if (lan.equals(oldLan)) {
                 language.setSelectedIndex(ilk);
             }
@@ -271,8 +234,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
         prefs.putBoolean(JabRefPreferences.ALLOW_TABLE_EDITING, allowEditing.isSelected());
         prefs.putBoolean(JabRefPreferences.CTRL_CLICK, ctrlClick.isSelected());
-        prefs.putBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG, useImportInspector.isSelected());
-        prefs.putBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE, useImportInspectorForSingle.isSelected());
         prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
         String owner = defOwnerField.getText().trim();
         prefs.put(JabRefPreferences.DEFAULT_OWNER, owner);
@@ -283,9 +244,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
 
-        if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
-            prefs.put(JabRefPreferences.LANGUAGE, GUIGlobals.LANGUAGES.get(language.getSelectedItem()));
-            Localization.setLanguage(GUIGlobals.LANGUAGES.get(language.getSelectedItem()), "");
+        if (!LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
+            prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getSelectedItem()));
+            Localization.setLanguage(LANGUAGES.get(language.getSelectedItem()));
             // Update any defaults that might be language dependent:
             Globals.prefs.setLanguageDependentDefaultValues();
             // Warn about restart needed:

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2013 JabRef contributors.
+/*  Copyright (C) 2013-2015 JabRef contributors.
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -53,22 +53,22 @@ class FileSortTab extends JPanel implements PrefsTab {
     private JTextField savePriField;
     private JTextField saveSecField;
     private JTextField saveTerField;
-    private JComboBox savePriSort;
-    private JComboBox saveSecSort;
-    private JComboBox saveTerSort;
+    private JComboBox<String> savePriSort;
+    private JComboBox<String> saveSecSort;
+    private JComboBox<String> saveTerSort;
 
     private final JRadioButton exportInOriginalOrder;
     private final JRadioButton exportInTableOrder;
     private final JRadioButton exportInSpecifiedOrder;
-    private JCheckBox exportPriDesc;
-    private JCheckBox exportSecDesc;
-    private JCheckBox exportTerDesc;
-    private JTextField exportPriField;
-    private JTextField exportSecField;
-    private JTextField exportTerField;
-    private JComboBox exportPriSort;
-    private JComboBox exportSecSort;
-    private JComboBox exportTerSort;
+    private final JCheckBox exportPriDesc;
+    private final JCheckBox exportSecDesc;
+    private final JCheckBox exportTerDesc;
+    private final JTextField exportPriField;
+    private final JTextField exportSecField;
+    private final JTextField exportTerField;
+    private final JComboBox<String> exportPriSort;
+    private final JComboBox<String> exportSecSort;
+    private final JComboBox<String> exportTerSort;
 
 
     public FileSortTab(JabRefPreferences prefs) {
@@ -108,13 +108,13 @@ class FileSortTab extends JPanel implements PrefsTab {
             saveInTableOrder.addActionListener(listener);
             saveInSpecifiedOrder.addActionListener(listener);
 
-            ArrayList<String> fieldNames = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+            ArrayList<String> fieldNames = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
             fieldNames.add(BibtexEntry.KEY_FIELD);
             Collections.sort(fieldNames);
             String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-            savePriSort = new JComboBox(allPlusKey);
-            saveSecSort = new JComboBox(allPlusKey);
-            saveTerSort = new JComboBox(allPlusKey);
+            savePriSort = new JComboBox<>(allPlusKey);
+            saveSecSort = new JComboBox<>(allPlusKey);
+            saveTerSort = new JComboBox<>(allPlusKey);
 
             savePriField = new JTextField(10);
             saveSecField = new JTextField(10);
@@ -228,13 +228,13 @@ class FileSortTab extends JPanel implements PrefsTab {
         exportInTableOrder.addActionListener(listener);
         exportInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> fieldNames = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        ArrayList<String> fieldNames = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
         fieldNames.add(BibtexEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-        exportPriSort = new JComboBox(allPlusKey);
-        exportSecSort = new JComboBox(allPlusKey);
-        exportTerSort = new JComboBox(allPlusKey);
+        exportPriSort = new JComboBox<>(allPlusKey);
+        exportSecSort = new JComboBox<>(allPlusKey);
+        exportTerSort = new JComboBox<>(allPlusKey);
 
         exportPriField = new JTextField(10);
         exportSecField = new JTextField(10);

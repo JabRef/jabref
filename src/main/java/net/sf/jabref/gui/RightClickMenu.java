@@ -63,7 +63,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         panel = panel_;
         metaData = metaData_;
 
-        // Are multiple entries selected? 
+        // Are multiple entries selected?
         boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
 
         // If only one entry is selected, get a reference to it for adapting the menu.
@@ -74,79 +74,18 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addPopupMenuListener(this);
 
-        add(new AbstractAction(Localization.lang("Copy"), IconTheme.getImage("copy")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.COPY);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not execute copy", ex);
-                }
-            }
-        });
-        add(new AbstractAction(Localization.lang("Paste"), IconTheme.getImage("paste")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.PASTE);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not execute paste", ex);
-                }
-            }
-        });
-        add(new AbstractAction(Localization.lang("Cut"), IconTheme.getImage("cut")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.CUT);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not execute cut", ex);
-                }
-            }
-        });
-
-        add(new AbstractAction(Localization.lang("Delete"), IconTheme.getImage("delete")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                /*SwingUtilities.invokeLater(new Runnable () {
-                public void run() {*/
-                try {
-                    panel.runCommand(Actions.DELETE);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not execute delete", ex);
-                }
-                /*}
-                }); */
-            }
-        });
+        add(new GeneralAction(Actions.COPY, Localization.lang("Copy"), IconTheme.JabRefIcon.COPY.getSmallIcon()));
+        add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon()));
+        add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon()));
+        add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getSmallIcon()));
         addSeparator();
 
-        add(new AbstractAction(Localization.lang("Export to clipboard")) {
+        add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key")));
+        add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}")));
+        add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title")));
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.EXPORT_TO_CLIPBOARD);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not execute exportToClipboard", ex);
-                }
-            }
-        });
-        add(new AbstractAction(Localization.lang("Send as email")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.SEND_AS_EMAIL);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not execute sendAsEmail", ex);
-                }
-            }
-        });
+        add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"), IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
+        add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
         addSeparator();
 
         JMenu markSpecific = JabRefFrame.subMenu("Mark specific color");
@@ -156,62 +95,19 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         }
 
         if (multiple) {
-            add(new AbstractAction(Localization.lang("Mark entries"), IconTheme.getImage("markEntries")) {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        panel.runCommand(Actions.MARK_ENTRIES);
-                    } catch (Throwable ex) {
-                        LOGGER.warn("Could not execute markEntries", ex);
-                    }
-                }
-            });
-
+            add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entries"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
             add(markSpecific);
-
-            add(new AbstractAction(Localization.lang("Unmark entries"), IconTheme.getImage("unmarkEntries")) {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        panel.runCommand(Actions.UNMARK_ENTRIES);
-                    } catch (Throwable ex) {
-                        LOGGER.warn("Could not execute unmarkEntries", ex);
-                    }
-                }
-            });
+            add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
             addSeparator();
         } else if (be != null) {
             String marked = be.getField(BibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
-            if (marked == null || marked.isEmpty()) {
-                add(new AbstractAction(Localization.lang("Mark entry"), IconTheme.getImage("markEntries")) {
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            panel.runCommand(Actions.MARK_ENTRIES);
-                        } catch (Throwable ex) {
-                            LOGGER.warn("Could not execute markEntries", ex);
-                        }
-                    }
-                });
-
+            if ((marked == null) || marked.isEmpty()) {
+                add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
                 add(markSpecific);
             } else {
                 add(markSpecific);
-                add(new AbstractAction(Localization.lang("Unmark entry"), IconTheme.getImage("unmarkEntries")) {
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            panel.runCommand(Actions.UNMARK_ENTRIES);
-                        } catch (Throwable ex) {
-                            LOGGER.warn("Could not execute unmarkEntries", ex);
-                        }
-                    }
-                });
+                add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entry"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
             }
             addSeparator();
         }
@@ -251,99 +147,36 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             addSeparator();
         }
 
-        add(new AbstractAction(Localization.lang("Open folder"), IconTheme.getImage("openFolder")) {
-
+        add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder")) {
             {
                 if (!isFieldSetForSelectedEntry("file")) {
                     this.setEnabled(false);
                 }
             }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.OPEN_FOLDER);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not open folder", ex);
-                }
-            }
         });
 
-        add(new AbstractAction(Localization.lang("Open file"), IconTheme.getImage("openExternalFile")) {
-
+        add(new GeneralAction(Actions.OPEN_EXTERNAL_FILE, Localization.lang("Open file"), getFileIconForSelectedEntry()) {
             {
                 if(!isFieldSetForSelectedEntry("file")) {
                     this.setEnabled(false);
                 }
             }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.OPEN_EXTERNAL_FILE);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not open external file", ex);
-                }
-            }
         });
 
-        add(new AbstractAction(Localization.lang("Attach file"), IconTheme.getImage("open")) {
+        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.ADD_FILE_LINK);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not attach file", ex);
-                }
-            }
-        });
-        /*add(new AbstractAction(Globals.lang("Open PDF or PS"), GUIGlobals.getImage("openFile")) {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand("openFile");
-                } catch (Throwable ex) {}
-            }
-        });*/
-
-        add(new AbstractAction(Localization.lang("Open URL or DOI"), IconTheme.getImage("www")) {
-
+        add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
             {
                 if(!(isFieldSetForSelectedEntry("url") || isFieldSetForSelectedEntry("doi"))) {
                     this.setEnabled(false);
                 }
             }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.OPEN_URL);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not execute open URL", ex);
-                }
-            }
         });
 
-        add(new AbstractAction(Localization.lang("Copy BibTeX key")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.COPY_KEY);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not copy BibTex key", ex);
-                }
-            }
-        });
-
-        add(new AbstractAction(Localization.lang("Copy") + " \\cite{" + Localization.lang("BibTeX key") + '}') {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.COPY_CITE_KEY);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not copy cite key", ex);
+        add(new GeneralAction(Actions.MERGE_DOI, Localization.lang("Get BibTeX data from DOI")) {
+            {
+                if(!(isFieldSetForSelectedEntry("doi"))) {
+                    this.setEnabled(false);
                 }
             }
         });
@@ -352,66 +185,19 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         populateTypeMenu();
 
         add(typeMenu);
-        add(new AbstractAction(Localization.lang("Plain text import"))
-        {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.PLAIN_TEXT_IMPORT);
-                } catch (Throwable ex) {
-                    LOGGER.debug("Could not import plain text", ex);
-                }
-            }
-        });
+        add(new GeneralAction(Actions.PLAIN_TEXT_IMPORT, Localization.lang("Plain text import")));
 
         add(JabRef.jrf.massSetField);
         add(JabRef.jrf.manageKeywords);
 
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
 
-        groupAdd = new JMenuItem(new AbstractAction(Localization.lang("Add to group"))
-        {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.ADD_TO_GROUP);
-
-                    //BibtexEntry[] bes = panel.getSelectedEntries();
-                    //JMenu groupMenu = buildGroupMenu(bes, true, false);
-
-                } catch (Throwable ex) {
-                    LOGGER.debug("Could not add to group", ex);
-                }
-            }
-        });
+        groupAdd = new JMenuItem(new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group")));
         add(groupAdd);
-        groupRemove = new JMenuItem(new AbstractAction(Localization.lang("Remove from group"))
-        {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.REMOVE_FROM_GROUP);
-                } catch (Throwable ex) {
-                    LOGGER.debug("Could not remove from group", ex);
-                }
-            }
-        });
+        groupRemove = new JMenuItem(new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang("Remove from group")));
         add(groupRemove);
 
-        JMenuItem groupMoveTo = add(new AbstractAction(Localization.lang("Move to group")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand(Actions.MOVE_TO_GROUP);
-                } catch (Throwable ex) {
-                    LOGGER.debug("Could not execute move to group", ex);
-                }
-            }
-        });
+        JMenuItem groupMoveTo = add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
         add(groupMoveTo);
 
         floatMarked.addActionListener(new ActionListener() {
@@ -423,7 +209,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-
+        // create disabledIcons for all menu entries
+        frame.createDisabledIconsForMenuEntries(this);
     }
 
     /**
@@ -438,13 +225,13 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     }
 
     /**
-     * Remove all types from the menu. 
+     * Remove all types from the menu.
      * Then cycle through all available values, and add them.
      */
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
         //menu.removeAll();
         menu.setText(field.getMenuString());
-        menu.setIcon(field.getRepresentingIcon());
+        menu.setIcon(((IconTheme.FontBasedIcon) field.getRepresentingIcon()).createSmallIcon());
         for (SpecialFieldValue val : field.getValues()) {
             menu.add(val.getMenuAction(frame));
         }
@@ -483,25 +270,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             groupRemoveMenu.setEnabled(false);
             return null;
         }
-
-        /*groupAddMenu.setEnabled(true);
-        groupMoveMenu.setEnabled(true);
-        groupRemoveMenu.setEnabled(true);
-        groupAddMenu.removeAll();
-        groupMoveMenu.removeAll();
-        groupRemoveMenu.removeAll();
-
-        add(groupAddMenu);
-        add(groupMoveMenu);
-        add(groupRemoveMenu);
-
-        groupAddMenu.setEnabled(false);
-        groupMoveMenu.setEnabled(false);
-        groupRemoveMenu.setEnabled(false);*/
-
-        /*insertNodes(groupAddMenu,metaData.getGroups(),bes,true,false);
-        insertNodes(groupMoveMenu,metaData.getGroups(),bes,true,true);
-        insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false,false);*/
 
         insertNodes(groupMenu, metaData.getGroups(), bes, add, move);
 
@@ -560,13 +328,13 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
             switch (group.getHierarchicalContext()) {
             case INCLUDING:
-                menuItem.setIcon(IconTheme.getImage("groupIncluding"));
+                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon());
                 break;
             case REFINING:
-                menuItem.setIcon(IconTheme.getImage("groupRefining"));
+                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon());
                 break;
             default:
-                menuItem.setIcon(IconTheme.getImage("groupRegular"));
+                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_REGULAR.getSmallIcon());
                 break;
             }
         }
@@ -604,13 +372,48 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private boolean isFieldSetForSelectedEntry(String fieldname) {
         if (panel.mainTable.getSelectedRowCount() == 1) {
             BibtexEntry entry = panel.mainTable.getSelected().get(0);
-            if (entry.getAllFields().contains(fieldname)) {
+            if (entry.getFieldNames().contains(fieldname)) {
                 return true;
             } else {
                 return false;
             }
         } else {
             return false;
+        }
+    }
+
+    private Icon getFileIconForSelectedEntry() {
+        if (panel.mainTable.getSelectedRowCount() == 1) {
+            BibtexEntry entry = panel.mainTable.getSelected().get(0);
+            String file = entry.getField(Globals.FILE_FIELD);
+            if(file!=null) {
+                return FileListTableModel.getFirstLabel(file).getIcon();
+            }
+        }
+        return IconTheme.JabRefIcon.FILE.getSmallIcon();
+    }
+
+    class GeneralAction extends AbstractAction {
+
+        private final String command;
+
+        public GeneralAction(String command, String name) {
+            super(name);
+            this.command = command;
+        }
+
+        public GeneralAction(String command, String name, Icon icon) {
+            super(name, icon);
+            this.command = command;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                panel.runCommand(command);
+            } catch (Throwable ex) {
+                LOGGER.debug("Could not execute command " + command + ".", ex);
+            }
         }
     }
 

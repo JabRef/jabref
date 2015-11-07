@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.util.Vector;
@@ -28,14 +28,14 @@ import net.sf.jabref.JabRefPreferences;
 /**
  * Listens for TableColumnModelEvents to keep track of changes made to the
  * MainTable columns, like reordering or resizing.
- * 
+ *
  * Changes to columns without a name and the "#" column are not saved. To have
  * consistent behavior (e.g. as in TableColumnsTab).
- * 
+ *
  * @author Fabian Bieker
  * @author Daniel Waeber
  * @since 12/2008
- * 
+ *
  */
 public class PersistenceTableColumnListener implements TableColumnModelListener {
 
@@ -47,8 +47,8 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
     private static final String simpleClassName =
             PersistenceTableColumnListener.class.getSimpleName();
 
-    // needed to get column names / indices mapped from view to model 
-    // and to access the table model 
+    // needed to get column names / indices mapped from view to model
+    // and to access the table model
     private final MainTable mainTable;
 
 
@@ -64,21 +64,21 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     private void updateColumnPrefs() {
         final int columnCount = mainTable.getColumnCount();
-        Vector<String> storedColumns = new Vector<String>(columnCount - 1);
-        Vector<String> columnsWidths = new Vector<String>(columnCount - 1);
+        Vector<String> storedColumns = new Vector<>(columnCount - 1);
+        Vector<String> columnsWidths = new Vector<>(columnCount - 1);
         int ncWidth = -1;
 
         for (int i = 0; i < columnCount; i++) {
             final String name = mainTable.getColumnName(i);
-            if ((name == null) || name.isEmpty()) {
-            } else if (name.equals("#")) { // TODO: get "#" from prefs?
-                ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
+            if ((name != null) && !name.isEmpty()) {
+                if (name.equals("#")) { // TODO: get "#" from prefs?
+                    ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
+                } else {
+                    storedColumns.add(name.toLowerCase());
+                    columnsWidths.add(String.valueOf(mainTable.getColumnModel().getColumn(
+                            i).getWidth()));
 
-            } else {
-                storedColumns.add(name.toLowerCase());
-                columnsWidths.add(String.valueOf(mainTable.getColumnModel().getColumn(
-                        i).getWidth()));
-
+                }
             }
         }
 

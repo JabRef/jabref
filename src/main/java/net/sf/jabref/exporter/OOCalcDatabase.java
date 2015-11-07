@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,11 +26,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.jabref.exporter.layout.format.GetOpenOfficeType;
 import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import net.sf.jabref.exporter.layout.format.RemoveWhitespace;
-
-import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -47,16 +49,17 @@ class OOCalcDatabase {
 
     private final Collection<BibtexEntry> entries;
 
+    private static final Log LOGGER = LogFactory.getLog(OOCalcDatabase.class);
 
-    @SuppressWarnings("unchecked")
+
     public OOCalcDatabase(BibtexDatabase bibtex, Set<String> keySet) {
         // Make a list of comparators for sorting the entries:
-        List<FieldComparator> comparators = new ArrayList<FieldComparator>();
+        List<FieldComparator> comparators = new ArrayList<>();
         comparators.add(new FieldComparator("author"));
         comparators.add(new FieldComparator("year"));
         comparators.add(new FieldComparator(BibtexEntry.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
-        BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
+        BasicEventList<BibtexEntry> entryList = new BasicEventList<>();
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
         if (keySet == null) {
@@ -66,9 +69,7 @@ class OOCalcDatabase {
                 entryList.add(bibtex.getEntryById(key));
             }
         }
-
-        entries = new SortedList(entryList, new FieldComparatorStack(comparators));
-
+        entries = new SortedList<>(entryList, new FieldComparatorStack<>(comparators));
     }
 
     public Document getDOMrepresentation() {
@@ -205,18 +206,17 @@ class OOCalcDatabase {
 
             result.appendChild(collection);
         } catch (Exception e) {
-            System.out.println("Exception caught..." + e);
-            e.printStackTrace();
+            LOGGER.warn("Exception caught...", e);
         }
         return result;
     }
 
-    private String getField(BibtexEntry e, String field) {
+    private static String getField(BibtexEntry e, String field) {
         Object o = e.getField(field);
         return o == null ? "" : o.toString();
     }
 
-    private void addTableCell(Document doc, Element parent, String content) {
+    private static void addTableCell(Document doc, Element parent, String content) {
         Element cell = doc.createElement("table:table-cell");
         Element text = doc.createElement("text:p");
         Text textNode = doc.createTextNode(content);

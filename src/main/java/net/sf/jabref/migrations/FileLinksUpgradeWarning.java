@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,14 +21,13 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -61,19 +60,16 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         if (!Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING)) {
             return false;
         }
-        if (pr.getJabrefMajorVersion() < 0)
-         {
+        if (pr.getJabrefMajorVersion() <= 0) {
             return false; // non-JabRef file
-        }
-        if (pr.getJabrefMajorVersion() < 2)
-         {
+        } else if (pr.getJabrefMajorVersion() < 2) {
             return true; // old
+        } else if (pr.getJabrefMajorVersion() == 2) {
+            return pr.getJabrefMinorVersion() <= 2;
+        } else {
+            // JabRef version 3 does not contain a header, but who knows
+            return true;
         }
-        if (pr.getJabrefMajorVersion() > 2)
-         {
-            return false; // wow, did we ever reach version 3?
-        }
-        return pr.getJabrefMinorVersion() <= 2;
     }
 
     /**
@@ -90,7 +86,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         // Only offer to upgrade links if the pdf/ps fields are used:
         boolean offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
-        boolean offerSetFileDir = !Globals.prefs.hasKey(GUIGlobals.FILE_FIELD + "Directory")
+        boolean offerSetFileDir = !Globals.prefs.hasKey(Globals.FILE_FIELD + "Directory")
                 && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
         if (!offerChangeDatabase && !offerChangeSettings && !offerSetFileDir)
@@ -108,20 +104,23 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 false);
 
         JPanel message = new JPanel();
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref", ""), message);
+        FormBuilder b = FormBuilder.create().layout(new FormLayout("left:pref", "p"));
         // Keep the formatting of these lines. Otherwise, strings have to be translated again.
         // See updated JabRef_en.properties modifications by python syncLang.py -s -u
-        b.append(new JLabel("<html>" + Localization.lang("This database was written using an older version of JabRef.") + "<br>"
+        int row = 1;
+        b.add(new JLabel("<html>" + Localization.lang("This database was written using an older version of JabRef.") + "<br>"
                 + Localization.lang("The current version features a new way of handling links to external files.<br>To take advantage of this, your links must be changed into the new format, and<br>JabRef must be configured to show the new links.") + "<p>"
-                + Localization.lang("Do you want JabRef to do the following operations?") + "</html>"));
-        b.nextLine();
+                + Localization.lang("Do you want JabRef to do the following operations?") + "</html>")).xy(1, row);
+
         if (offerChangeSettings) {
-            b.append(changeSettings);
-            b.nextLine();
+            b.appendRows("2dlu, p");
+            row += 2;
+            b.add(changeSettings).xy(1, row);
         }
         if (offerChangeDatabase) {
-            b.append(changeDatabase);
-            b.nextLine();
+            b.appendRows("2dlu, p");
+            row += 2;
+            b.add(changeDatabase).xy(1, row);
         }
         if (offerSetFileDir) {
             if (Globals.prefs.hasKey("pdfDirectory")) {
@@ -135,12 +134,14 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             JButton browse = new JButton(Localization.lang("Browse"));
             browse.addActionListener(BrowseAction.buildForDir(fileDir));
             pan.add(browse);
-            b.append(pan);
-            b.nextLine();
+            b.appendRows("2dlu, p");
+            row += 2;
+            b.add(pan).xy(1, row);
         }
-        b.append("");
-        b.nextLine();
-        b.append(doNotShowDialog);
+        b.appendRows("6dlu, p");
+        b.add(doNotShowDialog).xy(1, row+2);
+
+        message.add(b.build());
 
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 message, Localization.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
@@ -190,7 +191,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         }
 
         if (fileDir != null) {
-            Globals.prefs.put(GUIGlobals.FILE_FIELD + "Directory", fileDir);
+            Globals.prefs.put(Globals.FILE_FIELD + "Directory", fileDir);
         }
 
         if (upgradePrefs) {
@@ -207,7 +208,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 if (!gfs.isEmpty()) {
                     sb.append(";");
                 }
-                sb.append(GUIGlobals.FILE_FIELD);
+                sb.append(Globals.FILE_FIELD);
                 Globals.prefs.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "0", sb.toString());
                 Globals.prefs.updateEntryEditorTabList();
                 panel.frame().removeCachedEntryEditors();
@@ -222,7 +223,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         outer: for (int i = 0; i < tabList.getTabCount(); i++) {
             List<String> fields = tabList.getTabFields(i);
             for (String field : fields) {
-                if (field.equals(GUIGlobals.FILE_FIELD)) {
+                if (field.equals(Globals.FILE_FIELD)) {
                     found = true;
                     break outer;
                 }

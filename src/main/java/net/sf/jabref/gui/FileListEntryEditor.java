@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -35,14 +35,14 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
@@ -61,7 +61,7 @@ public class FileListEntryEditor {
     private final JTextField description = new JTextField();
     private final JButton ok = new JButton(Localization.lang("Ok"));
 
-    private final JComboBox types;
+    private final JComboBox<ExternalFileType> types;
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
     private final JLabel downloadLabel = new JLabel(Localization.lang("Downloading..."));
     private ConfirmCloseFileListEntryEditor externalConfirm;
@@ -83,6 +83,8 @@ public class FileListEntryEditor {
 
         AbstractAction okAction = new AbstractAction() {
 
+            private static final long serialVersionUID = -1277323545446098878L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 // If OK button is disabled, ignore this event:
@@ -103,7 +105,7 @@ public class FileListEntryEditor {
                 okPressed = true;
             }
         };
-        types = new JComboBox();
+        types = new JComboBox<>();
         types.addItemListener(new ItemListener() {
 
             @Override
@@ -114,40 +116,37 @@ public class FileListEntryEditor {
             }
         });
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
-                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(Localization.lang("Link"));
-        builder.append(link);
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout
+                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
+        builder.add(Localization.lang("Link")).xy(1, 1);
+        builder.add(link).xy(3, 1);
         final BrowseListener browse = new BrowseListener(frame, link);
         final JButton browseBut = new JButton(Localization.lang("Browse"));
         browseBut.addActionListener(browse);
-        builder.append(browseBut);
+        builder.add(browseBut).xy(5, 1);
         JButton open = new JButton(Localization.lang("Open"));
         if (showOpenButton) {
-            builder.append(open);
+            builder.add(open).xy(7, 1);
         }
-        builder.nextLine();
-        builder.append(Localization.lang("Description"));
-        builder.append(description, 3);
+        builder.add(Localization.lang("Description")).xy(1, 3);
+        builder.add(description).xyw(3,3,3);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        builder.nextLine();
-        builder.append(Localization.lang("File type"));
-        builder.append(types, 3);
+        builder.add(Localization.lang("File type")).xy(1, 5);
+        builder.add(types).xyw(3, 5, 3);
         if (showProgressBar) {
-            builder.nextLine();
-            builder.append(downloadLabel);
-            builder.append(prog, 3);
+            builder.appendRows("2dlu, p");
+            builder.add(downloadLabel).xy(1,7);
+            builder.add(prog).xyw(3,7,3);
         }
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        //bb.addButton(open);
-        //bb.addRelatedGap();
         bb.addRelatedGap();
         bb.addButton(ok);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         ok.addActionListener(okAction);
         // Add OK action to the two text fields to simplify entering:
@@ -163,6 +162,8 @@ public class FileListEntryEditor {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
+
+            private static final long serialVersionUID = 5291749955917931883L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -186,6 +187,7 @@ public class FileListEntryEditor {
 
             @Override
             public void removeUpdate(DocumentEvent documentEvent) {
+                // Do nothing
             }
 
             @Override
@@ -296,7 +298,7 @@ public class FileListEntryEditor {
         link.setText(entry.getLink());
         //if (link.getText().length() > 0)
         //    checkExtension();
-        types.setModel(new DefaultComboBoxModel(Globals.prefs.getExternalFileTypeSelection()));
+        types.setModel(new DefaultComboBoxModel<>(Globals.prefs.getExternalFileTypeSelection()));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
         if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType)) {
@@ -311,7 +313,7 @@ public class FileListEntryEditor {
         entry.setDescription(description.getText().trim());
         // See if we should trim the file link to be relative to the file directory:
         try {
-            String[] dirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+            String[] dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
             if (dirs.length == 0) {
                 entry.setLink(link.getText().trim());
             } else {
@@ -374,7 +376,7 @@ public class FileListEntryEditor {
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
-                String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                String[] dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
                 newFile = FileUtil.shortenFileName(newFile, dirsS);
 
                 comp.setText(newFile.getPath());

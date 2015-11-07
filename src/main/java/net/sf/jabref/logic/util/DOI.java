@@ -10,6 +10,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Class for working with Digital object identifiers (DOIs)
+ *
+ * @see https://en.wikipedia.org/wiki/Digital_object_identifier
+ */
 public class DOI {
     private static final Log LOGGER = LogFactory.getLog(DOI.class);
 
@@ -97,18 +102,27 @@ public class DOI {
     }
 
     /**
-     * Return a URL presentation for the DOI
+     * Return a URI presentation for the DOI
+     *
+     * @return an encoded URI representation of the DOI
+     */
+    public URI getURI() {
+        try {
+            URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/" + doi, null);
+            return uri;
+        } catch(URISyntaxException e) {
+            // should never happen
+            LOGGER.error(doi + " could not be encoded as URI.", e);
+            return null;
+        }
+    }
+
+    /**
+     * Return an ASCII URL presentation for the DOI
      *
      * @return an encoded URL representation of the DOI
      */
-    public String getURL() {
-        try {
-            URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/" + doi, null);
-            return uri.toASCIIString();
-        } catch(URISyntaxException e) {
-            // should never happen
-            LOGGER.error(doi + " could not be encoded as URL.");
-            return "";
-        }
+    public String getURLAsASCIIString() {
+        return getURI().toASCIIString();
     }
 }

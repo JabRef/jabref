@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,12 +12,12 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -28,9 +28,9 @@ public class Printed extends SpecialField {
 
 
     private Printed() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<>();
         // DO NOT TRANSLATE "printed" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Localization.lang("Toogle print status"), IconTheme.getImage("printed"), Localization.lang("Toogle print status")));
+        values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Localization.lang("Toogle print status"), IconTheme.JabRefIcon.PRINTED.getSmallIcon(), Localization.lang("Toogle print status")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Toggled print status for %0 entries";
     }
@@ -48,7 +48,7 @@ public class Printed extends SpecialField {
     }
 
     @Override
-    public ImageIcon getRepresentingIcon() {
+    public Icon getRepresentingIcon() {
         return this.getValues().get(0).getIcon();
     }
 

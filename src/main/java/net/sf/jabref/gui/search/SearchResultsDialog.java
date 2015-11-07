@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -54,15 +54,15 @@ import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.TransferableBibtexEntry;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.comparator.EntryComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -91,15 +91,15 @@ public class SearchResultsDialog {
     private final int FILE_COL = 0;
     private final int URL_COL = 1;
     private final int PAD = 2;
-    private final JLabel fileLabel = new JLabel(IconTheme.getImage("psSmall"));
-    private final JLabel urlLabel = new JLabel(IconTheme.getImage("wwwSmall"));
+    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
+    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
     private EventTableModel<BibtexEntry> model;
-    private final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
+    private final EventList<BibtexEntry> entries = new BasicEventList<>();
     private SortedList<BibtexEntry> sortedEntries;
-    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
+    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<>();
 
     private JTable entryTable;
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -120,9 +120,8 @@ public class SearchResultsDialog {
         preview = new PreviewPanel(null, new MetaData(),
                 activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
-        sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
-        model = new EventTableModel<BibtexEntry>(sortedEntries,
-                new EntryTableFormat());
+        sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
+        model = new EventTableModel<>(sortedEntries, new EntryTableFormat());
         entryTable = new JTable(model);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         entryTable.setDefaultRenderer(JLabel.class, renderer);
@@ -134,7 +133,7 @@ public class SearchResultsDialog {
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
-        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<BibtexEntry>(sortedEntries);
+        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<>(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         entryTable.addMouseListener(new TableClickListener());
@@ -224,7 +223,6 @@ public class SearchResultsDialog {
      * by clicking the column labels.
      * @param comparatorChooser The comparator chooser controlling the sort order.
      */
-    @SuppressWarnings("unchecked")
     private void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
         // First column:
         java.util.List<Comparator> comparators = comparatorChooser
@@ -239,7 +237,7 @@ public class SearchResultsDialog {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
-                comparators.add(new IconComparator(new String[] {GUIGlobals.FILE_FIELD}));
+                comparators.add(new IconComparator(new String[] {Globals.FILE_FIELD}));
             } else if (i == URL_COL) {
                 comparators.add(new IconComparator(new String[] {"url"}));
             }
@@ -265,20 +263,9 @@ public class SearchResultsDialog {
     private void setWidths() {
         TableColumnModel cm = entryTable.getColumnModel();
         for (int i = 0; i < PAD; i++) {
-            // Check if the Column is a RankingColumn
-            // If this is the case, set a certain Column-width,
-            // because the RankingIconColumn needs some more width
-            if (frame.basePanel().tableFormat.isRankingColumn(i)) {
-                // Lock the width of ranking icon column.
-                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-            } else {
-                // Lock the width of icon columns.
-                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
-                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
-            }
+            cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         }
 
         for (int i = 0; i < fields.length; i++) {
@@ -360,7 +347,7 @@ public class SearchResultsDialog {
                 BasePanel p = entryHome.get(entry);
                 switch (col) {
                 case FILE_COL:
-                    Object o = entry.getField(GUIGlobals.FILE_FIELD);
+                    Object o = entry.getField(Globals.FILE_FIELD);
                     if (o != null) {
                         FileListTableModel tableModel = new FileListTableModel();
                         tableModel.setContent((String) o);
@@ -403,7 +390,7 @@ public class SearchResultsDialog {
 
             if (col == FILE_COL) {
                 // We use a FileListTableModel to parse the field content:
-                Object o = entry.getField(GUIGlobals.FILE_FIELD);
+                Object o = entry.getField(Globals.FILE_FIELD);
                 FileListTableModel fileList = new FileListTableModel();
                 fileList.setContent((String) o);
                 // If there are one or more links, open the first one:
@@ -481,13 +468,13 @@ public class SearchResultsDialog {
                 Object o;
                 switch (column) {
                 case FILE_COL:
-                    o = entry.getField(GUIGlobals.FILE_FIELD);
+                    o = entry.getField(Globals.FILE_FIELD);
                     if (o != null) {
-                        FileListTableModel model = new FileListTableModel();
-                        model.setContent((String) o);
-                        fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
-                        if (model.getRowCount() > 0) {
-                            fileLabel.setIcon(model.getEntry(0).getType().getIcon());
+                        FileListTableModel tmpModel = new FileListTableModel();
+                        tmpModel.setContent((String) o);
+                        fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
+                        if (tmpModel.getRowCount() > 0) {
+                            fileLabel.setIcon(tmpModel.getEntry(0).getType().getIcon());
                         }
                         return fileLabel;
                     } else {

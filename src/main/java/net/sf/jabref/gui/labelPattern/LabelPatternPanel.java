@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -38,7 +38,9 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPattern;
+import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
+import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
@@ -55,11 +57,11 @@ public class LabelPatternPanel extends JPanel {
     protected final JTextField defaultPat = new JTextField();
 
     // one field for each type
-    private final HashMap<String, JTextField> textFields = new HashMap<String, JTextField>();
+    private final HashMap<String, JTextField> textFields = new HashMap<>();
 
 
     public LabelPatternPanel(HelpDialog helpDiag) {
-        help = new HelpAction(helpDiag, GUIGlobals.labelPatternHelp, "Help on key patterns");
+        help = new HelpAction(helpDiag, GUIGlobals.labelPatternHelp, Localization.lang("Help on key patterns"));
         buildGUI();
     }
 
@@ -142,7 +144,7 @@ public class LabelPatternPanel extends JPanel {
         con.weighty = 0;
         con.anchor = GridBagConstraints.SOUTHEAST;
         con.insets = new Insets(0, 5, 0, 5);
-        JButton hlb = new JButton(IconTheme.getImage("helpSmall"));
+        JButton hlb = new JButton(IconTheme.JabRefIcon.HELP.getSmallIcon());
         hlb.setToolTipText(Localization.lang("Help on key patterns"));
         gbl.setConstraints(hlb, con);
         add(hlb);
@@ -214,8 +216,8 @@ public class LabelPatternPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JTextField tf = textFields.get(e.getActionCommand());
-                tf.setText("");
+                JTextField tField = textFields.get(e.getActionCommand());
+                tField.setText("");
             }
         });
         c.add(but);
@@ -224,11 +226,9 @@ public class LabelPatternPanel extends JPanel {
     }
 
     /**
-     * @return the LabelPattern generated from the text fields 
+     * fill the given LabelPattern by values generated from the text fields
      */
-    public LabelPattern getLabelPattern() {
-        LabelPattern keypatterns = new LabelPattern();
-
+    private void fillPatternUsingPanelData(AbstractLabelPattern keypatterns) {
         // each entry type
         for (String s1 : textFields.keySet()) {
             String text = textFields.get(s1).getText();
@@ -242,16 +242,26 @@ public class LabelPatternPanel extends JPanel {
         if (!"".equals(text.trim())) { // we do not trim the value at the assignment to enable users to have spaces at the beginning and at the end of the pattern
             keypatterns.setDefaultValue(text);
         }
+    }
 
-        return keypatterns;
+    protected GlobalLabelPattern getLabelPatternAsGlobalLabelPattern() {
+        GlobalLabelPattern res = new GlobalLabelPattern();
+        fillPatternUsingPanelData(res);
+        return res;
+    }
+
+    public DatabaseLabelPattern getLabelPatternAsDatabaseLabelPattern() {
+        DatabaseLabelPattern res = new DatabaseLabelPattern();
+        fillPatternUsingPanelData(res);
+        return res;
     }
 
     /**
      * Fills the current values to the text fields
-     * 
+     *
      * @param keypatterns the LabelPattern to use as initial value
      */
-    public void setValues(LabelPattern keypatterns) {
+    public void setValues(AbstractLabelPattern keypatterns) {
         for (String name : textFields.keySet()) {
             JTextField tf = textFields.get(name);
             setValue(tf, name, keypatterns);
@@ -264,11 +274,10 @@ public class LabelPatternPanel extends JPanel {
         }
     }
 
-    private void setValue(JTextField tf, String fieldName, LabelPattern keypatterns) {
+    private static void setValue(JTextField tf, String fieldName, AbstractLabelPattern keypatterns) {
         if (keypatterns.isDefaultValue(fieldName)) {
             tf.setText("");
         } else {
-            //System.out.println(":: "+_keypatterns.getValue(fieldName).get(0).toString());
             tf.setText(keypatterns.getValue(fieldName).get(0));
         }
     }

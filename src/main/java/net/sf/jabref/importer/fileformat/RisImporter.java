@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.util.regex.Pattern;
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.AuthorList;
@@ -82,7 +81,7 @@ public class RisImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -104,16 +103,16 @@ public class RisImporter extends ImportFormat {
             String startPage = "";
             String endPage = "";
             String comment = "";
-            HashMap<String, String> hm = new HashMap<String, String>();
+            HashMap<String, String> hm = new HashMap<>();
 
             String[] fields = entry1.split("\n");
 
             for (int j = 0; j < fields.length; j++) {
                 StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
-                while (!done && j < fields.length - 1) {
-                    if (fields[j + 1].length() >= 6 && !fields[j + 1].substring(2, 6).equals("  - ")) {
-                        if (current.length() > 0
+                while (!done && (j < (fields.length - 1))) {
+                    if ((fields[j + 1].length() >= 6) && !fields[j + 1].substring(2, 6).equals("  - ")) {
+                        if ((current.length() > 0)
                                 && !Character.isWhitespace(current.charAt(current.length() - 1))
                                 && !Character.isWhitespace(fields[j + 1].charAt(0))) {
                             current.append(' ');
@@ -209,10 +208,10 @@ public class RisImporter extends ImportFormat {
                         }
                     } else if (lab.equals("UR")) {
                         hm.put("url", val);
-                    } else if ((lab.equals("Y1") || lab.equals("PY")) && val.length() >= 4) {
+                    } else if ((lab.equals("Y1") || lab.equals("PY")) && (val.length() >= 4)) {
                         String[] parts = val.split("/");
                         hm.put("year", parts[0]);
-                        if (parts.length > 1 && !parts[1].isEmpty()) {
+                        if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
 
                                 int monthNumber = Integer.parseInt(parts[1]);
@@ -263,14 +262,14 @@ public class RisImporter extends ImportFormat {
 
                 hm.put("pages", startPage + "--" + endPage);
             }
-            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
                     .getEntryType(type)); // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<Object>();
+            ArrayList<Object> toRemove = new ArrayList<>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if (content == null || content.trim().isEmpty()) {
+                if ((content == null) || content.trim().isEmpty()) {
                     toRemove.add(key);
                 }
             }

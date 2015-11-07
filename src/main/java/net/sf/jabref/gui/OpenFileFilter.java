@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.io.File;
@@ -21,7 +21,7 @@ import java.util.HashSet;
 
 public class OpenFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter {
 
-    private final HashSet<String> extSet = new HashSet<String>();
+    private final HashSet<String> extSet = new HashSet<>();
     private final String desc;
 
 
@@ -84,7 +84,7 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
         int dotDotPos = filenm.lastIndexOf(".", dotPos - 1); // for dot.dot extensions
 
         return extSet.contains(filenm.substring(dotPos)) ||
-                dotDotPos >= 0 && extSet.contains(filenm.substring(dotDotPos));
+                ((dotDotPos >= 0) && extSet.contains(filenm.substring(dotDotPos)));
     }
 
     public String getSuffix(String filenm) {

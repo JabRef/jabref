@@ -16,21 +16,12 @@
 
 package net.sf.jabref.gui;
 
-import java.awt.AlphaComposite;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 /**
  * Extends the JTabbedPane class to support Drag&Drop of Tabs.
@@ -142,22 +133,24 @@ class DragDropPane extends JTabbedPane {
     class MarkerPane extends JPanel {
 
         private Point locationP;
-        private final Image markerImg;
+        private final IconTheme.JabRefIcon moveTabArrow;
 
 
         public MarkerPane() {
             setOpaque(false);
 
-            // Sets the marker image
-            markerImg = IconTheme.getImage("dragNdropArrow").getImage();
+            // Sets the marker fontIcon
+            moveTabArrow = IconTheme.JabRefIcon.MOVE_TAB_ARROW;
         }
 
         @Override
         public void paintComponent(Graphics g) {
             ((Graphics2D) g).setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER, 0.9f)); // Set transparency
-            g.drawImage(markerImg, locationP.x - (markerImg.getWidth(null) / 2),
-                    locationP.y, null); // draw the image at the middle of the given location
+            g.setFont(IconTheme.FONT.deriveFont(Font.BOLD, 24f));
+            g.drawString("\uf214", locationP.x - (moveTabArrow.getIcon().getIconWidth() / 2),
+                    locationP.y + (moveTabArrow.getIcon().getIconHeight() / 2));
+
         }
 
         /**

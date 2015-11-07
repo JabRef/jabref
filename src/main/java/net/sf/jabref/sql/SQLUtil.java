@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General public static License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -23,12 +23,15 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.BibtexFields;
 
 /**
- * 
+ *
  * @author pattonlk
- * 
+ *
  *         Reestructured by ifsteinm. Jan 20th Now it is possible to export more
  *         than one jabref database. BD creation, insertions and queries where
  *         reformulated to accomodate the changes. The changes include a
@@ -39,11 +42,12 @@ import net.sf.jabref.gui.BibtexFields;
 
 public class SQLUtil {
 
-    private static final ArrayList<String> reservedDBWords = new ArrayList<String>(
+    private static final ArrayList<String> reservedDBWords = new ArrayList<>(
             Collections.singletonList("key"));
 
     private static ArrayList<String> allFields;
 
+    private static final Log LOGGER = LogFactory.getLog(SQLUtil.class);
 
     private SQLUtil() {
     }
@@ -54,7 +58,7 @@ public class SQLUtil {
      */
     private static void refreshFields() {
         if (SQLUtil.allFields == null) {
-            SQLUtil.allFields = new ArrayList<String>();
+            SQLUtil.allFields = new ArrayList<>();
         } else {
             SQLUtil.allFields.clear();
         }
@@ -63,7 +67,7 @@ public class SQLUtil {
     }
 
     /**
-     * 
+     *
      * @return All existent fields for a bibtex entry
      */
     public static ArrayList<String> getAllFields() {
@@ -74,7 +78,7 @@ public class SQLUtil {
     }
 
     /**
-     * 
+     *
      * @return Create a common separated field names
      */
     public static String getFieldStr() {
@@ -97,7 +101,7 @@ public class SQLUtil {
     /**
      * Inserts the elements of a String array into an ArrayList making sure not
      * to duplicate entries in the ArrayList
-     * 
+     *
      * @param list
      *            The ArrayList containing unique entries
      * @param array
@@ -121,7 +125,7 @@ public class SQLUtil {
     /**
      * Generates DML specifying table columns and their datatypes. The output of
      * this routine should be used within a CREATE TABLE statement.
-     * 
+     *
      * @param fields
      *            Contains unique field names
      * @param datatype
@@ -146,7 +150,7 @@ public class SQLUtil {
     }
 
     /**
-     * 
+     *
      * @param allFields
      *            All existent fields for a given entry type
      * @param reqFields
@@ -183,7 +187,7 @@ public class SQLUtil {
 
     /**
      * Return a message raised from a SQLException
-     * 
+     *
      * @param ex
      *            The SQLException raised
      */
@@ -200,7 +204,7 @@ public class SQLUtil {
     /**
      * return a ResultSet with the result of a "SELECT *" query for a given
      * table
-     * 
+     *
      * @param conn
      *            Connection to the database
      * @param tableName
@@ -218,7 +222,7 @@ public class SQLUtil {
 
     /**
      * Utility method for processing DML with proper output
-     * 
+     *
      * @param out
      *            The output (PrintStream or Connection) object to which the DML
      *            should be sent
@@ -238,7 +242,7 @@ public class SQLUtil {
 
     /**
      * Utility method for processing DML with proper output
-     * 
+     *
      * @param out
      *            The output (PrintStream or Connection) object to which the DML
      *            should be sent
@@ -249,7 +253,7 @@ public class SQLUtil {
     public static Object processQueryWithResults(Object out, String query)
             throws SQLException {
         if (out instanceof PrintStream) {// TODO: how to handle the PrintStream
-                                         // case?
+            // case?
             PrintStream fout = (PrintStream) out;
             fout.println(query);
             return fout;
@@ -263,7 +267,7 @@ public class SQLUtil {
 
     /**
      * This routine returns the JDBC url corresponding to the DBStrings input.
-     * 
+     *
      * @param dbStrings
      *            The DBStrings to use to make the connection
      * @return The JDBC url corresponding to the input DBStrings
@@ -280,7 +284,7 @@ public class SQLUtil {
      * Process a query and returns only the first result of a result set as a
      * String. To be used when it is certain that only one String (single cell)
      * will be returned from the DB
-     * 
+     *
      * @param conn
      *            The Connection object to which the DML should be sent
      * @param query
@@ -300,7 +304,7 @@ public class SQLUtil {
 
     /**
      * Utility method for executing DML
-     * 
+     *
      * @param conn
      *            The DML Connection object that will execute the SQL
      * @param qry
@@ -312,14 +316,14 @@ public class SQLUtil {
         stmnt.execute(qry);
         SQLWarning warn = stmnt.getWarnings();
         if (warn != null) {
-            System.err.println(warn);
+            LOGGER.warn(warn);
         }
         stmnt.close();
     }
 
     /**
      * Utility method for executing DML
-     * 
+     *
      * @param conn
      *            The DML Connection object that will execute the SQL
      * @param qry
@@ -331,8 +335,7 @@ public class SQLUtil {
         stmnt.executeQuery(qry);
         SQLWarning warn = stmnt.getWarnings();
         if (warn != null) {
-
-            System.err.println(warn);
+            LOGGER.warn(warn);
         }
         return stmnt;
     }

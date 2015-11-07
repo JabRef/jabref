@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.io.InputStream;
@@ -26,7 +26,6 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
@@ -63,7 +62,7 @@ public class ScifinderImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         int i = 0;
-        while ((str = in.readLine()) != null && i < 50) {
+        while (((str = in.readLine()) != null) && (i < 50)) {
 
             if (str.trim().equals("START_RECORD")) {
                 return true;
@@ -81,7 +80,7 @@ public class ScifinderImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -93,7 +92,7 @@ public class ScifinderImporter extends ImportFormat {
         }
 
         String[] entries = sb.toString().split("START_RECORD");
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
         for (int i = 1; i < entries.length; i++) {
             String[] fields = entries[i].split("FIELD ");
             String journal = null;
@@ -151,7 +150,7 @@ public class ScifinderImporter extends ImportFormat {
                 }
             }
 
-            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
                     .getEntryType(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(hm);

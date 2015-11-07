@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -76,7 +76,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         }
         else if (s.equalsIgnoreCase("comment")) {
             // Report error and exit.
-            JOptionPane.showMessageDialog(this, Localization.lang("The name 'comment' can not be used as an entry type name."),
+            JOptionPane.showMessageDialog(this, Localization.lang("The name 'comment' cannot be used as an entry type name."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -91,7 +91,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             changesMade = true;
         }
         for (int i = 0; i < selected.length; i++) {
-            String typeName = (String) listModel.get(selected[selected.length - 1 - i]);
+            String typeName = listModel.get(selected[selected.length - 1 - i]);
             BibtexEntryType type = BibtexEntryType.getType(typeName);
 
             // If it is a custom entry type, we can remove it. If type == null, it means
@@ -109,7 +109,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-
+        // Do nothing
     }
 
     public void enable(String typeName, boolean isChanged) {

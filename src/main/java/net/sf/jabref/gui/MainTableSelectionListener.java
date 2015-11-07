@@ -33,7 +33,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -334,7 +334,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             //If this is a file link field with specified file types,
             //we should also pass the types.
             String[] fileTypes = {};
-            if ((hasField == 0) && iconType[hasField].equals(GUIGlobals.FILE_FIELD) && (iconType.length > 1)) {
+            if ((hasField == 0) && iconType[hasField].equals(Globals.FILE_FIELD) && (iconType.length > 1)) {
                 fileTypes = iconType;
             }
             final List<String> listOfFileTypes = Collections.unmodifiableList(Arrays.asList(fileTypes));
@@ -354,7 +354,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
                     // See if this is a simple file link field, or if it is a file-list
                     // field that can specify a list of links:
-                    if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
+                    if (fieldName.equals(Globals.FILE_FIELD)) {
 
                         // We use a FileListTableModel to parse the field content:
                         FileListTableModel fileList = new FileListTableModel();
@@ -457,7 +457,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
-        if (iconType[0].equals(GUIGlobals.FILE_FIELD)) {
+        if (iconType[0].equals(Globals.FILE_FIELD)) {
             // We use a FileListTableModel to parse the field content:
             Object o = entry.getField(iconType[0]);
             FileListTableModel fileList = new FileListTableModel();

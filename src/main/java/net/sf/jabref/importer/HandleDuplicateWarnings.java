@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -38,7 +39,7 @@ public class HandleDuplicateWarnings implements PostOpenAction {
                         + "</p><p>" + Localization.lang("Do you want to resolve duplicate keys now?"),
                 Localization.lang("Duplicate BibTeX key"), JOptionPane.YES_NO_OPTION);
         if (answer == JOptionPane.YES_OPTION) {
-            panel.runCommand("resolveDuplicateKeys");
+            panel.runCommand(Actions.RESOLVE_DUPLICATE_KEYS);
         }
     }
 }

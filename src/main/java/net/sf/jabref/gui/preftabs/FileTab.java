@@ -37,7 +37,6 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
@@ -63,8 +62,8 @@ class FileTab extends JPanel implements PrefsTab {
     private final JCheckBox includeEmptyFields;
     private final JCheckBox camelCase;
     private final JCheckBox sameColumn;
-    private final JComboBox valueDelimiter;
-    private final JComboBox newlineSeparator;
+    private final JComboBox<String> valueDelimiter;
+    private final JComboBox<String> newlineSeparator;
     private final JRadioButton resolveStringsStandard;
     private final JRadioButton resolveStringsAll;
     private final JTextField bracesAroundCapitalsFields;
@@ -83,14 +82,12 @@ class FileTab extends JPanel implements PrefsTab {
         this.prefs = prefs;
         this.frame = frame;
 
-        HelpAction autosaveHelp = new HelpAction(frame.helpDiag, GUIGlobals.autosaveHelp, "Help",
-                IconTheme.getImage("helpSmall"));
         openLast = new JCheckBox(Localization.lang("Open last edited databases at startup"));
         backup = new JCheckBox(Localization.lang("Backup old file when saving"));
-        autoSave = new JCheckBox(Localization.lang(JabRefPreferences.AUTO_SAVE));
+        autoSave = new JCheckBox(Localization.lang("Autosave"));
         promptBeforeUsingAutoSave = new JCheckBox(Localization.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
-        valueDelimiter = new JComboBox(new String[] {
+        valueDelimiter = new JComboBox<>(new String[] {
                 Localization.lang("Quotes") + ": \", \"",
                 Localization.lang("Curly Brackets") + ": {, }"});
         includeEmptyFields = new JCheckBox(Localization.lang("Include empty fields"));
@@ -105,7 +102,7 @@ class FileTab extends JPanel implements PrefsTab {
         userDefinedFieldOrder = new JTextField(this.prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
 
         // This is sort of a quick hack
-        newlineSeparator = new JComboBox(new String[] {"CR", "CR/LF", "LF"});
+        newlineSeparator = new JComboBox<>(new String[] {"CR", "CR/LF", "LF"});
 
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
@@ -154,8 +151,7 @@ class FileTab extends JPanel implements PrefsTab {
 
         builder.appendSeparator(Localization.lang("Autosave"));
         builder.append(autoSave, 1);
-        JButton help = new JButton(autosaveHelp);
-        help.setText(null);
+        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.autosaveHelp).getIconButton();
         help.setPreferredSize(new Dimension(24, 24));
         JPanel hPan = new JPanel();
         hPan.setLayout(new BorderLayout());
@@ -183,7 +179,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.nextLine();
         //for LWang_AdjustableFieldOrder
         String[] _rbs0 = {"Save fields sorted in alphabetic order (as in versions 2.10+)", "Save fields in unsorted order (as until version 2.9.2)", "Save fields in user-defined order"};
-        ArrayList<String> _rbs = new ArrayList<String>();
+        ArrayList<String> _rbs = new ArrayList<>();
         for (String _rb : _rbs0) {
             _rbs.add(Localization.lang(_rb));
         }
@@ -241,7 +237,8 @@ class FileTab extends JPanel implements PrefsTab {
     //        fieldOrderStyle=getBgValue(bgFieldOrderStyle);
     //    }
 
-    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup, JTextField textField) {
+    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup,
+            JTextField textField) {
         //for LWang_AdjustableFieldOrder
 
         for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {

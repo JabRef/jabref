@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,7 +17,7 @@ package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -28,10 +28,10 @@ public class Relevance extends SpecialField {
 
 
     private Relevance() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<>();
         // action directly set by JabRefFrame
         // DO NOT TRANSLATE "relevant" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Localization.lang("Toggle relevance"), IconTheme.getImage("relevant"), Localization.lang("Toggle relevance")));
+        values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Localization.lang("Toggle relevance"), IconTheme.JabRefIcon.RELEVANCE.getSmallIcon(), Localization.lang("Toggle relevance")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Toggled relevance for %0 entries";
     }
@@ -49,7 +49,7 @@ public class Relevance extends SpecialField {
     }
 
     @Override
-    public ImageIcon getRepresentingIcon() {
+    public Icon getRepresentingIcon() {
         return this.getValues().get(0).getIcon();
     }
 

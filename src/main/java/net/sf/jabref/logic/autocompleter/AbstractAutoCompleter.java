@@ -26,7 +26,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
  * different use cases.
  * 
  * Example: {@link NameFieldAutoCompleter}, {@link EntireFieldAutoCompleter}
- * 
+ *
  * @author kahlert, cordes, olly98
  * @see AutoCompleterFactory
  */
@@ -43,14 +43,15 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
     // stores for a lowercase string the possible expanded strings
     private final HashMap<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<>();
 
-
     @Override
     public abstract void addBibtexEntry(BibtexEntry entry);
 
     /**
-     * Returns one or more possible completions for a given String. The returned completion depends on which
-     * informations were stored while adding BibtexEntries by the used implementation of {@link AbstractAutoCompleter} .
-     * 
+     * Returns one or more possible completions for a given String. The returned
+     * completion depends on which informations were stored while adding
+     * BibtexEntries by the used implementation of {@link AbstractAutoCompleter}
+     * .
+     *
      * @see AbstractAutoCompleter#addBibtexEntry(BibtexEntry)
      */
     @Override
@@ -65,7 +66,7 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
             String ender = AbstractAutoCompleter.incrementLastCharacter(lowerCase);
             SortedSet<String> subset = indexCaseInsensitive.subSet(lowerCase, ender);
 
-            // As subset only contains lower case strings, 
+            // As subset only contains lower case strings,
             // we have to to determine possible strings for each hit
             ArrayList<String> result = new ArrayList<>();
             for (String s : subset) {
@@ -83,7 +84,7 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
 
     /**
      * Increments the last character of a string.
-     * 
+     *
      * Example: incrementLastCharacter("abc") returns "abd".
      */
     private static String incrementLastCharacter(String toIncrement) {

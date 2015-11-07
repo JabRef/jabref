@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -36,7 +36,6 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
@@ -83,7 +82,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             piv++;
         }
 
-        JList list = new JList(array);
+        JList<String> list = new JList<>(array);
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -103,7 +102,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
-                .getFileDirectory(GUIGlobals.FILE_FIELD);
+                .getFileDirectory(Globals.FILE_FIELD);
         // Also store the database's file in a global variable:
         Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
 
@@ -115,7 +114,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             File f = new File(dir);
             lfName = f.getName();
             lfName = lfName.substring(0, lfName.indexOf("."));
-            // Remove file name - we want the directory only.
+            // Remove filename - we want the directory only.
             dir = f.getParent() + System.getProperty("file.separator");
         }
         final String format = lfName,
@@ -129,7 +128,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
             BibtexEntry[] bes = panel.getSelectedEntries();
-            HashSet<String> entries = new HashSet<String>(bes.length);
+            HashSet<String> entries = new HashSet<>(bes.length);
             for (BibtexEntry be : bes) {
                 entries.add(be.getId());
             }
@@ -148,6 +147,7 @@ public class ExportToClipboardAction extends AbstractWorker {
 
                 @Override
                 public void lostOwnership(Clipboard clipboard, Transferable content) {
+                    // Do nothing
                 }
             };
             //StringSelection ss = new StringSelection(sw.toString());

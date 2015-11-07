@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.collab;
 
 import javax.swing.JComponent;
@@ -23,7 +23,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.logic.bibtex.DuplicateCheck;
+import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -27,22 +27,21 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * User: alver
- * 
- * Date: Oct 18, 2006 
- * 
- * Time: 9:35:08 PM 
+ *
+ * Date: Oct 18, 2006
+ *
+ * Time: 9:35:08 PM
  */
 public class ExportFormats {
 
-    private static final Map<String, IExportFormat> exportFormats = new TreeMap<String, IExportFormat>();
+    private static final Map<String, IExportFormat> exportFormats = new TreeMap<>();
 
     // Global variable that is used for counting output entries when exporting:
     public static int entryNumber;
@@ -93,7 +92,7 @@ public class ExportFormats {
 
     /**
      * Build a string listing of all available export formats.
-     * 
+     *
      * @param maxLineLength
      *            The max line length before a line break must be added.
      * @param linePrefix
@@ -107,7 +106,7 @@ public class ExportFormats {
         int lastBreak = -firstLineSubtr;
 
         for (String name : ExportFormats.exportFormats.keySet()) {
-            if (sb.length() + 2 + name.length() - lastBreak > maxLineLength) {
+            if (((sb.length() + 2 + name.length()) - lastBreak) > maxLineLength) {
                 sb.append(",\n");
                 lastBreak = sb.length();
                 sb.append(linePrefix);
@@ -131,7 +130,7 @@ public class ExportFormats {
 
     /**
      * Look up the named export format.
-     * 
+     *
      * @param consoleName
      *            The export name given in the JabRef console help information.
      * @return The ExportFormat, or null if no exportformat with that name is
@@ -143,7 +142,7 @@ public class ExportFormats {
 
     /**
      * Create an AbstractAction for performing an export operation.
-     * 
+     *
      * @param frame
      *            The JabRefFrame of this JabRef instance.
      * @param selectedOnly
@@ -155,8 +154,6 @@ public class ExportFormats {
 
         class ExportAction extends MnemonicAwareAction {
 
-            private static final long serialVersionUID = 639463604530580554L;
-
             private final JabRefFrame frame;
 
             private final boolean selectedOnly;
@@ -165,7 +162,7 @@ public class ExportFormats {
             public ExportAction(JabRefFrame frame, boolean selectedOnly) {
                 this.frame = frame;
                 this.selectedOnly = selectedOnly;
-                putValue(Action.NAME, selectedOnly ? "Export selected entries" : "Export");
+                putValue(Action.NAME, selectedOnly ? Localization.menuTitle("Export selected entries") : Localization.menuTitle("Export"));
             }
 
             @Override
@@ -199,7 +196,7 @@ public class ExportFormats {
                     Set<String> entryIds = null;
                     if (selectedOnly) {
                         BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
-                        entryIds = new HashSet<String>();
+                        entryIds = new HashSet<>();
                         for (BibtexEntry bibtexEntry : selected) {
                             entryIds.add(bibtexEntry.getId());
                         }
@@ -209,7 +206,7 @@ public class ExportFormats {
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
                     Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
-                            .getFileDirectory(GUIGlobals.FILE_FIELD);
+                            .getFileDirectory(Globals.FILE_FIELD);
                     // Also store the database's file in a global variable:
                     Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
 
@@ -275,7 +272,7 @@ public class ExportFormats {
         String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet<FileFilter> filters = new TreeSet<FileFilter>();
+        TreeSet<FileFilter> filters = new TreeSet<>();
         for (Map.Entry<String, IExportFormat> e : ExportFormats.exportFormats.entrySet()) {
             String formatName = e.getKey();
             IExportFormat format = e.getValue();

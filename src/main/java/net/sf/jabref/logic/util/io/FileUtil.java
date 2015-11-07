@@ -1,8 +1,25 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -13,18 +30,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class FileUtil {
+    private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     /**
      * Returns the extension of a file or null if the file does not have one (no . in name).
      *
      * @param file
-     *
      * @return The extension, trimmed and in lowercase.
      */
     public static String getFileExtension(File file) {
         String name = file.getName();
         int pos = name.lastIndexOf('.');
-        if (pos >= 0 && pos < name.length() - 1) {
+        if ((pos >= 0) && (pos < (name.length() - 1))) {
             return name.substring(pos + 1).trim().toLowerCase();
         } else {
             return null;
@@ -34,16 +51,13 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param source
-     *            File Source file
-     * @param dest
-     *            File Destination file
-     * @param deleteIfExists
-     *            boolean Determines whether the copy goes on even if the file
-     *            exists.
-     * @throws IOException
+     * @param source         File Source file
+     * @param dest           File Destination file
+     * @param deleteIfExists boolean Determines whether the copy goes on even if the file
+     *                       exists.
      * @return boolean Whether the copy succeeded, or was stopped due to the
-     *         file already existing.
+     * file already existing.
+     * @throws IOException
      */
     public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
 
@@ -78,7 +92,6 @@ public class FileUtil {
     }
 
     /**
-     *
      * @param fileName
      * @param destFilename
      * @return
@@ -97,28 +110,26 @@ public class FileUtil {
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.<br/>
-     *
+     * <p>
      * Uses <ul>
      * <li>the default directory associated with the extension of the file</li>
      * <li>the standard file directory</li>
      * <li>the directory of the bib file</li>
      * </ul>
      *
-     * @param metaData
-     *            The MetaData for the database this file belongs to.
-     * @param name
-     *            The file name, may also be a relative path to the file
+     * @param metaData The MetaData for the database this file belongs to.
+     * @param name     The filename, may also be a relative path to the file
      */
     public static File expandFilename(final MetaData metaData, String name) {
         int pos = name.lastIndexOf('.');
-        String extension = pos >= 0 && pos < name.length() - 1 ? name
+        String extension = (pos >= 0) && (pos < (name.length() - 1)) ? name
                 .substring(pos + 1).trim().toLowerCase() : null;
         // Find the default directory for this field type, if any:
         String[] dir = metaData.getFileDirectory(extension);
         // Include the standard "file" directory:
-        String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
         // Include the directory of the bib file:
-        ArrayList<String> al = new ArrayList<String>();
+        ArrayList<String> al = new ArrayList<>();
         for (String aDir : dir) {
             if (!al.contains(aDir)) {
                 al.add(aDir);
@@ -136,7 +147,7 @@ public class FileUtil {
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.
-     *
+     * <p>
      * Will look in each of the given dirs starting from the beginning and
      * returning the first found file to match if any.
      */
@@ -161,13 +172,13 @@ public class FileUtil {
     public static File expandFilename(String name, String dir) {
 
         File file;
-        if (name == null || name.isEmpty()) {
+        if ((name == null) || name.isEmpty()) {
             return null;
         } else {
             file = new File(name);
         }
 
-        if (!file.exists() && dir != null) {
+        if (!file.exists() && (dir != null)) {
             if (dir.endsWith(System.getProperty("file.separator"))) {
                 name = dir + name;
             } else {
@@ -189,7 +200,7 @@ public class FileUtil {
                 try {
                     name = name.replaceAll("/", "\\\\");
                 } catch (StringIndexOutOfBoundsException exc) {
-                    System.err.println("An internal Java error was caused by the entry " + "\"" + name + "\"");
+                    LOGGER.error("An internal Java error was caused by the entry " + "\"" + name + "\"", exc);
                 }
             } else {
                 name = name.replaceAll("\\\\", "/");
@@ -206,25 +217,25 @@ public class FileUtil {
     /**
      * Converts an absolute filename to a relative one, if necessary.
      * Returns the parameter fileName itself if no shortening is possible
-     *
+     * <p>
      * This method works correctly only if dirs are sorted decent in their length
      * i.e. /home/user/literature/important before /home/user/literature
      *
-     * @param fileName the file name to be shortened
-     * @param dirs directories to check.
+     * @param fileName the filename to be shortened
+     * @param dirs     directories to check.
      */
     public static File shortenFileName(File fileName, String[] dirs) {
-        if (fileName == null || fileName.length() == 0) {
+        if ((fileName == null) || (fileName.length() == 0)) {
             return fileName;
         }
-        if (!fileName.isAbsolute() || dirs == null) {
+        if (!fileName.isAbsolute() || (dirs == null)) {
             return fileName;
         }
 
         for (String dir : dirs) {
             if (dir != null) {
                 File result = shortenFileName(fileName, dir);
-                if (result != null && !result.equals(fileName)) {
+                if ((result != null) && !result.equals(fileName)) {
                     return result;
                 }
             }
@@ -233,10 +244,10 @@ public class FileUtil {
     }
 
     private static File shortenFileName(File fileName, String dir) {
-        if (fileName == null || fileName.length() == 0) {
+        if ((fileName == null) || (fileName.length() == 0)) {
             return fileName;
         }
-        if (!fileName.isAbsolute() || dir == null) {
+        if (!fileName.isAbsolute() || (dir == null)) {
             return fileName;
         }
 

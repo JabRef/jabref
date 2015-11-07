@@ -22,15 +22,17 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import net.sf.jabref.JabRef;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 
 @SuppressWarnings("serial")
 public class ForkMeOnGitHubAction extends AbstractAction {
 
     public ForkMeOnGitHubAction() {
-        super(Localization.menuTitle("Fork me on GitHub"));
+        super(Localization.menuTitle("Fork me on GitHub"), IconTheme.JabRefIcon.GITHUB.getSmallIcon());
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Opens JabRef's GitHub page"));
+        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.GITHUB.getIcon());
     }
 
     @Override

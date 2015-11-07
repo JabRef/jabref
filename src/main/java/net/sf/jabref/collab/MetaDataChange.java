@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,7 +26,7 @@ import java.util.Vector;
 import java.util.ArrayList;
 
 /**
- * 
+ *
  */
 class MetaDataChange extends Change {
 
@@ -39,7 +39,7 @@ class MetaDataChange extends Change {
     private final JScrollPane sp = new JScrollPane(tp);
     private final MetaData md;
     private final MetaData mdSecondary;
-    private final ArrayList<MetaDataChangeUnit> changes = new ArrayList<MetaDataChangeUnit>();
+    private final ArrayList<MetaDataChangeUnit> changes = new ArrayList<>();
 
 
     public MetaDataChange(MetaData md, MetaData mdSecondary) {

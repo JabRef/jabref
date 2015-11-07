@@ -1,4 +1,5 @@
-/* Copyright (c) 2009, Ryo IGARASHI <rigarash@gmail.com>
+/* Copyright (C) 2003-2015 JabRef Contributors
+ * Copyright (c) 2009, Ryo IGARASHI <rigarash@gmail.com>
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -23,11 +24,7 @@
 
 package net.sf.jabref.importer.fetcher;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import javax.xml.stream.XMLInputFactory;
@@ -50,7 +47,6 @@ import net.sf.jabref.logic.l10n.Localization;
  * Fetching using DOI(Document Object Identifier) is only supported.
  *
  * @author Ryo IGARASHI
- * @version $Id$
  */
 public class ADSFetcher implements EntryFetcher {
 
@@ -68,12 +64,12 @@ public class ADSFetcher implements EntryFetcher {
 
     @Override
     public String getKeyName() {
-        return "ADS from ADS-DOI";
+        return Localization.lang("ADS from ADS-DOI");
     }
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle(getKeyName());
+        return getKeyName();
     }
 
     @Override
@@ -86,13 +82,14 @@ public class ADSFetcher implements EntryFetcher {
             /* Query ADS and load the results into the BibtexDatabase */
             status.setStatus(Localization.lang("Processing ") + key);
             BibtexDatabase bd = importADSEntries(key, status);
-            /* Add the entry to the inspection dialog */
-            status.setStatus("Adding fetched entries");
-            if (bd.getEntryCount() > 0) {
+            if ((bd != null) && (bd.getEntryCount() > 0)) {
+                /* Add the entry to the inspection dialog */
                 for (BibtexEntry entry : bd.getEntries()) {
                     importADSAbstract(key, entry, status);
                     dialog.addEntry(entry);
                 }
+            } else {
+                return false;
             }
         } catch (Exception e) {
             status.setStatus(Localization.lang("Error while fetching from ADS") + ": " + e.getMessage());
@@ -103,6 +100,7 @@ public class ADSFetcher implements EntryFetcher {
 
     @Override
     public void stopFetching() {
+        // Do nothing
     }
 
     private BibtexDatabase importADSEntries(String key, OutputPrinter status) {
@@ -111,23 +109,27 @@ public class ADSFetcher implements EntryFetcher {
             URL ADSUrl = new URL(url + "&data_type=BIBTEX");
             HttpURLConnection ADSConnection = (HttpURLConnection) ADSUrl.openConnection();
             ADSConnection.setRequestProperty("User-Agent", "Jabref");
-            InputStream is = ADSConnection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            ParserResult pr = BibtexParser.parse(reader);
-            return pr.getDatabase();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(ADSConnection.getInputStream()))) {
+                ParserResult pr = BibtexParser.parse(reader);
+                return pr.getDatabase();
+            }
+        } catch (FileNotFoundException e) {
+            status.showMessage(Localization.lang("'%0' is not a valid ADS bibcode.", key) + "\n\n" +
+                            Localization.lang("Note: A full text search is currently not supported for %0",
+                                    getKeyName()),
+                    getKeyName(), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang(
-                    "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
+                    getKeyName(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            status.showMessage(Localization.lang(
-                    "An Error occurred while fetching from ADS (%0):", new String[]{url})
-                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(
+                    Localization.lang("An Error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
+                    getKeyName(), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
 
-    private String constructUrl(String key) {
+    private static String constructUrl(String key) {
         return "http://adsabs.harvard.edu/doi/" + key;
     }
 
@@ -160,17 +162,15 @@ public class ADSFetcher implements EntryFetcher {
             abstractText = abstractText.replace("\n", " ");
             entry.setField("abstract", abstractText);
         } catch (XMLStreamException e) {
-            status.showMessage(Localization.lang(
-                            "An Error occurred while parsing abstract"),
-                    Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("An Error occurred while parsing abstract"), getKeyName(),
+                    JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang(
-                    "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
+                    getKeyName(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            status.showMessage(Localization.lang(
-                    "An Error occurred while fetching from ADS (%0):", new String[]{url})
-                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(
+                    Localization.lang("An Error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
+                    getKeyName(), JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.exporter;
 
 import net.sf.jabref.gui.JabRefFrame;
@@ -64,7 +64,7 @@ public class AutoSaveManager {
             // Since this method is running in the background, we must be prepared that
             // there could be changes done by the user while this method is running.
 
-            List<BasePanel> panels = new ArrayList<BasePanel>();
+            List<BasePanel> panels = new ArrayList<>();
             for (int i = 0; i < frame.baseCount(); i++) {
                 panels.add(frame.baseAt(i));
             }
@@ -134,7 +134,7 @@ public class AutoSaveManager {
      * if they exist.
      */
     public void clearAutoSaves() {
-        List<BasePanel> panels = new ArrayList<BasePanel>();
+        List<BasePanel> panels = new ArrayList<>();
         for (int i = 0; i < frame.baseCount(); i++) {
             panels.add(frame.baseAt(i));
         }
@@ -151,6 +151,6 @@ public class AutoSaveManager {
      */
     public static boolean newerAutoSaveExists(File f) {
         File asFile = AutoSaveManager.getAutoSaveFile(f);
-        return asFile.exists() && asFile.lastModified() > f.lastModified();
+        return asFile.exists() && (asFile.lastModified() > f.lastModified());
     }
 }

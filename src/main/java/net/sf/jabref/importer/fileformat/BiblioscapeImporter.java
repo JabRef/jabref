@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
@@ -23,7 +23,6 @@ import java.util.*;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
@@ -66,15 +65,15 @@ public class BiblioscapeImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        ArrayList<BibtexEntry> bibItems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibItems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
-        HashMap<String, String> hm = new HashMap<String, String>();
-        HashMap<String, StringBuffer> lines = new HashMap<String, StringBuffer>();
+        HashMap<String, String> hm = new HashMap<>();
+        HashMap<String, StringBuffer> lines = new HashMap<>();
         StringBuffer previousLine = null;
         while ((line = in.readLine()) != null) {
             if (line.isEmpty())
-             {
+            {
                 continue; // ignore empty lines, e.g. at file
             }
             // end
@@ -86,7 +85,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 String address = null;
                 String titleST = null;
                 String titleTI = null;
-                Vector<String> comments = new Vector<String>();
+                Vector<String> comments = new Vector<>();
                 // add item
                 for (Map.Entry<String, StringBuffer> entry : lines.entrySet()) {
                     if (entry.getKey().equals("AU")) {
@@ -124,7 +123,7 @@ public class BiblioscapeImporter extends ImportFormat {
                                 + entry.getValue());
                     } else if (entry.getKey().equals("SA")) {
                         comments
-                                .add("Secondary Authors: " + entry.getValue());
+                        .add("Secondary Authors: " + entry.getValue());
                     } else if (entry.getKey().equals("NT")) {
                         hm.put("note", entry
                                 .getValue().toString());
@@ -133,10 +132,10 @@ public class BiblioscapeImporter extends ImportFormat {
                                 .getValue().toString());
                     } else if (entry.getKey().equals("TA")) {
                         comments
-                                .add("Tertiary Authors: " + entry.getValue());
+                        .add("Tertiary Authors: " + entry.getValue());
                     } else if (entry.getKey().equals("TT")) {
                         comments
-                                .add("Tertiary Title: " + entry.getValue());
+                        .add("Tertiary Title: " + entry.getValue());
                     } else if (entry.getKey().equals("ED")) {
                         hm.put("edition", entry
                                 .getValue().toString());
@@ -145,10 +144,10 @@ public class BiblioscapeImporter extends ImportFormat {
                                 .toString();
                     } else if (entry.getKey().equals("QA")) {
                         comments
-                                .add("Quaternary Authors: " + entry.getValue());
+                        .add("Quaternary Authors: " + entry.getValue());
                     } else if (entry.getKey().equals("QT")) {
                         comments
-                                .add("Quaternary Title: " + entry.getValue());
+                        .add("Quaternary Title: " + entry.getValue());
                     } else if (entry.getKey().equals("IS")) {
                         hm.put("isbn", entry
                                 .getValue().toString());
@@ -196,19 +195,19 @@ public class BiblioscapeImporter extends ImportFormat {
                         comments.add("Short Title: "
                                 + entry.getValue());
                     } else if (entry.getKey().equals("SE"))
-                     {
+                    {
                         hm.put("chapter", entry
                                 .getValue().toString());
-                    //else if (entry.getKey().equals("AC"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("LP"))
-                    // hm.put("",entry.getValue().toString());
+                        //else if (entry.getKey().equals("AC"))
+                        // hm.put("",entry.getValue().toString());
+                        //else if (entry.getKey().equals("LP"))
+                        // hm.put("",entry.getValue().toString());
                     }
                 }
 
                 String bibtexType = "misc";
                 // to find type, first check TW, then RT
-                for (int i = 1; i >= 0 && bibtexType.equals("misc"); --i) {
+                for (int i = 1; (i >= 0) && bibtexType.equals("misc"); --i) {
                     if (type[i] == null) {
                         continue;
                     }
@@ -253,21 +252,21 @@ public class BiblioscapeImporter extends ImportFormat {
                     }
                 } else {
                     if (titleST != null)
-                     {
+                    {
                         hm.put("booktitle", titleST); // should not
                     }
-                                                      // happen, I
-                                                      // think
+                    // happen, I
+                    // think
                     if (titleTI != null) {
                         hm.put("title", titleTI);
                     }
                 }
 
                 // concatenate pages
-                if (pages[0] != null || pages[1] != null) {
+                if ((pages[0] != null) || (pages[1] != null)) {
                     hm.put("pages",
                             (pages[0] != null ? pages[0] : "")
-                                    + (pages[1] != null ? "--" + pages[1] : ""));
+                            + (pages[1] != null ? "--" + pages[1] : ""));
                 }
 
                 // concatenate address and country
@@ -283,7 +282,7 @@ public class BiblioscapeImporter extends ImportFormat {
                     }
                     hm.put("comment", s.toString());
                 }
-                BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
+                BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
                         BibtexEntryTypes.getEntryType(bibtexType));
                 b.setField(hm);
                 bibItems.add(b);
@@ -295,7 +294,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 continue;
             }
             // new key
-            if (line.startsWith("--") && line.length() >= 7
+            if (line.startsWith("--") && (line.length() >= 7)
                     && line.substring(4, 7).equals("-- ")) {
                 lines.put(line.substring(2, 4), previousLine = new StringBuffer(line
                         .substring(7)));

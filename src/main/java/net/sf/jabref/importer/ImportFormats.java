@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -29,7 +29,7 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -49,7 +49,7 @@ public class ImportFormats {
         String lastUsedFormat = Globals.prefs.get("lastUsedImport");
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet<ImportFileFilter> filters = new TreeSet<ImportFileFilter>();
+        TreeSet<ImportFileFilter> filters = new TreeSet<>();
         for (ImportFormat format : importers) {
             ImportFileFilter filter = new ImportFileFilter(format);
             filters.add(filter);
@@ -88,8 +88,8 @@ public class ImportFormats {
                 this.frame = frame;
                 this.openInNew = openInNew;
 
-                putValue(Action.NAME, openInNew ? "Import into new database" :
-                        "Import into current database");
+                putValue(Action.NAME, openInNew ? Localization.menuTitle("Import into new database") :
+                        Localization.menuTitle("Import into current database"));
                 putValue(Action.ACCELERATOR_KEY, openInNew ? Globals.prefs.getKey("Import into new database") :
                         Globals.prefs.getKey("Import into current database"));
             }

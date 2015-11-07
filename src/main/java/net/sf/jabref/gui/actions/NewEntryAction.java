@@ -14,15 +14,15 @@ import java.awt.event.ActionEvent;
 public class NewEntryAction extends MnemonicAwareAction {
     private static final Log LOGGER = LogFactory.getLog(NewEntryAction.class);
 
-    private JabRefFrame jabRefFrame;
+    private final JabRefFrame jabRefFrame;
     String type; // The type of item to create.
     KeyStroke keyStroke; // Used for the specific instances.
 
     public NewEntryAction(JabRefFrame jabRefFrame, KeyStroke key) {
         // This action leads to a dialog asking for entry type.
-        super(IconTheme.getImage("add"));
+        super(IconTheme.JabRefIcon.ADD_ENTRY.getIcon());
         this.jabRefFrame = jabRefFrame;
-        putValue(Action.NAME, "New entry");
+        putValue(Action.NAME, Localization.menuTitle("New entry"));
         putValue(Action.ACCELERATOR_KEY, key);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX entry"));
     }

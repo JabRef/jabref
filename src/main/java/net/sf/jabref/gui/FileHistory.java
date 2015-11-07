@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import net.sf.jabref.JabRefExecutorService;
@@ -33,7 +33,7 @@ import javax.swing.JOptionPane;
 public class FileHistory extends JMenu implements ActionListener {
 
     private final JabRefPreferences prefs;
-    private final LinkedList<String> history = new LinkedList<String>();
+    private final LinkedList<String> history = new LinkedList<>();
     private final JabRefFrame frame;
 
 
@@ -51,7 +51,7 @@ public class FileHistory extends JMenu implements ActionListener {
         this.prefs = prefs;
         this.frame = frame;
         String[] old = prefs.getStringArray("recentFiles");
-        if (old != null && old.length > 0) {
+        if ((old != null) && (old.length > 0)) {
             for (i = 0; i < old.length; i++) {
                 history.addFirst(old[i]);
             }
@@ -62,7 +62,7 @@ public class FileHistory extends JMenu implements ActionListener {
     }
 
     /**
-     * Adds the file name to the top of the menu. If it already is in
+     * Adds the filename to the top of the menu. If it already is in
      * the menu, it is merely moved to the top.
      *
      * @param filename a <code>String</code> value

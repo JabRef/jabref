@@ -63,7 +63,7 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        String[] dirs = frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] dirs = frame.basePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
             if (new File(dirs[i]).exists()) {

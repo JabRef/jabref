@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -42,26 +42,17 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
-/**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
     private final JTextField tf = new JTextField();
-    private final JButton helpBut = new JButton(
-            IconTheme.getImage("helpSmall"));
-    private final JComboBox fetcherChoice;
+
+    private final JComboBox<String> fetcherChoice;
     private final CardLayout optionsCards = new CardLayout();
     private final JPanel optionsPanel = new JPanel(optionsCards);
     private final JPanel optPanel = new JPanel(new BorderLayout());
-    private HelpAction help;
+    private final HelpAction help;
+    private final JButton helpBut;
 
     private final SidePaneManager sidePaneManager;
     private final Action action;
@@ -71,7 +62,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
-        super(p0, IconTheme.getImage("www"), Localization.lang("Web search"));
+        super(p0, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
         List<EntryFetcher> fetchers = EntryFetchers.INSTANCE.getEntryFetchers();
@@ -88,7 +79,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             else
                 optionsPanel.add(new JPanel(), String.valueOf(i));*/
         }
-        fetcherChoice = new JComboBox(choices);
+        fetcherChoice = new JComboBox<>(choices);
         int defaultFetcher = Globals.prefs.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
         if (defaultFetcher >= fetcherArray.length) {
             defaultFetcher = 0;
@@ -98,6 +89,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         if (this.activeFetcher.getOptionsPanel() != null) {
             optPanel.add(this.activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
         }
+        help = new HelpAction(GUIGlobals.helpDiag, activeFetcher.getHelpPage());
+        helpBut = help.getIconButton();
         helpBut.setEnabled(activeFetcher.getHelpPage() != null);
 
         //optionsCards.show(optionsPanel, String.valueOf(defaultFetcher));
@@ -142,9 +135,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         action = new FetcherAction();
 
-        help = new HelpAction(GUIGlobals.helpDiag, activeFetcher.getHelpPage(), "Help");
 
-        helpBut.addActionListener(help);
+
         helpBut.setMargin(new Insets(0, 0, 0, 0));
         tf.setPreferredSize(new Dimension(1, tf.getPreferredSize().height));
 
@@ -207,7 +199,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         tf.addActionListener(this);
     }
 
-    public void setHelpResourceOwner(Class c) {
+    public void setHelpResourceOwner(Class<?> c) {
         help.setResourceOwner(c);
     }
 
@@ -305,9 +297,10 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     class FetcherAction extends AbstractAction {
 
         public FetcherAction() {
-            super(Localization.lang("Web search"), IconTheme.getImage("www"));
+            super(Localization.lang("Web search"), IconTheme.JabRefIcon.WWW.getSmallIcon());
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
             putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Fetch Medline"));
+            putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.WWW.getIcon());
         }
 
         @Override
@@ -329,6 +322,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     @Override
     public void componentClosing() {
         super.componentClosing();
+        frame.fetcherToggle.setSelected(false);
         Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
     }
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package net.sf.jabref.util;
 
 import java.awt.BorderLayout;
@@ -45,8 +45,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.MnemonicAwareAction;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
@@ -59,7 +59,7 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
@@ -72,6 +72,8 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class ManageKeywordsAction extends MnemonicAwareAction {
 
+    private static final long serialVersionUID = -5234432936032780873L;
+
     private final JabRefFrame frame;
 
     private JDialog diag;
@@ -79,27 +81,27 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     // keyword to add
     private JTextField keyword;
 
-    private DefaultListModel keywordListModel;
-    private JList keywordList;
+    private DefaultListModel<String> keywordListModel;
+    private JList<String> keywordList;
 
     private JRadioButton intersectKeywords;
     private JRadioButton mergeKeywords;
 
     private boolean cancelled;
 
-    private final TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<String>();
+    private final TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<>();
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
-        putValue(Action.NAME, "Manage keywords");
+        putValue(Action.NAME, Localization.menuTitle("Manage keywords"));
         this.frame = frame;
     }
 
     private void createDialog() {
         keyword = new JTextField();
 
-        keywordListModel = new DefaultListModel();
-        keywordList = new JList(keywordListModel);
+        keywordListModel = new DefaultListModel<>();
+        keywordList = new JList<>(keywordListModel);
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
@@ -128,19 +130,16 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         mergeKeywords.addActionListener(stateChanged);
         intersectKeywords.setSelected(true);
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("fill:200dlu, 4dlu, left:pref, 4dlu, left:pref", ""));
-        builder.appendSeparator(Localization.lang("Keywords of selected entries"));
-        builder.append(intersectKeywords, 5);
-        builder.nextLine();
-        builder.append(mergeKeywords, 5);
-        builder.nextLine();
-        builder.append(kPane, 3);
-        builder.add(remove);
-        builder.nextLine();
-        builder.append(keyword, 3);
-        builder.append(add);
-        builder.nextLine();
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("fill:200dlu:grow, 4dlu, fill:pref",
+                "pref, 2dlu, pref, 1dlu, pref, 2dlu, fill:100dlu:grow, 4dlu, pref, 4dlu, pref, "));
+
+        builder.addSeparator(Localization.lang("Keywords of selected entries")).xyw(1, 1, 3);
+        builder.add(intersectKeywords).xyw(1, 3, 3);
+        builder.add(mergeKeywords).xyw(1, 5, 3);
+        builder.add(kPane).xywh(1, 7, 1, 3);
+        builder.add(remove).xy(3, 9);
+        builder.add(keyword).xy(1, 11);
+        builder.add(add).xy(3, 11);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -160,6 +159,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
+
+            private static final long serialVersionUID = -4623988526737916508L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -182,9 +183,9 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                     keywordListModel.addElement(text);
                 } else {
                     int idx = 0;
-                    String element = (String) keywordListModel.getElementAt(idx);
-                    while (idx < keywordListModel.size() &&
-                            element.compareTo(text) < 0) {
+                    String element = keywordListModel.getElementAt(idx);
+                    while ((idx < keywordListModel.size()) &&
+                            (element.compareTo(text) < 0)) {
                         idx++;
                     }
                     if (idx == keywordListModel.size()) {
@@ -207,7 +208,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-                String[] values = (String[]) keywordList.getSelectedValues();
+                String[] values = (String[]) keywordList.getSelectedValuesList().toArray();
 
                 for (String val : values) {
                     keywordListModel.removeElement(val);
@@ -263,7 +264,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-        //diag.pack();
     }
 
     @Override
@@ -273,7 +273,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
         if (bp.getSelectedEntries().length == 0) {
-            // no entries selected, silently ignore action
+            bp.output(Localization.lang("Select at least one entry to manage keywords."));
             return;
         }
 
@@ -293,21 +293,21 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        HashSet<String> keywordsToAdd = new HashSet<String>();
-        HashSet<String> userSelectedKeywords = new HashSet<String>();
+        HashSet<String> keywordsToAdd = new HashSet<>();
+        HashSet<String> userSelectedKeywords = new HashSet<>();
         // build keywordsToAdd and userSelectedKeywords in parallel
-        for (Enumeration keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
-            String keyword = (String) keywords.nextElement();
-            userSelectedKeywords.add(keyword);
-            if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
-                keywordsToAdd.add(keyword);
+        for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
+            String kword = keywords.nextElement();
+            userSelectedKeywords.add(kword);
+            if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(kword)) {
+                keywordsToAdd.add(kword);
             }
         }
 
-        HashSet<String> keywordsToRemove = new HashSet<String>();
-        for (String keyword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
-            if (!userSelectedKeywords.contains(keyword)) {
-                keywordsToRemove.add(keyword);
+        HashSet<String> keywordsToRemove = new HashSet<>();
+        for (String kword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
+            if (!userSelectedKeywords.contains(kword)) {
+                keywordsToRemove.add(kword);
             }
         }
 
@@ -377,7 +377,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             // we "intercept" with a treeset
             // pro: no duplicates
             // possible con: alphabetical sorting of the keywords
-            TreeSet<String> keywords = new TreeSet<String>();
+            TreeSet<String> keywords = new TreeSet<>();
             keywords.addAll(separatedKeywords);
 
             // update keywords
@@ -399,7 +399,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     @SuppressWarnings("unchecked")
-    private HashSet<String> createClone(HashSet<String> keywordsToAdd) {
+    private static HashSet<String> createClone(HashSet<String> keywordsToAdd) {
         return (HashSet<String>) keywordsToAdd.clone();
     }
 

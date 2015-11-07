@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.groups.structure;
 
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -38,7 +38,7 @@ public class ExplicitGroup extends AbstractGroup {
 
     public static final String ID = "ExplicitGroup:";
 
-    private final Set<BibtexEntry> entries = new HashSet<BibtexEntry>();
+    private final Set<BibtexEntry> entries = new HashSet<>();
 
     public ExplicitGroup(String name, GroupHierarchyType context) {
         super(name, context);
@@ -50,7 +50,7 @@ public class ExplicitGroup extends AbstractGroup {
                     "Internal error: ExplicitGroup cannot be created from \""
                             + s
                             + "\". "
-                            + "Please report this on www.sf.net/projects/jabref");
+                    + "Please report this on https://github.com/JabRef/jabref/issues");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
@@ -117,7 +117,7 @@ public class ExplicitGroup extends AbstractGroup {
             return null; // nothing to do
         }
 
-        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<BibtexEntry>(this.entries);
+        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<>(this.entries);
         Collections.addAll(this.entries, entries);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, this.entries);
@@ -133,7 +133,7 @@ public class ExplicitGroup extends AbstractGroup {
             return null; // nothing to do
         }
 
-        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<BibtexEntry>(this.entries);
+        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<>(this.entries);
         for (BibtexEntry entry : entries) {
             this.entries.remove(entry);
         }
@@ -172,7 +172,7 @@ public class ExplicitGroup extends AbstractGroup {
         if (entries.size() != other.entries.size()) {
             return false; // add/remove
         }
-        HashSet<String> keys = new HashSet<String>();
+        HashSet<String> keys = new HashSet<>();
         BibtexEntry entry;
         String key;
         // compare bibtex keys for all entries that have one
@@ -196,7 +196,7 @@ public class ExplicitGroup extends AbstractGroup {
             return false;
         }
         return other.name.equals(name)
-                && other.getHierarchicalContext() == getHierarchicalContext();
+                && (other.getHierarchicalContext() == getHierarchicalContext());
     }
 
     /**
@@ -209,13 +209,13 @@ public class ExplicitGroup extends AbstractGroup {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(ExplicitGroup.ID).append(StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
-                append(AbstractGroup.SEPARATOR).append(context.ordinal()).append(AbstractGroup.SEPARATOR);
+        append(AbstractGroup.SEPARATOR).append(context.ordinal()).append(AbstractGroup.SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
-        Set<String> sortedKeys = new TreeSet<String>();
+        Set<String> sortedKeys = new TreeSet<>();
         for (BibtexEntry m_entry : entries) {
             s = m_entry.getCiteKey();
-            if (s != null && !s.isEmpty()) {
+            if ((s != null) && !s.isEmpty()) {
                 sortedKeys.add(s);
             }
         }
@@ -280,7 +280,7 @@ public class ExplicitGroup extends AbstractGroup {
      */
     @Override
     public void refreshForNewDatabase(BibtexDatabase db) {
-        Set<BibtexEntry> newSet = new HashSet<BibtexEntry>();
+        Set<BibtexEntry> newSet = new HashSet<>();
         for (BibtexEntry entry : entries) {
             BibtexEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
             /*if (sameEntry == null) {
@@ -305,6 +305,12 @@ public class ExplicitGroup extends AbstractGroup {
 
     public int getNumEntries() {
         return entries.size();
+    }
+
+    @Override
+    public int hashCode() {
+        // TODO Auto-generated method stub
+        return super.hashCode();
     }
 
 }

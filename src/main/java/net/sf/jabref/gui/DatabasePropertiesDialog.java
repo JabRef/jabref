@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
@@ -34,8 +34,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -46,7 +44,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
@@ -63,17 +61,13 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private MetaData metaData;
     private BasePanel panel;
-    private final JComboBox encoding;
+    private final JComboBox<String> encoding;
     private final JButton ok;
     private final JButton cancel;
     private final JTextField fileDir = new JTextField(40);
     private final JTextField fileDirIndv = new JTextField(40);
-    private final JTextField pdfDir = new JTextField(40);
-    private final JTextField psDir = new JTextField(40);
     private String oldFileVal = "";
     private String oldFileIndvVal = "";
-    private String oldPdfVal = "";
-    private String oldPsVal = ""; // Remember old values to see if they are changed.
     private SaveOrderConfig oldSaveOrderConfig;
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
@@ -81,9 +75,9 @@ public class DatabasePropertiesDialog extends JDialog {
     private JRadioButton saveAsConfiguredGlobally;
     private JRadioButton saveInOriginalOrder;
     private JRadioButton saveInSpecifiedOrder;
-    private JComboBox savePriSort;
-    private JComboBox saveSecSort;
-    private JComboBox saveTerSort;
+    private JComboBox<String> savePriSort;
+    private JComboBox<String> saveSecSort;
+    private JComboBox<String> saveTerSort;
     private JTextField savePriField;
     private JTextField saveSecField;
     private JTextField saveTerField;
@@ -99,7 +93,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Localization.lang("Database properties"), true);
-        encoding = new JComboBox(Encodings.ENCODINGS);
+        encoding = new JComboBox<>(Encodings.ENCODINGS);
         ok = new JButton(Localization.lang("Ok"));
         cancel = new JButton(Localization.lang("Cancel"));
         init(parent);
@@ -114,77 +108,54 @@ public class DatabasePropertiesDialog extends JDialog {
 
         JButton browseFile = new JButton(Localization.lang("Browse"));
         JButton browseFileIndv = new JButton(Localization.lang("Browse"));
-        JButton browsePdf = new JButton(Localization.lang("Browse"));
-        JButton browsePs = new JButton(Localization.lang("Browse"));
         browseFile.addActionListener(BrowseAction.buildForDir(parent, fileDir));
         browseFileIndv.addActionListener(BrowseAction.buildForDir(parent, fileDirIndv));
-        browsePdf.addActionListener(BrowseAction.buildForDir(parent, pdfDir));
-        browsePs.addActionListener(BrowseAction.buildForDir(parent, psDir));
 
         setupSortOrderConfiguration();
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, fill:pref", ""));
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, fill:pref",
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        builder.append(Localization.lang("Database encoding"));
-        builder.append(encoding);
-        builder.nextLine();
+        builder.add(Localization.lang("Database encoding")).xy(1, 1);
+        builder.add(encoding).xy(3, 1);
 
-        builder.appendSeparator(Localization.lang("Override default file directories"));
-        builder.nextLine();
-        builder.append(Localization.lang("General file directory"));
-        builder.append(fileDir);
-        builder.append(browseFile);
-        builder.nextLine();
-        builder.append(Localization.lang("User-specific file directory"));
-        builder.append(fileDirIndv);
-        builder.append(browseFileIndv);
-        builder.nextLine();
-        builder.append(Localization.lang("PDF directory"));
-        builder.append(pdfDir);
-        builder.append(browsePdf);
-        builder.nextLine();
-        builder.append(Localization.lang("PS directory"));
-        builder.append(psDir);
-        builder.append(browsePs);
-        builder.nextLine();
+        builder.addSeparator(Localization.lang("Override default file directories")).xyw(1, 3, 5);
+        builder.add(Localization.lang("General file directory")).xy(1, 5);
+        builder.add(fileDir).xy(3, 5);
+        builder.add(browseFile).xy(5, 5);
+        builder.add(Localization.lang("User-specific file directory")).xy(1, 7);
+        builder.add(fileDirIndv).xy(3, 7);
+        builder.add(browseFileIndv).xy(5, 7);
 
-        builder.appendSeparator(Localization.lang("Save sort order"));
-        builder.append(saveAsConfiguredGlobally, 1);
-        builder.nextLine();
-        builder.append(saveInOriginalOrder, 1);
-        builder.nextLine();
-        builder.append(saveInSpecifiedOrder, 1);
-        builder.nextLine();
+        builder.addSeparator(Localization.lang("Save sort order")).xyw(1, 13, 5);
+        builder.add(saveAsConfiguredGlobally).xyw(1, 15, 5);
+        builder.add(saveInOriginalOrder).xyw(1, 17, 5);
+        builder.add(saveInSpecifiedOrder).xyw(1, 19, 5);
 
         // Create a new panel with its own FormLayout for these items:
-        FormLayout layout2 = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
-        DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        JLabel lab = new JLabel(Localization.lang("Primary sort criterion"));
-        builder2.append(lab);
-        builder2.append(savePriSort);
-        builder2.append(savePriField);
-        builder2.append(savePriDesc);
-        builder2.nextLine();
-        lab = new JLabel(Localization.lang("Secondary sort criterion"));
-        builder2.append(lab);
-        builder2.append(saveSecSort);
-        builder2.append(saveSecField);
-        builder2.append(saveSecDesc);
-        builder2.nextLine();
-        lab = new JLabel(Localization.lang("Tertiary sort criterion"));
-        builder2.append(lab);
-        builder2.append(saveTerSort);
-        builder2.append(saveTerField);
-        builder2.append(saveTerDesc);
+        FormLayout layout2 = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref",
+                "pref, 2dlu, pref, 2dlu, pref");
+        FormBuilder builder2 = FormBuilder.create().layout(layout2);
+        builder2.add(Localization.lang("Primary sort criterion")).xy(1, 1);
+        builder2.add(savePriSort).xy(3, 1);
+        builder2.add(savePriField).xy(5, 1);
+        builder2.add(savePriDesc).xy(7, 1);
 
-        JPanel saveSpecPanel = builder2.getPanel();
-        builder.append(saveSpecPanel);
-        builder.nextLine();
+        builder2.add(Localization.lang("Secondary sort criterion")).xy(1, 3);
+        builder2.add(saveSecSort).xy(3, 3);
+        builder2.add(saveSecField).xy(5, 3);
+        builder2.add(saveSecDesc).xy(7, 3);
 
-        builder.appendSeparator(Localization.lang("Database protection"));
-        builder.nextLine();
-        builder.append(protect, 3);
+        builder2.add(Localization.lang("Tertiary sort criterion")).xy(1, 5);
+        builder2.add(saveTerSort).xy(3, 5);
+        builder2.add(saveTerField).xy(5, 5);
+        builder2.add(saveTerDesc).xy(7, 5);
+
+        builder.add(builder2.getPanel()).xyw(1, 21, 5);
+
+        builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
+        builder.add(protect).xyw(1, 25, 5);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
@@ -256,13 +227,13 @@ public class DatabasePropertiesDialog extends JDialog {
         saveInOriginalOrder.addActionListener(listener);
         saveInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        ArrayList<String> v = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
         v.add(BibtexEntry.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
-        savePriSort = new JComboBox(allPlusKey);
-        saveSecSort = new JComboBox(allPlusKey);
-        saveTerSort = new JComboBox(allPlusKey);
+        savePriSort = new JComboBox<>(allPlusKey);
+        saveSecSort = new JComboBox<>(allPlusKey);
+        saveTerSort = new JComboBox<>(allPlusKey);
 
         savePriSort.insertItemAt(Localization.lang("<select>"), 0);
         saveSecSort.insertItemAt(Localization.lang("<select>"), 0);
@@ -386,26 +357,6 @@ public class DatabasePropertiesDialog extends JDialog {
             oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting normally if reading from ordinary setting
         }
 
-        Vector<String> pdfD = metaData.getData("pdfDirectory");
-        if (pdfD == null) {
-            pdfDir.setText("");
-        } else {
-            // Better be a little careful about how many entries the Vector has:
-            if (pdfD.size() >= 1) {
-                pdfDir.setText((pdfD.get(0)).trim());
-            }
-        }
-
-        Vector<String> psD = metaData.getData("psDirectory");
-        if (psD == null) {
-            psDir.setText("");
-        } else {
-            // Better be a little careful about how many entries the Vector has:
-            if (psD.size() >= 1) {
-                psDir.setText((psD.get(0)).trim());
-            }
-        }
-
         Vector<String> prot = metaData.getData(Globals.PROTECTED_FLAG_META);
         if (prot == null) {
             protect.setSelected(false);
@@ -417,8 +368,6 @@ public class DatabasePropertiesDialog extends JDialog {
 
         // Store original values to see if they get changed:
         oldFileVal = fileDir.getText();
-        oldPdfVal = pdfDir.getText();
-        oldPsVal = psDir.getText();
         oldProtectVal = protect.isSelected();
     }
 
@@ -450,7 +399,7 @@ public class DatabasePropertiesDialog extends JDialog {
         String newEncoding = (String) encoding.getSelectedItem();
         panel.setEncoding(newEncoding);
 
-        Vector<String> dir = new Vector<String>(1);
+        Vector<String> dir = new Vector<>(1);
         String text = fileDir.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -459,7 +408,7 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
-        dir = new Vector<String>(1);
+        dir = new Vector<>(1);
         text = fileDirIndv.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -468,26 +417,8 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL));
         }
 
-        dir = new Vector<String>(1);
-        text = pdfDir.getText().trim();
-        if (!text.isEmpty()) {
-            dir.add(text);
-            metaData.putData("pdfDirectory", dir);
-        } else {
-            metaData.remove("pdfDirectory");
-        }
-
-        dir = new Vector<String>(1);
-        text = psDir.getText().trim();
-        if (!text.isEmpty()) {
-            dir.add(text);
-            metaData.putData("psDirectory", dir);
-        } else {
-            metaData.remove("psDirectory");
-        }
-
         if (protect.isSelected()) {
-            dir = new Vector<String>(1);
+            dir = new Vector<>(1);
             dir.add("true");
             metaData.putData(Globals.PROTECTED_FLAG_META, dir);
         } else {
@@ -508,8 +439,6 @@ public class DatabasePropertiesDialog extends JDialog {
         boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
                 || !oldFileVal.equals(fileDir.getText())
                 || !oldFileIndvVal.equals(fileDirIndv.getText())
-                || !oldPdfVal.equals(pdfDir.getText())
-                || !oldPsVal.equals(psDir.getText())
                 || (oldProtectVal != protect.isSelected());
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:

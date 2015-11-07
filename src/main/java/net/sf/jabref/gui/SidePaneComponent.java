@@ -12,28 +12,21 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JToolBar;
+import javax.swing.*;
 
 import org.jdesktop.swingx.JXTitledPanel;
 
 public abstract class SidePaneComponent extends JXTitledPanel {
 
-    private static final long serialVersionUID = 1L;
-
-    protected final JButton close = new JButton(IconTheme.getImage("close"));
+    protected final JButton close = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
 
     private boolean visible;
 
@@ -42,16 +35,16 @@ public abstract class SidePaneComponent extends JXTitledPanel {
     protected BasePanel panel;
 
 
-    public SidePaneComponent(SidePaneManager manager, ImageIcon icon, String title) {
+    public SidePaneComponent(SidePaneManager manager, Icon icon, String title) {
         super(title);
         this.add(new JLabel(icon));
         this.manager = manager;
         JToolBar tlb = new JToolBar();
         close.setMargin(new Insets(0, 0, 0, 0));
         close.setBorder(null);
-        JButton up = new JButton(IconTheme.getImage("up"));
+        JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
         up.setMargin(new Insets(0, 0, 0, 0));
-        JButton down = new JButton(IconTheme.getImage("down"));
+        JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
         down.setMargin(new Insets(0, 0, 0, 0));
         up.setBorder(null);
         down.setBorder(null);
@@ -80,7 +73,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     /**
      * Used by SidePaneManager only, to keep track of visibility.
-     * 
+     *
      */
     void setVisibility(boolean vis) {
         visible = vis;
@@ -88,7 +81,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     /**
      * Used by SidePaneManager only, to keep track of visibility.
-     * 
+     *
      */
     boolean hasVisibility() {
         return visible;
@@ -106,14 +99,14 @@ public abstract class SidePaneComponent extends JXTitledPanel {
      * Override this method if the component needs to make any changes before it can close.
      */
     public void componentClosing() {
-
+        // Nothing right now
     }
 
     /**
      * Override this method if the component needs to do any actions when opening.
      */
     public void componentOpening() {
-
+        // Nothing right now
     }
 
     @Override

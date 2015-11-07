@@ -30,12 +30,6 @@ import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.gui.TableFormat;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 /**
@@ -64,14 +58,14 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     private static final String[] QUALITY = {SpecialFieldsUtils.FIELDNAME_QUALITY};
     private static final String[] PRINTED = {SpecialFieldsUtils.FIELDNAME_PRINTED};
     private static final String[] READ = {SpecialFieldsUtils.FIELDNAME_READ};
-    public static final String[] FILE = {GUIGlobals.FILE_FIELD};
+    public static final String[] FILE = {Globals.FILE_FIELD};
 
     private final BasePanel panel;
 
     private String[][] columns; // Contains the current column names.
     public int padleft = -1; // padleft indicates how many columns (starting from left) are
     // special columns (number column or icon column).
-    private final HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
+    private final HashMap<Integer, String[]> iconCols = new HashMap<>();
     private int[][] nameCols;
     private boolean namesAsIs;
     private boolean abbr_names;
@@ -192,23 +186,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         return false;
     }
 
-    private Object modifyIconForMultipleLinks(JLabel label) {
-        Icon icon = label.getIcon();
-        BufferedImage bufImg = new BufferedImage(
-                icon.getIconWidth(),
-                icon.getIconHeight(),
-                BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bufImg.createGraphics();
-        // paint the Icon to the BufferedImage.
-        icon.paintIcon(null, g, 0, 0);
-        // add the letter "m" in the bottom right corner
-        g.setColor(Color.BLACK);
-        g.setFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 12));
-        g.drawString("m", bufImg.getWidth() - g.getFontMetrics().stringWidth("m"), bufImg.getHeight());
-        g.dispose();
-        return new JLabel(new ImageIcon(bufImg));
-    }
-
     @Override
     public Object getColumnValue(BibtexEntry be, int col) {
         Object o = null;
@@ -227,11 +204,11 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             }
 
             // Ok, so we are going to display an icon. Find out which one, and return it:
-            if (iconType[hasField].equals(GUIGlobals.FILE_FIELD)) {
-                o = FileListTableModel.getFirstLabel(be.getField(GUIGlobals.FILE_FIELD));
+            if (iconType[hasField].equals(Globals.FILE_FIELD)) {
+                o = FileListTableModel.getFirstLabel(be.getField(Globals.FILE_FIELD));
 
                 if (fieldCount[1] > 1) {
-                    o = modifyIconForMultipleLinks((JLabel) o);
+                    o = new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
                 }
 
                 // Handle priority column special
@@ -260,7 +237,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 o = GUIGlobals.getTableIcon(iconType[hasField]);
 
                 if (fieldCount[1] > 1) {
-                    o = modifyIconForMultipleLinks((JLabel) o);
+                    o = new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
                 }
             }
         } else {
@@ -326,14 +303,14 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     private int[] hasField(BibtexEntry be, String[] field) {
         // If the entry has a nonzero value in any of the
-        // 'search' fields, returns the smallest index for which it does. 
+        // 'search' fields, returns the smallest index for which it does.
         // Otherwise returns -1. When field indicates one or more file types,
         // returns the index of the first present file type.
         if ((be == null) || (field == null) || (field.length < 1)) {
             return new int[]{-1, -1};
         }
         int hasField = -1;
-        if (!field[0].equals(GUIGlobals.FILE_FIELD)) {
+        if (!field[0].equals(Globals.FILE_FIELD)) {
             for (int i = field.length - 1; i >= 0; i--) {
                 if (hasField(be, field[i])) {
                     hasField = i;
@@ -342,7 +319,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             return new int[]{hasField, -1};
         } else {
             // We use a FileListTableModel to parse the field content:
-            Object o = be.getField(GUIGlobals.FILE_FIELD);
+            Object o = be.getField(Globals.FILE_FIELD);
             FileListTableModel fileList = new FileListTableModel();
             fileList.setContent((String) o);
             if (field.length == 1) {
@@ -380,7 +357,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
 
         // Read name format options:
-        boolean showShort = Globals.prefs.getBoolean(JabRefPreferences.SHOW_SHORT);
         namesNatbib = Globals.prefs.getBoolean(JabRefPreferences.NAMES_NATBIB); //MK:
         namesLastOnly = Globals.prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
         namesAsIs = Globals.prefs.getBoolean(JabRefPreferences.NAMES_AS_IS);
@@ -448,7 +424,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
             String[] desiredColumns = Globals.prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             for (String desiredColumn : desiredColumns) {
-                iconCols.put(coln, new String[]{GUIGlobals.FILE_FIELD, desiredColumn});
+                iconCols.put(coln, new String[]{Globals.FILE_FIELD, desiredColumn});
                 coln++;
             }
         }
@@ -461,7 +437,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         // of names as efficiently as possible.
         // Each subarray contains the column number (before padding) and the
         // subfield number in case a column has fallback fields.
-        Vector<int[]> tmp = new Vector<int[]>(2, 1);
+        Vector<int[]> tmp = new Vector<>(2, 1);
         for (int i = 0; i < columns.length; i++) {
             for (int j = 0; j < columns[i].length; j++) {
                 if (columns[i][j].equals("author")

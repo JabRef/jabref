@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.groups;
 
 import java.awt.BorderLayout;
@@ -81,17 +81,17 @@ import org.apache.commons.logging.LogFactory;
  * The whole UI component holding the groups tree and the buttons
  */
 public class GroupSelector extends SidePaneComponent implements
-        TreeSelectionListener, ActionListener {
+TreeSelectionListener, ActionListener {
 
     private static final Log LOGGER = LogFactory.getLog(GroupSelector.class);
 
-    private final JButton newButton = new JButton(IconTheme.getImage("new"));
+    private final JButton newButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
     private final JButton refresh = new JButton(
-            IconTheme.getImage("refresh"));
-    private final JButton autoGroup = new JButton(IconTheme.getImage("autoGroup"));
+            IconTheme.JabRefIcon.REFRESH.getSmallIcon());
+    private final JButton autoGroup = new JButton(IconTheme.JabRefIcon.AUTO_GROUP.getSmallIcon());
     private final JButton openset = new JButton(Localization.lang("Settings"));
     Color bgColor = Color.white;
-    private GroupsTree groupsTree;
+    private final GroupsTree groupsTree;
     private DefaultTreeModel groupsTreeModel;
     private GroupTreeNode groupsRoot;
     final JabRefFrame frame;
@@ -121,7 +121,7 @@ public class GroupSelector extends SidePaneComponent implements
      * quicksearch. The next two define the name and regexp for the group.
      */
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, IconTheme.getImage("toggleGroups"), Localization.lang("Groups"));
+        super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
         this.groupsRoot = new GroupTreeNode(new AllEntriesGroup());
 
         this.frame = frame;
@@ -262,7 +262,7 @@ public class GroupSelector extends SidePaneComponent implements
                 }
             }
         });
-        JButton expand = new JButton(IconTheme.getImage("down"));
+        JButton expand = new JButton(IconTheme.JabRefIcon.ADD_ROW.getSmallIcon());
         expand.addActionListener(new ActionListener() {
 
             @Override
@@ -277,7 +277,7 @@ public class GroupSelector extends SidePaneComponent implements
                 LOGGER.info("Height: " + GroupSelector.this.getHeight() + "; Preferred height: " + GroupSelector.this.getPreferredSize().getHeight());
             }
         });
-        JButton reduce = new JButton(IconTheme.getImage("up"));
+        JButton reduce = new JButton(IconTheme.JabRefIcon.REMOVE_ROW.getSmallIcon());
         reduce.addActionListener(new ActionListener() {
 
             @Override
@@ -314,8 +314,7 @@ public class GroupSelector extends SidePaneComponent implements
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
-        JButton helpButton = new JButton(
-                IconTheme.getImage("help"));
+        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.groupsHelp, Localization.lang("Help on groups")).getIconButton();
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);
         autoGroup.setPreferredSize(butDim);
@@ -388,10 +387,7 @@ public class GroupSelector extends SidePaneComponent implements
         main.add(autoGroup);
         con.gridx = 3;
         con.gridwidth = GridBagConstraints.REMAINDER;
-        HelpAction helpAction = new HelpAction(frame.helpDiag,
-                GUIGlobals.groupsHelp, "Help on groups");
-        helpButton.addActionListener(helpAction);
-        helpButton.setToolTipText(Localization.lang("Help on groups"));
+
         gbl.setConstraints(helpButton, con);
         main.add(helpButton);
 
@@ -518,11 +514,11 @@ public class GroupSelector extends SidePaneComponent implements
                 if (node.isRoot()) {
                     return;
                 }
-                if (e.getClickCount() == 2
-                        && e.getButton() == MouseEvent.BUTTON1) { // edit
+                if ((e.getClickCount() == 2)
+                        && (e.getButton() == MouseEvent.BUTTON1)) { // edit
                     editGroupAction.actionPerformed(null); // dummy event
-                } else if (e.getClickCount() == 1
-                        && e.getButton() == MouseEvent.BUTTON1) {
+                } else if ((e.getClickCount() == 1)
+                        && (e.getButton() == MouseEvent.BUTTON1)) {
                     annotationEvent(node);
                 }
             }
@@ -668,8 +664,8 @@ public class GroupSelector extends SidePaneComponent implements
         // Sort entries into current members and non-members of the group
         // Current members will be removed
         // Current non-members will be added
-        ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>(entries.length);
-        ArrayList<BibtexEntry> toAdd = new ArrayList<BibtexEntry>(entries.length);
+        ArrayList<BibtexEntry> toRemove = new ArrayList<>(entries.length);
+        ArrayList<BibtexEntry> toAdd = new ArrayList<>(entries.length);
 
         for (BibtexEntry entry : entries) {
             // Sort according to current state of the entries
@@ -707,7 +703,7 @@ public class GroupSelector extends SidePaneComponent implements
      * @param deletion != addition
      */
     public void updateGroupContentIfEnabled(boolean deletion) {
-        if (groupsTree == null || groupsTree.getSelectionCount() == 0) {
+        if ((groupsTree == null) || (groupsTree.getSelectionCount() == 0)) {
             return;
         }
         if (!this.editModeIndicator) {
@@ -739,9 +735,9 @@ public class GroupSelector extends SidePaneComponent implements
             return; // ignore this event
         }
         final TreePath[] selection = groupsTree.getSelectionPaths();
-        if (selection == null
-                || selection.length == 0
-                || selection.length == 1 && ((GroupTreeNode) selection[0].getLastPathComponent()).getGroup() instanceof AllEntriesGroup) {
+        if ((selection == null)
+                || (selection.length == 0)
+                || ((selection.length == 1) && (((GroupTreeNode) selection[0].getLastPathComponent()).getGroup() instanceof AllEntriesGroup))) {
             panel.stopShowingGroup();
             panel.mainTable.stopShowingFloatGrouping();
             if (showOverlappingGroups.isSelected()) {
@@ -784,7 +780,7 @@ public class GroupSelector extends SidePaneComponent implements
 
         private final SearchRule rules;
         private final String searchTerm;
-        private final ArrayList<BibtexEntry> matches = new ArrayList<BibtexEntry>();
+        private final ArrayList<BibtexEntry> matches = new ArrayList<>();
         private final boolean showOverlappingGroupsP;
         int hits;
 
@@ -834,7 +830,7 @@ public class GroupSelector extends SidePaneComponent implements
      * been changed) and set the specified selection and expansion state.
      */
     public void revalidateGroups(TreePath[] selectionPaths,
-                                 Enumeration<TreePath> expandedNodes) {
+            Enumeration<TreePath> expandedNodes) {
         revalidateGroups(selectionPaths, expandedNodes, null);
     }
 
@@ -845,7 +841,7 @@ public class GroupSelector extends SidePaneComponent implements
      * @param node If this is non-null, the view is scrolled to make it visible.
      */
     private void revalidateGroups(TreePath[] selectionPaths,
-                                  Enumeration<TreePath> expandedNodes, GroupTreeNode node) {
+            Enumeration<TreePath> expandedNodes, GroupTreeNode node) {
         groupsTreeModel.reload();
         groupsTree.clearSelection();
         if (selectionPaths != null) {
@@ -1347,7 +1343,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo;
-        if (!node.canMoveUp() || (undo = node.moveUp(GroupSelector.this)) == null) {
+        if (!node.canMoveUp() || ((undo = node.moveUp(GroupSelector.this)) == null)) {
             frame.output(Localization.lang(
                     "Cannot move group \"%0\" up.", node.getGroup().getName()));
             return false; // not possible
@@ -1372,7 +1368,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo;
-        if (!node.canMoveDown() || (undo = node.moveDown(GroupSelector.this)) == null) {
+        if (!node.canMoveDown() || ((undo = node.moveDown(GroupSelector.this)) == null)) {
             frame.output(Localization.lang(
                     "Cannot move group \"%0\" down.", node.getGroup().getName()));
             return false; // not possible
@@ -1397,7 +1393,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo;
-        if (!node.canMoveLeft() || (undo = node.moveLeft(GroupSelector.this)) == null) {
+        if (!node.canMoveLeft() || ((undo = node.moveLeft(GroupSelector.this)) == null)) {
             frame.output(Localization.lang(
                     "Cannot move group \"%0\" left.", node.getGroup().getName()));
             return false; // not possible
@@ -1421,7 +1417,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo;
-        if (!node.canMoveRight() || (undo = node.moveRight(GroupSelector.this)) == null) {
+        if (!node.canMoveRight() || ((undo = node.moveRight(GroupSelector.this)) == null)) {
             frame.output(Localization.lang(
                     "Cannot move group \"%0\" right.", node.getGroup().getName()));
             return false; // not possible
@@ -1519,12 +1515,12 @@ public class GroupSelector extends SidePaneComponent implements
      * If entries is null or has zero length, highlight is cleared.
      */
     public void showMatchingGroups(BibtexEntry[] entries, boolean requireAll) {
-        if (entries == null || entries.length == 0) { // nothing selected
+        if ((entries == null) || (entries.length == 0)) { // nothing selected
             groupsTree.setHighlight3Cells(null);
             groupsTree.revalidate();
             return;
         }
-        Vector<GroupTreeNode> vec = new Vector<GroupTreeNode>();
+        Vector<GroupTreeNode> vec = new Vector<>();
         for (Enumeration<GroupTreeNode> e = groupsRoot.preorderEnumeration(); e.hasMoreElements(); ) {
             GroupTreeNode node = e.nextElement();
             AbstractGroup group = node.getGroup();
@@ -1540,7 +1536,7 @@ public class GroupSelector extends SidePaneComponent implements
                     }
                 }
             }
-            if (requireAll && i >= entries.length) // did not break from loop
+            if (requireAll && (i >= entries.length)) // did not break from loop
             {
                 vec.add(node);
             }
@@ -1561,7 +1557,7 @@ public class GroupSelector extends SidePaneComponent implements
      * of the entries found in the specified search.
      */
     private void showOverlappingGroups(List<BibtexEntry> matches) { //DatabaseSearch search) {
-        List<GroupTreeNode> nodes = new ArrayList<GroupTreeNode>();
+        List<GroupTreeNode> nodes = new ArrayList<>();
         for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
             GroupTreeNode node = e.nextElement();
             SearchRule rule = node.getSearchRule();

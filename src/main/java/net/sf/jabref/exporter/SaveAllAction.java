@@ -21,6 +21,8 @@ import javax.swing.Action;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
 import spin.Spin;
@@ -38,11 +40,11 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
 
     /** Creates a new instance of SaveAllAction */
     public SaveAllAction(JabRefFrame frame) {
-        super(IconTheme.getImage("saveAll"));
+        super(IconTheme.JabRefIcon.SAVE_ALL.getIcon());
         this.frame = frame;
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Save all"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save all open databases"));
-        putValue(Action.NAME, "Save all");
+        putValue(Action.NAME, Localization.menuTitle("Save all"));
     }
 
     @Override
@@ -64,7 +66,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
                 if (panel.getFile() == null) {
                     frame.showBaseAt(i);
                 }
-                panel.runCommand("save");
+                panel.runCommand(Actions.SAVE);
                 // TODO: can we find out whether the save was actually done or not?
                 saved++;
             }

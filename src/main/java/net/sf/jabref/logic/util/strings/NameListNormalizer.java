@@ -32,6 +32,8 @@ public class NameListNormalizer {
 
     public static String normalizeAuthorList(String in) {
         boolean andSep = false;
+        // String can contain newlines. Convert each to a space
+        in = in.replaceAll("\n", " ");
         String[] authors = in.split("( |,)and ", -1);
         if (authors.length > 1) {
             andSep = true;

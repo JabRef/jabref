@@ -15,7 +15,7 @@
  */
 package net.sf.jabref.sql;
 
-import net.sf.jabref.gui.BaseAction;
+import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;

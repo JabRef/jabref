@@ -1,7 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id "eu.appsatori.fatjar" version "0.3"
+    id 'com.github.johnrengelman.shadow' version '1.2.2'
     id "edu.sc.seis.launch4j" version "1.1.4"
     id "com.github.kt3k.coveralls" version "2.4.0"
     id "edu.sc.seis.macAppBundle" version "2.1.1"
@@ -9,13 +9,11 @@ plugins {
 }
 
 apply plugin: "java"
-apply plugin: "eclipse"
 apply plugin: "application"
 apply plugin: "project-report"
-apply plugin: "sonar-runner"
-apply plugin: "maven"
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply from: 'eclipse.gradle'
 
 group = "net.sf.jabref"
 version = "2.80dev"
@@ -26,7 +24,7 @@ targetCompatibility = 1.8
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.6'
+    gradleVersion = '2.8'
 }
 
 repositories {
@@ -43,7 +41,7 @@ dependencies {
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
     compile 'com.jgoodies:jgoodies-looks:2.7.0'
 
-    compile 'org.swinglabs.swingx:swingx-core:1.6.5-1'
+    compile 'org.swinglabs:swingx:1.6.1' // do not update, 1.6.5.1 is broken
 
     compile 'org.apache.pdfbox:pdfbox:1.8.10'
     compile 'org.apache.pdfbox:fontbox:1.8.10'
@@ -62,13 +60,13 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.5.1-1'
     compile 'org.antlr:antlr4-runtime:4.5.1-1'
 
-    compile 'mysql:mysql-connector-java:5.1.36'
-    compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
+    compile 'mysql:mysql-connector-java:5.1.37'
+    compile 'org.postgresql:postgresql:9.4-1204-jdbc42'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'net.java.dev.jna:jna:4.1.0'
+    compile 'net.java.dev.jna:jna:4.2.1'
 
     compile files('lib/JSplitButton_1.2.jar')
 
@@ -77,6 +75,9 @@ dependencies {
     compile 'commons-logging:commons-logging:1.2'
 
     compile 'junit:junit:4.12'
+
+    compile 'org.jsoup:jsoup:1.8.3'
+    compile 'com.mashape.unirest:unirest-java:1.4.7'
 }
 
 sourceSets {
@@ -88,19 +89,74 @@ sourceSets {
 }
 
 processResources {
+    def licenseInformation = ""
+    def id = ""
+    def projectName
+    def url
+    def license
+    def note = ""
+
+    def externalLibraries = new File('external-libraries.txt')
+    externalLibraries.eachLine { currentLine ->
+        if (currentLine.startsWith('Id')) {
+            id = currentLine.substring(9)
+            // TODO: we can distinguish between fonts and libraries by the suffix of the id:
+            // fonts always end with ".font"
+            // With that information we can generate different sections
+        } else if (currentLine.startsWith('Project')) {
+            projectName = currentLine.substring(9)
+        } else if (currentLine.startsWith('URL')) {
+            url = currentLine.substring(9)
+        } else if (currentLine.startsWith('License:')) {
+            license = currentLine.substring(9)
+        } else if (currentLine.startsWith('Note:')) {
+            note =  currentLine.substring(9)
+        } else if (currentLine.isEmpty() && (!id.equals(""))) {
+            // the entry is finished, write it
+
+            licenseInformation += "\n<h3>" + projectName + "</h3>\n"
+            licenseInformation += '<p>URL: <a href="' + url + '">' + url + '</a></p>\n'
+            licenseInformation += '<p>License: ' + license + '</p>\n'
+            if (!note.equals("")) {
+                licenseInformation += '<p>Note: ' + note + '</p>\n'
+            }
+
+            id = id.replaceAll(':', '_')
+            def fileName = "licenses/" + id + ".txt"
+            def licenseInformationFile = new File(fileName)
+            if (licenseInformationFile.exists()) {
+                licenseInformation += '\n<h4>Further information</h4>\n'
+                licenseInformation += '<pre>\n'
+                licenseInformation += licenseInformationFile.text
+                licenseInformation += '</pre>\n'
+            }
+
+            // mark that entry has been written
+            id = ""
+            // note is not present at all entries. Ensure that no note is written instead of the last note.
+            note = ""
+        }
+    }
+
     filesMatching("help/**/About.html") {
         expand ("version": project.version,
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "))
+                "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "),
+                "developers": new File('DEVELOPERS').readLines().findAll {!it.startsWith("#")}.join(", "),
+                "licenseInformation": licenseInformation)
     }
 
-    filesMatching("resource/build.properties") {
+    filesMatching("build.properties") {
         expand version: project.version
     }
 
     filesMatching("resource/**/meta.xml") {
         expand version: project.version
     }
+}
+
+clean {
+    delete "src/main/gen"
 }
 
 task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
@@ -187,11 +243,8 @@ format {
     //files = sourceSets.main.java
 }
 
-fatJar {
+shadowJar {
     classifier 'fat'
-    manifest {
-        attributes 'Main-Class': project.mainClassName
-    }
 }
 
 
@@ -200,19 +253,36 @@ fatJar {
  * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
  */
 if (hasProperty('dev')) {
-    String command = "git log --pretty=format:'%cd--%h' -n 1 --date=short"
-    String result = ""
+    String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
+    String commitInfo = ""
     if (OperatingSystem.current().isWindows()) {
-        result = "cmd /c $command".execute().in.text
+        commitInfo = "cmd /c $command".execute().in.text
     } else {
-        result = command.execute().in.text
+        commitInfo = command.execute().in.text
     }
 
-    // remove enclosing ' of result
-    project.version += "--snapshot--" + result.substring(1, result.length() - 1)
+    // determine branch
+    command = "git symbolic-ref -q --short HEAD"
+    String branchName = ""
+    if (OperatingSystem.current().isWindows()) {
+        branchName = "cmd /c $command".execute().in.text
+    } else {
+        branchName = command.execute().in.text
+    }
+    // A newline is returned. Remove it. (trim())
+    // In the context of github, the branch name could be something like "pull/277"
+    // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
+    // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
+    branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_");
+
+    // hack string
+    // first the date (%cd), then the branch name, and finally the commit id (%h)
+    String infoString = commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
+
+    project.version += "--snapshot--" + infoString
 }
 
-task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "releaseSourceZip", "releaseSourceTar"]) {
+task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar"]) {
     group = 'JabRef - Release'
     description 'Creates a release for all target platforms.'
 }
@@ -227,9 +297,9 @@ launch4j {
     initialHeapSize = 32
     maxHeapSize = 512
 }
-createExe.dependsOn "fatJar"
+createExe.dependsOn "shadowJar"
 
-task releaseJar(dependsOn: "fatJar") {
+task releaseJar(dependsOn: "shadowJar") {
     group = 'JabRef - Release'
     description "Creates a Jar release."
 
@@ -266,7 +336,7 @@ task releaseWindows(dependsOn: "launch4j") {
             }
         }
         copy {
-            from("$buildDir/nsis/JabRefSetup.exe")
+            from("$buildDir/nsis/JabRefSetup-${version}.exe")
             from("$buildDir/nsis/JabRef.exe")
             into("$buildDir/releases")
         }
@@ -307,33 +377,13 @@ macAppBundle {
     bundleExtras.put("CFBundleDocumentTypes", [map])
 }
 
-task releaseSourceZip(type: Exec) {
-    group = 'JabRef - Release'
-    description "Creates a zip archive of the source code."
-
-    if (OperatingSystem.current().isWindows()) {
-        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
-    } else {
-        commandLine "bash", "-c", "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
+// fetch all dependencies to speedup CircleCI build
+// see http://stackoverflow.com/a/27455099/873282 for an inspiration of this task
+// better solution: https://discuss.gradle.org/t/how-to-download-maven-dependencies-into-project-local-directory-and-set-eclipse-classpath/9851
+task getdeps(type: Copy) {
+    from (configurations.compile+configurations.testCompile) {
+        include "*.jar"
     }
-
-    doFirst {
-        mkdir("$buildDir/releases")
-    }
-}
-
-task releaseSourceTar(type: Exec) {
-    group = 'JabRef - Release'
-    description "Creates a tar archive of the source code."
-
-    if (OperatingSystem.current().isWindows()) {
-        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
-    } else {
-        commandLine "bash", "-c", "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
-    }
-
-    doFirst {
-        mkdir("$buildDir/releases")
-    }
+    into 'build/tmp/alldeps/'
 }
 

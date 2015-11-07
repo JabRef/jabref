@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,9 +26,9 @@ import net.sf.jabref.model.entry.BibtexEntry;
 class TextAnalyzer {
 
     private final BibtexEntry be = null;
-    
+
     private static final Log LOGGER = LogFactory.getLog(TextAnalyzer.class);
-    
+
     // Needs to give a year definitely in the future.
     // Used for guessing the
     // year field when parsing textual data. :-)
@@ -44,7 +44,7 @@ class TextAnalyzer {
 
     private void guessBibtexFields(String text) {
 
-        TreeSet<Substring> usedParts = new TreeSet<Substring>();
+        TreeSet<Substring> usedParts = new TreeSet<>();
 
         text = "  " + text + "  ";
 
@@ -59,7 +59,7 @@ class TextAnalyzer {
             year = clean(cand[0]);
             int pos = text.indexOf(year);
             usedParts.add(new Substring("year", pos, pos + year.length()));
-            LOGGER.info("Guessing 'year': '" + year + "'");
+            LOGGER.debug("Guessing 'year': '" + year + "'");
         } else if (cand.length > 1) {
             // More than one four-digit numbers, so we look for one giving a reasonable year:
 
@@ -76,10 +76,10 @@ class TextAnalyzer {
                         yearFound = number;
                     } else {
                         // More than one found. Be a bit more specific.
-                        if (yearFound < FUTURE_YEAR && number < FUTURE_YEAR) {
+                        if ((yearFound < FUTURE_YEAR) && (number < FUTURE_YEAR)) {
                             good = -1;
                             break; // Give up, both seem good enough.
-                        } else if (yearFound >= FUTURE_YEAR && number < FUTURE_YEAR) {
+                        } else if ((yearFound >= FUTURE_YEAR) && (number < FUTURE_YEAR)) {
                             good = i;
                             yearFound = number;
                         }
@@ -90,7 +90,7 @@ class TextAnalyzer {
                 year = clean(cand[good]);
                 int pos = text.indexOf(year);
                 usedParts.add(new Substring("year", pos, pos + year.length()));
-                LOGGER.info("Guessing 'year': '" + year + "'");
+                LOGGER.debug("Guessing 'year': '" + year + "'");
             }
         }
 
@@ -102,7 +102,7 @@ class TextAnalyzer {
             pages = clean(cand[0].replaceAll("-|( - )", "--"));
             int pos = text.indexOf(cand[0]);
             usedParts.add(new Substring("pages", pos, pos + year.length()));
-            LOGGER.info("Guessing 'pages': '" + pages + "'");
+            LOGGER.debug("Guessing 'pages': '" + pages + "'");
         } else if (cand.length > 1) {
             int found = -1;
             for (int i = 0; i < cand.length; i++) {
@@ -110,7 +110,7 @@ class TextAnalyzer {
                 //   Util.pr("Pg: "+pages);
                 int first = Integer.parseInt(split[0]);
                 int second = Integer.parseInt(split[1]);
-                if (second - first > 3) {
+                if ((second - first) > 3) {
                     found = i;
                     break;
                 }
@@ -118,7 +118,7 @@ class TextAnalyzer {
             if (found >= 0) {
                 pages = clean(cand[found].replaceAll("-|( - )", "--"));
                 int pos = text.indexOf(cand[found]);
-                LOGGER.info("Guessing 'pages': '" + pages + "'");
+                LOGGER.debug("Guessing 'pages': '" + pages + "'");
                 usedParts.add(new Substring("pages", pos, pos + pages.length()));
             }
         }
@@ -134,7 +134,7 @@ class TextAnalyzer {
             int pos = cand[0].lastIndexOf(' ');
             if (pos > 0) {
                 volume = clean(cand[0].substring(pos + 1));
-                LOGGER.info("Guessing 'volume': '" + volume + "'");
+                LOGGER.debug("Guessing 'volume': '" + volume + "'");
                 journal = clean(cand[0].substring(0, pos));
                 //Util.pr("guessing 'journal': '" + journal + "'");
                 pos = journal.lastIndexOf(' ');
@@ -146,7 +146,7 @@ class TextAnalyzer {
                 }
                 pos = text.indexOf(journal);
                 usedParts.add(new Substring("journal", pos, pos + journal.length()));
-                LOGGER.info("Guessing 'journal': '" + journal + "'");
+                LOGGER.debug("Guessing 'journal': '" + journal + "'");
             }
             //Util.pr("Journal? '"+cand[0]+"'");
         } else {
@@ -155,26 +155,26 @@ class TextAnalyzer {
 
         // Then try to find title and authors.
         Substring ss;
-        Vector<String> free = new Vector<String>();
+        Vector<String> free = new Vector<>();
         int piv = 0;
         for (Substring usedPart : usedParts) {
             ss = usedPart;
-            if (ss.begin() - piv > 10) {
-                LOGGER.info("... " + text.substring(piv, ss.begin()));
+            if ((ss.begin() - piv) > 10) {
+                LOGGER.debug("... " + text.substring(piv, ss.begin()));
                 free.add(clean(text.substring(piv, ss.begin())));
             }
             piv = ss.end();
         }
-        if (text.length() - piv > 10) {
+        if ((text.length() - piv) > 10) {
             free.add(clean(text.substring(piv)));
         }
-        LOGGER.info("Free parts:");
+        LOGGER.debug("Free parts:");
         for (String s : free) {
-            LOGGER.info(": '" + s + "'");
+            LOGGER.debug(": '" + s + "'");
         }
     }
 
-    private String[] getMatches(String text, String regexp) {
+    private static String[] getMatches(String text, String regexp) {
         int piv = 0;
         String[] test = text.split(regexp);
         if (test.length < 2) {
@@ -191,24 +191,24 @@ class TextAnalyzer {
         return out;
     }
 
-    private String clean(String s) {
+    private static String clean(String s) {
         boolean found = false;
         int left = 0;
         int right = s.length() - 1;
-        while (!found && left < s.length()) {
+        while (!found && (left < s.length())) {
             char c = s.charAt(left);
-            if (Character.isWhitespace(c) || c == '.' || c == ',' || c == '('
-                    || c == ':' || c == ')') {
+            if (Character.isWhitespace(c) || (c == '.') || (c == ',') || (c == '(')
+                    || (c == ':') || (c == ')')) {
                 left++;
             } else {
                 found = true;
             }
         }
         found = false;
-        while (!found && right > left) {
+        while (!found && (right > left)) {
             char c = s.charAt(right);
-            if (Character.isWhitespace(c) || c == '.' || c == ',' || c == ')'
-                    || c == ':' || c == '(') {
+            if (Character.isWhitespace(c) || (c == '.') || (c == ',') || (c == ')')
+                    || (c == ':') || (c == '(')) {
                 right--;
             } else {
                 found = true;

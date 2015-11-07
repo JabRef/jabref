@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -29,11 +29,11 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
  * Prevents dragging of the first header column ("#"). Prevents dragging of
  * unnamed (aka special) header columns. This is needed to prevent the user from
  * putting the gui table in an inconsistent state.<br/>
- * 
+ *
  * This might not be the best way to solve this problem. Overriding
  * <code>getDraggedColumn</code> produces some ugly gui dragging artifacts if a
  * user attempts to drag something before the first columns.
- * 
+ *
  * @author Daniel Waeber
  * @author Fabian Bieker
  * @since 12/2008
@@ -103,10 +103,10 @@ class PreventDraggingJTableHeader extends JTableHeader {
     /**
      * Note: used to prevent dragging of other columns before the special
      * columns.
-     * 
+     *
      * @return count of special columns
      */
-    private int getSpecialColumnsCount() {
+    private static int getSpecialColumnsCount() {
         int count = 0;
         if (Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN)) {
             count++;
@@ -152,7 +152,7 @@ class PreventDraggingJTableHeader extends JTableHeader {
 
     private static boolean isUnnamed(TableColumn column) {
         return (column.getHeaderValue() == null)
-                || column.getHeaderValue().toString() != null && column.getHeaderValue().toString().isEmpty();
+                || ((column.getHeaderValue().toString() != null) && column.getHeaderValue().toString().isEmpty());
     }
 
     /**

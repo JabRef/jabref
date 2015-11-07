@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2015 JabRef contributors
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.sf.jabref.gui;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -25,7 +40,7 @@ import java.util.Map;
  */
 public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
-    private final EventList<TableEntry> entries = new BasicEventList<TableEntry>();
+    private final EventList<TableEntry> entries = new BasicEventList<>();
     //protected SortedList<TableEntry> sortedList;
     private final JTable glTable;
     private boolean okPressed;
@@ -75,13 +90,13 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
             }
         });
 
-        EventTableModel<TableEntry> tableModelGl = new EventTableModel<TableEntry>(entries,
+        EventTableModel<TableEntry> tableModelGl = new EventTableModel<>(entries,
                 new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
         glTable.setRowHeight(tableRowHeight);
         glTable.getColumnModel().getColumn(0).setMaxWidth(45);
         glTable.setPreferredScrollableViewportSize(new Dimension(1100, 600));
-        EventSelectionModel<TableEntry> selectionModel = new EventSelectionModel<TableEntry>(entries);
+        EventSelectionModel<TableEntry> selectionModel = new EventSelectionModel<>(entries);
         glTable.setSelectionModel(selectionModel);
         ButtonStackBuilder builder = new ButtonStackBuilder();
         builder.addButton(selectAll);
@@ -145,7 +160,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     }
 
     public Map<String, Boolean> getSelection() {
-        LinkedHashMap<String, Boolean> selection = new LinkedHashMap<String, Boolean>();
+        LinkedHashMap<String, Boolean> selection = new LinkedHashMap<>();
         for (TableEntry e : entries) {
             selection.put(e.id, e.isWanted());
         }
@@ -206,9 +221,9 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus,
                 int row, int column) {
-            JLabel label = (JLabel) value;
-            this.label.setText(label.getText());
-            return this.label;
+            JLabel valueLabel = (JLabel) value;
+            label.setText(valueLabel.getText());
+            return label;
         }
     }
 

@@ -82,7 +82,7 @@ public class SearchBar extends JPanel {
 
     /**
      * Initializes the search bar.
-     * 
+     *
      * @param frame the main window
      */
     public SearchBar(JabRefFrame frame) {
@@ -114,7 +114,7 @@ public class SearchBar extends JPanel {
      */
     private void initSearchButton() {
         // Create search button
-        searchButton = new JSplitButton(IconTheme.getImage("search"));
+        searchButton = new JSplitButton(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
         searchButton.setMinimumSize(new Dimension(50, 25));
         searchButton.setBackground(searchField.getBackground());
         searchButton.setContentAreaFilled(false);
@@ -148,7 +148,7 @@ public class SearchBar extends JPanel {
         initSearchSettingsMenu();
         popupMenu.add(settings);
 
-        JMenuItem help = new JMenuItem(Localization.lang("Help"), IconTheme.getImage("help"));
+        JMenuItem help = new JMenuItem(Localization.lang("Help"), IconTheme.JabRefIcon.HELP.getSmallIcon());
         help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
         popupMenu.add(help);
 
@@ -270,7 +270,7 @@ public class SearchBar extends JPanel {
         });
 
         // Subscribe to changes to the text in the search field in order to "live search"
-        // TODO: With this implementation "onSearchTextChanged" gets called two times when setText() is invoked (once for removing the initial string and then again for inserting the new one). This happens for example when an autocompletion is accepted. 
+        // TODO: With this implementation "onSearchTextChanged" gets called two times when setText() is invoked (once for removing the initial string and then again for inserting the new one). This happens for example when an autocompletion is accepted.
         searchField.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -315,7 +315,7 @@ public class SearchBar extends JPanel {
 
     /**
      * Switches to another search mode.
-     * 
+     *
      * @param mode the new search mode
      */
     private void setSearchMode(SearchMode mode) {
@@ -324,7 +324,7 @@ public class SearchBar extends JPanel {
 
     /**
      * Returns the currently activated search mode.
-     * 
+     *
      * @return current search mode
      */
     private SearchMode getSearchMode() {
@@ -353,7 +353,7 @@ public class SearchBar extends JPanel {
     /**
      * Adds a SearchTextListener to the search bar. The added listener is immediately informed about the current search.
      * Subscribers will be notified about searches.
-     * 
+     *
      * @param l SearchTextListener to be added
      */
     public void addSearchListener(SearchTextListener l) {
@@ -369,7 +369,7 @@ public class SearchBar extends JPanel {
 
     /**
      * Remove a SearchTextListener
-     * 
+     *
      * @param l SearchTextListener to be removed
      */
     public void removeSearchListener(SearchTextListener l) {
@@ -379,7 +379,7 @@ public class SearchBar extends JPanel {
     /**
      * Parses the search query for valid words and returns a list these words. For example, "The great Vikinger" will
      * give ["The","great","Vikinger"]
-     * 
+     *
      * @param searchText the search query
      * @return list of words found in the search query
      */
@@ -389,7 +389,7 @@ public class SearchBar extends JPanel {
 
     /**
      * Fires an event if a search was started (or cleared)
-     * 
+     *
      * @param searchText the search query
      */
     private void fireSearchlistenerEvent(String searchText) {

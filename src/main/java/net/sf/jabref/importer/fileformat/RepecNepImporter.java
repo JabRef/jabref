@@ -1,28 +1,19 @@
-/*
- Copyright (C) 2005 Andreas Rudert
+/* Copyright (C) 2005 Andreas Rudert
+   Copyright (C) 2015 JabRef contributors
 
- All programs in this directory and
- subdirectories are published under the GNU General Public License as
- described below.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or (at
- your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- USA
-
- Further information about the GNU GPL is available at:
- http://www.gnu.org/copyleft/gpl.ja.html
-
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package net.sf.jabref.importer.fileformat;
 
@@ -43,30 +34,30 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.
- * 
+ *
  * <p><a href="http://www.repec.org">RePEc (Research Papers in Economics)</a>
- * is a collaborative effort of over 100 volunteers in 49 countries 
- * to enhance the dissemination of research in economics. The heart of 
- * the project is a decentralized database of working papers, journal 
+ * is a collaborative effort of over 100 volunteers in 49 countries
+ * to enhance the dissemination of research in economics. The heart of
+ * the project is a decentralized database of working papers, journal
  * articles and software components. All RePEc material is freely available.</p>
  * At the time of writing RePEc holds over 300.000 items.</p>
- * 
+ *
  * <p><a href="http://nep.repec.org">NEP (New Economic Papers)</a> is an announcement
- * service which filters information on new additions to RePEc into edited 
- * reports. The goal is to provide subscribers with up-to-date information 
+ * service which filters information on new additions to RePEc into edited
+ * reports. The goal is to provide subscribers with up-to-date information
  * to the research literature.</p>
- * 
+ *
  * <p>This importer is capable of importing NEP messages into JabRef.</p>
- * 
- * <p>There is no officially defined message format for NEP. NEP messages are assumed to have 
+ *
+ * <p>There is no officially defined message format for NEP. NEP messages are assumed to have
  * (and almost always have) the form given by the following semi-formal grammar:
  * <pre>
  * NEPMessage:
  *       MessageSection NEPMessage
  *       MessageSection
- *       
- * MessageSection:            
- *       OverviewMessageSection 
+ *
+ * MessageSection:
+ *       OverviewMessageSection
  *       OtherMessageSection
  *
  * # we skip the overview
@@ -78,43 +69,43 @@ import org.apache.commons.logging.LogFactory;
  *
  * # we skip other stuff and read only full working paper references
  * OtherMessageSectionContent:
- *       WorkingPaper EmptyLine OtherMessageSectionContent 
+ *       WorkingPaper EmptyLine OtherMessageSectionContent
  *       OtherStuff EmptyLine OtherMessageSectionContent
  *       ''
- *       
+ *
  * OtherStuff:
  *       NonEmptyLine OtherStuff
  *       NonEmptyLine
- *       
+ *
  * NonEmptyLine:
  *       a non-empty String that does not start with a number followed by a '.'
- *       
- * # working papers are recognized by a number followed by a '.' 
+ *
+ * # working papers are recognized by a number followed by a '.'
  * # in a non-overview section
  * WorkingPaper:
  *       Number'.' WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract AdditionalFields
  *       Number'.' WhiteSpace TitleString AdditionalFields Abstract AdditionalFields
- *       
+ *
  * TitleString:
  *       a String that may span several lines and should be joined
- *       
+ *
  * # there must be at least one author
  * Authors:
  *       Author '\n' Authors
  *       Author '\n'
- * 
+ *
  * # optionally, an institution is given for an author
  * Author:
  *       AuthorName
  *       AuthorName '(' Institution ')'
- *       
+ *
  * # there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
  * AuthorName:
  *       a non-empty String without '(' or ')' characters, not spanning more that one line
- *       
+ *
  * Institution:
  *       a non-empty String that may span several lines
- *       
+ *
  * Abstract:
  *       a (possibly empty) String that may span several lines
  *
@@ -122,42 +113,42 @@ import org.apache.commons.logging.LogFactory;
  *       AdditionalField '\n' AdditionalFields
  *       EmptyLine AdditionalFields
  *       ''
- *       
+ *
  * AdditionalField:
  *       'Keywords:' KeywordList
  *       'URL:' non-empty String
  *       'Date:' DateString
  *       'JEL:' JelClassificationList
  *       'By': Authors
- *       
+ *
  * KeywordList:
  *        Keyword ',' KeywordList
  *        Keyword ';' KeywordList
  *        Keyword
- *        
+ *
  * Keyword:
  *        non-empty String that does not contain ',' (may contain whitespace)
- *        
+ *
  * # if no date is given, the current year as given by the system clock is assumed
  * DateString:
  *        'yyyy-MM-dd'
  *        'yyyy-MM'
  *        'yyyy'
- *        
+ *
  * JelClassificationList:
  *        JelClassification JelClassificationList
  *        JelClassification
- *      
+ *
  * # the JEL Classifications are set into a new BIBTEX-field 'jel'
  * # they will appear if you add it as a field to one of the BIBTex Entry sections
  * JelClassification:
  *        one of the allowed classes, see http://ideas.repec.org/j/
- *       
+ *
  * SectionSeparator:
  *       '\n-----------------------------'
  * </pre>
  * </p>
- * 
+ *
  * @see <a href="http://nep.repec.org">NEP</a>
  * @author andreas_sf at rudert-home dot de
  */
@@ -223,12 +214,12 @@ public class RepecNepImporter extends ImportFormat {
         // read the first couple of lines
         // NEP message usually contain the String 'NEP: New Economics Papers'
         // or, they are from nep.repec.org
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        BufferedReader inBR = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String startOfMessage = "";
-        String line = in.readLine();
-        for (int i = 0; i < 25 && line != null; i++) {
-            startOfMessage += line;
-            line = in.readLine();
+        String tmpLine = inBR.readLine();
+        for (int i = 0; (i < 25) && (tmpLine != null); i++) {
+            startOfMessage += tmpLine;
+            tmpLine = inBR.readLine();
         }
         return startOfMessage.contains("NEP: New Economics Papers") || startOfMessage.contains("nep.repec.org");
     }
@@ -250,7 +241,7 @@ public class RepecNepImporter extends ImportFormat {
 
     /**
      * Read multiple lines.
-     * 
+     *
      * <p>Reads multiple lines until either
      * <ul>
      *   <li>an empty line</li>
@@ -259,13 +250,13 @@ public class RepecNepImporter extends ImportFormat {
      *   <li>a keyword</li>
      * </ul>
      * is found. Whitespace at start or end of lines is trimmed except for one blank character.</p>
-     * 
+     *
      * @return  result
      */
     private String readMultipleLines() throws IOException {
         String result = this.lastLine.trim();
         readLine();
-        while (this.lastLine != null && !this.lastLine.trim().equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields) && !isStartOfWorkingPaper()) {
+        while ((this.lastLine != null) && !this.lastLine.trim().equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields) && !isStartOfWorkingPaper()) {
             result += this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim();
             readLine();
         }
@@ -274,7 +265,7 @@ public class RepecNepImporter extends ImportFormat {
 
     /**
      * Implements grammar rule "TitleString".
-     * 
+     *
      * @param be
      * @throws IOException
      */
@@ -286,7 +277,7 @@ public class RepecNepImporter extends ImportFormat {
 
     /**
      * Implements grammer rule "Authors"
-     * 
+     *
      * @param be
      * @throws IOException
      */
@@ -294,7 +285,7 @@ public class RepecNepImporter extends ImportFormat {
         // read authors and institutions
         String authors = "";
         String institutions = "";
-        while (this.lastLine != null && !this.lastLine.equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields)) {
+        while ((this.lastLine != null) && !this.lastLine.equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields)) {
 
             // read single author
             String author;
@@ -303,14 +294,14 @@ public class RepecNepImporter extends ImportFormat {
             if (this.lastLine.indexOf('(') >= 0) {
                 author = this.lastLine.substring(0, this.lastLine.indexOf('(')).trim();
                 institutionDone = this.lastLine.indexOf(')') > 0;
-                institution = this.lastLine.substring(this.lastLine.indexOf('(') + 1, institutionDone && this.lastLine.indexOf(')') > this.lastLine.indexOf('(') + 1 ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
+                institution = this.lastLine.substring(this.lastLine.indexOf('(') + 1, institutionDone && (this.lastLine.indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
             } else {
                 author = this.lastLine.substring(0, this.lastLine.length()).trim();
                 institutionDone = true;
             }
 
             readLine();
-            while (!institutionDone && this.lastLine != null) {
+            while (!institutionDone && (this.lastLine != null)) {
                 institutionDone = this.lastLine.indexOf(')') > 0;
                 institution += this.lastLine.substring(0, institutionDone ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
                 readLine();
@@ -334,7 +325,7 @@ public class RepecNepImporter extends ImportFormat {
 
     /**
      * Implements grammar rule "Abstract".
-     * 
+     *
      * @param be
      * @throws IOException
      */
@@ -348,19 +339,19 @@ public class RepecNepImporter extends ImportFormat {
 
     /**
      * Implements grammar rule "AdditionalFields".
-     * 
+     *
      * @param be
      * @throws IOException
      */
     private void parseAdditionalFields(BibtexEntry be, boolean multilineUrlFieldAllowed) throws IOException {
 
         // one empty line is possible before fields start
-        if (this.lastLine != null && this.lastLine.trim().equals("")) {
+        if ((this.lastLine != null) && this.lastLine.trim().equals("")) {
             readLine();
         }
 
         // read other fields
-        while (this.lastLine != null && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.recognizedFields) || this.lastLine.equals(""))) {
+        while ((this.lastLine != null) && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.recognizedFields) || this.lastLine.equals(""))) {
 
             // if multiple lines for a field are allowed and field consists of multiple lines, join them
             String keyword = this.lastLine.equals("") ? "" : this.lastLine.substring(0, this.lastLine.indexOf(':')).trim();
@@ -387,7 +378,7 @@ public class RepecNepImporter extends ImportFormat {
                 String content = readMultipleLines();
                 String[] recognizedDateFormats = new String[] {"yyyy-MM-dd", "yyyy-MM", "yyyy"};
                 int i = 0;
-                for (; i < recognizedDateFormats.length && date == null; i++) {
+                for (; (i < recognizedDateFormats.length) && (date == null); i++) {
                     try {
                         date = new SimpleDateFormat(recognizedDateFormats[i]).parse(content);
                     } catch (ParseException e) {
@@ -398,7 +389,7 @@ public class RepecNepImporter extends ImportFormat {
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(date != null ? date : new Date());
                 be.setField("year", "" + cal.get(Calendar.YEAR));
-                if (date != null && recognizedDateFormats[i - 1].contains("MM")) {
+                if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
                     be.setField("month", "" + cal.get(Calendar.MONTH));
                 }
 
@@ -415,7 +406,7 @@ public class RepecNepImporter extends ImportFormat {
 
                 // authors field
             } else if (keyword.startsWith("By")) {
-                // parse authors      
+                // parse authors
                 parseAuthors(be);
             } else {
                 readLine();
@@ -437,7 +428,7 @@ public class RepecNepImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         String paperNoStr = null;
         this.line = 0;
 

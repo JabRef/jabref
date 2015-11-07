@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -34,7 +34,7 @@ public class FileUpdateMonitor implements Runnable {
     private static final int WAIT = 4000;
 
     private int numberOfUpdateListener;
-    private final HashMap<String, Entry> entries = new HashMap<String, Entry>();
+    private final HashMap<String, Entry> entries = new HashMap<>();
 
     @Override
     public void run() {
@@ -54,7 +54,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
-                LOGGER.debug("FileUpdateMonitor has been interrupted. Terminating...");
+                LOGGER.debug("FileUpdateMonitor has been interrupted. Terminating...", ex);
                 return;
             }
         }
@@ -176,7 +176,7 @@ public class FileUpdateMonitor implements Runnable {
             if (modified == 0L) {
                 throw new IOException("File deleted");
             }
-            return timeStamp != modified || fileSize != fileSizeNow;
+            return (timeStamp != modified) || (fileSize != fileSizeNow);
         }
 
         public void updateTimeStamp() {
@@ -220,27 +220,16 @@ public class FileUpdateMonitor implements Runnable {
         public void notifyFileRemoved() {
             listener.fileRemoved();
         }
-
-        /*public void finalize() {
-          try {
-            tmpFile.delete();
-          } catch (Throwable e) {
-            Globals.logger("Cannot delete temporary file '"+tmpFile.getPath()+"'");
-          }
-        }*/
     }
 
 
     private static synchronized File getTempFile() {
         File f = null;
-        // Globals.prefs.get("tempDir")
-        //while ((f = File.createTempFile("jabref"+(tmpNum++), null)).exists());
         try {
             f = File.createTempFile("jabref", null);
             f.deleteOnExit();
-            //System.out.println(f.getPath());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Could not create temporary file.", ex);
         }
         return f;
     }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.gui.FetcherPreviewDialog;
@@ -25,6 +25,10 @@ import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,6 +38,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GoogleScholarFetcher implements PreviewEntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(GoogleScholarFetcher.class);
 
     private boolean hasRunConfig;
     private static final int MAX_ENTRIES_TO_LOAD = 50;
@@ -49,7 +55,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private static final Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     private static final Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
-    private final HashMap<String, String> entryLinks = new HashMap<String, String>();
+    private final HashMap<String, String> entryLinks = new HashMap<>();
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
@@ -151,13 +157,15 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         stopFetching = true;
     }
 
-    private void save(String filename, String content) throws IOException {
-        BufferedWriter out = new BufferedWriter(new FileWriter(filename));
-        out.write(content);
-        out.close();
+    /*  Used for debugging */
+    /*    private static void save(String filename, String content) throws IOException {
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {
+            out.write(content);
+        }
     }
+    */
 
-    private void runConfig() throws IOException {
+    private static void runConfig() throws IOException {
         try {
             new URLDownload(new URL("http://scholar.google.com")).downloadToString();
             //save("setting.html", ud.getStringContent());
@@ -181,7 +189,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             new URLDownload(new URL(ub.toString())).downloadToString();
 
         } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Unsupported encoding.", ex);
         }
     }
 
@@ -192,13 +200,13 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
      */
     private Map<String, JLabel> getCitations(String query) throws IOException {
         String urlQuery;
-        LinkedHashMap<String, JLabel> res = new LinkedHashMap<String, JLabel>();
+        LinkedHashMap<String, JLabel> res = new LinkedHashMap<>();
         try {
             urlQuery = GoogleScholarFetcher.SEARCH_URL.replace(GoogleScholarFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;
             String nextPage;
-            while ((nextPage = getCitationsFromUrl(urlQuery, res)) != null
-                    && count < 2) {
+            while (((nextPage = getCitationsFromUrl(urlQuery, res)) != null)
+                    && (count < 2)) {
                 urlQuery = nextPage;
                 count++;
                 if (stopFetching) {
@@ -267,7 +275,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             String s = new URLDownload(url).downloadToString();
             BibtexParser bp = new BibtexParser(new StringReader(s));
             ParserResult pr = bp.parse();
-            if (pr != null && pr.getDatabase() != null) {
+            if ((pr != null) && (pr.getDatabase() != null)) {
                 Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
                 if (entries.size() == 1) {
                     BibtexEntry entry = entries.iterator().next();
@@ -297,19 +305,17 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
                     return entry;
                 } else if (entries.isEmpty()) {
-                    System.out.println("No entry found! (" + link + ")");
+                    LOGGER.warn("No entry found! (" + link + ")");
                     return null;
                 } else {
-                    System.out.println(entries.size() + " entries found! (" + link + ")");
+                    LOGGER.debug(entries.size() + " entries found! (" + link + ")");
                     return null;
                 }
-            } else {
-                System.out.println("Parser failed! (" + link + ")");
-                return null;
-
             }
+            LOGGER.warn("Parser failed! (" + link + ")");
+            return null;
         } catch (MalformedURLException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Malformed URL.", ex);
             return null;
         }
     }
@@ -320,16 +326,16 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private static HashMap<String, String> getFormElements(String page) {
         Matcher m = GoogleScholarFetcher.inputPattern.matcher(page);
-        HashMap<String, String> items = new HashMap<String, String>();
+        HashMap<String, String> items = new HashMap<>();
         while (m.find()) {
             String name = m.group(2);
-            if (name.length() > 2 && name.charAt(0) == '"'
-                    && name.charAt(name.length() - 1) == '"') {
+            if ((name.length() > 2) && (name.charAt(0) == '"')
+                    && (name.charAt(name.length() - 1) == '"')) {
                 name = name.substring(1, name.length() - 1);
             }
             String value = m.group(3);
-            if (value.length() > 2 && value.charAt(0) == '"'
-                    && value.charAt(value.length() - 1) == '"') {
+            if ((value.length() > 2) && (value.charAt(0) == '"')
+                    && (value.charAt(value.length() - 1) == '"')) {
                 value = value.substring(1, value.length() - 1);
             }
             items.put(name, value);

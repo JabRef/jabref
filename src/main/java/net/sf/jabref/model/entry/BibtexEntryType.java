@@ -30,6 +30,7 @@ Modified for use in JabRef.
 package net.sf.jabref.model.entry;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -108,28 +109,43 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         STANDARD_TYPES = new TreeMap<>(ALL_TYPES);
     }
 
+    private List<String> requiredFields = new ArrayList<>();
+
+    private List<String> optionalFields = new ArrayList<>();
 
     @Override
     public int compareTo(BibtexEntryType o) {
         return getName().compareTo(o.getName());
     }
 
-    public abstract String[] getOptionalFields();
+    public List<String> getOptionalFields() {
+        return Collections.unmodifiableList(optionalFields);
+    }
 
-    public abstract String[] getRequiredFields();
+    public List<String> getRequiredFields() {
+        return Collections.unmodifiableList(requiredFields);
+    }
 
-    public String[] getPrimaryOptionalFields() {
+    void addAllOptional(String... fieldNames) {
+        optionalFields.addAll(Arrays.asList(fieldNames));
+    }
+
+    void addAllRequired(String... fieldNames) {
+        requiredFields.addAll(Arrays.asList(fieldNames));
+    }
+
+    public List<String> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
 
-    public String[] getSecondaryOptionalFields() {
-        String[] optionalFields = getOptionalFields();
+    public List<String> getSecondaryOptionalFields() {
+        List<String> optionalFields = getOptionalFields();
 
         if (optionalFields == null) {
-            return new String[0];
+            return new ArrayList<>(0);
         }
 
-        return Arrays.stream(optionalFields).filter(field -> !isPrimary(field)).toArray(String[]::new);
+        return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
     }
 
     public abstract boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
@@ -139,7 +155,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
     }
 
     public boolean isRequired(String field) {
-        String[] requiredFields = getRequiredFields();
+        List<String> requiredFields = getRequiredFields();
         if (requiredFields == null) {
             return false;
         }
@@ -152,7 +168,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
     }
 
     public boolean isOptional(String field) {
-        String[] optionalFields = getOptionalFields();
+        List<String> optionalFields = getOptionalFields();
 
         if (optionalFields == null) {
             return false;
@@ -162,7 +178,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
     }
 
     private boolean isPrimary(String field) {
-        String[] primaryFields = getPrimaryOptionalFields();
+        List<String> primaryFields = getPrimaryOptionalFields();
 
         if (primaryFields == null) {
             return false;
@@ -277,7 +293,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
      *
      * @return Array of the required fields in a form appropriate for the entry customization dialog.
      */
-    public String[] getRequiredFieldsForCustomization() {
+    public List<String> getRequiredFieldsForCustomization() {
         return getRequiredFields();
     }
 }

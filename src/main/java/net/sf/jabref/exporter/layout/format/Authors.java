@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.model.entry.AuthorList;
@@ -35,14 +35,14 @@ public class Authors extends AbstractParamLayoutFormatter {
     AuthorNumber = [inf | <number>]
     AuthorNumberEtAl = [ {1} | <number>]
     EtAlString = [ et al. | EtAl=<string>]
-    */
+     */
 
     private static final ArrayList<String>
-            authorOrder = new ArrayList<String>();
-    private static final ArrayList<String> authorAbbr = new ArrayList<String>();
-    private static final ArrayList<String> authorPunc = new ArrayList<String>();
-    private static final ArrayList<String> separators = new ArrayList<String>();
-    private static final ArrayList<String> lastSeparators = new ArrayList<String>();
+    authorOrder = new ArrayList<>();
+    private static final ArrayList<String> authorAbbr = new ArrayList<>();
+    private static final ArrayList<String> authorPunc = new ArrayList<>();
+    private static final ArrayList<String> separators = new ArrayList<>();
+    private static final ArrayList<String> lastSeparators = new ArrayList<>();
 
     private static final Pattern numberPattern = Pattern.compile("[0-9]+");
 
@@ -79,12 +79,12 @@ public class Authors extends AbstractParamLayoutFormatter {
     }
 
     private static final int
-            FIRST_FIRST = 0;
+    FIRST_FIRST = 0;
     private static final int LAST_FIRST = 1;
     private static final int LF_FF = 2;
 
     private static final String
-            COMMA = ", ";
+    COMMA = ", ";
     private static final String AMP = " & ";
     private static final String COLON = ": ";
     private static final String SEMICOLON = "; ";
@@ -94,7 +94,7 @@ public class Authors extends AbstractParamLayoutFormatter {
     private int flMode;
 
     private boolean
-            abbreviate = true;
+    abbreviate = true;
     private boolean firstInitialOnly;
     private boolean middleInitial;
     private boolean lastNameOnly;
@@ -253,7 +253,7 @@ public class Authors extends AbstractParamLayoutFormatter {
      * @param two The second string
      * @return true if the strings are deemed equal
      */
-    private boolean comp(String one, String two) {
+    private static boolean comp(String one, String two) {
         return one.trim().equalsIgnoreCase(two);
     }
 
@@ -262,15 +262,15 @@ public class Authors extends AbstractParamLayoutFormatter {
         StringBuilder sb = new StringBuilder();
         AuthorList al = AuthorList.getAuthorList(fieldText);
 
-        if (maxAuthors < 0 || al.size() <= maxAuthors) {
+        if ((maxAuthors < 0) || (al.size() <= maxAuthors)) {
             for (int i = 0; i < al.size(); i++) {
                 AuthorList.Author a = al.getAuthor(i);
 
-                addSingleName(sb, a, flMode == Authors.FIRST_FIRST || flMode == Authors.LF_FF && i > 0);
+                addSingleName(sb, a, (flMode == Authors.FIRST_FIRST) || ((flMode == Authors.LF_FF) && (i > 0)));
 
-                if (i < al.size() - 2) {
+                if (i < (al.size() - 2)) {
                     sb.append(separator);
-                } else if (i < al.size() - 1) {
+                } else if (i < (al.size() - 1)) {
                     sb.append(lastSeparator);
                 }
             }
@@ -293,19 +293,19 @@ public class Authors extends AbstractParamLayoutFormatter {
         String firstNamePart = a.getFirst();
         String lastNamePart = a.getLast();
         String von = a.getVon();
-        if (von != null && !von.isEmpty()) {
+        if ((von != null) && !von.isEmpty()) {
             lastNamePart = von + ' ' + lastNamePart;
         }
         String jr = a.getJr();
-        if (jr != null && !jr.isEmpty()) {
+        if ((jr != null) && !jr.isEmpty()) {
             String jrSeparator = " ";
             lastNamePart = lastNamePart + jrSeparator + jr;
         }
 
-        if (abbreviate && firstNamePart != null) {
+        if (abbreviate && (firstNamePart != null)) {
             firstNamePart = a.getFirstAbbr();
 
-            if (firstInitialOnly && firstNamePart.length() > 2) {
+            if (firstInitialOnly && (firstNamePart.length() > 2)) {
                 firstNamePart = firstNamePart.substring(0, 2);
             } else if (middleInitial) {
                 String abbr = firstNamePart;
@@ -328,7 +328,7 @@ public class Authors extends AbstractParamLayoutFormatter {
             }
         }
 
-        if (lastNameOnly || firstNamePart == null) {
+        if (lastNameOnly || (firstNamePart == null)) {
             sb.append(lastNamePart);
         }
         else if (firstFirst) {
@@ -340,11 +340,5 @@ public class Authors extends AbstractParamLayoutFormatter {
             sb.append(lastNamePart).append(lastFirstSeparator).append(firstNamePart);
         }
 
-    }
-
-    public static void main(String[] args) {
-        Authors format = new Authors();
-        format.setArgument("lastfirstfirstfirst , initials,  Nocomma,Amp,Semicolon,30 ,EtAl = m.fl.");
-        System.out.println(format.format("Alfredsen, Jr, Jo Arve and Morten Omholt Alver and Yngvar von Olsen and Sebastian A. L. M. Kooijman"));
     }
 }

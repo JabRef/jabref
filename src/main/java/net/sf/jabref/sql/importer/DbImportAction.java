@@ -26,6 +26,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.Globals;
@@ -42,10 +43,10 @@ import net.sf.jabref.sql.SQLUtil;
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 27, 2008 Time: 6:09:08 PM To
  * change this template use File | Settings | File Templates.
- * 
+ *
  * Jan. 20th Changed to accomodate the new way to connect to DB and also to show
  * the exceptions and to display more than one DB imported (by ifsteinm)
- * 
+ *
  */
 public class DbImportAction extends AbstractWorker {
 
@@ -69,8 +70,8 @@ public class DbImportAction extends AbstractWorker {
     class DbImpAction extends MnemonicAwareAction {
 
         public DbImpAction() {
-            super(IconTheme.getImage("dbImport"));
-            putValue(Action.NAME, "Import from external SQL database");
+            super();
+            putValue(Action.NAME, Localization.menuTitle("Import from external SQL database"));
 
         }
 
@@ -140,10 +141,10 @@ public class DbImportAction extends AbstractWorker {
                 ResultSet rs = SQLUtil.queryAllFromTable(conn,
                         "jabref_database");
                 Vector<String> v;
-                Vector<Vector<String>> matrix = new Vector<Vector<String>>();
+                Vector<Vector<String>> matrix = new Vector<>();
 
                 while (rs.next()) {
-                    v = new Vector<String>();
+                    v = new Vector<>();
                     v.add(rs.getString("database_name"));
                     matrix.add(v);
                 }

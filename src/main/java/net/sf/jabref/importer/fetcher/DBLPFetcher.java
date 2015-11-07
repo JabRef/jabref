@@ -1,4 +1,5 @@
-/*  Copyright (C) 2011 Sascha Hunold.
+/*  Copyright (C) 2015 JabRef contributors.
+    Copyright (C) 2011 Sascha Hunold.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +17,6 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +28,8 @@ import javax.swing.JPanel;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.bibtex.DuplicateCheck;
+import net.sf.jabref.util.Util;
+import net.sf.jabref.bibtex.DuplicateCheck;
 
 public class DBLPFetcher implements EntryFetcher {
 
@@ -48,13 +48,13 @@ public class DBLPFetcher implements EntryFetcher {
     }
 
     @Override
-    public boolean processQuery(String query, ImportInspector inspector,
+    public boolean processQuery(String newQuery, ImportInspector inspector,
             OutputPrinter status) {
 
-        final HashMap<String, Boolean> bibentryKnown = new HashMap<String, Boolean>();
+        final HashMap<String, Boolean> bibentryKnown = new HashMap<>();
 
         boolean res = false;
-        this.query = query;
+        this.query = newQuery;
 
         shouldContinue = true;
 
@@ -63,11 +63,11 @@ public class DBLPFetcher implements EntryFetcher {
             String address = makeSearchURL();
             //System.out.println(address);
             URL url = new URL(address);
-            String page = readFromURL(url);
+            String page = Util.getResults(url);
 
             //System.out.println(page);
             String[] lines = page.split("\n");
-            List<String> bibtexUrlList = new ArrayList<String>();
+            List<String> bibtexUrlList = new ArrayList<>();
             for (final String line : lines) {
                 if (line.startsWith("\"url\"")) {
                     String addr = line.replace("\"url\":\"", "");
@@ -97,7 +97,7 @@ public class DBLPFetcher implements EntryFetcher {
 
                 final URL bibUrl = new URL(urlStr);
 
-                final String bibtexHTMLPage = readFromURL(bibUrl);
+                final String bibtexHTMLPage = Util.getResults(bibUrl);
 
                 final String[] htmlLines = bibtexHTMLPage.split("\n");
 
@@ -113,7 +113,7 @@ public class DBLPFetcher implements EntryFetcher {
 
                         final URL bibFileURL = new URL(bibtexUrl);
                         //System.out.println("URL:|"+bibtexUrl+"|");
-                        final String bibtexPage = readFromURL(bibFileURL);
+                        final String bibtexPage = Util.getResults(bibFileURL);
 
                         Collection<BibtexEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
 
@@ -144,19 +144,6 @@ public class DBLPFetcher implements EntryFetcher {
         }
 
         return res;
-    }
-
-    private String readFromURL(final URL source) throws IOException {
-        final InputStream in = source.openStream();
-        final InputStreamReader ir = new InputStreamReader(in);
-        final StringBuilder sbuf = new StringBuilder();
-
-        char[] cbuf = new char[256];
-        int read;
-        while ((read = ir.read(cbuf)) != -1) {
-            sbuf.append(cbuf, 0, read);
-        }
-        return sbuf.toString();
     }
 
     private String makeSearchURL() {

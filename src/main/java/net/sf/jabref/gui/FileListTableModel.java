@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -34,7 +34,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
  */
 public class FileListTableModel extends AbstractTableModel {
 
-    private final ArrayList<FileListEntry> list = new ArrayList<FileListEntry>();
+    private final ArrayList<FileListEntry> list = new ArrayList<>();
 
     @Override
     public int getRowCount() {
@@ -109,6 +109,7 @@ public class FileListTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        // Do nothing
     }
 
     /**
@@ -127,9 +128,9 @@ public class FileListTableModel extends AbstractTableModel {
         if (value == null) {
             value = "";
         }
-        ArrayList<FileListEntry> newList = new ArrayList<FileListEntry>();
+        ArrayList<FileListEntry> newList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<String>();
+        ArrayList<String> thisEntry = new ArrayList<>();
         boolean inXmlChar = false;
         boolean escaped = false;
         for (int i = 0; i < value.length(); i++) {

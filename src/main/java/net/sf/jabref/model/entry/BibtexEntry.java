@@ -1,33 +1,18 @@
-/*
-Copyright (C) 2003 David Weitzman, Morten O. Alver
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-All programs in this directory and
-subdirectories are published under the GNU General Public License as
-described below.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-USA
-
-Further information about the GNU GPL is available at:
-http://www.gnu.org/copyleft/gpl.ja.html
-
-Note:
-Modified for use in JabRef.
-
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
 package net.sf.jabref.model.entry;
 
 import java.beans.PropertyChangeEvent;
@@ -40,7 +25,6 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import net.sf.jabref.*;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.util.date.MonthUtil;
@@ -49,41 +33,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibtexEntry {
+    private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
     private static final String ID_FIELD = "id";
-
-    private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
-
-    public static final Map<String, String> FIELD_ALIASES_OLD_TO_NEW = new HashMap<>(); // Bibtex to BibLatex
-    public static final Map<String, String> FIELD_ALIASES_NEW_TO_OLD = new HashMap<>(); // BibLatex to Bibtex
-
-    static {
-        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("address", "location");
-        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("location", "address");
-
-        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("annote", "annotation");
-        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("annotation", "annote");
-
-        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("archiveprefix", "eprinttype");
-        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("eprinttype", "archiveprefix");
-
-        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("journal", "journaltitle");
-        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("journaltitle", "journal");
-
-        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("key", "sortkey");
-        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("sortkey", "key");
-
-        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("pdf", "file");
-        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("file", "pdf");
-
-        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("primaryclass", "eprintclass");
-        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("eprintclass", "primaryclass");
-
-        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("school", "institution");
-        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("institution", "school");
-    }
 
     private String id;
 
@@ -107,9 +61,7 @@ public class BibtexEntry {
     }
 
     public BibtexEntry(String id, BibtexEntryType type) {
-        if (id == null) {
-            throw new NullPointerException("Every BibtexEntry must have an ID");
-        }
+        Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
 
         this.id = id;
         setType(type);
@@ -118,41 +70,28 @@ public class BibtexEntry {
     /**
      * @return An array describing the optional fields for this entry. "null" if no fields are required
      */
-    public String[] getOptionalFields() {
-        String[] res = type.getOptionalFields();
-        if (res == null) {
-            return res;
-        } else {
-            // Fix for https://sourceforge.net/p/jabref/bugs/1221/ - see https://github.com/fc7/jabref/commit/e92238a37cc780eb7fccc0684fa62d2437ddd825
-            return res.clone();
-        }
+    public List<String> getOptionalFields() {
+        return type.getOptionalFields();
     }
 
     /**
      * @return an array describing the required fields for this entry. "null" if no fields are required
      */
-    public String[] getRequiredFields() {
-        String[] res = type.getRequiredFields();
-        if (res == null) {
-            return res;
-        } else {
-            // FIXME: This fix slows down saving very much. The issue should be investigated further and the one working on the result should do the clone
-            //        Removing the "clone()" here is against a rule in "Effective Java". However, the speed improvement weights more 
-            // Fix for https://sourceforge.net/p/jabref/bugs/1221/ - see https://github.com/fc7/jabref/commit/e92238a37cc780eb7fccc0684fa62d2437ddd825
-            return res.clone();
-        }
+    public List<String> getRequiredFields() {
+        return type.getRequiredFields();
     }
 
     public String[] getUserDefinedFields() {
-
         return Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
     }
 
     /**
      * Returns an set containing the names of all fields that are
      * set for this particular entry.
+     *
+     * @return a set of existing field names
      */
-    public Set<String> getAllFields() {
+    public Set<String> getFieldNames() {
         return new TreeSet<>(fields.keySet());
     }
 
@@ -175,10 +114,7 @@ public class BibtexEntry {
      * Sets this entry's type.
      */
     public void setType(BibtexEntryType type) {
-        if (type == null) {
-            throw new IllegalArgumentException(
-                    "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
-        }
+        Objects.requireNonNull(type, "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
 
         BibtexEntryType oldType = this.type;
 
@@ -222,10 +158,7 @@ public class BibtexEntry {
      * doesn't veto the change.
      */
     public void setId(String id) {
-
-        if (id == null) {
-            throw new IllegalArgumentException("Every BibtexEntry must have an ID");
-        }
+        Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
 
         try {
             firePropertyChangedEvent(BibtexEntry.ID_FIELD, this.id, id);
@@ -274,23 +207,18 @@ public class BibtexEntry {
      */
     public String getFieldOrAlias(String name) {
         String fieldValue = getField(name);
-        if (fieldValue != null && !fieldValue.isEmpty()) {
+
+        if ((fieldValue != null) && !fieldValue.isEmpty()) {
             return fieldValue;
         }
 
         // No value of this field found, so look at the alias
+        String aliasForField = EntryConverter.FIELD_ALIASES.get(name);
 
-        // Create bidirectional dictionary between field names and their aliases
-        Map<String, String> aliases = new HashMap<>();
-        aliases.putAll(BibtexEntry.FIELD_ALIASES_OLD_TO_NEW);
-        aliases.putAll(BibtexEntry.FIELD_ALIASES_NEW_TO_OLD);
-
-        String aliasForField = aliases.get(name);
         if (aliasForField != null) {
             return getField(aliasForField);
         }
 
-        // So we did not found the field itself or its alias...
         // Finally, handle dates
         if (name.equals("date")) {
             String year = getField("year");
@@ -311,7 +239,6 @@ public class BibtexEntry {
 
             // Create date format matching dates with year and month
             DateFormat df = new DateFormat() {
-
                 static final String FORMAT1 = "yyyy-MM-dd";
                 static final String FORMAT2 = "yyyy-MM";
                 final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
@@ -325,7 +252,7 @@ public class BibtexEntry {
 
                 @Override
                 public Date parse(String source, ParsePosition pos) {
-                    if (source.length() - pos.getIndex() == FORMAT1.length()) {
+                    if ((source.length() - pos.getIndex()) == FORMAT1.length()) {
                         return sdf1.parse(source, pos);
                     }
                     return sdf2.parse(source, pos);
@@ -340,7 +267,7 @@ public class BibtexEntry {
                     return Integer.toString(calendar.get(Calendar.YEAR));
                 }
                 if (name.equals("month")) {
-                    return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0			
+                    return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0
                 }
             } catch (ParseException e) {
                 // So not a date with year and month, try just to parse years
@@ -354,18 +281,19 @@ public class BibtexEntry {
                         return Integer.toString(calendar.get(Calendar.YEAR));
                     }
                 } catch (ParseException e2) {
-                    LOGGER.warn("Could not parse entry " + name, e);
+                    LOGGER.warn("Could not parse entry " + name, e2);
                     return null; // Date field not in valid format
                 }
             }
         }
-
         return null;
     }
 
     public String getCiteKey() {
-        return fields.containsKey(KEY_FIELD) ?
-                fields.get(KEY_FIELD) : null;
+        if(!fields.containsKey(KEY_FIELD)) {
+            return null;
+        }
+        return fields.get(KEY_FIELD);
     }
 
     /**
@@ -388,8 +316,7 @@ public class BibtexEntry {
     public void setField(String name, String value) {
 
         if (BibtexEntry.ID_FIELD.equals(name)) {
-            throw new IllegalArgumentException("The field name '" + name +
-                    "' is reserved");
+            throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
 
         String oldValue = fields.get(name);
@@ -446,24 +373,25 @@ public class BibtexEntry {
                 return false;
             }
         }
-
         return true;
+    }
+
+    boolean allFieldsPresent(List<String> fields, BibtexDatabase database) {
+        return allFieldsPresent(fields.toArray(new String[0]), database);
     }
 
     boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
         for (String field : fields) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
-            if (value != null && !value.isEmpty()) {
+            if ((value != null) && !value.isEmpty()) {
                 return true;
             }
         }
         return false;
     }
 
-    private void firePropertyChangedEvent(String fieldName, Object oldValue,
-                                          Object newValue) throws PropertyVetoException {
-        changeSupport.fireVetoableChange(new PropertyChangeEvent(this,
-                fieldName, oldValue, newValue));
+    private void firePropertyChangedEvent(String fieldName, Object oldValue, Object newValue) throws PropertyVetoException {
+        changeSupport.fireVetoableChange(new PropertyChangeEvent(this, fieldName, oldValue, newValue));
     }
 
     /**
@@ -524,13 +452,14 @@ public class BibtexEntry {
                 getField("author"),
                 getField("title"),
                 getField("year")};
+
         for (int i = 0; i < s.length; ++i) {
             if (s[i] == null) {
                 s[i] = "N/A";
             }
         }
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
-        if (maxCharacters <= 0 || text.length() <= maxCharacters) {
+        if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
             return text;
         }
         return text.substring(0, maxCharacters + 1) + "...";

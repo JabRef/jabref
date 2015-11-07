@@ -15,8 +15,9 @@
 */
 package net.sf.jabref.gui.fieldeditors.contextmenu;
 
+import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.CaseChangers;
+import net.sf.jabref.logic.formatter.CaseChangers;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -34,13 +35,13 @@ public class CaseChangeMenu extends JMenu {
         parent = opener;
 
         // create menu items, one for each case changer
-        for (final CaseChangers.CaseChanger caseChanger : CaseChangers.ALL) {
+        for (final Formatter caseChanger : CaseChangers.ALL) {
             JMenuItem menuItem = new JMenuItem(Localization.lang(caseChanger.getName()));
             menuItem.addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    parent.setText(caseChanger.changeCase(parent.getText()));
+                    parent.setText(caseChanger.format(parent.getText()));
                 }
             });
             this.add(menuItem);

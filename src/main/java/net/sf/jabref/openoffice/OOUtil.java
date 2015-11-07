@@ -275,7 +275,7 @@ class OOUtil {
             values[ii] = String.valueOf(OOUtil.getProperty(doc.getCurrentController().getFrame(), "Title"));
             ii++;
         }
-        JList sel = new JList(values);
+        JList<String> sel = new JList<>(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sel.setSelectedIndex(0);
         int ans = JOptionPane.showConfirmDialog(parent, new JScrollPane(sel), Localization.lang("Select document"),
@@ -300,7 +300,7 @@ class OOUtil {
             return null;
         }
         BibtexEntry e = (BibtexEntry) entry.clone();
-        for (String field : e.getAllFields()) {
+        for (String field : e.getFieldNames()) {
             if (field.equals(BibtexEntry.KEY_FIELD)) {
                 continue;
             }

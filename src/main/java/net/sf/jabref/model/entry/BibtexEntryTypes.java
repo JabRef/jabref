@@ -2,6 +2,10 @@ package net.sf.jabref.model.entry;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class BibtexEntryTypes {
     // Get an entry type defined in BibtexEntryType
     public static BibtexEntryType getEntryType(String type) {
@@ -23,16 +27,6 @@ public class BibtexEntryTypes {
                 }
 
                 @Override
-                public String[] getOptionalFields() {
-                    return new String[0];
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[0];
-                }
-
-                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
                     return true;
                 }
@@ -41,23 +35,14 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType ARTICLE =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("volume", "pages", "number", "month", "note"); //- "volume", "pages", "part", "eid"
+                    addAllRequired("author", "title", "journal", "year");  //+ "volume", "pages"
+                }
+
                 @Override
                 public String getName() {
                     return "Article";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]{
-                            "volume", "pages", "number", "month", "note", //- "volume", "pages", "part", "eid"
-                    };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]{
-                            "author", "title", "journal", "year" //+ "volume", "pages"
-                    };
                 }
 
                 @Override
@@ -71,21 +56,13 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType BOOKLET =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("author", "howpublished", "address", "month", "year", "note");  //+ "lastchecked"
+                }
+
                 @Override
                 public String getName() {
                     return "Booklet";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]{
-                            "author", "howpublished", "address", "month", "year", "note" //+ "lastchecked"
-                    };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]{"title"};
                 }
 
                 @Override
@@ -97,32 +74,23 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType INBOOK =
             new BibtexEntryType() {
 
+                private List<String> requiredFieldsForCustomization = Collections.unmodifiableList(Arrays.asList(new String[]{"author/editor", "title", "chapter/pages", "year", "publisher"}));
+
+                {
+                    addAllOptional("volume", "number", "series", "type", "address", "edition",
+                            "month", "note"); //+ "pages"
+                    addAllRequired("chapter", "pages", "title", "publisher", "year", "editor",
+                            "author");
+                }
+
                 @Override
                 public String getName() {
                     return "InBook";
                 }
 
                 @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "volume", "number", "series", "type", "address", "edition",
-                                    "month", "note" //+ "pages"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "chapter", "pages", "title", "publisher", "year", "editor",
-                                    "author"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFieldsForCustomization() {
-                    return new String[]{"author/editor", "title", "chapter/pages", "year", "publisher"};
+                public List<String> getRequiredFieldsForCustomization() {
+                    return requiredFieldsForCustomization;
                 }
 
                 @Override
@@ -139,34 +107,24 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType BOOK =
             new BibtexEntryType() {
 
+                private List<String> requiredFieldsForCustomization = Collections.unmodifiableList(Arrays.asList(new String[]
+                        {"title", "publisher", "year", "author/editor"}));
+
+                {
+                    addAllRequired("title", "publisher", "year", "editor", "author");
+                    addAllOptional("volume", "number", "series", "address", "edition", "month",
+                            "note");     //+ pages
+                }
+
                 @Override
                 public String getName() {
                     return "Book";
                 }
 
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "volume", "number", "series", "address", "edition", "month",
-                                    "note" //+ pages
-                            };
-                }
 
                 @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "title", "publisher", "year", "editor", "author"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFieldsForCustomization() {
-                    return new String[]
-                            {
-                                    "title", "publisher", "year", "author/editor"
-                            };
+                public List<String> getRequiredFieldsForCustomization() {
+                    return requiredFieldsForCustomization;
                 }
 
                 @Override
@@ -183,26 +141,15 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType INCOLLECTION =
             new BibtexEntryType() {
 
+                {
+                    addAllRequired("author", "title", "booktitle", "publisher", "year");
+                    addAllOptional("editor", "volume", "number", "series", "type", "chapter",
+                            "pages", "address", "edition", "month", "note");
+                }
+
                 @Override
                 public String getName() {
                     return "InCollection";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "editor", "volume", "number", "series", "type", "chapter",
-                                    "pages", "address", "edition", "month", "note"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "author", "title", "booktitle", "publisher", "year"
-                            };
                 }
 
                 @Override
@@ -219,26 +166,15 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType CONFERENCE =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("editor", "volume", "number", "series", "pages",
+                            "address", "month", "organization", "publisher", "note");
+                    addAllRequired("author", "title", "booktitle", "year");
+                }
+
                 @Override
                 public String getName() {
                     return "Conference";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "editor", "volume", "number", "series", "pages",
-                                    "address", "month", "organization", "publisher", "note"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "author", "title", "booktitle", "year"
-                            };
                 }
 
                 @Override
@@ -253,26 +189,15 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType INPROCEEDINGS =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("editor", "volume", "number", "series", "pages",
+                            "address", "month", "organization", "publisher", "note");
+                    addAllRequired("author", "title", "booktitle", "year");
+                }
+
                 @Override
                 public String getName() {
                     return "InProceedings";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "editor", "volume", "number", "series", "pages",
-                                    "address", "month", "organization", "publisher", "note"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "author", "title", "booktitle", "year"
-                            };
                 }
 
                 @Override
@@ -287,26 +212,15 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType PROCEEDINGS =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("editor", "volume", "number", "series", "address",
+                            "publisher", "note", "month", "organization");
+                    addAllRequired("title", "year");
+                }
+
                 @Override
                 public String getName() {
                     return "Proceedings";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "editor", "volume", "number", "series", "address",
-                                    "publisher", "note", "month", "organization"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "title", "year"
-                            };
                 }
 
                 @Override
@@ -321,26 +235,15 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType MANUAL =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("author", "organization", "address", "edition",
+                            "month", "year", "note");
+                    addAllRequired("title");
+                }
+
                 @Override
                 public String getName() {
                     return "Manual";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "author", "organization", "address", "edition",
-                                    "month", "year", "note"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "title"
-                            };
                 }
 
                 @Override
@@ -355,25 +258,14 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType TECHREPORT =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("type", "number", "address", "month", "note");
+                    addAllRequired("author", "title", "institution", "year");
+                }
+
                 @Override
                 public String getName() {
                     return "TechReport";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "type", "number", "address", "month", "note"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "author", "title", "institution", "year"
-                            };
                 }
 
                 @Override
@@ -389,25 +281,14 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType MASTERSTHESIS =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("type", "address", "month", "note");
+                    addAllRequired("author", "title", "school", "year");
+                }
+
                 @Override
                 public String getName() {
                     return "MastersThesis";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "type", "address", "month", "note"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "author", "title", "school", "year"
-                            };
                 }
 
                 @Override
@@ -422,25 +303,14 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType PHDTHESIS =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("type", "address", "month", "note");
+                    addAllRequired("author", "title", "school", "year");
+                }
+
                 @Override
                 public String getName() {
                     return "PhdThesis";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "type", "address", "month", "note"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "author", "title", "school", "year"
-                            };
                 }
 
                 @Override
@@ -455,25 +325,14 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType UNPUBLISHED =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("month", "year");
+                    addAllRequired("author", "title", "note");
+                }
+
                 @Override
                 public String getName() {
                     return "Unpublished";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "month", "year"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "author", "title", "note"
-                            };
                 }
 
                 @Override
@@ -488,25 +347,14 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType PERIODICAL =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("editor", "language", "series", "volume", "number", "organization", "month", "note", "url");
+                    addAllRequired("title", "year");
+                }
+
                 @Override
                 public String getName() {
                     return "Periodical";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "editor", "language", "series", "volume", "number", "organization", "month", "note", "url"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "title", "year"
-                            };
                 }
 
                 @Override
@@ -521,25 +369,14 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType PATENT =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("author", "title", "language", "assignee", "address", "type", "number", "day", "dayfiled", "month", "monthfiled", "note", "url");
+                    addAllRequired("nationality", "number", "year", "yearfiled");
+                }
+
                 @Override
                 public String getName() {
                     return "Patent";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "author", "title", "language", "assignee", "address", "type", "number", "day", "dayfiled", "month", "monthfiled", "note", "url"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "nationality", "number", "year", "yearfiled"
-                            };
                 }
 
                 @Override
@@ -556,30 +393,22 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType STANDARD =
             new BibtexEntryType() {
 
+                private List<String> requiredFieldsForCustomization = Collections.unmodifiableList(Arrays.asList(new String[]{"title", "organization/institution"}));
+
+                {
+                    addAllOptional("author", "language", "howpublished", "type", "number", "revision", "address", "month", "year", "note", "url");
+                    addAllRequired("title", "organization", "institution");
+                }
+
                 @Override
                 public String getName() {
                     return "Standard";
                 }
 
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "author", "language", "howpublished", "type", "number", "revision", "address", "month", "year", "note", "url"
-                            };
-                }
 
                 @Override
-                public String[] getRequiredFields() {
-                    return new String[]
-                            {
-                                    "title", "organization", "institution"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFieldsForCustomization() {
-                    return new String[]{"title", "organization/institution"};
+                public List<String> getRequiredFieldsForCustomization() {
+                    return requiredFieldsForCustomization;
                 }
 
                 @Override
@@ -596,22 +425,14 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType ELECTRONIC =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("author", "month", "year", "title", "language", "howpublished", "organization", "address", "note", "url");
+
+                }
+
                 @Override
                 public String getName() {
                     return "Electronic";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "author", "month", "year", "title", "language", "howpublished", "organization", "address", "note", "url"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]{};
                 }
 
                 @Override
@@ -626,22 +447,13 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType MISC =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("author", "title", "howpublished", "month", "year", "note");
+                }
+
                 @Override
                 public String getName() {
                     return "Misc";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]
-                            {
-                                    "author", "title", "howpublished", "month", "year", "note"
-                            };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]{};
                 }
 
                 @Override
@@ -660,24 +472,16 @@ public class BibtexEntryTypes {
     public static final BibtexEntryType IEEETRANBSTCTL =
             new BibtexEntryType() {
 
+                {
+                    addAllOptional("ctluse_article_number", "ctluse_paper", "ctluse_forced_etal",
+                            "ctlmax_names_forced_etal", "ctlnames_show_etal", "ctluse_alt_spacing",
+                            "ctlalt_stretch_factor", "ctldash_repeated_names", "ctlname_format_string",
+                            "ctlname_latex_cmd", "ctlname_url_prefix");
+                }
+
                 @Override
                 public String getName() {
                     return "IEEEtranBSTCTL";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]{
-                            "ctluse_article_number", "ctluse_paper", "ctluse_forced_etal",
-                            "ctlmax_names_forced_etal", "ctlnames_show_etal", "ctluse_alt_spacing",
-                            "ctlalt_stretch_factor", "ctldash_repeated_names", "ctlname_format_string",
-                            "ctlname_latex_cmd", "ctlname_url_prefix"
-                    };
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]{};
                 }
 
                 @Override
@@ -701,16 +505,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "Typeless";
-                }
-
-                @Override
-                public String[] getOptionalFields() {
-                    return new String[]{};
-                }
-
-                @Override
-                public String[] getRequiredFields() {
-                    return new String[]{};
                 }
 
                 @Override

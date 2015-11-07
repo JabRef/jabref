@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
@@ -24,10 +24,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.util.strings.CaseChangers;
+import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -35,13 +34,13 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
- * 
+ *
  * Documentation about ISI WOS format:
- * 
+ *
  * <ul>
  * <li>http://wos.isitrial.com/help/helpprn.html</li>
  * </ul>
- * 
+ *
  * <ul>
  * <li>Check compatibility with other ISI2Bib tools like:
  * http://www-lab.imr.tohoku.ac.jp/~t-nissie/computer/software/isi/ or
@@ -62,7 +61,7 @@ public class IsiImporter extends ImportFormat {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
     @Override
@@ -86,13 +85,13 @@ public class IsiImporter extends ImportFormat {
 
         String str;
         int i = 0;
-        while ((str = in.readLine()) != null && i < 50) {
+        while (((str = in.readLine()) != null) && (i < 50)) {
 
             /**
              * The following line gives false positives for RIS files, so it
              * should not be uncommented. The hypen is a characteristic of the
              * RIS format.
-             * 
+             *
              * str = str.replace(" - ", "")
              */
             if (IsiImporter.isiPattern.matcher(str).find()) {
@@ -150,7 +149,7 @@ public class IsiImporter extends ImportFormat {
 
                 String s = map.get(aSubsup);
                 if (s.toUpperCase().equals(s)) {
-                    s = CaseChangers.TITLE.changeCase(s);
+                    s = CaseChangers.TITLE.format(s);
                     map.put(aSubsup, s);
                 }
             }
@@ -167,7 +166,7 @@ public class IsiImporter extends ImportFormat {
             throw new IOException("No stream given.");
         }
 
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -202,7 +201,7 @@ public class IsiImporter extends ImportFormat {
 
         String[] entries = sb.toString().split("::");
 
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
 
         // skip the first entry as it is either empty or has document header
         for (String entry : entries) {
@@ -262,7 +261,7 @@ public class IsiImporter extends ImportFormat {
 
                     value = value.replaceAll("EOLEOL", " ");
                     String existingKeywords = hm.get("keywords");
-                    if (existingKeywords != null && !existingKeywords.contains(value)) {
+                    if ((existingKeywords != null) && !existingKeywords.contains(value)) {
                         existingKeywords += ", " + value;
                     } else {
                         existingKeywords = value;
@@ -277,7 +276,7 @@ public class IsiImporter extends ImportFormat {
                     int detpos = value.indexOf(' ');
 
                     // tweak for IEEE Explore
-                    if (detpos != -1 && !value.substring(0, detpos).trim().isEmpty()) {
+                    if ((detpos != -1) && !value.substring(0, detpos).trim().isEmpty()) {
                         value = value.substring(0, detpos);
                     }
 
@@ -334,15 +333,15 @@ public class IsiImporter extends ImportFormat {
                 continue;
             }
 
-            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
                     .getEntryType(Type));
             // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<Object>();
+            ArrayList<Object> toRemove = new ArrayList<>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if (content == null || content.trim().isEmpty()) {
+                if ((content == null) || content.trim().isEmpty()) {
                     toRemove.add(key);
                 }
             }
@@ -387,7 +386,7 @@ public class IsiImporter extends ImportFormat {
                     return month.bibtexFormat;
                 }
             } catch (NumberFormatException ignored) {
-
+                // Ignored
             }
         }
         return null;
@@ -395,10 +394,10 @@ public class IsiImporter extends ImportFormat {
 
     /**
      * Will expand ISI first names.
-     * 
+     *
      * Fixed bug from:
      * http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306
-     * 
+     *
      */
     public static String isiAuthorConvert(String author) {
 
@@ -426,14 +425,14 @@ public class IsiImporter extends ImportFormat {
                 for (int j = 0; j < first.length(); j++) {
                     sb.append(first.charAt(j)).append(".");
 
-                    if (j < first.length() - 1) {
+                    if (j < (first.length() - 1)) {
                         sb.append(" ");
                     }
                 }
             } else {
                 sb.append(first);
             }
-            if (i < firstParts.length - 1) {
+            if (i < (firstParts.length - 1)) {
                 sb.append(" ");
             }
         }

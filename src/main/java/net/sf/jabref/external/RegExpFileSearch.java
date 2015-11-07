@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.external;
 
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -50,7 +50,7 @@ public class RegExpFileSearch {
     public static Map<BibtexEntry, java.util.List<File>> findFilesForSet(Collection<BibtexEntry> entries,
             Collection<String> extensions, List<File> directories, String regExp) {
 
-        Map<BibtexEntry, java.util.List<File>> res = new HashMap<BibtexEntry, List<File>>();
+        Map<BibtexEntry, java.util.List<File>> res = new HashMap<>();
         for (BibtexEntry entry : entries) {
             res.put(entry, RegExpFileSearch.findFiles(entry, extensions, directories, regExp));
         }
@@ -67,7 +67,7 @@ public class RegExpFileSearch {
      * @return A list of files paths matching the given criteria.
      */
     private static List<File> findFiles(BibtexEntry entry, Collection<String> extensions,
-                                        Collection<File> directories, String regularExpression) {
+            Collection<File> directories, String regularExpression) {
 
         StringBuilder sb = new StringBuilder();
         for (Iterator<String> i = extensions.iterator(); i.hasNext();) {
@@ -82,7 +82,7 @@ public class RegExpFileSearch {
     }
 
     /**
-     * Searches the given directory and file name pattern for a file for the
+     * Searches the given directory and filename pattern for a file for the
      * bibtexentry.
      *
      * Used to fix:
@@ -122,8 +122,8 @@ public class RegExpFileSearch {
      *         null if none was found.
      */
     private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, Collection<File> dirs,
-                                       String file, String extensionRegExp, boolean relative) {
-        ArrayList<File> res = new ArrayList<File>();
+            String file, String extensionRegExp, boolean relative) {
+        ArrayList<File> res = new ArrayList<>();
         for (File directory : dirs) {
             List<File> tmp = RegExpFileSearch.findFile(entry, database, directory.getPath(), file, extensionRegExp, relative);
             if (tmp != null) {
@@ -139,7 +139,7 @@ public class RegExpFileSearch {
      *
      */
     private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, String directory,
-                                       String file, String extensionRegExp, boolean relative) {
+            String file, String extensionRegExp, boolean relative) {
 
         List<File> res;
         File root;
@@ -164,7 +164,7 @@ public class RegExpFileSearch {
                     // Changed by M. Alver 2007.01.04:
                     // Remove first character if it is a directory separator character:
                     String tmp = res.get(i).getCanonicalPath().substring(root.getCanonicalPath().length());
-                    if (tmp.length() > 1 && tmp.charAt(0) == File.separatorChar) {
+                    if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar)) {
                         tmp = tmp.substring(1);
                     }
                     res.set(i, new File(tmp));
@@ -182,9 +182,9 @@ public class RegExpFileSearch {
      * given directory using the given regular expression string for search.
      */
     private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, File directory,
-                                       String file, String extensionRegExp) {
+            String file, String extensionRegExp) {
 
-        ArrayList<File> res = new ArrayList<File>();
+        ArrayList<File> res = new ArrayList<>();
 
         if (file.startsWith("/")) {
             directory = new File(".");
@@ -207,7 +207,7 @@ public class RegExpFileSearch {
 
         if (fileParts.length > 1) {
 
-            for (int i = 0; i < fileParts.length - 1; i++) {
+            for (int i = 0; i < (fileParts.length - 1); i++) {
 
                 String dirToProcess = fileParts[i];
                 dirToProcess = Util.expandBrackets(dirToProcess, entry, database);
@@ -238,7 +238,7 @@ public class RegExpFileSearch {
                 }
                 // Do for all direct and indirect subdirs
                 if (dirToProcess.equals("**")) {
-                    List<File> toDo = new LinkedList<File>();
+                    List<File> toDo = new LinkedList<>();
                     toDo.add(directory);
 
                     String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
@@ -281,7 +281,7 @@ public class RegExpFileSearch {
                 return toMatch.matcher(arg1).matches();
             }
         });
-        if (matches != null && matches.length > 0) {
+        if ((matches != null) && (matches.length > 0)) {
             Collections.addAll(res, matches);
         }
         return res;

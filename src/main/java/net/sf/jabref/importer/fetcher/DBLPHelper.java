@@ -1,4 +1,5 @@
 /*  Copyright (C) 2011 Sascha Hunold.
+ *  Copyright (C) 2015 JabRef Contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -68,7 +69,7 @@ class DBLPHelper {
      * @return list of BibtexEntry
      */
     public List<BibtexEntry> getBibTexFromPage(final String page) {
-        final List<BibtexEntry> bibtexList = new ArrayList<BibtexEntry>();
+        final List<BibtexEntry> bibtexList = new ArrayList<>();
         final String startPattern = "<pre class=\"verbatim select-on-click\">";
         final String endPattern = "</pre>";
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -52,7 +52,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private final JTable colSetup;
     private int rowCount = -1;
     private int ncWidth = -1;
-    private final Vector<TableRow> tableRows = new Vector<TableRow>(10);
+    private final Vector<TableRow> tableRows = new Vector<>(10);
     private final JabRefFrame frame;
 
     private final JCheckBox pdfColumn;
@@ -61,7 +61,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private final JCheckBox arxivColumn;
 
     private final JCheckBox extraFileColumns;
-    private JList listOfFileColumns;
+    private JList<String> listOfFileColumns;
 
     private final JRadioButton preferUrl;
     private final JRadioButton preferDoi;
@@ -71,7 +71,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     /*** begin: special fields ***/
     private final JCheckBox specialFieldsEnabled;
     private JCheckBox rankingColumn;
-    private JCheckBox compactRankingColumn;
     private JCheckBox qualityColumn;
     private JCheckBox priorityColumn;
     private JCheckBox relevanceColumn;
@@ -81,7 +80,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private JRadioButton writeSpecialFields;
     private boolean oldSpecialFieldsEnabled;
     private boolean oldRankingColumn;
-    private boolean oldCompcatRankingColumn;
     private boolean oldQualityColumn;
     private boolean oldPriorityColumn;
     private boolean oldRelevanceColumn;
@@ -170,14 +168,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             public Class<?> getColumnClass(int column) {
                 if (column == 0) {
                     return String.class;
-                } else {
-                    return Integer.class;
                 }
+                return Integer.class;
             }
 
             @Override
             public boolean isCellEditable(int row, int col) {
-                return !(row == 0 && col == 0);
+                return !((row == 0) && (col == 0));
             }
 
             @Override
@@ -188,7 +185,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     tableRows.add(new TableRow("", -1));
                 }
 
-                if (row == 0 && col == 1) {
+                if ((row == 0) && (col == 1)) {
                     ncWidth = Integer.parseInt(value.toString());
                     return;
                 }
@@ -277,16 +274,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         for (int i = 0; i < fileTypes.length; i++) {
             fileTypeNames[i] = fileTypes[i].getName();
         }
-        listOfFileColumns = new JList(fileTypeNames);
+        listOfFileColumns = new JList<>(fileTypeNames);
         JScrollPane listOfFileColumnsScrollPane = new JScrollPane(listOfFileColumns);
         listOfFileColumns.setVisibleRowCount(3);
 
         /*** begin: special table columns and special fields ***/
 
-        HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp);
-        JButton helpButton = new JButton(IconTheme.getImage("helpSmall"));
-        helpButton.setToolTipText(Localization.lang("Help on special fields"));
-        helpButton.addActionListener(help);
+        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp, Localization.lang("Help on special fields")).getIconButton();
 
         specialFieldsEnabled = new JCheckBox(Localization.lang("Enable special fields"));
         specialFieldsEnabled.addChangeListener(new ChangeListener() {
@@ -295,7 +289,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             public void stateChanged(ChangeEvent event) {
                 boolean isEnabled = specialFieldsEnabled.isSelected();
                 rankingColumn.setEnabled(isEnabled);
-                compactRankingColumn.setEnabled(isEnabled && rankingColumn.isSelected());
                 qualityColumn.setEnabled(isEnabled);
                 priorityColumn.setEnabled(isEnabled);
                 relevanceColumn.setEnabled(isEnabled);
@@ -306,14 +299,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
         });
         rankingColumn = new JCheckBox(Localization.lang("Show rank"));
-        rankingColumn.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                compactRankingColumn.setEnabled(rankingColumn.isSelected());
-            }
-        });
-        compactRankingColumn = new JCheckBox(Localization.lang("Compact rank"));
         qualityColumn = new JCheckBox(Localization.lang("Show quality"));
         priorityColumn = new JCheckBox(Localization.lang("Show priority"));
         relevanceColumn = new JCheckBox(Localization.lang("Show relevance"));
@@ -339,12 +324,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         specialTableColumnsBuilder.add(specialFieldsEnabled, cc.xyw(1, 1, 3));
         specialTableColumnsBuilder.add(rankingColumn, cc.xyw(2, 2, 2));
-        specialTableColumnsBuilder.add(compactRankingColumn, cc.xy(3, 3));
-        specialTableColumnsBuilder.add(relevanceColumn, cc.xyw(2, 4, 2));
-        specialTableColumnsBuilder.add(qualityColumn, cc.xyw(2, 5, 2));
-        specialTableColumnsBuilder.add(priorityColumn, cc.xyw(2, 6, 2));
-        specialTableColumnsBuilder.add(printedColumn, cc.xyw(2, 7, 2));
-        specialTableColumnsBuilder.add(readStatusColumn, cc.xyw(2, 8, 2));
+        specialTableColumnsBuilder.add(relevanceColumn, cc.xyw(2, 3, 2));
+        specialTableColumnsBuilder.add(qualityColumn, cc.xyw(2, 4, 2));
+        specialTableColumnsBuilder.add(priorityColumn, cc.xyw(2, 5, 2));
+        specialTableColumnsBuilder.add(printedColumn, cc.xyw(2, 6, 2));
+        specialTableColumnsBuilder.add(readStatusColumn, cc.xyw(2, 7, 2));
         specialTableColumnsBuilder.add(syncKeywords, cc.xyw(2, 10, 2));
         specialTableColumnsBuilder.add(writeSpecialFields, cc.xyw(2, 11, 2));
         specialTableColumnsBuilder.add(showOneLetterHeadingForIconColumns, cc.xyw(1, 12, 4));
@@ -420,9 +404,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         oldRankingColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING);
         rankingColumn.setSelected(oldRankingColumn);
 
-        oldCompcatRankingColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT);
-        compactRankingColumn.setSelected(oldCompcatRankingColumn);
-
         oldQualityColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY);
         qualityColumn.setSelected(oldQualityColumn);
 
@@ -473,7 +454,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", IconTheme.getImage("remove"));
+            super("Delete row", IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -485,7 +466,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
             int offs = 0;
             for (int i = rows.length - 1; i >= 0; i--) {
-                if (rows[i] <= tableRows.size() && rows[i] != 0) {
+                if ((rows[i] <= tableRows.size()) && (rows[i] != 0)) {
                     tableRows.remove(rows[i] - 1);
                     offs++;
                 }
@@ -503,7 +484,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", IconTheme.getImage("add"));
+            super("Add row", IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 
@@ -518,8 +499,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 return;
             }
             for (int i = 0; i < rows.length; i++) {
-                if (rows[i] + i - 1 < tableRows.size()) {
-                    tableRows.add(Math.max(0, rows[i] + i - 1), new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
+                if (((rows[i] + i) - 1) < tableRows.size()) {
+                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
                 }
             }
             rowCount += rows.length;
@@ -534,15 +515,15 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     abstract class AbstractMoveRowAction extends AbstractAction {
 
-        public AbstractMoveRowAction(String string, ImageIcon image) {
+        public AbstractMoveRowAction(String string, Icon image) {
             super(string, image);
         }
 
         void swap(int i, int j) {
-            if (i < 0 || i >= tableRows.size()) {
+            if ((i < 0) || (i >= tableRows.size())) {
                 return;
             }
-            if (j < 0 || j >= tableRows.size()) {
+            if ((j < 0) || (j >= tableRows.size())) {
                 return;
             }
             TableRow tmp = tableRows.get(i);
@@ -554,7 +535,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowUpAction extends AbstractMoveRowAction {
 
         public MoveRowUpAction() {
-            super("Up", IconTheme.getImage("up"));
+            super("Up", IconTheme.JabRefIcon.UP.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Move up"));
         }
 
@@ -564,7 +545,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             Arrays.sort(selected);
             // first element (#) not inside tableRows
             // don't move if a selected element is at bounce
-            if (selected.length > 0 && selected[0] > 1) {
+            if ((selected.length > 0) && (selected[0] > 1)) {
                 boolean[] newSelected = new boolean[colSetup.getRowCount()];
                 for (int i : selected) {
                     swap(i - 1, i - 2);
@@ -587,7 +568,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowDownAction extends AbstractMoveRowAction {
 
         public MoveRowDownAction() {
-            super("Down", IconTheme.getImage("down"));
+            super("Down", IconTheme.JabRefIcon.DOWN.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Down"));
         }
 
@@ -598,7 +579,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             final int last = selected.length - 1;
             boolean[] newSelected = new boolean[colSetup.getRowCount()];
             // don't move if a selected element is at bounce
-            if (selected.length > 0 && selected[last] < tableRows.size()) {
+            if ((selected.length > 0) && (selected[last] < tableRows.size())) {
                 for (int i = last; i >= 0; i--) {
                     swap(selected[i] - 1, selected[i]);
                     newSelected[selected[i] + 1] = true;
@@ -631,12 +612,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
             // idea: sort elements according to value stored in hash, keep
             // everything not inside hash/mainTable as it was
-            final HashMap<String, Integer> map = new HashMap<String, Integer>();
+            final HashMap<String, Integer> map = new HashMap<>();
 
             // first element (#) not inside tableRows
             for (int i = 1; i < panel.mainTable.getColumnCount(); i++) {
                 String name = panel.mainTable.getColumnName(i);
-                if (name != null && !name.isEmpty()) {
+                if ((name != null) && !name.isEmpty()) {
                     map.put(name.toLowerCase(), i);
                 }
             }
@@ -646,7 +627,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 public int compare(TableRow o1, TableRow o2) {
                     Integer n1 = map.get(o1.name);
                     Integer n2 = map.get(o2.name);
-                    if (n1 == null || n2 == null) {
+                    if ((n1 == null) || (n2 == null)) {
                         return 0;
                     }
                     return n1.compareTo(n2);
@@ -677,11 +658,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 try {
                     String name = panel.mainTable.getColumnName(i).toLowerCase();
                     int width = colMod.getColumn(i).getWidth();
-                    if (i <= tableRows.size() && ((String) colSetup.getValueAt(i, 0)).toLowerCase().equals(name)) {
+                    if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).toLowerCase().equals(name)) {
                         colSetup.setValueAt("" + width, i, 1);
                     } else { // Doesn't match; search for a matching col in our table
                         for (int j = 0; j < colSetup.getRowCount(); j++) {
-                            if (j < tableRows.size() &&
+                            if ((j < tableRows.size()) &&
                                     ((String) colSetup.getValueAt(j, 0)).toLowerCase().equals(name)) {
                                 colSetup.setValueAt("" + width, j, 1);
                                 break;
@@ -716,7 +697,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         if (extraFileColumns.isSelected() && !listOfFileColumns.isSelectionEmpty()) {
             String[] selections = new String[listOfFileColumns.getSelectedIndices().length];
             for (int i = 0; i < selections.length; i++) {
-                selections[i] = (String) listOfFileColumns.getModel().getElementAt(
+                selections[i] = listOfFileColumns.getModel().getElementAt(
                         listOfFileColumns.getSelectedIndices()[i]);
             }
             prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
@@ -731,7 +712,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         boolean newSpecialFieldsEnabled = specialFieldsEnabled.isSelected();
         boolean newRankingColumn = rankingColumn.isSelected();
-        boolean newCompactRankingColumn = compactRankingColumn.isSelected();
         boolean newQualityColumn = qualityColumn.isSelected();
         boolean newPriorityColumn = priorityColumn.isSelected();
         boolean newRelevanceColumn = relevanceColumn.isSelected();
@@ -741,21 +721,20 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         boolean newWriteSpecialFields = writeSpecialFields.isSelected();
 
         boolean restartRequired;
-        restartRequired = oldSpecialFieldsEnabled != newSpecialFieldsEnabled ||
-                oldRankingColumn != newRankingColumn ||
-                oldCompcatRankingColumn != newCompactRankingColumn ||
-                oldQualityColumn != newQualityColumn ||
-                oldPriorityColumn != newPriorityColumn ||
-                oldRelevanceColumn != newRelevanceColumn ||
-                oldPrintedColumn != newPrintedColumn ||
-                oldReadStatusColumn != newReadStatusColumn ||
-                oldSyncKeyWords != newSyncKeyWords ||
-                oldWriteSpecialFields != newWriteSpecialFields;
+        restartRequired = (oldSpecialFieldsEnabled != newSpecialFieldsEnabled) ||
+                (oldRankingColumn != newRankingColumn) ||
+                (oldQualityColumn != newQualityColumn) ||
+                (oldPriorityColumn != newPriorityColumn) ||
+                (oldRelevanceColumn != newRelevanceColumn) ||
+                (oldPrintedColumn != newPrintedColumn) ||
+                (oldReadStatusColumn != newReadStatusColumn) ||
+                (oldSyncKeyWords != newSyncKeyWords) ||
+                (oldWriteSpecialFields != newWriteSpecialFields);
         if (restartRequired) {
             JOptionPane.showMessageDialog(null,
                     Localization.lang("You have changed settings for special fields.")
-                            .concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                    .concat(" ")
+                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
                     Localization.lang("Changed special field settings"),
                     JOptionPane.WARNING_MESSAGE);
         }
@@ -765,7 +744,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         if (restartRequired) {
             prefs.putBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
             prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, newRankingColumn);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT, newCompactRankingColumn);
             prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, newPriorityColumn);
             prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, newQualityColumn);
             prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, newRelevanceColumn);
