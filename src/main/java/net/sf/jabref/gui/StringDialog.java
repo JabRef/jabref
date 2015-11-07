@@ -154,7 +154,8 @@ class StringDialog extends JDialog {
         } else {
             setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
         }
-        PositionWindow.setWindowPosition(this, PositionWindow.STRINGS);
+        PositionWindow.setWindowPosition(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
+                JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
     }
 
 
@@ -340,7 +341,9 @@ class StringDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             panel.stringsClosing();
             dispose();
-            PositionWindow.storeWindowPosition(this.parent, PositionWindow.STRINGS);
+            PositionWindow.storeWindowPosition(this.parent, JabRefPreferences.STRINGS_POS_X,
+                    JabRefPreferences.STRINGS_POS_Y, JabRefPreferences.STRINGS_SIZE_X,
+                    JabRefPreferences.STRINGS_SIZE_Y);
         }
     }
 

@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -127,7 +128,9 @@ public class MergeEntriesDialog extends JDialog {
 
         pack();
 
-        PositionWindow.setWindowPosition(this, PositionWindow.MERGEENTRIES);
+        PositionWindow.setWindowPosition(this, JabRefPreferences.MERGEENTRIES_POS_X,
+                JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
+                JabRefPreferences.MERGEENTRIES_SIZE_Y);
 
         // Show what we've got
         setVisible(true);
@@ -160,7 +163,9 @@ public class MergeEntriesDialog extends JDialog {
             panel.output(Localization.lang("Merged entries"));
         }
         // Save dialog position
-        PositionWindow.storeWindowPosition(this, PositionWindow.MERGEENTRIES);
+        PositionWindow.storeWindowPosition(this, JabRefPreferences.MERGEENTRIES_POS_X,
+                JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
+                JabRefPreferences.MERGEENTRIES_SIZE_Y);
         dispose();
     }
 }

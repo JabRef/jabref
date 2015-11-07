@@ -619,7 +619,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     private void positionWindowOnScreen() {
         if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            PositionWindow.setWindowPosition(this, PositionWindow.MAINWINDOW);
+            PositionWindow.setWindowPosition(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y,
+                    JabRefPreferences.SIZE_X, JabRefPreferences.SIZE_Y);
         }
     }
 
@@ -757,7 +758,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         if (basePanel() != null) {
             basePanel().saveDividerLocation();
         }
-        PositionWindow.storeWindowPosition(this, PositionWindow.MAINWINDOW);
+        PositionWindow.storeWindowPosition(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y,
+                JabRefPreferences.SIZE_X, JabRefPreferences.SIZE_Y);
 
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);

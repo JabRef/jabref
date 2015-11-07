@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
@@ -164,7 +165,8 @@ public class DuplicateResolverDialog extends JDialog {
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 
-        PositionWindow.setWindowPosition(this, PositionWindow.DUPLICATES);
+        PositionWindow.setWindowPosition(this, JabRefPreferences.DUPLICATES_POS_X, JabRefPreferences.DUPLICATES_POS_Y,
+                JabRefPreferences.DUPLICATES_SIZE_X, JabRefPreferences.DUPLICATES_SIZE_Y);
         both.requestFocus();
 
     }
@@ -173,7 +175,8 @@ public class DuplicateResolverDialog extends JDialog {
     private void buttonPressed(int button) {
         status = button;
         block = false;
-        PositionWindow.storeWindowPosition(this, PositionWindow.DUPLICATES);
+        PositionWindow.storeWindowPosition(this, JabRefPreferences.DUPLICATES_POS_X, JabRefPreferences.DUPLICATES_POS_Y,
+                JabRefPreferences.DUPLICATES_SIZE_X, JabRefPreferences.DUPLICATES_SIZE_Y);
         dispose();
     }
 

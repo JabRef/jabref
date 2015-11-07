@@ -26,26 +26,13 @@ import net.sf.jabref.Globals;
 
 public class PositionWindow {
 
-    // Strings for the corresponding preferences
-    public static final String MERGEENTRIES = "mergeEntries";
-    public static final String DUPLICATES = "duplicates";
-    public static final String STRINGS = "strings";
-    public static final String MAINWINDOW = "mainWindow";
+    public static void setWindowPosition(Window window, String posXKey, String posYKey, String sizeXKey,
+            String sizeYKey) {
 
-
-    public static void setWindowPosition(Window window, String name) {
-
-        // The actual preference strings ends with the following suffices
-        // There might be a better way to do this.
-        String prefSizeX = name + "SizeX";
-        String prefSizeY = name + "SizeY";
-        String prefPosX = name + "PosX";
-        String prefPosY = name + "PosY";
-
-        int sizeX = Globals.prefs.getInt(prefSizeX);
-        int sizeY = Globals.prefs.getInt(prefSizeY);
-        int posX = Globals.prefs.getInt(prefPosX);
-        int posY = Globals.prefs.getInt(prefPosY);
+        int sizeX = Globals.prefs.getInt(sizeXKey);
+        int sizeY = Globals.prefs.getInt(sizeYKey);
+        int posX = Globals.prefs.getInt(posXKey);
+        int posY = Globals.prefs.getInt(posYKey);
 
         //
         // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
@@ -75,8 +62,8 @@ public class PositionWindow {
                 if (sizeX <= width) {
                     posX = width - sizeX;
                 } else {
-                    posX = Globals.prefs.getIntDefault(prefPosX);
-                    sizeX = Globals.prefs.getIntDefault(prefSizeX);
+                    posX = Globals.prefs.getIntDefault(posXKey);
+                    sizeX = Globals.prefs.getIntDefault(sizeXKey);
                 }
             }
 
@@ -84,8 +71,8 @@ public class PositionWindow {
                 if (sizeY <= height) {
                     posY = height - sizeY;
                 } else {
-                    posY = Globals.prefs.getIntDefault(prefPosY);
-                    sizeY = Globals.prefs.getIntDefault(prefSizeY);
+                    posY = Globals.prefs.getIntDefault(posYKey);
+                    sizeY = Globals.prefs.getIntDefault(sizeYKey);
                 }
             }
         }
@@ -94,13 +81,14 @@ public class PositionWindow {
 
     }
 
-    public static void storeWindowPosition(Window window, String name) {
+    public static void storeWindowPosition(Window window, String posXKey, String posYKey, String sizeXKey,
+            String sizeYKey) {
         Point p = window.getLocation();
         Dimension d = window.getSize();
-        Globals.prefs.putInt(name + "PosX", p.x);
-        Globals.prefs.putInt(name + "PosY", p.y);
-        Globals.prefs.putInt(name + "SizeX", d.width);
-        Globals.prefs.putInt(name + "SizeY", d.height);
+        Globals.prefs.putInt(posXKey, p.x);
+        Globals.prefs.putInt(posYKey, p.y);
+        Globals.prefs.putInt(sizeXKey, d.width);
+        Globals.prefs.putInt(sizeYKey, d.height);
     }
 
     /**
