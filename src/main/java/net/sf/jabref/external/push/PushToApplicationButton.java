@@ -172,8 +172,8 @@ public class PushToApplicationButton implements ActionListener {
 
     static class BooleanHolder {
 
-        public BooleanHolder(boolean val) {
-            value = val;
+        public BooleanHolder(boolean value) {
+            this.value = value;
         }
 
 
@@ -249,8 +249,8 @@ public class PushToApplicationButton implements ActionListener {
         private final int index;
 
 
-        public PopupItemActionListener(int idx) {
-            index = idx;
+        public PopupItemActionListener(int index) {
+            this.index = index;
         }
 
         @Override

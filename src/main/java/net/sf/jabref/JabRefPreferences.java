@@ -454,7 +454,7 @@ public class JabRefPreferences {
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
 
         }
-        defaults.put(PUSH_TO_APPLICATION, "LyX/Kile");
+        defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
         defaults.put(USE_PROXY, Boolean.FALSE);
         defaults.put(PROXY_HOSTNAME, "my proxy host");
         defaults.put(PROXY_PORT, "my proxy port");
