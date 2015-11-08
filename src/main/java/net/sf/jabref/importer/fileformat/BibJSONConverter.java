@@ -22,7 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 public class BibJSONConverter {
 
@@ -41,7 +41,7 @@ public class BibJSONConverter {
 
     public static BibtexEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
         BibtexEntry entry = new BibtexEntry();
-        entry.setType(BibtexEntryType.getType("article"));
+        entry.setType(BibtexEntryTypes.ARTICLE);
 
         // Authors
         if (bibJsonEntry.has("author")) {
