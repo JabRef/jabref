@@ -17,7 +17,6 @@ package net.sf.jabref.bst;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,6 +39,8 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -53,7 +54,7 @@ import org.antlr.runtime.tree.Tree;
 
 public class VM implements Warn {
 
-    private final PrintStream out = System.out;
+    private static final Log LOGGER = LogFactory.getLog(VM.class);
 
 
     public class Identifier {
@@ -652,7 +653,7 @@ public class VM implements Warn {
             @Override
             public void execute(BstEntry context) {
                 while (!stack.empty()) {
-                    System.out.println(stack.pop());
+                    LOGGER.debug(stack.pop());
                 }
             }
         });
@@ -847,12 +848,11 @@ public class VM implements Warn {
         buildInFunctions.put("top$", new BstFunction() {
 
             /**
-             * Pops and prints the top of the stack on the terminal and log
-             * file. It's useful for debugging.
+             * Pops and prints the top of the stack to the log file. It's useful for debugging.
              */
             @Override
             public void execute(BstEntry context) {
-                System.out.println(stack.pop());
+                LOGGER.debug(stack.pop());
             }
         });
 
@@ -880,7 +880,7 @@ public class VM implements Warn {
 
             @Override
             public void execute(BstEntry context) {
-                out.println("Warning (#" + (warning++) + "): " + stack.pop());
+                LOGGER.warn("Warning (#" + (warning++) + "): " + stack.pop());
             }
         });
 
@@ -1253,10 +1253,10 @@ public class VM implements Warn {
                     }
                 } catch (VMException e) {
                     if (file != null) {
-                        System.err.println("ERROR " + e.getMessage() + " (" + file.getPath() + ":"
+                        LOGGER.error("ERROR " + e.getMessage() + " (" + file.getPath() + ":"
                                 + c.getLine() + ")");
                     } else {
-                        System.err.println("ERROR " + e.getMessage() + " (" + c.getLine() + ")");
+                        LOGGER.error("ERROR " + e.getMessage() + " (" + c.getLine() + ")");
                     }
                     throw e;
                 }
@@ -1419,7 +1419,7 @@ public class VM implements Warn {
 
     @Override
     public void warn(String string) {
-        System.out.println(string);
+        LOGGER.warn(string);
     }
 
 }
