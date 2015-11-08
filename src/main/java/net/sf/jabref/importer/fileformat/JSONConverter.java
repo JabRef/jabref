@@ -24,22 +24,24 @@ import org.json.JSONObject;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
-public class BibJSONConverter {
+public class JSONConverter {
 
-    private static final Log LOGGER = LogFactory.getLog(BibJSONConverter.class);
-
-    // Fields that are directly accessible at the top level BibJson object
-    private static final String[] singleFieldStrings = new String[] {"year", "title", "abstract", "month"};
-
-    // Fields that are accessible in the journal part of the BibJson object
-    private static final String[] journalSingleFieldStrings = new String[] {"publisher", "number", "volume"};
+    private static final Log LOGGER = LogFactory.getLog(JSONConverter.class);
 
 
-    public BibJSONConverter() {
+    public JSONConverter() {
 
     }
 
-    public static BibtexEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
+    public BibtexEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
+        // Fields that are directly accessible at the top level BibJson object
+        String[] singleFieldStrings = new String[] {"year", "title", "abstract", "month"};
+
+        // Fields that are accessible in the journal part of the BibJson object
+        String[] journalSingleFieldStrings = new String[] {"publisher", "number", "volume"};
+
+
+
         BibtexEntry entry = new BibtexEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
 

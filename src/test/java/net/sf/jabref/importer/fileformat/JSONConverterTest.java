@@ -23,8 +23,9 @@ import org.junit.Assert;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
-public class BibJSONConverterTest {
+public class JSONConverterTest {
 
+    private final JSONConverter jc = new JSONConverter();
     @Test
     public void testBibJSONConverter() {
         String jsonString = new String(
@@ -38,7 +39,7 @@ public class BibJSONConverterTest {
                         + "\"id\": \"1563-5171\"},{\"type\": \"doi\",\"id\": \"10.1155/2014/217495\""
                         + "}],\"created_date\":\"2014-05-09T19:38:31Z\"}\"");
         JSONObject jo = new JSONObject(jsonString);
-        BibtexEntry be = BibJSONConverter.BibJSONtoBibtex(jo);
+        BibtexEntry be = jc.BibJSONtoBibtex(jo);
 
         Assert.assertEquals(BibtexEntryTypes.ARTICLE, be.getType());
         Assert.assertEquals("VLSI Design", be.getField("journal"));

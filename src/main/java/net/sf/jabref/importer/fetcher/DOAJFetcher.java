@@ -30,7 +30,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.fileformat.BibJSONConverter;
+import net.sf.jabref.importer.fileformat.JSONConverter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 
@@ -41,6 +41,8 @@ public class DOAJFetcher implements EntryFetcher {
     private final int maxPerPage = 100;
     private boolean shouldContinue;
 
+
+    private final JSONConverter jsonConverter = new JSONConverter();
 
     public DOAJFetcher() {
         super();
@@ -100,7 +102,7 @@ public class DOAJFetcher implements EntryFetcher {
                         JSONArray results = jo.getJSONArray("results");
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                            BibtexEntry entry = BibJSONConverter.BibJSONtoBibtex(bibJsonEntry);
+                            BibtexEntry entry = jsonConverter.BibJSONtoBibtex(bibJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);
