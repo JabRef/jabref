@@ -119,7 +119,11 @@ public class BibtexCaseChanger {
             if (c[i] == '}') {
                 sb.append(c[i]);
                 i++;
-                braceLevel = decrBraceLevel(s, braceLevel);
+                if (braceLevel == 0) {
+                    LOGGER.warn("Too many closing braces in string: " + s);
+                } else {
+                    braceLevel--;
+                }
                 prevColon = false;
                 continue;
             }
@@ -130,27 +134,10 @@ public class BibtexCaseChanger {
             sb.append(c[i]);
             i++;
         }
-        BibtexCaseChanger.checkBrace(s, braceLevel);
-        return sb.toString();
-    }
-
-    private int decrBraceLevel(String string, int bLevel) {
-        if (bLevel == 0) {
-            BibtexCaseChanger.complain(string);
-        } else {
-            bLevel--;
-        }
-        return bLevel;
-    }
-
-    static void complain(String s) {
-        LOGGER.warn("String is not brace-balanced: " + s);
-    }
-
-    static void checkBrace(String s, int braceLevel) {
         if (braceLevel > 0) {
-            BibtexCaseChanger.complain(s);
+            LOGGER.warn("No enough closing braces in string: " + s);
         }
+        return sb.toString();
     }
 
     /**
