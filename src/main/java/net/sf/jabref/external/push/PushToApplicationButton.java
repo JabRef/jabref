@@ -284,7 +284,7 @@ public class PushToApplicationButton implements ActionListener {
         }
 
         public void setTitle(String appName) {
-            putValue(Action.NAME, Localization.lang("Push entries to external application (%0)", appName));
+            putValue(Action.NAME, Localization.menuTitle("Push entries to external application (%0)", appName));
         }
 
         @Override
