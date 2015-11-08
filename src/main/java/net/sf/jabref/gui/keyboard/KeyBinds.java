@@ -115,6 +115,7 @@ public class KeyBinds {
     public static final String UNABBREVIATE = "Unabbreviate";
     public static final String UNDO = "Undo";
     public static final String UNMARK_ENTRIES = "Unmark entries";
+    public static final String WEB_SEARCH = "Web search";
     public static final String WRITE_XMP = "Write XMP";
 
     private final HashMap<String, String> keyBindMap = new HashMap<>();
@@ -184,7 +185,7 @@ public class KeyBinds {
         keyBindMap.put(EDIT_ENTRY, "ctrl E");
         keyBindMap.put(MARK_ENTRIES, "ctrl M");
         keyBindMap.put(UNMARK_ENTRIES, "ctrl shift M");
-        keyBindMap.put(FETCH_MEDLINE, "F5");
+        keyBindMap.put(WEB_SEARCH, "F5");
         keyBindMap.put(SEARCH_SCIENCE_DIRECT, "ctrl F5");
         keyBindMap.put(SEARCH_ADS, "ctrl shift F6");
         keyBindMap.put(NEW_FROM_PLAIN_TEXT, "ctrl shift N");
