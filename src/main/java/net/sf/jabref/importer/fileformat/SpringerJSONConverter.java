@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
 
@@ -28,16 +29,15 @@ public class SpringerJSONConverter {
 
     private static final Log LOGGER = LogFactory.getLog(SpringerJSONConverter.class);
 
-    // Fields that are directly accessible at the top level Json object
-    private static final String[] singleFieldStrings = new String[] {"issn", "volume", "abstract", "doi", "title",
-            "number", "publisher"};
-
-
     public SpringerJSONConverter() {
 
     }
 
     public static BibtexEntry SpringerJSONtoBibtex(JSONObject springerJsonEntry) {
+        // Fields that are directly accessible at the top level Json object
+        String[] singleFieldStrings = new String[] {"issn", "volume", "abstract", "doi", "title", "number",
+                "publisher"};
+
         BibtexEntry entry = new BibtexEntry();
         String nametype;
 
@@ -106,9 +106,10 @@ public class SpringerJSONConverter {
         // Date
         if (springerJsonEntry.has("publicationDate")) {
             String date = springerJsonEntry.getString("publicationDate");
+            entry.setField("date", date); // For BibLatex
             String dateparts[] = date.split("-");
             entry.setField("year", dateparts[0]);
-            entry.setField("month", dateparts[1]);
+            entry.setField("month", MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
         }
 
         // Clean up abstract (often starting with Abstract)
