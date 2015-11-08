@@ -50,6 +50,8 @@ public class MergeEntriesDialog extends JDialog {
     private NamedCompound ce;
     private MergeEntries mergeEntries;
 
+    private PositionWindow pw;
+
 
     public MergeEntriesDialog(BasePanel panel) {
         super(panel.frame(), Localization.lang("Merge entries"), true);
@@ -128,9 +130,10 @@ public class MergeEntriesDialog extends JDialog {
 
         pack();
 
-        PositionWindow.setWindowPosition(this, JabRefPreferences.MERGEENTRIES_POS_X,
+        pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
                 JabRefPreferences.MERGEENTRIES_SIZE_Y);
+        pw.setWindowPosition();
 
         // Show what we've got
         setVisible(true);
@@ -163,9 +166,7 @@ public class MergeEntriesDialog extends JDialog {
             panel.output(Localization.lang("Merged entries"));
         }
         // Save dialog position
-        PositionWindow.storeWindowPosition(this, JabRefPreferences.MERGEENTRIES_POS_X,
-                JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
-                JabRefPreferences.MERGEENTRIES_SIZE_Y);
+        pw.storeWindowPosition();
         dispose();
     }
 }

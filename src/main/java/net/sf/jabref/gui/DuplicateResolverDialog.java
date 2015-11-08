@@ -56,6 +56,7 @@ public class DuplicateResolverDialog extends JDialog {
     private int status = DuplicateResolverDialog.NOT_CHOSEN;
     private boolean block = true;
     private MergeEntries me;
+    private PositionWindow pw;
 
     public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
@@ -165,8 +166,9 @@ public class DuplicateResolverDialog extends JDialog {
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 
-        PositionWindow.setWindowPosition(this, JabRefPreferences.DUPLICATES_POS_X, JabRefPreferences.DUPLICATES_POS_Y,
+        pw = new PositionWindow(this, JabRefPreferences.DUPLICATES_POS_X, JabRefPreferences.DUPLICATES_POS_Y,
                 JabRefPreferences.DUPLICATES_SIZE_X, JabRefPreferences.DUPLICATES_SIZE_Y);
+        pw.setWindowPosition();
         both.requestFocus();
 
     }
@@ -175,8 +177,7 @@ public class DuplicateResolverDialog extends JDialog {
     private void buttonPressed(int button) {
         status = button;
         block = false;
-        PositionWindow.storeWindowPosition(this, JabRefPreferences.DUPLICATES_POS_X, JabRefPreferences.DUPLICATES_POS_Y,
-                JabRefPreferences.DUPLICATES_SIZE_X, JabRefPreferences.DUPLICATES_SIZE_Y);
+        pw.storeWindowPosition();
         dispose();
     }
 

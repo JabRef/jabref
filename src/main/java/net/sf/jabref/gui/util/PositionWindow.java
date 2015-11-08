@@ -26,8 +26,23 @@ import net.sf.jabref.Globals;
 
 public class PositionWindow {
 
-    public static void setWindowPosition(Window window, String posXKey, String posYKey, String sizeXKey,
-            String sizeYKey) {
+    private final String posXKey;
+    private final String posYKey;
+    private final String sizeXKey;
+    private final String sizeYKey;
+    private final Window window;
+
+
+    public PositionWindow(Window window, String posXKey, String posYKey, String sizeXKey, String sizeYKey) {
+        this.posXKey = posXKey;
+        this.posYKey = posYKey;
+        this.sizeXKey = sizeXKey;
+        this.sizeYKey = sizeYKey;
+        this.window = window;
+    }
+
+
+    public void setWindowPosition() {
 
         int sizeX = Globals.prefs.getInt(sizeXKey);
         int sizeY = Globals.prefs.getInt(sizeYKey);
@@ -81,8 +96,7 @@ public class PositionWindow {
 
     }
 
-    public static void storeWindowPosition(Window window, String posXKey, String posYKey, String sizeXKey,
-            String sizeYKey) {
+    public void storeWindowPosition() {
         Point p = window.getLocation();
         Dimension d = window.getSize();
         Globals.prefs.putInt(posXKey, p.x);
@@ -94,6 +108,8 @@ public class PositionWindow {
     /**
      * This method sets the location of a Dialog such that it is centered with regard to another window, but not outside
      * the screen on the left and the top.
+     *
+     * Moved from Util
      */
     public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
         diag.setLocationRelativeTo(win);

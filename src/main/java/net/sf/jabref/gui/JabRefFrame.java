@@ -117,6 +117,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
+
+    private PositionWindow pw;
+
     private final GeneralAction checkIntegrity = new GeneralAction(Actions.CHECK_INTEGRITY, Localization.lang("Check integrity")) {
 
         @Override
@@ -572,6 +575,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+        pw = new PositionWindow(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
+                JabRefPreferences.SIZE_Y);
         positionWindowOnScreen();
 
         tabbedPane.setBorder(null);
@@ -619,8 +624,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     private void positionWindowOnScreen() {
         if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            PositionWindow.setWindowPosition(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y,
-                    JabRefPreferences.SIZE_X, JabRefPreferences.SIZE_Y);
+            pw.setWindowPosition();
         }
     }
 
@@ -758,8 +762,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         if (basePanel() != null) {
             basePanel().saveDividerLocation();
         }
-        PositionWindow.storeWindowPosition(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y,
-                JabRefPreferences.SIZE_X, JabRefPreferences.SIZE_Y);
+        pw.storeWindowPosition();
 
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);

@@ -73,6 +73,7 @@ class StringDialog extends JDialog {
     private final StringTable table;
     private final HelpAction helpAction;
 
+    private PositionWindow pw;
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibtexDatabase base, JabRefPreferences prefs) {
         super(frame);
@@ -154,8 +155,9 @@ class StringDialog extends JDialog {
         } else {
             setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
         }
-        PositionWindow.setWindowPosition(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
+        pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
+        pw.setWindowPosition();
     }
 
 
@@ -341,9 +343,7 @@ class StringDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             panel.stringsClosing();
             dispose();
-            PositionWindow.storeWindowPosition(this.parent, JabRefPreferences.STRINGS_POS_X,
-                    JabRefPreferences.STRINGS_POS_Y, JabRefPreferences.STRINGS_SIZE_X,
-                    JabRefPreferences.STRINGS_SIZE_Y);
+            pw.storeWindowPosition();
         }
     }
 
