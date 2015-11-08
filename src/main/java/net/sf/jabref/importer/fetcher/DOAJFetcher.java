@@ -30,7 +30,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.fileformat.JSONConverter;
+import net.sf.jabref.importer.fileformat.JSONEntryParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 
@@ -42,7 +42,7 @@ public class DOAJFetcher implements EntryFetcher {
     private boolean shouldContinue;
 
 
-    private final JSONConverter jsonConverter = new JSONConverter();
+    private final JSONEntryParser jsonConverter = new JSONEntryParser();
 
     public DOAJFetcher() {
         super();

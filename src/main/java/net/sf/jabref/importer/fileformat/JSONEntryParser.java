@@ -24,12 +24,12 @@ import org.json.JSONObject;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
-public class JSONConverter {
+public class JSONEntryParser {
 
-    private static final Log LOGGER = LogFactory.getLog(JSONConverter.class);
+    private static final Log LOGGER = LogFactory.getLog(JSONEntryParser.class);
 
 
-    public JSONConverter() {
+    public JSONEntryParser() {
 
     }
 

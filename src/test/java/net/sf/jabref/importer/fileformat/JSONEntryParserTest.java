@@ -23,9 +23,9 @@ import org.junit.Assert;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
-public class JSONConverterTest {
+public class JSONEntryParserTest {
 
-    private final JSONConverter jc = new JSONConverter();
+    private final JSONEntryParser jc = new JSONEntryParser();
     @Test
     public void testBibJSONConverter() {
         String jsonString = new String(
