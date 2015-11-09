@@ -34,7 +34,7 @@ public class CopacImporterTest {
         CopacImporter importer = new CopacImporter();
 
         @SuppressWarnings("unused")
-        List<BibtexEntry> entries = importer.importEntries(null, null);
+        List<BibtexEntry> entries = importer.importEntries(null, new OutputPrinterToNull());
     }
 
     @Test
