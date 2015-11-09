@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -107,7 +108,7 @@ public class IntegrityCheck {
 
     private static class TitleChecker implements Checker {
 
-        private static final Pattern INSIDE_CURLY_BRAKETS = Pattern.compile("\\{[^}]*\\}");
+        private static final Pattern INSIDE_CURLY_BRAKETS = Pattern.compile("\\{[^}\\{]*\\}");
         private static final Predicate<String> HAS_CAPITAL_LETTERS = Pattern.compile("[\\p{Lu}\\p{Lt}]").asPredicate();
 
         public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
@@ -120,7 +121,15 @@ public class IntegrityCheck {
              */
             String valueTrimmed = value.trim();
             String valueIgnoringFirstLetter = valueTrimmed.startsWith("{") ? valueTrimmed : valueTrimmed.substring(1);
-            String valueOnlySpacesWithinCurlyBraces = INSIDE_CURLY_BRAKETS.matcher(valueIgnoringFirstLetter).replaceAll("");
+            String valueOnlySpacesWithinCurlyBraces = valueIgnoringFirstLetter;
+            while(true) {
+                Matcher matcher = INSIDE_CURLY_BRAKETS.matcher(valueOnlySpacesWithinCurlyBraces);
+                if(!matcher.find()) {
+                    break;
+                }
+                valueOnlySpacesWithinCurlyBraces = matcher.replaceAll("");
+            }
+
             boolean hasCapitalLettersThatBibtexWillConvertToSmallerOnes = HAS_CAPITAL_LETTERS.test(valueOnlySpacesWithinCurlyBraces);
 
             if (hasCapitalLettersThatBibtexWillConvertToSmallerOnes) {

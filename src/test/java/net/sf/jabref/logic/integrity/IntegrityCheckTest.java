@@ -57,6 +57,7 @@ public class IntegrityCheckTest {
         assertCorrect("This is a {T}itle", IntegrityCheck.TITLE_CHECKER);
         assertCorrect("{This is a Title}", IntegrityCheck.TITLE_CHECKER);
         assertCorrect("This is a {Title}", IntegrityCheck.TITLE_CHECKER);
+        assertCorrect("{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}", IntegrityCheck.TITLE_CHECKER);
     }
 
     private void assertWrong(String value, IntegrityCheck.Checker yearChecker) {
