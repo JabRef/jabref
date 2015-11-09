@@ -35,10 +35,10 @@ public class JSONEntryParser {
 
     public BibtexEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
         // Fields that are directly accessible at the top level BibJson object
-        String[] singleFieldStrings = new String[] {"year", "title", "abstract", "month"};
+        String[] singleFieldStrings = {"year", "title", "abstract", "month"};
 
         // Fields that are accessible in the journal part of the BibJson object
-        String[] journalSingleFieldStrings = new String[] {"publisher", "number", "volume"};
+        String[] journalSingleFieldStrings = {"publisher", "number", "volume"};
 
 
 
