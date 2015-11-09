@@ -23,6 +23,7 @@ public class CopacImporterTest {
         }
     }
 
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -32,50 +33,47 @@ public class CopacImporterTest {
         thrown.expect(IOException.class);
 
         CopacImporter importer = new CopacImporter();
-
-        @SuppressWarnings("unused")
-        List<BibtexEntry> entries = importer.importEntries(null, new OutputPrinterToNull());
+        importer.importEntries(null, new OutputPrinterToNull());
     }
 
     @Test
-    public void testGetFormatName(){
+    public void testGetFormatName() {
         CopacImporter importer = new CopacImporter();
-        Assert.assertEquals("Copac",importer.getFormatName());
+        Assert.assertEquals("Copac", importer.getFormatName());
     }
 
     @Test
-    public void testGetCLIId(){
+    public void testGetCLIId() {
         CopacImporter importer = new CopacImporter();
-        Assert.assertEquals("cpc",importer.getCLIId());
+        Assert.assertEquals("cpc", importer.getCLIId());
     }
 
     @Test
     public void testIsRecognizedFormat() throws IOException {
 
         CopacImporter importer = new CopacImporter();
-        Assert.assertTrue(importer.isRecognizedFormat(CopacImporterTest.class
-                .getResourceAsStream("CopacImporterTest1.txt")));
+        Assert.assertTrue(
+                importer.isRecognizedFormat(CopacImporterTest.class.getResourceAsStream("CopacImporterTest1.txt")));
 
-        Assert.assertTrue(importer.isRecognizedFormat(CopacImporterTest.class
-                .getResourceAsStream("CopacImporterTest2.txt")));
+        Assert.assertTrue(
+                importer.isRecognizedFormat(CopacImporterTest.class.getResourceAsStream("CopacImporterTest2.txt")));
 
-        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
-                .getResourceAsStream("IEEEImport1.txt")));
+        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class.getResourceAsStream("IEEEImport1.txt")));
 
-        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
-                .getResourceAsStream("IsiImporterTest1.isi")));
+        Assert.assertFalse(
+                importer.isRecognizedFormat(CopacImporterTest.class.getResourceAsStream("IsiImporterTest1.isi")));
 
-        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
-                .getResourceAsStream("IsiImporterTestInspec.isi")));
+        Assert.assertFalse(
+                importer.isRecognizedFormat(CopacImporterTest.class.getResourceAsStream("IsiImporterTestInspec.isi")));
 
-        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
-                .getResourceAsStream("IsiImporterTestWOS.isi")));
+        Assert.assertFalse(
+                importer.isRecognizedFormat(CopacImporterTest.class.getResourceAsStream("IsiImporterTestWOS.isi")));
 
-        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
-                .getResourceAsStream("IsiImporterTestMedline.isi")));
+        Assert.assertFalse(
+                importer.isRecognizedFormat(CopacImporterTest.class.getResourceAsStream("IsiImporterTestMedline.isi")));
 
-        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
-                .getResourceAsStream("RisImporterTest1.ris")));
+        Assert.assertFalse(
+                importer.isRecognizedFormat(CopacImporterTest.class.getResourceAsStream("RisImporterTest1.ris")));
     }
 
     @Test
@@ -84,19 +82,20 @@ public class CopacImporterTest {
 
         CopacImporter importer = new CopacImporter();
 
-        List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
-                .getResourceAsStream("CopacImporterTest1.txt"), new OutputPrinterToNull());
+        List<BibtexEntry> entries = importer.importEntries(
+                CopacImporterTest.class.getResourceAsStream("CopacImporterTest1.txt"), new OutputPrinterToNull());
         Assert.assertEquals(1, entries.size());
         BibtexEntry entry = entries.get(0);
 
-        Assert.assertEquals("The SIS project : software reuse with a natural language approach", entry.getField("title"));
-        Assert.assertEquals(
-                "Prechelt, Lutz and Universität Karlsruhe. Fakultät für Informatik",
+        Assert.assertEquals("The SIS project : software reuse with a natural language approach",
+                entry.getField("title"));
+        Assert.assertEquals("Prechelt, Lutz and Universität Karlsruhe. Fakultät für Informatik",
                 entry.getField("author"));
         Assert.assertEquals("Interner Bericht ; Nr.2/92", entry.getField("series"));
         Assert.assertEquals("1992", entry.getField("year"));
         Assert.assertEquals("Karlsruhe :  Universitat Karlsruhe, Fakultat fur Informatik", entry.getField("publisher"));
         Assert.assertEquals("Edinburgh", entry.getField("HL"));
+        Assert.assertEquals("TXT", entry.getField("documenttype"));
         Assert.assertEquals(BibtexEntryTypes.BOOK, entry.getType());
     }
 
@@ -104,8 +103,8 @@ public class CopacImporterTest {
     public void testImportEntries2() throws IOException {
         CopacImporter importer = new CopacImporter();
 
-        List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
-                .getResourceAsStream("CopacImporterTest2.txt"), new OutputPrinterToNull());
+        List<BibtexEntry> entries = importer.importEntries(
+                CopacImporterTest.class.getResourceAsStream("CopacImporterTest2.txt"), new OutputPrinterToNull());
         Assert.assertEquals(2, entries.size());
 
         BibtexEntry one = entries.get(0);
@@ -117,11 +116,15 @@ public class CopacImporterTest {
         Assert.assertEquals("x, 102p, leaf : ill., form, port ; 22cm", one.getField("physicaldimensions"));
         Assert.assertEquals("0407517006 (Pbk)", one.getField("isbn"));
         Assert.assertEquals("Bibl.p.94-97. - Index", one.getField("note"));
-        Assert.assertEquals("London Hospital and Medical College, Electronic data processing - Medicine, Computers - Hospital administration, Hospital planning, Operations research, Hospital equipment and supplies, Electronic data processing - Hospitals - Administration, Hospitals, London, London Hospital and Medical College, Records management, Applications of computer systems, to 1971", one.getField("keywords"));
-        Assert.assertEquals("Aberdeen ; Birmingham ; Edinburgh ; Trinity College Dublin ; UCL (University College London)", one.getField("HL"));
+        Assert.assertEquals(
+                "London Hospital and Medical College, Electronic data processing - Medicine, Computers - Hospital administration, Hospital planning, Operations research, Hospital equipment and supplies, Electronic data processing - Hospitals - Administration, Hospitals, London, London Hospital and Medical College, Records management, Applications of computer systems, to 1971",
+                one.getField("keywords"));
+        Assert.assertEquals("TXT, PDF", one.getField("documenttype"));
+        Assert.assertEquals(
+                "Aberdeen ; Birmingham ; Edinburgh ; Trinity College Dublin ; UCL (University College London)",
+                one.getField("HL"));
 
         Assert.assertEquals(BibtexEntryTypes.BOOK, one.getType());
-
 
         BibtexEntry two = entries.get(1);
 
@@ -132,8 +135,12 @@ public class CopacImporterTest {
         Assert.assertEquals("ix, 357p : ill., forms ; 24cm", two.getField("physicaldimensions"));
         Assert.assertEquals("0070844828", two.getField("isbn"));
         Assert.assertEquals("Index", two.getField("note"));
-        Assert.assertEquals("Real-time data processing - Management, Real time computer systems, Design", two.getField("keywords"));
-        Assert.assertEquals("Aberdeen ; Birmingham ; Edinburgh ; Imperial College ; Liverpool ; Manchester ; Oxford ; Trinity College Dublin", two.getField("HL"));
+        Assert.assertEquals("Real-time data processing - Management, Real time computer systems, Design",
+                two.getField("keywords"));
+        Assert.assertEquals("TXT, PDF", two.getField("documenttype"));
+        Assert.assertEquals(
+                "Aberdeen ; Birmingham ; Edinburgh ; Imperial College ; Liverpool ; Manchester ; Oxford ; Trinity College Dublin",
+                two.getField("HL"));
 
         Assert.assertEquals(BibtexEntryTypes.BOOK, two.getType());
     }
