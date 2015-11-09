@@ -1,7 +1,0 @@
-\format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (\year), 
-'\format[RTFChars]{\title}'
-\begin{school}
-, PhD thesis, \format[RTFChars]{\school}
-\end{school}.
-\\par
-\\par

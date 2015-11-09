@@ -1,7 +1,0 @@
-\begin{author}\format[Iso690NamesAuthors,RTFChars]{\author}. \end{author}
-\begin{title}"\format[RTFChars]{\title}". \end{title}
-\begin{type}[\format[RTFChars]{\type}]. \end{type}
-\begin{year}\format[RTFChars]{\year}, \end{year}
-\begin{note}\format[RTFChars]{\note}. \end{note}
-\\par
-\\par

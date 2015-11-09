@@ -1,9 +1,0 @@
-\begin{author}\format[Iso690NamesAuthors,RTFChars]{\author}. \end{author}
-\begin{chapter}"\format[RTFChars]{\chapter}". \end{chapter}
-Informe \format[RTFChars]{inédito}. 
-\begin{institution}\format[RTFChars]{\institution}, \end{institution}
-\begin{address}\format[RTFChars]{\address}: \end{address}
-\begin{year}\format[RTFChars]{\year}. \end{year}
-\begin{pages}p.\format[RTFChars]{\pages}.\end{pages}
-\\par
-\\par

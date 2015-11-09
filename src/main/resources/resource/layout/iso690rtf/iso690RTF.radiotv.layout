@@ -1,6 +1,0 @@
-\begin{title}{\\i \format[RTFChars]{\title}}. \end{title}
-\begin{author}\format[RTFChars]{\author}. \end{author}
-\begin{editor}\format[RTFChars]{\editor}, \end{editor}
-\begin{year}\format[RTFChars]{\year}.\end{year}
-\\par
-\\par

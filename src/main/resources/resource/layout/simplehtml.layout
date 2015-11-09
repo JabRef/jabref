@@ -1,8 +1,0 @@
-<dt>\format[ToLowerCase]{\bibtextype} \begin{bibtexkey}<a name="\bibtexkey">(\bibtexkey)</a>\end{bibtexkey}</dt>
-\begin{author}<dd>\format[Authors(LastFirst,InititialsNoSpace),HTMLChars]{\author}</dd>\end{author}\begin{title}
-<dd><i>\format[HTMLChars]{\title}</i></dd>\end{title}\begin{editor}
-<dd>\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsCommaReplacer,HTMLChars]{\editor} <i>(ed.)</i></dd>\end{editor}\begin{booktitle}
-<dd>\format[HTMLChars]{\booktitle}</dd>\end{booktitle}\begin{chapter}
-<dd>Chapter \format[HTMLChars]{\chapter}</dd>\end{chapter}
-<dd>\begin{journal}\format[HTMLChars]{\journal}, \end{journal}\begin{school}\format[HTMLChars]{\school}, \end{school}\begin{institution}\format[HTMLChars]{\institution}, \end{institution}\begin{publisher}\format[HTMLChars]{\publisher}, \end{publisher}\begin{howpublished}\format[HTMLChars]{\howpublished}, \end{howpublished}\begin{year}<b>\year</b>\end{year}\begin{volume}, Vol. \volume\end{volume}\begin{number}(\format[FormatPagesForHTML]{\number})\end{number}\begin{pages}, pp. \format[FormatPagesForHTML]{\pages}\end{pages}</dd>
-

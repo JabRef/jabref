@@ -1,1 +1,0 @@
-\begin{author}\format[FormatChars,Iso690NamesAuthors]{\author}. \end{author}\begin{chapter}"\format[FormatChars]{\chapter}". \end{chapter}Informe inédito. \begin{school}\format[FormatChars]{\school}, \end{school}\begin{address}\format[FormatChars]{\address}: \end{address}\begin{year}\format[FormatChars]{\year}. \end{year}\begin{pages}p.\format[FormatChars]{\pages}.\end{pages}
