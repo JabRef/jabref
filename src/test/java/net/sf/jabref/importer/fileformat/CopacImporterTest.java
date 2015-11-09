@@ -22,6 +22,18 @@ public class CopacImporterTest {
     }
 
     @Test
+    public void testGetFormatName(){
+        CopacImporter importer = new CopacImporter();
+        Assert.assertEquals("Copac",importer.getFormatName());
+    }
+
+    @Test
+    public void testGetCLIId(){
+        CopacImporter importer = new CopacImporter();
+        Assert.assertEquals("cpc",importer.getCLIId());
+    }
+
+    @Test
     public void testIsRecognizedFormat() throws IOException {
 
         CopacImporter importer = new CopacImporter();
@@ -79,5 +91,18 @@ public class CopacImporterTest {
         BibtexEntry two = entries.get(1);
 
         Assert.assertEquals("Real time systems : management and design", two.getField("title"));
+    }
+
+    @Test
+    public void testSetOrAppend1() throws IOException{
+        CopacImporter importer = new CopacImporter();
+        List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
+                .getResourceAsStream("CopacImporterTest1.txt"), new OutputPrinterToNull());
+
+        BibtexEntry one = entries.get(0);
+
+        
+
+
     }
 }
