@@ -15,23 +15,39 @@
  */
 package net.sf.jabref.external.push;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Customized UI component for pushing to external applications. Has a selection popup menu to change the selected
@@ -74,7 +90,7 @@ public class PushToApplicationButton implements ActionListener {
         pushButton = new JButton();
 
         // Set the last used external application
-        String appSelected = Globals.prefs.get(Globals.prefs.PUSH_TO_APPLICATION);
+        String appSelected = Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
         for (int i = 0; i < pushActions.size(); i++) {
             if (pushActions.get(i).getApplicationName().equals(appSelected)) {
                 selected = i;
@@ -137,7 +153,7 @@ public class PushToApplicationButton implements ActionListener {
         pushButton.setPreferredSize(buttonDim);
 
         // Store the last used application
-        Globals.prefs.put(Globals.prefs.PUSH_TO_APPLICATION, toApp.getApplicationName());
+        Globals.prefs.put(JabRefPreferences.PUSH_TO_APPLICATION, toApp.getApplicationName());
 
         mAction.setTitle(toApp.getApplicationName());
         mAction.setIcon(toApp.getIcon());
