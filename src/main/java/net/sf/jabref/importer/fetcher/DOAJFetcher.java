@@ -124,7 +124,7 @@ public class DOAJFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return "DOAJ (Directory of Open Access Journals)";
+        return "DOAJ";
     }
 
     @Override
