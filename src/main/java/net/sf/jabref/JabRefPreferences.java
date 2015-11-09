@@ -129,7 +129,6 @@ public class JabRefPreferences {
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
-    public static final String SEARCH_AUTO_COMPLETE = "searchAutoComplete";
     public static final String SEARCH_MODE_LIVE_FILTER = "searchModeLiveFilter";
     public static final String SEARCH_MODE_INCREMENTAL = "incrementS";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
@@ -165,7 +164,6 @@ public class JabRefPreferences {
     public static final String SEARCH_PANE_POS_X = "searchPanePosX";
     public static final String SEARCH_HIGHLIGHT_WORDS = "highLightWords";
     public static final String SEARCH_REG_EXP = "regExpSearch";
-    public static final String SEARCH_SELECT_MATCHES = "selectS";
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
@@ -543,9 +541,6 @@ public class JabRefPreferences {
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_MODE_INCREMENTAL, Boolean.FALSE);
         defaults.put(SEARCH_MODE_LIVE_FILTER, Boolean.TRUE);
-        defaults.put(SEARCH_AUTO_COMPLETE, Boolean.TRUE);
-
-        defaults.put(SEARCH_SELECT_MATCHES, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.TRUE);
         defaults.put(SEARCH_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(SEARCH_PANE_POS_X, 0);

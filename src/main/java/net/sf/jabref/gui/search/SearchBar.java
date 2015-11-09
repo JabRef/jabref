@@ -71,7 +71,7 @@ public class SearchBar extends JPanel {
             modeGlobal;
 
     private JMenu settings;
-    private JCheckBoxMenuItem selectMatches, caseSensitive, regularExp, highlightWords, autoComplete;
+    private JCheckBoxMenuItem caseSensitive, regularExp, highlightWords;
 
     AutoCompleteSupport<String> autoCompleteSupport;
 
@@ -163,26 +163,18 @@ public class SearchBar extends JPanel {
     private void initSearchSettingsMenu() {
         // Create menu items
         settings = new JMenu(Localization.lang("Settings"));
-        selectMatches = new JCheckBoxMenuItem(Localization.lang("Select matches"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_SELECT_MATCHES));
-        selectMatches.addActionListener(ae -> updatePrefs());
         caseSensitive = new JCheckBoxMenuItem(Localization.lang("Case sensitive"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
         caseSensitive.addActionListener(ae -> updatePrefs());
         regularExp = new JCheckBoxMenuItem(Localization.lang("Use regular expressions"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
         regularExp.addActionListener(ae -> updatePrefs());
         highlightWords = new JCheckBoxMenuItem(Localization.lang("Highlight Words"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS));
         highlightWords.addActionListener(ae -> updatePrefs());
-        autoComplete = new JCheckBoxMenuItem(Localization.lang("Autocomplete names"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE));
-        autoComplete.addActionListener(ae -> updatePrefs());
 
         // Add them to the menu
-        settings.add(selectMatches);
-        settings.addSeparator();
         settings.add(caseSensitive);
         settings.add(regularExp);
         settings.addSeparator();
         settings.add(highlightWords);
-        settings.addSeparator();
-        settings.add(autoComplete);
     }
 
     /**
@@ -417,11 +409,9 @@ public class SearchBar extends JPanel {
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_RESULTS_IN_DIALOG, modeResultsInDialog.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_GLOBAL, modeGlobal.isSelected());
 
-        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_SELECT_MATCHES, selectMatches.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE, caseSensitive.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_REG_EXP, regularExp.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS, highlightWords.isSelected());
-        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE, autoComplete.isSelected());
     }
 
     /**
