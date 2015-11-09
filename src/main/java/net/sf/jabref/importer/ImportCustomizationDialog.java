@@ -41,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -250,7 +251,7 @@ public class ImportCustomizationDialog extends JDialog {
         JPanel mainPanel = new JPanel();
         ActionMap am = mainPanel.getActionMap();
         InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(frame.prefs().getKey("Close dialog"), "close");
+        im.put(frame.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(sp, BorderLayout.CENTER);

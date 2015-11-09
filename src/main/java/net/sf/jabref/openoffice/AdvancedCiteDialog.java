@@ -20,6 +20,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -106,7 +107,7 @@ class AdvancedCiteDialog {
         };
         cancel.addActionListener(cancelAction);
         b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.prefs.getKey("Close dialog"), "close");
+                .put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         b.getPanel().getActionMap().put("close", cancelAction);
 
     }

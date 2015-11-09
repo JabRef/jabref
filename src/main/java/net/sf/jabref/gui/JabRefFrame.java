@@ -260,7 +260,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction donationAction = new DonateAction();
     private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), helpDiag,
             GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
-            prefs.getKey("Help"));
+ prefs.getKey(KeyBinds.HELP));
     private final AbstractAction contents = new HelpAction(Localization.menuTitle("Help contents"), helpDiag,
             GUIGlobals.helpContents, Localization.lang("Help contents"),
             IconTheme.JabRefIcon.HELP_CONTENTS.getIcon());
@@ -517,26 +517,25 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public GroupSelector groupSelector;
 
     // The action for adding a new entry of unspecified type.
-    private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey("New entry"));
-    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[]
-            {
-                    new NewEntryAction(this, "article", prefs.getKey("New article")),
-                    new NewEntryAction(this, "book", prefs.getKey("New book")),
-                    new NewEntryAction(this, "phdthesis", prefs.getKey("New phdthesis")),
-                    new NewEntryAction(this, "inbook", prefs.getKey("New inbook")),
-                    new NewEntryAction(this, "mastersthesis", prefs.getKey("New mastersthesis")),
-                    new NewEntryAction(this, "proceedings", prefs.getKey("New proceedings")),
-                    new NewEntryAction(this, "inproceedings"),
-                    new NewEntryAction(this, "conference"),
-                    new NewEntryAction(this, "incollection"),
-                    new NewEntryAction(this, "booklet"),
-                    new NewEntryAction(this, "manual"),
-                    new NewEntryAction(this, "techreport"),
-                    new NewEntryAction(this, "unpublished",
-                            prefs.getKey("New unpublished")),
-                    new NewEntryAction(this, "misc"),
-                    new NewEntryAction(this, "other")
-            };
+    private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey(KeyBinds.NEW_ENTRY));
+    // @formatter:off
+    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[] {
+            new NewEntryAction(this, "article", prefs.getKey(KeyBinds.NEW_ARTICLE)),
+            new NewEntryAction(this, "book", prefs.getKey(KeyBinds.NEW_BOOK)),
+            new NewEntryAction(this, "phdthesis", prefs.getKey(KeyBinds.NEW_PHDTHESIS)),
+            new NewEntryAction(this, "inbook", prefs.getKey(KeyBinds.NEW_INBOOK)),
+            new NewEntryAction(this, "mastersthesis", prefs.getKey(KeyBinds.NEW_MASTERSTHESIS)),
+            new NewEntryAction(this, "proceedings", prefs.getKey(KeyBinds.NEW_PROCEEDINGS)),
+            new NewEntryAction(this, "inproceedings"),
+            new NewEntryAction(this, "conference"),
+            new NewEntryAction(this, "incollection"),
+            new NewEntryAction(this, "booklet"),
+            new NewEntryAction(this, "manual"),
+            new NewEntryAction(this, "techreport"),
+            new NewEntryAction(this, "unpublished", prefs.getKey(KeyBinds.NEW_UNPUBLISHED)),
+            new NewEntryAction(this, "misc"),
+            new NewEntryAction(this, "other")};
+    // @formatter:on
 
 
     public JabRefFrame(JabRef jabRef) {
@@ -1759,7 +1758,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public CloseAction() {
             putValue(Action.NAME, Localization.menuTitle("Quit"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Quit JabRef"));
-            putValue(Action.ACCELERATOR_KEY, prefs.getKey("Quit JabRef"));
+            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.QUIT_JAB_REF));
         }
 
         @Override
@@ -1776,7 +1775,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.NAME, Localization.menuTitle("Close database"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
-            putValue(Action.ACCELERATOR_KEY, prefs.getKey("Close database"));
+            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.CLOSE_DATABASE));
         }
 
         @Override
@@ -2013,7 +2012,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public SaveSessionAction() {
             super();
             putValue(Action.NAME, Localization.menuTitle("Save session"));
-            putValue(Action.ACCELERATOR_KEY, prefs.getKey("Save session"));
+            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.SAVE_SESSION));
         }
 
         @Override
@@ -2068,7 +2067,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public LoadSessionAction() {
             super();
             putValue(Action.NAME, Localization.menuTitle("Load session"));
-            putValue(Action.ACCELERATOR_KEY, prefs.getKey("Load session"));
+            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.LOAD_SESSION));
         }
 
         @Override
@@ -2127,7 +2126,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             this.next = next;
             //Util.pr(""+prefs.getKey("Next tab"));
             putValue(Action.ACCELERATOR_KEY,
-                    next ? prefs.getKey("Next tab") : prefs.getKey("Previous tab"));
+                    next ? prefs.getKey(KeyBinds.NEXT_TAB) : prefs.getKey(KeyBinds.PREVIOUS_TAB));
         }
 
         @Override
@@ -2160,7 +2159,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.ACCELERATOR_KEY, prefs.getKey(nName));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang(nName));
             //putValue(ACCELERATOR_KEY,
-            //         (next?prefs.getKey("Next tab"):prefs.getKey("Previous tab")));
+            //         (next?prefs.getKey(KeyBinds.NEXT_TAB):prefs.getKey(KeyBinds.PREVIOUS_TAB)));
         }
 
         @Override
@@ -2281,7 +2280,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         public IncreaseTableFontSizeAction() {
             putValue(Action.NAME, Localization.menuTitle("Increase table font size"));
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Increase table font size"));
+            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.INCREASE_TABLE_FONT_SIZE));
         }
 
         @Override
@@ -2300,7 +2299,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         public DecreaseTableFontSizeAction() {
             putValue(Action.NAME, Localization.menuTitle("Decrease table font size"));
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Decrease table font size"));
+            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.DECREASE_TABLE_FONT_SIZE));
         }
 
         @Override

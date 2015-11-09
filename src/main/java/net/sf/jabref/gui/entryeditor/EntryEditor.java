@@ -632,14 +632,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         inputMap.put(prefs.getKey("Entry editor, previous panel 2"), "left");
         actionMap.put("left", switchLeftAction);
 
-        inputMap.put(prefs.getKey("Help"), "help");
+        inputMap.put(prefs.getKey(KeyBinds.HELP), "help");
         actionMap.put("help", helpAction);
-        inputMap.put(prefs.getKey("Save database"), "save");
+        inputMap.put(prefs.getKey(KeyBinds.SAVE_DATABASE), "save");
         actionMap.put("save", saveDatabaseAction);
 
-        inputMap.put(Globals.prefs.getKey("Next tab"), "nexttab");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", frame.nextTab);
-        inputMap.put(Globals.prefs.getKey("Previous tab"), "prevtab");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.PREVIOUS_TAB), "prevtab");
         actionMap.put("prevtab", frame.prevTab);
 
 

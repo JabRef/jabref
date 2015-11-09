@@ -30,6 +30,7 @@ import javax.swing.event.CaretListener;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
@@ -146,7 +147,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(frame.prefs().getKey("Close dialog"), "close");
+        im.put(frame.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         ButtonGroup bg = new ButtonGroup();

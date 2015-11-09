@@ -26,6 +26,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
@@ -64,7 +65,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
         // Make ESC close dialog, and set shortkeys for back and forward.
         InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = tlb.getActionMap();
-        im.put(bf.prefs().getKey("Close dialog"), "close");
+        im.put(bf.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", new CloseAction());
         im.put(bf.prefs().getKey("Back, help dialog"), "left");
         am.put("left", back);
