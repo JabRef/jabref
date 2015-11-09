@@ -45,6 +45,7 @@ import net.sf.jabref.external.*;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;

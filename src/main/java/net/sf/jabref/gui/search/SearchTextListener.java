@@ -13,9 +13,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.search;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Every Listener that wants to receive events from a search needs to
@@ -31,5 +32,5 @@ public interface SearchTextListener {
      * 
      * @param words null if nothing is searched for
      */
-    void searchText(ArrayList<String> words);
+    void searchText(List<String> words);
 }
