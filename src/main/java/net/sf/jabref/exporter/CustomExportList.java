@@ -25,7 +25,6 @@ import net.sf.jabref.Globals;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.BasicEventList;
-import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class handles user defined custom export formats. They are initially
@@ -76,8 +75,7 @@ public class CustomExportList {
                 list.add(s);
             } else {
                 String customExportFormat = Globals.prefs.get("customExportFormat" + i);
-                LOGGER.error(Localization.lang("Error initializing custom export format from string '%0'",
-                        customExportFormat));
+                LOGGER.error("Error initializing custom export format from string " + customExportFormat);
             }
             i++;
         }

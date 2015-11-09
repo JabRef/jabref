@@ -101,7 +101,7 @@ public class SendAsEMailAction extends AbstractWorker {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
                 } catch (IOException e) {
-                    LOGGER.debug("Could not open file", e);
+                    LOGGER.debug("Cannot open file", e);
                 }
             }
         }

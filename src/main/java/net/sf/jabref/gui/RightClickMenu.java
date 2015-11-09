@@ -412,7 +412,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             try {
                 panel.runCommand(command);
             } catch (Throwable ex) {
-                LOGGER.debug("Could not execute command " + command + ".", ex);
+                LOGGER.debug("Cannot execute command " + command + ".", ex);
             }
         }
     }

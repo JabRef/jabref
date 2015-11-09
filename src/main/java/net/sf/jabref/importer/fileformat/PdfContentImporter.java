@@ -228,7 +228,7 @@ public class PdfContentImporter extends ImportFormat {
 
         try {
             if (document.isEncrypted()) {
-                LOGGER.error(Localization.lang("Encrypted documents are not supported"));
+                LOGGER.error("Encrypted documents are not supported");
                 //return res;
             }
 

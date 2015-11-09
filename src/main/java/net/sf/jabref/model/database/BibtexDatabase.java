@@ -489,7 +489,7 @@ public class BibtexDatabase {
             }
         }
         if (duplicate) {
-            LOGGER.warn(Localization.lang("Warning there is a duplicate key") + ':' + newKey);
+            LOGGER.warn("Warning there is a duplicate key: " + newKey);
         }
         return duplicate;
     }

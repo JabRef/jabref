@@ -812,7 +812,7 @@ public class Util {
         try {
             layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
         } catch (Exception e) {
-            Util.LOGGER.info(Localization.lang("Wrong Format").concat(" ").concat(e.toString()), e);
+            Util.LOGGER.info("Wrong format " + e.getMessage(), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);

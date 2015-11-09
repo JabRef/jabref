@@ -622,14 +622,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind < 0) {
-            IEEEXploreFetcher.LOGGER.debug(page);
-            throw new IOException(Localization.lang("Could not parse number of hits"));
+            LOGGER.debug(page);
+            throw new IOException(Localization.lang("Cannot parse number of hits"));
         }
         String substring = page.substring(ind, page.length());
         Matcher m = pattern.matcher(substring);
         if (m.find()) {
             return Integer.parseInt(m.group(1));
         }
-        throw new IOException(Localization.lang("Could not parse number of hits"));
+        LOGGER.debug(page);
+        throw new IOException(Localization.lang("Cannot parse number of hits"));
     }
 }
