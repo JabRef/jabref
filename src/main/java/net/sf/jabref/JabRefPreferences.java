@@ -324,6 +324,8 @@ public class JabRefPreferences {
     public static final String USE_CONVERT_TO_EQUATION = "useConvertToEquation";
     public static final String USE_IEEE_ABRV = "useIEEEAbrv";
 
+    public static final String PUSH_TO_APPLICATION = "pushToApplication";
+
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
@@ -452,6 +454,7 @@ public class JabRefPreferences {
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
 
         }
+        defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
         defaults.put(USE_PROXY, Boolean.FALSE);
         defaults.put(PROXY_HOSTNAME, "my proxy host");
         defaults.put(PROXY_PORT, "my proxy port");

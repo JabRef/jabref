@@ -23,20 +23,20 @@ import net.sf.jabref.openoffice.OpenOfficePanel;
 
 public class PushToApplications {
     public static final List<PushToApplication> applications;
-    
+
     /**
      * Set up the current available choices:
      */
     static {
         applications = new ArrayList<>();
 
-        PushToApplications.applications.add(new PushToLyx());
         PushToApplications.applications.add(new PushToEmacs());
-        PushToApplications.applications.add(new PushToWinEdt());
         PushToApplications.applications.add(new PushToLatexEditor());
-        PushToApplications.applications.add(new PushToVim());
+        PushToApplications.applications.add(new PushToLyx());
         PushToApplications.applications.add(OpenOfficePanel.getInstance());
-        PushToApplications.applications.add(new PushToTeXstudio());
         PushToApplications.applications.add(new PushToTexmaker());
+        PushToApplications.applications.add(new PushToTeXstudio());
+        PushToApplications.applications.add(new PushToVim());
+        PushToApplications.applications.add(new PushToWinEdt());
     }
 }
