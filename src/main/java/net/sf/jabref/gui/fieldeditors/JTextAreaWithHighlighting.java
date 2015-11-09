@@ -77,7 +77,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         });
 
         // Create an undo action and add it to the text component
-        getActionMap().put("Undo", new AbstractAction(Actions.UNDO) {
+        getActionMap().put("Undo", new AbstractAction("Undo") {
 
             @Override
             public void actionPerformed(ActionEvent evt) {

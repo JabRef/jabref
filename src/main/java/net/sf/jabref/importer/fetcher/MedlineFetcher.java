@@ -152,11 +152,6 @@ public class MedlineFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "Medline";
-    }
-
-    @Override
     public JPanel getOptionsPanel() {
         // No Option Panel
         return null;

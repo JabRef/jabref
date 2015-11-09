@@ -186,11 +186,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return "IEEEXploreHelp.html";
     }
 
-    @Override
-    public String getKeyName() {
-        return "IEEEXplore";
-    }
-
     /**
      * This method is called by the dialog when the user has cancelled the import.
      */

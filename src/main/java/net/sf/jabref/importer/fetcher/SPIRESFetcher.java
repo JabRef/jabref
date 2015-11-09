@@ -123,16 +123,13 @@ public class SPIRESFetcher implements EntryFetcher {
                 return pr.getDatabase();
             }
         } catch (IOException e) {
-            frame.showMessage(Localization.lang(
-                            "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Localization.lang(getKeyName()),
-                    JOptionPane.ERROR_MESSAGE);
+            frame.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
+                    getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            frame.showMessage(Localization.lang(
-                            "An Error occurred while fetching from SPIRES source (%0):",
-                            new String[]{url})
-                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()),
-                    JOptionPane.ERROR_MESSAGE);
+            frame.showMessage(
+                    Localization.lang("An Error occurred while fetching from SPIRES source (%0):", new String[] {url})
+                            + "\n\n" + e.getMessage(),
+                    getTitle(), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -155,11 +152,6 @@ public class SPIRESFetcher implements EntryFetcher {
     @Override
     public String getHelpPage() {
         return "Spires.html";
-    }
-
-    @Override
-    public String getKeyName() {
-        return "SPIRES";
     }
 
     @Override

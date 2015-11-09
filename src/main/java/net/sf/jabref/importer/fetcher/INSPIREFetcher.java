@@ -149,13 +149,15 @@ public class INSPIREFetcher implements EntryFetcher {
         } catch (IOException e) {
             frame.showMessage(Localization.lang(
                             "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Localization.lang(getKeyName()),
+ + "\n\n" + e,
+                    getTitle(),
                     JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             frame.showMessage(Localization.lang(
                             "An Error occurred while fetching from INSPIRE source (%0):",
                             new String[]{url})
-                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()),
+                            + "\n\n" + e.getMessage(),
+                    getTitle(),
                     JOptionPane.ERROR_MESSAGE);
         }
         return null;
@@ -179,11 +181,6 @@ public class INSPIREFetcher implements EntryFetcher {
     @Override
     public String getHelpPage() {
         return "Spires.html";
-    }
-
-    @Override
-    public String getKeyName() {
-        return "INSPIRE";
     }
 
     @Override

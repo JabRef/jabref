@@ -75,11 +75,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "CiteSeerX";
-    }
-
-    @Override
     public String getHelpPage() {
         return "CiteSeerHelp.html";
     }
