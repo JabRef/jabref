@@ -74,6 +74,7 @@ public class CopacImporterTest {
         Assert.assertEquals("Interner Bericht ; Nr.2/92", entry.getField("series"));
         Assert.assertEquals("1992", entry.getField("year"));
         Assert.assertEquals("Karlsruhe :  Universitat Karlsruhe, Fakultat fur Informatik", entry.getField("publisher"));
+        Assert.assertEquals("Edingburgh", entry.getField(""));
         Assert.assertEquals(BibtexEntryTypes.BOOK, entry.getType());
     }
 
@@ -84,25 +85,32 @@ public class CopacImporterTest {
         List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
                 .getResourceAsStream("CopacImporterTest2.txt"), new OutputPrinterToNull());
         Assert.assertEquals(2, entries.size());
+
         BibtexEntry one = entries.get(0);
 
         Assert.assertEquals("Computing and operational research at the London Hospital", one.getField("title"));
+        Assert.assertEquals("Barber, Barry and Abbott, W.", one.getField("author"));
+        Assert.assertEquals("Computers in medicine series", one.getField("series"));
+        Assert.assertEquals("London :  Butterworths", one.getField("publisher"));
+        Assert.assertEquals("x, 102p, leaf : ill., form, port ; 22cm", one.getField("physicaldimensions"));
+        Assert.assertEquals("0407517006 (Pbk)", one.getField("isbn"));
+        Assert.assertEquals("Bibl.p.94-97. - Index", one.getField("note"));
+        Assert.assertEquals("London Hospital and Medical College, Electronic data processing - Medicine, Computers - Hospital administration, Hospital planning, Operations research, Hospital equipment and supplies, Electronic data processing - Hospitals - Administration, Hospitals, London, London Hospital and Medical College, Records management, Applications of computer systems, to 1971", one.getField("keywords"));
+        Assert.assertEquals("Aberdeen ; Birmingham ; Edinburgh ; Trinity College Dublin ;\n" +
+                "    UCL (University College London)", one.getField(""));
+
 
         BibtexEntry two = entries.get(1);
 
         Assert.assertEquals("Real time systems : management and design", two.getField("title"));
-    }
-
-    @Test
-    public void testSetOrAppend1() throws IOException{
-        CopacImporter importer = new CopacImporter();
-        List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
-                .getResourceAsStream("CopacImporterTest1.txt"), new OutputPrinterToNull());
-
-        BibtexEntry one = entries.get(0);
-
-        
-
-
+        Assert.assertEquals("Tebbs, David and Collins, Garfield", two.getField("author"));
+        Assert.assertEquals("London ; New York :  McGraw-Hill", two.getField("publisher"));
+        Assert.assertEquals("1997", two.getField("year"));
+        Assert.assertEquals("ix, 357p : ill., forms ; 24cm", two.getField("physicaldimensions"));
+        Assert.assertEquals("0070844828", two.getField("isbn"));
+        Assert.assertEquals("index", two.getField("note"));
+        Assert.assertEquals("Real-time data processing - Management, Real time computer systems, Design", two.getField("kewords"));
+        Assert.assertEquals("Aberdeen ; Birmingham ; Edinburgh ; Imperial College ;\n" +
+                "    Liverpool ; Manchester ; Oxford ; Trinity College Dublin", two.getField(""));
     }
 }
