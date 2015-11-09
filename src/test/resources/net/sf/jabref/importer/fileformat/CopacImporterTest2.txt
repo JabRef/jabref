@@ -18,6 +18,8 @@ KW- Hospitals, London, London Hospital and Medical College, Records
     management, Applications of computer systems, to 1971
 HL- Aberdeen ; Birmingham ; Edinburgh ; Trinity College Dublin ;
     UCL (University College London)
+DT- TXT
+DT- PDF
 
 
 TI- Real time systems : management and design
@@ -32,3 +34,4 @@ KW- Real-time data processing - Management
 KW- Real time computer systems, Design
 HL- Aberdeen ; Birmingham ; Edinburgh ; Imperial College ;
     Liverpool ; Manchester ; Oxford ; Trinity College Dublin
+ DT- TXT, PDF
