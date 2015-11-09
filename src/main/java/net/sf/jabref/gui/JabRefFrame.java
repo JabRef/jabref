@@ -1178,17 +1178,17 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
     private void fillMenu() {
         //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         mb.setBorder(null);
-        JMenu file = JabRefFrame.subMenu(Localization.lang("File"));
-        JMenu sessions = JabRefFrame.subMenu(Localization.lang("Sessions"));
-        JMenu edit = JabRefFrame.subMenu(Localization.lang("Edit"));
-        JMenu search = JabRefFrame.subMenu(Localization.lang("Search"));
-        JMenu groups = JabRefFrame.subMenu(Localization.lang("Groups"));
-        JMenu bibtex = JabRefFrame.subMenu(Localization.lang("BibTeX"));
-        JMenu view = JabRefFrame.subMenu(Localization.lang("View"));
-        JMenu tools = JabRefFrame.subMenu(Localization.lang("Tools"));
-        JMenu options = JabRefFrame.subMenu(Localization.lang("Options"));
-        JMenu newSpec = JabRefFrame.subMenu(Localization.lang("New entry..."));
-        JMenu helpMenu = JabRefFrame.subMenu(Localization.lang("Help"));
+        JMenu file = JabRefFrame.subMenu(Localization.menuTitle("File"));
+        JMenu sessions = JabRefFrame.subMenu(Localization.menuTitle("Sessions"));
+        JMenu edit = JabRefFrame.subMenu(Localization.menuTitle("Edit"));
+        JMenu search = JabRefFrame.subMenu(Localization.menuTitle("Search"));
+        JMenu groups = JabRefFrame.subMenu(Localization.menuTitle("Groups"));
+        JMenu bibtex = JabRefFrame.subMenu(Localization.menuTitle("BibTeX"));
+        JMenu view = JabRefFrame.subMenu(Localization.menuTitle("View"));
+        JMenu tools = JabRefFrame.subMenu(Localization.menuTitle("Tools"));
+        JMenu options = JabRefFrame.subMenu(Localization.menuTitle("Options"));
+        JMenu newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry..."));
+        JMenu helpMenu = JabRefFrame.subMenu(Localization.menuTitle("Help"));
 
         file.add(newDatabaseAction);
         file.add(open); //opendatabaseaction
@@ -1240,7 +1240,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
         edit.addSeparator();
         edit.add(mark);
-        JMenu markSpecific = JabRefFrame.subMenu("Mark specific color");
+        JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(this, i).getMenuItem());
         }

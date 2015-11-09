@@ -883,7 +883,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                         UndoableAddOrRemoveGroup.ADD_NODE);
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
-                frame.output(Localization.lang("Created_group_\"%0\".", newGroup.getName()));
+                frame.output(Localization.lang("Created group \"%0\".", newGroup.getName()));
             }
         } else if (e.getSource() == autoGroup) {
             AutoGroupDialog gd = new AutoGroupDialog(frame, panel, GroupSelector.this, groupsRoot,

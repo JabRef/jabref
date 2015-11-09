@@ -190,7 +190,7 @@ public class ExportFormats {
                     if (file.exists()) {
                         // Warn that the file exists:
                         if (JOptionPane.showConfirmDialog(frame,
-                                '\'' + file.getName() + "' " + Localization.lang("exists. Overwrite file?"),
+                                Localization.lang("'%0' exists. Overwrite file?", file.getName()),
                                 Localization.lang("Export"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
                             return;
                         }

@@ -783,9 +783,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         Localization.lang("Copied key")) + '.');
                     // @formatter:on
                 } else {
-                    output(Localization.lang("Warning") + ": " + (bes.length - keys.size()) + ' '
-                            + Localization.lang("out of") + ' ' + bes.length + ' '
-                            + Localization.lang("entries have undefined BibTeX key") + '.');
+                    output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+                            Integer.toString(bes.length - keys.size()), Integer.toString(bes.length)));
                 }
             }
         });
@@ -825,9 +824,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             Localization.lang("Copied key") + '.');
                         // @formatter:on
                     } else {
-                        output(Localization.lang("Warning") + ": " + (bes.length - keys.size()) + ' '
-                                + Localization.lang("out of") + ' ' + bes.length + ' '
-                                + Localization.lang("entries have undefined BibTeX key") + '.');
+                        output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+                                Integer.toString(bes.length - keys.size()), Integer.toString(bes.length)));
                     }
                 }
             }
@@ -1423,8 +1421,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         } catch (UnsupportedCharsetException ex2) {
             // @formatter:off
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file. "
-                            + "Character encoding '%0' is not supported.", enc),
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ' '
+                            + Localization.lang("Character encoding '%0' is not supported.", enc),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
             // @formatter:on
             throw new SaveException("rt");
@@ -1441,7 +1439,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 ex.printStackTrace();
             }
 
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file") + ".\n" + ex.getMessage(),
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + "\n" + ex.getMessage(),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
 
@@ -1522,8 +1520,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 // Create an UndoableInsertEntry object.
                 undoManager.addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
-                output(Localization.lang("Added new") + " '" + type.getName().toLowerCase() + "' "
-                        + Localization.lang("entry") + '.');
+                output(Localization.lang("Added new '%0' entry.", type.getName().toLowerCase()));
 
                 // We are going to select the new entry. Before that, make sure that we are in
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
@@ -1628,8 +1625,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 // Create an UndoableInsertEntry object.
                 undoManager.addEdit(new UndoableInsertEntry(database, bibEntry, BasePanel.this));
-                output(Localization.lang("Added new") + " '" + bibEntry.getType().getName().toLowerCase() + "' "
-                        + Localization.lang("entry") + '.');
+                output(Localization.lang("Added new '%0' entry.", bibEntry.getType().getName().toLowerCase()));
 
                 markBaseChanged(); // The database just changed.
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
@@ -2367,29 +2363,28 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void changeType(BibtexEntry[] bes, BibtexEntryType type) {
 
         if ((bes == null) || (bes.length == 0)) {
-            output("First select the entries you wish to change type " + "for.");
+            output(Localization.lang("First select the entries you wish to change type for."));
             return;
         }
         if (bes.length > 1) {
-            int choice = JOptionPane.showConfirmDialog(
-                    this, "Multiple entries selected. Do you want to change" + "\nthe type of all these to '"
-                            + type.getName() + "'?",
-                    "Change type", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            int choice = JOptionPane.showConfirmDialog(this,
+                    // @formatter:off
+                    Localization.lang("Multiple entries selected. Do you want to change\nthe type of all these to '%0'?", type.getName()),
+                    Localization.lang("Change type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    // @formatter:on
             if (choice == JOptionPane.NO_OPTION) {
                 return;
             }
         }
 
-        NamedCompound ce = new NamedCompound(Localization.lang("change type"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Change type"));
         for (BibtexEntry be : bes) {
             ce.addEdit(new UndoableChangeType(be, be.getType(), type));
             be.setType(type);
         }
 
         // @formatter:off
-        output(Localization.lang("Changed type to") + " '" + type.getName() + "' "
-                + Localization.lang("for") + ' '
-                + bes.length + ' ' + Localization.lang("entries") + '.');
+        output(formatOutputMessage(Localization.lang("Changed type to '%0' for", type.getName()), bes.length));
         // @formatter:on
         ce.end();
         undoManager.addEdit(ce);
@@ -2401,13 +2396,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String msg;
             // @formatter:off
-            msg = Localization.lang("Really delete the selected") + ' ' +
-                    Localization.lang("entry") + '?';
+            msg = Localization.lang("Really delete the selected entry?");
             // @formatter:on
             String title = Localization.lang("Delete entry");
             if (numberOfEntries > 1) {
-                msg = Localization.lang("Really delete the selected") + ' ' + numberOfEntries + ' '
-                        + Localization.lang("entries") + '?';
+                msg = Localization.lang("Really delete the selected %0 entries?", Integer.toString(numberOfEntries));
                 title = Localization.lang("Delete multiple entries");
             }
 
@@ -2788,8 +2781,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private String formatOutputMessage(String start, int count) {
         // @formatter:off
-        return start + ' ' + count + ' ' + (count > 1 ? Localization.lang("entries") :
-            Localization.lang("entry"))  + '.';
+        return String.format("%s %d %s.", start, count, (count > 1 ? Localization.lang("entries") :
+            Localization.lang("entry")));
         // @formatter:on
     }
 
@@ -2812,12 +2805,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (chosenFile != null) {
                 File expFile = new File(chosenFile);
                 if (!expFile.exists() || (JOptionPane.showConfirmDialog(frame,
-                        '\'' + expFile.getName() + "' " + Localization.lang("exists. Overwrite file?"),
+                        Localization.lang("'%0' exists. Overwrite file?", expFile.getName()),
                         Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
-
                     saveDatabase(expFile, true, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), saveType);
                     frame.getFileHistory().newFile(expFile.getPath());
-                    frame.output(Localization.lang("Saved selected to") + " '" + expFile.getPath() + "'.");
+                    frame.output(Localization.lang("Saved selected to '%0'.", expFile.getPath()));
                 }
             }
         }

@@ -509,7 +509,8 @@ public class DroppedFileHandler {
         File toFile = new File(dirs[found] + System.getProperty("file.separator") + destFilename);
         if (toFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame,
-                    toFile.getAbsolutePath() + " exists. Overwrite?", "Overwrite file?",
+                    Localization.lang("'%0' exists. Overwrite file?", toFile.getAbsolutePath()),
+                    Localization.lang("Overwrite file?"),
                     JOptionPane.YES_NO_OPTION);
             if (answer == JOptionPane.NO_OPTION) {
                 return false;
@@ -518,8 +519,10 @@ public class DroppedFileHandler {
 
         if (!fromFile.renameTo(toFile)) {
             JOptionPane.showMessageDialog(frame,
-                    "There was an error moving the file. Please move the file manually and link in place.",
-                    "Error moving file", JOptionPane.ERROR_MESSAGE);
+                    // @formatter:off
+                    Localization.lang("There was an error moving the file. Please move the file manually and link in place."),
+                    Localization.lang("Error moving file"), JOptionPane.ERROR_MESSAGE);
+                    // @formatter:on
             return false;
         } else {
             return true;
@@ -564,7 +567,7 @@ public class DroppedFileHandler {
 
         if (destFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame,
-                    "'" + destFile.getPath() + "' " + Localization.lang("exists. Overwrite?"),
+                    Localization.lang("'%0' exists. Overwrite file?", destFile.getPath()),
                     Localization.lang("File exists"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.NO_OPTION) {
                 return false;
