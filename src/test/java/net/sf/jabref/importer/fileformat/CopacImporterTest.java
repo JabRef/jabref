@@ -7,7 +7,9 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +21,20 @@ public class CopacImporterTest {
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
         }
+    }
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+
+    @Test
+    public void testImportEntriesException() throws IOException {
+        thrown.expect(IOException.class);
+
+        CopacImporter importer = new CopacImporter();
+
+        @SuppressWarnings("unused")
+        List<BibtexEntry> entries = importer.importEntries(null, null);
     }
 
     @Test
