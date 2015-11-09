@@ -117,7 +117,7 @@ public class LayoutEntryTest {
         mBTE.setSearchHit(true);
 
         // define the serach words
-        ArrayList<String> words = new ArrayList<String>();
+        ArrayList<String> words = new ArrayList<>();
         words.add("google");
 
         // define the highlighting settings
@@ -139,7 +139,7 @@ public class LayoutEntryTest {
         mBTE.setSearchHit(true);
 
         // define the serach words
-        ArrayList<String> words = new ArrayList<String>();
+        ArrayList<String> words = new ArrayList<>();
         words.add("Android");
         words.add("study");
 
@@ -164,8 +164,8 @@ public class LayoutEntryTest {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
-        // define the serach words
-        ArrayList<String> words = new ArrayList<String>();
+        // define the search words
+        ArrayList<String> words = new ArrayList<>();
         words.add("google");
 
         // define the highlighting settings
@@ -187,7 +187,7 @@ public class LayoutEntryTest {
         mBTE.setSearchHit(true);
 
         // define the serach words
-        ArrayList<String> words = new ArrayList<String>();
+        ArrayList<String> words = new ArrayList<>();
         words.add("Android");
         words.add("study");
         words.add("Open");

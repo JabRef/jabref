@@ -242,7 +242,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      */
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-        BibtexEntry[] bes = panel.getSelectedEntries();
         panel.storeCurrentEdit();
         GroupTreeNode groups = panel.metaData().getGroups();
         if (groups == null) {

@@ -1418,7 +1418,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
             } else {
                 List<BibtexEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
-                addImportedEntries(panel, entries, "", false);
+                addImportedEntries(panel, entries, false);
             }
         } else {
             addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
@@ -1852,11 +1852,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      *
      * @param panel     The BasePanel to add to.
      * @param entries   The entries to add.
-     * @param filename  Name of the file where the import came from.
      * @param openInNew Should the entries be imported into a new database?
      */
     private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries,
-                                    String filename, final boolean openInNew) {
+ final boolean openInNew) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
