@@ -9,7 +9,12 @@
 If you do not have a GitHub account, create it at https://github.com.
 
 ### Get an IDE in place
-I suggest [Eclipse](https://eclipse.org/). Other developers like and use [IntelliJ](https://www.jetbrains.com/idea/).
+I suggest [Eclipse](https://eclipse.org/).
+Please install [EclEmma](http://eclemma.org/) for code coverage.
+
+Other developers like and use [IntelliJ](https://www.jetbrains.com/idea/).
+The community edition should be enough.
+If not, a developer key for the JabRef project for the full version is available upon request.
 
 In Ubuntu Linux, you can follow one of these guidelines:
 
