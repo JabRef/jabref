@@ -24,6 +24,7 @@ import javax.swing.JFrame;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.util.OS;
 
 /**
  * Created by IntelliJ IDEA.
@@ -105,8 +106,7 @@ public class FileDialogs {
 
         // Added the !dirOnly condition below as a workaround to the native file dialog
         // not supporting directory selection:
-        if (!dirOnly && Globals.prefs.getBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC)) {
-
+        if (!dirOnly && OS.OS_X) {
             return FileDialogs.getNewFileForMac(owner, directory, extension, dialogType, updateWorkingDirectory, dirOnly, off);
         }
 
@@ -127,7 +127,6 @@ public class FileDialogs {
 
         if (dirOnly) {
             fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
         }
 
         fc.setMultiSelectionEnabled(multipleSelection);

@@ -49,7 +49,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JabRefPreferences preferences;
     private final JCheckBox useDefault;
     private final JCheckBox useRemoteServer;
-    private final JCheckBox useNativeFileDialogOnMac;
     private final JCheckBox useIEEEAbrv;
     private final JCheckBox biblatexMode;
     private final JComboBox<String> className;
@@ -73,7 +72,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         useDefault = new JCheckBox(Localization.lang("Use other look and feel"));
         useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
-        useNativeFileDialogOnMac = new JCheckBox(Localization.lang("Use native file dialog"));
         useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
         biblatexMode = new JCheckBox(Localization.lang("BibLaTeX mode"));
         remoteServerPort = new JTextField();
@@ -97,13 +95,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         className = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
         className.setEditable(true);
         final JComboBox<String> clName = className;
-        useDefault.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                clName.setEnabled(((JCheckBox) e.getSource()).isSelected());
-            }
-        });
+        useDefault.addChangeListener(e -> clName.setEnabled(((JCheckBox) e.getSource()).isSelected()));
         useConvertToEquation = new JCheckBox(Localization.lang("Prefer converting subscripts and superscripts to equations rather than text"));
         useCaseKeeperOnSearch = new JCheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
         useUnitFormatterOnSearch = new JCheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
@@ -156,13 +148,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         p.add(new HelpAction(diag, GUIGlobals.remoteHelp).getIconButton());
         builder.append(p);
 
-        //if (Globals.OS_X) {
-        builder.nextLine();
-        builder.appendSeparator(Localization.lang("File dialog"));
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(useNativeFileDialogOnMac);
-        //}
         // IEEE
         builder.nextLine();
         builder.appendSeparator(Localization.lang("Search IEEEXplore"));
@@ -204,7 +189,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         useRemoteServer.setSelected(remotePreferences.useRemoteServer());
         oldPort = remotePreferences.getPort();
         remoteServerPort.setText(String.valueOf(oldPort));
-        useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC));
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV));
         oldBiblMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
         biblatexMode.setSelected(oldBiblMode);
@@ -217,7 +201,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
     public void storeSettings() {
         preferences.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !useDefault.isSelected());
         preferences.put(JabRefPreferences.WIN_LOOK_AND_FEEL, className.getSelectedItem().toString());
-        preferences.putBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC, useNativeFileDialogOnMac.isSelected());
 
         if(preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
             preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
