@@ -28,7 +28,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.fileformat.SpringerJSONConverter;
+import net.sf.jabref.importer.fileformat.JSONEntryParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 
@@ -39,6 +39,7 @@ public class SpringerFetcher implements EntryFetcher {
     private static final Log LOGGER = LogFactory.getLog(SpringerFetcher.class);
     private final int maxPerPage = 100;
     private boolean shouldContinue;
+    private final JSONEntryParser jep;
 
 
     @Override
@@ -100,7 +101,7 @@ public class SpringerFetcher implements EntryFetcher {
                         JSONArray results = jo.getJSONArray("records");
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject springerJsonEntry = results.getJSONObject(i);
-                            BibtexEntry entry = SpringerJSONConverter.SpringerJSONtoBibtex(springerJsonEntry);
+                            BibtexEntry entry = jep.SpringerJSONtoBibtex(springerJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);
@@ -143,6 +144,7 @@ public class SpringerFetcher implements EntryFetcher {
 
     public SpringerFetcher() {
         super();
+        jep = new JSONEntryParser();
     }
 
 }
