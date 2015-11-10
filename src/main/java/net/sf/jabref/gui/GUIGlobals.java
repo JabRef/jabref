@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui.util;
+package net.sf.jabref.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -30,8 +30,6 @@ import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;

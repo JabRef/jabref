@@ -23,7 +23,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import net.sf.jabref.gui.util.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 
 public class FieldNameLabel extends JLabel {
 

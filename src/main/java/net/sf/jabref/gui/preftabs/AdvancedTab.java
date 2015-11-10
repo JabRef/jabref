@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import net.sf.jabref.*;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.logic.journals.Abbreviations;
@@ -38,7 +39,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
-import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.logic.util.OS;
 
 class AdvancedTab extends JPanel implements PrefsTab {

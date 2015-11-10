@@ -4,7 +4,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;

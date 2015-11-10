@@ -19,7 +19,7 @@ import javax.swing.text.html.CSS;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
 
-import net.sf.jabref.gui.util.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 
 /**
  * An extended {@link HTMLEditorKit} that allow faster

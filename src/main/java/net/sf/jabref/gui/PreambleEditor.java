@@ -27,7 +27,6 @@ import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
-import net.sf.jabref.gui.util.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 
 class PreambleEditor extends JDialog {

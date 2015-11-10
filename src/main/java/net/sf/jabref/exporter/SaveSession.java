@@ -16,7 +16,7 @@
 package net.sf.jabref.exporter;
 
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.util.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
