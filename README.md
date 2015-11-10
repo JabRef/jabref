@@ -3,6 +3,7 @@
 [![CircleCI](https://img.shields.io/circleci/project/JabRef/jabref.svg)](https://circleci.com/gh/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
+[![Coverity Status](https://badges.ondemand.coverity.com/streams/unhetcisrp7nna3b5cilqev4bk)](https://ondemand.coverity.com/streams/unhetcisrp7nna3b5cilqev4bk)
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Donation](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?item_name=JabRef+Bibliography+Manager&cmd=_donations&lc=US&currency_code=EUR&business=jabrefmail%40gmail.com)
