@@ -1,5 +1,6 @@
 [master]
     - Feature: Search DOAJ, Directory of Open Access Journals
+    - Removes option to toggle native file dialog on mac by making JabRef always use native file dialogs on mac
     - Removes options to set PDF and PS directories per .bib database as the general options have also been deleted.
     - Removes option to disable renaming in FileChooser dialogs.
     - Removes option to hide the BibTeX Code tab in the entry editor.
