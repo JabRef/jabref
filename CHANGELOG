@@ -38,6 +38,14 @@
     - Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Remove support for custom icon themes. The user has to use the default one.
     - Bugfix: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
+    - Improvements to search:
+    	- Search bar is now at the top
+    	- Autocompletion suggestions are shown in a popup
+    	- Search options are available via a drop-down list, this implements Feature Request #853
+    	- "Clear search" button also clears search field, this implements Feature Request #601
+    	- In incremental search mode: next result is selected by pressing enter (instead of Control + F as previously)
+    	- Incremental search now uses the same search engine as the other search modes
+    	- Added a new search mode (Live filter) which filters the table as soon as the search text is changed 
     - Solved feature request #767: New subdatabase based on AUX file (biblatex)
     - Fixes GH Bug #173: Personal journal abbreviation list is not loaded twice
     - Bugfix: Preview of external journal abbreviation list now displays the correct list

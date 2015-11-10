@@ -22,7 +22,7 @@ import java.util.Comparator;
 /**
  * Comparator that handles icon columns. 
  */
-class IconComparator implements Comparator<BibtexEntry> {
+public class IconComparator implements Comparator<BibtexEntry> {
 
     private final String[] fields;
 

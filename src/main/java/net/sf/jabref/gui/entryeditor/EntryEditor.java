@@ -45,10 +45,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.gui.search.SearchTextListener;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
@@ -544,7 +545,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        frame.getSearchManager().addSearchListener((SearchTextListener) source);
+        frame.getSearchBar().addSearchListener((SearchTextListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);

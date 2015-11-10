@@ -48,6 +48,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanUpAction;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.journals.AbbreviateAction;
@@ -70,7 +71,6 @@ import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.matchers.NoSearchMatcher;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeEvent.ChangeType;
@@ -126,11 +126,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    // Hashtable indexing the only search auto completer
-    // required for the SearchAutoCompleterUpdater
-    private AutoCompleter searchAutoCompleter;
-
-    private AutoCompleteListener searchCompleteListener;
+    // AutoCompleter used in the search bar
+    private AutoCompleter<String> searchAutoCompleter;
 
     // The undo manager.
     public final CountingUndoManager undoManager = new CountingUndoManager(this);
@@ -189,6 +186,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final SidePaneManager sidePaneManager;
 
 
+    // Returns a collection of AutoCompleters, which are populated from the current database
     public ContentAutoCompleters getAutoCompleters() {
         return autoCompleters;
     }
@@ -722,24 +720,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
         actions.put(Actions.SEARCH, (BaseAction) () -> {
-            sidePaneManager.show("search");
-            frame.searchToggle.setSelected(true);
-            frame.getSearchManager().startSearch();
+            frame.setSearchBarVisible(true);
+            frame.getSearchBar().focus();
         });
 
         actions.put(Actions.TOGGLE_SEARCH, (BaseAction) () -> {
-            sidePaneManager.toggle("search");
-            boolean on = sidePaneManager.isComponentVisible("search");
-            frame.searchToggle.setSelected(on);
-            if (on) {
-                frame.getSearchManager().startSearch();
-            }
+            frame.setSearchBarVisible(! frame.searchBar.isVisible());
+	    if (frame.searchBar.isVisible()) {
+	            frame.getSearchBar().focus();
+	    }
         });
 
         actions.put(Actions.INC_SEARCH, (BaseAction) () -> {
-            sidePaneManager.show("search");
-            frame.searchToggle.setSelected(true);
-            frame.getSearchManager().startIncrementalSearch();
+            frame.setSearchBarVisible(true);
+	    frame.getSearchBar().startIncrementalSearch();
         });
 
         // The action for copying the selected entry's key.
@@ -1840,7 +1834,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void updateSearchManager() {
-        frame.getSearchManager().setAutoCompleteListener(searchCompleteListener);
+        frame.getSearchBar().setAutoCompleter(searchAutoCompleter);
     }
 
     private void instantiateSearchAutoCompleter() {
@@ -1848,8 +1842,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         for (BibtexEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);
         }
-        searchCompleteListener = new AutoCompleteListener(searchAutoCompleter);
-        searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
     }
 
     /*

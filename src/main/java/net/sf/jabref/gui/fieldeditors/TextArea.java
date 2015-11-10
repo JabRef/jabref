@@ -16,8 +16,8 @@
 package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.logic.util.strings.StringUtil;
 

@@ -34,6 +34,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +42,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import javax.swing.plaf.TabbedPaneUI;
+import javax.swing.plaf.basic.BasicTabbedPaneUI;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -54,6 +57,7 @@ import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
+import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
@@ -115,7 +119,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;
 
+    public SearchBar searchBar;
+
     public JTabbedPane tabbedPane; // initialized at constructor
+    final String htmlPadding = "<html><div style='padding:2px 5px;'>";
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
@@ -507,8 +514,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final List<Action> fetcherActions = new LinkedList<>();
 
-    private SearchManager searchManager;
-
     public GroupSelector groupSelector;
 
     // The action for adding a new entry of unspecified type.
@@ -710,16 +715,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         GUIGlobals.helpDiag = this.helpDiag;
 
         groupSelector = new GroupSelector(this, sidePaneManager);
-        searchManager = new SearchManager(this, sidePaneManager);
+
         generalFetcher = new GeneralFetcher(sidePaneManager, this);
 
         sidePaneManager.register("groups", groupSelector);
-        sidePaneManager.register("search", searchManager);
-
-        // Show the search panel if it was visible at last shutdown:
-        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE)) {
-            sidePaneManager.show("search");
-        }
     }
 
     // The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
@@ -813,7 +812,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
         prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
-        prefs.putBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE, sidePaneManager.isComponentVisible("search"));
         // Store divider location for side pane:
         int width = contentPane.getDividerLocation();
         if (width > 0) {
@@ -845,11 +843,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.autoSaveManager.clearAutoSaves();
         }
 
-        // Let the search interface store changes to prefs.
-        // But which one? Let's use the one that is visible.
-        if (basePanel() != null) {
-            searchManager.updatePrefs();
-        }
+		// Let the search interface store changes to prefs.
+		searchBar.updatePrefs();
 
         prefs.flush();
 
@@ -923,7 +918,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         if (close) {
-
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (baseAt(i).isSaving()) {
                     // There is a database still being saved, so we need to wait.
@@ -996,7 +990,22 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         con.weighty = 1;
         gbl.setConstraints(contentPane, con);
         getContentPane().add(contentPane);
-        contentPane.setRightComponent(tabbedPane);
+
+        JPanel main = new JPanel();
+        main.setLayout( new OverlayLayout(main) );
+        searchBar = new SearchBar(this);
+        searchBar.setAlignmentX(1.0f);
+        searchBar.setAlignmentY(0.0f);
+        searchBar.setMaximumSize(new Dimension(200, 25));
+        main.add(searchBar);
+        setSearchBarVisible(Globals.prefs.getBoolean(JabRefPreferences.SEARCH_BAR_VISIBLE));
+        tabbedPane.setAlignmentX(1.0f);
+        tabbedPane.setAlignmentY(0.0f);
+        main.add(tabbedPane);
+
+        UIManager.put("TabbedPane.contentBorderInsets", new Insets(0,0,0,0));
+
+        contentPane.setRightComponent(main);
         contentPane.setLeftComponent(sidePaneManager.getPanel());
         sidePaneManager.updateView();
 
@@ -1102,7 +1111,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public void setTabTitle(JComponent comp, String title, String toolTip) {
         int index = getTabIndex(comp);
-        tabbedPane.setTitleAt(index, title);
+        tabbedPane.setTitleAt(index, htmlPadding + title);
         tabbedPane.setToolTipTextAt(index, toolTip);
     }
 
@@ -1669,10 +1678,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             title = file.getName();
         }
-        // idea: "<html><div style='padding:2px 5px;'>" + title + "</div></html>" instead of "title" to get some space around.
-        // However, this causes https://sourceforge.net/p/jabref/bugs/1293/
-        // Therefore, plain "title" is used
-        tabbedPane.add(title, bp);
+
+        // We use html here to get some padding around the title
+        // There are no closing tags since we would otherwise run in a bug
+        // see https://sourceforge.net/p/jabref/bugs/1293/
+        tabbedPane.add(htmlPadding + title, bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1,
                 file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
@@ -2348,8 +2358,45 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JOptionPane.showMessageDialog(this, message);
     }
 
-    public SearchManager getSearchManager() {
-        return searchManager;
+    public SearchBar getSearchBar() {
+  	  return searchBar;
     }
 
+    public void setSearchBarVisible(boolean visible) {
+  	  searchBar.setVisible(visible);
+  	  searchToggle.setSelected(visible);
+  	  if(visible) {
+        setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 250));
+    } else {
+        setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 2));
+    }
+    }
+
+
+  // Copied from org.pushingpixels.lafwidget.LafWidgetSupport
+  // http://jarvis.cs.ucdavis.edu/code_essence/functions/5829321
+  // We need to use reflection to change the tabAreaInsets since a TappedPaneUI does not provide an easier way to set this
+  private void setTabAreaInsets(JTabbedPane tabbedPane, Insets tabAreaInsets) {
+	  TabbedPaneUI ui = tabbedPane.getUI();
+	  if (ui instanceof BasicTabbedPaneUI) {
+		  try {
+			  Class<?> clazz = ui.getClass();
+			  while (clazz != null) {
+				  try {
+					  Field fld = clazz.getDeclaredField("tabAreaInsets");
+					  if (fld != null) {
+						  fld.setAccessible(true);
+						  fld.set(ui, tabAreaInsets);
+						  return;
+					  }
+				  } catch (NoSuchFieldException nsfe) {
+				  }
+				  clazz = clazz.getSuperclass();
+			  }
+		  } catch (Throwable t) {
+			  // ignore all fall through
+		  }
+	  }
+	  throw new UnsupportedOperationException();
+  }
 }

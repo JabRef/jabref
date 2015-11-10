@@ -150,4 +150,9 @@ Project: Spin
 URL:     http://spin.sourceforge.net/
 License: LGPL 2.1+
 
+Path:    lib/JSplitButton_1.2.jar
+Project: jsplitbutton
+URL:     https://code.google.com/p/jsplitbutton/
+License: LGPL
+
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
