@@ -23,7 +23,6 @@ import org.json.JSONObject;
 
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 public class JSONEntryParser {
@@ -174,11 +173,11 @@ public class JSONEntryParser {
         String isbn = springerJsonEntry.optString("isbn");
         if ((isbn == null) || (isbn.length() == 0)) {
             // Probably article
-            entry.setType(BibtexEntryType.getType("article"));
+            entry.setType(BibtexEntryTypes.ARTICLE);
             nametype = "journal";
         } else {
             // Probably book chapter or from proceeding, go for book chapter
-            entry.setType(BibtexEntryType.getType("incollection"));
+            entry.setType(BibtexEntryTypes.INCOLLECTION);
             nametype = "booktitle";
             entry.setField("isbn", isbn);
         }
