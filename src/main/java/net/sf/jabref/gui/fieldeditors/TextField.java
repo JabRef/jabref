@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -204,7 +204,7 @@ public class TextField extends JTextField implements FieldEditor {
         getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
-        getActionMap().put("Redo", new AbstractAction("Redo") {
+        getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
 
             @Override
             public void actionPerformed(ActionEvent evt) {

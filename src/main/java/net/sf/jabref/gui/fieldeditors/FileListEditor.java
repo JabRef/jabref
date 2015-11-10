@@ -47,6 +47,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -186,7 +187,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         });
 
         // Add input/action pair for moving an entry up:
-        getInputMap().put(Globals.prefs.getKey("File list editor, move entry up"), "move up");
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.FILE_LIST_EDITOR_MOVE_ENTRY_UP), "move up");
         getActionMap().put("move up", new AbstractAction() {
 
             @Override
@@ -196,7 +197,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         });
 
         // Add input/action pair for moving an entry down:
-        getInputMap().put(Globals.prefs.getKey("File list editor, move entry down"), "move down");
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.FILE_LIST_EDITOR_MOVE_ENTRY_DOWN), "move down");
         getActionMap().put("move down", new AbstractAction() {
 
             @Override

@@ -230,15 +230,18 @@ public class OAI2Fetcher implements EntryFetcher {
             return be;
         } catch (IOException e) {
             status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, getKeyName(), JOptionPane.ERROR_MESSAGE);
+ + "\n\n" + e,
+                    getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
             status.showMessage(Localization.lang("An SAXException ocurred while parsing '%0':", url)
-                    + "\n\n" + e.getMessage(), getKeyName(), JOptionPane.ERROR_MESSAGE);
+ + "\n\n" + e.getMessage(),
+                    getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(Localization.lang("An Error occurred while fetching from OAI2 source (%0):", url)
                     + "\n\n" + e.getMessage()
-                    + "\n\n" + Localization.lang("Note: A full text search is currently not supported for %0", getKeyName()),
-                    getKeyName(), JOptionPane.ERROR_MESSAGE);
+ + "\n\n" + Localization
+                                    .lang("Note: A full text search is currently not supported for %0", getTitle()),
+                    getTitle(), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -247,11 +250,6 @@ public class OAI2Fetcher implements EntryFetcher {
     public String getHelpPage() {
         // there is no helppage
         return null;
-    }
-
-    @Override
-    public String getKeyName() {
-        return Localization.lang(oai2ArchiveName);
     }
 
     @Override

@@ -55,11 +55,6 @@ public class ScienceDirectFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "ScienceDirect";
-    }
-
-    @Override
     public JPanel getOptionsPanel() {
         // No Options panel
         return null;

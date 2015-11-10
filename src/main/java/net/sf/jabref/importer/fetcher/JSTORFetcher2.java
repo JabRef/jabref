@@ -64,11 +64,6 @@ public class JSTORFetcher2 implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "JSTOR";
-    }
-
-    @Override
     public JPanel getOptionsPanel() {
         // No Options panel
         return null;

@@ -437,11 +437,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         return "ACMPortalHelp.html";
     }
 
-    @Override
-    public String getKeyName() {
-        return "ACM Portal";
-    }
-
     // This method is called by the dialog when the user has cancelled the import.
     public void cancelled() {
         shouldContinue = false;

@@ -118,11 +118,6 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "DiVAtoBibTeX";
-    }
-
-    @Override
     public String getHelpPage() {
         return "DiVAtoBibTeXHelp.html";
     }

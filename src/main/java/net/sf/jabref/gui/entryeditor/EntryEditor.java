@@ -620,15 +620,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         InputMap inputMap = textComponent.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = textComponent.getActionMap();
 
-        inputMap.put(prefs.getKey("Entry editor, store field"), "store");
+        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", storeFieldAction);
 
-        inputMap.put(prefs.getKey("Entry editor, next panel"), "right");
-        inputMap.put(prefs.getKey("Entry editor, next panel 2"), "right");
+        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL), "right");
+        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL_2), "right");
         actionMap.put("right", switchRightAction);
 
-        inputMap.put(prefs.getKey("Entry editor, previous panel"), "left");
-        inputMap.put(prefs.getKey("Entry editor, previous panel 2"), "left");
+        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
+        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
         actionMap.put("left", switchLeftAction);
 
         inputMap.put(prefs.getKey(KeyBinds.HELP), "help");

@@ -61,11 +61,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "DOItoBibTeX";
-    }
-
-    @Override
     public String getHelpPage() {
         return "DOItoBibTeXHelp.html";
     }

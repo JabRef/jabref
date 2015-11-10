@@ -160,11 +160,6 @@ public class DBLPFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "DBLP";
-    }
-
-    @Override
     public String getHelpPage() {
         return null;
     }

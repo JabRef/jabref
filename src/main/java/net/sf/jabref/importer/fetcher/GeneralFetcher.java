@@ -39,6 +39,7 @@ import javax.swing.SwingUtilities;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
@@ -299,7 +300,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         public FetcherAction() {
             super(Localization.lang("Web search"), IconTheme.JabRefIcon.WWW.getSmallIcon());
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Fetch Medline"));
+            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.WEB_SEARCH));
             putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.WWW.getIcon());
         }
 
