@@ -188,7 +188,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
                     JOptionPane.showMessageDialog(null,
                             Localization.lang("Parsing error") + ": "
                                     + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage() + '\n'
-                                    + Localization.lang("Look at stderr for details") + '.',
+                                    + Localization.lang("Look at log for details") + '.',
                             Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
                 }
             }

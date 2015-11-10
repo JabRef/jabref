@@ -20,8 +20,6 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.util.Vector;
 
-import net.sf.jabref.logic.l10n.Localization;
-
 /**
  * Helper class to get a Layout object.
  *
@@ -309,7 +307,8 @@ public class LayoutHelper {
                             parsedEntries.size() - 1)) {
                         lastFive.append(entry.s);
                     }
-                    throw new StringIndexOutOfBoundsException(Localization.lang("Backslash parsing error near") + " \'"
+                    throw new StringIndexOutOfBoundsException(
+                            "Backslash parsing error near \'"
                             + lastFive.toString().replace("\n", " ") + '\'');
                 }
 

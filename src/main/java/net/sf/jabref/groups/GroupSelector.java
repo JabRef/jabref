@@ -350,7 +350,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         autoGroup.setToolTipText(Localization.lang("Automatically create groups for database."));
         invCb.setToolTipText(Localization.lang("Show entries *not* in group selection"));
         showOverlappingGroups.setToolTipText( // JZTODO lyrics
-                "Highlight groups that contain entries contained in any currently selected group");
+                Localization.lang("Highlight groups that contain entries contained in any currently selected group"));
         floatCb.setToolTipText(Localization.lang("Move entries in group selection to the top"));
         highlCb.setToolTipText(Localization.lang("Gray out entries not in group selection"));
         select.setToolTipText(Localization.lang("Select entries in group selection"));

@@ -370,10 +370,9 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             f = new File(chosenFile);
             // Check if the file already exists:
-            if (f.exists() && (JOptionPane.showConfirmDialog
-                    (frame, '\'' + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
-                            Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-                        != JOptionPane.OK_OPTION)) {
+            if (f.exists() && (JOptionPane.showConfirmDialog(frame,
+                    Localization.lang("'%0' exists. Overwrite file?", f.getName()),
+                    Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)) {
                 f = null;
             }
         }

@@ -273,12 +273,12 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
         // Radio buttons
         JRadioButton appRadio = new JRadioButton(Localization.lang("Append"));
-        appRadio.setToolTipText(Localization.lang("append_the_selected_text_to_bibtex_key"));
+        appRadio.setToolTipText(Localization.lang("Append_the_selected_text_to_bibtex_key"));
         appRadio.setMnemonic(KeyEvent.VK_A);
         appRadio.setSelected(true);
 
         overRadio = new JRadioButton(Localization.lang("Override"));
-        overRadio.setToolTipText(Localization.lang("override_the_bibtex_key_by_the_selected_text"));
+        overRadio.setToolTipText(Localization.lang("Override_the_bibtex_key_by_the_selected_text"));
         overRadio.setMnemonic(KeyEvent.VK_O);
         overRadio.setSelected(false);
 
@@ -676,11 +676,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
                 this.setForeground(Color.gray);
                 this.setFont(usedFont);
                 this.setIcon(okIcon);
-                this.setToolTipText("filled");
+                this.setToolTipText(Localization.lang("Filled"));
             }
             else {
                 this.setIcon(needIcon);
-                this.setToolTipText("field is missing");
+                this.setToolTipText(Localization.lang("Field is missing"));
             }
             return this;
         }
@@ -726,22 +726,9 @@ abstract class BasicAction extends AbstractAction {
         putValue(Action.SHORT_DESCRIPTION, description);
     }
 
-    /* TODO: Not used. Will comment out for a while for possible later removal
-    public BasicAction(String text, String description, URL icon, KeyStroke key) {
-        super(Localization.lang(text), new ImageIcon(icon));
-        putValue(Action.ACCELERATOR_KEY, key);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
-    } */
-
     public BasicAction(String text) {
         super(text);
     }
-    /* TODO: Not used. Will comment out for a while for possible later removal
-    public BasicAction(String text, KeyStroke key) {
-        super(Localization.lang(text));
-        putValue(Action.ACCELERATOR_KEY, key);
-    }
-    */
 
     @Override
     public abstract void actionPerformed(ActionEvent e);

@@ -32,17 +32,13 @@ abstract class Change extends DefaultMutableTreeNode {
         name = "";
     }
 
-    Change(String changeName) {
-        name = changeName;
-    }
-
-    private String getName() {
-        return name;
+    Change(String name) {
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return getName();
+        return name;
     }
 
     public boolean isAccepted() {

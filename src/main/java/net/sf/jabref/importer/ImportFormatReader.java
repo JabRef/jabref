@@ -20,7 +20,6 @@ import java.util.*;
 
 import net.sf.jabref.importer.fileformat.*;
 import net.sf.jabref.logic.id.IdGenerator;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.Log;
@@ -135,7 +134,7 @@ public class ImportFormatReader {
             stream = new FileInputStream(file);
 
             if (!importer.isRecognizedFormat(stream)) {
-                throw new IOException(Localization.lang("Wrong file format"));
+                throw new IOException("Wrong file format");
             }
 
             stream = new FileInputStream(file);

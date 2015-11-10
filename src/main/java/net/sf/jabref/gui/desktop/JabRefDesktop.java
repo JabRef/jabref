@@ -43,7 +43,7 @@ public class JabRefDesktop {
 
             // Check that the file exists:
             if ((file == null) || !file.exists()) {
-                throw new IOException(Localization.lang("File not found") + " (" + fieldName + "): '" + link + "'.");
+                throw new IOException("File not found (" + fieldName + "): '" + link + "'.");
             }
             link = file.getCanonicalPath();
 

@@ -188,10 +188,9 @@ public class DownloadExternalFile {
                     return false;
                 }
                 if (f.exists()) {
-                    return JOptionPane.showConfirmDialog
-                            (frame, "'" + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
-                                    Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
-                    == JOptionPane.OK_OPTION;
+                    return JOptionPane.showConfirmDialog(frame,
+                            Localization.lang("'%0' exists. Overwrite file?", f.getName()),
+                            Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
                 } else {
                     return true;
                 }

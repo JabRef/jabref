@@ -347,7 +347,7 @@ class ManageJournalsPanel extends JPanel {
             if (!newNameTf.getText().isEmpty()) {
                 f = new File(newNameTf.getText());
                 return !f.exists() || (JOptionPane.showConfirmDialog(this,
-                        "'" + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
+                        Localization.lang("'%0' exists. Overwrite file?", f.getName()),
                         Localization.lang("Store journal abbreviations"),
                         JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION);
             } else {

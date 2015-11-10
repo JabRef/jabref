@@ -21,7 +21,6 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
@@ -326,7 +325,7 @@ public class BibtexEntryWriter {
             try {
                 out.write(fieldFormatter.format(field, name));
             } catch (IOException ex) {
-                throw new IOException(Localization.lang("Error in field") + " '" + name + "': " + ex.getMessage());
+                throw new IOException("Error in field '" + name + "': " + ex.getMessage());
             }
             return true;
         } else {

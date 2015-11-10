@@ -74,7 +74,6 @@ public class MergeDialog extends JDialog {
         Cancel.addActionListener(new MergeDialog_Cancel_actionAdapter(this));
         jPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         jPanel1.setLayout(gridBagLayout1);
-        entries.setToolTipText("");
         entries.setSelected(true);
         entries.setText(Localization.lang("Import entries"));
         strings.setSelected(true);

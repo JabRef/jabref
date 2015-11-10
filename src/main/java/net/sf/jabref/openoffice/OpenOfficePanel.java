@@ -569,7 +569,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             URL[] jarList = new URL[jarFiles.length];
             for (int i = 0; i < jarList.length; i++) {
                 if (!jarFiles[i].exists()) {
-                    throw new Exception(Localization.lang("File not found") + ": " + jarFiles[i].getPath());
+                    throw new Exception("File not found: " + jarFiles[i].getPath());
                 }
                 jarList[i] = jarFiles[i].toURI().toURL();
             }

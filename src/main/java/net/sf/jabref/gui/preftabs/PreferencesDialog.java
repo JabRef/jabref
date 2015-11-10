@@ -182,10 +182,10 @@ public class PreferencesDialog extends JDialog {
                     return;
                 }
                 File file = new File(filename);
-                if (!file.exists()
-                        || (JOptionPane.showConfirmDialog(PreferencesDialog.this, '\'' + file.getName()
-                        + "' " + Localization.lang("exists. Overwrite file?"),
-                        Localization.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
+                if (!file.exists() || (JOptionPane.showConfirmDialog(PreferencesDialog.this,
+                        Localization.lang("'%0' exists. Overwrite file?", file.getName()),
+                        Localization.lang("Export preferences"),
+                        JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
 
                     try {
                         prefs.exportPreferences(filename);

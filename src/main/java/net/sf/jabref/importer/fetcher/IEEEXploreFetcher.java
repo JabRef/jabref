@@ -635,14 +635,13 @@ public class IEEEXploreFetcher implements EntryFetcher {
         int ind = page.indexOf(marker);
         if (ind < 0) {
             LOGGER.debug(page);
-            throw new IOException(Localization.lang("Cannot parse number of hits"));
+            throw new IOException("Cannot parse number of hits");
         }
         String substring = page.substring(ind, page.length());
         Matcher m = pattern.matcher(substring);
         if (m.find()) {
             return Integer.parseInt(m.group(1));
         }
-        LOGGER.debug(page);
-        throw new IOException(Localization.lang("Cannot parse number of hits"));
+        throw new IOException("Cannot parse number of hits");
     }
 }
