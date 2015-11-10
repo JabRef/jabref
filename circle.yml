@@ -15,8 +15,6 @@ dependencies:
     - TERM=dumb ./gradlew getdeps
 
 test:
-  pre:
-    - ./generate-authors.sh || true
   override:
     - TERM=dumb ./gradlew test
   post:
