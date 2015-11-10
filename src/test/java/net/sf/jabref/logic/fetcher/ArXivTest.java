@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
-
 public class ArXivTest {
     ArXiv finder;
     BibtexEntry entry;

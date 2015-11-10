@@ -5,12 +5,10 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class IntegrityCheck {
 
@@ -71,6 +69,7 @@ public class IntegrityCheck {
 
     private static class AuthorNameChecker implements Checker {
 
+        @Override
         public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
             String valueTrimmedAndLowerCase = value.trim().toLowerCase();
             if(valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
@@ -84,6 +83,7 @@ public class IntegrityCheck {
 
     private static class BracketChecker implements Checker {
 
+        @Override
         public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
             // metaphor: integer-based stack (push + / pop -)
             int counter = 0;
@@ -111,6 +111,7 @@ public class IntegrityCheck {
         private static final Pattern INSIDE_CURLY_BRAKETS = Pattern.compile("\\{[^}\\{]*\\}");
         private static final Predicate<String> HAS_CAPITAL_LETTERS = Pattern.compile("[\\p{Lu}\\p{Lt}]").asPredicate();
 
+        @Override
         public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
             /*
              * Algorithm:
@@ -145,6 +146,7 @@ public class IntegrityCheck {
         /**
          * Checks, if the number String contains a four digit year
          */
+        @Override
         public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
             if (!CONTAINS_FOUR_DIGIT.test(value.trim())) {
                 collector.add(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, fieldName));

@@ -89,7 +89,6 @@ import org.apache.commons.logging.LogFactory;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements VetoableChangeListener, EntryContainer {
-    private static final long serialVersionUID = 1L;
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
@@ -365,7 +364,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         // Create type-label
         leftPan.add(new TypeLabel(entry.getType().getName()), BorderLayout.CENTER);
-        TypeButton typeButton = new TypeButton(entry.getType().getName());
+        TypeButton typeButton = new TypeButton();
 
         toolBar.add(typeButton);
         toolBar.add(generateKeyAction);
@@ -772,10 +771,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Updates this editor to show the given entry, regardless of type
      * correspondence.
      *
-     * @param entry a <code>BibtexEntry</code> value
+     * @param swtichEntry a <code>BibtexEntry</code> value
      */
-    public synchronized void switchTo(BibtexEntry entry) {
-        if (this.entry == entry) {
+    public synchronized void switchTo(BibtexEntry swtichEntry) {
+        if (this.entry == swtichEntry) {
             /**
              * Even if the editor is already showing the same entry, update
              * the source panel. I'm not sure if this is the correct place to
@@ -792,14 +791,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         this.entry.removePropertyChangeListener(this);
 
         // Register as property listener for the new entry:
-        entry.addPropertyChangeListener(this);
+        swtichEntry.addPropertyChangeListener(this);
 
-        this.entry = entry;
+        this.entry = swtichEntry;
 
         updateAllFields();
         validateAllFields();
         updateSource();
-        panel.newEntryShowing(entry);
+        panel.newEntryShowing(swtichEntry);
 
     }
 
@@ -1004,8 +1003,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         setField(e.getPropertyName(), newValue);
     }
 
-    public void updateField(final Object source) {
-        storeFieldAction.actionPerformed(new ActionEvent(source, 0, ""));
+    public void updateField(final Object sourceObject) {
+        storeFieldAction.actionPerformed(new ActionEvent(sourceObject, 0, ""));
     }
 
     public void setMovingToDifferentEntry() {
@@ -1015,9 +1014,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private class TypeButton extends JButton {
 
-        private static final long serialVersionUID = 1L;
-
-        public TypeButton(String type) {
+        public TypeButton() {
             super(IconTheme.JabRefIcon.EDIT.getIcon());
             setToolTipText(Localization.lang("Change entry type"));
             addActionListener(new ActionListener() {
@@ -1090,6 +1087,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
          */
         @Override
         public void focusGained(FocusEvent e) {
+            // Do nothing
         }
 
         @Override
@@ -1591,22 +1589,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class ChangeTypeAction extends AbstractAction {
 
-        private static final long serialVersionUID = 1L;
+        final BibtexEntryType changeType;
 
-        final BibtexEntryType type;
-
-        final BasePanel panel;
+        final BasePanel changeTypePanel;
 
 
         public ChangeTypeAction(BibtexEntryType type, BasePanel bp) {
             super(type.getName());
-            this.type = type;
-            panel = bp;
+            this.changeType = type;
+            changeTypePanel = bp;
         }
 
         @Override
         public void actionPerformed(ActionEvent evt) {
-            panel.changeType(entry, type);
+            changeTypePanel.changeType(entry, changeType);
         }
     }
 
@@ -1631,11 +1627,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            FileListEditor fileListEditor = EntryEditor.this.fileListEditor;
-            if (fileListEditor == null) {
+            FileListEditor localFileListEditor = EntryEditor.this.fileListEditor;
+            if (localFileListEditor == null) {
                 LOGGER.warn("No file list editor found.");
             } else {
-                fileListEditor.autoSetLinks();
+                localFileListEditor.autoSetLinks();
             }
         }
     }

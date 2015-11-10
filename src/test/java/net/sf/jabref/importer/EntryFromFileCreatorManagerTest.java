@@ -47,37 +47,38 @@ public class EntryFromFileCreatorManagerTest {
     @Test
     @Ignore
     public void testAddEntrysFromFiles() throws Exception {
-        ParserResult result = BibtexParser.parse(new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB));
-        BibtexDatabase database = result.getDatabase();
+        try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
+            ParserResult result = BibtexParser.parse(fr);
+            BibtexDatabase database = result.getDatabase();
 
-        List<File> files = new ArrayList<>();
+            List<File> files = new ArrayList<>();
 
-        files.add(ImportDataTest.FILE_NOT_IN_DATABASE);
-        files.add(ImportDataTest.NOT_EXISTING_PDF);
+            files.add(ImportDataTest.FILE_NOT_IN_DATABASE);
+            files.add(ImportDataTest.NOT_EXISTING_PDF);
 
-        EntryFromFileCreatorManager manager = new EntryFromFileCreatorManager();
-        List<String> errors = manager.addEntrysFromFiles(files, database, null, true);
+            EntryFromFileCreatorManager manager = new EntryFromFileCreatorManager();
+            List<String> errors = manager.addEntrysFromFiles(files, database, null, true);
 
-        /**
-         * One file doesn't exist, so adding it as an entry should lead to an
-         * error message.
-         */
-        Assert.assertEquals(1, errors.size());
+            /**
+             * One file doesn't exist, so adding it as an entry should lead to an error message.
+             */
+            Assert.assertEquals(1, errors.size());
 
-        boolean file1Found = false;
-        boolean file2Found = false;
-        for (BibtexEntry entry : database.getEntries()) {
-            String filesInfo = entry.getField("file");
-            if (filesInfo.contains(files.get(0).getName())) {
-                file1Found = true;
+            boolean file1Found = false;
+            boolean file2Found = false;
+            for (BibtexEntry entry : database.getEntries()) {
+                String filesInfo = entry.getField("file");
+                if (filesInfo.contains(files.get(0).getName())) {
+                    file1Found = true;
+                }
+                if (filesInfo.contains(files.get(1).getName())) {
+                    file2Found = true;
+                }
             }
-            if (filesInfo.contains(files.get(1).getName())) {
-                file2Found = true;
-            }
+
+            Assert.assertTrue(file1Found);
+            Assert.assertFalse(file2Found);
         }
-
-        Assert.assertTrue(file1Found);
-        Assert.assertFalse(file2Found);
     }
 
 }

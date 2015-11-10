@@ -1,8 +1,8 @@
 package net.sf.jabref.logic.formatter;
 
-import junit.framework.Assert;
 import net.sf.jabref.logic.formatter.bibtexfields.PageNumbersFormatter;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

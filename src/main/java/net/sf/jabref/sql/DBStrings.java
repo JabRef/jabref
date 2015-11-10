@@ -113,16 +113,16 @@ public class DBStrings {
         return isInitialized;
     }
 
-    private void isInitialized(boolean isInitialized) {
-        this.isInitialized = isInitialized;
+    private void isInitialized(boolean isInit) {
+        this.isInitialized = isInit;
     }
 
     public boolean isConfigValid() {
         return configValid;
     }
 
-    public void isConfigValid(boolean configValid) {
-        this.configValid = configValid;
+    public void isConfigValid(boolean confValid) {
+        this.configValid = confValid;
     }
 
     /**

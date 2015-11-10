@@ -32,29 +32,26 @@ import net.sf.jabref.gui.BibtexFields;
  *
  * @author pattonlk
  *
- *         Reestructured by ifsteinm. Jan 20th Now it is possible to export more
- *         than one jabref database. BD creation, insertions and queries where
- *         reformulated to accomodate the changes. The changes include a
- *         refactory on import/export to SQL module, creating many other classes
- *         making them more readable This class just support Exporters and
- *         Importers
+ *         Reestructured by ifsteinm. Jan 20th Now it is possible to export more than one jabref database. BD creation,
+ *         insertions and queries where reformulated to accomodate the changes. The changes include a refactory on
+ *         import/export to SQL module, creating many other classes making them more readable This class just support
+ *         Exporters and Importers
  */
 
 public class SQLUtil {
 
-    private static final ArrayList<String> reservedDBWords = new ArrayList<>(
-            Collections.singletonList("key"));
+    private static final ArrayList<String> reservedDBWords = new ArrayList<>(Collections.singletonList("key"));
 
     private static ArrayList<String> allFields;
 
     private static final Log LOGGER = LogFactory.getLog(SQLUtil.class);
 
+
     private SQLUtil() {
     }
 
     /**
-     * loop through entry types to get required, optional, general and utility
-     * fields for this type.
+     * loop through entry types to get required, optional, general and utility fields for this type.
      */
     private static void refreshFields() {
         if (SQLUtil.allFields == null) {
@@ -99,17 +96,13 @@ public class SQLUtil {
     }
 
     /**
-     * Inserts the elements of a String array into an ArrayList making sure not
-     * to duplicate entries in the ArrayList
+     * Inserts the elements of a String array into an ArrayList making sure not to duplicate entries in the ArrayList
      *
-     * @param list
-     *            The ArrayList containing unique entries
-     * @param array
-     *            The String array to be inserted into the ArrayList
+     * @param list The ArrayList containing unique entries
+     * @param array The String array to be inserted into the ArrayList
      * @return The updated ArrayList with new unique entries
      */
-    private static ArrayList<String> uniqueInsert(ArrayList<String> list,
-            String[] array) {
+    private static ArrayList<String> uniqueInsert(ArrayList<String> list, String[] array) {
         if (array != null) {
             for (String anArray : array) {
                 if (!list.contains(anArray)) {
@@ -123,13 +116,11 @@ public class SQLUtil {
     }
 
     /**
-     * Generates DML specifying table columns and their datatypes. The output of
-     * this routine should be used within a CREATE TABLE statement.
+     * Generates DML specifying table columns and their datatypes. The output of this routine should be used within a
+     * CREATE TABLE statement.
      *
-     * @param fields
-     *            Contains unique field names
-     * @param datatype
-     *            Specifies the SQL data type that the fields should take on.
+     * @param fields Contains unique field names
+     * @param datatype Specifies the SQL data type that the fields should take on.
      * @return The SQL code to be included in a CREATE TABLE statement.
      */
     public static String fieldsAsCols(ArrayList<String> fields, String datatype) {
@@ -151,25 +142,16 @@ public class SQLUtil {
 
     /**
      *
-     * @param allFields
-     *            All existent fields for a given entry type
-     * @param reqFields
-     *            list containing required fields for an entry type
-     * @param optFields
-     *            list containing optional fields for an entry type
-     * @param utiFields
-     *            list containing utility fields for an entry type
-     * @param origList
-     *            original list with the correct size filled with the default
-     *            values for each field
-     * @return origList changing the values of the fields that appear on
-     *         reqFields, optFields, utiFields set to 'req', 'opt' and 'uti'
-     *         respectively
+     * @param allFields All existent fields for a given entry type
+     * @param reqFields list containing required fields for an entry type
+     * @param optFields list containing optional fields for an entry type
+     * @param utiFields list containing utility fields for an entry type
+     * @param origList original list with the correct size filled with the default values for each field
+     * @return origList changing the values of the fields that appear on reqFields, optFields, utiFields set to 'req',
+     *         'opt' and 'uti' respectively
      */
-    public static ArrayList<String> setFieldRequirement(
-            ArrayList<String> allFields, List<String> reqFields,
-            List<String> optFields, List<String> utiFields,
-            ArrayList<String> origList) {
+    public static ArrayList<String> setFieldRequirement(ArrayList<String> allFields, List<String> reqFields,
+            List<String> optFields, List<String> utiFields, ArrayList<String> origList) {
 
         String currentField;
         for (int i = 0; i < allFields.size(); i++) {
@@ -188,8 +170,7 @@ public class SQLUtil {
     /**
      * Return a message raised from a SQLException
      *
-     * @param ex
-     *            The SQLException raised
+     * @param ex The SQLException raised
      */
     public static String getExceptionMessage(Exception ex) {
         String msg;
@@ -202,32 +183,25 @@ public class SQLUtil {
     }
 
     /**
-     * return a ResultSet with the result of a "SELECT *" query for a given
-     * table
+     * return a ResultSet with the result of a "SELECT *" query for a given table
      *
-     * @param conn
-     *            Connection to the database
-     * @param tableName
-     *            String containing the name of the table you want to get the
-     *            results.
+     * @param conn Connection to the database
+     * @param tableName String containing the name of the table you want to get the results.
      * @return a ResultSet with the query result returned from the DB
      * @throws SQLException
      */
-    public static ResultSet queryAllFromTable(Connection conn, String tableName)
-            throws SQLException {
+    public static ResultSet queryAllFromTable(Connection conn, String tableName) throws SQLException {
         String query = "SELECT * FROM " + tableName + ';';
-        Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query);
-        return res.getResultSet();
+        try (Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query)) {
+            return res.getResultSet();
+        }
     }
 
     /**
      * Utility method for processing DML with proper output
      *
-     * @param out
-     *            The output (PrintStream or Connection) object to which the DML
-     *            should be sent
-     * @param dml
-     *            The DML statements to be processed
+     * @param out The output (PrintStream or Connection) object to which the DML should be sent
+     * @param dml The DML statements to be processed
      */
     public static void processQuery(Object out, String dml) throws SQLException {
         if (out instanceof PrintStream) {
@@ -243,15 +217,11 @@ public class SQLUtil {
     /**
      * Utility method for processing DML with proper output
      *
-     * @param out
-     *            The output (PrintStream or Connection) object to which the DML
-     *            should be sent
-     * @param query
-     *            The DML statements to be processed
+     * @param out The output (PrintStream or Connection) object to which the DML should be sent
+     * @param query The DML statements to be processed
      * @return the result of the statement
      */
-    public static Object processQueryWithResults(Object out, String query)
-            throws SQLException {
+    public static Object processQueryWithResults(Object out, String query) throws SQLException {
         if (out instanceof PrintStream) {// TODO: how to handle the PrintStream
             // case?
             PrintStream fout = (PrintStream) out;
@@ -268,69 +238,58 @@ public class SQLUtil {
     /**
      * This routine returns the JDBC url corresponding to the DBStrings input.
      *
-     * @param dbStrings
-     *            The DBStrings to use to make the connection
+     * @param dbStrings The DBStrings to use to make the connection
      * @return The JDBC url corresponding to the input DBStrings
      */
     public static String createJDBCurl(DBStrings dbStrings, boolean withDBName) {
         String url;
-        url = "jdbc:" + dbStrings.getServerType().toLowerCase() + "://"
-                + dbStrings.getServerHostname()
+        url = "jdbc:" + dbStrings.getServerType().toLowerCase() + "://" + dbStrings.getServerHostname()
                 + (withDBName ? '/' + dbStrings.getDatabase() : "");
         return url;
     }
 
     /**
-     * Process a query and returns only the first result of a result set as a
-     * String. To be used when it is certain that only one String (single cell)
-     * will be returned from the DB
+     * Process a query and returns only the first result of a result set as a String. To be used when it is certain that
+     * only one String (single cell) will be returned from the DB
      *
-     * @param conn
-     *            The Connection object to which the DML should be sent
-     * @param query
-     *            The query statements to be processed
+     * @param conn The Connection object to which the DML should be sent
+     * @param query The query statements to be processed
      * @return String with the result returned from the database
      * @throws SQLException
      */
-    public static String processQueryWithSingleResult(Connection conn,
-            String query) throws SQLException {
-        ResultSet rs = SQLUtil.executeQueryWithResults(conn, query)
-                .getResultSet();
-        rs.next();
-        String result = rs.getString(1);
-        rs.getStatement().close();
-        return result;
-    }
-
-    /**
-     * Utility method for executing DML
-     *
-     * @param conn
-     *            The DML Connection object that will execute the SQL
-     * @param qry
-     *            The DML statements to be executed
-     */
-    private static void executeQuery(Connection conn, String qry)
-            throws SQLException {
-        Statement stmnt = conn.createStatement();
-        stmnt.execute(qry);
-        SQLWarning warn = stmnt.getWarnings();
-        if (warn != null) {
-            LOGGER.warn(warn);
+    public static String processQueryWithSingleResult(Connection conn, String query) throws SQLException {
+        try (ResultSet rs = SQLUtil.executeQueryWithResults(conn, query).getResultSet()) {
+            rs.next();
+            String result = rs.getString(1);
+            rs.getStatement().close();
+            return result;
         }
-        stmnt.close();
     }
 
     /**
      * Utility method for executing DML
      *
-     * @param conn
-     *            The DML Connection object that will execute the SQL
-     * @param qry
-     *            The DML statements to be executed
+     * @param conn The DML Connection object that will execute the SQL
+     * @param qry The DML statements to be executed
      */
-    private static Statement executeQueryWithResults(Connection conn, String qry)
-            throws SQLException {
+    private static void executeQuery(Connection conn, String qry) throws SQLException {
+        try (Statement stmnt = conn.createStatement()) {
+            stmnt.execute(qry);
+            SQLWarning warn = stmnt.getWarnings();
+            if (warn != null) {
+                LOGGER.warn(warn);
+            }
+            stmnt.close();
+        }
+    }
+
+    /**
+     * Utility method for executing DML
+     *
+     * @param conn The DML Connection object that will execute the SQL
+     * @param qry The DML statements to be executed
+     */
+    private static Statement executeQueryWithResults(Connection conn, String qry) throws SQLException {
         Statement stmnt = conn.createStatement();
         stmnt.executeQuery(qry);
         SQLWarning warn = stmnt.getWarnings();

@@ -22,13 +22,12 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import java.util.Comparator;
 
 /**
- * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef.
- * It is structured as a node in a linked list of comparators, where each node can contain a link to a
- * new comparator that decides the ordering (by recursion) if this one can't find a difference. The next
- * node, if any, is given at construction time, and an arbitrary number of nodes can be included.
- * If the entries are equal by this comparator, and there is no next entry, the entries' unique IDs will
- * decide the ordering. Consequently, this comparator can never return 0 unless the entries are the same
- * object.
+ * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is
+ * structured as a node in a linked list of comparators, where each node can contain a link to a new comparator that
+ * decides the ordering (by recursion) if this one can't find a difference. The next node, if any, is given at
+ * construction time, and an arbitrary number of nodes can be included. If the entries are equal by this comparator, and
+ * there is no next entry, the entries' unique IDs will decide the ordering. Consequently, this comparator can never
+ * return 0 unless the entries are the same object.
  */
 public class EntryComparator implements Comparator<BibtexEntry> {
 
@@ -62,18 +61,15 @@ public class EntryComparator implements Comparator<BibtexEntry> {
             return 0;
         }
 
-        //Util.pr("EntryComparator: "+e1+" : "+e2);
         Object f1 = e1.getField(sortField);
         Object f2 = e2.getField(sortField);
 
         if (binary) {
             // We just separate on set and unset fields:
             if (f1 != null) {
-                return f2 == null ? -1 :
-                        next != null ? next.compare(e1, e2) : idCompare(e1, e2);
+                return f2 == null ? -1 : next != null ? next.compare(e1, e2) : idCompare(e1, e2);
             } else {
-                return f2 == null ? next != null ? next.compare(e1, e2) : idCompare(e1, e2)
-                        : 1;
+                return f2 == null ? next != null ? next.compare(e1, e2) : idCompare(e1, e2) : 1;
             }
         }
 
@@ -82,20 +78,18 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         if (sortField.equals("author") || sortField.equals("editor")) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
+                //ImportFormatReader.fixAuthor_lastNameFirst((String)f1);
             }
-            //ImportFormatReader.fixAuthor_lastNameFirst((String)f1);
-            if (f2 != null)
-             {
+            if (f2 != null) {
                 f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase();
-            //ImportFormatReader.fixAuthor_lastNameFirst((String)f2);
+                //ImportFormatReader.fixAuthor_lastNameFirst((String)f2);
             }
 
         } else if (sortField.equals(BibtexEntry.TYPE_HEADER)) {
             // Sort by type.
             f1 = e1.getType().getName();
             f2 = e2.getType().getName();
-        }
-        else if (numeric) {
+        } else if (numeric) {
             try {
                 Integer i1 = Integer.parseInt((String) f1);
                 Integer i2 = Integer.parseInt((String) f2);
@@ -120,8 +114,6 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
         int result;
 
-        //String ours = ((String)e1.getField(sortField)).toLowerCase(),
-        //    theirs = ((String)e2.getField(sortField)).toLowerCase();
         if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
             result = -((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
@@ -136,8 +128,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
             int comp = ours.compareTo(theirs);
             result = -comp;
         }
-        if (result != 0)
-         {
+        if (result != 0) {
             return descending ? result : -result; // Primary sort.
         }
         if (next != null) {

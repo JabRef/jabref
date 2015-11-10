@@ -183,7 +183,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             // Done by MrDlib
             if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
-                return handleDropTransfer(dropLink, dropRow);
+                return handleDropTransfer(dropLink);
             }
 
             if (t.isDataFlavorSupported(stringFlavor)) {
@@ -283,7 +283,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             URL url = new URL(dropStr);
             // JOptionPane.showMessageDialog(null, "Making URL:
             // "+url.toString());
-            return handleDropTransfer(url, dropRow);
+            return handleDropTransfer(url);
         }
         File tmpfile = java.io.File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
@@ -517,7 +517,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         }
     }
 
-    private boolean handleDropTransfer(URL dropLink, int dropRow) throws IOException {
+    private boolean handleDropTransfer(URL dropLink) throws IOException {
         File tmpfile = java.io.File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
 

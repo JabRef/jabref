@@ -96,7 +96,6 @@ public class DuplicateCheck {
         double res = 0;
         double totWeights = 0.;
         for (String field : fields) {
-            // Util.pr(":"+compareSingleField(fields[i], one, two));
             double weight;
             if (DuplicateCheck.fieldWeights.containsKey(field)) {
                 weight = DuplicateCheck.fieldWeights.get(field);
@@ -105,7 +104,6 @@ public class DuplicateCheck {
             }
             totWeights += weight;
             int result = DuplicateCheck.compareSingleField(field, one, two);
-            //System.out.println("Field: "+fields[i]+": "+result);
             if (result == EQUAL) {
                 res += weight;
             } else if (result == EMPTY_IN_BOTH) {
@@ -130,15 +128,11 @@ public class DuplicateCheck {
             return EMPTY_IN_TWO;
         }
 
-        // Util.pr(field+": '"+s1+"' vs '"+s2+"'");
         if (field.equals("author") || field.equals("editor")) {
             // Specific for name fields.
             // Harmonise case:
             String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase();
             String auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ").toLowerCase();
-            //System.out.println(auth1);
-            //System.out.println(auth2);
-            //System.out.println(correlateByWords(auth1, auth2));
             double similarity = DuplicateCheck.correlateByWords(auth1, auth2, false);
             if (similarity > 0.8) {
                 return EQUAL;
@@ -160,7 +154,6 @@ public class DuplicateCheck {
             // and without dots:
             s1 = s1.replaceAll("\\.", "").toLowerCase();
             s2 = s2.replaceAll("\\.", "").toLowerCase();
-            //System.out.println(s1+" :: "+s2);
             double similarity = DuplicateCheck.correlateByWords(s1, s2, true);
             if (similarity > 0.8) {
                 return EQUAL;
@@ -174,15 +167,11 @@ public class DuplicateCheck {
                 return EQUAL;
             }
             return NOT_EQUAL;
-            /*if (s1.trim().equals(s2.trim()))
-                return Util.EQUAL;
-            else
-                return Util.NOT_EQUAL;*/
         }
     }
 
     public static double compareEntriesStrictly(BibtexEntry one, BibtexEntry two) {
-        HashSet<String> allFields = new HashSet<>();// one.getAllFields());
+        HashSet<String> allFields = new HashSet<>();
         allFields.addAll(one.getFieldNames());
         allFields.addAll(two.getFieldNames());
 
@@ -236,8 +225,6 @@ public class DuplicateCheck {
         int n = Math.min(w1.length, w2.length);
         int misses = 0;
         for (int i = 0; i < n; i++) {
-            /*if (!w1[i].equalsIgnoreCase(w2[i]))
-                misses++;*/
             double corr = DuplicateCheck.correlateStrings(w1[i], w2[i], truncate);
             if (corr < 0.75) {
                 misses++;

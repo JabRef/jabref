@@ -49,8 +49,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
     }
 
     private static void storeOpenOfficeFile(File file, InputStream source) throws Exception {
-        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-        try {
+        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
             ZipEntry zipEntry = new ZipEntry("content.xml");
             out.putNextEntry(zipEntry);
             int c;
@@ -63,12 +62,9 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
             // resource/openoffice directory, and are copied verbatim into the zip file.
             OpenOfficeDocumentCreator.addResourceFile("meta.xml", "/resource/openoffice/meta.xml", out);
             OpenOfficeDocumentCreator.addResourceFile("mimetype", "/resource/openoffice/mimetype", out);
-            OpenOfficeDocumentCreator.addResourceFile("META-INF/manifest.xml", "/resource/openoffice/manifest.xml", out);
+            OpenOfficeDocumentCreator.addResourceFile("META-INF/manifest.xml", "/resource/openoffice/manifest.xml",
+                    out);
 
-            //zipEntry = new ZipEntry()
-
-        } finally {
-            out.close();
         }
     }
 
@@ -80,8 +76,9 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, keySet);
 
         // Then add the content to the zip file:
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile));
-        OpenOfficeDocumentCreator.storeOpenOfficeFile(file, in);
+        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
+            OpenOfficeDocumentCreator.storeOpenOfficeFile(file, in);
+        }
 
         // Delete the temporary file:
         tmpFile.delete();
@@ -90,19 +87,12 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
     private static void exportOpenOfficeCalcXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
         OOCalcDatabase od = new OOCalcDatabase(database, keySet);
 
-        try {
-            Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8");
-            try {
-
-                //            Writer ps = new FileWriter(tmpFile);
-                DOMSource source = new DOMSource(od.getDOMrepresentation());
-                StreamResult result = new StreamResult(ps);
-                Transformer trans = TransformerFactory.newInstance().newTransformer();
-                trans.setOutputProperty(OutputKeys.INDENT, "yes");
-                trans.transform(source, result);
-            } finally {
-                ps.close();
-            }
+        try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8")) {
+            DOMSource source = new DOMSource(od.getDOMrepresentation());
+            StreamResult result = new StreamResult(ps);
+            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            trans.transform(source, result);
         } catch (Exception e) {
             throw new Error(e);
         }
@@ -118,8 +108,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
 
     private static void addFromResource(String resource, OutputStream out) {
         URL url = OpenOfficeDocumentCreator.class.getResource(resource);
-        try {
-            InputStream in = url.openStream();
+        try (InputStream in = url.openStream()) {
             byte[] buffer = new byte[256];
             synchronized (out) {
                 while (true) {

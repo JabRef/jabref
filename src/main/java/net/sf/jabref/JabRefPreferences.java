@@ -787,7 +787,7 @@ public class JabRefPreferences {
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
         //defaults.put("confirmAutoRemoveExactDuplicates", Boolean.TRUE);
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
-        //Util.pr(System.getProperty("java.io.tempdir"));
+        LOGGER.debug("Temporary directory: " + System.getProperty("java.io.tempdir"));
         //defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
         defaults.put(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
         defaults.put(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
@@ -1622,15 +1622,10 @@ public class JabRefPreferences {
      */
     public void exportPreferences(String filename) throws IOException {
         File f = new File(filename);
-        OutputStream os = new FileOutputStream(f);
-        try {
+        try (OutputStream os = new FileOutputStream(f)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException ex) {
             throw new IOException(ex);
-        } finally {
-            if (os != null) {
-                os.close();
-            }
         }
     }
 
@@ -1641,8 +1636,7 @@ public class JabRefPreferences {
      */
     public void importPreferences(String filename) throws IOException {
         File f = new File(filename);
-        InputStream is = new FileInputStream(f);
-        try {
+        try (InputStream is = new FileInputStream(f)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException ex) {
             throw new IOException(ex);
@@ -1663,9 +1657,10 @@ public class JabRefPreferences {
      * ONLY FOR TESTING!
      *
      * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
-     * @param prefs
+     *
+     * @param owPrefs
      */
-    void overwritePreferences(JabRefPreferences prefs) {
-        singleton = prefs;
+    void overwritePreferences(JabRefPreferences owPrefs) {
+        singleton = owPrefs;
     }
 }

@@ -221,10 +221,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             @Override
             public void keyTyped(KeyEvent arg0) {
+                // Do nothing
             }
 
             @Override
             public void keyReleased(KeyEvent arg0) {
+                // Do nothing
             }
 
             @Override
@@ -243,10 +245,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             @Override
             public void keyTyped(KeyEvent e) {
+                // Do nothing
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
+                // Do nothing
             }
 
             @Override

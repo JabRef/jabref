@@ -335,6 +335,7 @@ public class AuthorListTest {
             AuthorList.getAuthorList("").getAuthor(0);
             Assert.fail();
         } catch (Exception ignored) {
+            // Ignored
         }
 
         AuthorList.Author author = AuthorList.getAuthorList("John Smith and von Neumann, Jr, John")

@@ -39,12 +39,14 @@ public class DatabaseFileLookupTest {
      */
     @Before
     public void setUp() throws Exception {
-        ParserResult result = BibtexParser.parse(new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB));
-        database = result.getDatabase();
-        entries = database.getEntries();
+        try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
+            ParserResult result = BibtexParser.parse(fr);
+            database = result.getDatabase();
+            entries = database.getEntries();
 
-        entry1 = database.getEntryByKey("entry1");
-        entry2 = database.getEntryByKey("entry2");
+            entry1 = database.getEntryByKey("entry1");
+            entry2 = database.getEntryByKey("entry2");
+        }
     }
 
     /**
@@ -181,7 +183,7 @@ public class DatabaseFileLookupTest {
                 return new Integer(c1.getParameterTypes().length).compareTo(c2.getParameterTypes().length);
             }
         });
-        return new ArrayList<Constructor<? extends T>>(list).toArray(new Constructor[list.size()]);
+        return new ArrayList<>(list).toArray(new Constructor[list.size()]);
     }
 
     private static <T> T getInstanceFromNonDefaultConstructor(Class<T> targetClass) {
@@ -198,6 +200,7 @@ public class DatabaseFileLookupTest {
                 T instance = (T) constructor.newInstance(new Object[parameterTypes.length]);
                 return instance;
             } catch (Exception ignored) {
+                // Ignored
             }
             /**
              * Creating proper instances for the parameter types.
@@ -211,6 +214,7 @@ public class DatabaseFileLookupTest {
                 T instance = (T) constructor.newInstance(arguments);
                 return instance;
             } catch (Exception ignored) {
+                // Ignored
             }
         }
         return null;

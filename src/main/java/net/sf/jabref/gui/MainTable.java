@@ -78,7 +78,7 @@ public class MainTable extends JTable {
     private final boolean tableColorCodes;
     private boolean showingFloatSearch;
     private boolean showingFloatGrouping;
-    private final EventSelectionModel<BibtexEntry> selectionModel;
+    private final EventSelectionModel<BibtexEntry> localSelectionModel;
     private final TableComparatorChooser<BibtexEntry> comparatorChooser;
     private final JScrollPane pane;
     private Comparator<BibtexEntry> searchComparator;
@@ -131,12 +131,12 @@ public class MainTable extends JTable {
         searchComparator = null;//new HitOrMissComparator(searchMatcher);
         groupComparator = null;//new HitOrMissComparator(groupMatcher);
 
-        EventTableModel<BibtexEntry> tableModel = new EventTableModel<BibtexEntry>(sortedForGrouping, tableFormat);
+        EventTableModel<BibtexEntry> tableModel = new EventTableModel<>(sortedForGrouping, tableFormat);
         setModel(tableModel);
 
         tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
-        selectionModel = new EventSelectionModel<BibtexEntry>(sortedForGrouping);
-        setSelectionModel(selectionModel);
+        localSelectionModel = new EventSelectionModel<>(sortedForGrouping);
+        setSelectionModel(localSelectionModel);
         pane = new JScrollPane(this);
         pane.setBorder(BorderFactory.createEmptyBorder());
         pane.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
@@ -516,7 +516,7 @@ public class MainTable extends JTable {
      *   and then <code>.unlock()</code>
      */
     public EventList<BibtexEntry> getSelected() {
-        return selectionModel.getSelected();
+        return localSelectionModel.getSelected();
     }
 
     /**
@@ -525,7 +525,7 @@ public class MainTable extends JTable {
      * @param row the row to select
      */
     public void setSelected(int row) {
-        selectionModel.setSelectionInterval(row, row);
+        localSelectionModel.setSelectionInterval(row, row);
     }
 
     /**
@@ -533,7 +533,7 @@ public class MainTable extends JTable {
      * @param row the row to add to the selection
      */
     public void addSelection(int row) {
-        this.selectionModel.addSelectionInterval(row, row);
+        this.localSelectionModel.addSelectionInterval(row, row);
     }
 
     public int findEntry(BibtexEntry entry) {

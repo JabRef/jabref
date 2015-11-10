@@ -16,7 +16,6 @@
 package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.bst.BibtexNameFormatter;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 
@@ -133,7 +132,7 @@ public class NameFormatter implements LayoutFormatter {
 
     }
 
-    public String format(String toFormat, String parameters, BibtexEntry currentEntry) {
+    public String format(String toFormat, String parameters) {
 
         AuthorList al = AuthorList.getAuthorList(toFormat);
 
@@ -163,7 +162,7 @@ public class NameFormatter implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        return format(fieldText, parameter, null);
+        return format(fieldText, parameter);
     }
 
 

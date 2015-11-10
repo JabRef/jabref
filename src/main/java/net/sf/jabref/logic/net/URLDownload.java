@@ -80,7 +80,7 @@ public class URLDownload {
             try {
                 urlConnection.getInputStream().close();
             } catch (IOException ignored) {
-
+                // Ignored
             }
         }
     }
@@ -118,12 +118,13 @@ public class URLDownload {
     private void copy(InputStream in, Writer out, String encoding) throws IOException {
         InputStream monitoredInputStream = monitorInputStream(in);
         Reader r = new InputStreamReader(monitoredInputStream, encoding);
-        BufferedReader read = new BufferedReader(r);
+        try (BufferedReader read = new BufferedReader(r)) {
 
-        String line;
-        while ((line = read.readLine()) != null) {
-            out.write(line);
-            out.write("\n");
+            String line;
+            while ((line = read.readLine()) != null) {
+                out.write(line);
+                out.write("\n");
+            }
         }
     }
 
@@ -138,14 +139,15 @@ public class URLDownload {
     }
 
     private void copy(InputStream in, OutputStream out) throws IOException {
-        InputStream monitorInputStream = monitorInputStream(in);
-        byte[] buffer = new byte[512];
-        while (true) {
-            int bytesRead = monitorInputStream.read(buffer);
-            if (bytesRead == -1) {
-                break;
+        try (InputStream monitorInputStream = monitorInputStream(in)) {
+            byte[] buffer = new byte[512];
+            while (true) {
+                int bytesRead = monitorInputStream.read(buffer);
+                if (bytesRead == -1) {
+                    break;
+                }
+                out.write(buffer, 0, bytesRead);
             }
-            out.write(buffer, 0, bytesRead);
         }
     }
 
