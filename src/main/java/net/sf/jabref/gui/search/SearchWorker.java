@@ -30,31 +30,29 @@ class SearchWorker extends AbstractWorker {
 
     /**
      * Resets the information and display of the previous search.
-     * DONE
      */
     public void restart() {
 
         incSearchPos = -1;
-        
+
         if (frame.basePanel() == null) {
             return;
         }
 
         if (frame.basePanel().isShowingFloatSearch()) {
             frame.basePanel().mainTable.stopShowingFloatSearch();
-        } 
+        }
         if (frame.basePanel().isShowingFilterSearch()) {
             frame.basePanel().stopShowingSearchResults();
         }
     }
 
     /**
-     * DONE
      * Initializes a new search.
      */
-    public void initSearch(SearchRule rule, String query, SearchMode mode) { 
+    public void initSearch(SearchRule rule, String query, SearchMode mode) {
         this.rule = rule;
-        if(this.query.equals(query) && this.mode == SearchMode.Incremental) {
+        if(this.query.equals(query) && (this.mode == SearchMode.Incremental)) {
             // The query stayed the same and we are in incremental mode
             // So we do not want to start the search at the next item
             incSearchPos ++;
@@ -66,14 +64,13 @@ class SearchWorker extends AbstractWorker {
             // We changed search mode so reset information
             restart();
         }
-        
+
         LogFactory.getLog(SearchWorker.class).debug("Search (" +  this.mode.getDisplayName() + "): " + this.query + " at " + incSearchPos);
-        
+
     }
 
     /* (non-Javadoc)
      * @see net.sf.jabref.Worker#run()
-     * DONE
      */
     @Override
     public void run() {
@@ -95,7 +92,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Searches for matches in all open databases. Saves the number of matches in hits. DONE
+     * Searches for matches in all open databases. Saves the number of matches in hits.
      */
     private void runGlobal() {
         // Search all databases
@@ -113,7 +110,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Searches for matches in the current database. Saves the number of matches in hits. DONE
+     * Searches for matches in the current database. Saves the number of matches in hits.
      */
     private void runNormal() {
         // Search the current database
@@ -128,7 +125,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * DONE Searches for the next match, beginning at incSearchPos. The index of the first match is then saved in
+     * Searches for the next match, beginning at incSearchPos. The index of the first match is then saved in
      * incSearchPos. Sets it to -1 if no further match was found.
      */
     private void runIncremental() {
@@ -141,7 +138,7 @@ class SearchWorker extends AbstractWorker {
             incSearchPos = -1;
             return;
         }
-        
+
         for (int i = incSearchPos; i < entryCount; i++) {
             BibtexEntry entry = frame.basePanel().mainTable.getEntryAt(i);
             boolean hit = rule.applyRule(query, entry);
@@ -157,7 +154,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * DONE Selects the next match in the entry table based on the position saved in incSearchPos.
+     * Selects the next match in the entry table based on the position saved in incSearchPos.
      */
     private void updateIncremental() {
         int entryCount = frame.basePanel().getDatabase().getEntryCount();
@@ -172,7 +169,6 @@ class SearchWorker extends AbstractWorker {
 
     /* (non-Javadoc)
      * @see net.sf.jabref.AbstractWorker#update()
-     * DONE
      */
     @Override
     public void update() {
@@ -203,7 +199,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Floats matches to the top of the entry table. DONE
+     * Floats matches to the top of the entry table.
      */
     private void updateFloat() {
         // TODO: Rename these things in mainTable, they are not search specific
@@ -214,7 +210,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Shows only matches in the entry table by removing non-hits. DONE
+     * Shows only matches in the entry table by removing non-hits.
      */
     private void updateFilter() {
         // TODO: Rename these things in basePanel, they are not search specific
@@ -225,7 +221,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Displays search results in a dialog window. DONE
+     * Displays search results in a dialog window.
      */
     private void updateResultsInDialog() {
         // Make sure the search dialog is instantiated and cleared:
@@ -241,7 +237,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Displays search results in a dialog window. DONE
+     * Displays search results in a dialog window.
      */
     private void updateGlobal() {
         // Make sure the search dialog is instantiated and cleared:
@@ -260,7 +256,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Initializes the search dialog, unless it has already been instantiated. DONE 
+     * Initializes the search dialog, unless it has already been instantiated.
      */
     private void initSearchDialog() {
         // TODO: Move search dialog to main table and make it non-search specific (similar to filter/float by SearchMatcher
