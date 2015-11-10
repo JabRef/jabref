@@ -128,11 +128,6 @@ public class DOAJFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "DOAJ";
-    }
-
-    @Override
     public String getHelpPage() {
         return "DOAJHelp.html";
     }

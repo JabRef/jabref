@@ -109,9 +109,9 @@ public class ADSFetcher implements EntryFetcher {
                 return pr.getDatabase();
             }
         } catch (FileNotFoundException e) {
-            status.showMessage(Localization.lang("'%0' is not a valid ADS bibcode.", key) + "\n\n" +
-                            Localization.lang("Note: A full text search is currently not supported for %0",
- getTitle()),
+            status.showMessage(
+                    Localization.lang("'%0' is not a valid ADS bibcode.", key) + "\n\n" + Localization
+                            .lang("Note: A full text search is currently not supported for %0", getTitle()),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
