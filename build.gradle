@@ -81,6 +81,8 @@ dependencies {
 
     compile 'net.java.dev.jna:jna:4.2.1'
 
+    compile files('lib/JSplitButton_1.2.jar')
+
     compile 'com.google.guava:guava:18.0'
 
     compile 'commons-logging:commons-logging:1.2'

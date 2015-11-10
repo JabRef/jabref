@@ -17,14 +17,15 @@ package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.SearchTextListener;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.search.SearchTextListener;
 import net.sf.jabref.util.Util;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 
 import javax.swing.AbstractAction;
@@ -39,7 +40,7 @@ import javax.swing.undo.UndoManager;
 
 public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
 
-    private ArrayList<String> wordsToHighlight;
+    private List<String> wordsToHighlight;
 
     private UndoManager undo;
 
@@ -138,7 +139,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
      *
      * @param words to highlight
      */
-    private void highLight(ArrayList<String> words) {
+    private void highLight(List<String> words) {
         // highlight all characters that appear in charsToHighlight
         Highlighter highlighter = getHighlighter();
         highlighter.removeAllHighlights();
@@ -167,7 +168,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
     @Override
     public void setText(String text) {
         super.setText(text);
-        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS)) {
             highLight(wordsToHighlight);
         }
         if (undo != null) {
@@ -176,11 +177,11 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
     }
 
     @Override
-    public void searchText(ArrayList<String> words) {
+    public void searchText(List<String> words) {
         // words have to be stored in class variable as
         // setText() makes use of them
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS)) {
             this.wordsToHighlight = words;
             highLight(words);
         } else {

@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.autocompleter;
 
 import javax.swing.text.JTextComponent;
 import javax.swing.text.BadLocationException;
@@ -32,7 +32,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     //TODO: The logging behavior in this class is probably too fine-grained and only understandable to its original author
     private static final Log LOGGER = LogFactory.getLog(AutoCompleteListener.class);
 
-    private final AutoCompleter completer;
+	private final AutoCompleter<String> completer;
 
     // These variables keep track of the situation from time to time.
     private String toSetIn; // null indicates that there are no completions available
@@ -48,7 +48,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     private FocusListener nextFocusListener;
 
 
-    public AutoCompleteListener(AutoCompleter completer) {
+    public AutoCompleteListener(AutoCompleter<String> completer) {
         //    	if (logger.getHandlers().length == 0) {
         //	    	logger.setLevel(Level.FINEST);
         //	    	ConsoleHandler ch = new ConsoleHandler();

@@ -23,7 +23,7 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
@@ -38,6 +38,7 @@ import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.search.SearchTextListener;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -270,7 +271,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private Action closeAction;
 
-    private ArrayList<String> wordsToHighlight;
+    private List<String> wordsToHighlight;
 
 
     private Action getCloseAction() {
@@ -455,8 +456,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     @Override
-    public void searchText(ArrayList<String> words) {
-        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
+    public void searchText(List<String> words) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS)) {
             this.wordsToHighlight = words;
             update();
         } else {
