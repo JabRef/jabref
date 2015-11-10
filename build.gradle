@@ -16,6 +16,17 @@ apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply from: 'eclipse.gradle'
 
+// HACK to disable coverityCheck task when not on CI server
+// necessary as coverity automatically adds check.dependsOn coverityCheck
+gradle.taskGraph.whenReady { taskGraph ->
+    def tasks = taskGraph.getAllTasks()
+    if (System.env.CI == null) {
+        tasks.findAll {it.name.startsWith('coverityCheck')}.each { task ->
+                task.enabled = false
+        }
+    }
+}
+
 group = "net.sf.jabref"
 version = "2.80dev"
 project.ext.threeDotVersion = "2.80.0.0"
