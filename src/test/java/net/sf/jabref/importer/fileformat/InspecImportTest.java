@@ -8,7 +8,7 @@ import org.junit.Test;
 
 /**
  *
- * This is the test class of the InspecImporter. It test all 4 methodes of the class.
+ * This is the test class of the InspecImporter. It tests all 4 methods of the class.
  *
  * @author mairdl
  * @author braunch
