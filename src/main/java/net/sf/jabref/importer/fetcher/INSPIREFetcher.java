@@ -123,13 +123,8 @@ public class INSPIREFetcher implements EntryFetcher {
 
                 return pr.getDatabase();
             }
-        } catch (IOException e) {
+        } catch (RuntimeException | IOException e) {
             frame.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
-                    Localization.lang(getTitle()), JOptionPane.ERROR_MESSAGE);
-        } catch (RuntimeException e) {
-            frame.showMessage(
-                    Localization.lang("An Error occurred while fetching from INSPIRE source (%0):", new String[] {url})
-                            + "\n\n" + e.getMessage(),
                     Localization.lang(getTitle()), JOptionPane.ERROR_MESSAGE);
         }
         return null;
