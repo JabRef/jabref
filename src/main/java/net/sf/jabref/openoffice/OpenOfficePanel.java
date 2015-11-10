@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -129,9 +129,10 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         OpenOfficePanel.update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         OpenOfficePanel.update.setToolTipText(Localization.lang("Sync OO bibliography"));
         if (OS.WINDOWS) {
-            Globals.prefs.putDefaultValue("ooPath", "C:\\Program Files\\OpenOffice.org 3");
-            Globals.prefs.putDefaultValue("ooExecutablePath", "C:\\Program Files\\OpenOffice.org 2.3\\program\\soffice.exe");
-            Globals.prefs.putDefaultValue("ooJarsPath", "C:\\Program Files\\OpenOffice.org 2.3\\program\\classes");
+            Globals.prefs.putDefaultValue("ooPath", "C:\\Program Files\\OpenOffice.org 4");
+            Globals.prefs.putDefaultValue("ooExecutablePath",
+                    "C:\\Program Files\\OpenOffice.org 4\\program\\soffice.exe");
+            Globals.prefs.putDefaultValue("ooJarsPath", "C:\\Program Files\\OpenOffice.org 4\\program\\classes");
         } else if (OS.OS_X) {
             Globals.prefs.putDefaultValue("ooExecutablePath", "/Applications/OpenOffice.org.app/Contents/MacOS/soffice.bin");
             Globals.prefs.putDefaultValue("ooPath", "/Applications/OpenOffice.org.app");
@@ -180,7 +181,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         if (Globals.prefs.getBoolean("showOOPanel")) {
             manager.show(getName());
         }
-        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"), IconTheme.getImage("openoffice"));
+        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
+                IconTheme.getImage("openoffice"));
         item.addActionListener(new ActionListener() {
 
             @Override
@@ -495,7 +497,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         String ooBaseDirectory;
         if (auto) {
             AutoDetectPaths adp = new AutoDetectPaths(diag);
-
             if (adp.runAutodetection()) {
                 autoDetected = true;
                 dialogOkPressed = true;
@@ -531,31 +532,20 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             String ooJars = Globals.prefs.get("ooJarsPath");
             sOffice = Globals.prefs.get("ooExecutablePath");
 
-            boolean openOffice3 = true;//Globals.prefs.getBoolean("connectToOO3");
             if (OS.WINDOWS) {
-                //if (openOffice3) {
-                unoilDir = ooPath + "\\Basis\\program\\classes";
-                ooBaseDirectory = ooPath + "\\URE\\java";
+                unoilDir = ooPath + "\\program\\classes";
+                ooBaseDirectory = ooPath + "\\program\\classes";
                 sOffice = ooPath + "\\program\\soffice.exe";
-                //}
-
             }
             else if (OS.OS_X) {
-                //if (openOffice3) {
                 sOffice = ooPath + "/Contents/MacOS/soffice.bin";
                 ooBaseDirectory = ooPath + "/Contents/basis-link/ure-link/share/java";
                 unoilDir = ooPath + "/Contents/basis-link/program/classes";
-                //}
-
             }
             else {
                 // Linux:
-                //if (openOffice3) {
                 unoilDir = ooJars + "/program/classes";
                 ooBaseDirectory = ooJars + "/ure-link/share/java";
-                //sOffice = ooPath+"/program/soffice";
-                //}
-
             }
         }
 

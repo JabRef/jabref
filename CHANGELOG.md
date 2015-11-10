@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+ - Updated to support OpenOffice 4 and LibreOffice 5
  - Better support for IEEEtranBSTCTL entries
  - Quick selection of month in entry editor
  - Unknown entry types will be converted to 'Misc' (was 'Other' before).
