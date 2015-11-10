@@ -125,7 +125,7 @@ public class INSPIREFetcher implements EntryFetcher {
             }
         } catch (RuntimeException | IOException e) {
             frame.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
-                    Localization.lang(getTitle()), JOptionPane.ERROR_MESSAGE);
+                    getTitle(), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }

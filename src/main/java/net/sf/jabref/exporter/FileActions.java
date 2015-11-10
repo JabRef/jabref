@@ -188,7 +188,7 @@ public class FileActions {
             // saving failed, no matter what the reason was
             // (and they won't just quit JabRef thinking
             // everything worked and loosing data)
-            throw new SaveException(e.getMessage());
+            throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
 
         // Get our data stream. This stream writes only to a temporary file,
@@ -262,7 +262,7 @@ public class FileActions {
             ex.printStackTrace();
             session.cancel();
             // repairAfterError(file, backup, INIT_OK);
-            throw new SaveException(ex.getMessage(), exceptionCause);
+            throw new SaveException(ex.getMessage(), ex.getLocalizedMessage(), exceptionCause);
         }
 
         return session;
@@ -373,7 +373,7 @@ public class FileActions {
         try {
             session = new SaveSession(file, encoding, backup);
         } catch (IOException e) {
-            throw new SaveException(e.getMessage());
+            throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
 
         // Define our data stream.
@@ -435,7 +435,7 @@ public class FileActions {
         } catch (Throwable ex) {
             session.cancel();
             //repairAfterError(file, backup, status);
-            throw new SaveException(ex.getMessage(), be);
+            throw new SaveException(ex.getMessage(), ex.getLocalizedMessage(), be);
         }
 
         return session;
