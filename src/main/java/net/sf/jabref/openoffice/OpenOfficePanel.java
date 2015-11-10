@@ -655,19 +655,18 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
 
     private static void addURL(URL[] u) throws IOException {
-        try (URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader()) {
-            Class<URLClassLoader> sysclass = URLClassLoader.class;
+        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        Class<URLClassLoader> sysclass = URLClassLoader.class;
 
-            try {
-                Method method = sysclass.getDeclaredMethod("addURL", OpenOfficePanel.parameters);
-                method.setAccessible(true);
-                for (URL anU : u) {
-                    method.invoke(sysloader, anU);
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-                throw new IOException("Error, could not add URL to system classloader");
+        try {
+            Method method = sysclass.getDeclaredMethod("addURL", OpenOfficePanel.parameters);
+            method.setAccessible(true);
+            for (URL anU : u) {
+                method.invoke(sysloader, anU);
             }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw new IOException("Error, could not add URL to system classloader");
         }
     }
 
