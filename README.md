@@ -1,6 +1,6 @@
 # JabRef development version (2.11 line)
 
-[![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=dev_2.11)](https://travis-ci.org/JabRef/jabref)
+[![Circle CI](https://circleci.com/gh/JabRef/jabref/tree/dev_2.11.svg?style=shield)](https://circleci.com/gh/JabRef/jabref/tree/dev_2.11)
 
 This version is a development version. Features may not work as expected.
 
