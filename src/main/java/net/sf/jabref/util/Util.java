@@ -45,7 +45,6 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.*;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.logic.util.date.YearUtil;
 import net.sf.jabref.logic.util.io.FileFinder;
@@ -111,8 +110,7 @@ public class Util {
     }
 
     /**
-     * Will return the publication date of the given bibtex entry in conformance to ISO 8601, i.e. either YYYY or
-     * YYYY-MM.
+     * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
      *
      * @param entry
      * @return will return the publication date of the entry or null if no year was found.
@@ -171,14 +169,14 @@ public class Util {
             }
         }
 
-        // Replace non-english characters like umlauts etc. with a sensible
+        // Replace non-English characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
 
         return net.sf.jabref.util.Util.replaceSpecialCharacters(newKey.toString());
     }
 
     /**
-     * Replace non-english characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
      * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
      */
     public static String replaceSpecialCharacters(String s) {
@@ -321,7 +319,7 @@ public class Util {
 
                         }
                     } else {
-                        // Incorrecly terminated open brace
+                        // Incorrectly terminated open brace
                         result.add(new String[] {method});
                     }
                 } else {
@@ -622,7 +620,7 @@ public class Util {
                 continue;
             }
             // If we are not allowed to overwrite values, check if there is a
-            // nonempy value already for this entry for the new field:
+            // non-empty value already for this entry for the new field:
             String valInNewField = entry.getField(newField);
             if (!overwriteValues && (valInNewField != null) && !valInNewField.isEmpty()) {
                 continue;
@@ -1217,7 +1215,7 @@ public class Util {
         return fieldValue;
     }
 
-    // Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
+    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
     public static Pattern getPatternForWords(ArrayList<String> words) {
         if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
             return Pattern.compile("");
@@ -1225,7 +1223,7 @@ public class Util {
 
         boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH);
 
-        // compile the words to a regex in the form (w1) | (w2) | (w3)
+        // compile the words to a regular expression in the form (w1) | (w2) | (w3)
         String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");
         for (int i = 1; i < words.size(); i++) {
             searchPattern = searchPattern.concat("|(").concat(regExSearch ? words.get(i) : Pattern.quote(words.get(i))).concat(")");
