@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,8 +32,10 @@ public class RISImporterTest {
     public void testIsRecognizedFormat() throws IOException {
 
         RisImporter importer = new RisImporter();
-        Assert.assertTrue(importer.isRecognizedFormat(RISImporterTest.class
-                .getResourceAsStream("RisImporterTest1.ris")));
+        try (InputStream stream = RISImporterTest.class
+                .getResourceAsStream("RisImporterTest1.ris")) {
+            Assert.assertTrue(importer.isRecognizedFormat(stream));
+        }
     }
 
     @Test
@@ -84,22 +87,24 @@ public class RISImporterTest {
     public void testImportEntries() throws IOException {
         RisImporter importer = new RisImporter();
 
-        List<BibtexEntry> entries = importer.importEntries(RISImporterTest.class
-                .getResourceAsStream("RisImporterTest1.ris"), new OutputPrinterToNull());
-        Assert.assertEquals(1, entries.size());
-        BibtexEntry entry = entries.get(0);
-        Assert.assertEquals("Editorial: Open Source and Empirical Software Engineering", entry
-                .getField("title"));
-        Assert.assertEquals(
-                "Harrison, Warren",
-                entry.getField("author"));
+        try (InputStream stream = RISImporterTest.class
+                .getResourceAsStream("RisImporterTest1.ris")) {
+            List<BibtexEntry> entries = importer.importEntries(stream, new OutputPrinterToNull());
+            Assert.assertEquals(1, entries.size());
+            BibtexEntry entry = entries.get(0);
+            Assert.assertEquals("Editorial: Open Source and Empirical Software Engineering", entry
+                    .getField("title"));
+            Assert.assertEquals(
+                    "Harrison, Warren",
+                    entry.getField("author"));
 
-        Assert.assertEquals(BibtexEntryTypes.ARTICLE, entry.getType());
-        Assert.assertEquals("Empirical Software Engineering", entry.getField("journal"));
-        Assert.assertEquals("2001", entry.getField("year"));
-        Assert.assertEquals("6", entry.getField("volume"));
-        Assert.assertEquals("3", entry.getField("number"));
-        Assert.assertEquals("193--194", entry.getField("pages"));
-        Assert.assertEquals("#sep#", entry.getField("month"));
+            Assert.assertEquals(BibtexEntryTypes.ARTICLE, entry.getType());
+            Assert.assertEquals("Empirical Software Engineering", entry.getField("journal"));
+            Assert.assertEquals("2001", entry.getField("year"));
+            Assert.assertEquals("6", entry.getField("volume"));
+            Assert.assertEquals("3", entry.getField("number"));
+            Assert.assertEquals("193--194", entry.getField("pages"));
+            Assert.assertEquals("#sep#", entry.getField("month"));
+        }
     }
 }
