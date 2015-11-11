@@ -53,22 +53,6 @@ public class UtilTest {
     }
 
     @Test
-    public void testParseField() {
-
-        Assert.assertEquals("", net.sf.jabref.util.Util.parseField(""));
-
-        // Three basic types (references, { } and " ")
-        Assert.assertEquals("#hallo#", net.sf.jabref.util.Util.parseField("hallo"));
-        Assert.assertEquals("hallo", net.sf.jabref.util.Util.parseField("{hallo}"));
-        Assert.assertEquals("bye", net.sf.jabref.util.Util.parseField("\"bye\""));
-
-        // Concatenation
-        Assert.assertEquals("longlonglonglong", net.sf.jabref.util.Util.parseField("\"long\" # \"long\" # \"long\" # \"long\""));
-
-        Assert.assertEquals("hallo#bye#", net.sf.jabref.util.Util.parseField("{hallo} # bye"));
-    }
-
-    @Test
     public void testShaveString() {
 
         Assert.assertEquals(null, StringUtil.shaveString(null));
@@ -96,39 +80,7 @@ public class UtilTest {
         Assert.assertEquals("AeaeaAAA", net.sf.jabref.util.Util.replaceSpecialCharacters("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
     }
 
-    @Test
-    public void testJoin() {
-        String[] s = "ab/cd/ed".split("/");
-        Assert.assertEquals("ab\\cd\\ed", StringUtil.join(s, "\\", 0, s.length));
 
-        Assert.assertEquals("cd\\ed", StringUtil.join(s, "\\", 1, s.length));
-
-        Assert.assertEquals("ed", StringUtil.join(s, "\\", 2, s.length));
-
-        Assert.assertEquals("", StringUtil.join(s, "\\", 3, s.length));
-
-        Assert.assertEquals("", StringUtil.join(new String[]{}, "\\", 0, 0));
-    }
-
-    @Test
-    public void testStripBrackets() {
-        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo]"));
-        Assert.assertEquals("[foo]", StringUtil.stripBrackets("[[foo]]"));
-        Assert.assertEquals("foo", StringUtil.stripBrackets("foo]"));
-        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo"));
-        Assert.assertEquals("", StringUtil.stripBrackets(""));
-        Assert.assertEquals("", StringUtil.stripBrackets("[]"));
-        Assert.assertEquals("", StringUtil.stripBrackets("["));
-        Assert.assertEquals("", StringUtil.stripBrackets("]"));
-        Assert.assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
-
-        try {
-            StringUtil.stripBrackets(null);
-            Assert.fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
-    }
 
 
     BibtexDatabase database;
@@ -302,18 +254,6 @@ public class UtilTest {
         Assert.assertEquals("/src/doof.txt", net.sf.jabref.util.Util.sanitizeUrl("/src/doof.txt"));
         Assert.assertEquals("/", net.sf.jabref.util.Util.sanitizeUrl("/"));
         Assert.assertEquals("/home/user/example.txt", net.sf.jabref.util.Util.sanitizeUrl("/home/user/example.txt"));
-    }
-
-    @Test
-    public void testToUpperCharFirst() {
-
-        Assert.assertEquals("", StringUtil.toUpperFirstLetter(""));
-        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("a"));
-        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("A"));
-        Assert.assertEquals("An", StringUtil.toUpperFirstLetter("an"));
-        Assert.assertEquals("AN", StringUtil.toUpperFirstLetter("AN"));
-        Assert.assertEquals("TestTest", StringUtil.toUpperFirstLetter("testTest"));
-
     }
 
     @Test

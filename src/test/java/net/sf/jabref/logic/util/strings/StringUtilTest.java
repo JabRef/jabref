@@ -59,4 +59,62 @@ public class StringUtilTest {
         assertEquals("abc", StringUtil.putBracesAroundCapitals("abc"));
         assertEquals("{ABC} def {EFG}", StringUtil.putBracesAroundCapitals("ABC def EFG"));
     }
+
+    @Test
+    public void testShaveString() {
+
+        Assert.assertEquals(null, StringUtil.shaveString(null));
+        Assert.assertEquals("", StringUtil.shaveString(""));
+        Assert.assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
+        Assert.assertEquals("a", StringUtil.shaveString("  {a}    "));
+        Assert.assertEquals("a", StringUtil.shaveString("  \"a\"    "));
+        Assert.assertEquals("{a}", StringUtil.shaveString("  {{a}}    "));
+        Assert.assertEquals("{a}", StringUtil.shaveString("  \"{a}\"    "));
+        Assert.assertEquals("\"{a\"}", StringUtil.shaveString("  \"{a\"}    "));
+    }
+
+    @Test
+    public void testJoin() {
+        String[] s = "ab/cd/ed".split("/");
+        Assert.assertEquals("ab\\cd\\ed", StringUtil.join(s, "\\", 0, s.length));
+
+        Assert.assertEquals("cd\\ed", StringUtil.join(s, "\\", 1, s.length));
+
+        Assert.assertEquals("ed", StringUtil.join(s, "\\", 2, s.length));
+
+        Assert.assertEquals("", StringUtil.join(s, "\\", 3, s.length));
+
+        Assert.assertEquals("", StringUtil.join(new String[] {}, "\\", 0, 0));
+    }
+
+    @Test
+    public void testStripBrackets() {
+        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo]"));
+        Assert.assertEquals("[foo]", StringUtil.stripBrackets("[[foo]]"));
+        Assert.assertEquals("foo", StringUtil.stripBrackets("foo]"));
+        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo"));
+        Assert.assertEquals("", StringUtil.stripBrackets(""));
+        Assert.assertEquals("", StringUtil.stripBrackets("[]"));
+        Assert.assertEquals("", StringUtil.stripBrackets("["));
+        Assert.assertEquals("", StringUtil.stripBrackets("]"));
+        Assert.assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
+
+        try {
+            StringUtil.stripBrackets(null);
+            Assert.fail();
+        } catch (NullPointerException ignored) {
+            // Ignored
+        }
+    }
+
+    @Test
+    public void testToUpperCharFirst() {
+
+        Assert.assertEquals("", StringUtil.toUpperFirstLetter(""));
+        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("a"));
+        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("A"));
+        Assert.assertEquals("An", StringUtil.toUpperFirstLetter("an"));
+        Assert.assertEquals("AN", StringUtil.toUpperFirstLetter("AN"));
+        Assert.assertEquals("TestTest", StringUtil.toUpperFirstLetter("testTest"));
+    }
 }

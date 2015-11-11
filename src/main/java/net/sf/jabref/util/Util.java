@@ -103,39 +103,11 @@ public class Util {
 
 
     /**
-     * This method translates a field or string from Bibtex notation, with possibly text contained in " " or { }, and
-     * string references, concatenated by '#' characters, into Bibkeeper notation, where string references are enclosed
-     * in a pair of '#' characters.
+     * This method sets the location of a Dialog such that it is centered with regard to another window, but not outside
+     * the screen on the left and the top.
      */
-    public static String parseField(String content) {
-        if (content.isEmpty()) {
-            return content;
-        }
-
-        String[] strings = content.split("#");
-        StringBuilder result = new StringBuilder();
-        for (String string : strings) {
-            String s = string.trim();
-            if (!s.isEmpty()) {
-                char c = s.charAt(0);
-                // String reference or not?
-                if ((c == '{') || (c == '"')) {
-                    result.append(StringUtil.shaveString(string));
-                } else {
-                    // This part should normally be a string reference, but if it's
-                    // a pure number, it is not.
-                    String s2 = StringUtil.shaveString(s);
-
-                    try {
-                        Integer.parseInt(s2);
-                        result.append(s2);
-                    } catch (NumberFormatException e) {
-                        result.append('#').append(s2).append('#');
-                    }
-                }
-            }
-        }
-        return result.toString();
+    public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
+        diag.setLocationRelativeTo(win);
     }
 
     /**
