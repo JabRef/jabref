@@ -260,63 +260,6 @@ public class Util {
         return res;
     }
 
-    /**
-     * Make sure an URL is "portable", in that it doesn't contain bad characters that break the open command in some
-     * OSes.
-     *
-     * A call to this method will also remove \\url{} enclosings and clean Doi links.
-     *
-     * @param link :the URL to sanitize.
-     * @return Sanitized URL
-     */
-    public static String sanitizeUrl(String link) {
-        link = link.trim();
-
-        // First check if it is enclosed in \\url{}. If so, remove the wrapper.
-        if (link.startsWith("\\url{") && link.endsWith("}")) {
-            link = link.substring(5, link.length() - 1);
-        }
-
-        // DOI cleanup
-        // converts doi-only link to full http address
-        // Morten Alver 6 Nov 2012: this extracts a nonfunctional Doi from some complete
-        // http addresses (e.g. http://onlinelibrary.wiley.com/doi/10.1002/rra.999/abstract, where
-        // the trailing "/abstract" is included but doesn't lead to a resolvable Doi).
-        // To prevent mangling of working URLs I'm disabling this check if the link is already
-        // a full http link:
-        // TODO: not sure if this is allowed
-        if (link.matches("^doi:/*.*")) {
-            // Remove 'doi:'
-            link = link.replaceFirst("^doi:/*", "");
-            link = new DOI(link).getURLAsASCIIString();
-        }
-
-        Optional<DOI> doi = DOI.build(link);
-        if (doi.isPresent() && !link.matches("^https?://.*")) {
-            link = doi.get().getURLAsASCIIString();
-        }
-
-        // FIXME: everything below is really flawed atm
-        link = link.replaceAll("\\+", "%2B");
-
-        try {
-            link = URLDecoder.decode(link, "UTF-8");
-        } catch (UnsupportedEncodingException ignored) {
-            // Ignored
-        }
-
-        /**
-         * Fix for: [ 1574773 ] sanitizeUrl() breaks ftp:// and file:///
-         *
-         * http://sourceforge.net/tracker/index.php?func=detail&aid=1574773&group_id=92314&atid=600306
-         */
-        try {
-            return new URI(null, link, null).toASCIIString();
-        } catch (URISyntaxException e) {
-            return link;
-        }
-    }
-
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
 
         ArrayList<String[]> result = new ArrayList<>();

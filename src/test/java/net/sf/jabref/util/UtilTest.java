@@ -7,7 +7,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.Util;
 import org.junit.Assert;
@@ -225,35 +224,6 @@ public class UtilTest {
 
         Assert.assertEquals("Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
                 net.sf.jabref.util.Util.expandBrackets("[author] have published [title] in [journal].", entry, database));
-    }
-
-    @Test
-    public void testSanitizeUrl() {
-
-        Assert.assertEquals("http://www.vg.no", net.sf.jabref.util.Util.sanitizeUrl("http://www.vg.no"));
-        Assert.assertEquals("http://www.vg.no/fil%20e.html", net.sf.jabref.util.Util.sanitizeUrl("http://www.vg.no/fil e.html"));
-        Assert.assertEquals("http://www.vg.no/fil%20e.html", net.sf.jabref.util.Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
-        Assert.assertEquals("www.vg.no/fil%20e.html", net.sf.jabref.util.Util.sanitizeUrl("www.vg.no/fil%20e.html"));
-
-        Assert.assertEquals("www.vg.no/fil%20e.html", net.sf.jabref.util.Util.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
-
-        /**
-         * Doi Test cases
-         */
-        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), net.sf.jabref.util.Util.sanitizeUrl("10.1109/VLHCC.2004.20"));
-        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), net.sf.jabref.util.Util.sanitizeUrl("doi://10.1109/VLHCC.2004.20"));
-        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), net.sf.jabref.util.Util.sanitizeUrl("doi:/10.1109/VLHCC.2004.20"));
-        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), net.sf.jabref.util.Util.sanitizeUrl("doi:10.1109/VLHCC.2004.20"));
-
-        /**
-         * Additional testcases provided by Hannes Restel and Micha Beckmann.
-         */
-        Assert.assertEquals("ftp://www.vg.no", net.sf.jabref.util.Util.sanitizeUrl("ftp://www.vg.no"));
-        Assert.assertEquals("file://doof.txt", net.sf.jabref.util.Util.sanitizeUrl("file://doof.txt"));
-        Assert.assertEquals("file:///", net.sf.jabref.util.Util.sanitizeUrl("file:///"));
-        Assert.assertEquals("/src/doof.txt", net.sf.jabref.util.Util.sanitizeUrl("/src/doof.txt"));
-        Assert.assertEquals("/", net.sf.jabref.util.Util.sanitizeUrl("/"));
-        Assert.assertEquals("/home/user/example.txt", net.sf.jabref.util.Util.sanitizeUrl("/home/user/example.txt"));
     }
 
     @Test
