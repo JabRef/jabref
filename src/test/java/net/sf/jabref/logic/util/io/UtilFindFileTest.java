@@ -1,9 +1,10 @@
-package net.sf.jabref.util;
+package net.sf.jabref.logic.util.io;
 
 import net.sf.jabref.AssertUtil;
 import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.FileBasedTestCase;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -83,13 +84,16 @@ public class UtilFindFileTest extends FileBasedTestCase {
     public void testFindAssociatedFiles() throws IOException {
         Collection<BibtexEntry> entries = Collections.singletonList(entry);
         Collection<String> extensions = Arrays.asList("jpg", "pdf");
-        Collection<File> dirs = Arrays.asList(new File(root.getAbsoluteFile() + "/pdfs/"), new File(root.getAbsoluteFile() + "/graphicsDir/"));
+        Collection<File> dirs = Arrays.asList(new File(root.getAbsoluteFile() + "/pdfs/"),
+                new File(root.getAbsoluteFile() + "/graphicsDir/"));
 
         Map<BibtexEntry, List<File>> results = Util.findAssociatedFiles(entries, extensions, dirs);
 
         Assert.assertEquals(2, results.get(entry).size());
-        Assert.assertTrue(results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/HipKro03test.jpg")));
-        Assert.assertFalse(results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/HipKro03test.png")));
+        Assert.assertTrue(
+                results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/HipKro03test.jpg")));
+        Assert.assertFalse(
+                results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/HipKro03test.png")));
         Assert.assertTrue(results.get(entry).contains(new File(root.getAbsoluteFile() + "/pdfs/sub/HipKro03-sub.pdf")));
     }
 
@@ -217,4 +221,6 @@ public class UtilFindFileTest extends FileBasedTestCase {
         AssertUtil.assertEqualPaths(new File(root, "/HipKro03 - Hello.pdf").getCanonicalPath(), FileFinder.findFile(
                 entry, database, root.getAbsolutePath() + "/**/" + "[bibtexkey].*Hello.pdf"));
     }
+
+
 }

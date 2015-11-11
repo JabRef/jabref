@@ -17,7 +17,6 @@ import org.junit.Test;
 import java.io.StringReader;
 import java.util.*;
 import java.util.List;
-
 public class UtilTest {
 
     @Test
@@ -233,5 +232,6 @@ public class UtilTest {
         String[] expected = new String[]{"w1", "w2a w2b", "w3"};
         Assert.assertArrayEquals(expected, separatedKeywords.toArray());
     }
+
 
 }
