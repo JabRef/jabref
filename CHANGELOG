@@ -66,13 +66,13 @@
     - Fix #250: No hard line breaks after 70 chars in serialized JabRef meta data
     - Update supported LookAndFeels
     - Fix sourceforge bug 1296: External links in the help open in the standard browser
-[dev_2.11]
-    - Backports from 2.80: Fix bug #194: JabRef starts again on Win XP and Win Vista
-    - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly
+    - Show replaced journal abbreviations on console
+2.11
     - Backports from 2.80: Bug fix in #193: sometimes IEEEXplore stalls during fetch
     - Backports from 2.80: Fixes #194 and #244: JabRef starts again on Win XP and Win Vista
     - Backports from 2.80: Fixes #103: JDialog for auto set links is opened and closed correctly
     - Backports from 2.80: Define a default lookAndFeel for Mac OS X
+    - Do not show replaced journal abbreviations on console
 2.11 beta 4
     - Add of Persian localization (by Behrouz Javanmardi)
     - Backport from 2.80: Fixes #115: Remove whitespaces in serialization
