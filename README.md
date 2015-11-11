@@ -1,7 +1,9 @@
-# JabRef 2.11
+# JabRef development version (2.11 line)
 
 [![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=dev_2.11)](https://travis-ci.org/JabRef/jabref)
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+This version is a development version. Features may not work as expected.
 
 The branch of this README file is `dev_2.11`.
 This branch is intended for maintenance releases in the 2.11 line with Java 6 compatibility and plugin support.

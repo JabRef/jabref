@@ -1,3 +1,4 @@
+[dev_2.11]
 2.11
     - Backports from 2.80: Bug fix in #193: sometimes IEEEXplore stalls during fetch
     - Backports from 2.80: Fixes #194 and #244: JabRef starts again on Win XP and Win Vista
