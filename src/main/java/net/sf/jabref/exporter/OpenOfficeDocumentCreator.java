@@ -68,9 +68,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         }
     }
 
-    private static void exportOpenOfficeCalc(File file, BibtexDatabase database,
-                                             Set<String> keySet) throws Exception {
-
+    private static void exportOpenOfficeCalc(File file, BibtexDatabase database, Set<String> keySet) throws Exception {
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("oocalc", null);
         OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, keySet);

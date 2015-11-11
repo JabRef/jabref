@@ -37,9 +37,7 @@ import java.util.*;
  * @author Christopher Oezbek <oezi@oezi.de>
  */
 public class XMPUtilTest {
-
     public static final String SRC_TEST_ESOURCES_ENCRYPTED_PDF = "src/test/resources/encrypted.pdf";
-
 
     /**
      * Wrap bibtex-data (<bibtex:author>...) into an rdf:Description.
@@ -457,9 +455,9 @@ public class XMPUtilTest {
                 // PDMetadata.getInputStreamAsString() does not work
 
                 // Convert to UTF8 and make available for metadata.
-                InputStreamReader is = new InputStreamReader(meta
-                        .createInputStream(), "UTF8");
-                return XMPUtilTest.slurp(is).trim(); // Trim to kill padding end-newline.
+                try(InputStreamReader is = new InputStreamReader(meta.createInputStream(), "UTF8")) {
+                    return XMPUtilTest.slurp(is).trim(); // Trim to kill padding end-newline.
+                }
             }
         } finally {
             if (document != null) {
