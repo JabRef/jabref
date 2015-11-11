@@ -13,28 +13,36 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.logic.util.strings;
+package net.sf.jabref.logic.formatter.bibtexfields;
+
+import net.sf.jabref.logic.formatter.Formatter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Class containing method(s) for normalizing author lists to BibTeX format.
+ * Class for normalizing author lists to BibTeX format.
  */
-public class NameListNormalizer {
-
+public class AuthorsFormatter implements Formatter {
     private static final Pattern lastFF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) (\\p{javaUpperCase}+)");
     private static final Pattern lastFdotF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) ([\\. \\p{javaUpperCase}]+)");
     private static final Pattern FFlast = Pattern.compile("(\\p{javaUpperCase}+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
     private static final Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
     private static final Pattern SINGLE_NAME = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
 
+    @Override
+    public String getName() {
+        return "BibTex authors format";
+    }
 
-    public static String normalizeAuthorList(String in) {
+    /**
+     *
+     */
+    public String format(String value) {
         boolean andSep = false;
         // String can contain newlines. Convert each to a space
-        in = in.replaceAll("\n", " ");
-        String[] authors = in.split("( |,)and ", -1);
+        value = value.replaceAll("\n", " ");
+        String[] authors = value.split("( |,)and ", -1);
         if (authors.length > 1) {
             andSep = true;
         } else {
@@ -44,11 +52,11 @@ public class NameListNormalizer {
             If there is a semicolon, we go by that. If not, we assume commas, and count the parts
             separated by commas to determine which it is.
             */
-            String[] authors2 = in.split("; ");
+            String[] authors2 = value.split("; ");
             if (authors2.length > 1) {
                 authors = authors2;
             } else {
-                authors2 = in.split(", ");
+                authors2 = value.split(", ");
                 if (authors2.length > 3) { // Probably more than a single author, so we split by commas.
                     authors = authors2;
                 } else {
@@ -109,7 +117,7 @@ public class NameListNormalizer {
 
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < authors.length; i++) {
-            String norm = NameListNormalizer.normalizeName(authors[i]);
+            String norm = AuthorsFormatter.normalizeName(authors[i]);
             stringBuilder.append(norm);
             if (i < authors.length - 1) {
                 stringBuilder.append(" and ");
@@ -119,7 +127,7 @@ public class NameListNormalizer {
     }
 
     private static String normalizeName(String name) {
-        Matcher matcher = NameListNormalizer.lastFF.matcher(name);
+        Matcher matcher = AuthorsFormatter.lastFF.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(2);
             StringBuilder stringBuilder = new StringBuilder(matcher.group(1));
@@ -133,7 +141,7 @@ public class NameListNormalizer {
             }
             return stringBuilder.toString();
         }
-        matcher = NameListNormalizer.lastFdotF.matcher(name);
+        matcher = AuthorsFormatter.lastFdotF.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(2).replaceAll("[\\. ]+", "");
             StringBuilder stringBuilder = new StringBuilder(matcher.group(1));
@@ -148,7 +156,7 @@ public class NameListNormalizer {
             return stringBuilder.toString();
         }
 
-        matcher = NameListNormalizer.FFlast.matcher(name);
+        matcher = AuthorsFormatter.FFlast.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(1);
             StringBuilder stringBuilder = new StringBuilder(matcher.group(2));
@@ -162,7 +170,7 @@ public class NameListNormalizer {
             }
             return stringBuilder.toString();
         }
-        matcher = NameListNormalizer.FdotFlast.matcher(name);
+        matcher = AuthorsFormatter.FdotFlast.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(1).replaceAll("[\\. ]+", "");
             StringBuilder stringBuilder = new StringBuilder(matcher.group(2));
@@ -204,7 +212,7 @@ public class NameListNormalizer {
                 }
             } else {
                 // Only a single part. Check if it looks like a name or initials:
-                Matcher nameMatcher = NameListNormalizer.SINGLE_NAME.matcher(firstNameParts[0]);
+                Matcher nameMatcher = AuthorsFormatter.SINGLE_NAME.matcher(firstNameParts[0]);
                 if (nameMatcher.matches()) {
                     stringBuilder.append(firstNameParts[0]);
                 } else {
@@ -226,7 +234,7 @@ public class NameListNormalizer {
             String[] parts = name.split(" +");
             boolean allNames = true;
             for (String part : parts) {
-                matcher = NameListNormalizer.SINGLE_NAME.matcher(part);
+                matcher = AuthorsFormatter.SINGLE_NAME.matcher(part);
                 if (!matcher.matches()) {
                     allNames = false;
                     break;
