@@ -50,6 +50,8 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -65,6 +67,8 @@ public class PreferencesDialog extends JDialog {
     private final JPanel main;
 
     private final JabRefFrame frame;
+
+    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
     public PreferencesDialog(JabRefFrame parent, JabRef jabRef) {
         super(parent, Localization.lang("JabRef preferences"), false);
@@ -217,11 +221,10 @@ public class PreferencesDialog extends JDialog {
                     ExportFormats.initAllExports();
                     frame.removeCachedEntryEditors();
                     Globals.prefs.updateEntryEditorTabList();
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(PreferencesDialog.this,
-                            Localization.lang("Could not import preferences")
-                            + ": " + ex.getMessage(), Localization.lang("Import preferences"),
-                            JOptionPane.ERROR_MESSAGE);
+                } catch (JabRefException ex) {
+                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
+                            Localization.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn(ex.getMessage(), ex);
                 }
             }
 
