@@ -39,7 +39,6 @@ import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
@@ -137,8 +136,8 @@ public class FileActions {
                 fw.write(formatted);
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException(
-                        Localization.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + '\n'
-                        + Localization.lang("Before saving, please edit any strings containing the # character."));
+                        "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
+                                + "Before saving, please edit any strings containing the # character.");
             }
 
         } else {
@@ -189,7 +188,7 @@ public class FileActions {
             // saving failed, no matter what the reason was
             // (and they won't just quit JabRef thinking
             // everything worked and loosing data)
-            throw new SaveException(e.getMessage());
+            throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
 
         // Get our data stream. This stream writes only to a temporary file,
@@ -263,7 +262,7 @@ public class FileActions {
             ex.printStackTrace();
             session.cancel();
             // repairAfterError(file, backup, INIT_OK);
-            throw new SaveException(ex.getMessage(), exceptionCause);
+            throw new SaveException(ex.getMessage(), ex.getLocalizedMessage(), exceptionCause);
         }
 
         return session;
@@ -374,7 +373,7 @@ public class FileActions {
         try {
             session = new SaveSession(file, encoding, backup);
         } catch (IOException e) {
-            throw new SaveException(e.getMessage());
+            throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
 
         // Define our data stream.
@@ -436,7 +435,7 @@ public class FileActions {
         } catch (Throwable ex) {
             session.cancel();
             //repairAfterError(file, backup, status);
-            throw new SaveException(ex.getMessage(), be);
+            throw new SaveException(ex.getMessage(), ex.getLocalizedMessage(), be);
         }
 
         return session;
@@ -458,14 +457,14 @@ public class FileActions {
             try {
                 reader = new InputStreamReader(reso.openStream());
             } catch (FileNotFoundException ex) {
-                throw new IOException(Localization.lang("Could not find layout file") + ": '" + name + "'.");
+                throw new IOException("Cannot find layout file: '" + name + "'.");
             }
         } else {
             File f = new File(name);
             try {
                 reader = new FileReader(f);
             } catch (FileNotFoundException ex) {
-                throw new IOException(Localization.lang("Could not find layout file") + ": '" + name + "'.");
+                throw new IOException("Cannot find layout file: '" + name + "'.");
             }
         }
 

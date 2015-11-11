@@ -70,7 +70,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -274,12 +273,12 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
         // Radio buttons
         JRadioButton appRadio = new JRadioButton(Localization.lang("Append"));
-        appRadio.setToolTipText(Localization.lang("append_the_selected_text_to_bibtex_key"));
+        appRadio.setToolTipText(Localization.lang("Append_the_selected_text_to_bibtex_key"));
         appRadio.setMnemonic(KeyEvent.VK_A);
         appRadio.setSelected(true);
 
         overRadio = new JRadioButton(Localization.lang("Override"));
-        overRadio.setToolTipText(Localization.lang("override_the_bibtex_key_by_the_selected_text"));
+        overRadio.setToolTipText(Localization.lang("Override_the_bibtex_key_by_the_selected_text"));
         overRadio.setMnemonic(KeyEvent.VK_O);
         overRadio.setSelected(false);
 
@@ -528,7 +527,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class PasteAction extends BasicAction {
         public PasteAction() {
-            super("Paste", "Paste from clipboard", IconTheme.JabRefIcon.PASTE.getIcon());
+            // @formatter:off
+            super(Localization.lang("Paste"),
+                    Localization.lang("Paste from clipboard"),
+                    IconTheme.JabRefIcon.PASTE.getIcon());
+            // @formatter:on
         }
 
         @Override
@@ -552,7 +555,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class LoadAction extends BasicAction {
         public LoadAction() {
-            super("Open", "Open_file", IconTheme.JabRefIcon.OPEN.getIcon());
+            // @formatter:off
+            super(Localization.lang("Open"),
+                    Localization.lang("Open file"),
+                    IconTheme.JabRefIcon.OPEN.getIcon());
+            // @formatter:on
         }
 
         @Override
@@ -580,7 +587,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class ClearAction extends BasicAction {
         public ClearAction() {
-            super("Clear", "Clear_inputarea", IconTheme.JabRefIcon.NEW.getIcon());
+            // @formatter:off
+            super(Localization.lang("Clear"),
+                    Localization.lang("Clear inputarea"),
+                    IconTheme.JabRefIcon.NEW.getIcon());
+            // @formatter:on
         }
 
         @Override
@@ -591,7 +602,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class MenuHeaderAction extends BasicAction {
         public MenuHeaderAction() {
-            super("Edit");
+            super(Localization.lang("Edit"));
             this.setEnabled(false);
         }
 
@@ -665,11 +676,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
                 this.setForeground(Color.gray);
                 this.setFont(usedFont);
                 this.setIcon(okIcon);
-                this.setToolTipText("filled");
+                this.setToolTipText(Localization.lang("Filled"));
             }
             else {
                 this.setIcon(needIcon);
-                this.setToolTipText("field is missing");
+                this.setToolTipText(Localization.lang("Field is missing"));
             }
             return this;
         }
@@ -711,23 +722,12 @@ class PopupListener extends MouseAdapter {
 
 abstract class BasicAction extends AbstractAction {
     public BasicAction(String text, String description, Icon icon) {
-        super(Localization.lang(text), icon);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
-    }
-
-    public BasicAction(String text, String description, URL icon, KeyStroke key) {
-        super(Localization.lang(text), new ImageIcon(icon));
-        putValue(Action.ACCELERATOR_KEY, key);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
+        super(text, icon);
+        putValue(Action.SHORT_DESCRIPTION, description);
     }
 
     public BasicAction(String text) {
-        super(Localization.lang(text));
-    }
-
-    public BasicAction(String text, KeyStroke key) {
-        super(Localization.lang(text));
-        putValue(Action.ACCELERATOR_KEY, key);
+        super(text);
     }
 
     @Override

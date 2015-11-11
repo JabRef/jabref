@@ -39,12 +39,18 @@ public class UndoableInsertString extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + Localization.lang("insert string ");
+        // @formatter:off
+        return Localization.lang("Undo") + ": " +
+                Localization.lang("insert string ");
+        // @formatter:on
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + Localization.lang("insert string ");
+        // @formatter:off
+        return Localization.lang("Redo") + ": " +
+                Localization.lang("insert string ");
+        // @formatter:on
     }
 
     @Override

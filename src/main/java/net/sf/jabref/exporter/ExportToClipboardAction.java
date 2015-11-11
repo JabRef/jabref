@@ -87,11 +87,12 @@ public class ExportToClipboardAction extends AbstractWorker {
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         int answer = JOptionPane.showOptionDialog(frame, list, Localization.lang("Select format"),
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null,
-                new String[] {Localization.lang("Ok"), Localization.lang("Cancel")},
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                // @formatter:off
+                new String[] {Localization.lang("Ok"),
+                        Localization.lang("Cancel")},
                 Localization.lang("Ok"));
-
+                // @formatter:on
         if (answer == JOptionPane.NO_OPTION) {
             return;
         }

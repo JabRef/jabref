@@ -799,7 +799,10 @@ public class SearchManager extends SidePaneComponent
      * the type of search that will happen on click.
      */
     private void updateSearchButtonText() {
-        search.setText(isSpecificSearch() ? Localization.lang("Search specified field(s)") : Localization.lang("Search all fields"));
+        // @formatter:off
+        search.setText(isSpecificSearch() ? Localization.lang("Search specified field(s)") :
+            Localization.lang("Search all fields"));
+        // @formatter:on
     }
 
     private boolean isSpecificSearch() {

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -33,7 +33,7 @@ class PreambleChange extends Change {
 
 
     public PreambleChange(String tmp, String mem, String disk) {
-        super("Changed preamble");
+        super(Localization.lang("Changed preamble"));
         this.disk = disk;
         this.mem = mem;
 
@@ -41,13 +41,13 @@ class PreambleChange extends Change {
         text.append("<FONT SIZE=3>");
         text.append("<H2>").append(Localization.lang("Changed preamble")).append("</H2>");
 
-        if (disk != null && !disk.isEmpty()) {
+        if ((disk != null) && !disk.isEmpty()) {
             text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
         } else {
             text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
         }
 
-        if (mem != null && !mem.isEmpty()) {
+        if ((mem != null) && !mem.isEmpty()) {
             text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
         }
 

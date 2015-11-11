@@ -23,13 +23,12 @@ import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * Handles versioning of groups, e.g. automatic conversion from previous to
  * current versions, or import of flat groups (JabRef <= 1.6) to tree.
- * 
+ *
  * @author jzieren (10.04.2005)
  */
 public class VersionHandling {
@@ -40,7 +39,7 @@ public class VersionHandling {
     /**
      * Imports old (flat) groups data and converts it to a 2-level tree with an
      * AllEntriesGroup at the root.
-     * 
+     *
      * @return the root of the generated tree.
      */
     public static GroupTreeNode importFlatGroups(Vector<String> groups)
@@ -52,8 +51,8 @@ public class VersionHandling {
         String regexp;
         for (int i = 0; i < number; ++i) {
             field = groups.get(3 * i);
-            name = groups.get(3 * i + 1);
-            regexp = groups.get(3 * i + 2);
+            name = groups.get((3 * i) + 1);
+            regexp = groups.get((3 * i) + 2);
             root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp,
                     false, true, GroupHierarchyType.INDEPENDENT)));
         }
@@ -71,7 +70,9 @@ public class VersionHandling {
         case 3:
             return Version2_3.fromString(orderedData, db, version);
         default:
-            throw new IllegalArgumentException(Localization.lang("Failed to read groups data (unsupported version: %0)", Integer.toString(version)));
+            throw new IllegalArgumentException(
+                    "Failed to read groups data (unsupported version: " +
+                    Integer.toString(version) + ")");
         }
     }
 
@@ -83,7 +84,7 @@ public class VersionHandling {
          * Parses the textual representation obtained from
          * GroupTreeNode.toString() and recreates that node and all of its
          * children from it.
-         * 
+         *
          * @throws Exception
          *             When a group could not be recreated
          */
@@ -126,7 +127,7 @@ public class VersionHandling {
         /**
          * Returns the substring delimited by a pair of matching braces, with
          * the first brace at index 0. Quoted characters are skipped.
-         * 
+         *
          * @return the matching substring, or "" if not found.
          */
         private static String getSubtree(String s) {
@@ -155,7 +156,7 @@ public class VersionHandling {
         /**
          * Returns the index of the first occurence of c, skipping quoted
          * special characters (escape character: '\\').
-         * 
+         *
          * @param s
          *            The String to search in.
          * @param c

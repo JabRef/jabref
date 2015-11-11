@@ -293,9 +293,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Back"), prefs.getKey(KeyBinds.BACK), IconTheme.JabRefIcon.LEFT.getIcon());
     private final AbstractAction delete = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete"),
             Localization.lang("Delete"), prefs.getKey(KeyBinds.DELETE), IconTheme.JabRefIcon.DELETE.getIcon());
-    private final AbstractAction copy = new EditAction(Actions.COPY, IconTheme.JabRefIcon.COPY.getIcon());
-    private final AbstractAction paste = new EditAction(Actions.PASTE, IconTheme.JabRefIcon.PASTE.getIcon());
-    private final AbstractAction cut = new EditAction(Actions.CUT, IconTheme.JabRefIcon.CUT.getIcon());
+    private final AbstractAction copy = new EditAction(Actions.COPY, Localization.lang("Copy"),
+            IconTheme.JabRefIcon.COPY.getIcon());
+    private final AbstractAction paste = new EditAction(Actions.PASTE, Localization.lang("Paste"),
+            IconTheme.JabRefIcon.PASTE.getIcon());
+    private final AbstractAction cut = new EditAction(Actions.CUT, Localization.lang("Cut"),
+            IconTheme.JabRefIcon.CUT.getIcon());
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
             Localization.lang("Mark entries"), prefs.getKey(KeyBinds.MARK_ENTRIES), IconTheme.JabRefIcon.MARK_ENTRIES.getIcon());
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES,
@@ -370,8 +373,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.TOGGLE_GROUPS_INTERFACE),
             IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon());
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group"));
-    private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang(
-            "Remove from group"));
+    private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
+            Localization.lang("Remove from group"));
     private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group"));
 
 
@@ -493,9 +496,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
 
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
-            FindUnlinkedFilesDialog.ACTION_COMMAND,
-            Localization.menuTitle(FindUnlinkedFilesDialog.ACTION_MENU_TITLE),
-            Localization.lang(FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION),
+FindUnlinkedFilesDialog.ACTION_COMMAND,
+            FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
             prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION)
     );
 
@@ -699,7 +701,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (bp.getFile() != null) {
             setTitle(GUIGlobals.frameTitle + " - " + bp.getFile().getPath() + star);
         } else {
-            setTitle(GUIGlobals.frameTitle + " - " + Localization.lang("untitled") + star);
+            setTitle(GUIGlobals.frameTitle + " - " + GUIGlobals.untitledTitle + star);
         }
     }
 
@@ -1176,17 +1178,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void fillMenu() {
         //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         mb.setBorder(null);
-        JMenu file = JabRefFrame.subMenu("File");
-        JMenu sessions = JabRefFrame.subMenu("Sessions");
-        JMenu edit = JabRefFrame.subMenu("Edit");
-        JMenu search = JabRefFrame.subMenu("Search");
-        JMenu groups = JabRefFrame.subMenu("Groups");
-        JMenu bibtex = JabRefFrame.subMenu("BibTeX");
-        JMenu view = JabRefFrame.subMenu("View");
-        JMenu tools = JabRefFrame.subMenu("Tools");
-        JMenu options = JabRefFrame.subMenu("Options");
-        JMenu newSpec = JabRefFrame.subMenu("New entry...");
-        JMenu helpMenu = JabRefFrame.subMenu("Help");
+        JMenu file = JabRefFrame.subMenu(Localization.menuTitle("File"));
+        JMenu sessions = JabRefFrame.subMenu(Localization.menuTitle("Sessions"));
+        JMenu edit = JabRefFrame.subMenu(Localization.menuTitle("Edit"));
+        JMenu search = JabRefFrame.subMenu(Localization.menuTitle("Search"));
+        JMenu groups = JabRefFrame.subMenu(Localization.menuTitle("Groups"));
+        JMenu bibtex = JabRefFrame.subMenu(Localization.menuTitle("BibTeX"));
+        JMenu view = JabRefFrame.subMenu(Localization.menuTitle("View"));
+        JMenu tools = JabRefFrame.subMenu(Localization.menuTitle("Tools"));
+        JMenu options = JabRefFrame.subMenu(Localization.menuTitle("Options"));
+        JMenu newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry..."));
+        JMenu helpMenu = JabRefFrame.subMenu(Localization.menuTitle("Help"));
 
         file.add(newDatabaseAction);
         file.add(open); //opendatabaseaction
@@ -1238,7 +1240,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         edit.addSeparator();
         edit.add(mark);
-        JMenu markSpecific = JabRefFrame.subMenu("Mark specific color");
+        JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(this, i).getMenuItem());
         }
@@ -1394,7 +1396,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     public static JMenu subMenu(String name) {
-        name = Localization.menuTitle(name);
         int i = name.indexOf('&');
         JMenu res;
         if (i >= 0) {
@@ -1658,7 +1659,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
         String title;
         if (file == null) {
-            title = Localization.lang(GUIGlobals.untitledTitle);
+            title = GUIGlobals.untitledTitle;
             if (!bp.database().getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
@@ -2110,7 +2111,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
 
         public ChangeTabAction(boolean next) {
-            putValue(Action.NAME, next ? Localization.menuTitle("Next tab") : Localization.menuTitle("Previous tab"));
+            // @formatter:off
+            putValue(Action.NAME, next ? Localization.menuTitle("Next tab") :
+                Localization.menuTitle("Previous tab"));
+            // @formatter:on
             this.next = next;
             putValue(Action.ACCELERATOR_KEY,
                     next ? prefs.getKey(KeyBinds.NEXT_TAB) : prefs.getKey(KeyBinds.PREVIOUS_TAB));
@@ -2138,13 +2142,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     class EditAction extends MnemonicAwareAction {
         private final String command;
 
-        public EditAction(String command, Icon icon) {
+
+        public EditAction(String command, String name, Icon icon) {
             super(icon);
             this.command = command;
             String nName = StringUtil.capitalizeFirst(command);
             putValue(Action.NAME, nName);
             putValue(Action.ACCELERATOR_KEY, prefs.getKey(nName));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(nName));
+            putValue(Action.SHORT_DESCRIPTION, name);
             //putValue(ACCELERATOR_KEY,
             //         (next?prefs.getKey(KeyBinds.NEXT_TAB):prefs.getKey(KeyBinds.PREVIOUS_TAB)));
         }

@@ -374,9 +374,8 @@ public class CleanUpAction extends AbstractWorker {
             return;
         }
         if (unsuccessfulRenames > 0) { //Rename failed for at least one entry
-            JOptionPane.showMessageDialog(frame, Localization.lang("File rename failed for") + " "
-                    + unsuccessfulRenames
-                    + " " + Localization.lang("entries") + ".",
+            JOptionPane.showMessageDialog(frame,
+                    Localization.lang("File rename failed for %0 entries.", Integer.toString(unsuccessfulRenames)),
                     Localization.lang("Autogenerate PDF Names"), JOptionPane.INFORMATION_MESSAGE);
         }
         if (modifiedEntriesCount > 0) {

@@ -16,7 +16,7 @@ import java.awt.event.ActionEvent;
  */
 public class NewSubDatabaseAction extends MnemonicAwareAction {
 
-    private JabRefFrame jabRefFrame;
+    private final JabRefFrame jabRefFrame;
 
     public NewSubDatabaseAction(JabRefFrame jabRefFrame) {
         super(IconTheme.JabRefIcon.NEW.getIcon());
@@ -39,7 +39,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
                     dialog.getGenerateDB(), // database
                     null, // file
                     new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)); // meta data
-            jabRefFrame.tabbedPane.add(Localization.lang(GUIGlobals.untitledTitle), bp);
+            jabRefFrame.tabbedPane.add(GUIGlobals.untitledTitle, bp);
             jabRefFrame.tabbedPane.setSelectedComponent(bp);
             jabRefFrame.output(Localization.lang("New database created."));
         }

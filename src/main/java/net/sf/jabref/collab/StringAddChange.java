@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -32,22 +32,22 @@ import net.sf.jabref.gui.undo.UndoableInsertString;
 
 class StringAddChange extends Change {
 
-    private static final long serialVersionUID = 1L;
-
     private final BibtexString string;
 
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
-    
+
     private static final Log LOGGER = LogFactory.getLog(StringAddChange.class);
 
 
     public StringAddChange(BibtexString string) {
-        name = Localization.lang("Added string") + ": '" + string.getName() + '\'';
+        super(Localization.lang("Added string") + ": '" + string.getName() + '\'');
         this.string = string;
-
-        tp.setText("<HTML><H2>" + Localization.lang("Added string") + "</H2><H3>" + Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
-
+        // @formatter:off
+        tp.setText("<HTML><H2>" + Localization.lang("Added string") + "</H2><H3>" +
+                Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" +
+                Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
+        // @formatter:on
     }
 
     @Override

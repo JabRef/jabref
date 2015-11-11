@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -32,25 +32,28 @@ class StringRemoveChange extends Change {
 
 
     private static final long serialVersionUID = 1L;
-    
+
     private final BibtexString string;
     private final BibtexString inMem;
 
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
     private final BibtexString tmpString;
-    
+
     private static final Log LOGGER = LogFactory.getLog(StringRemoveChange.class);
 
 
     public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {
+        super(Localization.lang("Removed string") + ": '" + string.getName() + '\'');
         this.tmpString = tmpString;
-        name = Localization.lang("Removed string") + ": '" + string.getName() + '\'';
         this.string = string;
         this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
 
-        tp.setText("<HTML><H2>" + Localization.lang("Removed string") + "</H2><H3>" + Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
-
+        // @formatter:off
+        tp.setText("<HTML><H2>" + Localization.lang("Removed string") + "</H2><H3>" +
+                Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" +
+                Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
+        // @formatter:on
     }
 
     @Override

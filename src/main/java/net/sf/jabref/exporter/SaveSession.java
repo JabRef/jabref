@@ -69,11 +69,11 @@ public class SaveSession {
         useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
         this.backup = backup;
         this.encoding = encoding;
-	/* Using 
+	/* Using
 	   try (FileOutputStream fos = new FileOutputStream(tmp)) {
 	       writer = new VerifyingWriter(fos, encoding);
 	   }
-	   doesn't work since fos is closed after assigning write, 
+	   doesn't work since fos is closed after assigning write,
 	   leading to that fos may never be closed at all
 	 */
         writer = new VerifyingWriter(new FileOutputStream(tmp), encoding);
@@ -104,7 +104,6 @@ public class SaveSession {
             } catch (IOException ex) {
                 ex.printStackTrace();
                 throw SaveException.BACKUP_CREATION;
-                //throw new SaveException(Globals.lang("Save failed during backup creation")+": "+ex.getMessage());
             }
         }
         try {
@@ -128,8 +127,8 @@ public class SaveSession {
             // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that
             // repeating the action will have a different result.
             // On the other hand, our temporary file should still be clean, and won't be deleted.
-            throw new SaveException(
-                    Localization.lang("Save failed while committing changes") + ": " + ex2.getMessage());
+            throw new SaveException("Save failed while committing changes: " + ex2.getMessage(),
+                    Localization.lang("Save failed while committing changes: %0", ex2.getMessage()));
         } finally {
             if (useLockFile) {
                 deleteLockFile();

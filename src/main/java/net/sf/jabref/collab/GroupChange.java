@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -31,10 +31,12 @@ class GroupChange extends Change {
     private final GroupTreeNode changedGroups;
     private final GroupTreeNode tmpGroupRoot;
 
+
     public GroupChange(GroupTreeNode changedGroups, GroupTreeNode tmpGroupRoot) {
-        super(changedGroups != null ?
-                "Modified groups tree"
-                : "Removed all groups"); // JZTODO lyrics
+        // @formatter:off
+        super(changedGroups != null ? Localization.lang("Modified groups tree") :
+            Localization.lang("Removed all groups")); // JZTODO lyrics
+        // @formatter:on
         this.changedGroups = changedGroups;
         this.tmpGroupRoot = tmpGroupRoot;
     }
@@ -79,9 +81,10 @@ class GroupChange extends Change {
 
     @Override
     JComponent description() {
-        return new JLabel("<html>" + name + '.' + (changedGroups != null ? ' '
-                + "Accepting the change replaces the complete " +
-                "groups tree with the externally modified groups tree." : "")
+        return new JLabel("<html>" + toString() + '.' + (changedGroups != null ? ' ' +
+                // @formatter:off
+                Localization.lang("Accepting the change replaces the complete groups tree with the externally modified groups tree.") : "")
+                // @formatter:on
                 + "</html>");
         // JZTODO lyrics
     }

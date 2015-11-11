@@ -36,7 +36,7 @@ public class CaseChangeMenu extends JMenu {
 
         // create menu items, one for each case changer
         for (final Formatter caseChanger : CaseChangers.ALL) {
-            JMenuItem menuItem = new JMenuItem(Localization.lang(caseChanger.getName()));
+            JMenuItem menuItem = new JMenuItem(caseChanger.getName());
             menuItem.addActionListener(new ActionListener() {
 
                 @Override

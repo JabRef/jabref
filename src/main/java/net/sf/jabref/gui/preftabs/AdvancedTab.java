@@ -28,9 +28,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.help.HelpAction;
@@ -75,12 +72,9 @@ class AdvancedTab extends JPanel implements PrefsTab {
         useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
         biblatexMode = new JCheckBox(Localization.lang("BibLaTeX mode"));
         remoteServerPort = new JTextField();
-        String[] possibleLookAndFeels = {
-                UIManager.getSystemLookAndFeelClassName(),
-                UIManager.getCrossPlatformLookAndFeelClassName(),
-                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
-                "com.jgoodies.looks.windows.WindowsLookAndFeel"
-        };
+        String[] possibleLookAndFeels = {UIManager.getSystemLookAndFeelClassName(),
+                UIManager.getCrossPlatformLookAndFeelClassName(), "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
+                "com.jgoodies.looks.windows.WindowsLookAndFeel"};
         // Only list L&F which are available
         List<String> lookAndFeels = new ArrayList<>();
         for (String lf : possibleLookAndFeels) {
@@ -108,7 +102,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         if (!OS.OS_X) {
             builder.appendSeparator(Localization.lang("Look and feel"));
-            JLabel lab = new JLabel(Localization.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
+            JLabel lab = new JLabel(
+                    Localization.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
             builder.nextLine();
             builder.append(pan);
             builder.append(lab);
@@ -124,21 +119,25 @@ class AdvancedTab extends JPanel implements PrefsTab {
             builder.append(pan2);
             builder.nextLine();
             builder.append(pan);
-            lab = new JLabel(Localization.lang("Note that you must specify the fully qualified class name for the look and feel,"));
+            lab = new JLabel(Localization
+                    .lang("Note that you must specify the fully qualified class name for the look and feel,"));
             builder.append(lab);
             builder.nextLine();
             builder.append(pan);
-            lab = new JLabel(Localization.lang("and the class must be available in your classpath next time you start JabRef."));
+            lab = new JLabel(
+                    Localization.lang("and the class must be available in your classpath next time you start JabRef."));
             builder.append(lab);
             builder.nextLine();
         }
         builder.appendSeparator(Localization.lang("Remote operation"));
         builder.nextLine();
         builder.append(new JPanel());
-        builder.append(new JLabel("<html>" + Localization.lang("This feature lets new files be opened or imported into an "
-                + "already running instance of JabRef<BR>instead of opening a new instance. For instance, this "
-                + "is useful when you open a file in JabRef<br>from your web browser."
-                + "<BR>Note that this will prevent you from running more than one instance of JabRef at a time.") + "</html>"));
+        builder.append(new JLabel("<html>"
+                + Localization.lang("This feature lets new files be opened or imported into an "
+                        + "already running instance of JabRef<BR>instead of opening a new instance. For instance, this "
+                        + "is useful when you open a file in JabRef<br>from your web browser."
+                        + "<BR>Note that this will prevent you from running more than one instance of JabRef at a time.")
+                + "</html>"));
         builder.nextLine();
         builder.append(new JPanel());
 
@@ -202,7 +201,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         preferences.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !useDefault.isSelected());
         preferences.put(JabRefPreferences.WIN_LOOK_AND_FEEL, className.getSelectedItem().toString());
 
-        if(preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
+        if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
             preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
             Abbreviations.initializeJournalNames(preferences);
         }
@@ -210,21 +209,17 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         preferences.putBoolean(JabRefPreferences.BIBLATEX_MODE, biblatexMode.isSelected());
 
-        if ((useDefault.isSelected() == oldUseDef) ||
-                !oldLnf.equals(className.getSelectedItem().toString())) {
+        if ((useDefault.isSelected() == oldUseDef) || !oldLnf.equals(className.getSelectedItem().toString())) {
             JOptionPane.showMessageDialog(null,
-                    Localization.lang("You have changed the look and feel setting.")
-                    .concat(" ")
-                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                    Localization.lang("Changed look and feel settings"),
-                    JOptionPane.WARNING_MESSAGE);
+                    Localization.lang("You have changed the look and feel setting.").concat(" ")
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                    Localization.lang("Changed look and feel settings"), JOptionPane.WARNING_MESSAGE);
         }
 
         if (biblatexMode.isSelected() != oldBiblMode) {
             JOptionPane.showMessageDialog(null,
-                    Localization.lang("You have toggled the BibLaTeX mode.")
-                    .concat(" ")
-                    .concat("You must restart JabRef for this change to come into effect."),
+                    Localization.lang("You have toggled the BibLaTeX mode.").concat(" ")
+                            .concat("You must restart JabRef for this change to come into effect."),
                     Localization.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
 
@@ -235,15 +230,14 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
     public void storeRemoteSettings() {
         Optional<Integer> newPort = getPortAsInt();
-        if(newPort.isPresent()) {
+        if (newPort.isPresent()) {
             if (remotePreferences.isDifferentPort(newPort.get())) {
                 remotePreferences.setPort(newPort.get());
 
-                if(remotePreferences.useRemoteServer()) {
+                if (remotePreferences.useRemoteServer()) {
                     JOptionPane.showMessageDialog(null,
-                            Localization.lang("Remote server port")
-                            .concat(" ")
-                            .concat("You must restart JabRef for this change to come into effect."),
+                            Localization.lang("Remote server port").concat(" ")
+                                    .concat("You must restart JabRef for this change to come into effect."),
                             Localization.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
                 }
             }
@@ -276,10 +270,12 @@ class AdvancedTab extends JPanel implements PrefsTab {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog
-            (null, Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
-                    Localization.lang("Remote server port") + '\'', Localization.lang("Remote server port"),
-                    JOptionPane.ERROR_MESSAGE);
+            // @formatter:off
+            JOptionPane.showMessageDialog(null,
+                    Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for")
+                            + " '" + Localization.lang("Remote server port") + '\'',
+                    Localization.lang("Remote server port"), JOptionPane.ERROR_MESSAGE);
+            // @formatter:on
             return false;
         }
 

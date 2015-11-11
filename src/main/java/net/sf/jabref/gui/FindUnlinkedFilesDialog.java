@@ -107,10 +107,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * Keys to be used for referencing this Action.
      */
     public static final String ACTION_COMMAND = "findUnlinkedFiles";
-    public static final String ACTION_MENU_TITLE = "Find unlinked files...";
+    public static final String ACTION_MENU_TITLE = Localization.menuTitle("Find unlinked files...");
     public static final String ACTION_ICON = "toggleSearch";
     public static final String ACTION_KEYBINDING_ACTION = "Find unlinked files";
-    public static final String ACTION_SHORT_DESCRIPTION = "Searches for unlinked PDF files on the file system";
+    // @formatter:off
+    public static final String ACTION_SHORT_DESCRIPTION = Localization.lang("Searches for unlinked PDF files on the file system");
+    // @formatter:on
 
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";

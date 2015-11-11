@@ -245,7 +245,7 @@ public class BibtexDatabase {
     public synchronized void addString(BibtexString string)
             throws KeyCollisionException {
         if (hasStringLabel(string.getName())) {
-            throw new KeyCollisionException(Localization.lang("A string with this label already exists"));
+            throw new KeyCollisionException("A string with this label already exists");
         }
 
         if (bibtexStrings.containsKey(string.getId())) {

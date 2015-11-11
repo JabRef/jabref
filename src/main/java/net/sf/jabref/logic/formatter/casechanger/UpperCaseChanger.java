@@ -1,12 +1,13 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class UpperCaseChanger implements Formatter {
 
     @Override
     public String getName() {
-        return "UPPER";
+        return Localization.lang("UPPER");
     }
 
     /**

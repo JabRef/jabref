@@ -81,7 +81,10 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"), Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+            // @formatter:off
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"),
+                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+            // @formatter:on
             return;
         }
 
@@ -180,16 +183,14 @@ public class DownloadExternalFile {
                 File f = directory != null ? expandFilename(directory, entry.getLink())
                         : new File(entry.getLink());
                 if (f.isDirectory()) {
-                    JOptionPane.showMessageDialog(frame,
-                            Localization.lang("Target file cannot be a directory."), Localization.lang("Download file"),
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
+                            Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
                 if (f.exists()) {
-                    return JOptionPane.showConfirmDialog
-                            (frame, "'" + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
-                                    Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
-                    == JOptionPane.OK_OPTION;
+                    return JOptionPane.showConfirmDialog(frame,
+                            Localization.lang("'%0' exists. Overwrite file?", f.getName()),
+                            Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
                 } else {
                     return true;
                 }

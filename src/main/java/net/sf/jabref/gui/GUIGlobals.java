@@ -48,8 +48,8 @@ public class GUIGlobals {
 
     // Frame titles.
     public static final String frameTitle = "JabRef";
-    public static final String stringsTitle = "Strings for database";
-    public static final String untitledTitle = "untitled";
+    public static final String stringsTitle = Localization.lang("Strings for database");
+    public static final String untitledTitle = Localization.lang("untitled");
     public static final String NUMBER_COL = "#";
 
     public static Font CURRENTFONT;
@@ -227,7 +227,10 @@ public class GUIGlobals {
         GUIGlobals.tableIcons.put("eprint", label);
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
-        label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
+        // @formatter:off
+        label.setToolTipText(Localization.lang("Open") + " DOI " +
+                Localization.lang("web link"));
+        // @formatter:on
         GUIGlobals.tableIcons.put("doi", label);
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());

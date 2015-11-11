@@ -170,7 +170,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             status.showMessage(Localization.lang("Connection to ACM Portal failed"),
                     Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang(e.getMessage()),
+            status.showMessage(e.getMessage(),
                     Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
@@ -403,7 +403,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind < 0) {
-            throw new IOException(Localization.lang("Could not parse number of hits"));
+            throw new IOException("Cannot parse number of hits");
         }
         String substring = page.substring(ind, Math.min(ind + 42, page.length()));
         Matcher m = pattern.matcher(substring);
@@ -419,12 +419,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 //System.out.println(number);
                 return Integer.parseInt(number);
             } catch (NumberFormatException ex) {
-                throw new IOException(Localization.lang("Could not parse number of hits"));
+                throw new IOException("Cannot parse number of hits");
             } catch (IllegalStateException e) {
-                throw new IOException(Localization.lang("Could not parse number of hits"));
+                throw new IOException("Cannot parse number of hits");
             }
         }
-        throw new IOException(Localization.lang("Could not parse number of hits"));
+        throw new IOException("Cannot parse number of hits");
     }
 
     @Override
