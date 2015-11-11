@@ -99,7 +99,7 @@ public class JournalAbbreviationRepository {
             Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
             abbreviations.remove(previous);
             // TODO logging strategy required
-            System.out.println(Globals.lang("Duplicate Journal Abbreviation - old one will be overwritten by new one\nOLD: %0\nNEW: %1", previous.toString(), abbreviation.toString()));
+            // System.out.println(Globals.lang("Duplicate Journal Abbreviation - old one will be overwritten by new one\nOLD: %0\nNEW: %1", previous.toString(), abbreviation.toString()));
         }
 
         abbreviations.add(abbreviation);
