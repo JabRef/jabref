@@ -30,8 +30,6 @@ Modified for use in JabRef
 package net.sf.jabref.model.database;
 
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.bibtex.EntrySorter;
-import net.sf.jabref.logic.l10n.Localization;
 
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
