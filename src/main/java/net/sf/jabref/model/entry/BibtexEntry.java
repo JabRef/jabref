@@ -79,10 +79,6 @@ public class BibtexEntry {
         return type.getRequiredFields();
     }
 
-    public String[] getUserDefinedFields() {
-        return Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
-    }
-
     /**
      * Returns an set containing the names of all fields that are
      * set for this particular entry.

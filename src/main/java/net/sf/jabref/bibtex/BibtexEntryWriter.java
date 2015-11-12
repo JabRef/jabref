@@ -259,7 +259,7 @@ public class BibtexEntryWriter {
         boolean hasWritten = false;
 
         // Write user defined fields first.
-        String[] fields = entry.getUserDefinedFields();
+        String[] fields = Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
         if (fields != null) {
             //do not sort, write as it is.
             for (String value : fields) {
