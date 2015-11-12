@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,13 +15,23 @@
 */
 package net.sf.jabref;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+import java.util.Vector;
 
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.migrations.VersionHandling;
 import net.sf.jabref.labelPattern.LabelPattern;
-
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.util.StringUtil;
 
@@ -263,7 +273,6 @@ public class MetaData implements Iterable<String> {
                 sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
             }
             sb.append("}");
-            wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
 
@@ -290,7 +299,6 @@ public class MetaData implements Iterable<String> {
             while (tok.hasMoreTokens()) {
                 StringBuffer s =
                         new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
-                wrapStringBuffer(s, Globals.METADATA_LINE_LENGTH);
                 sb.append(s);
                 sb.append(Globals.NEWLINE);
             }
@@ -298,12 +306,6 @@ public class MetaData implements Iterable<String> {
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
             out.write(sb.toString());
-        }
-    }
-
-    private void wrapStringBuffer(StringBuffer sb, int lineLength) {
-        for (int i = lineLength; i < sb.length(); i += lineLength + Globals.NEWLINE_LENGTH) {
-            sb.insert(i, Globals.NEWLINE);
         }
     }
 
