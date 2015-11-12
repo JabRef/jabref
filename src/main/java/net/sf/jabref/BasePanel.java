@@ -2230,6 +2230,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             autoCompleters = new ContentAutoCompleters(getDatabase(), metaData);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
+        } else {
+            // create empty ContentAutoCompleters() if autoCompletion is deactivated
+            autoCompleters = new ContentAutoCompleters();
         }
 
         splitPane.revalidate();
