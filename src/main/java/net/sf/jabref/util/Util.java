@@ -46,7 +46,7 @@ import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.*;
-import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.logic.util.date.YearUtil;
 import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;

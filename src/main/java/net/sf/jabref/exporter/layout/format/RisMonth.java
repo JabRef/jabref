@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.exporter.layout.format;
 
-import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 public class RisMonth implements LayoutFormatter {
