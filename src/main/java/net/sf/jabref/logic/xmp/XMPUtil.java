@@ -29,7 +29,8 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.jempbox.impl.DateConverter;
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -694,7 +695,7 @@ public class XMPUtil {
                  *
                  * Bibtex-Fields used: year, month
                  */
-                String publicationDate = Util.getPublicationDate(entry);
+                String publicationDate = entry.getPublicationDate();
                 if (publicationDate != null) {
                     dcSchema.addSequenceValue("dc:date", publicationDate);
                 }

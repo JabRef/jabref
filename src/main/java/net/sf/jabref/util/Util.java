@@ -45,8 +45,6 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.logic.util.date.YearUtil;
 import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -107,32 +105,6 @@ public class Util {
      */
     public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
         diag.setLocationRelativeTo(win);
-    }
-
-    /**
-     * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
-     *
-     * @param entry
-     * @return will return the publication date of the entry or null if no year was found.
-     */
-    // TODO: Should be instance method of BibTexEntry
-    public static String getPublicationDate(BibtexEntry entry) {
-
-        Object o = entry.getField("year");
-        if (o == null) {
-            return null;
-        }
-
-        String year = YearUtil.toFourDigitYear(o.toString());
-
-        o = entry.getField("month");
-        if (o != null) {
-            MonthUtil.Month month = MonthUtil.getMonth(o.toString());
-            if (month.isValid()) {
-                return year + "-" + month.twoDigitNumber;
-            }
-        }
-        return year;
     }
 
     /**

@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import net.sf.jabref.logic.util.date.YearUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -435,5 +436,30 @@ public class BibtexEntry {
             return text;
         }
         return text.substring(0, maxCharacters + 1) + "...";
+    }
+
+    /**
+     * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
+     *
+     * @param entry
+     * @return will return the publication date of the entry or null if no year was found.
+     */
+    public String getPublicationDate() {
+
+        Object o = getField("year");
+        if (o == null) {
+            return null;
+        }
+
+        String year = YearUtil.toFourDigitYear(o.toString());
+
+        o = getField("month");
+        if (o != null) {
+            MonthUtil.Month month = MonthUtil.getMonth(o.toString());
+            if (month.isValid()) {
+                return year + "-" + month.twoDigitNumber;
+            }
+        }
+        return year;
     }
 }

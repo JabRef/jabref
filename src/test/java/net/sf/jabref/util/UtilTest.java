@@ -27,28 +27,6 @@ public class UtilTest {
         Assert.assertEquals("Aa", Util.capitalizeFirst("AA"));
     }
 
-    @Test
-    public void testGetPublicationDate() {
-
-        Assert.assertEquals("2003-02", net.sf.jabref.util.Util.getPublicationDate(BibtexParser
-                .singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }")));
-
-        Assert.assertEquals("2003-03", net.sf.jabref.util.Util.getPublicationDate(BibtexParser
-                .singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")));
-
-        Assert.assertEquals("2003", net.sf.jabref.util.Util.getPublicationDate(BibtexParser
-                .singleFromString("@ARTICLE{HipKro03, year = {2003}}")));
-
-        Assert.assertEquals(null, net.sf.jabref.util.Util.getPublicationDate(BibtexParser
-                .singleFromString("@ARTICLE{HipKro03, month = 3 }")));
-
-        Assert.assertEquals(null, net.sf.jabref.util.Util.getPublicationDate(BibtexParser
-                .singleFromString("@ARTICLE{HipKro03, author={bla}}")));
-
-        Assert.assertEquals("2003-12", net.sf.jabref.util.Util.getPublicationDate(BibtexParser
-                .singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }")));
-
-    }
 
     @Test
     public void testShaveString() {
