@@ -4,6 +4,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.EntryTypes;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,7 +59,7 @@ public class NewEntryAction extends MnemonicAwareAction {
 
         if (jabRefFrame.tabbedPane.getTabCount() > 0) {
             ((BasePanel) jabRefFrame.tabbedPane.getSelectedComponent())
-                    .newEntry(BibtexEntryType.getType(thisType));
+                    .newEntry(EntryTypes.getType(thisType));
         } else {
             LOGGER.info("Action 'New entry' must be disabled when no " + "database is open.");
         }

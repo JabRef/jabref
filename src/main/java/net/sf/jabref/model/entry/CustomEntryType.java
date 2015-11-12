@@ -15,14 +15,11 @@
 */
 package net.sf.jabref.model.entry;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 
@@ -63,7 +60,7 @@ public class CustomEntryType extends BibtexEntryType {
         this(name, required, optional, new String[0]);
     }
 
-    private CustomEntryType(String name, String required, String optional) {
+    public CustomEntryType(String name, String required, String optional) {
         this.name = StringUtil.capitalizeFirst(name);
         if (required.isEmpty()) {
             this.required = new String[0];
@@ -219,44 +216,4 @@ public class CustomEntryType extends BibtexEntryType {
         return sb.toString();
     }
 
-    public void save(Writer out) throws IOException {
-        out.write("@comment{");
-        out.write(ENTRYTYPE_FLAG);
-        out.write(getName());
-        out.write(": req[");
-        out.write(getRequiredFieldsString());
-        out.write("] opt[");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < optional.length; i++) {
-            sb.append(optional[i]);
-            if (i < (optional.length - 1)) {
-                sb.append(';');
-            }
-        }
-        out.write(sb.toString());
-        out.write("]}" + Globals.NEWLINE);
-    }
-
-    public static CustomEntryType parseEntryType(String comment) {
-        try {
-            String rest;
-            rest = comment.substring(ENTRYTYPE_FLAG.length());
-            int nPos = rest.indexOf(':');
-            String name = rest.substring(0, nPos);
-            rest = rest.substring(nPos + 2);
-
-            int rPos = rest.indexOf(']');
-            if (rPos < 4) {
-                throw new IndexOutOfBoundsException();
-            }
-            String reqFields = rest.substring(4, rPos);
-            int oPos = rest.indexOf(']', rPos + 1);
-            String optFields = rest.substring(rPos + 6, oPos);
-            return new CustomEntryType(name, reqFields, optFields);
-        } catch (IndexOutOfBoundsException ex) {
-            LOGGER.info("Ill-formed entrytype comment in BibTeX file.", ex);
-            return null;
-        }
-
-    }
 }

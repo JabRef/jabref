@@ -27,6 +27,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,10 +42,6 @@ import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.CustomEntryType;
 
 public class FileActions {
 
@@ -220,7 +218,7 @@ public class FileActions {
                 // types (*not* customized standard types) must be written.
                 BibtexEntryType tp = be.getType();
 
-                if (BibtexEntryType.getStandardType(tp.getName()) == null) {
+                if (EntryTypes.getStandardType(tp.getName()) == null) {
                     types.put(tp.getName(), tp);
                 }
 
@@ -252,7 +250,7 @@ public class FileActions {
                     BibtexEntryType type = stringBibtexEntryTypeEntry.getValue();
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
-                        tp.save(fw);
+                        CustomEntryTypesManager.save(tp, fw);
                         fw.write(Globals.NEWLINE);
                     }
                 }
@@ -410,7 +408,7 @@ public class FileActions {
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
                 BibtexEntryType tp = be.getType();
-                if (BibtexEntryType.getStandardType(tp.getName()) == null) {
+                if (EntryTypes.getStandardType(tp.getName()) == null) {
                     types.put(tp.getName(), tp);
                 }
 
@@ -427,7 +425,7 @@ public class FileActions {
             if (!types.isEmpty()) {
                 for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
                     CustomEntryType tp = (CustomEntryType) stringBibtexEntryTypeEntry.getValue();
-                    tp.save(fw);
+                    CustomEntryTypesManager.save(tp, fw);
                     fw.write(Globals.NEWLINE);
                 }
 

@@ -17,6 +17,7 @@ package net.sf.jabref.importer.fileformat;
 
 import java.util.ArrayList;
 
+import net.sf.jabref.model.entry.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
@@ -97,7 +98,7 @@ class BibTeXMLHandler extends DefaultHandler {
                 raw.equals("bibtex:unpublished") ||
                 raw.equals("bibtex:misc") ||
                 raw.equals("bibtex:other")) {
-            BibtexEntryType tp = BibtexEntryType.getType(local);
+            BibtexEntryType tp = EntryTypes.getType(local);
             b.setType(tp);
         }
         currentChars = "";

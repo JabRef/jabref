@@ -25,12 +25,9 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 
-import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
-import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.util.Util;
 import org.apache.jempbox.impl.DateConverter;
 import org.apache.jempbox.impl.XMLUtil;
@@ -231,8 +228,7 @@ public class XMPUtil {
                 String value = dict.getString(key);
                 key = key.substring("bibtex/".length());
                 if (key.equals("entrytype")) {
-                    BibtexEntryType type = BibtexEntryType
-                            .getStandardType(value);
+                    BibtexEntryType type = EntryTypes.getStandardType(value);
                     if (type != null) {
                         entry.setType(type);
                     }
@@ -432,7 +428,7 @@ public class XMPUtil {
         if ((l != null) && !l.isEmpty()) {
             s = l.get(0);
             if (s != null) {
-                BibtexEntryType type = BibtexEntryType.getStandardType(s);
+                BibtexEntryType type = EntryTypes.getStandardType(s);
                 if (type != null) {
                     entry.setType(type);
                 }

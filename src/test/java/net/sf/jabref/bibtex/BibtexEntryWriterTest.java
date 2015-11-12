@@ -6,7 +6,7 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.EntryTypes;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -41,7 +41,7 @@ public class BibtexEntryWriterTest {
     public void testSerialization() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibtexEntry entry = new BibtexEntry("1234", BibtexEntryType.getType("Article"));
+        BibtexEntry entry = new BibtexEntry("1234", EntryTypes.getType("Article"));
         //set a required field
         entry.setField("author", "Foo Bar");
         entry.setField("journal", "International Journal of Something");

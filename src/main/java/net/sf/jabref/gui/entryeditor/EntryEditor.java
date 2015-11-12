@@ -67,6 +67,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.EntryConverter;
+import net.sf.jabref.model.entry.EntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -1022,8 +1023,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JPopupMenu typeMenu = new JPopupMenu();
-                    for (String s : BibtexEntryType.getAllTypes()) {
-                        typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
+                    for (String s : EntryTypes.getAllTypes()) {
+                        typeMenu.add(new ChangeTypeAction(EntryTypes.getType(s), panel));
                     }
 
                     typeMenu.show(ths, 0, 0);
@@ -1063,8 +1064,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 private void handleTypeChange() {
                     JPopupMenu typeMenu = new JPopupMenu();
-                    for (String s : BibtexEntryType.getAllTypes()) {
-                        typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
+                    for (String s : EntryTypes.getAllTypes()) {
+                        typeMenu.add(new ChangeTypeAction(EntryTypes.getType(s), panel));
                     }
                     typeMenu.show(ths, 0, 0);
                 }

@@ -56,13 +56,14 @@ import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.EntryTypes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -840,7 +841,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         fileHistory.storeHistory();
         prefs.customExports.store();
         prefs.customImports.store();
-        BibtexEntryType.saveCustomEntryTypes(prefs);
+        CustomEntryTypesManager.saveCustomEntryTypes(prefs);
 
         // Clear autosave files:
         if (Globals.autoSaveManager != null) {

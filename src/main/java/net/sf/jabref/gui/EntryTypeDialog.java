@@ -31,6 +31,7 @@ import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.EntryTypes;
 
 public class EntryTypeDialog extends JDialog implements ActionListener {
 
@@ -104,7 +105,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         con.insets = new Insets(4, 4, 4, 4);
         int col = 0;
 
-        for (BibtexEntryType tp : BibtexEntryType.getAllValues()) {
+        for (BibtexEntryType tp : EntryTypes.getAllValues()) {
             if (tp.isVisibleAtNewEntryDialog()) {
                 TypeButton b = new TypeButton(StringUtil.capitalizeFirst(tp.getName()), tp);
                 b.addActionListener(this);

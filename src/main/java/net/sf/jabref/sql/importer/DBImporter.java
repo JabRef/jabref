@@ -21,17 +21,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
@@ -101,7 +98,7 @@ public abstract class DBImporter extends DBImporterExporter {
                     try (ResultSet rsEntryType = SQLUtil.queryAllFromTable(conn, "entry_types")) {
                         while (rsEntryType.next()) {
                             types.put(rsEntryType.getString("entry_types_id"),
-                                    BibtexEntryType.getType(rsEntryType.getString("label")));
+                                    EntryTypes.getType(rsEntryType.getString("label")));
                         }
                         rsEntryType.getStatement().close();
                     }

@@ -23,10 +23,7 @@ import java.util.ArrayList;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.*;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -85,8 +82,7 @@ public class JstorImporter extends ImportFormat {
             BibtexEntry be = new BibtexEntry(IdGenerator.next());
             try {
                 if (fields[0].equals("FLA")) {
-                    be.setType(BibtexEntryType
-                            .getType("article"));
+                    be.setType(EntryTypes.getType("article"));
                 }
                 ImportFormatReader.setIfNecessary(be, "title", fields[2]);
                 ImportFormatReader.setIfNecessary(be, "author", AuthorList.fixAuthor_lastNameFirst(fields[4].replaceAll("; ", " and ")));
