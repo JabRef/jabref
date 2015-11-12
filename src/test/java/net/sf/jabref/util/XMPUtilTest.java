@@ -10,7 +10,7 @@ import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.apache.jempbox.xmp.*;

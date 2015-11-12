@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.id;
+package net.sf.jabref.model.entry;
 
 import java.text.NumberFormat;
 

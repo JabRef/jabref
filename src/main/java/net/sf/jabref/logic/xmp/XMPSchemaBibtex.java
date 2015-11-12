@@ -23,7 +23,7 @@ import javax.xml.transform.TransformerException;
 import net.sf.jabref.*;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;

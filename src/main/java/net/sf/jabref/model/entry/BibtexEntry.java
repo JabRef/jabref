@@ -26,7 +26,6 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import net.sf.jabref.*;
-import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import org.apache.commons.logging.Log;

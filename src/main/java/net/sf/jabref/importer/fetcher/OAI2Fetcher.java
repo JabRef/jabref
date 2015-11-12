@@ -32,7 +32,7 @@ import javax.xml.parsers.SAXParserFactory;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.entry.BibtexEntry;

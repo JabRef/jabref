@@ -22,7 +22,7 @@ import java.util.TreeSet;
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.xml.sax.Attributes;
