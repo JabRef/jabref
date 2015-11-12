@@ -886,12 +886,23 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (baseAt(i).isBaseChanged()) {
                     tabbedPane.setSelectedIndex(i);
-                    int answer = JOptionPane.showConfirmDialog
-                            (JabRefFrame.this, Localization.lang
-                                            ("Database has changed. Do you "
-                                                    + "want to save before closing?"),
-                                    Localization.lang("Save before closing"),
-                                    JOptionPane.YES_NO_CANCEL_OPTION);
+                    Object[] options = {Localization.lang("Save changes"),
+                            Localization.lang("Discard changes"),
+                            Localization.lang("Return to JabRef")};
+                    String filename;
+
+                    if (baseAt(i).getFile() != null) {
+                        filename = baseAt(i).getFile().getAbsolutePath();
+                    } else {
+                        filename = GUIGlobals.untitledTitle;
+                    }
+                    int answer = JOptionPane.showOptionDialog(JabRefFrame.this,
+                            "<html><br><b>" + Localization.lang("Database %0 has changed.", filename) + "</b>\n\n"
+                                    + Localization.lang(
+                                            "Click \"%0\" to save the changes,\nclick \"%1\" to discard any changes,\nclick \"%2\" to return to the main window.",
+                                            options[0].toString(), options[1].toString(), options[2].toString()),
+                            Localization.lang("Unsaved changes"), JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 
                     if ((answer == JOptionPane.CANCEL_OPTION) ||
                             (answer == JOptionPane.CLOSED_OPTION)) {
