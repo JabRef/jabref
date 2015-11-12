@@ -1,4 +1,4 @@
-# JabRef development version (2.11 line)
+# JabRef Development Version (2.11 line)
 
 [![Circle CI](https://circleci.com/gh/JabRef/jabref/tree/dev_2.11.svg?style=shield)](https://circleci.com/gh/JabRef/jabref/tree/dev_2.11)
 
