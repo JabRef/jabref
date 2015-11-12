@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BibtexEntryTests {
+
     @Before
     public void setup() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -26,29 +27,6 @@ public class BibtexEntryTests {
         Assert.assertEquals(EntryTypes.getType("misc"), entry.getType());
         Assert.assertNotNull(entry.getId());
         Assert.assertNull(entry.getField("author"));
-    }
-
-    @Test
-    public void testGetPublicationDate() {
-        Assert.assertEquals("2003-02",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }"))
-                        .getPublicationDate());
-
-        Assert.assertEquals("2003-03",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")).getPublicationDate());
-
-        Assert.assertEquals("2003",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}}")).getPublicationDate());
-
-        Assert.assertEquals(null,
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, month = 3 }")).getPublicationDate());
-
-        Assert.assertEquals(null,
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}")).getPublicationDate());
-
-        Assert.assertEquals("2003-12",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }"))
-                        .getPublicationDate());
     }
 
     @Test
@@ -110,4 +88,27 @@ public class BibtexEntryTests {
         Assert.assertFalse(e.hasCiteKey());
     }
 
+    public void testGetPublicationDate() {
+
+        Assert.assertEquals("2003-02",
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }"))
+                        .getPublicationDate());
+
+        Assert.assertEquals("2003-03",
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")).getPublicationDate());
+
+        Assert.assertEquals("2003",
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}}")).getPublicationDate());
+
+        Assert.assertEquals(null,
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, month = 3 }")).getPublicationDate());
+
+        Assert.assertEquals(null,
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}")).getPublicationDate());
+
+        Assert.assertEquals("2003-12",
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }"))
+                        .getPublicationDate());
+
+    }
 }
