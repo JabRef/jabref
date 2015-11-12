@@ -1,7 +1,5 @@
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.util.Util;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -130,7 +128,7 @@ public class MonthUtil {
         }
 
         try {
-            int number = Util.intValueOf(value);
+            int number = Integer.parseInt(value);
             return MonthUtil.getMonthByNumber(number);
         } catch (NumberFormatException e) {
             return MonthUtil.NULL_OBJECT;
