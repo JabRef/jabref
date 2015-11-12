@@ -47,7 +47,7 @@ test {
     }
 }
 
-version = "2.11dev"
+version = "2.11.1dev"
 
 repositories {
     jcenter()
