@@ -22,9 +22,9 @@ import java.util.TreeSet;
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -244,7 +244,7 @@ class MedlineHandler extends DefaultHandler
             String keywords = sb.toString();
 
             BibtexEntry b = new BibtexEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
-            BibtexEntryTypes.getEntryType("article")); // id assumes an existing database so don't create one here
+            EntryTypes.getBibtexEntryType("article")); // id assumes an existing database so don't create one here
             if (!author.equals("")) {
                 b.setField("author", MedlineHandler.htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));

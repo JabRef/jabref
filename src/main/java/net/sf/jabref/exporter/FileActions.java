@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;

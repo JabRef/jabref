@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 
 import org.apache.commons.logging.Log;
@@ -46,10 +45,10 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     public CustomEntryType(String name, String[] required, String[] priOpt, String[] secOpt) {
-        this.name = StringUtil.capitalizeFirst(name);
+        this.name = Util.capitalizeFirst(name);
         parseRequiredFields(required);
         this.priOpt = priOpt;
-        optional = StringUtil.arrayConcat(priOpt, secOpt);
+        optional = Util.arrayConcat(priOpt, secOpt);
     }
 
     public CustomEntryType(String name, List<String> required, List<String> optional) {
@@ -61,7 +60,7 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     public CustomEntryType(String name, String required, String optional) {
-        this.name = StringUtil.capitalizeFirst(name);
+        this.name = Util.capitalizeFirst(name);
         if (required.isEmpty()) {
             this.required = new String[0];
         } else {
@@ -119,7 +118,7 @@ public class CustomEntryType extends BibtexEntryType {
 
     @Override
     public List<String> getSecondaryOptionalFields() {
-        return Arrays.asList(StringUtil.getRemainder(optional, priOpt));
+        return Arrays.asList(Util.getRemainder(optional, priOpt));
     }
 
     @Override

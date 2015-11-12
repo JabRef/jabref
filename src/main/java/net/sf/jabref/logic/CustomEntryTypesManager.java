@@ -3,7 +3,7 @@ package net.sf.jabref.logic;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.CustomEntryType;
-import net.sf.jabref.model.entry.EntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

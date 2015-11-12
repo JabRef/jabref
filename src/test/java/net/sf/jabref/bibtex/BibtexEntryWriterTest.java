@@ -6,7 +6,6 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.EntryTypes;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;

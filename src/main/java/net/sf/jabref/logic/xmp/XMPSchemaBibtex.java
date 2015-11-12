@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.model.database.BibtexDatabase;
 import org.apache.jempbox.xmp.XMPMetadata;

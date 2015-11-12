@@ -40,10 +40,10 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
-import net.sf.jabref.model.entry.EntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.Util;
 
 public class LabelPatternPanel extends JPanel {
 
@@ -180,7 +180,7 @@ public class LabelPatternPanel extends JPanel {
 
     private JTextField addEntryType(Container c, String name, int y) {
 
-        JLabel lab = new JLabel(StringUtil.capitalizeFirst(name));
+        JLabel lab = new JLabel(Util.capitalizeFirst(name));
         name = name.toLowerCase();
         con.gridx = 0;
         con.gridy = y;

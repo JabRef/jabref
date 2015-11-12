@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.database.KeyCollisionException;

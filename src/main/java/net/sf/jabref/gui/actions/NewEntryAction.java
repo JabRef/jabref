@@ -2,10 +2,9 @@ package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.gui.*;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.EntryTypes;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -31,14 +30,14 @@ public class NewEntryAction extends MnemonicAwareAction {
     public NewEntryAction(JabRefFrame jabRefFrame, String type_) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, StringUtil.capitalizeFirst(type_));
+        putValue(Action.NAME, Util.capitalizeFirst(type_));
         type = type_;
     }
 
     public NewEntryAction(JabRefFrame jabRefFrame, String type_, KeyStroke key) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, StringUtil.capitalizeFirst(type_));
+        putValue(Action.NAME, Util.capitalizeFirst(type_));
         putValue(Action.ACCELERATOR_KEY, key);
         type = type_;
     }
@@ -48,7 +47,7 @@ public class NewEntryAction extends MnemonicAwareAction {
         String thisType = type;
         if (thisType == null) {
             EntryTypeDialog etd = new EntryTypeDialog(jabRefFrame);
-            Util.placeDialog(etd, jabRefFrame);
+            net.sf.jabref.util.Util.placeDialog(etd, jabRefFrame);
             etd.setVisible(true);
             BibtexEntryType tp = etd.getChoice();
             if (tp == null) {

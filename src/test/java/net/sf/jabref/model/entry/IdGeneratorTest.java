@@ -15,7 +15,6 @@
  */
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.entry.IdGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 

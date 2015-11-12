@@ -24,7 +24,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.EntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
 
 /**
  * This action checks whether any new custom entry types were loaded from this

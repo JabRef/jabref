@@ -30,7 +30,6 @@ import java.io.Writer;
 import java.util.*;
 
 import com.google.common.base.Strings;
-import net.sf.jabref.model.entry.EntryTypes;
 
 public class BibtexEntryWriter {
 

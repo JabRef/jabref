@@ -27,7 +27,7 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.util.Util;
 
 /**
@@ -273,8 +273,8 @@ public class EndnoteImporter extends ImportFormat {
                 hm.put("pages", artnum);
             }
 
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
-                    .getEntryType(Type)); // id assumes an existing database so don't
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getBibtexEntryType(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(hm);
             //if (hm.isEmpty())

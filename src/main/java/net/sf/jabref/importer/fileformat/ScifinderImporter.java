@@ -26,7 +26,7 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -150,8 +150,8 @@ public class ScifinderImporter extends ImportFormat {
                 }
             }
 
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
-                    .getEntryType(Type)); // id assumes an existing database so don't
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getBibtexEntryType(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(hm);
             if (journal != null) {

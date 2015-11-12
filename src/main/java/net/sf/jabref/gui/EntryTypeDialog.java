@@ -30,8 +30,8 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.EntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.Util;
 
 public class EntryTypeDialog extends JDialog implements ActionListener {
 
@@ -107,7 +107,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         for (BibtexEntryType tp : EntryTypes.getAllValues()) {
             if (tp.isVisibleAtNewEntryDialog()) {
-                TypeButton b = new TypeButton(StringUtil.capitalizeFirst(tp.getName()), tp);
+                TypeButton b = new TypeButton(Util.capitalizeFirst(tp.getName()), tp);
                 b.addActionListener(this);
                 // Check if we should finish the row.
                 col++;
