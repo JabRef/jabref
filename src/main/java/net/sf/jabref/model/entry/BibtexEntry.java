@@ -25,7 +25,6 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import net.sf.jabref.*;
 import net.sf.jabref.model.database.BibtexDatabase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -124,27 +123,6 @@ public class BibtexEntry {
             pve.printStackTrace();
         }
 
-    }
-
-    /**
-     * Prompts the entry to call BibtexEntryType.getType(String) with
-     * its current type name as argument, and sets its type according
-     * to what is returned. This method is called when a user changes
-     * the type customization, to make sure all entries are set with
-     * current types.
-     *
-     * @return true if the entry could find a type, false if not (in
-     * this case the type will have been set to
-     * BibtexEntryTypes.TYPELESS).
-     */
-    public boolean updateType() {
-        BibtexEntryType newType = BibtexEntryType.getType(type.getName());
-        if (newType != null) {
-            type = newType;
-            return true;
-        }
-        type = BibtexEntryTypes.TYPELESS;
-        return false;
     }
 
     /**

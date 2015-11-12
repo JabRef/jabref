@@ -34,6 +34,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.CustomEntryType;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
@@ -381,7 +382,12 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             bp.entryEditors.remove(typeName);
 
             for (BibtexEntry entry : bp.database().getEntries()) {
-                entry.updateType();
+                BibtexEntryType newType = BibtexEntryType.getType(entry.getType().getName());
+                if (newType != null) {
+                    entry.setType(newType);
+                } else {
+                    entry.setType(BibtexEntryTypes.TYPELESS);
+                }
             }
         }
 
