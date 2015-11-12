@@ -1169,8 +1169,8 @@ public class JabRefPreferences {
         if (getBoolean(MEMORY_STICK_MODE)) {
             try {
                 exportPreferences("jabref.xml");
-            } catch (IOException e) {
-                LOGGER.info("Could not save preferences for memory stick mode: " + e.getLocalizedMessage(), e);
+            } catch (JabRefException e) {
+                LOGGER.warn("Could not export preferences for memory stick mode: " + e.getMessage(), e);
             }
         }
         try {
@@ -1634,12 +1634,12 @@ public class JabRefPreferences {
      *
      * @param filename String File to export to
      */
-    public void exportPreferences(String filename) throws IOException {
+    public void exportPreferences(String filename) throws JabRefException {
         File f = new File(filename);
         try (OutputStream os = new FileOutputStream(f)) {
             prefs.exportSubtree(os);
-        } catch (BackingStoreException ex) {
-            throw new IOException(ex);
+        } catch (BackingStoreException | IOException ex) {
+            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"), ex);
         }
     }
 

@@ -400,7 +400,7 @@ public class JabRef {
         if (cli.isPreferencesExport()) {
             try {
                 Globals.prefs.exportPreferences(cli.getPreferencesExport());
-            } catch (IOException ex) {
+            } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
             }
         }

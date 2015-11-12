@@ -3,7 +3,6 @@ package net.sf.jabref;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class JabRefException extends Exception {
 
     private String localizedMessage;
@@ -30,7 +29,7 @@ public class JabRefException extends Exception {
 
     @Override
     public String getLocalizedMessage() {
-        if(localizedMessage==null) {
+        if (localizedMessage == null) {
             LOGGER.warn("No localized message exception message defined. Falling back to getMessage().");
             return getMessage();
         } else {

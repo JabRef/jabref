@@ -193,11 +193,10 @@ public class PreferencesDialog extends JDialog {
 
                     try {
                         prefs.exportPreferences(filename);
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(PreferencesDialog.this,
-                                Localization.lang("Could not export preferences")
-                                + ": " + ex.getMessage(), Localization.lang("Export preferences"),
-                                JOptionPane.ERROR_MESSAGE);
+                    } catch (JabRefException ex) {
+                        LOGGER.warn(ex.getMessage(), ex);
+                        JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
+                                Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
 
@@ -222,9 +221,9 @@ public class PreferencesDialog extends JDialog {
                     frame.removeCachedEntryEditors();
                     Globals.prefs.updateEntryEditorTabList();
                 } catch (JabRefException ex) {
+                    LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.warn(ex.getMessage(), ex);
                 }
             }
 
