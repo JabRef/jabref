@@ -1,7 +1,28 @@
 This page provides some development support in the form of howtos. 
 
-## Outputting Errors
-(to be filled)
+## Error Handling in JabRef
+### Throwing and Catching Exceptions
+Principles: 
+- All Exceptions we throw should be or extend `JabRefException`
+- Catch and wrap all API exceptions (such as `IOExceptions`) and rethrow them
+ - Example:
+  ```java
+  try {
+      // ...
+  } catch (IOException ioe) {
+      throw new JabRefException("Something went wrong...", Localization.lang("Something went wrong...", ioe);
+  }
+  ```
+- Never, ever throw and catch `Exception` or `Throwable`
+- Errors should only be logged when they are finally caught (i.e., logged only once). See **Logging** for details.
+
+### Outputting Errors in the UI
+Principle: Error messages shown to the User should not contain technical details (e.g., underlying exceptions, or even stack traces). Instead, the message should be concise, understandable for non-programmers and localized.
+
+To show error message two different ways are usally used in JabRef:
+- showing an error dialog
+- updating the status bar at the bottom of the main window
+*TODO: Usage of status bar and Swing Dialogs*
 
 In old verisons of JabRef, there was `Utils.showQuickErrorDialog` to output exceptions, but it was not used and therefore removed in 4c11b4b7466 (PR #205).
 
