@@ -10,11 +10,15 @@ Principles:
   try {
       // ...
   } catch (IOException ioe) {
-      throw new JabRefException("Something went wrong...", Localization.lang("Something went wrong...", ioe);
+      throw new JabRefException("Something went wrong...", 
+           Localization.lang("Something went wrong...", ioe);
   }
   ```
 - Never, ever throw and catch `Exception` or `Throwable`
 - Errors should only be logged when they are finally caught (i.e., logged only once). See **Logging** for details.
+- If the Exception message is intended to be shown to the User in the UI (see below) provide also a localizedMessage (see `JabRefException`).
+
+*(Rationale and further reading: https://today.java.net/article/2006/04/04/exception-handling-antipatterns)*
 
 ### Outputting Errors in the UI
 Principle: Error messages shown to the User should not contain technical details (e.g., underlying exceptions, or even stack traces). Instead, the message should be concise, understandable for non-programmers and localized.
@@ -22,6 +26,7 @@ Principle: Error messages shown to the User should not contain technical details
 To show error message two different ways are usally used in JabRef:
 - showing an error dialog
 - updating the status bar at the bottom of the main window
+
 *TODO: Usage of status bar and Swing Dialogs*
 
 In old verisons of JabRef, there was `Utils.showQuickErrorDialog` to output exceptions, but it was not used and therefore removed in 4c11b4b7466 (PR #205).
@@ -30,13 +35,53 @@ In old verisons of JabRef, there was `Utils.showQuickErrorDialog` to output exce
 
 JabRef uses the logging facade [Apache Commons Logging](http://commons.apache.org/proper/commons-logging/).
 All log messages are passed internally to Java's [java.util.logging](http://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html) which handles any filterting, formatting and writing of log messages. 
+- Obtaining a Logger for a Class: 
 
-If the logging event is caused by an exception, please add the exception to the log message as: 
+  ```java
+  private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
+  ```
 
-    catch (Exception e) {
+- If the logging event is caused by an exception, please add the exception to the log message as: 
+
+  ```java
+    catch (SomeException e) {
        LOGGER.warn("Warning text.", e);
        ...
     }
+  ```
+
+## Using Localization correctly
+All labeled UI elements, descriptions and messages shown to the user should be localized, i.e., should be displayed in the chosen language.
+
+JabRef uses ResourceBundles ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized. 
+
+To show an localized String the following `net.sf.jabref.logic.l10n.Localization` has to be used. The Class currently provides three methods to optain translated strings:
+
+```java
+    public static String lang(String key);
+    
+    public static String lang(String key, String... params);
+
+    public static String menuTitle(String key, String... params);
+```
+
+The actual usage might look like:
+
+```java
+    Localization.lang("Get me a translated String");
+    Localization.lang("Using %0 or more %1 is also possible", "one", "parameter");
+    Localization.menuTitle("Used for Menus only");
+```
+
+Moreover, there is a Python script (`scripts/syncLang.py`) which is able used to detect all used and unused localization Strings and which is used to synchronize the used resource bundle by adding and removing (no longer) needed Strings.
+
+The following best practices should be applied when dealing with `net.sf.jabref.logic.l10n.Localization` to reduce the amount of Strings to be translated and keep the script working:
+- Only one call to `Localization.lang(...)` per line
+- Use the String you want to localize directly, do not use members or local variables: `Localization("Translate me");` instead of `Localization(someVariable)` 
+- Use `%x`-variables where appropriate: `Localization.lang("Exported %0 entries.", number)` instead of `Localization.lang("Exported ") + number + Localization.lang(" entries.");
+- Use a full stop/period (".") to end full sentences
+- *to be continued*
+
 
 ## Drag and Drop
 
@@ -44,7 +89,7 @@ If the logging event is caused by an exception, please add the exception to the 
 
 ## Get the JabRef frame / panel
 
-```Java
+```java
 net.sf.jabref.JabRefFrame jrf = JabRef.jrf;
 net.sf.jabref.BasePanel basePanel = JabRef.jrf.basepanel();
 ```
@@ -86,7 +131,7 @@ When accessing a preference value, the method Globals.prefs.getTYPE(key) has to 
 
 If `Globals.prefs` are not initialized in a test case, try to add
 
-```
+```java
 @BeforeClass
 public static void setUp() {
     Globals.prefs = JabRefPreferences.getInstance();
@@ -95,7 +140,7 @@ public static void setUp() {
 
 If you modify preference, use following pattern:
 
-```
+```java
 private JabRefPreferences backup;
 
 @Before
