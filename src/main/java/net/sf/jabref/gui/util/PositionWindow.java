@@ -108,8 +108,6 @@ public class PositionWindow {
     /**
      * This method sets the location of a Dialog such that it is centered with regard to another window, but not outside
      * the screen on the left and the top.
-     *
-     * Moved from Util
      */
     public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
         diag.setLocationRelativeTo(win);

@@ -17,6 +17,8 @@ package net.sf.jabref.gui.mergeentries;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.*;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -128,18 +130,28 @@ public class MergeEntriesDialog extends JDialog {
         layout.insertRow(1, RowSpec.decode("5px"));
         layout.insertColumn(1, ColumnSpec.decode("5px"));
 
-        pack();
+        // Set up a ComponentListener that saves the last size and position of the dialog
+        this.addComponentListener(new ComponentAdapter() {
 
-        pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
-                JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
-                JabRefPreferences.MERGEENTRIES_SIZE_Y);
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+        });
+
+        pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X, JabRefPreferences.MERGEENTRIES_POS_Y,
+                JabRefPreferences.MERGEENTRIES_SIZE_X, JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.setWindowPosition();
 
         // Show what we've got
         setVisible(true);
-
-        pack();
-
     }
 
     /**
@@ -165,8 +177,6 @@ public class MergeEntriesDialog extends JDialog {
             panel.undoManager.addEdit(ce);
             panel.output(Localization.lang("Merged entries"));
         }
-        // Save dialog position
-        pw.storeWindowPosition();
         dispose();
     }
 }

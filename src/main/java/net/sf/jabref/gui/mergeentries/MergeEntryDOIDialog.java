@@ -17,6 +17,8 @@ package net.sf.jabref.gui.mergeentries;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -143,16 +145,29 @@ public class MergeEntryDOIDialog extends JDialog {
         layout.insertRow(1, RowSpec.decode("5px"));
         layout.insertColumn(1, ColumnSpec.decode("5px"));
 
-        pack();
-
         pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
                 JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.setWindowPosition();
+
+        // Set up a ComponentListener that saves the last size and position of the dialog
+        addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+        });
+
         // Show what we've got
         setVisible(true);
-
-        pack();
 
     }
 
@@ -191,8 +206,6 @@ public class MergeEntryDOIDialog extends JDialog {
                 panel.output(Localization.lang("No information added"));
             }
         }
-        // Save dialog position
-        pw.storeWindowPosition();
         dispose();
     }
 }
