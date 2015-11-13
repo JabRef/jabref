@@ -30,7 +30,6 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the
@@ -67,7 +66,7 @@ class ReplaceStringDialog extends JDialog {
                     return;
                 }
                 ok_pressed = true;
-                flds = StringUtil.split(fields.getText().toLowerCase(), ";");
+                flds = fields.getText().toLowerCase().split(";");
                 dispose();
             }
         };
@@ -198,10 +197,6 @@ class ReplaceStringDialog extends JDialog {
 
     public boolean selOnly() {
         return selOnly.isSelected();
-    }
-
-    public String[] fields() {
-        return StringUtil.split(field.getText(), ";");
     }
 
     /**
