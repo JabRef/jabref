@@ -106,15 +106,4 @@ public class StringUtilTest {
             // Ignored
         }
     }
-
-    @Test
-    public void testToUpperCharFirst() {
-
-        Assert.assertEquals("", StringUtil.toUpperFirstLetter(""));
-        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("a"));
-        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("A"));
-        Assert.assertEquals("An", StringUtil.toUpperFirstLetter("an"));
-        Assert.assertEquals("AN", StringUtil.toUpperFirstLetter("AN"));
-        Assert.assertEquals("TestTest", StringUtil.toUpperFirstLetter("testTest"));
-    }
 }

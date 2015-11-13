@@ -34,7 +34,7 @@ import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 
 /**
  * Created by IntelliJ IDEA.
@@ -143,7 +143,7 @@ public class AttachFileDialog extends JDialog {
         FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         //builder.append(Util.capitalizeFirst(fieldName));//(editor.getLabel());
-        builder.appendSeparator(Util.capitalizeFirst(fieldName));
+        builder.appendSeparator(EntryUtil.capitalizeFirst(fieldName));
         builder.append(editor.getTextComponent());
         builder.append(browse);
 

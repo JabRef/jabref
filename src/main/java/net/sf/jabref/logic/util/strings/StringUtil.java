@@ -85,25 +85,16 @@ public class StringUtil {
     }
 
     /**
-     * Returns the given string but with the first character turned into an
-     * upper case character.
-     * <p>
-     * Example: testTest becomes TestTest
+     * Takes a delimited string, splits it and returns
      *
-     * @param string The string to change the first character to upper case to.
-     * @return A string has the first character turned to upper case and the
-     * rest unchanged from the given one.
+     * @param names a <code>String</code> value
+     * @return a <code>String[]</code> value
      */
-    public static String toUpperFirstLetter(String string) {
-        if (string == null) {
-            throw new IllegalArgumentException();
+    public static String[] split(String names, String delimiter) {
+        if (names == null) {
+            return null;
         }
-
-        if (string.isEmpty()) {
-            return string;
-        }
-
-        return Character.toUpperCase(string.charAt(0)) + string.substring(1);
+        return names.split(delimiter);
     }
 
     /**

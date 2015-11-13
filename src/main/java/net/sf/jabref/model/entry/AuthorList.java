@@ -1023,11 +1023,11 @@ public class AuthorList {
                 return false;
             }
             Author a = (Author) o;
-            return Util.equals(firstPart, a.firstPart)
-                    && Util.equals(firstAbbr, a.firstAbbr)
-                    && Util.equals(vonPart, a.vonPart)
-                    && Util.equals(lastPart, a.lastPart)
-                    && Util.equals(jrPart, a.jrPart);
+            return EntryUtil.equals(firstPart, a.firstPart)
+                    && EntryUtil.equals(firstAbbr, a.firstAbbr)
+                    && EntryUtil.equals(vonPart, a.vonPart)
+                    && EntryUtil.equals(lastPart, a.lastPart)
+                    && EntryUtil.equals(jrPart, a.jrPart);
         }
 
 

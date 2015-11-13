@@ -168,7 +168,7 @@ public class Util {
                 String fieldValue = o.toString().trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
                 while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.Util.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -193,7 +193,7 @@ public class Util {
             if (o != null) {
                 tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.Util.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }

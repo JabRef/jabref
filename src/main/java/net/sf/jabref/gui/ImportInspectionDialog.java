@@ -67,7 +67,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
@@ -1496,7 +1496,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return Localization.lang("Keep");
             }
             if (i >= PAD) {
-                return Util.capitalizeFirst(fields[i - PAD]);
+                return EntryUtil.capitalizeFirst(fields[i - PAD]);
             }
             return "";
         }
