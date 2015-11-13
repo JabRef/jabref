@@ -897,10 +897,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                         filename = GUIGlobals.untitledTitle;
                     }
                     int answer = JOptionPane.showOptionDialog(JabRefFrame.this,
-                            "<html><br><b>" + Localization.lang("Database %0 has changed.", filename) + "</b>\n\n"
-                                    + Localization.lang(
-                                            "Click \"%0\" to save the changes,\nclick \"%1\" to discard any changes,\nclick \"%2\" to return to the main window.",
-                                            options[0].toString(), options[1].toString(), options[2].toString()),
+                            Localization.lang("Database %0 has changed.", filename),
                             Localization.lang("Unsaved changes"), JOptionPane.YES_NO_CANCEL_OPTION,
                             JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 
