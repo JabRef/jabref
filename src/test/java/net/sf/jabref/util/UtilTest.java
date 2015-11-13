@@ -7,8 +7,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.Util;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -19,27 +17,7 @@ import java.util.*;
 import java.util.List;
 public class UtilTest {
 
-    @Test
-    public void testNCase() {
-        Assert.assertEquals("", Util.capitalizeFirst(""));
-        Assert.assertEquals("Hello world", Util.capitalizeFirst("Hello World"));
-        Assert.assertEquals("A", Util.capitalizeFirst("a"));
-        Assert.assertEquals("Aa", Util.capitalizeFirst("AA"));
-    }
 
-
-    @Test
-    public void testShaveString() {
-
-        Assert.assertEquals(null, StringUtil.shaveString(null));
-        Assert.assertEquals("", StringUtil.shaveString(""));
-        Assert.assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
-        Assert.assertEquals("a", StringUtil.shaveString("  {a}    "));
-        Assert.assertEquals("a", StringUtil.shaveString("  \"a\"    "));
-        Assert.assertEquals("{a}", StringUtil.shaveString("  {{a}}    "));
-        Assert.assertEquals("{a}", StringUtil.shaveString("  \"{a}\"    "));
-        Assert.assertEquals("\"{a\"}", StringUtil.shaveString("  \"{a\"}    "));
-    }
 
     @Test
     public void testCheckLegalKey() {
