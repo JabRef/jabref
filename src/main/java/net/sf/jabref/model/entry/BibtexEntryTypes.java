@@ -38,7 +38,7 @@ public class BibtexEntryTypes {
                 @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
                     return entry.allFieldsPresent(new String[]{
-                            "author", "title", "journal", "year", "bibtexkey", "volume", "pages"
+                            "author", "title", "journal", "year", "bibtexkey"
                     }, database);
                 }
             };
