@@ -25,10 +25,9 @@ When you use Eclipse, the required config is generated automatically by `gradlew
 You can also run `gradlew format` to let the [Gradle Format plugin](https://github.com/youribonnaffe/gradle-format-plugin) do the formatting.
 
 
-### Add your change to the CHANGELOG
-You should edit the [CHANGELOG](CHANGELOG) located in the root directory of the JabRef source.
-Add a line with your changes and your name.
-Nicknames are OK.
+### Add your change to CHANGELOG.md
+You should edit the [CHANGELOG.md](CHANGELOG.md) located in the root directory of the JabRef source.
+Add a line with your changes in the appropriate section.
 
 If you did internal refactorings or improvements not visible to the user (e.g., UI, .bib file), then you don't need to put an entry there.
 
