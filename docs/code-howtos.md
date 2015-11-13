@@ -38,7 +38,7 @@ All log messages are passed internally to Java's [java.util.logging](http://docs
 - Obtaining a Logger for a Class: 
 
   ```java
-  private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
+  private static final Log LOGGER = LogFactory.getLog(<ClassName>.class);
   ```
 
 - If the logging event is caused by an exception, please add the exception to the log message as: 
