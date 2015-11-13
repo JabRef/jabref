@@ -147,7 +147,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             addSeparator();
         }
 
-        add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder")) {
+        add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder"),
+                IconTheme.JabRefIcon.FOLDER.getSmallIcon()) {
             {
                 if (!isFieldSetForSelectedEntry("file")) {
                     this.setEnabled(false);

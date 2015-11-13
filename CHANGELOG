@@ -1,4 +1,5 @@
 [master]
+    - Fixed bug SF #1149: Missing icon for "Open folder"
     - Feature: Search DOAJ, Directory of Open Access Journals
     - The key bindings for searching specific databases are removed
     - Removes option to toggle native file dialog on mac by making JabRef always use native file dialogs on mac

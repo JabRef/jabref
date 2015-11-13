@@ -401,8 +401,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.WRITE_XMP));
 
     private final AbstractAction openFolder = new GeneralAction(Actions.OPEN_FOLDER,
-            Localization.menuTitle("Open folder"), Localization.lang("Open folder"),
-            prefs.getKey(KeyBinds.OPEN_FOLDER));
+            Localization.menuTitle("Open folder"),
+            Localization.lang("Open folder"),
+ prefs.getKey(KeyBinds.OPEN_FOLDER),
+            IconTheme.JabRefIcon.FOLDER.getIcon());
     private final AbstractAction openFile = new GeneralAction(Actions.OPEN_EXTERNAL_FILE,
             Localization.menuTitle("Open file"),
             Localization.lang("Open file"),

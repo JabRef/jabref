@@ -54,7 +54,7 @@ public class IconTheme {
         ADD_ENTRY("\uF571") /*css: tooltip-outline-plus */,
         EDIT_ENTRY("\uf56e") /*css: tooltip-edit */,
         EDIT_STRINGS("\uf572") /*css: tooltip-text */,
-        FOLDER("\uf07b"),
+        FOLDER("\uF300") /*css: folder */,
         REMOVE("\uf406"),
         REMOVE_NOBOX("\uF405") /*css: minus */,
         FILE("\uf2cf"),
