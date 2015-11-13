@@ -77,8 +77,8 @@ Moreover, there is a Python script (`scripts/syncLang.py`) which is able used to
 
 The following best practices should be applied when dealing with `net.sf.jabref.logic.l10n.Localization` to reduce the amount of Strings to be translated and keep the script working:
 - Only one call to `Localization.lang(...)` per line
-- Use the String you want to localize directly, do not use members or local variables: `Localization("Translate me");` instead of `Localization(someVariable)` 
-- Use `%x`-variables where appropriate: `Localization.lang("Exported %0 entries.", number)` instead of `Localization.lang("Exported ") + number + Localization.lang(" entries.");
+- Use the String you want to localize directly, do not use members or local variables: `Localization.lang("Translate me");` instead of `Localization.lang(someVariable)` (possibly in the form `someVariable = Localization.lang("Translate me")`
+- Use `%x`-variables where appropriate: `Localization.lang("Exported %0 entries.", number)` instead of `Localization.lang("Exported ") + number + Localization.lang(" entries.");`
 - Use a full stop/period (".") to end full sentences
 - *to be continued*
 
