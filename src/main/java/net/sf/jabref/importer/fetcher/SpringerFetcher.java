@@ -13,6 +13,9 @@
 */
 package net.sf.jabref.importer.fetcher;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -53,6 +56,7 @@ public class SpringerFetcher implements EntryFetcher {
         try {
             status.setStatus(Localization.lang("Searching Springer..."));
             HttpResponse<JsonNode> jsonResponse;
+            query = URLEncoder.encode(query, "UTF-8");
             jsonResponse = Unirest.get(API_URL + query + "&api_key=" + API_KEY + "&p=1")
                     .header("accept", "application/json")
                     .asJson();
@@ -94,8 +98,6 @@ public class SpringerFetcher implements EntryFetcher {
                     jsonResponse = Unirest
                             .get(API_URL + query + "&api_key=" + API_KEY + "&p=" + noToFetch + "&s=" + startItem)
                             .header("accept", "application/json").asJson();
-                    //                    jsonResponse = Unirest.get(searchURL + query + "?page=" + page + "&pageSize=" + noToFetch)
-                    //                           .header("accept", "application/json").asJson();
                     jo = jsonResponse.getBody().getObject();
                     if (jo.has("records")) {
                         JSONArray results = jo.getJSONArray("records");
@@ -116,8 +118,10 @@ public class SpringerFetcher implements EntryFetcher {
             }
         } catch (UnirestException e) {
             LOGGER.warn("Problem searching Springer", e);
-            return false;
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.warn("Cannot encode query", e);
         }
+        return false;
 
     }
 
@@ -133,7 +137,7 @@ public class SpringerFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return null;
+        return "SpringerHelp.html";
     }
 
     @Override
