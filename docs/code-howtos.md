@@ -51,6 +51,8 @@ All log messages are passed internally to Java's [java.util.logging](http://docs
   ```
 
 ## Using Localization correctly
+*(More information about this topic from the translator side is provided [here in the wiki](https://github.com/JabRef/jabref/wiki/Translating-JabRef))*
+
 All labeled UI elements, descriptions and messages shown to the user should be localized, i.e., should be displayed in the chosen language.
 
 JabRef uses ResourceBundles ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized. 
