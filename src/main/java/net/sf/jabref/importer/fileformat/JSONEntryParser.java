@@ -21,9 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.MonthUtil;
 
 public class JSONEntryParser {
 
@@ -50,7 +50,7 @@ public class JSONEntryParser {
 
 
         BibtexEntry entry = new BibtexEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setType(EntryTypes.getType("article"));
 
         // Authors
         if (bibJsonEntry.has("author")) {
@@ -173,11 +173,11 @@ public class JSONEntryParser {
         String isbn = springerJsonEntry.optString("isbn");
         if ((isbn == null) || (isbn.length() == 0)) {
             // Probably article
-            entry.setType(BibtexEntryTypes.ARTICLE);
+            entry.setType(EntryTypes.getType("article"));
             nametype = "journal";
         } else {
             // Probably book chapter or from proceeding, go for book chapter
-            entry.setType(BibtexEntryTypes.INCOLLECTION);
+            entry.setType(EntryTypes.getType("incollection"));
             nametype = "booktitle";
             entry.setField("isbn", isbn);
         }

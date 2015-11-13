@@ -131,11 +131,6 @@ public class SpringerFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "Springer";
-    }
-
-    @Override
     public String getHelpPage() {
         return "SpringerHelp.html";
     }
