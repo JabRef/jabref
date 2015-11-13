@@ -11,17 +11,20 @@ import java.net.ServerSocket;
 public class RemoteTest {
 
     @Test
-    public void testGoodCase() {
+    public void testGoodCase() throws Exception {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle();
-        Assert.assertFalse(server.isOpen());
-        server.openAndStart(msg -> Assert.assertEquals(message, msg), port);
-        Assert.assertTrue(server.isOpen());
-        Assert.assertTrue(RemoteListenerClient.sendToActiveJabRefInstance(new String[] {message}, port));
-        server.stop();
-        Assert.assertFalse(server.isOpen());
+
+        try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+            Assert.assertFalse(server.isOpen());
+            server.openAndStart(msg -> Assert.assertEquals(message, msg), port);
+            Assert.assertTrue(server.isOpen());
+            Assert.assertTrue(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
+            server.stop();
+            Assert.assertFalse(server.isOpen());
+        }
+
     }
 
     @Test
@@ -29,7 +32,7 @@ public class RemoteTest {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        try(RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+        try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
             Assert.assertFalse(server.isOpen());
             Assert.assertTrue(server.isNotStartedBefore());
             server.stop();
@@ -42,7 +45,7 @@ public class RemoteTest {
             Assert.assertTrue(server.isOpen());
             Assert.assertFalse(server.isNotStartedBefore());
 
-            Assert.assertTrue(RemoteListenerClient.sendToActiveJabRefInstance(new String[] {message}, port));
+            Assert.assertTrue(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
             server.stop();
             Assert.assertFalse(server.isOpen());
             Assert.assertTrue(server.isNotStartedBefore());
@@ -54,7 +57,7 @@ public class RemoteTest {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        try(ServerSocket socket = new ServerSocket(port)) {
+        try (ServerSocket socket = new ServerSocket(port)) {
             Assert.assertTrue(socket.isBound());
 
             RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle();
@@ -69,7 +72,7 @@ public class RemoteTest {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        Assert.assertFalse(RemoteListenerClient.sendToActiveJabRefInstance(new String[] {message}, port));
+        Assert.assertFalse(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
     }
 
     @Test
@@ -77,7 +80,7 @@ public class RemoteTest {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        try(ServerSocket socket = new ServerSocket(port)) {
+        try (ServerSocket socket = new ServerSocket(port)) {
             new Thread() {
 
                 @Override
@@ -90,7 +93,7 @@ public class RemoteTest {
                 }
             }.start();
             Thread.sleep(100);
-            Assert.assertFalse(RemoteListenerClient.sendToActiveJabRefInstance(new String[] {message}, port));
+            Assert.assertFalse(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
         }
     }
 
