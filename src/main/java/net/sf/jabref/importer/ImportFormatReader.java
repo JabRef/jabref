@@ -127,26 +127,16 @@ public class ImportFormatReader {
     }
 
     public List<BibtexEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
-        List<BibtexEntry> result = null;
-        InputStream stream = null;
-        try {
-            File file = new File(filename);
-            stream = new FileInputStream(file);
+        File file = new File(filename);
+
+        try (InputStream stream = new FileInputStream(file)) {
 
             if (!importer.isRecognizedFormat(stream)) {
                 throw new IOException("Wrong file format");
             }
 
-            stream = new FileInputStream(file);
-
-            result = importer.importEntries(stream, status);
-        } finally {
-            if (stream != null) {
-                stream.close();
-            }
+            return importer.importEntries(stream, status);
         }
-
-        return result;
     }
 
     public static BibtexDatabase createDatabase(Collection<BibtexEntry> bibentries) {
