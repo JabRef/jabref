@@ -24,11 +24,19 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import net.sf.jabref.logic.util.date.YearUtil;
-import net.sf.jabref.model.database.BibtexDatabase;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.model.database.BibtexDatabase;
 
 public class BibtexEntry {
     private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);

@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.util.date;
+package net.sf.jabref.model.entry;
 
 import java.util.Calendar;
 
