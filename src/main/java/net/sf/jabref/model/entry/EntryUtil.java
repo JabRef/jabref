@@ -3,8 +3,12 @@ package net.sf.jabref.model.entry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class EntryUtil {
+
+    public static final String SEPARATING_CHARS_NOSPACE = ";,\n";
+
 
     /**
      * Static equals that can also return the right result when one of the objects is null.
@@ -62,5 +66,44 @@ public class EntryUtil {
             }
         }
         return al;
+    }
+
+    /**
+	 * Concatenate two String arrays
+	 *
+	 * @param array1
+	 *            the first string array
+	 * @param array2
+	 *            the second string array
+	 * @return The concatenation of array1 and array2
+	 */
+	public static String[] arrayConcat(String[] array1, String[] array2) {
+		int len1 = array1.length;
+		int len2 = array2.length;
+		String[] union = new String[len1 + len2];
+		System.arraycopy(array1, 0, union, 0, len1);
+		System.arraycopy(array2, 0, union, len1, len2);
+		return union;
+	}
+
+    /**
+     * @param keywords a String of keywords
+     * @return an ArrayList containing the keywords. An emtpy list if keywords are null or empty
+     */
+    public static ArrayList<String> getSeparatedKeywords(String keywords) {
+        ArrayList<String> res = new ArrayList<>();
+        if (keywords == null) {
+            return res;
+        }
+        // _NOSPACE is a hack to support keywords such as "choreography transactions"
+        // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
+        // if nothing is found, " " is likely to be the separating char.
+        // solution by RisKeywords.java: s.split(",[ ]*")
+        StringTokenizer tok = new StringTokenizer(keywords, SEPARATING_CHARS_NOSPACE);
+        while (tok.hasMoreTokens()) {
+            String word = tok.nextToken().trim();
+            res.add(word);
+        }
+        return res;
     }
 }

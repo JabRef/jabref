@@ -24,6 +24,7 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -492,5 +493,71 @@ public class BibtexEntry {
             }
         }
         return year;
+    }
+
+    public void putKeywords(ArrayList<String> keywords) {
+        // Set Keyword Field
+        String oldValue = this.getField("keywords");
+        String newValue;
+        if (!keywords.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (String keyword : keywords) {
+                sb.append(keyword);
+                sb.append(", ");
+            }
+            sb.delete(sb.length() - 2, sb.length());
+            newValue = sb.toString();
+        } else {
+            newValue = null;
+        }
+        if ((oldValue == null) && (newValue == null)) {
+            return;
+        }
+        if ((oldValue == null) || !oldValue.equals(newValue)) {
+            this.setField("keywords", newValue);
+        }
+    }
+
+    /**
+     * Check if a keyword already exists (case insensitive), if not: add it
+     *
+     * @param keyword Keyword to add
+     */
+    public void addKeyword(String keyword) {
+        ArrayList<String> keywords = this.getSeparatedKeywords();
+        Boolean duplicate = false;
+
+        if ((keyword == null) || (keyword.length() == 0)) {
+            return;
+        }
+
+        for (String key : keywords) {
+            if (keyword.equalsIgnoreCase(key)) {
+                duplicate = true;
+                break;
+            }
+        }
+
+        if (!duplicate) {
+            keywords.add(keyword);
+            this.putKeywords(keywords);
+        }
+    }
+
+    /**
+     * Add multiple keywords to entry
+     *
+     * @param keywords Keywords to add
+     */
+    public void addKeywords(ArrayList<String> keywords) {
+        if (keywords != null) {
+            for (String keyword : keywords) {
+                this.addKeyword(keyword);
+            }
+        }
+    }
+
+    public ArrayList<String> getSeparatedKeywords() {
+        return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField("keywords"));
     }
 }

@@ -745,7 +745,7 @@ public class LabelPatternUtil {
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
-                ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
+                ArrayList<String> separatedKeywords = entry.getSeparatedKeywords();
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
@@ -761,7 +761,7 @@ public class LabelPatternUtil {
                 } else {
                     num = Integer.MAX_VALUE;
                 }
-                ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
+                ArrayList<String> separatedKeywords = entry.getSeparatedKeywords();
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < Math.min(separatedKeywords.size(), num); i++) {
                     String keyword = separatedKeywords.get(i);

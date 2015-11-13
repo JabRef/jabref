@@ -111,4 +111,36 @@ public class BibtexEntryTests {
                         .getPublicationDate());
 
     }
+
+
+    @Test
+    public void testKeywordMethods() {
+        BibtexEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
+
+        String[] expected = {"Foo",  "Bar"};
+        Assert.assertArrayEquals(expected, be.getSeparatedKeywords().toArray());
+
+        be.addKeyword("FooBar");
+        String[] expected2 = {"Foo", "Bar", "FooBar"};
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeyword("FooBar");
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeyword("FOO");
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeyword("");
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeyword(null);
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeywords(null);
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        BibtexEntry be2 = new BibtexEntry();
+        be2.addKeywords(be.getSeparatedKeywords());
+        Assert.assertArrayEquals(expected2, be2.getSeparatedKeywords().toArray());
+    }
 }

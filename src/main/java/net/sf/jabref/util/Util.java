@@ -94,8 +94,6 @@ public class Util {
 
     public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
-    private static final String SEPARATING_CHARS_NOSPACE = ";,\n";
-
     private static final UnicodeCharMap UNICODE_CHAR_MAP = new UnicodeCharMap();
 
 
@@ -686,57 +684,6 @@ public class Util {
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
-    }
-
-    /**
-     * @param keywords a String of keywords
-     * @return an ArrayList containing the keywords. An emtpy list if keywords are null or empty
-     */
-    public static ArrayList<String> getSeparatedKeywords(String keywords) {
-        ArrayList<String> res = new ArrayList<>();
-        if (keywords == null) {
-            return res;
-        }
-        // _NOSPACE is a hack to support keywords such as "choreography transactions"
-        // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
-        // if nothing is found, " " is likely to be the separating char.
-        // solution by RisKeywords.java: s.split(",[ ]*")
-        StringTokenizer tok = new StringTokenizer(keywords, net.sf.jabref.util.Util.SEPARATING_CHARS_NOSPACE);
-        while (tok.hasMoreTokens()) {
-            String word = tok.nextToken().trim();
-            res.add(word);
-        }
-        return res;
-    }
-
-    public static ArrayList<String> getSeparatedKeywords(BibtexEntry be) {
-        return net.sf.jabref.util.Util.getSeparatedKeywords(be.getField("keywords"));
-    }
-
-    public static void putKeywords(BibtexEntry entry, ArrayList<String> keywords, NamedCompound ce) {
-        // Set Keyword Field
-        String oldValue = entry.getField("keywords");
-        String newValue;
-        if (!keywords.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (String keyword : keywords) {
-                sb.append(keyword);
-                sb.append(", ");
-            }
-            sb.delete(sb.length() - 2, sb.length());
-            newValue = sb.toString();
-        } else {
-            newValue = null;
-        }
-        if ((oldValue == null) && (newValue == null)) {
-            return;
-        }
-        if ((oldValue == null) || !oldValue.equals(newValue)) {
-            entry.setField("keywords", newValue);
-            if (ce != null) {
-                ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
-            }
-        }
     }
 
     /**

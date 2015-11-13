@@ -179,13 +179,5 @@ public class UtilTest {
                 net.sf.jabref.util.Util.expandBrackets("[author] have published [title] in [journal].", entry, database));
     }
 
-    @Test
-    public void getSeparatedKeywords() {
-        String keywords = "w1, w2a w2b, w3";
-        ArrayList<String> separatedKeywords = net.sf.jabref.util.Util.getSeparatedKeywords(keywords);
-        String[] expected = new String[]{"w1", "w2a w2b", "w3"};
-        Assert.assertArrayEquals(expected, separatedKeywords.toArray());
-    }
-
 
 }
