@@ -27,10 +27,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -178,7 +180,7 @@ public class BibtexParser {
                 }
                 skipWhitespace();
                 String entryType = parseTextToken();
-                BibtexEntryType tp = BibtexEntryType.getType(entryType);
+                BibtexEntryType tp = EntryTypes.getType(entryType);
                 boolean isEntry = tp != null;
                 // The entry type name was not recognized. This can mean
                 // that it is a string, preamble, or comment. If so,
@@ -242,7 +244,7 @@ public class BibtexParser {
                                 CustomEntryType.ENTRYTYPE_FLAG)) {
                             // A custom entry type can also be stored in a
                             // "@comment"
-                            CustomEntryType typ = CustomEntryType.parseEntryType(comment);
+                            CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
                             entryTypes.put(typ.getName().toLowerCase(), typ);
                         } else {
                             // FIXME: user comments are simply dropped

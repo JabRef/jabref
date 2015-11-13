@@ -23,12 +23,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 
@@ -43,6 +38,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.exporter.FileActions;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.sql.DBImportExportDialog;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
@@ -195,7 +191,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
             }
         }
-        for (BibtexEntryType val : BibtexEntryType.getAllValues()) {
+        for (BibtexEntryType val : EntryTypes.getAllValues()) {
             fieldRequirement.clear();
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 fieldRequirement.add(i, "gen");

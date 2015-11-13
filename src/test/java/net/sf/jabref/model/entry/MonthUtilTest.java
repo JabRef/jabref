@@ -1,6 +1,5 @@
-package net.sf.jabref.logic.util;
+package net.sf.jabref.model.entry;
 
-import net.sf.jabref.logic.util.date.MonthUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

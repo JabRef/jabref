@@ -34,12 +34,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.bibtex.EntryTypes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -507,32 +508,32 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")
                         || typeName.equalsIgnoreCase("MIT Press Journals")
                         || typeName.equalsIgnoreCase("Alcatel-Lucent Journal")) {
-                    type = BibtexEntryType.getType("article");
+                    type = EntryTypes.getType("article");
                     sourceField = "journal";
                 } else if (typeName.equalsIgnoreCase("IEEE Conference Publications")
                         || typeName.equalsIgnoreCase("IET Conference Publications")
                         || typeName.equalsIgnoreCase("VDE Conference Publications")) {
-                    type = BibtexEntryType.getType("inproceedings");
+                    type = EntryTypes.getType("inproceedings");
                     sourceField = "booktitle";
                 } else if (typeName.equalsIgnoreCase("IEEE Standards") || typeName.equalsIgnoreCase("Standards")) {
-                    type = BibtexEntryType.getType("standard");
+                    type = EntryTypes.getType("standard");
                     sourceField = "number";
                 } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
-                    type = BibtexEntryType.getType("electronic");
+                    type = EntryTypes.getType("electronic");
                     sourceField = "note";
                 } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")
                         || typeName.equalsIgnoreCase("MIT Press eBook Chapters")
                         || typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
-                    type = BibtexEntryType.getType("incollection");
+                    type = EntryTypes.getType("incollection");
                     sourceField = "booktitle";
                 } else if (typeName.equalsIgnoreCase("Morgan and Claypool eBooks")) {
-                    type = BibtexEntryType.getType("book");
+                    type = EntryTypes.getType("book");
                     sourceField = "note";
                 }
             }
 
             if (type == null) {
-                type = BibtexEntryType.getType("misc");
+                type = EntryTypes.getType("misc");
                 sourceField = "note";
                 IEEEXploreFetcher.LOGGER.warn("Type detection failed. Use MISC instead. Type string: " + text);
                 unparseable++;
@@ -565,7 +566,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     entry.setField(field, htmlConverter.format(fieldMatcher.group(1)));
                     if (field.equals("title") && fieldMatcher.find()) {
                         String sec_title = htmlConverter.format(fieldMatcher.group(1));
-                        if (entry.getType() == BibtexEntryType.getStandardType("standard")) {
+                        if (entry.getType() == EntryTypes.getStandardType("standard")) {
                             sec_title = sec_title.replaceAll("IEEE Std ", "");
                         }
                         entry.setField(sourceField, sec_title);
@@ -597,9 +598,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 entry.setField("author", authorString);
             }
 
-            if ((entry.getType() == BibtexEntryType.getStandardType("inproceedings"))
+            if ((entry.getType() == EntryTypes.getStandardType("inproceedings"))
                     && entry.getField("author").equals("")) {
-                entry.setType(BibtexEntryType.getStandardType("proceedings"));
+                entry.setType(EntryTypes.getStandardType("proceedings"));
             }
 
             if (includeAbstract) {

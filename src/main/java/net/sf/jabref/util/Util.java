@@ -46,7 +46,7 @@ import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.*;
-import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.logic.util.date.YearUtil;
 import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
@@ -210,7 +210,7 @@ public class Util {
         // Replace non-english characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
 
-        return Util.replaceSpecialCharacters(newKey.toString());
+        return net.sf.jabref.util.Util.replaceSpecialCharacters(newKey.toString());
     }
 
     /**
@@ -218,7 +218,7 @@ public class Util {
      * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
      */
     public static String replaceSpecialCharacters(String s) {
-        for (Map.Entry<String, String> chrAndReplace : Util.UNICODE_CHAR_MAP.entrySet()) {
+        for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
             s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
         }
         return s;
@@ -234,7 +234,7 @@ public class Util {
                 String fieldValue = o.toString().trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
                 while (tok.hasMoreTokens()) {
-                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(net.sf.jabref.model.entry.Util.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -259,7 +259,7 @@ public class Util {
             if (o != null) {
                 tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
-                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(net.sf.jabref.model.entry.Util.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -443,10 +443,10 @@ public class Util {
 
 
     public static String expandBrackets(String bracketString, BibtexEntry entry, BibtexDatabase database) {
-        Matcher m = Util.squareBracketsPattern.matcher(bracketString);
+        Matcher m = net.sf.jabref.util.Util.squareBracketsPattern.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            String replacement = Util.getFieldAndFormat(m.group(), entry, database);
+            String replacement = net.sf.jabref.util.Util.getFieldAndFormat(m.group(), entry, database);
             if (replacement == null) {
                 replacement = "";
             }
@@ -468,7 +468,7 @@ public class Util {
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
 
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = Util.dateFormatter.getCurrentDate();
+        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
         boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER);
         boolean globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
 
@@ -481,7 +481,7 @@ public class Util {
         for (BibtexEntry curEntry : bibs) {
             boolean setOwner = globalSetOwner && (overwriteOwner || (curEntry.getField(BibtexFields.OWNER) == null));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (curEntry.getField(timeStampField) == null));
-            Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+            net.sf.jabref.util.Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
             if (markEntries) {
                 EntryMarker.markEntry(curEntry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
             }
@@ -498,12 +498,12 @@ public class Util {
      */
     public static void setAutomaticFields(BibtexEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = Util.dateFormatter.getCurrentDate();
+        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER) && (overwriteOwner || (entry.getField(BibtexFields.OWNER) == null));
         boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && (overwriteTimestamp || (entry.getField(timeStampField) == null));
 
-        Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+        net.sf.jabref.util.Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
 
     private static void setAutomaticFields(BibtexEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStampField, String timeStamp) {
@@ -532,7 +532,7 @@ public class Util {
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
-        return Util.upgradePdfPsToFile(database.getEntryMap().values(), fields);
+        return net.sf.jabref.util.Util.upgradePdfPsToFile(database.getEntryMap().values(), fields);
     }
 
     /**
@@ -762,17 +762,6 @@ public class Util {
     }
 
     /**
-     * Static equals that can also return the right result when one of the objects is null.
-     *
-     * @param one The object whose equals method is called if the first is not null.
-     * @param two The object passed to the first one if the first is not null.
-     * @return <code>one == null ? two == null : one.equals(two);</code>
-     */
-    public static boolean equals(Object one, Object two) {
-        return one == null ? two == null : one.equals(two);
-    }
-
-    /**
      * Run an AbstractWorker's methods using Spin features to put each method on the correct thread.
      *
      * @param worker The worker to run.
@@ -812,7 +801,7 @@ public class Util {
         try {
             layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
         } catch (Exception e) {
-            Util.LOGGER.info("Wrong format " + e.getMessage(), e);
+            net.sf.jabref.util.Util.LOGGER.info("Wrong format " + e.getMessage(), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);
@@ -835,7 +824,7 @@ public class Util {
         // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
         // if nothing is found, " " is likely to be the separating char.
         // solution by RisKeywords.java: s.split(",[ ]*")
-        StringTokenizer tok = new StringTokenizer(keywords, Util.SEPARATING_CHARS_NOSPACE);
+        StringTokenizer tok = new StringTokenizer(keywords, net.sf.jabref.util.Util.SEPARATING_CHARS_NOSPACE);
         while (tok.hasMoreTokens()) {
             String word = tok.nextToken().trim();
             res.add(word);
@@ -844,7 +833,7 @@ public class Util {
     }
 
     public static ArrayList<String> getSeparatedKeywords(BibtexEntry be) {
-        return Util.getSeparatedKeywords(be.getField("keywords"));
+        return net.sf.jabref.util.Util.getSeparatedKeywords(be.getField("keywords"));
     }
 
     public static void putKeywords(BibtexEntry entry, ArrayList<String> keywords, NamedCompound ce) {
@@ -877,7 +866,7 @@ public class Util {
      * @param ce indicates the undo named compound. May be null
      */
     public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
-        Util.updateField(be, field, newValue, ce, false);
+        net.sf.jabref.util.Util.updateField(be, field, newValue, ce, false);
     }
 
     /**
@@ -923,7 +912,7 @@ public class Util {
      */
     public static String getResults(URL source) throws IOException {
 
-        return Util.getResultsWithEncoding(source.openConnection(), null);
+        return net.sf.jabref.util.Util.getResultsWithEncoding(source.openConnection(), null);
     }
 
     /**
@@ -935,7 +924,7 @@ public class Util {
      */
     public static String getResults(URLConnection source) throws IOException {
 
-        return Util.getResultsWithEncoding(source, null);
+        return net.sf.jabref.util.Util.getResultsWithEncoding(source, null);
     }
 
     /**
@@ -946,7 +935,7 @@ public class Util {
      * @throws IOException
      */
     public static String getResultsWithEncoding(URL source, String encoding) throws IOException {
-        return Util.getResultsWithEncoding(source.openConnection(), encoding);
+        return net.sf.jabref.util.Util.getResultsWithEncoding(source.openConnection(), encoding);
     }
     /**
      * Download the URL using specified encoding and return contents as a String.
@@ -1014,8 +1003,8 @@ public class Util {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String timestamp = Util.dateFormatter.getCurrentDate();
-        Util.updateField(entry, timeStampField, timestamp, ce);
+        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
+        net.sf.jabref.util.Util.updateField(entry, timeStampField, timestamp, ce);
         return ce;
     }
 
@@ -1082,7 +1071,7 @@ public class Util {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
                 } else {
-                    result = Util.findAssociatedFiles(entries, extensions, dirs);
+                    result = net.sf.jabref.util.Util.findAssociatedFiles(entries, extensions, dirs);
                 }
 
                 boolean foundAny = false;
@@ -1195,7 +1184,7 @@ public class Util {
         final Collection<BibtexEntry> entries = new ArrayList<>();
         entries.add(entry);
 
-        return Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
+        return net.sf.jabref.util.Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
     }
 
     /**

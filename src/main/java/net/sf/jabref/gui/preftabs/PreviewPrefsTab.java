@@ -29,10 +29,10 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 
 class PreviewPrefsTab extends JPanel implements PrefsTab {
 
@@ -221,7 +221,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         if (PreviewPrefsTab.entry != null) {
             return PreviewPrefsTab.entry;
         }
-        PreviewPrefsTab.entry = new BibtexEntry(IdGenerator.next(), BibtexEntryType.getType("article"));
+        PreviewPrefsTab.entry = new BibtexEntry(IdGenerator.next(), EntryTypes.getType("article"));
         PreviewPrefsTab.entry.setField(BibtexEntry.KEY_FIELD, "conceicao1997");
         PreviewPrefsTab.entry.setField("author",
                 "Luis E. C. Conceic{\\~a}o and Terje van der Meeren and Johan A. J. Verreth and M S. Evjen and D. F. Houlihan and H. J. Fyhn");

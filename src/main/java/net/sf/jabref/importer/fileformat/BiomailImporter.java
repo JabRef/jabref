@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
 
 /**
  * Importer for the ISI Web of Science format.
@@ -201,7 +201,7 @@ public class BiomailImporter extends ImportFormat {
             }
 
             BibtexEntry b =
-                    new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes.getEntryType(Type)); // id assumes an existing database so don't
+                    new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes.getBibtexEntryType(Type)); // id assumes an existing database so don't
 
             // create one here
             b.setField(hm);

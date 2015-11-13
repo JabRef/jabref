@@ -33,9 +33,8 @@ import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.model.entry.Util;
 
 /**
  * Created by IntelliJ IDEA.
@@ -90,7 +89,7 @@ public class AttachFileDialog extends JDialog {
     private void initGui() {
 
         final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, metaData, entry,
-                editor, Util.getFileFilterForField(fieldName));
+                editor, net.sf.jabref.util.Util.getFileFilterForField(fieldName));
 
         browse.addActionListener(new ActionListener() {
 
@@ -144,7 +143,7 @@ public class AttachFileDialog extends JDialog {
         FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         //builder.append(Util.capitalizeFirst(fieldName));//(editor.getLabel());
-        builder.appendSeparator(StringUtil.capitalizeFirst(fieldName));
+        builder.appendSeparator(Util.capitalizeFirst(fieldName));
         builder.append(editor.getTextComponent());
         builder.append(browse);
 

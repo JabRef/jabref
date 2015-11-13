@@ -25,7 +25,7 @@ import java.util.List;
  * This class defines entry types for BibLatex support.
  */
 
-class BibLatexEntryTypes {
+public class BibLatexEntryTypes {
 
     /*
         "rare" fields?

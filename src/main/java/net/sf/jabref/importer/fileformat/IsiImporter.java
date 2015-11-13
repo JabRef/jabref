@@ -27,10 +27,10 @@ import java.util.regex.Pattern;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.formatter.CaseChangers;
-import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -333,8 +333,8 @@ public class IsiImporter extends ImportFormat {
                 continue;
             }
 
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
-                    .getEntryType(Type));
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getBibtexEntryType(Type));
             // id assumes an existing database so don't
 
             // Remove empty fields:

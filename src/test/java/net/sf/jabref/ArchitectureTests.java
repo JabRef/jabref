@@ -20,6 +20,8 @@ public class ArchitectureTests {
     public static final String PACKAGE_JAVAX_SWING = "javax.swing";
     public static final String PACKAGE_JAVA_AWT = "java.awt";
     public static final String PACKAGE_NET_SF_JABREF_GUI = "net.sf.jabref.gui";
+    public static final String PACKAGE_NET_SF_JABREF_LOGIC = "net.sf.jabref.logic";
+    public static final String PACKAGE_NET_SF_JABREF_MODEL = "net.sf.jabref.model";
 
     private final String firstPackage;
     private final String secondPackage;
@@ -33,12 +35,19 @@ public class ArchitectureTests {
     public static Iterable<Object[]> data() {
         return Arrays.asList(
                 new Object[][] {
-                        {"net.sf.jabref.logic", PACKAGE_JAVA_AWT},
-                        {"net.sf.jabref.logic", PACKAGE_JAVAX_SWING},
-                        {"net.sf.jabref.logic", PACKAGE_NET_SF_JABREF_GUI},
-                        {"net.sf.jabref.model", PACKAGE_JAVA_AWT},
-                        {"net.sf.jabref.model", PACKAGE_JAVAX_SWING},
-                        {"net.sf.jabref.model", PACKAGE_NET_SF_JABREF_GUI}
+                        {PACKAGE_NET_SF_JABREF_LOGIC, PACKAGE_JAVA_AWT},
+                        {PACKAGE_NET_SF_JABREF_LOGIC, PACKAGE_JAVAX_SWING},
+                        {PACKAGE_NET_SF_JABREF_LOGIC, PACKAGE_NET_SF_JABREF_GUI},
+
+                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_JAVA_AWT},
+                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_JAVAX_SWING},
+                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_NET_SF_JABREF_GUI},
+                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_NET_SF_JABREF_LOGIC},
+
+                        {"net.sf.jabref.bst", PACKAGE_JAVA_AWT},
+                        {"net.sf.jabref.bst", PACKAGE_JAVAX_SWING},
+                        {"net.sf.jabref.bst", PACKAGE_NET_SF_JABREF_GUI},
+                        {"net.sf.jabref.bst", PACKAGE_NET_SF_JABREF_LOGIC}
                 }
         );
     }

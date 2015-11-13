@@ -68,7 +68,7 @@ public class BibtexEntryWriter {
         // XXX JK: Look for all used field names not only defined once, since
         //         there may be some unofficial field name used.
         int max = 0;
-        for (BibtexEntryType type : BibtexEntryType.getAllValues()) {
+        for (BibtexEntryType type : EntryTypes.getAllValues()) {
             if (type.getRequiredFields() != null) {
                 for (String field : type.getRequiredFields()) {
                     max = Math.max(max, field.length());
@@ -259,7 +259,7 @@ public class BibtexEntryWriter {
         boolean hasWritten = false;
 
         // Write user defined fields first.
-        String[] fields = entry.getUserDefinedFields();
+        String[] fields = Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
         if (fields != null) {
             //do not sort, write as it is.
             for (String value : fields) {

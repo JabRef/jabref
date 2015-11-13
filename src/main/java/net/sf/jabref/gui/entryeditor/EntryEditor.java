@@ -62,11 +62,12 @@ import net.sf.jabref.gui.journals.JournalAbbreviationsUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.Util;
 import net.sf.jabref.model.entry.EntryConverter;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -74,7 +75,6 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -242,7 +242,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
                 List<String> secondaryOptionalFields = entry.getType().getSecondaryOptionalFields();
-                String[] optionalFieldsNotPrimaryOrDeprecated = StringUtil.getRemainder((secondaryOptionalFields.toArray(new String[0])),
+                String[] optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder((secondaryOptionalFields.toArray(new String[0])),
                         deprecatedFields.toArray(new String[deprecatedFields.size()]));
 
                 // Get list of all optional fields of this entry and their aliases
@@ -1022,8 +1022,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JPopupMenu typeMenu = new JPopupMenu();
-                    for (String s : BibtexEntryType.getAllTypes()) {
-                        typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
+                    for (String s : EntryTypes.getAllTypes()) {
+                        typeMenu.add(new ChangeTypeAction(EntryTypes.getType(s), panel));
                     }
 
                     typeMenu.show(ths, 0, 0);
@@ -1063,8 +1063,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 private void handleTypeChange() {
                     JPopupMenu typeMenu = new JPopupMenu();
-                    for (String s : BibtexEntryType.getAllTypes()) {
-                        typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
+                    for (String s : EntryTypes.getAllTypes()) {
+                        typeMenu.add(new ChangeTypeAction(EntryTypes.getType(s), panel));
                     }
                     typeMenu.show(ths, 0, 0);
                 }
@@ -1208,7 +1208,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
 
                 // Make sure the key is legal:
-                String cleaned = Util.checkLegalKey(newValue);
+                String cleaned = net.sf.jabref.util.Util.checkLegalKey(newValue);
                 if ((cleaned != null) && !cleaned.equals(newValue)) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
                             Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
@@ -1232,8 +1232,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
                 UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.database, entry.getId(), oldValue, newValue);
-                if (Util.updateTimeStampIsSet()) {
-                    NamedCompound ce = Util.doUpdateTimeStamp(entry, undoableKeyChange);
+                if (net.sf.jabref.util.Util.updateTimeStampIsSet()) {
+                    NamedCompound ce = net.sf.jabref.util.Util.doUpdateTimeStamp(entry, undoableKeyChange);
                     panel.undoManager.addEdit(ce);
                 } else {
                     panel.undoManager.addEdit(undoableKeyChange);
@@ -1295,8 +1295,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                         // Add an UndoableFieldChange to the baseframe's undoManager.
                         UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fieldEditor.getFieldName(), oldValue, toSet);
-                        if (Util.updateTimeStampIsSet()) {
-                            NamedCompound ce = Util.doUpdateTimeStamp(entry, undoableFieldChange);
+                        if (net.sf.jabref.util.Util.updateTimeStampIsSet()) {
+                            NamedCompound ce = net.sf.jabref.util.Util.doUpdateTimeStamp(entry, undoableFieldChange);
                             panel.undoManager.addEdit(ce);
                         } else {
                             panel.undoManager.addEdit(undoableFieldChange);

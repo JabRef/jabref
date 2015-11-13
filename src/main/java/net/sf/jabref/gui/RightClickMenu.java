@@ -32,6 +32,7 @@ import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -219,8 +220,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      */
     private void populateTypeMenu() {
         typeMenu.removeAll();
-        for (String key : BibtexEntryType.getAllTypes()) {
-            typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(key), panel));
+        for (String key : EntryTypes.getAllTypes()) {
+            typeMenu.add(new ChangeTypeAction(EntryTypes.getType(key), panel));
         }
     }
 

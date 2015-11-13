@@ -59,7 +59,7 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;

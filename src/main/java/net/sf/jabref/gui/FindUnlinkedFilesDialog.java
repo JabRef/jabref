@@ -38,12 +38,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -84,6 +79,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.bibtex.EntryTypes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -1106,7 +1102,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void createEntryTypesCombobox() {
 
-        Iterator<BibtexEntryType> iterator = BibtexEntryType.getAllValues().iterator();
+        Iterator<BibtexEntryType> iterator = EntryTypes.getAllValues().iterator();
         Vector<BibtexEntryTypeWrapper> list = new Vector<>();
         list.add(new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {

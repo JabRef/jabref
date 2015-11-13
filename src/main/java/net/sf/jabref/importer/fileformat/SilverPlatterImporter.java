@@ -29,7 +29,7 @@ import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.regex.Pattern;
 
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
 
 /**
  * Imports a SilverPlatter exported file. This is a poor format to parse,
@@ -212,8 +212,8 @@ public class SilverPlatterImporter extends ImportFormat {
 
                 }
 
-                BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
-                        .getEntryType(Type)); // id assumes an existing database so don't
+                BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                        .getBibtexEntryType(Type)); // id assumes an existing database so don't
                 // create one here
                 b.setField(h);
 

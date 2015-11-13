@@ -22,7 +22,7 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.Util;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -63,7 +63,7 @@ public class TextField extends JTextField implements FieldEditor {
             addFocusListener(new FieldEditorFocusListener());
         }
         this.fieldName = fieldName;
-        label = new FieldNameLabel(' ' + StringUtil.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(' ' + Util.capitalizeFirst(this.fieldName) + ' ');
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 

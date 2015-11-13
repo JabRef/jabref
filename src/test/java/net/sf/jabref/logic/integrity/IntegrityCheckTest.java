@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.integrity;
 
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.junit.Test;
 

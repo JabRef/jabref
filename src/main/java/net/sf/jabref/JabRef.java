@@ -36,13 +36,13 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.nativeext.PinToTaskbar;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
@@ -119,7 +119,7 @@ public class JabRef {
 
         /* Build list of Import and Export formats */
         Globals.importFormatReader.resetImportFormats();
-        BibtexEntryType.loadCustomEntryTypes(prefs);
+        CustomEntryTypesManager.loadCustomEntryTypes(prefs);
         ExportFormats.initAllExports();
 
         // Read list(s) of journal names and abbreviations:
@@ -210,7 +210,7 @@ public class JabRef {
         if (cli.isPreferencesImport()) {
             try {
                 Globals.prefs.importPreferences(cli.getPreferencesImport());
-                BibtexEntryType.loadCustomEntryTypes(Globals.prefs);
+                CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
                 ExportFormats.initAllExports();
             } catch (IOException ex) {
                 LOGGER.error("Cannot import preferences", ex);
