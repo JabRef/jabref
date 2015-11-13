@@ -23,6 +23,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.*;
@@ -33,17 +34,18 @@ public class IconTheme {
     public static Font FONT_16;
 
     public static final Color DEFAULT_COLOR = new Color(98, 119, 130);
-    public static final Color DEFAULT_DISABLED_COLOR = new Color(200,200,200);
+    public static final Color DEFAULT_DISABLED_COLOR = new Color(200, 200, 200);
     public static final int DEFAULT_SIZE = 24;
     public static final int SMALL_SIZE = 16;
 
+    private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
+
     static {
-        try {
-            FONT = Font.createFont(Font.TRUETYPE_FONT, FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf"));
+        try (InputStream stream = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
+            FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
             FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
         } catch (FontFormatException | IOException e) {
-            // PROBLEM!
-            e.printStackTrace();
+            LOGGER.warn("Error loading font", e);
         }
     }
 
@@ -223,7 +225,6 @@ public class IconTheme {
         }
     }
 
-    private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
 
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
