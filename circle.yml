@@ -18,7 +18,7 @@ test:
   override:
     - TERM=dumb ./gradlew test
   post:
-    - TERM=dumb [[ -z "$COVERITY_ACCESS_TOKEN" ]] || ./gradlew coverityCheck || exit 0
+    - if [[ ! -z $COVERITY_ACCESS_TOKEN ]] ; then ./gradlew coverityCheck || true ; else true ; fi 
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
     - TERM=dumb ./gradlew jacocoTestReport coveralls
