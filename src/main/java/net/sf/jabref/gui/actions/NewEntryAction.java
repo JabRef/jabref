@@ -5,7 +5,7 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,14 +32,14 @@ public class NewEntryAction extends MnemonicAwareAction {
     public NewEntryAction(JabRefFrame jabRefFrame, String type_) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, Util.capitalizeFirst(type_));
+        putValue(Action.NAME, EntryUtil.capitalizeFirst(type_));
         type = type_;
     }
 
     public NewEntryAction(JabRefFrame jabRefFrame, String type_, KeyStroke key) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, Util.capitalizeFirst(type_));
+        putValue(Action.NAME, EntryUtil.capitalizeFirst(type_));
         putValue(Action.ACCELERATOR_KEY, key);
         type = type_;
     }

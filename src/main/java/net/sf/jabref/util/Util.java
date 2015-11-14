@@ -45,9 +45,6 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.*;
-import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.logic.util.date.YearUtil;
 import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -103,66 +100,11 @@ public class Util {
 
 
     /**
-     * This method translates a field or string from Bibtex notation, with possibly text contained in " " or { }, and
-     * string references, concatenated by '#' characters, into Bibkeeper notation, where string references are enclosed
-     * in a pair of '#' characters.
+     * This method sets the location of a Dialog such that it is centered with regard to another window, but not outside
+     * the screen on the left and the top.
      */
-    public static String parseField(String content) {
-        if (content.isEmpty()) {
-            return content;
-        }
-
-        String[] strings = content.split("#");
-        StringBuilder result = new StringBuilder();
-        for (String string : strings) {
-            String s = string.trim();
-            if (!s.isEmpty()) {
-                char c = s.charAt(0);
-                // String reference or not?
-                if ((c == '{') || (c == '"')) {
-                    result.append(StringUtil.shaveString(string));
-                } else {
-                    // This part should normally be a string reference, but if it's
-                    // a pure number, it is not.
-                    String s2 = StringUtil.shaveString(s);
-
-                    try {
-                        Integer.parseInt(s2);
-                        result.append(s2);
-                    } catch (NumberFormatException e) {
-                        result.append('#').append(s2).append('#');
-                    }
-                }
-            }
-        }
-        return result.toString();
-    }
-
-    /**
-     * Will return the publication date of the given bibtex entry in conformance to ISO 8601, i.e. either YYYY or
-     * YYYY-MM.
-     *
-     * @param entry
-     * @return will return the publication date of the entry or null if no year was found.
-     */
-    // TODO: Should be instance method of BibTexEntry
-    public static String getPublicationDate(BibtexEntry entry) {
-
-        Object o = entry.getField("year");
-        if (o == null) {
-            return null;
-        }
-
-        String year = YearUtil.toFourDigitYear(o.toString());
-
-        o = entry.getField("month");
-        if (o != null) {
-            MonthUtil.Month month = MonthUtil.getMonth(o.toString());
-            if (month.isValid()) {
-                return year + "-" + month.twoDigitNumber;
-            }
-        }
-        return year;
+    public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
+        diag.setLocationRelativeTo(win);
     }
 
     /**
@@ -199,14 +141,14 @@ public class Util {
             }
         }
 
-        // Replace non-english characters like umlauts etc. with a sensible
+        // Replace non-English characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
 
         return net.sf.jabref.util.Util.replaceSpecialCharacters(newKey.toString());
     }
 
     /**
-     * Replace non-english characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
      * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
      */
     public static String replaceSpecialCharacters(String s) {
@@ -226,7 +168,7 @@ public class Util {
                 String fieldValue = o.toString().trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
                 while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.Util.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -251,7 +193,7 @@ public class Util {
             if (o != null) {
                 tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.Util.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -286,63 +228,6 @@ public class Util {
         }
 
         return res;
-    }
-
-    /**
-     * Make sure an URL is "portable", in that it doesn't contain bad characters that break the open command in some
-     * OSes.
-     *
-     * A call to this method will also remove \\url{} enclosings and clean Doi links.
-     *
-     * @param link :the URL to sanitize.
-     * @return Sanitized URL
-     */
-    public static String sanitizeUrl(String link) {
-        link = link.trim();
-
-        // First check if it is enclosed in \\url{}. If so, remove the wrapper.
-        if (link.startsWith("\\url{") && link.endsWith("}")) {
-            link = link.substring(5, link.length() - 1);
-        }
-
-        // DOI cleanup
-        // converts doi-only link to full http address
-        // Morten Alver 6 Nov 2012: this extracts a nonfunctional Doi from some complete
-        // http addresses (e.g. http://onlinelibrary.wiley.com/doi/10.1002/rra.999/abstract, where
-        // the trailing "/abstract" is included but doesn't lead to a resolvable Doi).
-        // To prevent mangling of working URLs I'm disabling this check if the link is already
-        // a full http link:
-        // TODO: not sure if this is allowed
-        if (link.matches("^doi:/*.*")) {
-            // Remove 'doi:'
-            link = link.replaceFirst("^doi:/*", "");
-            link = new DOI(link).getURLAsASCIIString();
-        }
-
-        Optional<DOI> doi = DOI.build(link);
-        if (doi.isPresent() && !link.matches("^https?://.*")) {
-            link = doi.get().getURLAsASCIIString();
-        }
-
-        // FIXME: everything below is really flawed atm
-        link = link.replaceAll("\\+", "%2B");
-
-        try {
-            link = URLDecoder.decode(link, "UTF-8");
-        } catch (UnsupportedEncodingException ignored) {
-            // Ignored
-        }
-
-        /**
-         * Fix for: [ 1574773 ] sanitizeUrl() breaks ftp:// and file:///
-         *
-         * http://sourceforge.net/tracker/index.php?func=detail&aid=1574773&group_id=92314&atid=600306
-         */
-        try {
-            return new URI(null, link, null).toASCIIString();
-        } catch (URISyntaxException e) {
-            return link;
-        }
     }
 
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
@@ -406,7 +291,7 @@ public class Util {
 
                         }
                     } else {
-                        // Incorrecly terminated open brace
+                        // Incorrectly terminated open brace
                         result.add(new String[] {method});
                     }
                 } else {
@@ -707,7 +592,7 @@ public class Util {
                 continue;
             }
             // If we are not allowed to overwrite values, check if there is a
-            // nonempy value already for this entry for the new field:
+            // non-empty value already for this entry for the new field:
             String valInNewField = entry.getField(newField);
             if (!overwriteValues && (valInNewField != null) && !valInNewField.isEmpty()) {
                 continue;
@@ -1302,7 +1187,7 @@ public class Util {
         return fieldValue;
     }
 
-    // Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
+    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
     public static Pattern getPatternForWords(ArrayList<String> words) {
         if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
             return Pattern.compile("");
@@ -1310,7 +1195,7 @@ public class Util {
 
         boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH);
 
-        // compile the words to a regex in the form (w1) | (w2) | (w3)
+        // compile the words to a regular expression in the form (w1) | (w2) | (w3)
         String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");
         for (int i = 1; i < words.size(); i++) {
             searchPattern = searchPattern.concat("|(").concat(regExSearch ? words.get(i) : Pattern.quote(words.get(i))).concat(")");

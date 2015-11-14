@@ -64,7 +64,7 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import net.sf.jabref.model.entry.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -448,7 +448,7 @@ public class SearchResultsDialog {
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return Util.capitalizeFirst(fields[column - PAD]);
+                return EntryUtil.capitalizeFirst(fields[column - PAD]);
             } else {
                 return "";
             }

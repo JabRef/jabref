@@ -247,7 +247,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             if (defaulted.contains(stringListEntry.getKey())) {
                 // This type should be reverted to its default setup.
                 //System.out.println("Defaulting: "+typeName);
-                String nm = Util.capitalizeFirst(stringListEntry.getKey());
+                String nm = EntryUtil.capitalizeFirst(stringListEntry.getKey());
                 EntryTypes.removeType(nm);
 
                 updateTypesForEntries(nm);
@@ -273,8 +273,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             if (changesMade) {
                 //System.out.println("Updating: "+typeName);
                 CustomEntryType typ = biblatexMode ?
-                        new CustomEntryType(Util.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
-                        new CustomEntryType(Util.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
+                        new CustomEntryType(EntryUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
+                        new CustomEntryType(EntryUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
 
                 EntryTypes.addOrModifyCustomEntryType(typ);
                 updateTypesForEntries(typ.getName());
@@ -308,14 +308,14 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                                         + "type will be declared "
                                         + "typeless. Continue?"),
                                 Localization.lang("Delete custom format") +
-                                        " '" + Util.capitalizeFirst(name) + '\'', JOptionPane.YES_NO_OPTION,
+                                        " '" + EntryUtil.capitalizeFirst(name) + '\'', JOptionPane.YES_NO_OPTION,
                                 JOptionPane.WARNING_MESSAGE);
                 if (reply != JOptionPane.YES_OPTION) {
                     return;
                 }
             }
             EntryTypes.removeType(name);
-            updateTypesForEntries(Util.capitalizeFirst(name));
+            updateTypesForEntries(EntryUtil.capitalizeFirst(name));
             changed.remove(name);
             reqLists.remove(name);
             optLists.remove(name);

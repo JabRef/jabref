@@ -22,7 +22,7 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
@@ -109,7 +109,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 if (disName != null) {
                     sb.append(disName);
                 } else {
-                    sb.append(Util.capitalizeFirst(fld[i]));
+                    sb.append(EntryUtil.capitalizeFirst(fld[i]));
                 }
             }
             return sb.toString();

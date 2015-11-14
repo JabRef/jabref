@@ -19,8 +19,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
-import net.sf.jabref.model.entry.Util;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.EntryUtil;
+
 import java.awt.*;
 
 import javax.swing.*;
@@ -58,7 +58,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
         setWrapStyleWord(true);
         this.fieldName = fieldName;
 
-        label = new FieldNameLabel(' ' + Util.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(' ' + EntryUtil.capitalizeFirst(this.fieldName) + ' ');
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 

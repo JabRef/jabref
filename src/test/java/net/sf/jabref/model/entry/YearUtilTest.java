@@ -1,8 +1,9 @@
-package net.sf.jabref.logic.util.date;
+package net.sf.jabref.model.entry;
 
-import net.sf.jabref.logic.util.date.YearUtil;
 import org.junit.Assert;
 import org.junit.Test;
+
+import net.sf.jabref.model.entry.YearUtil;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

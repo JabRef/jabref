@@ -52,7 +52,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.model.entry.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -80,7 +80,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         this.metaData = metaData;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
-        label = new FieldNameLabel(" " + Util.capitalizeFirst(fieldName) + " ");
+        label = new FieldNameLabel(" " + EntryUtil.capitalizeFirst(fieldName) + " ");
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);

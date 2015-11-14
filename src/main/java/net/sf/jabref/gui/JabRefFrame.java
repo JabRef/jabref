@@ -64,7 +64,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -2124,7 +2124,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         public EditAction(String command, String name, Icon icon) {
             super(icon);
             this.command = command;
-            String nName = Util.capitalizeFirst(command);
+            String nName = EntryUtil.capitalizeFirst(command);
             putValue(Action.NAME, nName);
             putValue(Action.ACCELERATOR_KEY, prefs.getKey(nName));
             putValue(Action.SHORT_DESCRIPTION, name);

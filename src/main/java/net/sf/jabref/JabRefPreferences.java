@@ -44,7 +44,7 @@ import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.entry.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.CustomEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1353,10 +1353,10 @@ public class JabRefPreferences {
             return null;
         }
         if (priOpt == null) {
-            return new CustomEntryType(Util.capitalizeFirst(name), req, opt);
+            return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt);
         }
-        String[] secOpt = Util.getRemainder(opt, priOpt);
-        return new CustomEntryType(Util.capitalizeFirst(name), req, priOpt, secOpt);
+        String[] secOpt = EntryUtil.getRemainder(opt, priOpt);
+        return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secOpt);
 
     }
 

@@ -2,7 +2,7 @@ package net.sf.jabref.model.entry;
 
 import java.util.ArrayList;
 
-public class Util {
+public class EntryUtil {
 
     /**
      * Static equals that can also return the right result when one of the objects is null.

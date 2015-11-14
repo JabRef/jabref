@@ -34,8 +34,8 @@ import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.gui.PreviewPanel;
 
 import com.jgoodies.forms.layout.CellConstraints;
@@ -208,7 +208,7 @@ public class MergeEntries {
         int tmpLabelWidth = 0;
         for (String field : joint) {
             jointStrings[row - 2] = field;
-            label = new JLabel(StringUtil.toUpperFirstLetter(field));
+            label = new JLabel(CaseChangers.UPPER_FIRST.format(field));
             font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
             mergePanel.add(label, cc.xy(1, row));

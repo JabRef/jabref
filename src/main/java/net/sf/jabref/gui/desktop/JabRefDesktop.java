@@ -10,6 +10,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.URLUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.Util;
 
@@ -69,7 +70,7 @@ public class JabRefDesktop {
         } else if (fieldName.equals("eprint")) {
             fieldName = "url";
 
-            link = Util.sanitizeUrl(link);
+            link = URLUtil.sanitizeUrl(link);
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
@@ -431,7 +432,7 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openBrowser(String url) throws IOException {
-        url = Util.sanitizeUrl(url);
+        url = URLUtil.sanitizeUrl(url);
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
     }

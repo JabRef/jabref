@@ -45,10 +45,10 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     public CustomEntryType(String name, String[] required, String[] priOpt, String[] secOpt) {
-        this.name = Util.capitalizeFirst(name);
+        this.name = EntryUtil.capitalizeFirst(name);
         parseRequiredFields(required);
         this.priOpt = priOpt;
-        optional = Util.arrayConcat(priOpt, secOpt);
+        optional = EntryUtil.arrayConcat(priOpt, secOpt);
     }
 
     public CustomEntryType(String name, List<String> required, List<String> optional) {
@@ -60,7 +60,7 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     public CustomEntryType(String name, String required, String optional) {
-        this.name = Util.capitalizeFirst(name);
+        this.name = EntryUtil.capitalizeFirst(name);
         if (required.isEmpty()) {
             this.required = new String[0];
         } else {
@@ -118,7 +118,7 @@ public class CustomEntryType extends BibtexEntryType {
 
     @Override
     public List<String> getSecondaryOptionalFields() {
-        return Arrays.asList(Util.getRemainder(optional, priOpt));
+        return Arrays.asList(EntryUtil.getRemainder(optional, priOpt));
     }
 
     @Override
