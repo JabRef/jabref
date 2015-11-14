@@ -85,19 +85,6 @@ public class StringUtil {
     }
 
     /**
-     * Takes a delimited string, splits it and returns
-     *
-     * @param names a <code>String</code> value
-     * @return a <code>String[]</code> value
-     */
-    public static String[] split(String names, String delimiter) {
-        if (names == null) {
-            return null;
-        }
-        return names.split(delimiter);
-    }
-
-    /**
      * Removes optional square brackets from the string s
      *
      * @param toStrip
