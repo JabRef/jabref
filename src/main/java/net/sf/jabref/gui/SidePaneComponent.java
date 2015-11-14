@@ -28,8 +28,6 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     protected final JButton close = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
 
-    private boolean visible;
-
     private final SidePaneManager manager;
 
     protected BasePanel panel;
@@ -69,22 +67,6 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     private void moveDown() {
         manager.moveDown(this);
-    }
-
-    /**
-     * Used by SidePaneManager only, to keep track of visibility.
-     *
-     */
-    void setVisibility(boolean vis) {
-        visible = vis;
-    }
-
-    /**
-     * Used by SidePaneManager only, to keep track of visibility.
-     *
-     */
-    boolean hasVisibility() {
-        return visible;
     }
 
     public void setActiveBasePanel(BasePanel panel) {

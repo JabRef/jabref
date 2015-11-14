@@ -15,20 +15,32 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 /**
  * Manages visibility of SideShowComponents in a given newly constructed
  * sidePane.
  */
 public class SidePaneManager {
+
+    private static final Log LOGGER = LogFactory.getLog(SidePaneManager.class);
 
     private final JabRefFrame frame;
 
@@ -97,7 +109,7 @@ public class SidePaneManager {
         if (o != null) {
             show((SidePaneComponent) o);
         } else {
-            System.err.println("Side pane component '" + name + "' unknown.");
+            LOGGER.warn("Side pane component '" + name + "' unknown.");
         }
     }
 
@@ -106,18 +118,13 @@ public class SidePaneManager {
         if (o != null) {
             hideComponent((SidePaneComponent) o);
         } else {
-            System.err.println("Side pane component '" + name + "' unknown.");
+            LOGGER.warn("Side pane component '" + name + "' unknown.");
         }
     }
 
     public synchronized void register(String name, SidePaneComponent comp) {
         components.put(name, comp);
         componentNames.put(comp, name);
-    }
-
-    public synchronized void registerAndShow(String name, SidePaneComponent comp) {
-        register(name, comp);
-        show(name);
     }
 
     private synchronized void show(SidePaneComponent component) {
@@ -171,7 +178,7 @@ public class SidePaneManager {
             try {
                 preferredPositions.put(componentNames[i], Integer.parseInt(componentPositions[i]));
             } catch (NumberFormatException e) {
-                // Invalid integer format, ignore
+                LOGGER.info("Invalid number format for side pane component '" + componentNames[i] + "'.", e);
             }
         }
 
@@ -203,7 +210,7 @@ public class SidePaneManager {
     }
 
 
-    // Helper class for sorting visible componenys based on their preferred position
+    // Helper class for sorting visible components based on their preferred position
     private class PreferredIndexSort implements Comparator<SidePaneComponent> {
 
         private final Map<String, Integer> preferredPositions;
@@ -217,7 +224,6 @@ public class SidePaneManager {
         public int compare(SidePaneComponent comp1, SidePaneComponent comp2) {
             int pos1 = preferredPositions.getOrDefault(getComponentName(comp1), 0);
             int pos2 = preferredPositions.getOrDefault(getComponentName(comp2), 0);
-            // Could make a one-liner...
             return Integer.valueOf(pos1).compareTo(pos2);
         }
     }
@@ -288,10 +294,5 @@ public class SidePaneManager {
             sidep.setVisible(false);
 
         }
-    }
-
-    public void revalidate() {
-        sidep.revalidate();
-        sidep.repaint();
     }
 }
