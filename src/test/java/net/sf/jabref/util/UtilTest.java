@@ -53,15 +53,6 @@ public class UtilTest {
     }
 
     @Test
-    public void testMakeBibtexExtension() {
-        Assert.assertEquals("aa.bib", StringUtil.makeBibtexExtension("aa"));
-        Assert.assertEquals(".bib", StringUtil.makeBibtexExtension(""));
-        Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a.bib"));
-        Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a"));
-        Assert.assertEquals("a.bb.bib", StringUtil.makeBibtexExtension("a.bb"));
-    }
-
-    @Test
     public void testParseField() {
 
         Assert.assertEquals("", net.sf.jabref.util.Util.parseField(""));
