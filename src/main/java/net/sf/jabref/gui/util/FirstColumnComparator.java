@@ -13,14 +13,14 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.util;
 
 import java.util.Comparator;
 
-import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 
-class FirstColumnComparator implements Comparator<BibtexEntry> {
+public class FirstColumnComparator implements Comparator<BibtexEntry> {
 
     private final BibtexDatabase database;
 

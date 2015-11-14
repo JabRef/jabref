@@ -30,12 +30,13 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -285,7 +286,7 @@ public class WriteXMPAction extends AbstractWorker {
         public void open() {
             progressArea.setText("");
             canceled = false;
-            Util.placeDialog(optDiag, panel.frame());
+            PositionWindow.placeDialog(optDiag, panel.frame());
 
             okButton.setEnabled(false);
             cancelButton.setEnabled(true);

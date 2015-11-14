@@ -13,21 +13,21 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.util;
+
+import java.util.Comparator;
 
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
-import java.util.Comparator;
-
 /**
  * Comparator that handles the ranking icon column
- * 
+ *
  * Based on IconComparator
  * Only comparing ranking field
  * inverse comparison of ranking as rank5 is higher than rank1
  */
-class RankingFieldComparator implements Comparator<BibtexEntry> {
+public class RankingFieldComparator implements Comparator<BibtexEntry> {
 
     @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {

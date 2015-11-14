@@ -16,9 +16,9 @@
 package net.sf.jabref.sql;
 
 import net.sf.jabref.gui.actions.BaseAction;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.sql.exporter.DBExporter;
 
 import javax.swing.*;
@@ -68,7 +68,7 @@ public class DbConnectAction implements BaseAction {
 
         // show connection dialog
         DBConnectDialog dbd = new DBConnectDialog(panel.frame(), dbs);
-        Util.placeDialog(dbd, panel);
+        PositionWindow.placeDialog(dbd, panel);
         dbd.setVisible(true);
 
         // connnect to database to test DBStrings

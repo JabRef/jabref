@@ -24,9 +24,9 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.GUIGlobals;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

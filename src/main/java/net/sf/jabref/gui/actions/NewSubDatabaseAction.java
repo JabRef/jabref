@@ -4,8 +4,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
 
 import javax.swing.*;
@@ -31,7 +31,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
 
         FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.tabbedPane);
 
-        Util.placeDialog(dialog, jabRefFrame);
+        PositionWindow.placeDialog(dialog, jabRefFrame);
         dialog.setVisible(true);
 
         if (dialog.generatePressed()) {

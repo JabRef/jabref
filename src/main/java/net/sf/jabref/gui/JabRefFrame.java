@@ -17,17 +17,16 @@ package net.sf.jabref.gui;
 
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
@@ -54,6 +53,8 @@ import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -92,7 +93,6 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.util.ManageKeywordsAction;
 import net.sf.jabref.util.MassSetFieldAction;
-
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import osx.macadapter.MacAdapter;
@@ -118,6 +118,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
+
+    private PositionWindow pw;
+
     private final GeneralAction checkIntegrity = new GeneralAction(Actions.CHECK_INTEGRITY, Localization.lang("Check integrity")) {
 
         @Override
@@ -573,7 +576,26 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+        pw = new PositionWindow(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
+                JabRefPreferences.SIZE_Y);
         positionWindowOnScreen();
+
+        // Set up a ComponentListener that saves the last size and position of the dialog
+        this.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+        });
+
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
@@ -620,55 +642,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     private void positionWindowOnScreen() {
         if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-
-            int sizeX = prefs.getInt(JabRefPreferences.SIZE_X);
-            int sizeY = prefs.getInt(JabRefPreferences.SIZE_Y);
-            int posX = prefs.getInt(JabRefPreferences.POS_X);
-            int posY = prefs.getInt(JabRefPreferences.POS_Y);
-
-            //
-            // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
-            //
-            // Do not put a window outside the screen if the preference values are wrong.
-            //
-            // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
-            // googled on forums.java.sun.com graphicsenvironment second screen java
-            //
-            if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length >= 1) {
-                Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
-                        .getDefaultConfiguration().getBounds();
-                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-
-                // Make sure we are not above or to the left of the screen bounds:
-                if (posX < bounds.x) {
-                    posX = bounds.x;
-                }
-                if (posY < bounds.y) {
-                    posY = bounds.y;
-                }
-
-                int height = (int) dim.getHeight();
-                int width = (int) dim.getWidth();
-
-                if ((posX + sizeX) > width) {
-                    if (sizeX <= width) {
-                        posX = width - sizeX;
-                    } else {
-                        posX = prefs.getIntDefault(JabRefPreferences.POS_X);
-                        sizeX = prefs.getIntDefault(JabRefPreferences.SIZE_X);
-                    }
-                }
-
-                if ((posY + sizeY) > height) {
-                    if (sizeY <= height) {
-                        posY = height - sizeY;
-                    } else {
-                        posY = prefs.getIntDefault(JabRefPreferences.POS_Y);
-                        sizeY = prefs.getIntDefault(JabRefPreferences.SIZE_Y);
-                    }
-                }
-            }
-            setBounds(posX, posY, sizeX, sizeY);
+            pw.setWindowPosition();
         }
     }
 
@@ -770,7 +744,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                 output(Localization.lang("Opening preferences..."));
                 if (prefsDialog == null) {
                     prefsDialog = new PreferencesDialog(JabRefFrame.this, jabRef);
-                    net.sf.jabref.util.Util.placeDialog(prefsDialog, JabRefFrame.this);
+                    PositionWindow.placeDialog(prefsDialog, JabRefFrame.this);
                 } else {
                     prefsDialog.setValues();
                 }
@@ -806,10 +780,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         if (basePanel() != null) {
             basePanel().saveDividerLocation();
         }
-        prefs.putInt(JabRefPreferences.POS_X, JabRefFrame.this.getLocation().x);
-        prefs.putInt(JabRefPreferences.POS_Y, JabRefFrame.this.getLocation().y);
-        prefs.putInt(JabRefPreferences.SIZE_X, JabRefFrame.this.getSize().width);
-        prefs.putInt(JabRefPreferences.SIZE_Y, JabRefFrame.this.getSize().height);
+
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
@@ -1734,7 +1705,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             KeyBindingsDialog d = new KeyBindingsDialog(new HashMap<>(prefs.getKeyBindings()), prefs.getDefaultKeys());
             d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             d.pack(); //setSize(300,500);
-            net.sf.jabref.util.Util.placeDialog(d, JabRefFrame.this);
+            PositionWindow.placeDialog(d, JabRefFrame.this);
             d.setVisible(true);
             if (d.getAction()) {
                 prefs.setNewKeyBindings(d.getNewKeyBindings());
@@ -1872,7 +1843,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                             openInNew);
                     diag.addEntries(entries);
                     diag.entryListComplete();
-                    net.sf.jabref.util.Util.placeDialog(diag, JabRefFrame.this);
+                    PositionWindow.placeDialog(diag, JabRefFrame.this);
                     diag.setVisible(true);
                     diag.toFront();
                 }
@@ -2209,7 +2180,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         @Override
         public void actionPerformed(ActionEvent e) {
             JDialog dl = new EntryCustomizationDialog2(JabRefFrame.this);
-            net.sf.jabref.util.Util.placeDialog(dl, JabRefFrame.this);
+            PositionWindow.placeDialog(dl, JabRefFrame.this);
             dl.setVisible(true);
         }
     }
@@ -2223,7 +2194,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         @Override
         public void actionPerformed(ActionEvent e) {
             GenFieldsCustomizer gf = new GenFieldsCustomizer(JabRefFrame.this);
-            net.sf.jabref.util.Util.placeDialog(gf, JabRefFrame.this);
+            PositionWindow.placeDialog(gf, JabRefFrame.this);
             gf.setVisible(true);
 
         }
@@ -2244,7 +2215,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                 propertiesDialog = new DatabasePropertiesDialog(JabRefFrame.this);
             }
             propertiesDialog.setPanel(basePanel());
-            net.sf.jabref.util.Util.placeDialog(propertiesDialog, JabRefFrame.this);
+            PositionWindow.placeDialog(propertiesDialog, JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }
 
@@ -2269,7 +2240,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                 // BibtexKeyPatternDialog allows for updating content based on currently selected panel
                 bibtexKeyPatternDialog.setPanel(basePanel());
             }
-            net.sf.jabref.util.Util.placeDialog(bibtexKeyPatternDialog, JabRefFrame.this);
+            PositionWindow.placeDialog(bibtexKeyPatternDialog, JabRefFrame.this);
             bibtexKeyPatternDialog.setVisible(true);
         }
 

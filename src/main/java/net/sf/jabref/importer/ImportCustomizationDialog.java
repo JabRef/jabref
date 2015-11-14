@@ -30,8 +30,6 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.gui.FocusRequester;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
@@ -40,12 +38,13 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-
-import net.sf.jabref.util.Util;
 
 /**
  * Dialog to manage custom importers.
@@ -272,7 +271,7 @@ public class ImportCustomizationDialog extends JDialog {
         getContentPane().add(buttons, BorderLayout.SOUTH);
         this.setSize(getSize());
         pack();
-        Util.placeDialog(this, frame);
+        PositionWindow.placeDialog(this, frame);
         new FocusRequester(customImporterTable);
     }
 

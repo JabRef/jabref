@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.fileformat.ImportFormat;
@@ -188,7 +189,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
                     diag.addEntries(bibtexResult.getDatabase().getEntries());
                     diag.entryListComplete();
-                    Util.placeDialog(diag, frame);
+                    PositionWindow.placeDialog(diag, frame);
                     diag.setVisible(true);
                     diag.toFront();
                 } else {

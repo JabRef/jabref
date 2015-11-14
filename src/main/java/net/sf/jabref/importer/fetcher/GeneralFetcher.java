@@ -40,8 +40,9 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
@@ -253,7 +254,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                                 final ImportInspectionDialog d2 = new ImportInspectionDialog(frame, frame.basePanel(),
                                         BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
                                 d2.addCallBack(activeFetcher);
-                                Util.placeDialog(d2, frame);
+                                PositionWindow.placeDialog(d2, frame);
                                 d2.setVisible(true);
                                 JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
@@ -277,7 +278,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.basePanel(),
                     BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
             dialog.addCallBack(activeFetcher);
-            Util.placeDialog(dialog, frame);
+            PositionWindow.placeDialog(dialog, frame);
             dialog.setVisible(true);
 
             JabRefExecutorService.INSTANCE.execute(new Runnable() {

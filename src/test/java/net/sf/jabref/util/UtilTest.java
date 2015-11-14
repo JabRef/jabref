@@ -15,9 +15,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.swing.*;
-
-import java.awt.*;
 import java.io.StringReader;
 import java.util.*;
 import java.util.List;
@@ -62,27 +59,6 @@ public class UtilTest {
         Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a.bib"));
         Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a"));
         Assert.assertEquals("a.bb.bib", StringUtil.makeBibtexExtension("a.bb"));
-    }
-
-    @Test
-    @Ignore
-    public void testPlaceDialog() {
-        Dialog d = new JDialog();
-        d.setSize(50, 50);
-        Container c = new JWindow();
-        c.setBounds(100, 200, 100, 50);
-
-        net.sf.jabref.util.Util.placeDialog(d, c);
-        Assert.assertEquals(125, d.getX());
-        Assert.assertEquals(200, d.getY());
-
-        // Test upper left corner
-        c.setBounds(0, 0, 100, 100);
-        d.setSize(200, 200);
-
-        net.sf.jabref.util.Util.placeDialog(d, c);
-        Assert.assertEquals(0, d.getX());
-        Assert.assertEquals(0, d.getY());
     }
 
     @Test

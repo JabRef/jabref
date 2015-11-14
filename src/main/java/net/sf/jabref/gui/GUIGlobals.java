@@ -18,20 +18,20 @@ package net.sf.jabref.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JLabel;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.external.ExternalFileType;
-
-import net.sf.jabref.gui.help.HelpDialog;
-import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -196,11 +196,12 @@ public class GUIGlobals {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
         if (middle.equals("en/")) {
-            middle = ""; // english in base help dir.
+            middle = ""; // English in base help dir.
         }
 
         return GUIGlobals.helpPre + middle;
     }
+
 
     /**
      * Perform initializations that are only used in graphical mode. This is to prevent

@@ -28,9 +28,9 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.util.Util;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the
@@ -185,7 +185,7 @@ class ReplaceStringDialog extends JDialog {
         pack();
         //setSize(400, 170);
 
-        Util.placeDialog(this, parent_);
+        PositionWindow.placeDialog(this, parent_);
     }
 
     public boolean okPressed() {

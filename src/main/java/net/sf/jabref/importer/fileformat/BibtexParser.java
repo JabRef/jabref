@@ -28,8 +28,8 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.IdGenerator;

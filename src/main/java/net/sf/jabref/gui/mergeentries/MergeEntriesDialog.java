@@ -15,19 +15,21 @@
  */
 package net.sf.jabref.gui.mergeentries;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.*;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.util.PositionWindow;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -42,7 +44,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
  */
 public class MergeEntriesDialog extends JDialog {
 
-    private final Dimension DIM = new Dimension(800, 800);
     private final BasePanel panel;
     private final JabRefFrame frame;
     private final CellConstraints cc = new CellConstraints();
@@ -50,6 +51,8 @@ public class MergeEntriesDialog extends JDialog {
     private BibtexEntry two;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
+
+    private PositionWindow pw;
 
 
     public MergeEntriesDialog(BasePanel panel) {
@@ -60,7 +63,6 @@ public class MergeEntriesDialog extends JDialog {
 
         // Start setting up the dialog
         init(panel.getSelectedEntries());
-        Util.placeDialog(this, this.frame);
     }
 
     /**
@@ -128,20 +130,28 @@ public class MergeEntriesDialog extends JDialog {
         layout.insertRow(1, RowSpec.decode("5px"));
         layout.insertColumn(1, ColumnSpec.decode("5px"));
 
-        pack();
+        // Set up a ComponentListener that saves the last size and position of the dialog
+        this.addComponentListener(new ComponentAdapter() {
 
-        if (getHeight() > DIM.height) {
-            setSize(new Dimension(getWidth(), DIM.height));
-        }
-        if (getWidth() > DIM.width) {
-            setSize(new Dimension(DIM.width, getHeight()));
-        }
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+        });
+
+        pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X, JabRefPreferences.MERGEENTRIES_POS_Y,
+                JabRefPreferences.MERGEENTRIES_SIZE_X, JabRefPreferences.MERGEENTRIES_SIZE_Y);
+        pw.setWindowPosition();
 
         // Show what we've got
         setVisible(true);
-
-        pack();
-
     }
 
     /**
@@ -154,8 +164,6 @@ public class MergeEntriesDialog extends JDialog {
         if (button.equals("cancel")) {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));
-
-            dispose();
         } else if (button.equals("replace")) {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
@@ -168,7 +176,7 @@ public class MergeEntriesDialog extends JDialog {
             ce.end();
             panel.undoManager.addEdit(ce);
             panel.output(Localization.lang("Merged entries"));
-            dispose();
         }
+        dispose();
     }
 }

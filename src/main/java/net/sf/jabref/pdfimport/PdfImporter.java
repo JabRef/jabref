@@ -38,12 +38,13 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryTypeDialog;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.FocusRequester;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
@@ -318,7 +319,7 @@ public class PdfImporter {
         // Find out what type is wanted.
         EntryTypeDialog etd = new EntryTypeDialog(frame);
         // We want to center the dialog, to make it look nicer.
-        Util.placeDialog(etd, frame);
+        PositionWindow.placeDialog(etd, frame);
         etd.setVisible(true);
         BibtexEntryType type = etd.getChoice();
 

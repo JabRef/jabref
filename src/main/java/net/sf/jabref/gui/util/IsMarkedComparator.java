@@ -13,33 +13,20 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.util;
 
-import javax.swing.SwingUtilities;
-import java.awt.Component;
+import java.util.Comparator;
 
-public class FocusRequester implements Runnable {
+import net.sf.jabref.gui.EntryMarker;
+import net.sf.jabref.model.entry.BibtexEntry;
 
-    private final Component comp;
-
-
-    public FocusRequester(Component comp) {
-        if (comp == null) {
-            Thread.dumpStack();
-        }
-
-        //System.out.println("FocusRequester: "+comp.toString());
-        this.comp = comp;
-        try {
-            SwingUtilities.invokeLater(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+public class IsMarkedComparator implements Comparator<BibtexEntry> {
 
     @Override
-    public void run() {
+    public int compare(BibtexEntry e1, BibtexEntry e2) {
 
-        comp.requestFocus();
+        return -EntryMarker.isMarked(e1) + EntryMarker.isMarked(e2);
+
     }
+
 }

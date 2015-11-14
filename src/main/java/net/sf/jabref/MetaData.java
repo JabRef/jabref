@@ -19,8 +19,8 @@ import java.io.*;
 import java.util.*;
 
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibtexDatabase;
