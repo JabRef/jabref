@@ -481,7 +481,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 public void actionPerformed(ActionEvent actionEvent) {
                     String text = editor.getText();
                     if (Abbreviations.journalAbbrev.isKnownName(text)) {
-                        String s = toggleAbbreviation(text);
+                        String s = Abbreviations.journalAbbrev.getNextAbbreviation(text).orElse(text);
 
                         if (s != null) {
                             editor.setText(s);
@@ -490,10 +490,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                                     .addEdit(new UndoableFieldChange(getEntry(), editor.getFieldName(), text, s));
                         }
                     }
-                }
-
-                public String toggleAbbreviation(String currentText) {
-                    return Abbreviations.journalAbbrev.getNextAbbreviation(currentText).orElse(currentText);
                 }
             });
 
