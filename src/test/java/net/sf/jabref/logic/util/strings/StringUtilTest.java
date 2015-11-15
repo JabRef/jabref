@@ -2,7 +2,6 @@ package net.sf.jabref.logic.util.strings;
 
 import static org.junit.Assert.*;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -30,12 +29,13 @@ public class StringUtilTest {
 
     @Test
     public void testGetCorrectFileName() {
-        Assert.assertEquals("aa.bib", StringUtil.getCorrectFileName("aa", "bib"));
-        Assert.assertEquals(".login.bib", StringUtil.getCorrectFileName(".login", "bib"));
-        Assert.assertEquals("a.bib", StringUtil.getCorrectFileName("a.bib", "bib"));
-        Assert.assertEquals("a.bib", StringUtil.getCorrectFileName("a.bib", "BIB"));
-        Assert.assertEquals("a.bib", StringUtil.getCorrectFileName("a", "bib"));
-        Assert.assertEquals("a.bb", StringUtil.getCorrectFileName("a.bb", "bib"));
+        assertEquals("aa.bib", StringUtil.getCorrectFileName("aa", "bib"));
+        assertEquals(".login.bib", StringUtil.getCorrectFileName(".login", "bib"));
+        assertEquals("a.bib", StringUtil.getCorrectFileName("a.bib", "bib"));
+        assertEquals("a.bib", StringUtil.getCorrectFileName("a.bib", "BIB"));
+        assertEquals("a.bib", StringUtil.getCorrectFileName("a", "bib"));
+        assertEquals("a.bb", StringUtil.getCorrectFileName("a.bb", "bib"));
+        assertEquals("", StringUtil.getCorrectFileName(null, "bib"));
     }
 
     @Test
@@ -57,53 +57,128 @@ public class StringUtilTest {
         assertEquals("{ABC}", StringUtil.putBracesAroundCapitals("ABC"));
         assertEquals("{ABC}", StringUtil.putBracesAroundCapitals("{ABC}"));
         assertEquals("abc", StringUtil.putBracesAroundCapitals("abc"));
+        assertEquals("#ABC#", StringUtil.putBracesAroundCapitals("#ABC#"));
         assertEquals("{ABC} def {EFG}", StringUtil.putBracesAroundCapitals("ABC def EFG"));
     }
 
     @Test
     public void testShaveString() {
 
-        Assert.assertEquals(null, StringUtil.shaveString(null));
-        Assert.assertEquals("", StringUtil.shaveString(""));
-        Assert.assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
-        Assert.assertEquals("a", StringUtil.shaveString("  {a}    "));
-        Assert.assertEquals("a", StringUtil.shaveString("  \"a\"    "));
-        Assert.assertEquals("{a}", StringUtil.shaveString("  {{a}}    "));
-        Assert.assertEquals("{a}", StringUtil.shaveString("  \"{a}\"    "));
-        Assert.assertEquals("\"{a\"}", StringUtil.shaveString("  \"{a\"}    "));
+        assertEquals(null, StringUtil.shaveString(null));
+        assertEquals("", StringUtil.shaveString(""));
+        assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
+        assertEquals("a", StringUtil.shaveString("  {a}    "));
+        assertEquals("a", StringUtil.shaveString("  \"a\"    "));
+        assertEquals("{a}", StringUtil.shaveString("  {{a}}    "));
+        assertEquals("{a}", StringUtil.shaveString("  \"{a}\"    "));
+        assertEquals("\"{a\"}", StringUtil.shaveString("  \"{a\"}    "));
     }
 
     @Test
     public void testJoin() {
         String[] s = "ab/cd/ed".split("/");
-        Assert.assertEquals("ab\\cd\\ed", StringUtil.join(s, "\\", 0, s.length));
+        assertEquals("ab\\cd\\ed", StringUtil.join(s, "\\", 0, s.length));
 
-        Assert.assertEquals("cd\\ed", StringUtil.join(s, "\\", 1, s.length));
+        assertEquals("cd\\ed", StringUtil.join(s, "\\", 1, s.length));
 
-        Assert.assertEquals("ed", StringUtil.join(s, "\\", 2, s.length));
+        assertEquals("ed", StringUtil.join(s, "\\", 2, s.length));
 
-        Assert.assertEquals("", StringUtil.join(s, "\\", 3, s.length));
+        assertEquals("", StringUtil.join(s, "\\", 3, s.length));
 
-        Assert.assertEquals("", StringUtil.join(new String[] {}, "\\", 0, 0));
+        assertEquals("", StringUtil.join(new String[] {}, "\\", 0, 0));
+
+        assertEquals("a:b", StringUtil.join(stringArray1[0], ":"));
     }
 
     @Test
     public void testStripBrackets() {
-        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo]"));
-        Assert.assertEquals("[foo]", StringUtil.stripBrackets("[[foo]]"));
-        Assert.assertEquals("foo", StringUtil.stripBrackets("foo]"));
-        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo"));
-        Assert.assertEquals("", StringUtil.stripBrackets(""));
-        Assert.assertEquals("", StringUtil.stripBrackets("[]"));
-        Assert.assertEquals("", StringUtil.stripBrackets("["));
-        Assert.assertEquals("", StringUtil.stripBrackets("]"));
-        Assert.assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
+        assertEquals("foo", StringUtil.stripBrackets("[foo]"));
+        assertEquals("[foo]", StringUtil.stripBrackets("[[foo]]"));
+        assertEquals("foo", StringUtil.stripBrackets("foo]"));
+        assertEquals("foo", StringUtil.stripBrackets("[foo"));
+        assertEquals("", StringUtil.stripBrackets(""));
+        assertEquals("", StringUtil.stripBrackets("[]"));
+        assertEquals("", StringUtil.stripBrackets("["));
+        assertEquals("", StringUtil.stripBrackets("]"));
+        assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
 
         try {
             StringUtil.stripBrackets(null);
-            Assert.fail();
+            fail();
         } catch (NullPointerException ignored) {
             // Ignored
         }
     }
+
+    @Test
+    public void testGetPart() {
+
+    }
+
+    @Test
+    public void testWrap() {
+        assertEquals("aaaaa" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\tccccc",
+                StringUtil.wrap("aaaaa bbbbb ccccc", 5));
+        assertEquals("aaaaa bbbbb" + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
+        assertEquals("aaaaa bbbbb" + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
+        assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12));
+        assertEquals("aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\t"
+                + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
+        assertEquals(
+                "aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb"
+                        + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tccccc",
+                StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12));
+        assertEquals("aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\t"
+                + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
+    }
+
+    @Test
+    public void testQuote() {
+        assertEquals("a::", StringUtil.quote("a:", "", ':'));
+        assertEquals("a::", StringUtil.quote("a:", null, ':'));
+        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
+        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
+    }
+
+    @Test
+    public void testUnquote() {
+        assertEquals("a:", StringUtil.unquote("a::", ':'));
+        assertEquals("a:;", StringUtil.unquote("a:::;", ':'));
+        assertEquals("a:b%c;", StringUtil.unquote("a::b:%c:;", ':'));
+    }
+
+
+    String[][] stringArray1 = {{"a", "b"}, {"c", "d"}};
+    String encStringArray1 = "a:b;c:d";
+    String[][] stringArray2null = {{"a", null}, {"c", "d"}};
+    String encStringArray2 = "a:;c:d";
+    String[][] stringArray2 = {{"a", ""}, {"c", "d"}};
+    String encStringArray2null = "a:" + null + ";c:d";
+    String[][] stringArray3 = {{"a", ":b"}, {"c;", "d"}};
+    String encStringArray3 = "a:\\:b;c\\;:d";
+
+
+    @Test
+    public void testEncodeStringArray() {
+        assertEquals(encStringArray1, StringUtil.encodeStringArray(stringArray1));
+        assertEquals(encStringArray2, StringUtil.encodeStringArray(stringArray2));
+        assertEquals(encStringArray2null, StringUtil.encodeStringArray(stringArray2null));
+        assertEquals(encStringArray3, StringUtil.encodeStringArray(stringArray3));
+    }
+
+    @Test
+    public void testDecodeStringDoubleArray() {
+        assertArrayEquals(stringArray1, StringUtil.decodeStringDoubleArray(encStringArray1));
+        assertArrayEquals(stringArray2, StringUtil.decodeStringDoubleArray(encStringArray2));
+        // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
+        // assertArrayEquals(stringArray2res, StringUtil.decodeStringDoubleArray(encStringArray2));
+        assertArrayEquals(stringArray3, StringUtil.decodeStringDoubleArray(encStringArray3));
+    }
+
+    @Test
+    public void testBooleanToBinaryString() {
+        assertEquals("0", StringUtil.booleanToBinaryString(false));
+        assertEquals("1", StringUtil.booleanToBinaryString(true));
+    }
+
 }

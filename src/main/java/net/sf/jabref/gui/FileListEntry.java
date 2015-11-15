@@ -57,6 +57,11 @@ public class FileListEntry {
         this.type = type;
     }
 
+    public String[] getStringArrayRepresentation() {
+        String type = getType() != null ? getType().getName() : "";
+        return new String[] {getDescription(), getLink(), type};
+    }
+
     @Override
     public String toString() {
         return description + " : " + link + " : " + type;
