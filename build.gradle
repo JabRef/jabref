@@ -28,8 +28,8 @@ gradle.taskGraph.whenReady { taskGraph ->
 }
 
 group = "net.sf.jabref"
-version = "2.80dev"
-project.ext.threeDotVersion = "2.80.0.0"
+version = "3.0dev"
+project.ext.threeDotVersion = "3.0.0.0"
 project.ext.nsisExec = hasProperty("nsisExec") ? getProperty("nsisExec") : "C:/Program Files/NSIS/makensis.exe"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
