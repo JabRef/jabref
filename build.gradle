@@ -6,7 +6,7 @@ plugins {
     id "com.github.kt3k.coveralls" version "2.4.0x"
     id "edu.sc.seis.macAppBundle" version "2.1.1"
     id "com.github.youribonnaffe.gradle.format" version "1.2"
-    id "com.coverity.ondemand" version "1.3.708"
+    id "com.coverity.ondemand" version "1.4.742"
 }
 
 apply plugin: "java"
