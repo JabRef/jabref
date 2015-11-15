@@ -70,8 +70,9 @@ import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import net.sf.jabref.model.entry.EntryUtil;
 
@@ -97,7 +98,7 @@ public class SearchResultsDialog {
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
-    private EventTableModel<BibtexEntry> model;
+    private DefaultEventTableModel<BibtexEntry> model;
     private final EventList<BibtexEntry> entries = new BasicEventList<>();
     private SortedList<BibtexEntry> sortedEntries;
     private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<>();
@@ -122,7 +123,8 @@ public class SearchResultsDialog {
                 activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
-        model = new EventTableModel<>(sortedEntries, new EntryTableFormat());
+        model = (DefaultEventTableModel<BibtexEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
+                new EntryTableFormat());
         entryTable = new JTable(model);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         entryTable.setDefaultRenderer(JLabel.class, renderer);
@@ -134,7 +136,8 @@ public class SearchResultsDialog {
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
-        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<>(sortedEntries);
+        final DefaultEventSelectionModel<BibtexEntry> selectionModel = (DefaultEventSelectionModel<BibtexEntry>) GlazedListsSwing
+                .eventSelectionModelWithThreadProxyList(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         entryTable.addMouseListener(new TableClickListener());

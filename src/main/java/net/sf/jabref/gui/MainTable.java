@@ -59,8 +59,9 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.Matcher;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 
 /**
@@ -83,7 +84,7 @@ public class MainTable extends JTable {
     private final boolean tableColorCodes;
     private boolean isFloatSearchActive;
     private boolean isFloatGroupingActive;
-    private final EventSelectionModel<BibtexEntry> localSelectionModel;
+    private final DefaultEventSelectionModel<BibtexEntry> localSelectionModel;
     private final TableComparatorChooser<BibtexEntry> comparatorChooser;
     private final JScrollPane pane;
     private Comparator<BibtexEntry> searchComparator;
@@ -120,7 +121,7 @@ public class MainTable extends JTable {
         this.tableFormat = tableFormat;
         this.panel = panel;
         // This SortedList has a Comparator controlled by the TableComparatorChooser
-        // we are going to install, which responds to user sorting selctions:
+        // we are going to install, which responds to user sorting selections:
         sortedForTable = new SortedList<>(list, null);
         // This SortedList applies afterwards, and floats marked entries:
         sortedForMarking = new SortedList<>(sortedForTable, null);
@@ -134,11 +135,13 @@ public class MainTable extends JTable {
         searchComparator = null;
         groupComparator = null;
 
-        EventTableModel<BibtexEntry> tableModel = new EventTableModel<>(sortedForGrouping, tableFormat);
+        DefaultEventTableModel<BibtexEntry> tableModel = (DefaultEventTableModel<BibtexEntry>) GlazedListsSwing
+                .eventTableModelWithThreadProxyList(sortedForGrouping, tableFormat);
         setModel(tableModel);
 
         tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
-        localSelectionModel = new EventSelectionModel<>(sortedForGrouping);
+        localSelectionModel = (DefaultEventSelectionModel<BibtexEntry>) GlazedListsSwing
+                .eventSelectionModelWithThreadProxyList(sortedForGrouping);
         setSelectionModel(localSelectionModel);
         pane = new JScrollPane(this);
         pane.setBorder(BorderFactory.createEmptyBorder());

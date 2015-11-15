@@ -75,8 +75,9 @@ import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -93,8 +94,8 @@ class StyleSelectDialog {
     private JDialog diag;
     private JTable table;
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    private EventTableModel<OOBibStyle> tableModel;
-    private EventSelectionModel<OOBibStyle> selectionModel;
+    private DefaultEventTableModel<OOBibStyle> tableModel;
+    private DefaultEventSelectionModel<OOBibStyle> selectionModel;
     private final JPopupMenu popup = new JPopupMenu();
     private final JMenuItem edit = new JMenuItem(Localization.lang("Edit"));
     private final JRadioButton useDefaultAuthoryear = new JRadioButton(Localization.lang("Default style (author-year citations)"));
@@ -208,13 +209,15 @@ class StyleSelectDialog {
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);//PreviewPrefsTab.getTestEntry());
 
-        tableModel = new EventTableModel<>(sortedStyles, new StyleTableFormat());
+        tableModel = (DefaultEventTableModel<OOBibStyle>) GlazedListsSwing
+                .eventTableModelWithThreadProxyList(sortedStyles, new StyleTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(100);
         cm.getColumn(1).setPreferredWidth(200);
         cm.getColumn(2).setPreferredWidth(80);
-        selectionModel = new EventSelectionModel<>(sortedStyles);
+        selectionModel = (DefaultEventSelectionModel<OOBibStyle>) GlazedListsSwing
+                .eventSelectionModelWithThreadProxyList(sortedStyles);
         table.setSelectionModel(selectionModel);
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {

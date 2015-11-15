@@ -97,8 +97,9 @@ import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -154,7 +155,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final TableComparatorChooser<BibtexEntry> comparatorChooser;
 
-    private final EventSelectionModel<BibtexEntry> selectionModel;
+    private final DefaultEventSelectionModel<BibtexEntry> selectionModel;
 
     private final String[] fields;
 
@@ -246,8 +247,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
         sortedList = new SortedList<>(entries);
-        EventTableModel<BibtexEntry> tableModelGl = new EventTableModel<>(sortedList,
-                new EntryTableFormat());
+        DefaultEventTableModel<BibtexEntry> tableModelGl = (DefaultEventTableModel<BibtexEntry>) GlazedListsSwing
+                .eventTableModelWithThreadProxyList(sortedList, new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         glTable.setDefaultRenderer(JLabel.class, renderer);
@@ -256,7 +257,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         DeleteListener deleteListener = new DeleteListener();
         glTable.getActionMap().put("delete", deleteListener);
 
-        selectionModel = new EventSelectionModel<>(sortedList);
+        selectionModel = (DefaultEventSelectionModel<BibtexEntry>) GlazedListsSwing
+                .eventSelectionModelWithThreadProxyList(sortedList);
         glTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         comparatorChooser = TableComparatorChooser.install(glTable, sortedList,
