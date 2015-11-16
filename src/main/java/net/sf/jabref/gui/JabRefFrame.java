@@ -1577,7 +1577,6 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     private int previousTabCount = -1;
 
-
     /**
      * Enable or Disable all actions based on the number of open tabs.
      * <p>
@@ -1616,7 +1615,6 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                 bf.setupMainPanel();
 
             }
-
         }
     }
 
@@ -1646,14 +1644,12 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                 title = title + '*';
             }
         } else {
-            title = file.getName();
+            title = file.getName() + " (" + bp.database.getEntryCount() + ")";
         }
-        // idea: "<html><div style='padding:2px 5px;'>" + title + "</div></html>" instead of "title" to get some space around.
-        // However, this causes https://sourceforge.net/p/jabref/bugs/1293/
-        // Therefore, plain "title" is used
+
         tabbedPane.add(title, bp);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1,
-                file != null ? file.getAbsolutePath() : null);
+        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file != null ? file.getAbsolutePath() : null);
+
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
         }
@@ -1832,8 +1828,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
      * @param entries   The entries to add.
      * @param openInNew Should the entries be imported into a new database?
      */
-    private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries,
- final boolean openInNew) {
+    private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries, final boolean openInNew) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
