@@ -30,8 +30,8 @@ public class ContentAutoCompleters extends AutoCompleters {
      * values to the autocompleter list:
      */
     public void addContentSelectorValuesToAutoCompleters(MetaData metaData) {
-        for (Map.Entry<String, AutoCompleter> entry : this.autoCompleters.entrySet()) {
-            AutoCompleter ac = entry.getValue();
+        for (Map.Entry<String, AutoCompleter<String>> entry : this.autoCompleters.entrySet()) {
+            AutoCompleter<String> ac = entry.getValue();
             if (metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey()) != null) {
                 Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey());
                 if (items != null) {
@@ -48,7 +48,7 @@ public class ContentAutoCompleters extends AutoCompleters {
      * journal names in the journal abbreviation list to this autocompleter.
      */
     public void addJournalListToAutoCompleter() {
-        AutoCompleter autoCompleter = get("journal");
+        AutoCompleter<String> autoCompleter = get("journal");
         if(autoCompleter != null) {
             for(Abbreviation abbreviation : Abbreviations.journalAbbrev.getAbbreviations()) {
                 autoCompleter.addWordToIndex(abbreviation.getName());

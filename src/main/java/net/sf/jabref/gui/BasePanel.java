@@ -56,6 +56,7 @@ import net.sf.jabref.gui.journals.UnabbreviateAction;
 import net.sf.jabref.gui.labelPattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
+import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.*;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
@@ -184,7 +185,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private final HashMap<String, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
-
+    private final SearchBar searchBar;
 
     // Returns a collection of AutoCompleters, which are populated from the current database
     public ContentAutoCompleters getAutoCompleters() {
@@ -209,7 +210,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.frame = frame;
         database = db;
 
+        searchBar = new SearchBar(this);
+
+
         setupMainPanel();
+
+        this.add(searchBar, BorderLayout.NORTH);
+
         setupActions();
 
         metaData.setFile(file);
@@ -719,17 +726,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
-        actions.put(Actions.SEARCH, (BaseAction) () -> {
-            frame.setSearchBarVisible(true);
-            frame.getSearchBar().focus();
-        });
-
-        actions.put(Actions.TOGGLE_SEARCH, (BaseAction) () -> {
-            frame.setSearchBarVisible(! frame.searchBar.isVisible());
-	    if (frame.searchBar.isVisible()) {
-	            frame.getSearchBar().focus();
-	    }
-        });
+        actions.put(Actions.SEARCH, (BaseAction) searchBar::focus);
 
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, (BaseAction) () -> {
@@ -1512,6 +1509,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return null;
     }
 
+    public SearchBar getSearchBar() {
+        return searchBar;
+    }
 
     /**
      * This listener is used to add a new entry to a group (or a set of groups) in case the Group View is selected and
@@ -1829,7 +1829,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void updateSearchManager() {
-        frame.getSearchBar().setAutoCompleter(searchAutoCompleter);
+        searchBar.setAutoCompleter(searchAutoCompleter);
     }
 
     private void instantiateSearchAutoCompleter() {

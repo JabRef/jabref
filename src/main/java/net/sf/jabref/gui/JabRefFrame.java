@@ -119,8 +119,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;
 
-    public SearchBar searchBar;
-
     public JTabbedPane tabbedPane; // initialized at constructor
     final String htmlPadding = "<html><div style='padding:2px 5px;'>";
 
@@ -245,7 +243,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /* References to the toggle buttons in the toolbar */
     // the groups interface
     public JToggleButton groupToggle;
-    public JToggleButton searchToggle;
     public JToggleButton previewToggle;
     public JToggleButton fetcherToggle;
 
@@ -330,9 +327,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public final AbstractAction loadSessionAction = new LoadSessionAction();
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), prefs.getKey(KeyBinds.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
-    private final AbstractAction toggleSearch = new GeneralAction(Actions.TOGGLE_SEARCH,
-            Localization.menuTitle("Search"), Localization.lang("Toggle search panel"),
-            IconTheme.JabRefIcon.SEARCH.getIcon());
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY));
@@ -594,7 +588,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 BasePanel bp = basePanel();
                 if (bp != null) {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-                    searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
                     previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
                     fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
                     Globals.focusListener.setFocused(bp.mainTable);
@@ -841,9 +834,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.autoSaveManager.clearAutoSaves();
         }
 
-		// Let the search interface store changes to prefs.
-		searchBar.updatePrefs();
-
         prefs.flush();
 
         // dispose all windows, even if they are not displayed anymore
@@ -989,21 +979,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         gbl.setConstraints(contentPane, con);
         getContentPane().add(contentPane);
 
-        JPanel main = new JPanel();
-        main.setLayout( new OverlayLayout(main) );
-        searchBar = new SearchBar(this);
-        searchBar.setAlignmentX(1.0f);
-        searchBar.setAlignmentY(0.0f);
-        searchBar.setMaximumSize(new Dimension(400, 25));
-        main.add(searchBar);
-        setSearchBarVisible(Globals.prefs.getBoolean(JabRefPreferences.SEARCH_BAR_VISIBLE));
-        tabbedPane.setAlignmentX(1.0f);
-        tabbedPane.setAlignmentY(0.0f);
-        main.add(tabbedPane);
-
         UIManager.put("TabbedPane.contentBorderInsets", new Insets(0,0,0,0));
 
-        contentPane.setRightComponent(main);
+        contentPane.setRightComponent(tabbedPane);
         contentPane.setLeftComponent(sidePaneManager.getPanel());
         sidePaneManager.updateView();
 
@@ -1324,7 +1302,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(decreseFontSize);
         view.addSeparator();
         view.add(toggleToolbar);
-        view.add(toggleSearch);
         view.add(generalFetcher.getAction());
         view.add(toggleGroups);
         view.add(togglePreview);
@@ -1490,9 +1467,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             tlb.addSeparator();
         }
 
-        searchToggle = new JToggleButton(toggleSearch);
-        tlb.addJToogleButton(searchToggle);
-
         fetcherToggle = new JToggleButton(generalFetcher.getAction());
         tlb.addJToogleButton(fetcherToggle);
 
@@ -1555,7 +1529,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors,
                 mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, saveSelectedAsPlain, undo,
                 redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
-                selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
+                selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups,
                 makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
                 replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
@@ -2354,21 +2328,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
-
-    public SearchBar getSearchBar() {
-  	  return searchBar;
-    }
-
-    public void setSearchBarVisible(boolean visible) {
-  	  searchBar.setVisible(visible);
-  	  searchToggle.setSelected(visible);
-  	  if(visible) {
-        setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 250));
-    } else {
-        setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 2));
-    }
-    }
-
 
   // Copied from org.pushingpixels.lafwidget.LafWidgetSupport
   // http://jarvis.cs.ucdavis.edu/code_essence/functions/5829321

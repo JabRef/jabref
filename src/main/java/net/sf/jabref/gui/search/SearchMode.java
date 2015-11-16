@@ -6,16 +6,15 @@ import net.sf.jabref.logic.l10n.Localization;
  * Collects the possible search modes
  */
 public enum SearchMode {
+
     FLOAT(Localization.lang("Float"),
             Localization.lang("Gray out non-matching entries")),
     FILTER(Localization.lang("Filter"),
-            Localization.lang("Hide non-matching entries")),
-    GLOBAL(
-            Localization.lang("Global search"),
-            Localization.lang("Search in all open databases"));
+            Localization.lang("Hide non-matching entries"))
+    ;
 
-    private String displayName;
-    private String toolTipText;
+    private final String displayName;
+    private final String toolTipText;
 
     SearchMode(String displayName, String toolTipText) {
         this.displayName = displayName;

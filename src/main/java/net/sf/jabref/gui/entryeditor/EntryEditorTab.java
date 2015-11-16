@@ -156,14 +156,15 @@ class EntryEditorTab {
                 defaultHeight = 0;
             } else {
                 fieldEditor = new TextArea(fields[i], null);
-                frame.getSearchBar().addSearchListener((TextArea) fieldEditor);
+                // TODO SIMON
+                // frame.getSearchBar().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
             
             JComponent extra = parent.getExtra(fields[i], fieldEditor);
 
             // Add autocompleter listener, if required for this field:
-            AutoCompleter autoCompleter = bPanel.getAutoCompleters().get(fields[i]);
+            AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(fields[i]);
             AutoCompleteListener autoCompleteListener = null;
             if (autoCompleter != null) {
                 autoCompleteListener = new AutoCompleteListener(autoCompleter);

@@ -545,7 +545,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        frame.getSearchBar().addSearchListener((SearchTextListener) source);
+        // TODO SIMON
+        // frame.getSearchBar().addSearchListener((SearchTextListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);

@@ -26,7 +26,7 @@ public class AutoCompleterTest {
     @Test
     public void testAutoCompleterFactory() {
         Globals.prefs = JabRefPreferences.getInstance();
-        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
+        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
         Assert.assertTrue(autoCompleter instanceof NameFieldAutoCompleter);
 
         autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
@@ -35,7 +35,7 @@ public class AutoCompleterTest {
 
     @Test
     public void testDefaultAutoCompleter() {
-        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
+        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -52,7 +52,7 @@ public class AutoCompleterTest {
 
     @Test
     public void testCrossRefCompleter() {
-        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.CROSSREF_FIELD);
+        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.CROSSREF_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -66,7 +66,7 @@ public class AutoCompleterTest {
 
     @Test
     public void testEntireFieldCompleter() {
-        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.ENTIRE_FIELD);
+        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.ENTIRE_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -81,7 +81,7 @@ public class AutoCompleterTest {
     @Test
     public void testNameFieldCompleter() {
         Globals.prefs = JabRefPreferences.getInstance();
-        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
+        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }

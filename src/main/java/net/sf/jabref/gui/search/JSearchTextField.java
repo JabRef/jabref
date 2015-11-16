@@ -1,5 +1,7 @@
 package net.sf.jabref.gui.search;
 
+import net.sf.jabref.logic.l10n.Localization;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
@@ -17,7 +19,7 @@ public class JSearchTextField extends JTextField implements FocusListener {
         super();
         this.setEditable(true);
         this.setText("");
-        this.textWhenNotFocused = "Search...";
+        this.textWhenNotFocused = Localization.lang("Search...");
         this.addFocusListener(this);
     }
 
