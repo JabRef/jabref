@@ -32,8 +32,8 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.11.1" />
-	<property name="jabref.version.full" value="2.11.101.0" /> <!-- a version number with 4 places. Required by launch4j. We use "101" instead of "1" as the old versions incremented that number -->
+	<property name="jabref.version" value="2.11.2dev" />
+	<property name="jabref.version.full" value="2.11.102.0" /> <!-- a version number with 4 places. Required by launch4j. We use "101" instead of "1" as the old versions incremented that number -->
 	<property name="jabref.year" value="2015" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<property name="jabref.placeholder.year" value="@year@" />

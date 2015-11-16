@@ -1,6 +1,8 @@
-# JabRef 2.11.1
+# JabRef Development Version (2.11 line)
 
 [![Circle CI](https://circleci.com/gh/JabRef/jabref/tree/dev_2.11.svg?style=shield)](https://circleci.com/gh/JabRef/jabref/tree/dev_2.11)
+
+This version is a development version. Features may not work as expected.
 
 The branch of this README file is `dev_2.11`.
 This branch is intended for maintenance releases in the 2.11 line with Java 6 compatibility and plugin support.
