@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+ - Added a page numbers integrity checker
  - Position and size of certain dialogs are stored and restored.
  - Feature: Search DOAJ, Directory of Open Access Journals
  - Changes the old integrity check by improving the code base (+tests) and converting it to a simple issues table
