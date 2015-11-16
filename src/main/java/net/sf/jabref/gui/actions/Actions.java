@@ -29,7 +29,6 @@ public class Actions {
     public static final String EXPORT_TO_CLIPBOARD = "exportToClipboard";
     public static final String FOCUS_TABLE = "focusTable";
     public static final String FORWARD = "forward";
-    public static final String INC_SEARCH = "incSearch";
     public static final String MAKE_KEY = "makeKey";
     public static final String MANAGE_SELECTORS = "manageSelectors";
     public static final String MARK_ENTRIES = "markEntries";

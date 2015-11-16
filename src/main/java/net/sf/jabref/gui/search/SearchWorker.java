@@ -1,5 +1,6 @@
 package net.sf.jabref.gui.search;
 
+import net.sf.jabref.logic.search.describer.SearchDescribers;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
@@ -15,14 +16,9 @@ class SearchWorker extends AbstractWorker {
     private final JabRefFrame frame;
     private SearchRule rule;
     private String query = "";
-    private SearchMode mode = SearchMode.Incremental;
+    private SearchMode mode = SearchMode.FILTER;
     private int hits = 0;
     private SearchResultsDialog searchDialog = null;
-
-    /**
-     * To keep track of where we are in an incremental search. -1 means that the search is inactive.
-     */
-    private int incSearchPos = -1;
 
     public SearchWorker(JabRefFrame frame) {
         this.frame = frame;
@@ -34,8 +30,6 @@ class SearchWorker extends AbstractWorker {
      */
     public void restart() {
 
-        incSearchPos = -1;
-        
         if (frame.basePanel() == null) {
             return;
         }
@@ -54,11 +48,6 @@ class SearchWorker extends AbstractWorker {
      */
     public void initSearch(SearchRule rule, String query, SearchMode mode) { 
         this.rule = rule;
-        if(this.query.equals(query) && this.mode == SearchMode.Incremental) {
-            // The query stayed the same and we are in incremental mode
-            // So we do not want to start the search at the next item
-            incSearchPos ++;
-        }
         this.query = query;
         if(this.mode != mode)
         {
@@ -67,7 +56,7 @@ class SearchWorker extends AbstractWorker {
             restart();
         }
         
-        LogFactory.getLog(SearchWorker.class).debug("Search (" +  this.mode.getDisplayName() + "): " + this.query + " at " + incSearchPos);
+        LogFactory.getLog(SearchWorker.class).debug("Search (" +  this.mode.getDisplayName() + "): " + this.query);
         
     }
 
@@ -77,18 +66,14 @@ class SearchWorker extends AbstractWorker {
      */
     @Override
     public void run() {
+        this.hits = 0;
 
         switch (mode) {
-        case Incremental:
-            runIncremental();
-            break;
-        case Float:
-        case Filter:
-        case LiveFilter:
-        case ResultsInDialog:
+        case FLOAT:
+        case FILTER:
             runNormal();
             break;
-        case Global:
+        case GLOBAL:
             runGlobal();
             break;
         }
@@ -100,24 +85,12 @@ class SearchWorker extends AbstractWorker {
     private void runGlobal() {
         // Search all databases
         for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-            BasePanel p = frame.baseAt(i);
-            for (BibtexEntry entry : p.getDatabase().getEntries()) {
-
-                boolean hit = rule.applyRule(query, entry);
-                entry.setSearchHit(hit);
-                if (hit) {
-                    hits++;
-                }
-            }
+            findResultsInBasePanel(frame.baseAt(i));
         }
     }
 
-    /**
-     * Searches for matches in the current database. Saves the number of matches in hits. DONE
-     */
-    private void runNormal() {
-        // Search the current database
-        for (BibtexEntry entry : frame.basePanel().getDatabase().getEntries()) {
+    private void findResultsInBasePanel(BasePanel p) {
+        for (BibtexEntry entry : p.getDatabase().getEntries()) {
 
             boolean hit = rule.applyRule(query, entry);
             entry.setSearchHit(hit);
@@ -128,46 +101,11 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * DONE Searches for the next match, beginning at incSearchPos. The index of the first match is then saved in
-     * incSearchPos. Sets it to -1 if no further match was found.
+     * Searches for matches in the current database. Saves the number of matches in hits. DONE
      */
-    private void runIncremental() {
-        int entryCount = frame.basePanel().getDatabase().getEntryCount();
-
-        if (incSearchPos < 0) {
-            incSearchPos = 0;
-        }
-        if (incSearchPos >= entryCount) {
-            incSearchPos = -1;
-            return;
-        }
-        
-        for (int i = incSearchPos; i < entryCount; i++) {
-            BibtexEntry entry = frame.basePanel().mainTable.getEntryAt(i);
-            boolean hit = rule.applyRule(query, entry);
-            entry.setSearchHit(hit);
-            if (hit) {
-                incSearchPos = i;
-                return;
-            }
-        }
-
-        incSearchPos = -1;
-        return;
-    }
-
-    /**
-     * DONE Selects the next match in the entry table based on the position saved in incSearchPos.
-     */
-    private void updateIncremental() {
-        int entryCount = frame.basePanel().getDatabase().getEntryCount();
-        if ((incSearchPos >= entryCount) || (incSearchPos < 0)) {
-            frame.basePanel().output('\'' + query + "' : " + Localization.lang("Incremental search failed. Repeat to search from top.") + '.');
-            return;
-        }
-
-        frame.basePanel().selectSingleEntry(incSearchPos);
-        frame.basePanel().output('\'' + query + "' " + Localization.lang("found") + '.');
+    private void runNormal() {
+        // Search the current database
+        findResultsInBasePanel(frame.basePanel());
     }
 
     /* (non-Javadoc)
@@ -179,27 +117,21 @@ class SearchWorker extends AbstractWorker {
 
         // Show the result in the chosen way:
         switch (mode) {
-        case Incremental:
-            updateIncremental();
-            break;
-        case Float:
+        case FLOAT:
             updateFloat();
             break;
-        case Filter:
-        case LiveFilter:
+        case FILTER:
             updateFilter();
             break;
-        case ResultsInDialog:
-            updateResultsInDialog();
-            break;
-        case Global:
+        case GLOBAL:
             updateGlobal();
             break;
         }
 
-        if (mode != SearchMode.Incremental) {
-            frame.basePanel().output(Localization.lang("Searched database. Number of hits") + ": " + hits);
-        }
+        frame.basePanel().output(Localization.lang("Searched database. Number of hits") + ": " + hits);
+        frame.getSearchBar().updateResults(hits);
+        String description = SearchDescribers.getSearchDescriberFor(this.rule, frame.getSearchBar().getSearchQuery().query).getDescription();
+        frame.getSearchBar().updateSearchDescription(description);
     }
 
     /**
@@ -209,7 +141,9 @@ class SearchWorker extends AbstractWorker {
         // TODO: Rename these things in mainTable, they are not search specific
         frame.basePanel().mainTable.showFloatSearch(new SearchMatcher());
         if (hits > 0) {
-            frame.basePanel().mainTable.setSelected(0);
+            if(frame.basePanel().mainTable.getRowCount() > 0) {
+                frame.basePanel().mainTable.setSelected(0);
+            }
         }
     }
 
@@ -220,24 +154,10 @@ class SearchWorker extends AbstractWorker {
         // TODO: Rename these things in basePanel, they are not search specific
         frame.basePanel().setSearchMatcher(new SearchMatcher());
         if (hits > 0) {
-            frame.basePanel().mainTable.setSelected(0);
-        }
-    }
-
-    /**
-     * Displays search results in a dialog window. DONE
-     */
-    private void updateResultsInDialog() {
-        // Make sure the search dialog is instantiated and cleared:
-        initSearchDialog();
-        searchDialog.clear();
-        for (BibtexEntry entry : frame.basePanel().getDatabase().getEntries()) {
-            if (entry.isSearchHit()) {
-                searchDialog.addEntry(entry, frame.basePanel());
+            if(frame.basePanel().mainTable.getRowCount() > 0) {
+                frame.basePanel().mainTable.setSelected(0);
             }
         }
-        searchDialog.selectFirstEntry();
-        searchDialog.setVisible(true);
     }
 
     /**

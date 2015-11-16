@@ -56,10 +56,14 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
             searchDescription += StringUtil.join(unprocessedWordsInHtmlFormatArray, andSeparator);
         }
 
-        String caseSensitiveDescription = caseSensitive ? Localization.lang("case sensitive") : Localization.lang("case insensitive");
+        String caseSensitiveDescription = getCaseSensitiveDescription();
         String genericDescription = Localization.lang(
                 "Entries cannot be manually assigned to or removed from this group.") + "<p><br>" + Localization.lang(
                 "Hint%c To search specific fields only, enter for example%c<p><tt>author%esmith and title%eelectrical</tt>");
         return String.format("%s (%s). %s", searchDescription, caseSensitiveDescription, genericDescription);
+    }
+
+    private String getCaseSensitiveDescription() {
+        return caseSensitive ? Localization.lang("case sensitive") : Localization.lang("case insensitive");
     }
 }

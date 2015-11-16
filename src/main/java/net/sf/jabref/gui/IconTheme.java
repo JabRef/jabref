@@ -140,6 +140,10 @@ public class IconTheme {
         KEY_BINDINGS("\uf3ad"), /*css: keyboard */
         FIND_DUPLICATES("\uf233"), /*css: code-equal */
 
+        REGEX("\uf4f0"), /*css: regex */
+        CASE_SENSITIVE("\uf127"), /*css: alphabetical */
+        OPEN_IN_NEW_WINDOW("\uf47b"), /*css: open-in-new */
+
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 

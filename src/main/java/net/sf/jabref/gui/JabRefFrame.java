@@ -328,9 +328,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Manage content selectors"));
     private final AbstractAction saveSessionAction = new SaveSessionAction();
     public final AbstractAction loadSessionAction = new LoadSessionAction();
-    private final AbstractAction incrementalSearch = new GeneralAction(Actions.INC_SEARCH,
-            Localization.menuTitle("Incremental search"), Localization.lang("Start incremental search"),
-            prefs.getKey(KeyBinds.INCREMENTAL_SEARCH));
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), prefs.getKey(KeyBinds.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
     private final AbstractAction toggleSearch = new GeneralAction(Actions.TOGGLE_SEARCH,
@@ -997,7 +994,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         searchBar = new SearchBar(this);
         searchBar.setAlignmentX(1.0f);
         searchBar.setAlignmentY(0.0f);
-        searchBar.setMaximumSize(new Dimension(200, 25));
+        searchBar.setMaximumSize(new Dimension(400, 25));
         main.add(searchBar);
         setSearchBarVisible(Globals.prefs.getBoolean(JabRefPreferences.SEARCH_BAR_VISIBLE));
         tabbedPane.setAlignmentX(1.0f);
@@ -1291,7 +1288,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(edit);
 
         search.add(normalSearch);
-        search.add(incrementalSearch);
         search.add(replaceAll);
         search.add(massSetField);
         search.addSeparator();
@@ -1561,7 +1557,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
                 selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
                 makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
-                incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
+                replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
                 openPdf, openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),

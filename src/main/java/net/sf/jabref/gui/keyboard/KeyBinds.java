@@ -65,7 +65,6 @@ public class KeyBinds {
     public static final String IMPORT_INTO_CURRENT_DATABASE = "Import into current database";
     public static final String IMPORT_INTO_NEW_DATABASE = "Import into new database";
     public static final String INCREASE_TABLE_FONT_SIZE = "Increase table font size";
-    public static final String INCREMENTAL_SEARCH = "Incremental search";
     public static final String LOAD_SESSION = "Load session";
     public static final String MARK_ENTRIES = "Mark entries";
     public static final String NEW_ARTICLE = "New article";
@@ -92,7 +91,6 @@ public class KeyBinds {
     public static final String QUIT_JAB_REF = "Quit JabRef";
     public static final String REDO = "Redo";
     public static final String REFRESH_OO = "Refresh OO";
-    public static final String REPEAT_INCREMENTAL_SEARCH = "Repeat incremental search";
     public static final String REPLACE_STRING = "Replace string";
     public static final String RESOLVE_DUPLICATE_BIB_TE_X_KEYS = "Resolve duplicate BibTeX keys";
     public static final String SAVE_ALL = "Save all";
@@ -150,8 +148,6 @@ public class KeyBinds {
         keyBindMap.put(TOGGLE_GROUPS_INTERFACE, "ctrl shift G");
         keyBindMap.put(AUTOGENERATE_BIB_TE_X_KEYS, "ctrl G");
         keyBindMap.put(SEARCH, "ctrl F");
-        keyBindMap.put(INCREMENTAL_SEARCH, "ctrl shift F");
-        keyBindMap.put(REPEAT_INCREMENTAL_SEARCH, "ctrl shift F");
         keyBindMap.put(CLOSE_DIALOG, "ESCAPE");
         keyBindMap.put(CLOSE_ENTRY_EDITOR, "ESCAPE");
         keyBindMap.put(CLOSE_PREAMBLE_EDITOR, "ESCAPE");

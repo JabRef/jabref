@@ -131,7 +131,6 @@ public class JabRefPreferences {
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
     public static final String SEARCH_AUTO_COMPLETE = "searchAutoComplete";
     public static final String SEARCH_MODE_LIVE_FILTER = "searchModeLiveFilter";
-    public static final String SEARCH_MODE_INCREMENTAL = "incrementS";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String DEFAULT_AUTO_SORT = "defaultAutoSort";
     public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
@@ -165,7 +164,6 @@ public class JabRefPreferences {
     public static final String SEARCH_PANE_POS_X = "searchPanePosX";
     public static final String SEARCH_HIGHLIGHT_WORDS = "highLightWords";
     public static final String SEARCH_REG_EXP = "regExpSearch";
-    public static final String SEARCH_SELECT_MATCHES = "selectS";
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
@@ -256,7 +254,6 @@ public class JabRefPreferences {
     public static final String DEFAULT_LABEL_PATTERN = "defaultLabelPattern";
 
     public static final String SEARCH_MODE_GLOBAL = "searchAllBases";
-    public static final String SEARCH_MODE_RESULTS_IN_DIALOG = "showSearchInDialog";
     public static final String SEARCH_MODE_FLOAT = "floatSearch";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
     public static final String CONFIRM_DELETE = "confirmDelete";
@@ -541,11 +538,9 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
-        defaults.put(SEARCH_MODE_INCREMENTAL, Boolean.FALSE);
         defaults.put(SEARCH_MODE_LIVE_FILTER, Boolean.TRUE);
         defaults.put(SEARCH_AUTO_COMPLETE, Boolean.TRUE);
 
-        defaults.put(SEARCH_SELECT_MATCHES, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.TRUE);
         defaults.put(SEARCH_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(SEARCH_PANE_POS_X, 0);
@@ -652,7 +647,6 @@ public class JabRefPreferences {
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
         defaults.put(SEARCH_MODE_FLOAT, Boolean.TRUE);
-        defaults.put(SEARCH_MODE_RESULTS_IN_DIALOG, Boolean.FALSE);
         defaults.put(SEARCH_MODE_GLOBAL, Boolean.FALSE);
         defaults.put(DEFAULT_LABEL_PATTERN, "[authors3][year]");
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);

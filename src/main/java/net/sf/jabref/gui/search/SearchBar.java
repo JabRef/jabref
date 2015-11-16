@@ -15,24 +15,13 @@
  */
 package net.sf.jabref.gui.search;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -48,9 +37,11 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.search.SearchRules;
+import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 
+import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.LogFactory;
 import org.gpl.JSplitButton.JSplitButton;
 import org.gpl.JSplitButton.action.SplitButtonActionListener;
@@ -60,24 +51,41 @@ import org.gpl.JSplitButton.action.SplitButtonActionListener;
  */
 public class SearchBar extends JPanel {
 
+    public SearchQuery getSearchQuery() {
+        return new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
+    }
+
+    public void updateResults(int matched) {
+        if(matched == 0) {
+            this.currentResults.setText(Localization.lang("No results found."));
+        } else {
+            this.currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
+        }
+    }
+
     private final JabRefFrame frame;
 
     private JSearchTextField searchField;
     private JSplitButton searchButton;
-    private JPopupMenu popupMenu;
 
-    private JMenuItem clearSearch;
-    private JRadioButtonMenuItem modeIncremental, modeFloat, modeFilter, modeLiveFilter, modeResultsInDialog,
+    private JRadioButtonMenuItem modeFloat, modeLiveFilter,
             modeGlobal;
 
     private JMenu settings;
-    private JCheckBoxMenuItem selectMatches, caseSensitive, regularExp, highlightWords, autoComplete;
+    private JCheckBoxMenuItem highlightWords, autoComplete;
+
+    private final JToggleButton caseSensitive;
+    private final JToggleButton regularExp;
+
+    private final JButton openCurrentResultsInDialog;
+
+    private final JLabel currentResults = new JLabel("");
 
     AutoCompleteSupport<String> autoCompleteSupport;
 
     SearchWorker worker;
 
-    private final ArrayList<SearchTextListener> listeners = new ArrayList<SearchTextListener>();
+    private final ArrayList<SearchTextListener> listeners = new ArrayList<>();
 
 
     /**
@@ -90,6 +98,33 @@ public class SearchBar extends JPanel {
 
         this.frame = frame;
         worker = new SearchWorker(frame);
+
+        currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
+
+        caseSensitive = new JToggleButton(IconTheme.JabRefIcon.CASE_SENSITIVE.getSmallIcon(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
+        caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
+        caseSensitive.addActionListener(ae -> updatePrefs());
+        caseSensitive.addActionListener(ae -> performSearch());
+        caseSensitive.addChangeListener(c -> performSearch());
+        regularExp = new JToggleButton(IconTheme.JabRefIcon.REGEX.getSmallIcon(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
+        regularExp.setToolTipText(Localization.lang("Use regular expressions"));
+        regularExp.addActionListener(ae -> updatePrefs());
+        regularExp.addActionListener(ae -> performSearch());
+        regularExp.addChangeListener(c -> performSearch());
+
+        openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
+        openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
+        openCurrentResultsInDialog.addActionListener(ae -> {
+            SearchResultsDialog searchDialog = new SearchResultsDialog(frame, Localization.lang("Search results in database %0 for %1",
+                    frame.basePanel().getFile().getName(), this.getSearchQuery().toString()));
+            for (BibtexEntry entry : frame.basePanel().getDatabase().getEntries()) {
+                if (entry.isSearchHit()) {
+                    searchDialog.addEntry(entry, frame.basePanel());
+                }
+            }
+            searchDialog.selectFirstEntry();
+            searchDialog.setVisible(true);
+        });
 
         // Init controls
         setLayout(new GridBagLayout());
@@ -107,6 +142,17 @@ public class SearchBar extends JPanel {
         c.anchor = GridBagConstraints.EAST;
         c.gridx = GridBagConstraints.RELATIVE;
         this.add(searchButton, c);
+
+        JToolBar toolBar = new JToolBar();
+        toolBar.setFloatable(false);
+        toolBar.add(regularExp);
+        toolBar.add(caseSensitive);
+        toolBar.addSeparator();
+        toolBar.add(openCurrentResultsInDialog);
+        toolBar.addSeparator();
+        toolBar.add(new HelpAction(frame.helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
+        this.add(toolBar);
+        this.add(currentResults);
     }
 
     /**
@@ -131,58 +177,30 @@ public class SearchBar extends JPanel {
             }
         });
 
-        // Populate popup menu and add it to search button
-        popupMenu = new JPopupMenu("");
 
-        clearSearch = new JMenuItem(Localization.lang("Clear search"));
-        clearSearch.addActionListener(e -> clearSearch());
-        popupMenu.add(clearSearch);
-        popupMenu.addSeparator();
 
-        initSearchModeMenu();
-        for (SearchMode mode : SearchMode.values()) {
-            popupMenu.add(getSearchModeMenuItem(mode));
-        }
-        popupMenu.addSeparator();
-
-        initSearchSettingsMenu();
-        popupMenu.add(settings);
-
-        JMenuItem help = new JMenuItem(Localization.lang("Help"), IconTheme.JabRefIcon.HELP.getSmallIcon());
-        help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
-        popupMenu.add(help);
-
-        searchButton.setPopupMenu(popupMenu);
+        searchButton.setPopupMenu(createPopupMenu());
 
         updateSearchButtonText();
     }
 
-    /**
-     * Initializes the popup menu items for controlling search settings
-     */
-    private void initSearchSettingsMenu() {
-        // Create menu items
-        settings = new JMenu(Localization.lang("Settings"));
-        selectMatches = new JCheckBoxMenuItem(Localization.lang("Select matches"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_SELECT_MATCHES));
-        selectMatches.addActionListener(ae -> updatePrefs());
-        caseSensitive = new JCheckBoxMenuItem(Localization.lang("Case sensitive"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
-        caseSensitive.addActionListener(ae -> updatePrefs());
-        regularExp = new JCheckBoxMenuItem(Localization.lang("Use regular expressions"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
-        regularExp.addActionListener(ae -> updatePrefs());
+    private JPopupMenu createPopupMenu() {
+        // Populate popup menu and add it to search button
+        JPopupMenu menu = new JPopupMenu("");
+
+        initSearchModeMenu();
+        menu.add(getSearchModeMenuItem(SearchMode.FILTER));
+        menu.add(getSearchModeMenuItem(SearchMode.FLOAT));
+        menu.addSeparator();
+        menu.add(getSearchModeMenuItem(SearchMode.GLOBAL));
+        menu.addSeparator();
         highlightWords = new JCheckBoxMenuItem(Localization.lang("Highlight Words"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS));
         highlightWords.addActionListener(ae -> updatePrefs());
         autoComplete = new JCheckBoxMenuItem(Localization.lang("Autocomplete names"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE));
         autoComplete.addActionListener(ae -> updatePrefs());
-
-        // Add them to the menu
-        settings.add(selectMatches);
-        settings.addSeparator();
-        settings.add(caseSensitive);
-        settings.add(regularExp);
-        settings.addSeparator();
-        settings.add(highlightWords);
-        settings.addSeparator();
-        settings.add(autoComplete);
+        menu.add(highlightWords);
+        menu.add(autoComplete);
+        return menu;
     }
 
     /**
@@ -193,22 +211,13 @@ public class SearchBar extends JPanel {
         for (SearchMode mode : SearchMode.values()) {
             // Create menu items
             switch (mode) {
-            case Incremental:
-                modeIncremental = new JRadioButtonMenuItem(mode.getDisplayName(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_INCREMENTAL));
-                break;
-            case Float:
+            case FLOAT:
                 modeFloat = new JRadioButtonMenuItem(mode.getDisplayName(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FLOAT));
                 break;
-            case Filter:
-                modeFilter = new JRadioButtonMenuItem(mode.getDisplayName(), true);
-                break;
-            case LiveFilter:
+            case FILTER:
                 modeLiveFilter = new JRadioButtonMenuItem(mode.getDisplayName(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_LIVE_FILTER));
                 break;
-            case ResultsInDialog:
-                modeResultsInDialog = new JRadioButtonMenuItem(mode.getDisplayName(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_RESULTS_IN_DIALOG));
-                break;
-            case Global:
+            case GLOBAL:
                 modeGlobal = new JRadioButtonMenuItem(mode.getDisplayName(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_GLOBAL));
                 break;
             }
@@ -220,7 +229,8 @@ public class SearchBar extends JPanel {
             searchMethod.add(getSearchModeMenuItem(mode));
 
             // Listen to selection changed events
-            getSearchModeMenuItem(mode).addItemListener(e -> updateSearchButtonText());
+            getSearchModeMenuItem(mode).addChangeListener(e -> updateSearchButtonText());
+            getSearchModeMenuItem(mode).addChangeListener(e -> performSearch());
         }
     }
 
@@ -233,7 +243,7 @@ public class SearchBar extends JPanel {
         searchField.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
 
         // Add autocompleter
-        autoCompleteSupport = new AutoCompleteSupport<String>(searchField);
+        autoCompleteSupport = new AutoCompleteSupport<>(searchField);
         autoCompleteSupport.install();
 
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
@@ -241,33 +251,6 @@ public class SearchBar extends JPanel {
 
         // Search if user press enter
         searchField.addActionListener(e -> performSearch());
-
-        // Restart incremental search if focus was lost
-        searchField.addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (getSearchMode() == SearchMode.Incremental) {
-                    clearSearch();
-                }
-            }
-        });
-
-        // Register key binding to repeat the previous incremental search (i.e. jump to next match)
-        searchField.getInputMap().put(Globals.prefs.getKey(KeyBinds.REPEAT_INCREMENTAL_SEARCH), "repeat");
-        searchField.getActionMap().put("repeat", new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (modeIncremental.isSelected()) {
-                    performSearch();
-                }
-            }
-        });
 
         // Subscribe to changes to the text in the search field in order to "live search"
         // TODO: With this implementation "onSearchTextChanged" gets called two times when setText() is invoked (once for removing the initial string and then again for inserting the new one). This happens for example when an autocompletion is accepted.
@@ -297,18 +280,12 @@ public class SearchBar extends JPanel {
      */
     private JRadioButtonMenuItem getSearchModeMenuItem(SearchMode mode) {
         switch (mode) {
-        case Incremental:
-            return modeIncremental;
-        case Filter:
-            return modeFilter;
-        case Float:
+        case FLOAT:
             return modeFloat;
-        case Global:
+        case GLOBAL:
             return modeGlobal;
-        case LiveFilter:
+        case FILTER:
             return modeLiveFilter;
-        case ResultsInDialog:
-            return modeResultsInDialog;
         }
         return null;
     }
@@ -328,26 +305,17 @@ public class SearchBar extends JPanel {
      * @return current search mode
      */
     private SearchMode getSearchMode() {
-        if (modeIncremental.isSelected()) {
-            return SearchMode.Incremental;
-        }
         if (modeFloat.isSelected()) {
-            return SearchMode.Float;
-        }
-        if (modeFilter.isSelected()) {
-            return SearchMode.Filter;
+            return SearchMode.FLOAT;
         }
         if (modeLiveFilter.isSelected()) {
-            return SearchMode.LiveFilter;
-        }
-        if (modeResultsInDialog.isSelected()) {
-            return SearchMode.ResultsInDialog;
+            return SearchMode.FILTER;
         }
         if (modeGlobal.isSelected()) {
-            return SearchMode.Global;
+            return SearchMode.GLOBAL;
         }
 
-        return SearchMode.Incremental;
+        return SearchMode.FILTER;
     }
 
     /**
@@ -411,25 +379,14 @@ public class SearchBar extends JPanel {
      * Save current settings.
      */
     public void updatePrefs() {
-        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_INCREMENTAL, modeIncremental.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_FLOAT, modeFloat.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_LIVE_FILTER, modeLiveFilter.isSelected());
-        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_RESULTS_IN_DIALOG, modeResultsInDialog.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_GLOBAL, modeGlobal.isSelected());
 
-        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_SELECT_MATCHES, selectMatches.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE, caseSensitive.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_REG_EXP, regularExp.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS, highlightWords.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE, autoComplete.isSelected());
-    }
-
-    /**
-     * Switches search mode to incremental and sets the focus to the search field.
-     */
-    public void startIncrementalSearch() {
-        setSearchMode(SearchMode.Incremental);
-        searchField.requestFocus();
     }
 
     /**
@@ -439,23 +396,14 @@ public class SearchBar extends JPanel {
         if (searchField.hasFocus()) {
 
             switch (getSearchMode()) {
-            case Incremental:
-                setSearchMode(SearchMode.Float);
+            case FLOAT:
+                setSearchMode(SearchMode.FILTER);
                 break;
-            case Float:
-                setSearchMode(SearchMode.Filter);
+            case FILTER:
+                setSearchMode(SearchMode.GLOBAL);
                 break;
-            case Filter:
-                setSearchMode(SearchMode.LiveFilter);
-                break;
-            case LiveFilter:
-                setSearchMode(SearchMode.ResultsInDialog);
-                break;
-            case ResultsInDialog:
-                setSearchMode(SearchMode.Global);
-                break;
-            case Global:
-                setSearchMode(SearchMode.Incremental);
+            case GLOBAL:
+                setSearchMode(SearchMode.FLOAT);
                 break;
 
             }
@@ -469,9 +417,9 @@ public class SearchBar extends JPanel {
      * incremental or live filter search mode.
      */
     private void onSearchTextChanged() {
-        if ((getSearchMode() == SearchMode.Incremental) || (getSearchMode() == SearchMode.LiveFilter)) {
+        if ((getSearchMode() == SearchMode.FILTER) || (getSearchMode() == SearchMode.FLOAT)) {
             // wait until the text is changed
-            SwingUtilities.invokeLater(() -> performSearch());
+            SwingUtilities.invokeLater(this::performSearch);
         }
     }
 
@@ -485,6 +433,8 @@ public class SearchBar extends JPanel {
             searchField.setText("");
 
             fireSearchlistenerEvent(null);
+
+            this.currentResults.setText("");
         });
     }
 
@@ -511,11 +461,15 @@ public class SearchBar extends JPanel {
         // Search
         SearchRule searchRule = SearchRules.getSearchRuleByQuery(searchText, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
 
+
+
         if (!searchRule.validateSearchStrings(searchText)) {
             frame.basePanel().output(Localization.lang("Search failed: illegal search expression"));
             clearSearch();
             return;
         }
+
+
 
         worker.initSearch(searchRule, searchText, getSearchMode());
         // TODO: What is the purpose of implementing the AbstractWorker interface if we call the worker that stupidly?
@@ -540,5 +494,9 @@ public class SearchBar extends JPanel {
      */
     public void setAutoCompleter(AutoCompleter<String> searchCompleter) {
         this.autoCompleteSupport.setAutoCompleter(searchCompleter);
+    }
+
+    public void updateSearchDescription(String description) {
+        this.searchField.setToolTipText(description);
     }
 }

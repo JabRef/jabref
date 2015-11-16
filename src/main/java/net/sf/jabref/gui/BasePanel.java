@@ -731,11 +731,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 	    }
         });
 
-        actions.put(Actions.INC_SEARCH, (BaseAction) () -> {
-            frame.setSearchBarVisible(true);
-	    frame.getSearchBar().startIncrementalSearch();
-        });
-
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, (BaseAction) () -> {
             BibtexEntry[] bes = mainTable.getSelectedEntries();
