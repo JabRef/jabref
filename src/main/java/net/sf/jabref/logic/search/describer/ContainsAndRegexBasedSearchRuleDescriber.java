@@ -40,9 +40,9 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
         String firstWord = !words.isEmpty() ? words.get(0) : "";
 
         String searchDescription = regExp ? Localization.lang(
-                "This group contains entries in which any field contains the regular expression <b>%0</b>",
+                "This search contains entries in which any field contains the regular expression <b>%0</b>",
                 StringUtil.quoteForHTML(firstWord))
-                : Localization.lang("This group contains entries in which any field contains the term <b>%0</b>",
+                : Localization.lang("This search contains entries in which any field contains the term <b>%0</b>",
                 StringUtil.quoteForHTML(firstWord));
 
         if(words.size() > 1) {
@@ -57,8 +57,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
         }
 
         String caseSensitiveDescription = getCaseSensitiveDescription();
-        String genericDescription = Localization.lang(
-                "Entries cannot be manually assigned to or removed from this group.") + "<p><br>" + Localization.lang(
+        String genericDescription = "<p><br>" + Localization.lang(
                 "Hint%c To search specific fields only, enter for example%c<p><tt>author%esmith and title%eelectrical</tt>");
         return String.format("%s (%s). %s", searchDescription, caseSensitiveDescription, genericDescription);
     }

@@ -26,7 +26,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
     public String getDescription() {
         StringBuilder stringBuilder = new StringBuilder();
         // describe advanced search expression
-        stringBuilder.append(Localization.lang("This group contains entries in which")).append(' ');
+        stringBuilder.append(Localization.lang("This search contains entries in which")).append(' ');
         stringBuilder.append(new SearchBaseVisitor<String>() {
 
             @Override
@@ -70,12 +70,12 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
                 if (operator == GrammarBasedSearchRule.ComparisonOperator.CONTAINS) {
                     if (regExp) {
                         return Localization.lang(
-                                "%0 contains the Regular Expression <b>%1</b>", fieldSpecQuoted, termQuoted);
+                                "%0 contains the regular expression <b>%1</b>", fieldSpecQuoted, termQuoted);
                     }
                     return Localization.lang("%0 contains the term <b>%1</b>", fieldSpecQuoted, termQuoted);
                 } else if (operator == GrammarBasedSearchRule.ComparisonOperator.EXACT) {
                     if (regExp) {
-                        return Localization.lang("%0 matches the Regular Expression <b>%1</b>",
+                        return Localization.lang("%0 matches the regular expression <b>%1</b>",
                                 fieldSpecQuoted, termQuoted);
                     }
                     return Localization.lang("%0 matches the term <b>%1</b>",
@@ -83,7 +83,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
                             termQuoted);
                 } else if (operator == GrammarBasedSearchRule.ComparisonOperator.DOES_NOT_CONTAIN) {
                     if (regExp) {
-                        return Localization.lang("%0 doesn't contain the Regular Expression <b>%1</b>",
+                        return Localization.lang("%0 doesn't contain the regular expression <b>%1</b>",
                                 fieldSpecQuoted, termQuoted);
                     }
                     return Localization.lang("%0 doesn't contain the term <b>%1</b>", fieldSpecQuoted,

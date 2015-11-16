@@ -17,8 +17,6 @@ package net.sf.jabref.gui.search;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -34,10 +32,8 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.search.SearchRules;
-import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 
@@ -51,16 +47,17 @@ import org.gpl.JSplitButton.action.SplitButtonActionListener;
  */
 public class SearchBar extends JPanel {
 
-    public SearchQuery getSearchQuery() {
+    private SearchQuery getSearchQuery() {
         return new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
     }
 
-    public void updateResults(int matched) {
+    public void updateResults(int matched, String description) {
         if(matched == 0) {
             this.currentResults.setText(Localization.lang("No results found."));
         } else {
             this.currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
         }
+        this.searchField.setToolTipText("<html>" + description + "</html>");
     }
 
     private final JabRefFrame frame;
@@ -68,8 +65,7 @@ public class SearchBar extends JPanel {
     private JSearchTextField searchField;
     private JSplitButton searchButton;
 
-    private JRadioButtonMenuItem modeFloat, modeLiveFilter,
-            modeGlobal;
+    private JRadioButtonMenuItem modeFloat, modeLiveFilter, modeGlobal;
 
     private JMenu settings;
     private JCheckBoxMenuItem highlightWords, autoComplete;
@@ -471,7 +467,7 @@ public class SearchBar extends JPanel {
 
 
 
-        worker.initSearch(searchRule, searchText, getSearchMode());
+        worker.initSearch(getSearchQuery(), getSearchMode());
         // TODO: What is the purpose of implementing the AbstractWorker interface if we call the worker that stupidly?
         worker.getWorker().run();
         worker.getCallBack().update();
@@ -496,7 +492,4 @@ public class SearchBar extends JPanel {
         this.autoCompleteSupport.setAutoCompleter(searchCompleter);
     }
 
-    public void updateSearchDescription(String description) {
-        this.searchField.setToolTipText(description);
-    }
 }

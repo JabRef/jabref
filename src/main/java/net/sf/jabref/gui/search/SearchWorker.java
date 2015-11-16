@@ -14,10 +14,12 @@ import net.sf.jabref.logic.search.matchers.SearchMatcher;
 class SearchWorker extends AbstractWorker {
 
     private final JabRefFrame frame;
-    private SearchRule rule;
-    private String query = "";
+
+    private SearchQuery searchQuery;
     private SearchMode mode = SearchMode.FILTER;
+
     private int hits = 0;
+
     private SearchResultsDialog searchDialog = null;
 
     public SearchWorker(JabRefFrame frame) {
@@ -26,7 +28,6 @@ class SearchWorker extends AbstractWorker {
 
     /**
      * Resets the information and display of the previous search.
-     * DONE
      */
     public void restart() {
 
@@ -43,26 +44,21 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * DONE
      * Initializes a new search.
      */
-    public void initSearch(SearchRule rule, String query, SearchMode mode) { 
-        this.rule = rule;
-        this.query = query;
-        if(this.mode != mode)
-        {
+    public void initSearch(SearchQuery searchQuery, SearchMode mode) {
+        this.searchQuery = searchQuery;
+        if(this.mode != mode) {
             this.mode = mode;
             // We changed search mode so reset information
             restart();
         }
         
-        LogFactory.getLog(SearchWorker.class).debug("Search (" +  this.mode.getDisplayName() + "): " + this.query);
-        
+        LogFactory.getLog(SearchWorker.class).debug("Search (" +  this.mode.getDisplayName() + "): " + this.searchQuery.toString());
     }
 
     /* (non-Javadoc)
      * @see net.sf.jabref.Worker#run()
-     * DONE
      */
     @Override
     public void run() {
@@ -80,7 +76,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Searches for matches in all open databases. Saves the number of matches in hits. DONE
+     * Searches for matches in all open databases. Saves the number of matches in hits.
      */
     private void runGlobal() {
         // Search all databases
@@ -92,7 +88,7 @@ class SearchWorker extends AbstractWorker {
     private void findResultsInBasePanel(BasePanel p) {
         for (BibtexEntry entry : p.getDatabase().getEntries()) {
 
-            boolean hit = rule.applyRule(query, entry);
+            boolean hit = searchQuery.rule.applyRule(searchQuery.query, entry);
             entry.setSearchHit(hit);
             if (hit) {
                 hits++;
@@ -101,7 +97,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Searches for matches in the current database. Saves the number of matches in hits. DONE
+     * Searches for matches in the current database. Saves the number of matches in hits.
      */
     private void runNormal() {
         // Search the current database
@@ -110,7 +106,6 @@ class SearchWorker extends AbstractWorker {
 
     /* (non-Javadoc)
      * @see net.sf.jabref.AbstractWorker#update()
-     * DONE
      */
     @Override
     public void update() {
@@ -128,14 +123,11 @@ class SearchWorker extends AbstractWorker {
             break;
         }
 
-        frame.basePanel().output(Localization.lang("Searched database. Number of hits") + ": " + hits);
-        frame.getSearchBar().updateResults(hits);
-        String description = SearchDescribers.getSearchDescriberFor(this.rule, frame.getSearchBar().getSearchQuery().query).getDescription();
-        frame.getSearchBar().updateSearchDescription(description);
+        frame.getSearchBar().updateResults(hits, searchQuery.description);
     }
 
     /**
-     * Floats matches to the top of the entry table. DONE
+     * Floats matches to the top of the entry table.
      */
     private void updateFloat() {
         // TODO: Rename these things in mainTable, they are not search specific
@@ -148,7 +140,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Shows only matches in the entry table by removing non-hits. DONE
+     * Shows only matches in the entry table by removing non-hits.
      */
     private void updateFilter() {
         // TODO: Rename these things in basePanel, they are not search specific
@@ -161,7 +153,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Displays search results in a dialog window. DONE
+     * Displays search results in a dialog window.
      */
     private void updateGlobal() {
         // Make sure the search dialog is instantiated and cleared:
@@ -180,7 +172,7 @@ class SearchWorker extends AbstractWorker {
     }
 
     /**
-     * Initializes the search dialog, unless it has already been instantiated. DONE 
+     * Initializes the search dialog, unless it has already been instantiated.
      */
     private void initSearchDialog() {
         // TODO: Move search dialog to main table and make it non-search specific (similar to filter/float by SearchMatcher
