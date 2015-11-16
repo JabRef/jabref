@@ -21,6 +21,7 @@ public class InspecImportTest {
      */
     @Before
     public void setUp() throws Exception {
+
     }
 
     /**
@@ -35,6 +36,10 @@ public class InspecImportTest {
      */
     @Test
     public void testIsRecognizedFormat() {
+        //TODO complete the test
+        // InspecImporter inspecImp = new InspecImporter();
+        // instream ...
+        // assertTrue("testIsRecognizedFormat failed",inspecImp.isRecognizedFormat(inStream));
         fail("Not yet implemented");
     }
 
@@ -45,6 +50,7 @@ public class InspecImportTest {
      */
     @Test
     public void testImportEntries() {
+        //TODO complete the test
         fail("Not yet implemented");
     }
 
@@ -53,7 +59,8 @@ public class InspecImportTest {
      */
     @Test
     public void testGetFormatName() {
-        fail("Not yet implemented");
+        InspecImporter inspecImp = new InspecImporter();
+        assertEquals("testGetFormatName failed", "INSPEC", inspecImp.getFormatName());
     }
 
     /**
@@ -61,7 +68,9 @@ public class InspecImportTest {
      */
     @Test
     public void testGetCLIId() {
-        fail("Not yet implemented");
+        InspecImporter inspecImp = new InspecImporter();
+        assertEquals("testGetCLIId failed", "inspec", inspecImp.getCLIId());
+
     }
 
 }
