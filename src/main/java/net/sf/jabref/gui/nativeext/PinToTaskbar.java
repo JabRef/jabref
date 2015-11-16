@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
  * Native pin to taskbar extension for Windows.
  * Only use this class after checking for OS Windows 7 and up!
  * <example>OS.isWindows7OrLater()</example>
+ * TODO: Remove when install4j is used.
  */
 public class PinToTaskbar {
     private static final Log LOGGER = LogFactory.getLog(PinToTaskbar.class);
