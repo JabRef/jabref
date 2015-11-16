@@ -1,4 +1,4 @@
-[dev_2.11]
+2.11.1
     - Backports from 2.80: Fix #250: No hard line breaks after 70 chars in serialized JabRef meta data
     - Backports from 2.80: Fix #325: Deactivating AutoCompletion crashes EntryEditor
 2.11
