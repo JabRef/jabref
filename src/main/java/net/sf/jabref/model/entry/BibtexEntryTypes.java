@@ -22,12 +22,18 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * An article from a journal or magazine.
+     *
+     * Required fields: author, title, journal, year.
+     * Optional fields: volume, number, pages, month, note.
+     */
     public static final BibtexEntryType ARTICLE =
             new BibtexEntryType() {
 
                 {
-                    addAllOptional("volume", "pages", "number", "month", "note"); //- "volume", "pages", "part", "eid"
-                    addAllRequired("author", "title", "journal", "year");  //+ "volume", "pages"
+                    addAllRequired("author", "title", "journal", "year");
+                    addAllOptional("volume", "number", "pages", "month", "note");
                 }
 
                 @Override
@@ -43,11 +49,18 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * A work that is printed and bound, but without a named publisher or sponsoring institution.
+     *
+     * Required field: title.
+     * Optional fields: author, howpublished, address, month, year, note.
+     */
     public static final BibtexEntryType BOOKLET =
             new BibtexEntryType() {
 
                 {
-                    addAllOptional("author", "howpublished", "address", "month", "year", "note");  //+ "lastchecked"
+                    addAllRequired("title");
+                    addAllOptional("author", "howpublished", "address", "month", "year", "note");
                 }
 
                 @Override
@@ -61,6 +74,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * A part of a book, which may be a chapter (or section or whatever) and/or a range of pages.
+     *
+     * Required fields: author or editor, title, chapter and/or pages, publisher, year.
+     * Optional fields: volume or number, series, type, address, edition, month, note.
+     */
     public static final BibtexEntryType INBOOK =
             new BibtexEntryType() {
 
@@ -68,7 +87,7 @@ public class BibtexEntryTypes {
 
                 {
                     addAllOptional("volume", "number", "series", "type", "address", "edition",
-                            "month", "note"); //+ "pages"
+                            "month", "note");
                     addAllRequired("chapter", "pages", "title", "publisher", "year", "editor",
                             "author");
                 }
@@ -94,6 +113,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * A book with an explicit publisher.
+     *
+     * Required fields: author or editor, title, publisher, year.
+     * Optional fields: volume or number, series, address, edition, month, note.
+     */
     public static final BibtexEntryType BOOK =
             new BibtexEntryType() {
 
@@ -103,7 +128,7 @@ public class BibtexEntryTypes {
                 {
                     addAllRequired("title", "publisher", "year", "editor", "author");
                     addAllOptional("volume", "number", "series", "address", "edition", "month",
-                            "note");     //+ pages
+                            "note");
                 }
 
                 @Override
@@ -128,6 +153,11 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * A part of a book having its own title.
+     * Required fields: author, title, booktitle, publisher, year.
+     * Optional fields: editor, volume or number, series, type, chapter, pages, address, edition, month, note.
+     */
     public static final BibtexEntryType INCOLLECTION =
             new BibtexEntryType() {
 
@@ -153,6 +183,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * An article in a conference proceedings.
+     *
+     * Required fields: author, title, booktitle, year.
+     * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
+     */
     public static final BibtexEntryType CONFERENCE =
             new BibtexEntryType() {
 
@@ -176,6 +212,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * An article in a conference proceedings.
+     *
+     * Required fields: author, title, booktitle, year.
+     * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
+     */
     public static final BibtexEntryType INPROCEEDINGS =
             new BibtexEntryType() {
 
@@ -199,6 +241,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * The proceedings of a conference.
+     *
+     * Required fields: title, year.
+     * Optional fields: editor, volume or number, series, address, month, organization, publisher, note.
+     */
     public static final BibtexEntryType PROCEEDINGS =
             new BibtexEntryType() {
 
@@ -222,6 +270,11 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * Technical documentation.
+     * Required field: title.
+     * Optional fields: author, organization, address, edition, month, year, note.
+     */
     public static final BibtexEntryType MANUAL =
             new BibtexEntryType() {
 
@@ -245,6 +298,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * A report published by a school or other institution, usually numbered within a series.
+     *
+     * Required fields: author, title, institution, year.
+     * Optional fields: type, number, address, month, note.
+     */
     public static final BibtexEntryType TECHREPORT =
             new BibtexEntryType() {
 
@@ -268,6 +327,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * A Master’s thesis.
+     *
+     * Required fields: author, title, school, year.
+     * Optional fields: type, address, month, note.
+     */
     public static final BibtexEntryType MASTERSTHESIS =
             new BibtexEntryType() {
 
@@ -290,6 +355,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * A PhD thesis.
+     *
+     * Required fields: author, title, school, year.
+     * Optional fields: type, address, month, note.
+     */
     public static final BibtexEntryType PHDTHESIS =
             new BibtexEntryType() {
 
@@ -312,6 +383,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * A document having an author and title, but not formally published.
+     *
+     * Required fields: author, title, note.
+     * Optional fields: month, year.
+     */
     public static final BibtexEntryType UNPUBLISHED =
             new BibtexEntryType() {
 
@@ -334,6 +411,9 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * TODO: unknown
+     */
     public static final BibtexEntryType PERIODICAL =
             new BibtexEntryType() {
 
@@ -356,6 +436,9 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * TODO: unknown
+     */
     public static final BibtexEntryType PATENT =
             new BibtexEntryType() {
 
@@ -380,6 +463,9 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * TODO: unknown
+     */
     public static final BibtexEntryType STANDARD =
             new BibtexEntryType() {
 
@@ -412,6 +498,9 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * TODO: unknown
+     */
     public static final BibtexEntryType ELECTRONIC =
             new BibtexEntryType() {
 
@@ -434,6 +523,12 @@ public class BibtexEntryTypes {
                 }
             };
 
+    /**
+     * Use this type when nothing else fits.
+     *
+     * Required fields: none.
+     * Optional fields: author, title, howpublished, month, year, note.
+     */
     public static final BibtexEntryType MISC =
             new BibtexEntryType() {
 
