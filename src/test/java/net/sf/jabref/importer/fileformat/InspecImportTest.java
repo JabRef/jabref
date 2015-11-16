@@ -2,9 +2,16 @@ package net.sf.jabref.importer.fileformat;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 /**
  *
@@ -16,11 +23,17 @@ import org.junit.Test;
  */
 public class InspecImportTest {
 
+    InspecImporter inspecImp;
     /**
      * @throws java.lang.Exception
      */
     @Before
     public void setUp() throws Exception {
+
+        if (Globals.prefs == null) {
+            Globals.prefs = JabRefPreferences.getInstance();
+        }
+        this.inspecImp = new InspecImporter();
 
     }
 
@@ -33,14 +46,16 @@ public class InspecImportTest {
 
     /**
      * Test method for {@link net.sf.jabref.importer.fileformat.InspecImporter#isRecognizedFormat(java.io.InputStream)}.
+     * 
+     * @throws IOException
      */
     @Test
-    public void testIsRecognizedFormat() {
-        //TODO complete the test
-        // InspecImporter inspecImp = new InspecImporter();
-        // instream ...
-        // assertTrue("testIsRecognizedFormat failed",inspecImp.isRecognizedFormat(inStream));
-        fail("Not yet implemented");
+    public void testIsRecognizedFormat() throws IOException {
+
+        InputStream testInput = InspecImportTest.class.getResourceAsStream("InpsecImportTest.txt");
+
+        Assert.assertTrue("InspecImporter isRecognizedFormat test failed", inspecImp.isRecognizedFormat(testInput));
+
     }
 
     /**
@@ -59,7 +74,7 @@ public class InspecImportTest {
      */
     @Test
     public void testGetFormatName() {
-        InspecImporter inspecImp = new InspecImporter();
+
         assertEquals("testGetFormatName failed", "INSPEC", inspecImp.getFormatName());
     }
 
@@ -68,7 +83,7 @@ public class InspecImportTest {
      */
     @Test
     public void testGetCLIId() {
-        InspecImporter inspecImp = new InspecImporter();
+
         assertEquals("testGetCLIId failed", "inspec", inspecImp.getCLIId());
 
     }
