@@ -328,7 +328,7 @@ public class BibtexEntryTypes {
             };
 
     /**
-     * A Master’s thesis.
+     * A Master's thesis.
      *
      * Required fields: author, title, school, year.
      * Optional fields: type, address, month, note.
