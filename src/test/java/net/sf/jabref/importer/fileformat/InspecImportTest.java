@@ -3,8 +3,6 @@ package net.sf.jabref.importer.fileformat;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.InputStream;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,15 +44,14 @@ public class InspecImportTest {
 
     /**
      * Test method for {@link net.sf.jabref.importer.fileformat.InspecImporter#isRecognizedFormat(java.io.InputStream)}.
-     * 
+     *
      * @throws IOException
      */
     @Test
     public void testIsRecognizedFormat() throws IOException {
 
-        InputStream testInput = InspecImportTest.class.getResourceAsStream("InpsecImportTest.txt");
-
-        Assert.assertTrue("InspecImporter isRecognizedFormat test failed", inspecImp.isRecognizedFormat(testInput));
+        Assert.assertTrue("InspecImporter isRecognizedFormat test failed",
+                inspecImp.isRecognizedFormat(InspecImportTest.class.getResourceAsStream("InpsecImportTest.txt")));
 
     }
 
