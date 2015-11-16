@@ -30,6 +30,11 @@ public class PageNumbersFormatterTest {
     }
 
     @Test
+    public void formatPageNumbersPlusRange() {
+        expectCorrect("43+", "43+");
+    }
+
+    @Test
     public void ignoreWhitespaceInPageNumbers() {
         expectCorrect("   1  - 2 ", "1--2");
     }
