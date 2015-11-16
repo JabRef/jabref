@@ -69,6 +69,10 @@ public class IntegrityCheckTest {
         assertCorrect("43+", IntegrityCheck.PAGES_CHECKER);
         assertWrong("1 2", IntegrityCheck.PAGES_CHECKER);
         assertWrong("{1}-{2}", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("7,41,73--97", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("7,41--42,73", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("7--11,41--43,73", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("7+,41--43,73", IntegrityCheck.PAGES_CHECKER);
     }
 
     private void assertWrong(String value, IntegrityCheck.Checker yearChecker) {

@@ -166,11 +166,9 @@ public class IntegrityCheck {
      * (the ‘+’ in this last example indicates pages following that don’t form a simple range).
      * To make it easier to maintain Scribe-compatible databases, the standard styles convert
      * a single dash (as in 7-33) to the double dash used in TEX to denote number ranges (as in 7--33).
-     *
-     * Additionally: 1,2,3
      */
     private static class PagesChecker implements Checker {
-        private static final Predicate<String> VALID_PAGE_NUMBER = Pattern.compile("\\A\\d+(?:\\+|\\-{2}\\d+|(?:,\\d+)+)?\\z").asPredicate();
+        private static final Predicate<String> VALID_PAGE_NUMBER = Pattern.compile("\\A\\d+(?:\\+|\\-{2}\\d+)?(?:,\\d+(?:\\+|\\-{2}\\d+)?)*\\z").asPredicate();
 
         /**
          * Checks, if the page numbers String conforms to the BibTex manual
