@@ -16,6 +16,7 @@ public class IntegrityCheck {
     public static final Checker YEAR_CHECKER = new YearChecker();
     public static final Checker TITLE_CHECKER = new TitleChecker();
     public static final Checker BRACKET_CHECKER = new BracketChecker();
+    public static final Checker PAGES_CHECKER = new PagesChecker();
 
     public List<IntegrityMessage> checkBibtexDatabase(BibtexDatabase base) {
         List<IntegrityMessage> result = new ArrayList<>();
@@ -57,6 +58,11 @@ public class IntegrityCheck {
         data = entry.getField("year");
         if (data != null) {
             YEAR_CHECKER.check(data.toString(), "year", entry, result);
+        }
+
+        data = entry.getField("pages");
+        if (data != null) {
+            PAGES_CHECKER.check(data.toString(), "pages", entry, result);
         }
 
         return result;
@@ -150,6 +156,29 @@ public class IntegrityCheck {
         public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
             if (!CONTAINS_FOUR_DIGIT.test(value.trim())) {
                 collector.add(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, fieldName));
+            }
+        }
+    }
+
+    /**
+     * From BibTex manual:
+     * One or more page numbers or range of numbers, such as 42--111 or 7,41,73--97 or 43+
+     * (the ‘+’ in this last example indicates pages following that don’t form a simple range).
+     * To make it easier to maintain Scribe-compatible databases, the standard styles convert
+     * a single dash (as in 7-33) to the double dash used in TEX to denote number ranges (as in 7--33).
+     *
+     * Additionally: 1,2,3
+     */
+    private static class PagesChecker implements Checker {
+        private static final Predicate<String> VALID_PAGE_NUMBER = Pattern.compile("\\A\\d+(?:\\+|\\-{2}\\d+|(?:,\\d+)+)?\\z").asPredicate();
+
+        /**
+         * Checks, if the page numbers String conforms to the BibTex manual
+         */
+        @Override
+        public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
+            if (!VALID_PAGE_NUMBER.test(value.trim())) {
+                collector.add(new IntegrityMessage(Localization.lang("should contain a valid page number range"), entry, fieldName));
             }
         }
     }
