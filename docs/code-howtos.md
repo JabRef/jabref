@@ -82,6 +82,11 @@ The following best practices should be applied when dealing with `net.sf.jabref.
 - Use a full stop/period (".") to end full sentences
 - *to be continued*
 
+## Cleanup / Formatters
+
+We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themself are independent of any logic and therefore easy to test. 
+
+Example: (PageNumbersFormatter)[https://github.com/JabRef/jabref/blob/master/src/main/java/net/sf/jabref/logic/formatter/bibtexfields/PageNumbersFormatter.java]
 
 ## Drag and Drop
 
