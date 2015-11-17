@@ -1,20 +1,21 @@
-package net.sf.jabref.gui.search;
+package net.sf.jabref.logic.search;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescriber;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 public class SearchQuery {
 
     public final String query;
     public final boolean caseSensitive;
     public final boolean regularExpression;
-    public final SearchRule rule;
+    private final SearchRule rule;
     public final String description;
 
-    SearchQuery(String query, boolean caseSensitive, boolean regularExpression) {
+    public SearchQuery(String query, boolean caseSensitive, boolean regularExpression) {
         this.query = query;
         this.caseSensitive = caseSensitive;
         this.regularExpression = regularExpression;
@@ -25,6 +26,14 @@ public class SearchQuery {
     @Override
     public String toString() {
         return String.format("\"%s\" (%s, %s)", query, getCaseSensitiveDescription(), getRegularExpressionDescription());
+    }
+
+    public boolean isMatch(BibtexEntry entry) {
+        return this.rule.applyRule(query, entry);
+    }
+
+    public boolean isValidQuery() {
+        return this.rule.validateSearchStrings(query);
     }
 
     private SearchRule getSearchRule() {

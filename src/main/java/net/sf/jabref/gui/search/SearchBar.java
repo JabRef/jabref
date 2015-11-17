@@ -32,6 +32,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -49,8 +50,10 @@ public class SearchBar extends JPanel {
     public void updateResults(int matched, String description) {
         if(matched == 0) {
             this.currentResults.setText(Localization.lang("No results found."));
+            this.searchField.setBackground(Color.RED);
         } else {
             this.currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
+            this.searchField.setBackground(Color.GREEN);
         }
         this.searchField.setToolTipText("<html>" + description + "</html>");
     }
@@ -93,14 +96,12 @@ public class SearchBar extends JPanel {
 
         caseSensitive = new JToggleButton(IconTheme.JabRefIcon.CASE_SENSITIVE.getSmallIcon(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
         caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
-        caseSensitive.addActionListener(ae -> updatePrefs());
-        caseSensitive.addActionListener(ae -> performSearch());
-        caseSensitive.addChangeListener(c -> performSearch());
+        caseSensitive.addItemListener(ae -> performSearch());
+        caseSensitive.addItemListener(ae -> updatePrefs());
         regularExp = new JToggleButton(IconTheme.JabRefIcon.REGEX.getSmallIcon(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
         regularExp.setToolTipText(Localization.lang("Use regular expressions"));
-        regularExp.addActionListener(ae -> updatePrefs());
-        regularExp.addActionListener(ae -> performSearch());
-        regularExp.addChangeListener(c -> performSearch());
+        regularExp.addItemListener(ae -> performSearch());
+        regularExp.addItemListener(ae -> updatePrefs());
 
         openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
@@ -118,22 +119,31 @@ public class SearchBar extends JPanel {
 
         // Init controls
         setLayout(new FlowLayout(FlowLayout.LEFT));
+        this.setBackground(Color.WHITE);
+        JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
+        searchIcon.setBackground(Color.WHITE);
+        this.add(searchIcon);
         initSearchField();
         this.add(searchField);
         JButton button = new JButton(Localization.lang("Settings"));
+        button.setBackground(Color.WHITE);
         JPopupMenu settingsMenu = createSettingsMenu();
         button.addActionListener(l -> {
-            settingsMenu.setVisible(true);
+            settingsMenu.show(button, 0, button.getHeight());
         });
-        this.add(button);
 
         JToolBar toolBar = new JToolBar();
+        toolBar.setBackground(Color.WHITE);
         toolBar.setFloatable(false);
         toolBar.add(regularExp);
         toolBar.add(caseSensitive);
         toolBar.addSeparator();
+        toolBar.add(button);
+        toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);
+        openCurrentResultsInDialog.setBackground(Color.WHITE);
         JButton globalSearch = new JButton(Localization.lang("Search in all open databases"));
+        globalSearch.setBackground(Color.WHITE);
         globalSearch.addActionListener(l -> {
             AbstractWorker worker = new GlobalSearchWorker(basePanel.frame(), getSearchQuery());
             worker.run();
@@ -141,7 +151,7 @@ public class SearchBar extends JPanel {
         });
         toolBar.add(globalSearch);
         toolBar.addSeparator();
-        toolBar.add(new HelpAction(basePanel.frame().helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
+        toolBar.add(new HelpAction(basePanel.frame().helpDiag, GUIGlobals.searchHelp, Localization.lang("Help"))).setBackground(Color.WHITE);
         this.add(toolBar);
         this.add(currentResults);
     }
@@ -379,6 +389,7 @@ public class SearchBar extends JPanel {
             worker.restart();
 
             searchField.setText("");
+            searchField.setBackground(Color.WHITE);
 
             fireSearchlistenerEvent(null);
 
@@ -407,7 +418,7 @@ public class SearchBar extends JPanel {
 
         SearchQuery searchQuery = getSearchQuery();
 
-        if (!searchQuery.rule.validateSearchStrings(searchText)) {
+        if (!searchQuery.isValidQuery()) {
             basePanel.output(Localization.lang("Search failed: illegal search expression"));
             clearSearch();
             return;

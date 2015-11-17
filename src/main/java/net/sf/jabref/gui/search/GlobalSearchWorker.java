@@ -4,10 +4,9 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.entry.BibtexEntry;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 class GlobalSearchWorker extends AbstractWorker {
@@ -34,8 +33,7 @@ class GlobalSearchWorker extends AbstractWorker {
         for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
             BasePanel basePanel = frame.baseAt(i);
             for (BibtexEntry entry : basePanel.getDatabase().getEntries()) {
-                boolean hit = searchQuery.rule.applyRule(searchQuery.query, entry);
-                if (hit) {
+                if (searchQuery.isMatch(entry)) {
                     dialog.addEntry(entry, basePanel);
                 }
             }

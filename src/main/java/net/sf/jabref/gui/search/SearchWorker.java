@@ -2,6 +2,7 @@ package net.sf.jabref.gui.search;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.LogFactory;
@@ -64,7 +65,7 @@ class SearchWorker extends AbstractWorker {
         // Search the current database
         for (BibtexEntry entry : basePanel.getDatabase().getEntries()) {
 
-            boolean hit = searchQuery.rule.applyRule(searchQuery.query, entry);
+            boolean hit = searchQuery.isMatch(entry);
             entry.setSearchHit(hit);
             if (hit) {
                 hits++;
