@@ -35,22 +35,22 @@ import java.util.stream.Collectors;
 import net.sf.jabref.model.database.BibtexDatabase;
 
 /**
- * Provides a list of known entry types
- * <p>
- * The list of optional and required fields is derived from http://en.wikipedia.org/wiki/BibTeX#Entry_types
+ * Abstract base class for all entry types.
  */
 public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
+    private List<String> requiredFields;
+    private List<String> optionalFields;
+
+    public BibtexEntryType() {
+        requiredFields = new ArrayList<>();
+        optionalFields = new ArrayList<>();
+
+        // key is always required
+        requiredFields.add("bibtexkey");
+    }
 
     public abstract String getName();
-
-    private List<String> requiredFields = new ArrayList<>();
-
-    private List<String> optionalFields = new ArrayList<>();
-
-    @Override
-    public int compareTo(BibtexEntryType o) {
-        return getName().compareTo(o.getName());
-    }
+    public abstract boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
 
     public List<String> getOptionalFields() {
         return Collections.unmodifiableList(optionalFields);
@@ -81,8 +81,6 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
 
         return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
     }
-
-    public abstract boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
 
     public String[] getUtilityFields() {
         return new String[]{"search"};
@@ -121,6 +119,9 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         return Arrays.asList(primaryFields).contains(field);
     }
 
+    /**
+     * Overidden for some entry types like IEEETRANBSTCTL
+     */
     public boolean isVisibleAtNewEntryDialog() {
         return true;
     }
@@ -134,5 +135,10 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
      */
     public List<String> getRequiredFieldsForCustomization() {
         return getRequiredFields();
+    }
+
+    @Override
+    public int compareTo(BibtexEntryType o) {
+        return getName().compareTo(o.getName());
     }
 }
