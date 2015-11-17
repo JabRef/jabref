@@ -22,4 +22,15 @@ public interface EntryType extends Comparable<EntryType> {
     boolean isVisibleAtNewEntryDialog();
 
     List<String> getRequiredFieldsForCustomization();
+
+    /**
+     * TODO: remove
+     */
+    List<String> getPrimaryOptionalFields();
+
+
+    /**
+     * TODO: remove
+     */
+    List<String> getSecondaryOptionalFields();
 }

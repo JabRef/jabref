@@ -27,10 +27,10 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 
 public class EntryTypeDialog extends JDialog implements ActionListener {
@@ -40,17 +40,17 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
      * Returns null if cancelled.
      */
 
-    private BibtexEntryType type;
+    private EntryType type;
     private final CancelAction cancelAction = new CancelAction();
     private static final int COLNUM = 3;
 
 
     static class TypeButton extends JButton implements Comparable<TypeButton> {
 
-        final BibtexEntryType type;
+        final EntryType type;
 
 
-        public TypeButton(String label, BibtexEntryType type_) {
+        public TypeButton(String label, EntryType type_) {
             super(label);
             type = type_;
         }
@@ -105,7 +105,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         con.insets = new Insets(4, 4, 4, 4);
         int col = 0;
 
-        for (BibtexEntryType tp : EntryTypes.getAllValues()) {
+        for (EntryType tp : EntryTypes.getAllValues()) {
             if (tp.isVisibleAtNewEntryDialog()) {
                 TypeButton b = new TypeButton(EntryUtil.capitalizeFirst(tp.getName()), tp);
                 b.addActionListener(this);
@@ -138,8 +138,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         dispose();
     }
 
-    public BibtexEntryType getChoice() {
-        //return type;
+    public EntryType getChoice() {
         return type;
     }
 

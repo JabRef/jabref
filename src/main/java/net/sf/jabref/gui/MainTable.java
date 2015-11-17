@@ -45,7 +45,7 @@ import net.sf.jabref.gui.util.IsMarkedComparator;
 import net.sf.jabref.gui.util.RankingFieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -497,7 +497,7 @@ public class MainTable extends JTable {
     private int getCellStatus(int row, int col) {
         try {
             BibtexEntry be = sortedForGrouping.get(row);
-            BibtexEntryType type = be.getType();
+            EntryType type = be.getType();
             String columnName = getColumnName(col).toLowerCase();
             if (columnName.equals(BibtexEntry.KEY_FIELD) || type.isRequired(columnName)) {
                 return MainTable.REQUIRED;

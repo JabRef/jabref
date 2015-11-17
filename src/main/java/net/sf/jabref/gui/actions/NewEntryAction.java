@@ -3,8 +3,8 @@ package net.sf.jabref.gui.actions;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 
 import org.apache.commons.logging.Log;
@@ -51,7 +51,7 @@ public class NewEntryAction extends MnemonicAwareAction {
             EntryTypeDialog etd = new EntryTypeDialog(jabRefFrame);
             PositionWindow.placeDialog(etd, jabRefFrame);
             etd.setVisible(true);
-            BibtexEntryType tp = etd.getChoice();
+            EntryType tp = etd.getChoice();
             if (tp == null) {
                 return;
             }

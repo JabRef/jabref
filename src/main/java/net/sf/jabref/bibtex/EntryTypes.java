@@ -2,17 +2,14 @@ package net.sf.jabref.bibtex;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.entry.*;
 
 import java.util.*;
 
 public class EntryTypes {
 
-    private static final TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<>();
-    private static final TreeMap<String, BibtexEntryType> STANDARD_TYPES;
+    private static final TreeMap<String, EntryType> ALL_TYPES = new TreeMap<>();
+    private static final TreeMap<String, EntryType> STANDARD_TYPES;
 
     static {
         // Put the standard entry types into the type map.
@@ -74,13 +71,14 @@ public class EntryTypes {
         ALL_TYPES.put("phdthesis", BibtexEntryTypes.PHDTHESIS);
         ALL_TYPES.put("techreport", BibtexEntryTypes.TECHREPORT);
         ALL_TYPES.put("unpublished", BibtexEntryTypes.UNPUBLISHED);
-        ALL_TYPES.put("patent", BibtexEntryTypes.PATENT);
-        ALL_TYPES.put("standard", BibtexEntryTypes.STANDARD);
-        ALL_TYPES.put("electronic", BibtexEntryTypes.ELECTRONIC);
-        ALL_TYPES.put("periodical", BibtexEntryTypes.PERIODICAL);
         ALL_TYPES.put("misc", BibtexEntryTypes.MISC);
         ALL_TYPES.put("other", BibtexEntryTypes.OTHER);
-        ALL_TYPES.put("ieeetranbstctl", BibtexEntryTypes.IEEETRANBSTCTL);
+        // IEEE types
+        ALL_TYPES.put("patent", IEEETranEntryTypes.PATENT);
+        ALL_TYPES.put("standard", IEEETranEntryTypes.STANDARD);
+        ALL_TYPES.put("electronic", IEEETranEntryTypes.ELECTRONIC);
+        ALL_TYPES.put("periodical", IEEETranEntryTypes.PERIODICAL);
+        ALL_TYPES.put("ieeetranbstctl", IEEETranEntryTypes.IEEETRANBSTCTL);
     }
 
 
@@ -88,21 +86,20 @@ public class EntryTypes {
      * This method returns the BibtexEntryType for the name of a type,
      * or null if it does not exist.
      */
-    public static BibtexEntryType getType(String name) {
-        BibtexEntryType entryType = ALL_TYPES.get(name.toLowerCase(Locale.US));
+    public static EntryType getType(String name) {
+        EntryType entryType = ALL_TYPES.get(name.toLowerCase(Locale.US));
         if (entryType == null) {
             return null;
-        } else {
-            return entryType;
         }
+        return entryType;
     }
 
     /**
      * This method returns the standard BibtexEntryType for the
      * name of a type, or null if it does not exist.
      */
-    public static BibtexEntryType getStandardType(String name) {
-        BibtexEntryType entryType = STANDARD_TYPES.get(name.toLowerCase());
+    public static EntryType getStandardType(String name) {
+        EntryType entryType = STANDARD_TYPES.get(name.toLowerCase());
         if (entryType == null) {
             return null;
         } else {
@@ -118,7 +115,7 @@ public class EntryTypes {
         return ALL_TYPES.keySet();
     }
 
-    public static Collection<BibtexEntryType> getAllValues() {
+    public static Collection<EntryType> getAllValues() {
         return ALL_TYPES.values();
     }
 
@@ -141,13 +138,12 @@ public class EntryTypes {
     }
 
     // Get an entry type defined in BibtexEntryType
-    public static BibtexEntryType getBibtexEntryType(String type) {
+    public static EntryType getBibtexEntryType(String type) {
         // decide which entryType object to return
-        BibtexEntryType o = getType(type);
+        EntryType o = getType(type);
         if (o != null) {
             return o;
-        } else {
-            return BibtexEntryTypes.OTHER;
         }
+        return BibtexEntryTypes.OTHER;
     }
 }

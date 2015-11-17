@@ -23,13 +23,13 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
 import com.google.common.base.Strings;
+import net.sf.jabref.model.entry.EntryType;
 
 public class BibtexEntryWriter {
 
@@ -68,7 +68,7 @@ public class BibtexEntryWriter {
         // XXX JK: Look for all used field names not only defined once, since
         //         there may be some unofficial field name used.
         int max = 0;
-        for (BibtexEntryType type : EntryTypes.getAllValues()) {
+        for (EntryType type : EntryTypes.getAllValues()) {
             if (type.getRequiredFields() != null) {
                 for (String field : type.getRequiredFields()) {
                     max = Math.max(max, field.length());

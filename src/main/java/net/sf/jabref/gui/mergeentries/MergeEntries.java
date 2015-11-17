@@ -24,13 +24,13 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -167,8 +167,8 @@ public class MergeEntries {
         mainPanel.add(new JSeparator(), cc.xyw(1, 3, 11));
 
         // Start with entry type
-        BibtexEntryType type1 = one.getType();
-        BibtexEntryType type2 = two.getType();
+        EntryType type1 = one.getType();
+        EntryType type2 = two.getType();
 
         mergedEntry.setType(type1);
         label = new JLabel(Localization.lang("Entry type"));

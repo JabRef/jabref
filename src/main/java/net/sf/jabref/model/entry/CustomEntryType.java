@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * This class is used to represent customized entry types.
  */
 public class CustomEntryType extends BibtexEntryType {
+    private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final String name;
@@ -36,8 +37,6 @@ public class CustomEntryType extends BibtexEntryType {
     private final String[] optional;
     private String[] priOpt;
     private String[][] reqSets; // Sets of either-or required fields, if any
-
-    private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
     public CustomEntryType(String name, List<String> required, List<String> priOpt, List<String> secOpt) {
         this(name, required.toArray(new String[required.size()]), priOpt.toArray(new String[priOpt.size()]),

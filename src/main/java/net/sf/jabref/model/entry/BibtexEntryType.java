@@ -116,4 +116,31 @@ public abstract class BibtexEntryType implements EntryType {
     public int compareTo(EntryType o) {
         return getName().compareTo(o.getName());
     }
+
+    /**
+     * TODO: remove all methods from here on
+     * @return
+     */
+    public List<String> getPrimaryOptionalFields() {
+        return getOptionalFields();
+    }
+
+    public List<String> getSecondaryOptionalFields() {
+        List<String> optionalFields = getOptionalFields();
+
+        if (optionalFields == null) {
+            return new ArrayList<>(0);
+        }
+
+        return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
+    }
+
+    private boolean isPrimary(String field) {
+        List<String> primaryFields = getPrimaryOptionalFields();
+
+        if (primaryFields == null) {
+            return false;
+        }
+        return primaryFields.contains(field);
+    }
 }

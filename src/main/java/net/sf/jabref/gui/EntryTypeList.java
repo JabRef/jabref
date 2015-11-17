@@ -25,10 +25,10 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
 
 /**
@@ -93,7 +93,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         }
         for (int i = 0; i < selected.length; i++) {
             String typeName = listModel.get(selected[selected.length - 1 - i]);
-            BibtexEntryType type = EntryTypes.getType(typeName);
+            EntryType type = EntryTypes.getType(typeName);
 
             // If it is a custom entry type, we can remove it. If type == null, it means
             // the user must have added it and not yet applied it, so we can remove it

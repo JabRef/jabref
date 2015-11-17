@@ -80,6 +80,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -590,7 +591,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         progressBarImporting.setValue(0);
         progressBarImporting.setString("");
 
-        final BibtexEntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).entryType;
+        final EntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).entryType;
 
         threadState = new int[] {1};
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
@@ -1102,7 +1103,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void createEntryTypesCombobox() {
 
-        Iterator<BibtexEntryType> iterator = EntryTypes.getAllValues().iterator();
+        Iterator<EntryType> iterator = EntryTypes.getAllValues().iterator();
         Vector<BibtexEntryTypeWrapper> list = new Vector<>();
         list.add(new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {
@@ -1121,10 +1122,10 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private static class BibtexEntryTypeWrapper {
 
-        final BibtexEntryType entryType;
+        final EntryType entryType;
 
 
-        BibtexEntryTypeWrapper(BibtexEntryType bibtexType) {
+        BibtexEntryTypeWrapper(EntryType bibtexType) {
             this.entryType = bibtexType;
         }
 

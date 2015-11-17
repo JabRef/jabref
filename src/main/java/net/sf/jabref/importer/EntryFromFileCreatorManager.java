@@ -29,10 +29,10 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 
 /**
  * The class EntryFromFileCreatorManager manages entry creators.
@@ -106,7 +106,7 @@ public final class EntryFromFileCreatorManager {
      * @return List of unexcpected import event messages including failures.
      */
     public List<String> addEntrysFromFiles(List<File> files,
-            BibtexDatabase database, BibtexEntryType entryType,
+            BibtexDatabase database, EntryType entryType,
             boolean generateKeywordsFromPathToFile) {
         List<String> importGUIMessages = new LinkedList<>();
         addEntriesFromFiles(files, database, null, entryType,
@@ -128,7 +128,7 @@ public final class EntryFromFileCreatorManager {
      * @return Returns The number of entries added
      */
     public int addEntriesFromFiles(List<File> files,
-            BibtexDatabase database, BasePanel panel, BibtexEntryType entryType,
+            BibtexDatabase database, BasePanel panel, EntryType entryType,
             boolean generateKeywordsFromPathToFile,
             ChangeListener changeListener, List<String> importGUIMessages) {
 

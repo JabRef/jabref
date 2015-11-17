@@ -168,7 +168,7 @@ public class FileActions {
             boolean checkSearch, boolean checkGroup, String encoding, boolean suppressBackup)
                     throws SaveException {
 
-        TreeMap<String, BibtexEntryType> types = new TreeMap<>();
+        TreeMap<String, EntryType> types = new TreeMap<>();
 
         boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
         if (suppressBackup) {
@@ -217,7 +217,7 @@ public class FileActions {
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                BibtexEntryType tp = be.getType();
+                EntryType tp = be.getType();
 
                 if (EntryTypes.getStandardType(tp.getName()) == null) {
                     types.put(tp.getName(), tp);
@@ -247,8 +247,8 @@ public class FileActions {
 
             // Write type definitions, if any:
             if (!types.isEmpty()) {
-                for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
-                    BibtexEntryType type = stringBibtexEntryTypeEntry.getValue();
+                for (Map.Entry<String, EntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
+                    EntryType type = stringBibtexEntryTypeEntry.getValue();
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
                         CustomEntryTypesManager.save(tp, fw);
@@ -357,7 +357,7 @@ public class FileActions {
     public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
             File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding, DatabaseSaveType saveType) throws SaveException {
 
-        TreeMap<String, BibtexEntryType> types = new TreeMap<>(); // Map
+        TreeMap<String, EntryType> types = new TreeMap<>(); // Map
         // to
         // collect
         // entry
@@ -408,7 +408,7 @@ public class FileActions {
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                BibtexEntryType tp = be.getType();
+                EntryType tp = be.getType();
                 if (EntryTypes.getStandardType(tp.getName()) == null) {
                     types.put(tp.getName(), tp);
                 }
@@ -424,7 +424,7 @@ public class FileActions {
 
             // Write type definitions, if any:
             if (!types.isEmpty()) {
-                for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
+                for (Map.Entry<String, EntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
                     CustomEntryType tp = (CustomEntryType) stringBibtexEntryTypeEntry.getValue();
                     CustomEntryTypesManager.save(tp, fw);
                     fw.write(Globals.NEWLINE);

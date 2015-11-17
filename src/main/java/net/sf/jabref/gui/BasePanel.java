@@ -65,6 +65,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
@@ -79,7 +80,6 @@ import net.sf.jabref.model.database.DatabaseChangeEvent.ChangeType;
 import net.sf.jabref.model.database.DatabaseChangeListener;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.specialfields.*;
 import net.sf.jabref.sql.*;
 import net.sf.jabref.sql.exporter.DBExporter;
@@ -1217,7 +1217,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 EntryTypeDialog etd = new EntryTypeDialog(frame);
                 PositionWindow.placeDialog(etd, BasePanel.this);
                 etd.setVisible(true);
-                BibtexEntryType tp = etd.getChoice();
+                EntryType tp = etd.getChoice();
                 if (tp == null) {
                     return;
                 }
@@ -1501,7 +1501,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param type The type of the entry to create.
      * @return The newly created BibtexEntry or null the operation was canceled by the user.
      */
-    public BibtexEntry newEntry(BibtexEntryType type) {
+    public BibtexEntry newEntry(EntryType type) {
         if (type == null) {
             // Find out what type is wanted.
             EntryTypeDialog etd = new EntryTypeDialog(frame);
@@ -2356,16 +2356,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         stringDialog = null;
     }
 
-    public void changeType(BibtexEntry entry, BibtexEntryType type) {
+    public void changeType(BibtexEntry entry, EntryType type) {
         changeType(new BibtexEntry[] {entry}, type);
     }
 
-    public void changeType(BibtexEntryType type) {
+    public void changeType(EntryType type) {
         BibtexEntry[] bes = mainTable.getSelectedEntries();
         changeType(bes, type);
     }
 
-    private void changeType(BibtexEntry[] bes, BibtexEntryType type) {
+    private void changeType(BibtexEntry[] bes, EntryType type) {
 
         if ((bes == null) || (bes.length == 0)) {
             output(Localization.lang("First select the entries you wish to change type for."));

@@ -47,7 +47,7 @@ public class BibtexEntry {
 
     private String id;
 
-    private BibtexEntryType type;
+    private EntryType type;
 
     private Map<String, String> fields = new HashMap<>();
 
@@ -66,7 +66,7 @@ public class BibtexEntry {
         this(id, BibtexEntryTypes.OTHER);
     }
 
-    public BibtexEntry(String id, BibtexEntryType type) {
+    public BibtexEntry(String id, EntryType type) {
         Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
 
         this.id = id;
@@ -108,17 +108,17 @@ public class BibtexEntry {
     /**
      * Returns this entry's type.
      */
-    public BibtexEntryType getType() {
+    public EntryType getType() {
         return type;
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(BibtexEntryType type) {
+    public void setType(EntryType type) {
         Objects.requireNonNull(type, "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
 
-        BibtexEntryType oldType = this.type;
+        EntryType oldType = this.type;
 
         try {
             // We set the type before throwing the changeEvent, to enable

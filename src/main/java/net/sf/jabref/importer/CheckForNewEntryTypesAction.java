@@ -21,10 +21,10 @@ import java.util.Iterator;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 
 /**
  * This action checks whether any new custom entry types were loaded from this
@@ -63,7 +63,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
         if (answer == JOptionPane.YES_OPTION) {
             // Import
-            for (BibtexEntryType typ : pr.getEntryTypes().values()) {
+            for (EntryType typ : pr.getEntryTypes().values()) {
                 EntryTypes.addOrModifyCustomEntryType((CustomEntryType) typ);
             }
         }
