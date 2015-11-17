@@ -29,19 +29,20 @@ Modified for use in JabRef.
 */
 package net.sf.jabref.model.entry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
-
-import net.sf.jabref.model.database.BibtexDatabase;
 
 /**
  * Abstract base class for all BibTex entry types.
  */
-public abstract class BibtexEntryType implements EntryType {
+public abstract class BibLatexEntryType implements EntryType {
     private final List<String> requiredFields;
     private final List<String> optionalFields;
 
-    public BibtexEntryType() {
+    public BibLatexEntryType() {
         requiredFields = new ArrayList<>();
         optionalFields = new ArrayList<>();
 
@@ -67,6 +68,20 @@ public abstract class BibtexEntryType implements EntryType {
         requiredFields.addAll(Arrays.asList(fieldNames));
     }
 
+    public List<String> getPrimaryOptionalFields() {
+        return getOptionalFields();
+    }
+
+    public List<String> getSecondaryOptionalFields() {
+        List<String> optionalFields = getOptionalFields();
+
+        if (optionalFields == null) {
+            return new ArrayList<>(0);
+        }
+
+        return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
+    }
+
     @Override
     public boolean isRequired(String field) {
         List<String> requiredFields = getRequiredFields();
@@ -85,6 +100,15 @@ public abstract class BibtexEntryType implements EntryType {
             return false;
         }
         return optionalFields.contains(field);
+    }
+
+    private boolean isPrimary(String field) {
+        List<String> primaryFields = getPrimaryOptionalFields();
+
+        if (primaryFields == null) {
+            return false;
+        }
+        return primaryFields.contains(field);
     }
 
     /**
@@ -108,7 +132,7 @@ public abstract class BibtexEntryType implements EntryType {
     }
 
     @Override
-    public int compareTo(BibtexEntryType o) {
+    public int compareTo(BibLatexEntryType o) {
         return getName().compareTo(o.getName());
     }
 }
