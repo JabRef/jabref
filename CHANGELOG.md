@@ -56,6 +56,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Show replaced journal abbreviations on console
 
 ### Fixed
+ - Fixed the bug that the file encoding was not correctly determined from the first (or second) line
  - Fixed #325: Deactivating AutoCompletion crashes EntryEditor
  - Fixed bug when having added and then removed a personal journal list, an exception is always shown on startup
  - Fixed a bug in the IEEEXploreFetcher

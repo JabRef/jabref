@@ -11,7 +11,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class OpenDatabaseActionTest {
-    private final String defaultEncoding = "UTF-8";
+
+    private final String defaultEncoding = "CP1252";
 
     @BeforeClass
     public static void setUpGlobalsPrefs() {
@@ -52,6 +53,9 @@ public class OpenDatabaseActionTest {
         // Version
         Assert.assertEquals(0, result.getJabrefMajorVersion());
         Assert.assertEquals(0, result.getJabrefMinorVersion());
+
+        // Encoding
+        Assert.assertEquals("UTF-8", result.getEncoding());
     }
 
     @Test

@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -410,74 +411,33 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     }
 
     private static String checkForEncoding(Reader reader) {
-        String suppliedEncoding = null;
-        StringBuilder headerText = new StringBuilder();
         try {
-            boolean keepon = true;
-            int piv = 0;
-            int offset = 0;
-            int c;
+            BufferedReader br = new BufferedReader(reader);
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
 
-            while (keepon) {
-                c = reader.read();
-                if ((piv == 0) && ((c == '%') || Character.isWhitespace((char) c))) {
-                    offset++;
+                // Line does not start with %, so there are no comment lines for us and we can stop parsing
+                if(! line.startsWith("%")) {
+                    return null;
+                }
+
+                // Only keep the part after %
+                line = line.substring(1).trim();
+
+                if (line.startsWith(Globals.SIGNATURE)) {
+                    // Signature line, so keep reading and skip to next line
+                } else if (line.startsWith(Globals.encPrefix)) {
+                    // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
+                    return line.substring(Globals.encPrefix.length()).trim();
                 } else {
-                    headerText.append((char) c);
-                    if (c == Globals.SIGNATURE.charAt(piv)) {
-                        piv++;
-                    } else {
-                        //if (((char)c) == '@')
-                        keepon = false;
-                    }
+                    // Line not recognized so stop parsing
+                    return null;
                 }
-
-                found: if (piv == Globals.SIGNATURE.length()) {
-                    keepon = false;
-
-                    //if (headerText.length() > GUIGlobals.SIGNATURE.length())
-                    //    System.out.println("'"+headerText.toString().substring(0, headerText.length()-GUIGlobals.SIGNATURE.length())+"'");
-                    // Found the signature. The rest of the line is unknown, so we skip
-                    // it:
-                    while (reader.read() != '\n') {
-                        // keep reading
-                    }
-                    // If the next line starts with something like "% ", handle this:
-                    while (((c = reader.read()) == '%') || Character.isWhitespace((char) c)) {
-                        // keep reading
-                    }
-                    // Then we must skip the "Encoding: ". We may already have read the first
-                    // character:
-                    if ((char) c != Globals.encPrefix.charAt(0)) {
-                        break found;
-                    }
-
-                    for (int i = 1; i < Globals.encPrefix.length(); i++) {
-                        if (reader.read() != Globals.encPrefix.charAt(i)) {
-                            break found; // No,
-                            // it
-                            // doesn't
-                            // seem
-                            // to
-                            // match.
-                        }
-                    }
-
-                    // If ok, then read the rest of the line, which should contain the
-                    // name
-                    // of the encoding:
-                    StringBuilder sb = new StringBuilder();
-
-                    while ((c = reader.read()) != '\n') {
-                        sb.append((char) c);
-                    }
-
-                    suppliedEncoding = sb.toString();
-                }
-            }
+             }
         } catch (IOException ignored) {
             // Ignored
         }
-        return suppliedEncoding != null ? suppliedEncoding.trim() : null;
+        return null;
     }
 }
