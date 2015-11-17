@@ -27,6 +27,21 @@ public class LatexFieldFormatterTests {
     }
 
     @Test
+    public void normalizeNewlineInAbstractField() {
+        String fieldName = "abstract";
+        String text = "lorem" + Globals.NEWLINE + " ipsum lorem ipsum\nlorem ipsum lorem ipsum\r\ntest";
+
+        // The newlines are normalized according to the globally configured newline setting in the formatter
+        String expected = "{" + "lorem" + Globals.NEWLINE + " ipsum lorem ipsum" + Globals.NEWLINE
+                + "lorem ipsum lorem ipsum"
+                + Globals.NEWLINE + "test" + "}";
+
+        String result = formatter.format(text, fieldName);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void preserveNewlineInAbstractField() {
         String fieldName = "abstract";
         String text = "lorem ipsum lorem ipsum\nlorem ipsum lorem ipsum\n";
@@ -36,6 +51,20 @@ public class LatexFieldFormatterTests {
 
         String result = formatter.format(text, fieldName);
         String expected = "{"+text+"}";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void preserveMultipleNewlinesInAbstractField() {
+        String fieldName = "abstract";
+        String text = "lorem ipsum lorem ipsum\n\nlorem ipsum lorem ipsum\n";
+        // The newlines are normalized according to the globally configured newline setting in the formatter
+        // Therefore, "\n" has to be replaced by that
+        text = text.replaceAll("\n", Globals.NEWLINE);
+
+        String result = formatter.format(text, fieldName);
+        String expected = "{" + text + "}";
 
         assertEquals(expected, result);
     }
