@@ -73,7 +73,7 @@ public class EntryTypes {
      * or null if it does not exist.
      */
     public static EntryType getType(String name) {
-        EntryType entryType = ALL_TYPES.get(name.toLowerCase(Locale.US));
+        EntryType entryType = ALL_TYPES.get(name.toLowerCase());
         if (entryType == null) {
             return null;
         }
@@ -94,7 +94,7 @@ public class EntryTypes {
     }
 
     public static void addOrModifyCustomEntryType(CustomEntryType type) {
-        ALL_TYPES.put(type.getName().toLowerCase(Locale.US), type);
+        ALL_TYPES.put(type.getName().toLowerCase(), type);
     }
 
     public static Set<String> getAllTypes() {
