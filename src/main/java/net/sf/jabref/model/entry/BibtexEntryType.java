@@ -35,11 +35,11 @@ import java.util.stream.Collectors;
 import net.sf.jabref.model.database.BibtexDatabase;
 
 /**
- * Abstract base class for all entry types.
+ * Abstract base class for all BibTex entry types.
  */
-public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
-    private List<String> requiredFields;
-    private List<String> optionalFields;
+public abstract class BibtexEntryType implements EntryType {
+    private final List<String> requiredFields;
+    private final List<String> optionalFields;
 
     public BibtexEntryType() {
         requiredFields = new ArrayList<>();
@@ -49,13 +49,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         requiredFields.add("bibtexkey");
     }
 
-    public abstract String getName();
-    public abstract boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
-
+    @Override
     public List<String> getOptionalFields() {
         return Collections.unmodifiableList(optionalFields);
     }
 
+    @Override
     public List<String> getRequiredFields() {
         return Collections.unmodifiableList(requiredFields);
     }
@@ -82,6 +81,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
     }
 
+    @Override
     public boolean isRequired(String field) {
         List<String> requiredFields = getRequiredFields();
 
@@ -91,6 +91,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         return requiredFields.contains(field);
     }
 
+    @Override
     public boolean isOptional(String field) {
         List<String> optionalFields = getOptionalFields();
 
@@ -112,6 +113,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
     /**
      * Overidden for some entry types like IEEETRANBSTCTL
      */
+    @Override
     public boolean isVisibleAtNewEntryDialog() {
         return true;
     }
@@ -123,6 +125,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
      *
      * @return Array of the required fields in a form appropriate for the entry customization dialog.
      */
+    @Override
     public List<String> getRequiredFieldsForCustomization() {
         return getRequiredFields();
     }
