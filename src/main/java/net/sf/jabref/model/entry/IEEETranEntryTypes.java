@@ -161,4 +161,6 @@ public class IEEETranEntryTypes {
 
                 }
             };
+
+    public static final List<EntryType> ALL = Arrays.asList(ELECTRONIC, IEEETRANBSTCTL, PERIODICAL, PATENT, STANDARD);
 }

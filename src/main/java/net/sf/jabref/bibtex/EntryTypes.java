@@ -7,7 +7,6 @@ import net.sf.jabref.model.entry.*;
 import java.util.*;
 
 public class EntryTypes {
-
     private static final TreeMap<String, EntryType> ALL_TYPES = new TreeMap<>();
     private static final TreeMap<String, EntryType> STANDARD_TYPES;
 
@@ -58,27 +57,14 @@ public class EntryTypes {
     }
 
     private static void initBibtexEntryTypes() {
-        ALL_TYPES.put("article", BibtexEntryTypes.ARTICLE);
-        ALL_TYPES.put("inbook", BibtexEntryTypes.INBOOK);
-        ALL_TYPES.put("book", BibtexEntryTypes.BOOK);
-        ALL_TYPES.put("booklet", BibtexEntryTypes.BOOKLET);
-        ALL_TYPES.put("incollection", BibtexEntryTypes.INCOLLECTION);
-        ALL_TYPES.put("conference", BibtexEntryTypes.CONFERENCE);
-        ALL_TYPES.put("inproceedings", BibtexEntryTypes.INPROCEEDINGS);
-        ALL_TYPES.put("proceedings", BibtexEntryTypes.PROCEEDINGS);
-        ALL_TYPES.put("manual", BibtexEntryTypes.MANUAL);
-        ALL_TYPES.put("mastersthesis", BibtexEntryTypes.MASTERSTHESIS);
-        ALL_TYPES.put("phdthesis", BibtexEntryTypes.PHDTHESIS);
-        ALL_TYPES.put("techreport", BibtexEntryTypes.TECHREPORT);
-        ALL_TYPES.put("unpublished", BibtexEntryTypes.UNPUBLISHED);
-        ALL_TYPES.put("misc", BibtexEntryTypes.MISC);
-        ALL_TYPES.put("other", BibtexEntryTypes.OTHER);
+        // BibTex
+        for(EntryType type: BibtexEntryTypes.ALL) {
+            ALL_TYPES.put(type.getName().toLowerCase(), type);
+        }
         // IEEE types
-        ALL_TYPES.put("patent", IEEETranEntryTypes.PATENT);
-        ALL_TYPES.put("standard", IEEETranEntryTypes.STANDARD);
-        ALL_TYPES.put("electronic", IEEETranEntryTypes.ELECTRONIC);
-        ALL_TYPES.put("periodical", IEEETranEntryTypes.PERIODICAL);
-        ALL_TYPES.put("ieeetranbstctl", IEEETranEntryTypes.IEEETRANBSTCTL);
+        for(EntryType type: IEEETranEntryTypes.ALL) {
+            ALL_TYPES.put(type.getName().toLowerCase(), type);
+        }
     }
 
 

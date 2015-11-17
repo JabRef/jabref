@@ -28,11 +28,12 @@ import java.util.Collection;
 import javax.swing.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.*;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
@@ -41,6 +42,7 @@ import net.sf.jabref.model.entry.EntryUtil;
 public class EntryTypeDialog extends JDialog implements ActionListener {
     private EntryType type;
     private static final int COLUMN = 3;
+    private boolean biblatexMode;
 
     private final CancelAction cancelAction = new CancelAction();
 
@@ -61,6 +63,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     public EntryTypeDialog(JabRefFrame _baseFrame) {
         // modal dialog
         super(_baseFrame, true);
+
+        biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
 
         setTitle(Localization.lang("Select entry type"));
 
@@ -90,7 +94,12 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         getContentPane().add(buttons, BorderLayout.SOUTH);
 
         // Entry types
-        addEntryTypeGroup(panel, EntryTypes.getAllValues());
+        if(biblatexMode) {
+            addEntryTypeGroup(panel, EntryTypes.getAllValues());
+        } else {
+            addEntryTypeGroup(panel, BibtexEntryTypes.ALL);
+            addEntryTypeGroup(panel, IEEETranEntryTypes.ALL);
+        }
 
         pack();
         setResizable(false);
