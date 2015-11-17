@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This class is used to represent customized entry types.
  */
-public class CustomEntryType extends BibtexEntryType {
+public class CustomEntryType implements EntryType {
     private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
@@ -71,6 +71,41 @@ public class CustomEntryType extends BibtexEntryType {
         } else {
             this.optional = optional.split(";");
         }
+    }
+
+    @Override
+    public EntryTypes getEntryType() {
+        return EntryTypes.BIBTEX;
+    }
+
+    @Override
+    public boolean isRequired(String field) {
+        List<String> requiredFields = getRequiredFields();
+
+        if (requiredFields == null) {
+            return false;
+        }
+        return requiredFields.contains(field);
+    }
+
+    @Override
+    public boolean isOptional(String field) {
+        List<String> optionalFields = getOptionalFields();
+
+        if (optionalFields == null) {
+            return false;
+        }
+        return optionalFields.contains(field);
+    }
+
+    @Override
+    public boolean isVisibleAtNewEntryDialog() {
+        return true;
+    }
+
+    @Override
+    public int compareTo(EntryType o) {
+        return getName().compareTo(o.getName());
     }
 
     private void parseRequiredFields(String req) {

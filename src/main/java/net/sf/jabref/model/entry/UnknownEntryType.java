@@ -17,6 +17,12 @@ package net.sf.jabref.model.entry;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * This class is used to represent an unknown entry type, e.g. encountered
  * during bibtex parsing. The only known information is the type name.
@@ -25,12 +31,19 @@ import net.sf.jabref.model.database.BibtexDatabase;
  * are found. In the meantime, the entries will be assigned an
  * UnknownEntryType giving the name.
  */
-public class UnknownEntryType extends BibtexEntryType {
-
+public class UnknownEntryType implements EntryType {
     private final String name;
+    private final List<String> requiredFields;
+    private final List<String> optionalFields;
 
     public UnknownEntryType(String name) {
         this.name = name;
+
+        requiredFields = new ArrayList<>();
+        optionalFields = new ArrayList<>();
+
+        // key is always required
+        requiredFields.add("bibtexkey");
     }
 
     @Override
@@ -44,4 +57,61 @@ public class UnknownEntryType extends BibtexEntryType {
         return true;
     }
 
+    @Override
+    public EntryTypes getEntryType() {
+        return EntryTypes.UNKNOWN;
+    }
+
+    @Override
+    public boolean isVisibleAtNewEntryDialog() {
+        return true;
+    }
+
+    @Override
+    public List<String> getOptionalFields() {
+        return Collections.unmodifiableList(optionalFields);
+    }
+
+    @Override
+    public List<String> getRequiredFields() {
+        return Collections.unmodifiableList(requiredFields);
+    }
+
+    public List<String> getPrimaryOptionalFields() {
+        return getOptionalFields();
+    }
+
+    public List<String> getSecondaryOptionalFields() {
+        return Collections.unmodifiableList(new ArrayList<>(0));
+    }
+
+    @Override
+    public int compareTo(EntryType o) {
+        return getName().compareTo(o.getName());
+    }
+
+    @Override
+    public List<String> getRequiredFieldsForCustomization() {
+        return getRequiredFields();
+    }
+
+    @Override
+    public boolean isRequired(String field) {
+        List<String> requiredFields = getRequiredFields();
+
+        if (requiredFields == null) {
+            return false;
+        }
+        return requiredFields.contains(field);
+    }
+
+    @Override
+    public boolean isOptional(String field) {
+        List<String> optionalFields = getOptionalFields();
+
+        if (optionalFields == null) {
+            return false;
+        }
+        return optionalFields.contains(field);
+    }
 }

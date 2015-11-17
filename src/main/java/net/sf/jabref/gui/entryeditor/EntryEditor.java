@@ -226,8 +226,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
             } else {
-                optPan = new EntryEditorTab(frame, panel,
-                        entry.getType().getPrimaryOptionalFields(), this,
+                optPan = new EntryEditorTab(frame, panel, entry.getType().getPrimaryOptionalFields(), this,
                         false, true, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
