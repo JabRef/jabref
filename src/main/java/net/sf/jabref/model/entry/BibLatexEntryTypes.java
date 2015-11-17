@@ -907,7 +907,7 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType IEEETRANBSTCTL = new BibLatexEntryType() {
 
         {
-            addAllOptional("ctluse_article_number", "ctluse_paper", "ctluse_forced_etal",
+            addAllOptional("ctluse_article_number", "ctluse_paper", "ctluse_forced_etal", "ctluse_url",
                     "ctlmax_names_forced_etal", "ctlnames_show_etal", "ctluse_alt_spacing",
                     "ctlalt_stretch_factor", "ctldash_repeated_names", "ctlname_format_string",
                     "ctlname_latex_cmd", "ctlname_url_prefix");
