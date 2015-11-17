@@ -137,7 +137,7 @@ public class CustomEntryType extends BibtexEntryType {
     @Override
     public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
         // First check if the bibtex key is set:
-        if (entry.getField(BibtexEntry.KEY_FIELD) == null) {
+        if (entry.getCiteKey() == null) {
             return false;
         }
         // Then check other fields:

@@ -98,7 +98,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         String citeKey;
         boolean first = true;
         for (BibtexEntry bes : bibentries) {
-            citeKey = bes.getField(BibtexEntry.KEY_FIELD);
+            citeKey = bes.getCiteKey();
             // if the key is empty we give a warning and ignore this entry
             if ((citeKey == null) || citeKey.equals("")) {
                 continue;
