@@ -152,7 +152,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     public void update() {
         if (success) {
             // Reset title of tab
-            frame.setTabTitle(panel, panel.getFile().getName() + " (" + panel.database.getEntryCount() + ")", panel.getFile().getAbsolutePath());
+            frame.setTabTitle(panel, panel.getTabTitle(), panel.getFile().getAbsolutePath());
             frame.output(Localization.lang("Saved database") + " '" + panel.getFile().getPath() + "'.");
             frame.setWindowTitle();
         } else if (!cancelled) {

@@ -1633,20 +1633,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
     }
 
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
-        String title;
-        if (file == null) {
-            title = GUIGlobals.untitledTitle;
-            if (!bp.database().getEntries().isEmpty()) {
-                // if the database is not empty and no file is assigned,
-                // the database came from an import and has to be treated somehow
-                // -> mark as changed
-                // This also happens internally at basepanel to ensure consistency
-                title = title + '*';
-            }
-        } else {
-            title = file.getName() + " (" + bp.database.getEntryCount() + ")";
-        }
-
+        String title = bp.getTabTitle();
         tabbedPane.add(title, bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file != null ? file.getAbsolutePath() : null);
 

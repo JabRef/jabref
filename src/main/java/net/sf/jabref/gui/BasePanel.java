@@ -96,7 +96,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
-
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
     public static final int SHOWING_NOTHING = 0;
@@ -239,6 +238,26 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     }
 
+    public String getTabTitle() {
+        String title;
+
+        if (getFile() == null) {
+            title = GUIGlobals.untitledTitle;
+
+            if (!database().getEntries().isEmpty()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                // This also happens internally at basepanel to ensure consistency line 224
+                title = title + '*';
+            }
+        } else {
+            title = getFile().getName() + " (" + database.getEntryCount() + ")";
+        }
+
+        return title;
+    }
+
     public boolean isBaseChanged() {
         return baseChanged;
     }
@@ -247,12 +266,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return mode;
     }
 
-    //Done by MrDlib
     public void setMode(int mode) {
         this.mode = mode;
     }
-
-    //Done by MrDlib
 
     public BibtexDatabase database() {
         return database;
