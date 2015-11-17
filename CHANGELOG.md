@@ -14,6 +14,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Changed
  - EntryTypes are now clustered per group on the 'new entry' GUI screen.
+ - Show database size info in tab title
  - Added a page numbers integrity checker
  - Position and size of certain dialogs are stored and restored.
  - Feature: Search DOAJ, Directory of Open Access Journals
