@@ -79,7 +79,6 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         JPanel panel = new JPanel();
         getContentPane().add(panel, BorderLayout.CENTER);
 
-        JPanel buttons = new JPanel();
         JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(this);
 
@@ -87,6 +86,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(_baseFrame.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         cancel.getActionMap().put("close", cancelAction);
 
+        JPanel buttons = new JPanel();
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
         bb.addGlue();
         bb.addButton(cancel);
@@ -95,17 +95,17 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         // Entry types
         if(biblatexMode) {
-            addEntryTypeGroup(panel, EntryTypes.getAllValues());
+            addEntryTypeGroup(panel, "BibLateX", EntryTypes.getAllValues());
         } else {
-            addEntryTypeGroup(panel, BibtexEntryTypes.ALL);
-            addEntryTypeGroup(panel, IEEETranEntryTypes.ALL);
+            addEntryTypeGroup(panel, "BibTeX", BibtexEntryTypes.ALL);
+            addEntryTypeGroup(panel, "IEEETran", IEEETranEntryTypes.ALL);
         }
 
         pack();
         setResizable(false);
     }
 
-    private void addEntryTypeGroup(JPanel panel, Collection<EntryType> entries) {
+    private void addEntryTypeGroup(JPanel panel, String groupTitle, Collection<EntryType> entries) {
         GridBagLayout bagLayout = new GridBagLayout();
         panel.setLayout(bagLayout);
         GridBagConstraints constraints = new GridBagConstraints();
@@ -129,7 +129,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             bagLayout.setConstraints(entryButton, constraints);
             panel.add(entryButton);
         }
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Entry types")));
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), groupTitle));
     }
 
     @Override
