@@ -82,10 +82,6 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
     }
 
-    public String[] getUtilityFields() {
-        return new String[]{"search"};
-    }
-
     public boolean isRequired(String field) {
         List<String> requiredFields = getRequiredFields();
 
