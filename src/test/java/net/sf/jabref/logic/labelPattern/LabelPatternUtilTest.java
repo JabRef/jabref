@@ -500,11 +500,25 @@ public class LabelPatternUtilTest {
     }
 
     /**
-     * Tests the [authorsN] pattern.
+     * Tests the [authorsN] pattern. -> [authors1]
      */
     @Test
-    public void testNAuthors() {
-        // test [authors3]
+    public void testNAuthors1() {
+        Assert.assertEquals("Newton",
+                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
+        Assert.assertEquals("NewtonEtAl",
+                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 1));
+        Assert.assertEquals("NewtonEtAl",
+                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 1));
+        Assert.assertEquals("NewtonEtAl",
+                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 1));
+    }
+
+    /**
+     * Tests the [authorsN] pattern. -> [authors3]
+     */
+    @Test
+    public void testNAuthors3() {
         Assert.assertEquals(
                 "Newton",
                 LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 3));
