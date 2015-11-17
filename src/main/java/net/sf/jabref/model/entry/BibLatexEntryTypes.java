@@ -34,7 +34,7 @@ public class BibLatexEntryTypes {
 
      */
 
-    public static final BibtexEntryType ARTICLE = new BibtexEntryType() {
+    public static final BibLatexEntryType ARTICLE = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "editor", "series", "volume", "number", "eid", "issue", "pages", "note", "issn",
@@ -67,7 +67,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType BOOK = new BibtexEntryType() {
+    public static final BibLatexEntryType BOOK = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"editor",
                 "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "volume", "edition",
@@ -101,7 +101,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType INBOOK = new BibtexEntryType() {
+    public static final BibLatexEntryType INBOOK = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{
                 "bookauthor", "editor", "subtitle", "titleaddon", "maintitle",
@@ -136,7 +136,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType BOOKINBOOK = new BibtexEntryType() {
+    public static final BibLatexEntryType BOOKINBOOK = new BibLatexEntryType() {
 
         @Override
         public String getName() {
@@ -165,7 +165,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType SUPPBOOK = new BibtexEntryType() {
+    public static final BibLatexEntryType SUPPBOOK = new BibLatexEntryType() {
 
         @Override
         public String getName() {
@@ -194,7 +194,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType BOOKLET = new BibtexEntryType() {
+    public static final BibLatexEntryType BOOKLET = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "howpublished", "chapter", "pages", "doi", "eprint",
@@ -223,7 +223,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType COLLECTION = new BibtexEntryType() {
+    public static final BibLatexEntryType COLLECTION = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{
                 "translator", "subtitle", "titleaddon", "maintitle",
@@ -257,7 +257,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType INCOLLECTION = new BibtexEntryType() {
+    public static final BibLatexEntryType INCOLLECTION = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{
                 "translator", "subtitle", "titleaddon", "maintitle",
@@ -291,7 +291,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType SUPPCOLLECTION = new BibtexEntryType() {
+    public static final BibLatexEntryType SUPPCOLLECTION = new BibLatexEntryType() {
 
         @Override
         public String getName() {
@@ -320,7 +320,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType MANUAL = new BibtexEntryType() {
+    public static final BibLatexEntryType MANUAL = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "edition", "publisher", "isbn", "chapter",
@@ -351,7 +351,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType MISC = new BibtexEntryType() {
+    public static final BibLatexEntryType MISC = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "howpublished", "location", "doi", "eprint", "eprintclass",
@@ -380,7 +380,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType ONLINE = new BibtexEntryType() {
+    public static final BibLatexEntryType ONLINE = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "note", "organization", "urldate"}));
@@ -408,7 +408,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType PATENT = new BibtexEntryType() {
+    public static final BibLatexEntryType PATENT = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"holder",
                 "subtitle", "titleaddon", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
@@ -436,7 +436,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType PERIODICAL = new BibtexEntryType() {
+    public static final BibLatexEntryType PERIODICAL = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "issuetitle", "issuesubtitle", "issn", "doi", "eprint", "eprintclass",
@@ -466,7 +466,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType SUPPPERIODICAL = new BibtexEntryType() {
+    public static final BibLatexEntryType SUPPPERIODICAL = new BibLatexEntryType() {
 
         @Override
         public String getName() {
@@ -495,7 +495,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType PROCEEDINGS = new BibtexEntryType() {
+    public static final BibLatexEntryType PROCEEDINGS = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "maintitle", "mainsubtitle",
@@ -527,7 +527,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType INPROCEEDINGS = new BibtexEntryType() {
+    public static final BibLatexEntryType INPROCEEDINGS = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "maintitle", "mainsubtitle",
@@ -560,7 +560,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType REFERENCE = new BibtexEntryType() {
+    public static final BibLatexEntryType REFERENCE = new BibLatexEntryType() {
 
         @Override
         public String getName() {
@@ -589,7 +589,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType INREFERENCE = new BibtexEntryType() {
+    public static final BibLatexEntryType INREFERENCE = new BibLatexEntryType() {
 
         @Override
         public String getName() {
@@ -618,7 +618,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType REPORT = new BibtexEntryType() {
+    public static final BibLatexEntryType REPORT = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "number", "isrn", "chapter", "pages", "pagetotal", "doi",
@@ -647,7 +647,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType SET = new BibtexEntryType() {
+    public static final BibLatexEntryType SET = new BibLatexEntryType() {
 
         {
             addAllRequired("entryset", "crossref");
@@ -664,7 +664,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType THESIS = new BibtexEntryType() {
+    public static final BibLatexEntryType THESIS = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "chapter", "pages", "pagetotal", "doi", "eprint",
@@ -693,7 +693,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType UNPUBLISHED = new BibtexEntryType() {
+    public static final BibLatexEntryType UNPUBLISHED = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "howpublished", "pubstate", "url", "urldate"}));
@@ -722,7 +722,7 @@ public class BibLatexEntryTypes {
 
     // === Type aliases: ===
 
-    public static final BibtexEntryType CONFERENCE = new BibtexEntryType() {
+    public static final BibLatexEntryType CONFERENCE = new BibLatexEntryType() {
 
         @Override
         public String getName() {
@@ -751,7 +751,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType ELECTRONIC = new BibtexEntryType() {
+    public static final BibLatexEntryType ELECTRONIC = new BibLatexEntryType() {
 
         @Override
         public String getName() {
@@ -780,7 +780,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType MASTERSTHESIS = new BibtexEntryType() {
+    public static final BibLatexEntryType MASTERSTHESIS = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "type", "chapter", "pages", "pagetotal", "doi", "eprint",
@@ -811,7 +811,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType PHDTHESIS = new BibtexEntryType() {
+    public static final BibLatexEntryType PHDTHESIS = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "type", "chapter", "pages", "pagetotal", "doi", "eprint",
@@ -841,7 +841,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType TECHREPORT = new BibtexEntryType() {
+    public static final BibLatexEntryType TECHREPORT = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
                 "titleaddon", "type", "number", "isrn", "chapter", "pages", "pagetotal",
@@ -871,7 +871,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibtexEntryType WWW = new BibtexEntryType() {
+    public static final BibLatexEntryType WWW = new BibLatexEntryType() {
 
         @Override
         public String getName() {
@@ -904,7 +904,7 @@ public class BibLatexEntryTypes {
      * This type is used for IEEEtran.bst to control various
      * be repeated or not. Not a very elegant solution, but it works...
      */
-    public static final BibtexEntryType IEEETRANBSTCTL = new BibtexEntryType() {
+    public static final BibLatexEntryType IEEETRANBSTCTL = new BibLatexEntryType() {
 
         {
             addAllOptional("ctluse_article_number", "ctluse_paper", "ctluse_forced_etal",

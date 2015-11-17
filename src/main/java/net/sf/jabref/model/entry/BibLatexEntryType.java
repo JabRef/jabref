@@ -51,6 +51,11 @@ public abstract class BibLatexEntryType implements EntryType {
     }
 
     @Override
+    public EntryTypes getEntryType() {
+        return EntryTypes.BIBLATEX;
+    }
+
+    @Override
     public List<String> getOptionalFields() {
         return Collections.unmodifiableList(optionalFields);
     }
@@ -132,7 +137,7 @@ public abstract class BibLatexEntryType implements EntryType {
     }
 
     @Override
-    public int compareTo(BibLatexEntryType o) {
+    public int compareTo(EntryType o) {
         return getName().compareTo(o.getName());
     }
 }

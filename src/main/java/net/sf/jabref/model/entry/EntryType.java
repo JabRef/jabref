@@ -4,7 +4,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 
 import java.util.List;
 
-public interface EntryType extends Comparable<BibtexEntryType> {
+public interface EntryType extends Comparable<EntryType> {
     String getName();
 
     boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
@@ -16,6 +16,8 @@ public interface EntryType extends Comparable<BibtexEntryType> {
     boolean isRequired(String field);
 
     boolean isOptional(String field);
+
+    EntryTypes getEntryType();
 
     boolean isVisibleAtNewEntryDialog();
 
