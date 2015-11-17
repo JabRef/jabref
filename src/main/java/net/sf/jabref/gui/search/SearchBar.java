@@ -25,8 +25,8 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.search.SearchObservable;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,8 +34,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The search bar at the top of the screen allowing the user to search his database.
@@ -58,6 +56,7 @@ public class SearchBar extends JPanel {
     }
 
     private final BasePanel basePanel;
+    private final SearchObservable searchObservable;
 
     private JSearchTextField searchField;
 
@@ -77,17 +76,16 @@ public class SearchBar extends JPanel {
 
     private final SearchWorker worker;
 
-    private final ArrayList<SearchTextListener> listeners = new ArrayList<>();
-
     /**
      * Initializes the search bar.
      *
      * @param frame the main window
      */
-    public SearchBar(BasePanel basePanel) {
+    public SearchBar(BasePanel basePanel, SearchObservable searchObservable) {
         super();
 
         this.basePanel = basePanel;
+        this.searchObservable = searchObservable;
         worker = new SearchWorker(basePanel);
 
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
@@ -284,63 +282,6 @@ public class SearchBar extends JPanel {
     }
 
     /**
-     * Adds a SearchTextListener to the search bar. The added listener is immediately informed about the current search.
-     * Subscribers will be notified about searches.
-     *
-     * @param l SearchTextListener to be added
-     */
-    public void addSearchListener(SearchTextListener l) {
-        if (listeners.contains(l)) {
-            return;
-        } else {
-            listeners.add(l);
-        }
-
-        // fire event for the new subscriber
-        l.searchText(getSearchwords(searchField.getText()));
-    }
-
-    /**
-     * Remove a SearchTextListener
-     *
-     * @param l SearchTextListener to be removed
-     */
-    public void removeSearchListener(SearchTextListener l) {
-        listeners.remove(l);
-    }
-
-    /**
-     * Parses the search query for valid words and returns a list these words. For example, "The great Vikinger" will
-     * give ["The","great","Vikinger"]
-     *
-     * @param searchText the search query
-     * @return list of words found in the search query
-     */
-    private List<String> getSearchwords(String searchText) {
-        return (new SentenceAnalyzer(searchText)).getWords();
-    }
-
-    /**
-     * Fires an event if a search was started (or cleared)
-     *
-     * @param searchText the search query
-     */
-    private void fireSearchlistenerEvent(String searchText) {
-        // Parse the search string to words
-        List<String> words;
-        if ((searchText == null) || (searchText.isEmpty())) {
-            words = null;
-        } else {
-            words = getSearchwords(searchText);
-        }
-
-        // Fire an event for every listener
-        for (SearchTextListener s : listeners) {
-            s.searchText(words);
-        }
-    }
-
-    /**
      * Save current settings.
      */
     public void updatePrefs() {
@@ -395,7 +336,7 @@ public class SearchBar extends JPanel {
             searchField.setText("");
             searchField.setBackground(Color.WHITE);
 
-            fireSearchlistenerEvent(null);
+            searchObservable.fireSearchlistenerEvent("");
 
             this.currentResults.setText("");
         });
@@ -408,7 +349,7 @@ public class SearchBar extends JPanel {
         String searchText = searchField.getText();
 
         // Notify others about the search
-        fireSearchlistenerEvent(searchText);
+        searchObservable.fireSearchlistenerEvent(searchText);
 
         // An empty search field should cause the search to be cleared.
         if (searchText.isEmpty()) {

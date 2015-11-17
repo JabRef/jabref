@@ -20,11 +20,10 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.gui.search.SearchTextListener;
+import net.sf.jabref.logic.search.SearchTextListener;
 import net.sf.jabref.util.Util;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 

@@ -23,7 +23,6 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -38,7 +37,7 @@ import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
-import net.sf.jabref.gui.search.SearchTextListener;
+import net.sf.jabref.logic.search.SearchTextListener;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -422,13 +421,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         // Scroll to top:
         final JScrollBar bar = scrollPane.getVerticalScrollBar();
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                bar.setValue(0);
-            }
-        });
+        SwingUtilities.invokeLater(() -> bar.setValue(0));
 
         // update pdf preview
         if (pdfPreviewPanel != null) {

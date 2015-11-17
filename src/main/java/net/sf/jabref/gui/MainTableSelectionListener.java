@@ -58,12 +58,13 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class MainTableSelectionListener implements ListEventListener<BibtexEntry>, MouseListener,
         KeyListener, FocusListener {
 
-    private PreviewPanel[] previewPanel;
-    private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
-    private PreviewPanel preview;
+    private final PreviewPanel[] previewPanel;
     private final MainTable table;
     private final BasePanel panel;
     private final EventList<BibtexEntry> tableRows;
+
+    private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
+    private PreviewPanel preview;
     private boolean previewActive = Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
     private boolean workingOnPreview;
 
@@ -84,7 +85,16 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         this.table = table;
         this.panel = panel;
         this.tableRows = table.getTableRows();
-        instantiatePreviews();
+        previewPanel = new PreviewPanel[] {
+                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
+                        .get(JabRefPreferences.PREVIEW_0), true),
+                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
+                        .get(JabRefPreferences.PREVIEW_1), true)};
+
+        // TODO SIMON
+        //panel.frame().getSearchBar().addSearchListener(previewPanel[0]);
+        //panel.frame().getSearchBar().addSearchListener(previewPanel[1]);
+
         this.preview = previewPanel[activePreview];
     }
 
@@ -93,15 +103,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     }
 
     private void instantiatePreviews() {
-        previewPanel = new PreviewPanel[] {
-                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_0), true),
-                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_1), true)};
 
-        // TODO SIMON
-		//panel.frame().getSearchBar().addSearchListener(previewPanel[0]);
-		//panel.frame().getSearchBar().addSearchListener(previewPanel[1]);
     }
 
     public void updatePreviews() {

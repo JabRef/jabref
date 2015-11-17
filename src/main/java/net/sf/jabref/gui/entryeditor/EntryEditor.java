@@ -49,7 +49,6 @@ import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.gui.search.SearchTextListener;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
