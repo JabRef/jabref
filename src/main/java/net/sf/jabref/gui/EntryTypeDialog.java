@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Collection;
 
 import javax.swing.*;
 
@@ -33,26 +34,22 @@ import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 
+/**
+ * Dialog that prompts the user to choose a type for an entry.
+ * Returns null if cancelled.
+ */
 public class EntryTypeDialog extends JDialog implements ActionListener {
-
-    /*
-     * Dialog that prompts the user to choose a type for an entry.
-     * Returns null if cancelled.
-     */
-
     private EntryType type;
-    private final CancelAction cancelAction = new CancelAction();
-    private static final int COLNUM = 3;
+    private static final int COLUMN = 3;
 
+    private final CancelAction cancelAction = new CancelAction();
 
     static class TypeButton extends JButton implements Comparable<TypeButton> {
-
         final EntryType type;
 
-
-        public TypeButton(String label, EntryType type_) {
+        public TypeButton(String label, EntryType _type) {
             super(label);
-            type = type_;
+            type = _type;
         }
 
         @Override
@@ -61,14 +58,13 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         }
     }
 
-
-    public EntryTypeDialog(JabRefFrame baseFrame_) {
-        super(baseFrame_, true); // Set modal on.
+    public EntryTypeDialog(JabRefFrame _baseFrame) {
+        // modal dialog
+        super(_baseFrame, true);
 
         setTitle(Localization.lang("Select entry type"));
 
         addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowClosing(WindowEvent e) {
                 cancelAction.actionPerformed(null);
@@ -76,56 +72,55 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         });
 
         getContentPane().setLayout(new BorderLayout());
-        JPanel pan = new JPanel();
-        getContentPane().add(pan, BorderLayout.CENTER);
+        JPanel panel = new JPanel();
+        getContentPane().add(panel, BorderLayout.CENTER);
+
         JPanel buttons = new JPanel();
-        JButton // ok = new JButton("Ok"),
-        cancel = new JButton(Localization.lang("Cancel"));
-        //ok.addActionListener(this);
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(this);
 
         // Make ESC close dialog, equivalent to clicking Cancel.
-        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(baseFrame_.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(_baseFrame.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         cancel.getActionMap().put("close", cancelAction);
 
-        //buttons.add(ok);
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
-        //buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         bb.addGlue();
         bb.addButton(cancel);
         bb.addGlue();
-
         getContentPane().add(buttons, BorderLayout.SOUTH);
-        GridBagLayout gbl = new GridBagLayout();
-        pan.setLayout(gbl);
-        GridBagConstraints con = new GridBagConstraints();
-        con.anchor = GridBagConstraints.WEST;
-        con.fill = GridBagConstraints.HORIZONTAL;
-        con.insets = new Insets(4, 4, 4, 4);
-        int col = 0;
 
-        for (EntryType tp : EntryTypes.getAllValues()) {
-            TypeButton b = new TypeButton(EntryUtil.capitalizeFirst(tp.getName()), tp);
-            b.addActionListener(this);
-            // Check if we should finish the row.
-            col++;
-            if (col == EntryTypeDialog.COLNUM) {
-                col = 0;
-                con.gridwidth = GridBagConstraints.REMAINDER;
-            } else {
-                con.gridwidth = 1;
-            }
-            gbl.setConstraints(b, con);
-            pan.add(b);
-        }
-        pan.setBorder(BorderFactory.createTitledBorder
-                (BorderFactory.createEtchedBorder(),
-                        Localization.lang("Entry types")));
-        //pan.setBackground(Color.white);
-        //buttons.setBackground(Color.white);
+        // Entry types
+        addEntryTypeGroup(panel, EntryTypes.getAllValues());
+
         pack();
         setResizable(false);
+    }
+
+    private void addEntryTypeGroup(JPanel panel, Collection<EntryType> entries) {
+        GridBagLayout bagLayout = new GridBagLayout();
+        panel.setLayout(bagLayout);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(4, 4, 4, 4);
+        // column count
+        int col = 0;
+
+        for (EntryType entryType : entries) {
+            TypeButton entryButton = new TypeButton(EntryUtil.capitalizeFirst(entryType.getName()), entryType);
+            entryButton.addActionListener(this);
+            // Check if we should finish the row.
+            col++;
+            if (col == EntryTypeDialog.COLUMN) {
+                col = 0;
+                constraints.gridwidth = GridBagConstraints.REMAINDER;
+            } else {
+                constraints.gridwidth = 1;
+            }
+            bagLayout.setConstraints(entryButton, constraints);
+            panel.add(entryButton);
+        }
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Entry types")));
     }
 
     @Override
@@ -142,12 +137,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
 
     class CancelAction extends AbstractAction {
-
         public CancelAction() {
             super("Cancel");
-            //  new ImageIcon(GUIGlobals.imagepath+GUIGlobals.closeIconFile));
-            //putValue(SHORT_DESCRIPTION, "Cancel");
-            //putValue(MNEMONIC_KEY, GUIGlobals.closeKeyCode);
         }
 
         @Override
