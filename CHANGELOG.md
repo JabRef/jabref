@@ -89,8 +89,21 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Remove "edit preamble" from toolbar
  - Remove support to the move-to-SysTray action
 
+## [dev_2.11] - unreleased
+
+### Fixed
+ - Fix #345: Remove history from help file
+
+## [2.11.1] - 2015-11-16
+
+### Fixed
+ - Backports from 2.80: Fixed #250: No hard line breaks after 70 chars in serialized JabRef meta data
+ - Backports from 2.80: Fixed #325: Deactivating AutoCompletion crashes EntryEditor
+
 ## 2.11 - 2015-11-11
 
 The changelog of 2.11 and versions before is maintained as text file in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v2.11...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/dev_2.11...HEAD
+[dev_2.11]: https://github.com/JabRef/jabref/compare/v2.11.1...dev_2.11
+[2.11.1]: https://github.com/JabRef/jabref/compare/v2.11...v2.11.1
