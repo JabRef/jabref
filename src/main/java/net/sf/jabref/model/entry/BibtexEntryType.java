@@ -88,15 +88,11 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
 
     public boolean isRequired(String field) {
         List<String> requiredFields = getRequiredFields();
+
         if (requiredFields == null) {
             return false;
         }
-        for (String requiredField : requiredFields) {
-            if (requiredField.equals(field)) {
-                return true;
-            }
-        }
-        return false;
+        return requiredFields.contains(field);
     }
 
     public boolean isOptional(String field) {
@@ -105,8 +101,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         if (optionalFields == null) {
             return false;
         }
-
-        return Arrays.asList(optionalFields).contains(field);
+        return optionalFields.contains(field);
     }
 
     private boolean isPrimary(String field) {
@@ -115,8 +110,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         if (primaryFields == null) {
             return false;
         }
-
-        return Arrays.asList(primaryFields).contains(field);
+        return primaryFields.contains(field);
     }
 
     /**
