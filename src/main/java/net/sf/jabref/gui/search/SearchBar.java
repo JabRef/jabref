@@ -15,28 +15,27 @@
  */
 package net.sf.jabref.gui.search;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.autocompleter.AutoCompleter;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
-
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.LogFactory;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The search bar at the top of the screen allowing the user to search his database.
@@ -48,7 +47,7 @@ public class SearchBar extends JPanel {
     }
 
     public void updateResults(int matched, String description) {
-        if(matched == 0) {
+        if (matched == 0) {
             this.currentResults.setText(Localization.lang("No results found."));
             this.searchField.setBackground(Color.RED);
         } else {
@@ -67,8 +66,8 @@ public class SearchBar extends JPanel {
     private JMenu settings;
     private JCheckBoxMenuItem highlightWords, autoComplete;
 
-    private final JToggleButton caseSensitive;
-    private final JToggleButton regularExp;
+    private final JCheckBox caseSensitive;
+    private final JCheckBox regularExp;
 
     private final JButton openCurrentResultsInDialog;
 
@@ -79,7 +78,6 @@ public class SearchBar extends JPanel {
     private final SearchWorker worker;
 
     private final ArrayList<SearchTextListener> listeners = new ArrayList<>();
-
 
     /**
      * Initializes the search bar.
@@ -94,12 +92,10 @@ public class SearchBar extends JPanel {
 
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
 
-        caseSensitive = new JToggleButton(IconTheme.JabRefIcon.CASE_SENSITIVE.getSmallIcon(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
-        caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
+        caseSensitive = new JCheckBox(Localization.lang("Match case"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
         caseSensitive.addItemListener(ae -> performSearch());
         caseSensitive.addItemListener(ae -> updatePrefs());
-        regularExp = new JToggleButton(IconTheme.JabRefIcon.REGEX.getSmallIcon(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
-        regularExp.setToolTipText(Localization.lang("Use regular expressions"));
+        regularExp = new JCheckBox(Localization.lang("Regex"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
         regularExp.addItemListener(ae -> performSearch());
         regularExp.addItemListener(ae -> updatePrefs());
 
@@ -119,21 +115,18 @@ public class SearchBar extends JPanel {
 
         // Init controls
         setLayout(new FlowLayout(FlowLayout.LEFT));
-        this.setBackground(Color.WHITE);
+
         JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
-        searchIcon.setBackground(Color.WHITE);
         this.add(searchIcon);
         initSearchField();
         this.add(searchField);
         JButton button = new JButton(Localization.lang("Settings"));
-        button.setBackground(Color.WHITE);
         JPopupMenu settingsMenu = createSettingsMenu();
         button.addActionListener(l -> {
             settingsMenu.show(button, 0, button.getHeight());
         });
 
         JToolBar toolBar = new JToolBar();
-        toolBar.setBackground(Color.WHITE);
         toolBar.setFloatable(false);
         toolBar.add(regularExp);
         toolBar.add(caseSensitive);
@@ -141,9 +134,7 @@ public class SearchBar extends JPanel {
         toolBar.add(button);
         toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);
-        openCurrentResultsInDialog.setBackground(Color.WHITE);
         JButton globalSearch = new JButton(Localization.lang("Search in all open databases"));
-        globalSearch.setBackground(Color.WHITE);
         globalSearch.addActionListener(l -> {
             AbstractWorker worker = new GlobalSearchWorker(basePanel.frame(), getSearchQuery());
             worker.run();
@@ -151,11 +142,24 @@ public class SearchBar extends JPanel {
         });
         toolBar.add(globalSearch);
         toolBar.addSeparator();
-        toolBar.add(new HelpAction(basePanel.frame().helpDiag, GUIGlobals.searchHelp, Localization.lang("Help"))).setBackground(Color.WHITE);
+        toolBar.add(new HelpAction(basePanel.frame().helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
+
         this.add(toolBar);
         this.add(currentResults);
+
+        paintBackgroundWhite(this);
     }
 
+    private void paintBackgroundWhite(Container container) {
+        container.setBackground(Color.WHITE);
+        for (Component component : container.getComponents()) {
+            component.setBackground(Color.WHITE);
+
+            if(component instanceof Container) {
+                paintBackgroundWhite((Container) component);
+            }
+        }
+    }
 
     private JPopupMenu createSettingsMenu() {
         // Populate popup menu and add it to search button
@@ -431,6 +435,7 @@ public class SearchBar extends JPanel {
 
     /**
      * Sets the autocompleter used in the search field.
+     *
      * @param searchCompleter the autocompleter
      */
     public void setAutoCompleter(AutoCompleter<String> searchCompleter) {
