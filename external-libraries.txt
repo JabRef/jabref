@@ -20,12 +20,6 @@ URL:     https://materialdesignicons.com/
 License: SIL Open Font License, Version 1.1
 Note:    Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
 
-Id:      crystal.icons
-Project: Crystal Icons
-URL:     https://commons.wikimedia.org/wiki/Crystal_Clear
-License: LGPL
-Note:    Icons not available any more at the original page http://everaldo.com/crystal/
-
 
 # Libraries
 Id:      com.apple:AppleJavaExtensions
