@@ -32,8 +32,6 @@ package net.sf.jabref.model.entry;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-
 /**
  * Abstract base class for all BibTex entry types.
  */
@@ -90,14 +88,6 @@ public abstract class BibtexEntryType implements EntryType {
             return false;
         }
         return optionalFields.contains(field);
-    }
-
-    /**
-     * Overidden for some entry types like IEEETRANBSTCTL
-     */
-    @Override
-    public boolean isVisibleAtNewEntryDialog() {
-        return true;
     }
 
 

@@ -116,14 +116,6 @@ public abstract class BibLatexEntryType implements EntryType {
         return primaryFields.contains(field);
     }
 
-    /**
-     * Overidden for some entry types like IEEETRANBSTCTL
-     */
-    @Override
-    public boolean isVisibleAtNewEntryDialog() {
-        return true;
-    }
-
 
     /**
      * Get an array of the required fields in a form appropriate for the entry customization

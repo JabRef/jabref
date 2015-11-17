@@ -99,11 +99,6 @@ public class CustomEntryType implements EntryType {
     }
 
     @Override
-    public boolean isVisibleAtNewEntryDialog() {
-        return true;
-    }
-
-    @Override
     public int compareTo(EntryType o) {
         return getName().compareTo(o.getName());
     }

@@ -19,8 +19,6 @@ public interface EntryType extends Comparable<EntryType> {
 
     EntryTypes getEntryType();
 
-    boolean isVisibleAtNewEntryDialog();
-
     List<String> getRequiredFieldsForCustomization();
 
     /**

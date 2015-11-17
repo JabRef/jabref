@@ -106,20 +106,18 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         int col = 0;
 
         for (EntryType tp : EntryTypes.getAllValues()) {
-            if (tp.isVisibleAtNewEntryDialog()) {
-                TypeButton b = new TypeButton(EntryUtil.capitalizeFirst(tp.getName()), tp);
-                b.addActionListener(this);
-                // Check if we should finish the row.
-                col++;
-                if (col == EntryTypeDialog.COLNUM) {
-                    col = 0;
-                    con.gridwidth = GridBagConstraints.REMAINDER;
-                } else {
-                    con.gridwidth = 1;
-                }
-                gbl.setConstraints(b, con);
-                pan.add(b);
+            TypeButton b = new TypeButton(EntryUtil.capitalizeFirst(tp.getName()), tp);
+            b.addActionListener(this);
+            // Check if we should finish the row.
+            col++;
+            if (col == EntryTypeDialog.COLNUM) {
+                col = 0;
+                con.gridwidth = GridBagConstraints.REMAINDER;
+            } else {
+                con.gridwidth = 1;
             }
+            gbl.setConstraints(b, con);
+            pan.add(b);
         }
         pan.setBorder(BorderFactory.createTitledBorder
                 (BorderFactory.createEtchedBorder(),

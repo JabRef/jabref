@@ -64,11 +64,6 @@ public class IEEETranEntryTypes {
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
                     return true;
                 }
-
-                @Override
-                public boolean isVisibleAtNewEntryDialog() {
-                    return false;
-                }
             };
 
     /**

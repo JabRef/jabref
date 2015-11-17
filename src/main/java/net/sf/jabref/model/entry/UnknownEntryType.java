@@ -18,10 +18,8 @@ package net.sf.jabref.model.entry;
 import net.sf.jabref.model.database.BibtexDatabase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class is used to represent an unknown entry type, e.g. encountered
@@ -60,11 +58,6 @@ public class UnknownEntryType implements EntryType {
     @Override
     public EntryTypes getEntryType() {
         return EntryTypes.UNKNOWN;
-    }
-
-    @Override
-    public boolean isVisibleAtNewEntryDialog() {
-        return true;
     }
 
     @Override
