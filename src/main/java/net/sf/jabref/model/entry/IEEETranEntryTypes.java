@@ -50,11 +50,6 @@ public class IEEETranEntryTypes {
                 public String getName() {
                     return "IEEEtranBSTCTL";
                 }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return true;
-                }
             };
 
     /**
@@ -88,21 +83,12 @@ public class IEEETranEntryTypes {
 
                 {
                     addAllOptional("author", "title", "language", "assignee", "address", "type", "number", "day", "dayfiled", "month", "monthfiled", "note", "url");
-                    addAllRequired("nationality", "number", "year", "yearfiled");
+                    addAllRequired("nationality", "number", "year/yearfiled");
                 }
 
                 @Override
                 public String getName() {
                     return "Patent";
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "year|yearfiled", "number", "bibtexkey"
-                            }, database);
-
                 }
             };
 
@@ -119,7 +105,7 @@ public class IEEETranEntryTypes {
 
                 {
                     addAllOptional("author", "language", "howpublished", "type", "number", "revision", "address", "month", "year", "note", "url");
-                    addAllRequired("title", "organization", "institution");
+                    addAllRequired("title", "organization/institution");
                 }
 
                 @Override
@@ -131,15 +117,6 @@ public class IEEETranEntryTypes {
                 @Override
                 public List<String> getRequiredFieldsForCustomization() {
                     return requiredFieldsForCustomization;
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "organization|institution", "title", "bibtexkey"
-                            }, database);
-
                 }
             };
 

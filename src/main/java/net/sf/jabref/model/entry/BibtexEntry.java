@@ -278,6 +278,13 @@ public class BibtexEntry {
         return fields.get(KEY_FIELD);
     }
 
+    public boolean hasCiteKey() {
+        if(getCiteKey() == null || getCiteKey().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Sets a number of fields simultaneously. The given HashMap contains field
      * names as keys, each mapped to the value to set.
@@ -350,12 +357,12 @@ public class BibtexEntry {
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     boolean allFieldsPresent(String[] allFields, BibtexDatabase database) {
-        final String orSeparator = "|";
+        final String orSeparator = "/";
 
         for (String field : allFields) {
             // OR fields
             if(field.contains(orSeparator)) {
-                String[] altFields = field.split(Pattern.quote(orSeparator));
+                String[] altFields = field.split(orSeparator);
 
                 if (!atLeastOnePresent(altFields, database)) {
                     return false;

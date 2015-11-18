@@ -70,6 +70,7 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
  *
  */
 public class MainTable extends JTable {
+    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -103,8 +104,6 @@ public class MainTable extends JTable {
     private static final int OTHER = 3;
     private static final int BOOLEAN = 4;
     public static final int ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
-
-    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     static {
         MainTable.updateRenderers();
@@ -499,15 +498,14 @@ public class MainTable extends JTable {
             BibtexEntry be = sortedForGrouping.get(row);
             EntryType type = be.getType();
             String columnName = getColumnName(col).toLowerCase();
-            if (columnName.equals(BibtexEntry.KEY_FIELD) || type.isRequired(columnName)) {
+            if (columnName.equals(BibtexEntry.KEY_FIELD) || type.getRequiredFieldsFlat().contains(columnName)) {
                 return MainTable.REQUIRED;
             }
-            if (type.isOptional(columnName)) {
+            if (type.getOptionalFields().contains(columnName)) {
                 return MainTable.OPTIONAL;
             }
             return MainTable.OTHER;
         } catch (NullPointerException ex) {
-            //System.out.println("Exception: getCellStatus");
             return MainTable.OTHER;
         }
     }

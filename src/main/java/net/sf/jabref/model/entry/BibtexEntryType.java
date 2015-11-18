@@ -44,9 +44,6 @@ public abstract class BibtexEntryType implements EntryType {
     public BibtexEntryType() {
         requiredFields = new ArrayList<>();
         optionalFields = new ArrayList<>();
-
-        // key is always required
-        requiredFields.add("bibtexkey");
     }
 
     @Override
@@ -70,31 +67,6 @@ public abstract class BibtexEntryType implements EntryType {
 
     void addAllRequired(String... fieldNames) {
         requiredFields.addAll(Arrays.asList(fieldNames));
-    }
-
-    @Override
-    public boolean isRequired(String field) {
-        List<String> requiredFields = getRequiredFields();
-
-        if (requiredFields == null) {
-            return false;
-        }
-        return requiredFields.contains(field);
-    }
-
-    @Override
-    public boolean isOptional(String field) {
-        List<String> optionalFields = getOptionalFields();
-
-        if (optionalFields == null) {
-            return false;
-        }
-        return optionalFields.contains(field);
-    }
-
-    @Override
-    public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-        return entry.allFieldsPresent(getRequiredFields(), database);
     }
 
     /**

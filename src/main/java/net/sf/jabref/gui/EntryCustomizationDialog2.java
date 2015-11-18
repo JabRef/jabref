@@ -255,7 +255,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
             EntryType oldType = EntryTypes.getType(stringListEntry.getKey());
             if (oldType != null) {
-                List<String> oldReq = oldType.getRequiredFields();
+                List<String> oldReq = oldType.getRequiredFieldsFlat();
                 List<String> oldOpt = oldType.getOptionalFields();
                 if (biblatexMode) {
                     List<String> oldPriOpt = oldType.getPrimaryOptionalFields();

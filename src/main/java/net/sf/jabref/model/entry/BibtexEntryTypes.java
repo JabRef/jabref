@@ -41,11 +41,11 @@ public class BibtexEntryTypes {
     public static final EntryType BOOK =
             new BibtexEntryType() {
 
-                private List<String> requiredFieldsForCustomization = Collections.unmodifiableList(Arrays.asList(new String[]
+                private List<String> requiredFields = Collections.unmodifiableList(Arrays.asList(new String[]
                         {"title", "publisher", "year", "author/editor"}));
 
                 {
-                    addAllRequired("title", "publisher", "year", "editor", "author");
+                    addAllRequired("title", "publisher", "year", "author/editor");
                     addAllOptional("volume", "number", "series", "address", "edition", "month",
                             "note");
                 }
@@ -58,16 +58,7 @@ public class BibtexEntryTypes {
 
                 @Override
                 public List<String> getRequiredFieldsForCustomization() {
-                    return requiredFieldsForCustomization;
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "author|editor", "title", "publisher", "year", "bibtexkey"
-                            }, database);
-
+                    return requiredFields;
                 }
             };
 
@@ -126,8 +117,7 @@ public class BibtexEntryTypes {
                 {
                     addAllOptional("volume", "number", "series", "type", "address", "edition",
                             "month", "note");
-                    addAllRequired("chapter", "pages", "title", "publisher", "year", "editor",
-                            "author");
+                    addAllRequired("chapter/pages", "title", "publisher", "year", "author/editor");
                 }
 
                 @Override
@@ -138,14 +128,6 @@ public class BibtexEntryTypes {
                 @Override
                 public List<String> getRequiredFieldsForCustomization() {
                     return requiredFieldsForCustomization;
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "author|editor", "chapter|pages", "title", "publisher", "year", "bibtexkey"
-                            }, database);
                 }
             };
 
@@ -341,11 +323,6 @@ public class BibtexEntryTypes {
                 public String getName() {
                     return "Other";
                 }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return true;
-                }
             };
 
     /**
@@ -360,11 +337,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "Typeless";
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return false;
                 }
             };
 

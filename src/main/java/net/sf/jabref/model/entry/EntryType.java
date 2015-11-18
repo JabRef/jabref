@@ -2,7 +2,10 @@ package net.sf.jabref.model.entry;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Interface for all EntryTypes.
@@ -10,28 +13,30 @@ import java.util.List;
 public interface EntryType extends Comparable<EntryType> {
     String getName();
 
-    boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
-
     List<String> getOptionalFields();
 
     List<String> getRequiredFields();
 
-    boolean isRequired(String field);
+    default List<String> getRequiredFieldsFlat() {
+        List<String> requiredFlat = getRequiredFields().stream()
+                .map(field -> field.split("/"))
+                .flatMap(Arrays::stream)
+                .collect(Collectors.toList());
 
-    boolean isOptional(String field);
+        return Collections.unmodifiableList(requiredFlat);
+    }
 
     EntryTypes getEntryType();
 
     List<String> getRequiredFieldsForCustomization();
 
     /**
-     * TODO: remove
+     * TODO: move inside GUI
      */
     List<String> getPrimaryOptionalFields();
 
-
     /**
-     * TODO: remove
+     * TODO: move inside GUI
      */
     List<String> getSecondaryOptionalFields();
 }

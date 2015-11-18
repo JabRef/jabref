@@ -75,11 +75,6 @@ public abstract class BibLatexEntryType implements EntryType {
         requiredFields.addAll(Arrays.asList(fieldNames));
     }
 
-    @Override
-    public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-        return entry.allFieldsPresent(getRequiredFields(), database);
-    }
-
     public List<String> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
@@ -92,26 +87,6 @@ public abstract class BibLatexEntryType implements EntryType {
         }
 
         return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean isRequired(String field) {
-        List<String> requiredFields = getRequiredFields();
-
-        if (requiredFields == null) {
-            return false;
-        }
-        return requiredFields.contains(field);
-    }
-
-    @Override
-    public boolean isOptional(String field) {
-        List<String> optionalFields = getOptionalFields();
-
-        if (optionalFields == null) {
-            return false;
-        }
-        return optionalFields.contains(field);
     }
 
     private boolean isPrimary(String field) {

@@ -58,7 +58,7 @@ public class BibtexEntryTests {
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
-        List<String> requiredFields = new ArrayList<String>();
+        List<String> requiredFields = new ArrayList<>();
 
         requiredFields.add("author");
         requiredFields.add("title");
@@ -66,7 +66,6 @@ public class BibtexEntryTests {
 
         requiredFields.add("year");
         Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
-        requiredFields.remove("year");
     }
 
     @Test
@@ -75,13 +74,13 @@ public class BibtexEntryTests {
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
-        List<String> requiredFields = new ArrayList<String>();
+        List<String> requiredFields = new ArrayList<>();
 
         // XOR required
-        requiredFields.add("journal|year");
+        requiredFields.add("journal/year");
         Assert.assertTrue(e.allFieldsPresent(requiredFields, null));
 
-        requiredFields.add("year|address");
+        requiredFields.add("year/address");
         Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
     }
 
@@ -95,6 +94,6 @@ public class BibtexEntryTests {
         Assert.assertFalse(e.hasAllRequiredFields(null));
 
         e.setField("year", "2015");
-        Assert.assertFalse(e.hasAllRequiredFields(null));
+        Assert.assertTrue(e.hasAllRequiredFields(null));
     }
 }

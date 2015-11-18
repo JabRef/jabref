@@ -196,7 +196,7 @@ public abstract class DBExporter extends DBImporterExporter {
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 fieldRequirement.add(i, "gen");
             }
-            List<String> reqFields = val.getRequiredFields();
+            List<String> reqFields = val.getRequiredFieldsFlat();
             List<String> optFields = val.getOptionalFields();
             List<String> utiFields = Arrays.asList(new String[]{"search"});
             fieldRequirement = SQLUtil.setFieldRequirement(SQLUtil.getAllFields(), reqFields, optFields, utiFields,

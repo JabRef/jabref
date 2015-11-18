@@ -49,12 +49,6 @@ public class UnknownEntryType implements EntryType {
         return name;
     }
 
-
-    @Override
-    public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-        return true;
-    }
-
     @Override
     public EntryTypes getEntryType() {
         return EntryTypes.UNKNOWN;
@@ -88,23 +82,4 @@ public class UnknownEntryType implements EntryType {
         return getRequiredFields();
     }
 
-    @Override
-    public boolean isRequired(String field) {
-        List<String> requiredFields = getRequiredFields();
-
-        if (requiredFields == null) {
-            return false;
-        }
-        return requiredFields.contains(field);
-    }
-
-    @Override
-    public boolean isOptional(String field) {
-        List<String> optionalFields = getOptionalFields();
-
-        if (optionalFields == null) {
-            return false;
-        }
-        return optionalFields.contains(field);
-    }
 }

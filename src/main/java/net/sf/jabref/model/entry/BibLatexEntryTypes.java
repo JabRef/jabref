@@ -771,10 +771,5 @@ public class BibLatexEntryTypes {
         public String getName() {
             return "IEEEtranBSTCTL";
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return true;
-        }
     };
 }

@@ -69,11 +69,10 @@ public class BibtexEntryWriter {
         //         there may be some unofficial field name used.
         int max = 0;
         for (EntryType type : EntryTypes.getAllValues()) {
-            if (type.getRequiredFields() != null) {
-                for (String field : type.getRequiredFields()) {
-                    max = Math.max(max, field.length());
-                }
+            for (String field : type.getRequiredFieldsFlat()) {
+                max = Math.max(max, field.length());
             }
+
             if (type.getOptionalFields() != null) {
                 for (String field : type.getOptionalFields()) {
                     max = Math.max(max, field.length());
