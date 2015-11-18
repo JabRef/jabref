@@ -60,7 +60,6 @@ public class BibtexEntryTypes {
      */
     public static final EntryType BOOKLET =
             new BibtexEntryType() {
-
                 {
                     addAllRequired("title");
                     addAllOptional("author", "howpublished", "address", "month", "year", "note");
@@ -80,7 +79,6 @@ public class BibtexEntryTypes {
      */
     public static final EntryType CONFERENCE =
             new BibtexEntryType() {
-
                 {
                     addAllOptional("editor", "volume", "number", "series", "pages",
                             "address", "month", "organization", "publisher", "note");
@@ -120,7 +118,6 @@ public class BibtexEntryTypes {
      */
     public static final EntryType INCOLLECTION =
             new BibtexEntryType() {
-
                 {
                     addAllRequired("author", "title", "booktitle", "publisher", "year");
                     addAllOptional("editor", "volume", "number", "series", "type", "chapter",
@@ -141,7 +138,6 @@ public class BibtexEntryTypes {
      */
     public static final EntryType INPROCEEDINGS =
             new BibtexEntryType() {
-
                 {
                     addAllOptional("editor", "volume", "number", "series", "pages",
                             "address", "month", "organization", "publisher", "note");
@@ -262,7 +258,6 @@ public class BibtexEntryTypes {
      */
     public static final EntryType TECHREPORT =
             new BibtexEntryType() {
-
                 {
                     addAllOptional("type", "number", "address", "month", "note");
                     addAllRequired("author", "title", "institution", "year");
@@ -282,7 +277,6 @@ public class BibtexEntryTypes {
      */
     public static final EntryType UNPUBLISHED =
             new BibtexEntryType() {
-
                 {
                     addAllOptional("month", "year");
                     addAllRequired("author", "title", "note");

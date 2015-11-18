@@ -44,6 +44,14 @@ public abstract class BibtexEntryType implements EntryType {
         optionalFields = new ArrayList<>();
     }
 
+    void addAllOptional(String... fieldNames) {
+        optionalFields.addAll(Arrays.asList(fieldNames));
+    }
+
+    void addAllRequired(String... fieldNames) {
+        requiredFields.addAll(Arrays.asList(fieldNames));
+    }
+
     @Override
     public List<String> getOptionalFields() {
         return Collections.unmodifiableList(optionalFields);
@@ -54,23 +62,11 @@ public abstract class BibtexEntryType implements EntryType {
         return Collections.unmodifiableList(requiredFields);
     }
 
-    void addAllOptional(String... fieldNames) {
-        optionalFields.addAll(Arrays.asList(fieldNames));
-    }
-
-    void addAllRequired(String... fieldNames) {
-        requiredFields.addAll(Arrays.asList(fieldNames));
-    }
-
     @Override
     public int compareTo(EntryType o) {
         return getName().compareTo(o.getName());
     }
 
-    /**
-     * TODO: remove all methods from here on
-     * @return
-     */
     public List<String> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
