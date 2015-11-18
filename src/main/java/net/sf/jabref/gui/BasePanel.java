@@ -645,7 +645,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // This is a partial clone of net.sf.jabref.gui.entryeditor.EntryEditor.GenerateKeyAction.actionPerformed(ActionEvent)
                 for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
                     bes = i.next();
-                    if (bes.getField(BibtexEntry.KEY_FIELD) != null) {
+                    if (bes.getCiteKey() != null) {
                         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                             // Remove the entry, because its key is already set:
                             i.remove();
@@ -686,7 +686,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Finally, set the new keys:
                 for (BibtexEntry entry : entries) {
                     bes = entry;
-                    bes = LabelPatternUtil.makeLabel(metaData, database, bes);
+                    LabelPatternUtil.makeLabel(metaData, database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes.getId(), (String) oldvals.get(bes),
                             bes.getField(BibtexEntry.KEY_FIELD)));
                 }
@@ -760,8 +760,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 List<String> keys = new ArrayList<>(bes.length);
                 // Collect all non-null keys.
                 for (BibtexEntry be : bes) {
-                    if (be.getField(BibtexEntry.KEY_FIELD) != null) {
-                        keys.add(be.getField(BibtexEntry.KEY_FIELD));
+                    if (be.getCiteKey() != null) {
+                        keys.add(be.getCiteKey());
                     }
                 }
                 if (keys.isEmpty()) {
@@ -802,8 +802,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     List<String> keys = new ArrayList<>(bes.length);
                     // Collect all non-null keys.
                     for (BibtexEntry be : bes) {
-                        if (be.getField(BibtexEntry.KEY_FIELD) != null) {
-                            keys.add(be.getField(BibtexEntry.KEY_FIELD));
+                        if (be.getCiteKey() != null) {
+                            keys.add(be.getCiteKey());
                         }
                     }
                     if (keys.isEmpty()) {
@@ -858,7 +858,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     int copied = 0;
                     // Collect all non-null keys.
                     for (BibtexEntry be : bes) {
-                        if (be.getField(BibtexEntry.KEY_FIELD) != null) {
+                        if (be.getCiteKey() != null) {
                             copied++;
                             sb.append(layout.doLayout(be, database));
                         }
@@ -2435,7 +2435,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || oldKey.isEmpty()) {
                     LabelPatternUtil.makeLabel(metaData, database, bes);
-                    ce.addEdit(new UndoableKeyChange(database, bes.getId(), null, bes.getField(BibtexEntry.KEY_FIELD)));
+                    ce.addEdit(new UndoableKeyChange(database, bes.getId(), null, bes.getCiteKey()));
                     any = true;
                 }
             }
@@ -2664,7 +2664,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         String citeKey;//, message = "";
         boolean first = true;
         for (BibtexEntry bes : mainTable.getSelected()) {
-            citeKey = bes.getField(BibtexEntry.KEY_FIELD);
+            citeKey = bes.getCiteKey();
             // if the key is empty we give a warning and ignore this entry
             if ((citeKey == null) || citeKey.isEmpty()) {
                 continue;

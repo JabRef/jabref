@@ -894,7 +894,8 @@ public class BibtexParser {
                     be.setType(type);
                 } else {
                     _pr.addWarning(Localization.lang("unknown entry type") + ": "
-                                    + be.getType().getName() + ":" + be.getField(BibtexEntry.KEY_FIELD)
+ + be.getType().getName() + ":"
+                            + be.getCiteKey()
                                     + " . " + Localization.lang("Type set to 'other'")
                                     + ".");
                     be.setType(BibtexEntryTypes.OTHER);

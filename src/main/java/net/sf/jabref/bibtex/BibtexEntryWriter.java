@@ -296,7 +296,7 @@ public class BibtexEntryWriter {
     }
 
     private void writeKeyField(BibtexEntry entry, Writer out) throws IOException {
-        String keyField = StringUtil.shaveString(entry.getField(BibtexEntry.KEY_FIELD));
+        String keyField = StringUtil.shaveString(entry.getCiteKey());
         out.write((keyField == null ? "" : keyField) + ',' + Globals.NEWLINE);
     }
 

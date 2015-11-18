@@ -167,7 +167,7 @@ public class ExternalFilePanel extends JPanel {
     }
 
     private Object getKey() {
-        return getEntry().getField(BibtexEntry.KEY_FIELD);
+        return getEntry().getCiteKey();
     }
 
     private void output(String s) {

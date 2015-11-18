@@ -270,10 +270,10 @@ public class BibtexEntry {
         return null;
     }
 
+    /**
+     * Returns the bibtex key, or null if it is not set.
+     */
     public String getCiteKey() {
-        if(!fields.containsKey(KEY_FIELD)) {
-            return null;
-        }
         return fields.get(KEY_FIELD);
     }
 
@@ -403,7 +403,7 @@ public class BibtexEntry {
 
     @Override
     public String toString() {
-        return getType().getName() + ':' + getField(KEY_FIELD);
+        return getType().getName() + ':' + getCiteKey();
     }
 
     public boolean isSearchHit() {
