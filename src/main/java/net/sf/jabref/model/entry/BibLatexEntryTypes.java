@@ -23,8 +23,8 @@ import java.util.List;
 
 /**
  * This class defines entry types for BibLatex support.
+ * @see http://mirrors.concertpass.com/tex-archive/macros/latex/contrib/biblatex/doc/biblatex.pdf
  */
-
 public class BibLatexEntryTypes {
 
     /*
@@ -33,7 +33,6 @@ public class BibLatexEntryTypes {
             "issuetitle", "issuesubtitle", "origlanguage", "version", "addendum"
 
      */
-
     public static final BibLatexEntryType ARTICLE = new BibLatexEntryType() {
 
         private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",

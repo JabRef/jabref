@@ -9,6 +9,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BibtexEntryTests {
 
     private BibtexEntry entry;
@@ -47,5 +50,38 @@ public class BibtexEntryTests {
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }"))
                         .getPublicationDate());
 
+    }
+
+    @Test
+    public void testAllFieldsPresentDefault() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        e.setField("author", "abc");
+        e.setField("title", "abc");
+        e.setField("journal", "abc");
+        List<String> requiredFields = new ArrayList<String>();
+
+        requiredFields.add("author");
+        requiredFields.add("title");
+        Assert.assertTrue(e.allFieldsPresent(requiredFields, null));
+
+        requiredFields.add("year");
+        Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
+        requiredFields.remove("year");
+    }
+
+    @Test
+    public void testAllFieldsPresentOr() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        e.setField("author", "abc");
+        e.setField("title", "abc");
+        e.setField("journal", "abc");
+        List<String> requiredFields = new ArrayList<String>();
+
+        // XOR required
+        requiredFields.add("journal|year");
+        Assert.assertTrue(e.allFieldsPresent(requiredFields, null));
+
+        requiredFields.add("year|address");
+        Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
     }
 }

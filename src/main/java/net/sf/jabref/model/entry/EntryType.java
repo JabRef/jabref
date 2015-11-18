@@ -4,6 +4,9 @@ import net.sf.jabref.model.database.BibtexDatabase;
 
 import java.util.List;
 
+/**
+ * Interface for all EntryTypes.
+ */
 public interface EntryType extends Comparable<EntryType> {
     String getName();
 

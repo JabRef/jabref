@@ -73,9 +73,8 @@ public class BibtexEntryTypes {
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
                     return entry.allFieldsPresent(new String[]
                             {
-                                    "title", "publisher", "year", "bibtexkey"
-                            }, database) &&
-                            entry.atLeastOnePresent(new String[]{"author", "editor"}, database);
+                                    "author|editor", "title", "publisher", "year", "bibtexkey"
+                            }, database);
 
                 }
             };
@@ -166,10 +165,8 @@ public class BibtexEntryTypes {
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
                     return entry.allFieldsPresent(new String[]
                             {
-                                    "title", "publisher", "year", "bibtexkey"
-                            }, database) &&
-                            entry.atLeastOnePresent(new String[]{"author", "editor"}, database) &&
-                            entry.atLeastOnePresent(new String[]{"chapter", "pages"}, database);
+                                    "author|editor", "chapter|pages", "title", "publisher", "year", "bibtexkey"
+                            }, database);
                 }
             };
 

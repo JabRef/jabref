@@ -8,7 +8,6 @@ import java.util.List;
 
 /**
  * This class represents all supported IEEETran entry types.
- *
  * @see http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEtran_bst_HOWTO.pdf
  *
  * Electronic, IEEETranBSTCTL, Periodical, Patent, Standard
@@ -117,9 +116,8 @@ public class IEEETranEntryTypes {
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
                     return entry.allFieldsPresent(new String[]
                             {
-                                    "number", "bibtexkey"
-                            }, database) &&
-                            entry.atLeastOnePresent(new String[]{"year", "yearfiled"}, database);
+                                    "year|yearfiled", "number", "bibtexkey"
+                            }, database);
 
                 }
             };
@@ -155,9 +153,8 @@ public class IEEETranEntryTypes {
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
                     return entry.allFieldsPresent(new String[]
                             {
-                                    "title", "bibtexkey"
-                            }, database) &&
-                            entry.atLeastOnePresent(new String[]{"organization", "institution"}, database);
+                                    "organization|institution", "title", "bibtexkey"
+                            }, database);
 
                 }
             };

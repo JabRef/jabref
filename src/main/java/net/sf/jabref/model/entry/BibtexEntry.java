@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -349,9 +350,20 @@ public class BibtexEntry {
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     boolean allFieldsPresent(String[] allFields, BibtexDatabase database) {
+        final String orSeparator = "|";
+
         for (String field : allFields) {
-            if (BibtexDatabase.getResolvedField(field, this, database) == null) {
-                return false;
+            // OR fields
+            if(field.contains(orSeparator)) {
+                String[] altFields = field.split(Pattern.quote(orSeparator));
+
+                if (!atLeastOnePresent(altFields, database)) {
+                    return false;
+                }
+            } else {
+                if (BibtexDatabase.getResolvedField(field, this, database) == null) {
+                    return false;
+                }
             }
         }
         return true;
@@ -361,8 +373,8 @@ public class BibtexEntry {
         return allFieldsPresent(allFields.toArray(new String[allFields.size()]), database);
     }
 
-    boolean atLeastOnePresent(String[] oneFields, BibtexDatabase database) {
-        for (String field : oneFields) {
+    private boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
+        for (String field : fields) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
             if ((value != null) && !value.isEmpty()) {
                 return true;
