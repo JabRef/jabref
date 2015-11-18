@@ -40,10 +40,6 @@ public class BibtexEntryTypes {
      */
     public static final EntryType BOOK =
             new BibtexEntryType() {
-
-                private List<String> requiredFields = Collections.unmodifiableList(Arrays.asList(new String[]
-                        {"title", "publisher", "year", "author/editor"}));
-
                 {
                     addAllRequired("title", "publisher", "year", "author/editor");
                     addAllOptional("volume", "number", "series", "address", "edition", "month",
@@ -53,12 +49,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "Book";
-                }
-
-
-                @Override
-                public List<String> getRequiredFieldsForCustomization() {
-                    return requiredFields;
                 }
             };
 
@@ -111,9 +101,6 @@ public class BibtexEntryTypes {
      */
     public static final EntryType INBOOK =
             new BibtexEntryType() {
-
-                private List<String> requiredFieldsForCustomization = Collections.unmodifiableList(Arrays.asList(new String[]{"author/editor", "title", "chapter/pages", "year", "publisher"}));
-
                 {
                     addAllOptional("volume", "number", "series", "type", "address", "edition",
                             "month", "note");
@@ -123,11 +110,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "InBook";
-                }
-
-                @Override
-                public List<String> getRequiredFieldsForCustomization() {
-                    return requiredFieldsForCustomization;
                 }
             };
 

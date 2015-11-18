@@ -28,8 +28,6 @@ public interface EntryType extends Comparable<EntryType> {
 
     EntryTypes getEntryType();
 
-    List<String> getRequiredFieldsForCustomization();
-
     /**
      * TODO: move inside GUI
      */

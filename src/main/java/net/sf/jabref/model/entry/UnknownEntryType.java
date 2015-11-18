@@ -76,10 +76,4 @@ public class UnknownEntryType implements EntryType {
     public int compareTo(EntryType o) {
         return getName().compareTo(o.getName());
     }
-
-    @Override
-    public List<String> getRequiredFieldsForCustomization() {
-        return getRequiredFields();
-    }
-
 }

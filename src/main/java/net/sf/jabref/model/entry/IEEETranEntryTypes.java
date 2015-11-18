@@ -100,9 +100,6 @@ public class IEEETranEntryTypes {
      */
     public static final EntryType STANDARD =
             new BibtexEntryType() {
-
-                private List<String> requiredFieldsForCustomization = Collections.unmodifiableList(Arrays.asList(new String[]{"title", "organization/institution"}));
-
                 {
                     addAllOptional("author", "language", "howpublished", "type", "number", "revision", "address", "month", "year", "note", "url");
                     addAllRequired("title", "organization/institution");
@@ -111,12 +108,6 @@ public class IEEETranEntryTypes {
                 @Override
                 public String getName() {
                     return "Standard";
-                }
-
-
-                @Override
-                public List<String> getRequiredFieldsForCustomization() {
-                    return requiredFieldsForCustomization;
                 }
             };
 

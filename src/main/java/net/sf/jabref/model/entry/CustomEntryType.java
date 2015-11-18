@@ -110,11 +110,6 @@ public class CustomEntryType implements EntryType {
         return Arrays.asList(EntryUtil.getRemainder(optional, priOpt));
     }
 
-    @Override
-    public List<String> getRequiredFieldsForCustomization() {
-        return Arrays.asList(getRequiredFieldsString().split(";"));
-    }
-
     /**
      * Get a String describing the required field set for this entry type.
      *

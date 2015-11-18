@@ -98,18 +98,6 @@ public abstract class BibLatexEntryType implements EntryType {
         return primaryFields.contains(field);
     }
 
-
-    /**
-     * Get an array of the required fields in a form appropriate for the entry customization
-     * dialog - that is, the either-or fields together and separated by slashes.
-     *
-     * @return Array of the required fields in a form appropriate for the entry customization dialog.
-     */
-    @Override
-    public List<String> getRequiredFieldsForCustomization() {
-        return getRequiredFields();
-    }
-
     @Override
     public int compareTo(EntryType o) {
         return getName().compareTo(o.getName());

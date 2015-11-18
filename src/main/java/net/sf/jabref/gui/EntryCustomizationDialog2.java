@@ -181,7 +181,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         if (rl == null) {
             EntryType type = EntryTypes.getType(s);
             if (type != null) {
-                List<String> req = type.getRequiredFieldsForCustomization();
+                List<String> req = type.getRequiredFields();
 
                 List<String> opt;
                 if (!biblatexMode) {
@@ -414,7 +414,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             EntryType type = EntryTypes.getStandardType(lastSelected);
             if (type != null) {
                 List<String> of = type.getOptionalFields();
-                List<String> req = type.getRequiredFieldsForCustomization();
+                List<String> req = type.getRequiredFields();
                 List<String> opt1 = new ArrayList<>();
                 List<String> opt2 = new ArrayList<>();
 
