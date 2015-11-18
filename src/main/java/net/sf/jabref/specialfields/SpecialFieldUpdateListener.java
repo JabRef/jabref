@@ -56,7 +56,7 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
 
                         @Override
                         public void run() {
-                            JabRef.jrf.basePanel().updateEntryEditorIfShowing();
+                            JabRef.jrf.getCurrentBasePanel().updateEntryEditorIfShowing();
                         }
                     });
                 } else {
@@ -70,7 +70,7 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
 
                             @Override
                             public void run() {
-                                JabRef.jrf.basePanel().updateEntryEditorIfShowing();
+                                JabRef.jrf.getCurrentBasePanel().updateEntryEditorIfShowing();
                             }
                         });
                     }

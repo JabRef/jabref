@@ -151,8 +151,8 @@ class StringDialog extends JDialog {
         conPane.add(tlb, BorderLayout.NORTH);
         conPane.add(pan, BorderLayout.CENTER);
 
-        if (panel.getFile() != null) {
-            setTitle(GUIGlobals.stringsTitle + ": " + panel.getFile().getName());
+        if (panel.getDatabaseFile() != null) {
+            setTitle(GUIGlobals.stringsTitle + ": " + panel.getDatabaseFile().getName());
         } else {
             setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
         }

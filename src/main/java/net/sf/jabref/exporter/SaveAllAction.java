@@ -63,9 +63,9 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
         for (int i = 0; i < databases; i++) {
             if (i < frame.getTabbedPane().getTabCount()) {
                 //System.out.println("Base "+i);
-                BasePanel panel = frame.baseAt(i);
-                if (panel.getFile() == null) {
-                    frame.showBaseAt(i);
+                BasePanel panel = frame.getBasePanelAt(i);
+                if (panel.getDatabaseFile() == null) {
+                    frame.showBasePanelAt(i);
                 }
                 panel.runCommand(Actions.SAVE);
                 // TODO: can we find out whether the save was actually done or not?

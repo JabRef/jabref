@@ -65,13 +65,13 @@ public class AutoSaveManager {
             // there could be changes done by the user while this method is running.
 
             List<BasePanel> panels = new ArrayList<>();
-            for (int i = 0; i < frame.baseCount(); i++) {
-                panels.add(frame.baseAt(i));
+            for (int i = 0; i < frame.getBasePanelCount(); i++) {
+                panels.add(frame.getBasePanelAt(i));
             }
 
             for (BasePanel panel : panels) {
                 if (panel.isBaseChanged()) {
-                    if (panel.getFile() != null) {
+                    if (panel.getDatabaseFile() != null) {
                         AutoSaveManager.autoSave(panel);
                     }
                 }
@@ -96,7 +96,7 @@ public class AutoSaveManager {
      * @return true if successful, false otherwise.
      */
     private static boolean autoSave(BasePanel panel) {
-        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getFile());
+        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getDatabaseFile());
         try {
             SaveSession ss = FileActions.saveDatabase(panel.database(), panel.metaData(),
                     backupFile, Globals.prefs,
@@ -118,10 +118,10 @@ public class AutoSaveManager {
      * @return true if there was no autosave or if the autosave was successfully deleted, false otherwise.
      */
     public static boolean deleteAutoSaveFile(BasePanel panel) {
-        if (panel.getFile() == null) {
+        if (panel.getDatabaseFile() == null) {
             return true;
         }
-        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getFile());
+        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getDatabaseFile());
         if (backupFile.exists()) {
             return backupFile.delete();
         } else {
@@ -135,8 +135,8 @@ public class AutoSaveManager {
      */
     public void clearAutoSaves() {
         List<BasePanel> panels = new ArrayList<>();
-        for (int i = 0; i < frame.baseCount(); i++) {
-            panels.add(frame.baseAt(i));
+        for (int i = 0; i < frame.getBasePanelCount(); i++) {
+            panels.add(frame.getBasePanelAt(i));
         }
         for (BasePanel panel : panels) {
             AutoSaveManager.deleteAutoSaveFile(panel);

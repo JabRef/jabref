@@ -742,7 +742,7 @@ public class JabRef {
                 } else if (wrn.length() > 0) {
                     wrn.deleteCharAt(wrn.length() - 1);
                 }
-                JabRef.jrf.showBaseAt(i);
+                JabRef.jrf.showBasePanelAt(i);
                 JOptionPane.showMessageDialog(JabRef.jrf, wrn.toString(),
                         Localization.lang("Warnings") + " (" + pr.getFile().getName() + ")",
                         JOptionPane.WARNING_MESSAGE);
@@ -754,12 +754,12 @@ public class JabRef {
         // if we found new entry types that can be imported, or checking
         // if the database contents should be modified due to new features
         // in this version of JabRef.
-        // Note that we have to check whether i does not go over baseCount().
+        // Note that we have to check whether i does not go over getBasePanelCount().
         // This is because importToOpen might have been used, which adds to
-        // loaded, but not to baseCount()
-        for (int i = 0; (i < loaded.size()) && (i < JabRef.jrf.baseCount()); i++) {
+        // loaded, but not to getBasePanelCount()
+        for (int i = 0; (i < loaded.size()) && (i < JabRef.jrf.getBasePanelCount()); i++) {
             ParserResult pr = loaded.elementAt(i);
-            BasePanel panel = JabRef.jrf.baseAt(i);
+            BasePanel panel = JabRef.jrf.getBasePanelAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
         }
 

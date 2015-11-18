@@ -61,7 +61,7 @@ public class ExportToClipboardAction extends AbstractWorker {
 
     @Override
     public void run() {
-        BasePanel panel = frame.basePanel();
+        BasePanel panel = frame.getCurrentBasePanel();
         if (panel == null) {
             return;
         }
@@ -102,10 +102,10 @@ public class ExportToClipboardAction extends AbstractWorker {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
+        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().metaData()
                 .getFileDirectory(Globals.FILE_FIELD);
         // Also store the database's file in a global variable:
-        Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
+        Globals.prefs.databaseFile = frame.getCurrentBasePanel().metaData().getFile();
 
         /*final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
         String dir = null;

@@ -65,7 +65,7 @@ public class SendAsEMailAction extends AbstractWorker {
             return;
         }
 
-        BasePanel panel = frame.basePanel();
+        BasePanel panel = frame.getCurrentBasePanel();
         if (panel == null) {
             return;
         }
@@ -94,7 +94,7 @@ public class SendAsEMailAction extends AbstractWorker {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<File> fileList = Util.getListOfLinkedFiles(bes, frame.basePanel().metaData().getFileDirectory(Globals.FILE_FIELD));
+        List<File> fileList = Util.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD));
         for (File f : fileList) {
             attachments.add(f.getPath());
             if (openFolders) {

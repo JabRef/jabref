@@ -192,16 +192,16 @@ public class FileActions {
 
         // Get our data stream. This stream writes only to a temporary file,
         // until committed.
-        try (VerifyingWriter fw = session.getWriter()) {
+        try (VerifyingWriter writer = session.getWriter()) {
 
             // Write signature.
-            FileActions.writeBibFileHeader(fw, encoding);
+            FileActions.writeBibFileHeader(writer, encoding);
 
             // Write preamble if there is one.
-            FileActions.writePreamble(fw, database.getPreamble());
+            FileActions.writePreamble(writer, database.getPreamble());
 
             // Write strings if there are any.
-            FileActions.writeStrings(fw, database);
+            FileActions.writeStrings(writer, database);
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
@@ -211,38 +211,38 @@ public class FileActions {
 
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
-            for (BibtexEntry be : sorter) {
-                exceptionCause = be;
+            for (BibtexEntry entry : sorter) {
+                exceptionCause = entry;
 
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                EntryType tp = be.getType();
+                EntryType entryType = entry.getType();
 
-                if (EntryTypes.getStandardType(tp.getName()) == null) {
-                    types.put(tp.getName(), tp);
+                if (EntryTypes.getStandardType(entryType.getName()) == null) {
+                    types.put(entryType.getName(), entryType);
                 }
 
                 // Check if the entry should be written.
                 boolean write = true;
 
-                if (checkSearch && !FileActions.nonZeroField(be, BibtexFields.SEARCH)) {
+                if (checkSearch && !FileActions.nonZeroField(entry, BibtexFields.SEARCH)) {
                     write = false;
                 }
 
-                if (checkGroup && !FileActions.nonZeroField(be, BibtexFields.GROUPSEARCH)) {
+                if (checkGroup && !FileActions.nonZeroField(entry, BibtexFields.GROUPSEARCH)) {
                     write = false;
                 }
 
                 if (write) {
-                    bibtexEntryWriter.write(be, fw);
-                    fw.write(Globals.NEWLINE);
+                    bibtexEntryWriter.write(entry, writer);
+                    writer.write(Globals.NEWLINE);
                 }
             }
 
             // Write meta data.
             if (metaData != null) {
-                metaData.writeMetaData(fw);
+                metaData.writeMetaData(writer);
             }
 
             // Write type definitions, if any:
@@ -251,8 +251,8 @@ public class FileActions {
                     EntryType type = stringBibtexEntryTypeEntry.getValue();
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
-                        CustomEntryTypesManager.save(tp, fw);
-                        fw.write(Globals.NEWLINE);
+                        CustomEntryTypesManager.save(tp, writer);
+                        writer.write(Globals.NEWLINE);
                     }
                 }
 

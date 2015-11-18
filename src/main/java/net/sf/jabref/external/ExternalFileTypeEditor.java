@@ -401,8 +401,8 @@ public class ExternalFileTypeEditor extends JDialog {
             editor.setValues();
             editor.setVisible(true);
             if (frame != null) {
-                if (frame.basePanel() != null) {
-                    frame.basePanel().mainTable.repaint();
+                if (frame.getCurrentBasePanel() != null) {
+                    frame.getCurrentBasePanel().mainTable.repaint();
                 }
             }
         }

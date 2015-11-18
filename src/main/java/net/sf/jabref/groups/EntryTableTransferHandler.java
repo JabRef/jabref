@@ -468,7 +468,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             				if (c != null && c.size() > 0) {
             					Iterator it = c.iterator();
 
-            					BasePanel panel = frame.basePanel();
+            					BasePanel panel = frame.getCurrentBasePanel();
 
             					if (panel == null) {
             						// // Create a new, empty, database.
@@ -476,10 +476,10 @@ public class EntryTableTransferHandler extends TransferHandler {
             						frame.addTab(database, null, null, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING),
             							true);
             						frame.output(Globals.lang("New database created."));
-            						panel = frame.basePanel();
+            						panel = frame.getCurrentBasePanel();
             					}
 
-            					BibtexDatabase database = frame.basePanel().database();
+            					BibtexDatabase database = frame.getCurrentBasePanel().database();
 
             					NamedCompound ce = new NamedCompound(Glbals.lang("Drop PDF"));
 

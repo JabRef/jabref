@@ -55,7 +55,7 @@ public class SpecialFieldAction implements BaseAction {
     public void action() {
         try {
             NamedCompound ce = new NamedCompound(undoText);
-            BibtexEntry[] bes = frame.basePanel().getSelectedEntries();
+            BibtexEntry[] bes = frame.getCurrentBasePanel().getSelectedEntries();
             if (bes == null) {
                 return;
             }
@@ -65,9 +65,9 @@ public class SpecialFieldAction implements BaseAction {
             }
             ce.end();
             if (ce.hasEdits()) {
-                frame.basePanel().undoManager.addEdit(ce);
-                frame.basePanel().markBaseChanged();
-                frame.basePanel().updateEntryEditorIfShowing();
+                frame.getCurrentBasePanel().undoManager.addEdit(ce);
+                frame.getCurrentBasePanel().markBaseChanged();
+                frame.getCurrentBasePanel().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame) {
                     outText = Localization.lang(doneTextPattern, Integer.toString(bes.length));

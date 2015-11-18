@@ -49,7 +49,7 @@ public class AutosaveStartupPrompter implements Runnable {
 
     @Override
     public void run() {
-        boolean first = frame.baseCount() == 0;
+        boolean first = frame.getBasePanelCount() == 0;
         List<ParserResult> loaded = new ArrayList<>();
         Map<ParserResult, Integer> location = new HashMap<>();
         for (File file : files) {
@@ -77,7 +77,7 @@ public class AutosaveStartupPrompter implements Runnable {
                     loaded.add(pr);
                     BasePanel panel = frame.addTab(pr.getDatabase(), file,
                             pr.getMetaData(), pr.getEncoding(), first);
-                    location.put(pr, frame.baseCount() - 1);
+                    location.put(pr, frame.getBasePanelCount() - 1);
                     if (tryingAutosave) {
                         panel.markNonUndoableBaseChanged();
                     }
@@ -118,7 +118,7 @@ public class AutosaveStartupPrompter implements Runnable {
                     if (wrn.length() > 0) {
                         wrn.deleteCharAt(wrn.length() - 1);
                     }
-                    frame.showBaseAt(location.get(pr));
+                    frame.showBasePanelAt(location.get(pr));
                     JOptionPane.showMessageDialog(frame, wrn.toString(),
                             Localization.lang("Warnings"),
                             JOptionPane.WARNING_MESSAGE);

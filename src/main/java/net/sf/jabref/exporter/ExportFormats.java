@@ -198,7 +198,7 @@ public class ExportFormats {
                     final IExportFormat format = eff.getExportFormat();
                     Set<String> entryIds = null;
                     if (selectedOnly) {
-                        BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
+                        BibtexEntry[] selected = frame.getCurrentBasePanel().getSelectedEntries();
                         entryIds = new HashSet<>();
                         for (BibtexEntry bibtexEntry : selected) {
                             entryIds.add(bibtexEntry.getId());
@@ -208,10 +208,10 @@ public class ExportFormats {
                     // Set the global variable for this database's file directory before exporting,
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
-                    Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
+                    Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().metaData()
                             .getFileDirectory(Globals.FILE_FIELD);
                     // Also store the database's file in a global variable:
-                    Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
+                    Globals.prefs.databaseFile = frame.getCurrentBasePanel().metaData().getFile();
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
@@ -228,10 +228,10 @@ public class ExportFormats {
                         @Override
                         public void run() {
                             try {
-                                format.performExport(frame.basePanel().database(),
-                                        frame.basePanel().metaData(),
+                                format.performExport(frame.getCurrentBasePanel().database(),
+                                        frame.getCurrentBasePanel().metaData(),
                                         finFile.getPath(), frame
-                                                .basePanel().getEncoding(), finEntryIDs);
+                                                .getCurrentBasePanel().getEncoding(), finEntryIDs);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                                 if (ex.getMessage() == null) {

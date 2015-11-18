@@ -241,7 +241,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public String getTabTitle() {
         String title;
 
-        if (getFile() == null) {
+        if (getDatabaseFile() == null) {
             title = GUIGlobals.untitledTitle;
 
             if (!database().getEntries().isEmpty()) {
@@ -252,7 +252,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 title = title + '*';
             }
         } else {
-            title = getFile().getName() + " (" + database.getEntryCount() + ")";
+            title = getDatabaseFile().getName() + " \u2014 " + " (" + database.getEntryCount() + ")";
         }
 
         return title;
@@ -2270,8 +2270,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
-            if (getFile() != null) {
-                frame.setTabTitle(BasePanel.this, getFile().getName(), getFile().getAbsolutePath());
+            if (getDatabaseFile() != null) {
+                frame.setTabTitle(BasePanel.this, getDatabaseFile().getName(), getDatabaseFile().getAbsolutePath());
             } else {
                 frame.setTabTitle(BasePanel.this, GUIGlobals.untitledTitle, null);
             }
@@ -2582,7 +2582,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //LOGGER.debug("File '"+file.getPath()+"' has been modified.");
         updatedExternally = true;
 
-        final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this, BasePanel.this.getFile());
+        final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this, BasePanel.this.getDatabaseFile());
 
         // Adding the sidepane component is Swing work, so we must do this in the Swing
         // thread:
@@ -2598,7 +2598,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     sidePaneManager.hideComponent(FileUpdatePanel.NAME);
                     sidePaneManager.unregisterComponent(FileUpdatePanel.NAME);
                 }
-                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, getFile(), scanner);
+                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, getDatabaseFile(), scanner);
                 sidePaneManager.register(FileUpdatePanel.NAME, pan);
                 sidePaneManager.show(FileUpdatePanel.NAME);
                 //setUpdatedExternally(false);
@@ -2607,7 +2607,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         };
 
         // Test: running scan automatically in background
-        if ((BasePanel.this.getFile() != null) && !FileBasedLock.waitForFileLock(BasePanel.this.getFile(), 10)) {
+        if ((BasePanel.this.getDatabaseFile() != null) && !FileBasedLock.waitForFileLock(BasePanel.this.getDatabaseFile(), 10)) {
             // The file is locked even after the maximum wait. Do nothing.
             LOGGER.error("File updated externally, but change scan failed because the file is locked.");
             // Perturb the stored timestamp so successive checks are made:
@@ -2627,7 +2627,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     @Override
     public void fileRemoved() {
-        LOGGER.info("File '" + getFile().getPath() + "' has been deleted.");
+        LOGGER.info("File '" + getDatabaseFile().getPath() + "' has been deleted.");
     }
 
     /**
@@ -2666,7 +2666,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      *
      * @return The relevant File, or null if none is defined.
      */
-    public File getFile() {
+    public File getDatabaseFile() {
         return metaData.getFile();
     }
 

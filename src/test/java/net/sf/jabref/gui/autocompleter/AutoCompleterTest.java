@@ -23,11 +23,11 @@ public class AutoCompleterTest {
         BibtexEntry bibtexEntry = new BibtexEntry();
         bibtexEntry.setField("author", "Brigitte Laurant");
         FieldEditor authorTextField = new TextArea("author", "Hans Meiser");
-        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.basePanel(), bibtexEntry);
+        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibtexEntry);
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
         // test content of stored words in autocompleter ...
-        AutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleters().get("author");
+        AutoCompleter autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("author");
         Assert.assertTrue(autoCompleter.indexContainsWord("Hans Meiser"));
         Assert.assertTrue(autoCompleter.indexContainsWord("Meiser, Hans"));
 
@@ -42,11 +42,11 @@ public class AutoCompleterTest {
         BibtexEntry bibtexEntry = new BibtexEntry();
         bibtexEntry.setField("journal", "Testtext");
         FieldEditor authorTextField = new TextArea("journal", "New Testtext");
-        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.basePanel(), bibtexEntry);
+        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibtexEntry);
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
         // test content of stored words in autocompleter ...
-        AutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleters().get("journal");
+        AutoCompleter autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("journal");
         Assert.assertTrue(autoCompleter.indexContainsWord("New Testtext"));
 
         TestUtils.closeJabRef();

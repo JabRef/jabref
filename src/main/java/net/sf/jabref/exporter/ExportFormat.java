@@ -44,7 +44,7 @@ public class ExportFormat implements IExportFormat {
     private String directory;
     private String extension;
     String encoding; // If this value is set, it will be used to override
-    // the default encoding for the basePanel.
+    // the default encoding for the getCurrentBasePanel.
 
     private FileFilter fileFilter;
     private boolean customExport;
