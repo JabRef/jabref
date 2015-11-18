@@ -19,11 +19,13 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -348,69 +350,76 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         return bp;
     }
 
-    public static ParserResult loadDatabase(File fileToOpen, String encoding) throws IOException {
-
-        // First we make a quick check to see if this looks like a BibTeX file:
-        Reader reader;// = ImportFormatReader.getReader(fileToOpen, encoding);
-        //if (!BibtexParser.isRecognizedFormat(reader))
-        //    return null;
-
-        // The file looks promising. Reinitialize the reader and go on:
-        //reader = getReader(fileToOpen, encoding);
+    /**
+     * Opens a new database.
+     */
+    public static ParserResult loadDatabase(File fileToOpen, String fallbackEncoding) throws IOException {
 
         // We want to check if there is a JabRef signature in the file, because that would tell us
         // which character encoding is used. However, to read the signature we must be using a compatible
         // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
-        // read it regardless of encoding, with either UTF8 or UTF-16. That's the hypothesis, at any rate.
+        // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
         // 8 bit is most likely, so we try that first:
-        String suppliedEncoding = null;
+        Optional<String> suppliedEncoding = Optional.empty();
         try (Reader utf8Reader = ImportFormatReader.getUTF8Reader(fileToOpen)) {
-            suppliedEncoding = OpenDatabaseAction.checkForEncoding(utf8Reader);
-            utf8Reader.close();
+            suppliedEncoding = OpenDatabaseAction.getSuppliedEncoding(utf8Reader);
         }
         // Now if that didn't get us anywhere, we check with the 16 bit encoding:
-        if (suppliedEncoding == null) {
+        if (!suppliedEncoding.isPresent()) {
             try (Reader utf16Reader = ImportFormatReader.getUTF16Reader(fileToOpen)) {
-                suppliedEncoding = OpenDatabaseAction.checkForEncoding(utf16Reader);
-                utf16Reader.close();
+                suppliedEncoding = OpenDatabaseAction.getSuppliedEncoding(utf16Reader);
             }
         }
 
-        if (suppliedEncoding != null) {
-            try {
-                reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
-                encoding = suppliedEncoding; // Just so we put the right info into the ParserResult.
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
+        // Open and parse file
+        try (InputStreamReader reader = openFile(fileToOpen, suppliedEncoding, fallbackEncoding)) {
+            BibtexParser bp = new BibtexParser(reader);
+
+            ParserResult pr = bp.parse();
+            pr.setEncoding(reader.getEncoding());
+            pr.setFile(fileToOpen);
+
+            if (SpecialFieldsUtils.keywordSyncEnabled()) {
+                for (BibtexEntry entry : pr.getDatabase().getEntries()) {
+                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
+                }
+                LOGGER.info("Synchronized special fields based on keywords");
             }
-        } else {
-            // We couldn't find a header with info about encoding. Use default:
-            reader = ImportFormatReader.getReader(fileToOpen, encoding);
-        }
 
-        BibtexParser bp = new BibtexParser(reader);
-
-        ParserResult pr = bp.parse();
-        pr.setEncoding(encoding);
-        pr.setFile(fileToOpen);
-
-        if (SpecialFieldsUtils.keywordSyncEnabled()) {
-            for (BibtexEntry entry : pr.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
+            if (!pr.getMetaData().isGroupTreeValid()) {
+                pr.addWarning(Localization.lang(
+                        "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
             }
-            LOGGER.info("Synchronized special fields based on keywords");
-        }
 
-        if (!pr.getMetaData().isGroupTreeValid()) {
-            pr.addWarning(Localization
-                    .lang("Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
+            return pr;
         }
-
-        return pr;
     }
 
-    private static String checkForEncoding(Reader reader) {
+    /**
+     * Opens the file with the provided encoding. If this fails (or no encoding is provided), then the fallback encoding
+     * will be used.
+     */
+    private static InputStreamReader openFile(File fileToOpen, Optional<String> encoding, String fallbackEncoding)
+            throws IOException {
+        if (encoding.isPresent()) {
+            try {
+                return ImportFormatReader.getReader(fileToOpen, encoding.get());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                // The supplied encoding didn't work out, so we use the fallback.
+                return ImportFormatReader.getReader(fileToOpen, fallbackEncoding);
+            }
+        } else {
+            // We couldn't find a header with info about encoding. Use fallback:
+            return ImportFormatReader.getReader(fileToOpen, fallbackEncoding);
+
+        }
+    }
+
+    /**
+     * Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
+     */
+    private static Optional<String> getSuppliedEncoding(Reader reader) {
         try {
             BufferedReader br = new BufferedReader(reader);
             String line;
@@ -418,8 +427,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 line = line.trim();
 
                 // Line does not start with %, so there are no comment lines for us and we can stop parsing
-                if(! line.startsWith("%")) {
-                    return null;
+                if (!line.startsWith("%")) {
+                    return Optional.empty();
                 }
 
                 // Only keep the part after %
@@ -429,15 +438,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // Signature line, so keep reading and skip to next line
                 } else if (line.startsWith(Globals.encPrefix)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
-                    return line.substring(Globals.encPrefix.length()).trim();
+                    return Optional.of(line.substring(Globals.encPrefix.length()).trim());
                 } else {
                     // Line not recognized so stop parsing
-                    return null;
+                    return Optional.empty();
                 }
-             }
+            }
         } catch (IOException ignored) {
             // Ignored
         }
-        return null;
+        return Optional.empty();
     }
 }

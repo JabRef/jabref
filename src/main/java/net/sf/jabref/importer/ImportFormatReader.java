@@ -333,20 +333,17 @@ public class ImportFormatReader {
         }
     }
 
-    public static Reader getUTF8Reader(File f) throws IOException {
+    public static InputStreamReader getUTF8Reader(File f) throws IOException {
         return getReader(f, "UTF-8");
     }
 
-    public static Reader getUTF16Reader(File f) throws IOException {
+    public static InputStreamReader getUTF16Reader(File f) throws IOException {
         return getReader(f, "UTF-16");
     }
 
-    public static Reader getReader(File f, String encoding)
+    public static InputStreamReader getReader(File f, String encoding)
             throws IOException {
-        InputStreamReader reader;
-        reader = new InputStreamReader(new FileInputStream(f), encoding);
-
-        return reader;
+        return new InputStreamReader(new FileInputStream(f), encoding);
     }
 
     public static Reader getReaderDefaultEncoding(InputStream in)
