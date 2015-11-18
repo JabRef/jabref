@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+ - EntryTypes are now clustered per group on the 'new entry' GUI screen.
  - Added a page numbers integrity checker
  - Position and size of certain dialogs are stored and restored.
  - Feature: Search DOAJ, Directory of Open Access Journals
@@ -75,6 +76,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Fixed [bug 1296](https://sourceforge.net/p/jabref/bugs/1296/): External links in the help open in the standard browser
 
 ### Removed
+ - Entry type 'Other' is not selectable anymore as it is no real entry type.
  - BREAKING: Remove plugin functionality.
  - The key bindings for searching specific databases are removed
  - Remove option to toggle native file dialog on mac by making JabRef always use native file dialogs on mac
