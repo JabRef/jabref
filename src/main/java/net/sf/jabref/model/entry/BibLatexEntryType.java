@@ -29,8 +29,6 @@ Modified for use in JabRef.
 */
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,11 +48,6 @@ public abstract class BibLatexEntryType implements EntryType {
 
         // key is always required
         requiredFields.add("bibtexkey");
-    }
-
-    @Override
-    public EntryTypes getEntryType() {
-        return EntryTypes.BIBLATEX;
     }
 
     @Override

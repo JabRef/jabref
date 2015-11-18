@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,11 +45,6 @@ public class UnknownEntryType implements EntryType {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public EntryTypes getEntryType() {
-        return EntryTypes.UNKNOWN;
     }
 
     @Override
