@@ -31,14 +31,6 @@ public class IEEETranEntryTypes {
                 public String getName() {
                     return "Electronic";
                 }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "bibtexkey"
-                            }, database);
-                }
             };
 
     /**
@@ -82,14 +74,6 @@ public class IEEETranEntryTypes {
                 @Override
                 public String getName() {
                     return "Periodical";
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "title", "year", "bibtexkey"
-                            }, database);
                 }
             };
 

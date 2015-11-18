@@ -103,7 +103,7 @@ public class BibtexEntry {
      * complete.
      */
     public boolean hasAllRequiredFields(BibtexDatabase database) {
-        return type.hasAllRequiredFields(this, database);
+        return allFieldsPresent(type.getRequiredFields(), database);
     }
 
     /**

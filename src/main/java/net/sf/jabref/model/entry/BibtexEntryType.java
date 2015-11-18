@@ -29,6 +29,8 @@ Modified for use in JabRef.
 */
 package net.sf.jabref.model.entry;
 
+import net.sf.jabref.model.database.BibtexDatabase;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -90,6 +92,10 @@ public abstract class BibtexEntryType implements EntryType {
         return optionalFields.contains(field);
     }
 
+    @Override
+    public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
+        return entry.allFieldsPresent(getRequiredFields(), database);
+    }
 
     /**
      * Get an array of the required fields in a form appropriate for the entry customization

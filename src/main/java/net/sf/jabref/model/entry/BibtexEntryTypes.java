@@ -21,7 +21,6 @@ public class BibtexEntryTypes {
      */
     public static final EntryType ARTICLE =
             new BibtexEntryType() {
-
                 {
                     addAllRequired("author", "title", "journal", "year");
                     addAllOptional("volume", "number", "pages", "month", "note");
@@ -30,13 +29,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "Article";
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]{
-                            "author", "title", "journal", "year", "bibtexkey"
-                    }, database);
                 }
             };
 
@@ -97,11 +89,6 @@ public class BibtexEntryTypes {
                 public String getName() {
                     return "Booklet";
                 }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]{"title", "bibtexkey"}, database);
-                }
             };
 
     /**
@@ -122,14 +109,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "Conference";
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "author", "title", "booktitle", "year", "bibtexkey"
-                            }, database);
                 }
             };
 
@@ -188,16 +167,6 @@ public class BibtexEntryTypes {
                 public String getName() {
                     return "InCollection";
                 }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "author", "title", "booktitle", "publisher", "year",
-                                    "bibtexkey"
-
-                            }, database);
-                }
             };
 
     /**
@@ -219,14 +188,6 @@ public class BibtexEntryTypes {
                 public String getName() {
                     return "InProceedings";
                 }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "author", "title", "booktitle", "year", "bibtexkey"
-                            }, database);
-                }
             };
 
     /**
@@ -246,14 +207,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "Manual";
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "title", "bibtexkey"
-                            }, database);
                 }
             };
 
@@ -275,14 +228,6 @@ public class BibtexEntryTypes {
                 public String getName() {
                     return "MastersThesis";
                 }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "author", "title", "school", "year", "bibtexkey"
-                            }, database);
-                }
             };
 
     /**
@@ -301,14 +246,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "Misc";
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "bibtexkey"
-                            }, database);
                 }
             };
 
@@ -329,14 +266,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "PhdThesis";
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "author", "title", "school", "year", "bibtexkey"
-                            }, database);
                 }
             };
 
@@ -359,14 +288,6 @@ public class BibtexEntryTypes {
                 public String getName() {
                     return "Proceedings";
                 }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "title", "year", "bibtexkey"
-                            }, database);
-                }
             };
 
     /**
@@ -387,15 +308,6 @@ public class BibtexEntryTypes {
                 public String getName() {
                     return "TechReport";
                 }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "author", "title", "institution", "year",
-                                    "bibtexkey"
-                            }, database);
-                }
             };
 
     /**
@@ -415,14 +327,6 @@ public class BibtexEntryTypes {
                 @Override
                 public String getName() {
                     return "Unpublished";
-                }
-
-                @Override
-                public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-                    return entry.allFieldsPresent(new String[]
-                            {
-                                    "author", "title", "note", "bibtexkey"
-                            }, database);
                 }
             };
 

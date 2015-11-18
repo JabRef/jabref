@@ -84,4 +84,17 @@ public class BibtexEntryTests {
         requiredFields.add("year|address");
         Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
     }
+
+    @Test
+    public void testhasAllRequiredFields() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        e.setField("author", "abc");
+        e.setField("title", "abc");
+        e.setField("journal", "abc");
+
+        Assert.assertFalse(e.hasAllRequiredFields(null));
+
+        e.setField("year", "2015");
+        Assert.assertFalse(e.hasAllRequiredFields(null));
+    }
 }

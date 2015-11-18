@@ -59,11 +59,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType BOOK = new BibLatexEntryType() {
@@ -92,11 +87,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -128,11 +118,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType BOOKINBOOK = new BibLatexEntryType() {
@@ -156,11 +141,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INBOOK.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -186,11 +166,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INBOOK.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType BOOKLET = new BibLatexEntryType() {
@@ -214,11 +189,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -249,11 +219,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType INCOLLECTION = new BibLatexEntryType() {
@@ -283,11 +248,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType SUPPCOLLECTION = new BibLatexEntryType() {
@@ -311,11 +271,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INCOLLECTION.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -343,11 +298,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType MISC = new BibLatexEntryType() {
@@ -372,11 +322,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType ONLINE = new BibLatexEntryType() {
@@ -400,11 +345,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType PATENT = new BibLatexEntryType() {
@@ -427,11 +367,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -458,11 +393,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType SUPPPERIODICAL = new BibLatexEntryType() {
@@ -486,11 +416,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.ARTICLE.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -518,11 +443,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -552,11 +472,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType REFERENCE = new BibLatexEntryType() {
@@ -580,11 +495,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.COLLECTION.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -610,11 +520,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INCOLLECTION.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType REPORT = new BibLatexEntryType() {
@@ -639,11 +544,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType SET = new BibLatexEntryType() {
@@ -655,11 +555,6 @@ public class BibLatexEntryTypes {
         @Override
         public String getName() {
             return "Set";
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -685,11 +580,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType UNPUBLISHED = new BibLatexEntryType() {
@@ -711,11 +601,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -743,11 +628,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INPROCEEDINGS.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType ELECTRONIC = new BibLatexEntryType() {
@@ -771,11 +651,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.ONLINE.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -803,11 +678,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType PHDTHESIS = new BibLatexEntryType() {
@@ -832,11 +702,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
@@ -863,11 +728,6 @@ public class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     public static final BibLatexEntryType WWW = new BibLatexEntryType() {
@@ -891,11 +751,6 @@ public class BibLatexEntryTypes {
         @Override
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.ONLINE.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
         }
     };
 
