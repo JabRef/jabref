@@ -406,7 +406,7 @@ class StringDialog extends JDialog {
                 BibtexString bs = new BibtexString(newId, name, "");
 
                 // Store undo information:
-                panel.undoManager.addEdit(new UndoableInsertString(panel, panel.database, bs));
+                panel.undoManager.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
 
                 base.addString(bs);
                 refreshTable();

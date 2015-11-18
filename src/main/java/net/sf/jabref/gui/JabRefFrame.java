@@ -1611,7 +1611,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             BasePanel bf = baseAt(i);
 
             // Update tables:
-            if (bf.database != null) {
+            if (bf.getDatabase() != null) {
                 bf.setupMainPanel();
 
             }

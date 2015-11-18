@@ -106,7 +106,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     /*
      * The database shown in this panel.
      */
-    public BibtexDatabase database;
+    private BibtexDatabase database;
 
     private int mode;
     private EntryEditor currentEditor;
