@@ -1629,44 +1629,37 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
     }
 
 
-    private String getUniquePathPart(int panelId) {
+    private List<String> getUniquePathParts() {
         try {
             List<Stack<String>> paths = new ArrayList<>();
 
             for(int i = 0; i < getBasePanelCount(); i++) {
-                String path = getBasePanelAt(i).getDatabaseFile().getCanonicalFile().getParent();
+                String path = getBasePanelAt(i).getDatabaseFile().getCanonicalPath();
                 List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
                 Stack<String> stack = new Stack<>();
                 stack.addAll(directories);
                 paths.add(stack);
             }
             List<String> uniquePaths = FileUtil.uniquePathSubstrings(paths);
-            return uniquePaths.get(panelId);
+            return uniquePaths;
         } catch(IOException ex) {
             LOGGER.error("Invalid database file path: " + ex.getMessage());
-            return "";
+            return new ArrayList<>();
         }
-    }
-
-    private boolean hasDuplicateDatabaseFileNames() {
-        List<String> files = new ArrayList<>();
-
-        for(int i = 0; i < getBasePanelCount(); i++) {
-            String fileName = getBasePanelAt(i).getDatabaseFile().getName();
-            files.add(fileName);
-        }
-        Set<String> set = new HashSet<String>(files);
-        return set.size() != files.size();
     }
 
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
-        String title = bp.getTabTitle();
-        tabbedPane.add(title, bp);
+        tabbedPane.add(bp.getTabTitle(), bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file != null ? file.getAbsolutePath() : null);
 
-        if(hasDuplicateDatabaseFileNames()) {
-            String uniqPath = " \u2014 " + getUniquePathPart(getBasePanelCount() - 1);
-            tabbedPane.setTitleAt(getBasePanelCount() - 1, title + uniqPath);
+        List<String> paths = getUniquePathParts();
+        for(int i = 0; i < getBasePanelCount(); i++) {
+            String uniqPath = paths.get(i);
+            if (!uniqPath.equals(file.getName())) {
+                // remove filename
+                uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
+                tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+            }
         }
 
         if (raisePanel) {

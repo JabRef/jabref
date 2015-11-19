@@ -67,7 +67,9 @@ public class FileUtil {
                 if(tempString.isEmpty()) {
                     pathSubstrings.set(i, paths.get(i).pop());
                 } else {
-                    pathSubstrings.set(i, paths.get(i).pop() + File.separator + tempString);
+                    if(!paths.get(i).isEmpty()) {
+                        pathSubstrings.set(i, paths.get(i).pop() + File.separator + tempString);
+                    }
                 }
             }
 
