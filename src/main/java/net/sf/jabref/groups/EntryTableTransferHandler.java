@@ -40,7 +40,6 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.TransferableFileLinkSelection;
@@ -48,7 +47,6 @@ import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.MainTableFormat;
 import net.sf.jabref.importer.ImportMenuItem;
 import net.sf.jabref.importer.OpenDatabaseAction;
-import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
@@ -91,7 +89,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     }
 
     /**
-     * Overriden to indicate which types of drags are supported (only LINK).
+     * Overridden to indicate which types of drags are supported (only LINK).
      */
     @Override
     public int getSourceActions(JComponent c) {
@@ -137,66 +135,18 @@ public class EntryTableTransferHandler extends TransferHandler {
                 @SuppressWarnings("unchecked")
                 List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
                 return handleDraggedFiles(l, dropRow);
-            }
-            // Done by MrDlib
-            /*if(t.isDataFlavorSupported(MindMapNodesSelection.mindMapNodesFlavor)){
-                String xml = (String)t.getTransferData(MindMapNodesSelection.mindMapNodesFlavor);
-                URL mindmapURL = null;
-                if(t.isDataFlavorSupported(MindMapNodesSelection.mindmapUrlFlavor)){
-                    mindmapURL = (URL)t.getTransferData(MindMapNodesSelection.mindmapUrlFlavor);
-                }
-                List<File> files = new ArrayList<File>();
-                String[] xmlNodes = xml.split("<nodeseparator>");
-                for(String xmlNode : xmlNodes){
-                    XMLElement element = new XMLElement();
-                    element.parseString(xmlNode);
-                    String link = element.getStringAttribute("Link");
-                    String absoluteLink = Tools.getLink(link, mindmapURL);
-                    if(absoluteLink == null) continue;
-                    File file = new File(absoluteLink);
-                    if(file.exists()){
-                        files.add(file);
-                    }
-                    else{
-                        try {
-                            URL url = new URL(absoluteLink);
-                            file = new File(url.toURI());
-                            if(file.exists()){
-                                files.add(file);
-                            }
-                        } catch (URISyntaxException e) {
-                            // Todo logging
-                        } catch(IllegalArgumentException e){
-                            // Todo logging
-                        } catch(MalformedURLException e){
-                            // Todo logging
-                        }
-                    }
-                }
-                if(files.size() > 0){
-                    return handleDraggedFiles(files, dropRow);
-                }
-                else{
-                    return false;
-                }
-            }*/
-            // Done by MrDlib
-            if (t.isDataFlavorSupported(urlFlavor)) {
+            } else if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
                 return handleDropTransfer(dropLink);
-            }
-
-            if (t.isDataFlavorSupported(stringFlavor)) {
-                // JOptionPane.showMessageDialog(null, "Received stringFlavor:
-                // "+dropStr);
+            } else if (t.isDataFlavorSupported(stringFlavor)) {
                 String dropStr = (String) t.getTransferData(stringFlavor);
+                LOGGER.debug("Received stringFlavor: " + dropStr);
                 return handleDropTransfer(dropStr, dropRow);
             }
-
         } catch (IOException ioe) {
-            LOGGER.error("Failed to read dropped data: " + ioe);
+            LOGGER.error("Failed to read dropped data", ioe);
         } catch (UnsupportedFlavorException ufe) {
-            LOGGER.error("Drop type error: " + ufe);
+            LOGGER.error("Drop type error", ufe);
         }
 
         // all supported flavors failed
@@ -383,13 +333,10 @@ public class EntryTableTransferHandler extends TransferHandler {
 
             @Override
             public void run() {
-                // Done by MrDlib
                 final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
                 if (importRes.noPdfFiles.length > 0) {
                     loadOrImportFiles(importRes.noPdfFiles, dropRow);
                 }
-                //loadOrImportFiles(fileNames, dropRow);
-                // Done by MrDlib
             }
         });
 
@@ -406,8 +353,8 @@ public class EntryTableTransferHandler extends TransferHandler {
     private void loadOrImportFiles(String[] fileNames, int dropRow) {
 
         OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
-        ArrayList<String> notBibFiles = new ArrayList<>();
-        String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
+        List<String> notBibFiles = new ArrayList<>();
+        List<String> bibFiles = new ArrayList<>();
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
             String extension = "";
@@ -415,24 +362,15 @@ public class EntryTableTransferHandler extends TransferHandler {
             int index = fileName.lastIndexOf('.');
             if ((index >= 0) && (index < fileName.length())) {
                 extension = fileName.substring(index + 1).toLowerCase();
-                fileType = Globals.prefs.getExternalFileTypeByExt(extension);
             }
             if (extension.equals("bib")) {
-                File f = new File(fileName);
-                try {
-                    ParserResult pr = OpenDatabaseAction.loadDatabase(f, encoding);
-                    if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
-                        notBibFiles.add(fileName);
-                    } else {
-                        openAction.addNewDatabase(pr, f, true);
-                        frame.getFileHistory().newFile(fileName);
-                    }
-                } catch (IOException e) {
-                    notBibFiles.add(fileName);
-                }
+                // we assume that it is a BibTeX file.
+                // When a user wants to import something with file extension "bib", but which is not a BibTeX file, he should use "file -> import"
+                bibFiles.add(fileName);
                 continue;
             }
 
+            fileType = Globals.prefs.getExternalFileTypeByExt(extension);
             /*
              * This is a linkable file. If the user dropped it on an entry, we
              * should offer options for autolinking to this files:
@@ -455,56 +393,10 @@ public class EntryTableTransferHandler extends TransferHandler {
 
                 continue;
             }
-            /*
-            			if (extension.equals("pdf")) {
-            				Collection c;
-            				try {
-            					c = XMPUtil.readXMP(fileNames[i]);
-            				} catch (IOException e1) {
-            					c = null;
-            					frame.output(Globals.lang("No XMP metadata found in " + fileNames[i]));
-            				}
-
-            				if (c != null && c.size() > 0) {
-            					Iterator it = c.iterator();
-
-            					BasePanel panel = frame.getCurrentBasePanel();
-
-            					if (panel == null) {
-            						// // Create a new, empty, database.
-            						BibtexDatabase database = new BibtexDatabase();
-            						frame.addTab(database, null, null, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING),
-            							true);
-            						frame.output(Globals.lang("New database created."));
-            						panel = frame.getCurrentBasePanel();
-            					}
-
-            					BibtexDatabase database = frame.getCurrentBasePanel().database();
-
-            					NamedCompound ce = new NamedCompound(Glbals.lang("Drop PDF"));
-
-            					while (it.hasNext()) {
-            						BibtexEntry e = (BibtexEntry) it.next();
-
-            						try {
-            							e.setId(Util.next());
-            							database.insertEntry(e);
-            							ce.addEdit(new UndoableInsertEntry(database, e, panel));
-            						} catch (Exception e2) {
-            							// Should not happen?
-            						}
-            					}
-
-            					ce.end();
-            					panel.undoManager.addEdit(ce);
-            					panel.markBaseChanged();
-            					continue;
-            				}
-            			}
-            			*/
-
             notBibFiles.add(fileName);
         }
+
+        openAction.openFilesAsStringList(bibFiles, true);
 
         if (!notBibFiles.isEmpty()) {
             String[] toImport = new String[notBibFiles.size()];

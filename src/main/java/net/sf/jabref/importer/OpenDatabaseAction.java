@@ -136,10 +136,18 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         openFiles(filesToOpen, raisePanel);
     }
 
+    public void openFilesAsStringList(List<String> fileNamesToOpen, boolean raisePanel) {
+        List<File> filesToOpen = new ArrayList<>();
+        for (String fileName : fileNamesToOpen) {
+            filesToOpen.add(new File(fileName));
+        }
+        openFiles(filesToOpen, raisePanel);
+    }
+
     /**
      * Opens the given files. If one of it is null or 404, nothing happens
      *
-     * @param file the file, may be null or not existing
+     * @param filesToOpen the filesToOpen, may be null or not existing
      */
     public void openFiles(List<File> filesToOpen, boolean raisePanel) {
         BasePanel toRaise = null;
