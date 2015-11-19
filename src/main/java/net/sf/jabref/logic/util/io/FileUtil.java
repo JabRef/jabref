@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class FileUtil {
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
@@ -55,29 +56,39 @@ public class FileUtil {
      * @param paths the file paths
      * @return the minimal unique path substring for each file path
      */
-    public static List<String> uniquePathSubstrings(List<Stack<String>> paths) {
+    public static List<String> uniquePathSubstrings(List<String> paths) {
+        List<Stack<String>> stackList = new ArrayList<>(paths.size());
+        // prepare data structures
+        for (String path : paths) {
+            List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
+            Stack<String> stack = new Stack<>();
+            stack.addAll(directories);
+            stackList.add(stack);
+        }
+
         String[] arr = new String[paths.size()];
         Arrays.fill(arr, "");
         List<String> pathSubstrings = Arrays.asList(arr);
 
-        while(!paths.stream().allMatch(p -> p.isEmpty())) {
-            for(int i = 0; i < paths.size(); i++) {
+        // compute shortest folder substrings
+        while(!stackList.stream().allMatch(p -> p.isEmpty())) {
+            for(int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
-                if(tempString.isEmpty() && !paths.get(i).isEmpty()) {
-                    pathSubstrings.set(i, paths.get(i).pop());
+                if(tempString.isEmpty() && !stackList.get(i).isEmpty()) {
+                    pathSubstrings.set(i, stackList.get(i).pop());
                 } else {
-                    if(!paths.get(i).isEmpty()) {
-                        pathSubstrings.set(i, paths.get(i).pop() + File.separator + tempString);
+                    if(!stackList.get(i).isEmpty()) {
+                        pathSubstrings.set(i, stackList.get(i).pop() + File.separator + tempString);
                     }
                 }
             }
 
-            for(int i = 0; i < paths.size(); i++) {
+            for(int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
                 if(Collections.frequency(pathSubstrings, tempString) == 1) {
-                    paths.get(i).clear();
+                    stackList.get(i).clear();
                 }
             }
         }

@@ -1652,16 +1652,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private List<String> getUniquePathParts() {
         List<String> dbPaths = collectDatabaseFilePaths();
-        List<Stack<String>> stackList = new ArrayList<>(dbPaths.size());
-        // prepare data structure
-        for (String path : dbPaths) {
-            List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
-            Stack<String> stack = new Stack<>();
-            stack.addAll(directories);
-            stackList.add(stack);
-        }
-        // get unique paths
-        List<String> uniquePaths = FileUtil.uniquePathSubstrings(stackList);
+        List<String> uniquePaths = FileUtil.uniquePathSubstrings(dbPaths);
+
         return uniquePaths;
     }
 
