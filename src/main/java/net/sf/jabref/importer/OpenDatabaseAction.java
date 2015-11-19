@@ -116,7 +116,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
+        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel bp = frame.getBasePanelAt(i);
@@ -197,9 +197,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 int answer = JOptionPane.showConfirmDialog(null,
                         "<html>" + Localization
                                 .lang("An autosave file was found for this database. This could indicate ")
-                        + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.")
-                        + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
-                        + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
+                                + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.")
+                                + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
+                                + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     fileToLoad = AutoSaveManager.getAutoSaveFile(file);
                     tryingAutosave = true;
@@ -252,8 +252,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                     String message = "<html>" + errorMessage + "<p>"
                             + (tryingAutosave ? Localization.lang(
-                                    "Error opening autosave of '%0'. Trying to load '%0' instead.",
-                                    file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
+                            "Error opening autosave of '%0'. Trying to load '%0' instead.",
+                            file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
                             + "</html>";
                     JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"),
                             JOptionPane.ERROR_MESSAGE);
@@ -296,7 +296,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * Go through the list of post open actions, and perform those that need to be performed.
      *
      * @param panel The BasePanel where the database is shown.
-     * @param pr The result of the bib file parse operation.
+     * @param pr    The result of the bib file parse operation.
      */
     public static void performPostOpenActions(BasePanel panel, ParserResult pr, boolean mustRaisePanel) {
         for (PostOpenAction action : OpenDatabaseAction.postOpenActions) {
@@ -376,7 +376,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             BibtexParser bp = new BibtexParser(reader);
 
             ParserResult pr = bp.parse();
-            pr.setEncoding(reader.getEncoding());
+            pr.setEncoding(getEncodingFromStream(reader));
             pr.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
@@ -392,6 +392,17 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             }
 
             return pr;
+        }
+    }
+
+
+    private static String getEncodingFromStream(InputStreamReader reader) {
+        String encoding = reader.getEncoding();
+        // compatibility hack to transfrom the UTF8 string to the version we expect
+        if (encoding == "UTF8") {
+            return "UTF-8";
+        } else {
+            return encoding;
         }
     }
 

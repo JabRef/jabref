@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class OpenDatabaseActionTest {
 
-    private final String defaultEncoding = "UTF8";
+    private final String defaultEncoding = "UTF-8";
     private final File bibNoHeader = new File(OpenDatabaseActionTest.class.getResource("headerless.bib").getFile());
     private final File bibWrongHeader = new File(
             OpenDatabaseActionTest.class.getResource("wrong-header.bib").getFile());
@@ -41,13 +41,13 @@ public class OpenDatabaseActionTest {
     @Test
     public void useSpecifiedEncoding() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibHeader, "noEncoding");
-        Assert.assertEquals("UTF8", result.getEncoding());
+        Assert.assertEquals("UTF-8", result.getEncoding());
     }
 
     @Test
     public void useSpecifiedEncodingWithSignature() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibHeaderAndSignature, "noEncoding");
-        Assert.assertEquals("UTF8", result.getEncoding());
+        Assert.assertEquals("UTF-8", result.getEncoding());
     }
 
     @Test
