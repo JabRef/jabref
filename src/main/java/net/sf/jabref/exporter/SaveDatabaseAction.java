@@ -155,6 +155,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             frame.setTabTitle(panel, panel.getTabTitle(), panel.getDatabaseFile().getAbsolutePath());
             frame.output(Localization.lang("Saved database") + " '" + panel.getDatabaseFile().getPath() + "'.");
             frame.setWindowTitle();
+            frame.updateAllTabTitles();
         } else if (!cancelled) {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.

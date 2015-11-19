@@ -40,6 +40,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -140,7 +141,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // construct view
                 JTable table = new JTable(
                         model,
-                        new Object[] {"key", "field", "message"}
+                        new Object[]{"key", "field", "message"}
                 );
 
                 table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -251,7 +252,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction donationAction = new DonateAction();
     private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), helpDiag,
             GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
- prefs.getKey(KeyBinds.HELP));
+            prefs.getKey(KeyBinds.HELP));
     private final AbstractAction contents = new HelpAction(Localization.menuTitle("Help contents"), helpDiag,
             GUIGlobals.helpContents, Localization.lang("Help contents"),
             IconTheme.JabRefIcon.HELP_CONTENTS.getIcon());
@@ -361,10 +362,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.HIDE_SHOW_TOOLBAR));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Hide/show toolbar"));
         }
+
         @Override
         public void actionPerformed(ActionEvent e) {
             tlb.setVisible(!tlb.isVisible());
-        }};
+        }
+    };
     private final AbstractAction toggleGroups = new GeneralAction(Actions.TOGGLE_GROUPS,
             Localization.menuTitle("Toggle groups interface"),
             Localization.lang("Toggle groups interface"),
@@ -494,7 +497,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
 
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
-FindUnlinkedFilesDialog.ACTION_COMMAND,
+            FindUnlinkedFilesDialog.ACTION_COMMAND,
             FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
             prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION)
     );
@@ -514,7 +517,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey(KeyBinds.NEW_ENTRY));
     // @formatter:off
-    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[] {
+    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[]{
             new NewEntryAction(this, "article", prefs.getKey(KeyBinds.NEW_ARTICLE)),
             new NewEntryAction(this, "book", prefs.getKey(KeyBinds.NEW_BOOK)),
             new NewEntryAction(this, "phdthesis", prefs.getKey(KeyBinds.NEW_PHDTHESIS)),
@@ -644,7 +647,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     /**
      * Tries to open a browser with the given URL
-     *
+     * <p>
      * All errors are logged
      *
      * @param url the url to open
@@ -1629,38 +1632,59 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
     }
 
 
-    private List<String> getUniquePathParts() {
-        try {
-            List<Stack<String>> paths = new ArrayList<>();
+    private List<String> collectDatabaseFilePaths() {
+        List<String> dbPaths = new ArrayList<>(getBasePanelCount());
 
-            for(int i = 0; i < getBasePanelCount(); i++) {
-                String path = getBasePanelAt(i).getDatabaseFile().getCanonicalPath();
-                List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
-                Stack<String> stack = new Stack<>();
-                stack.addAll(directories);
-                paths.add(stack);
+        for (int i = 0; i < getBasePanelCount(); i++) {
+            try {
+                // db file exists
+                if(getBasePanelAt(i).getDatabaseFile() == null) {
+                    dbPaths.add("");
+                } else {
+                    dbPaths.add(getBasePanelAt(i).getDatabaseFile().getCanonicalPath());
+                }
+            } catch (IOException ex) {
+                LOGGER.error("Invalid database file path: " + ex.getMessage());
             }
-            List<String> uniquePaths = FileUtil.uniquePathSubstrings(paths);
-            return uniquePaths;
-        } catch(IOException ex) {
-            LOGGER.error("Invalid database file path: " + ex.getMessage());
-            return new ArrayList<>();
         }
+        return dbPaths;
     }
 
-    public void addTab(BasePanel bp, File file, boolean raisePanel) {
-        tabbedPane.add(bp.getTabTitle(), bp);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file != null ? file.getAbsolutePath() : null);
+    private List<String> getUniquePathParts() {
+        List<String> dbPaths = collectDatabaseFilePaths();
+        List<Stack<String>> stackList = new ArrayList<>(dbPaths.size());
+        // prepare data structure
+        for (String path : dbPaths) {
+            List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
+            Stack<String> stack = new Stack<>();
+            stack.addAll(directories);
+            stackList.add(stack);
+        }
+        // get unique paths
+        List<String> uniquePaths = FileUtil.uniquePathSubstrings(stackList);
+        return uniquePaths;
+    }
 
+    public void updateAllTabTitles() {
         List<String> paths = getUniquePathParts();
-        for(int i = 0; i < getBasePanelCount(); i++) {
+        for (int i = 0; i < getBasePanelCount(); i++) {
             String uniqPath = paths.get(i);
-            if (!uniqPath.equals(file.getName())) {
+            File file = getBasePanelAt(i).getDatabaseFile();
+
+            if (file != null && !uniqPath.equals(file.getName())) {
                 // remove filename
                 uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
             }
         }
+    }
+
+    public void addTab(BasePanel bp, File file, boolean raisePanel) {
+        // add tab
+        tabbedPane.add(bp.getTabTitle(), bp);
+        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file != null ? file.getAbsolutePath() : null);
+        // update all tab titles
+        updateAllTabTitles();
 
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
@@ -1686,16 +1710,16 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
      * Creates icons for the disabled state for all JMenuItems with FontBasedIcons in the given menuElement.
      * This is necessary as Swing is not able to generate default disabled icons for font based icons.
      *
-     * @param menuElement   the menuElement for which disabled icons should be generated
+     * @param menuElement the menuElement for which disabled icons should be generated
      */
     public void createDisabledIconsForMenuEntries(MenuElement menuElement) {
-        for(MenuElement subElement : menuElement.getSubElements()) {
-            if((subElement instanceof JMenu) || (subElement instanceof JPopupMenu)) {
+        for (MenuElement subElement : menuElement.getSubElements()) {
+            if ((subElement instanceof JMenu) || (subElement instanceof JPopupMenu)) {
                 createDisabledIconsForMenuEntries(subElement);
             } else if (subElement instanceof JMenuItem) {
                 JMenuItem item = (JMenuItem) subElement;
-                if(item.getIcon() instanceof IconTheme.FontBasedIcon) {
-                    item.setDisabledIcon(((IconTheme.FontBasedIcon)item.getIcon()).createDisabledIcon());
+                if (item.getIcon() instanceof IconTheme.FontBasedIcon) {
+                    item.setDisabledIcon(((IconTheme.FontBasedIcon) item.getIcon()).createDisabledIcon());
                 }
             }
         }
@@ -1841,20 +1865,20 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
      * @param openInNew Should the entries be imported into a new database?
      */
     private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries, final boolean openInNew) {
-            SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
 
-                @Override
-                public void run() {
-                    ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
-                            panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"),
-                            openInNew);
-                    diag.addEntries(entries);
-                    diag.entryListComplete();
-                    PositionWindow.placeDialog(diag, JabRefFrame.this);
-                    diag.setVisible(true);
-                    diag.toFront();
-                }
-            });
+            @Override
+            public void run() {
+                ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
+                        panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"),
+                        openInNew);
+                diag.addEntries(entries);
+                diag.entryListComplete();
+                PositionWindow.placeDialog(diag, JabRefFrame.this);
+                diag.setVisible(true);
+                diag.toFront();
+            }
+        });
     }
 
     public FileHistory getFileHistory() {
@@ -2098,7 +2122,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         public ChangeTabAction(boolean next) {
             // @formatter:off
             putValue(Action.NAME, next ? Localization.menuTitle("Next tab") :
-                Localization.menuTitle("Previous tab"));
+                    Localization.menuTitle("Previous tab"));
             // @formatter:on
             this.next = next;
             putValue(Action.ACCELERATOR_KEY,

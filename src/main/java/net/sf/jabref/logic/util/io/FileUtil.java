@@ -64,7 +64,7 @@ public class FileUtil {
             for(int i = 0; i < paths.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
-                if(tempString.isEmpty()) {
+                if(tempString.isEmpty() && !paths.get(i).isEmpty()) {
                     pathSubstrings.set(i, paths.get(i).pop());
                 } else {
                     if(!paths.get(i).isEmpty()) {
