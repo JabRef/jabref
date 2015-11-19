@@ -924,7 +924,7 @@ class MSBibEntry {
     }
 
     private EntryType mapMSBibToBibtexType(String msbib) {
-        EntryType bibtex = BibtexEntryTypes.MISC;
+        EntryType bibtex;
         if (msbib.equals("Book")) {
             bibtex = BibtexEntryTypes.BOOK;
         } else if (msbib.equals("BookSection")) {
