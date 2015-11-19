@@ -13,10 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BibtexEntryTests {
-
-    private BibtexEntry entry;
-
-
     @Before
     public void setup() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -24,12 +20,11 @@ public class BibtexEntryTests {
 
     @Test
     public void testDefaultConstructor() {
-        entry = new BibtexEntry();
+        BibtexEntry entry = new BibtexEntry();
     }
 
     @Test
     public void testGetPublicationDate() {
-
         Assert.assertEquals("2003-02",
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }"))
                         .getPublicationDate());
@@ -49,11 +44,10 @@ public class BibtexEntryTests {
         Assert.assertEquals("2003-12",
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }"))
                         .getPublicationDate());
-
     }
 
     @Test
-    public void testAllFieldsPresentDefault() {
+    public void allFieldsPresentDefault() {
         BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
         e.setField("author", "abc");
         e.setField("title", "abc");
@@ -69,7 +63,7 @@ public class BibtexEntryTests {
     }
 
     @Test
-    public void testAllFieldsPresentOr() {
+    public void allFieldsPresentOr() {
         BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
         e.setField("author", "abc");
         e.setField("title", "abc");
@@ -85,7 +79,7 @@ public class BibtexEntryTests {
     }
 
     @Test
-    public void testhasAllRequiredFields() {
+    public void hasAllRequiredFields() {
         BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
         e.setField("author", "abc");
         e.setField("title", "abc");
