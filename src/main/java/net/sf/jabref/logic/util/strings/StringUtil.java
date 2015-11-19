@@ -21,6 +21,7 @@ import net.sf.jabref.logic.l10n.Encodings;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -78,6 +79,11 @@ public class StringUtil {
             stringBuilder.append(strings[i]).append(separator);
         }
         return stringBuilder.append(strings[to - 1]).toString();
+    }
+
+    public static String join(Collection<String> strings, String separator) {
+        String[] arr = strings.toArray(new String[strings.size()]);
+        return join(arr, separator, 0, arr.length);
     }
 
     public static String join(String[] strings, String separator) {

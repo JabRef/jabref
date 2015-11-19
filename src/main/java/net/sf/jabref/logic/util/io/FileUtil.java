@@ -18,6 +18,7 @@ package net.sf.jabref.logic.util.io;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,7 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 public class FileUtil {
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
@@ -46,6 +47,39 @@ public class FileUtil {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Creates the minimal unique path substring for each file among multiple file paths.
+     *
+     * @param paths the file paths
+     * @return the minimal unique path substring for each file path
+     */
+    public static List<String> uniquePathSubstrings(List<Stack<String>> paths) {
+        String[] arr = new String[paths.size()];
+        Arrays.fill(arr, "");
+        List<String> pathSubstrings = Arrays.asList(arr);
+
+        while(!paths.stream().allMatch(p -> p.isEmpty())) {
+            for(int i = 0; i < paths.size(); i++) {
+                String tempString = pathSubstrings.get(i);
+
+                if(tempString.isEmpty()) {
+                    pathSubstrings.set(i, paths.get(i).pop());
+                } else {
+                    pathSubstrings.set(i, paths.get(i).pop() + File.separator + tempString);
+                }
+            }
+
+            for(int i = 0; i < paths.size(); i++) {
+                String tempString = pathSubstrings.get(i);
+
+                if(Collections.frequency(pathSubstrings, tempString) == 1) {
+                    paths.get(i).clear();
+                }
+            }
+        }
+        return pathSubstrings;
     }
 
     /**

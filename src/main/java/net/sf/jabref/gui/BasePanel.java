@@ -24,8 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
@@ -252,7 +254,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 title = title + '*';
             }
         } else {
-            title = getDatabaseFile().getName() + " \u2014 " + " (" + database.getEntryCount() + ")";
+            title = getDatabaseFile().getName();
         }
 
         return title;

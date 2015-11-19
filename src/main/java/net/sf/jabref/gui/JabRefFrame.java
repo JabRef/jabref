@@ -33,13 +33,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
+import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -62,6 +57,7 @@ import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -1632,10 +1628,46 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         return bp;
     }
 
+
+    private String getUniquePathPart(int panelId) {
+        try {
+            List<Stack<String>> paths = new ArrayList<>();
+
+            for(int i = 0; i < getBasePanelCount(); i++) {
+                String path = getBasePanelAt(i).getDatabaseFile().getCanonicalFile().getParent();
+                List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
+                Stack<String> stack = new Stack<>();
+                stack.addAll(directories);
+                paths.add(stack);
+            }
+            List<String> uniquePaths = FileUtil.uniquePathSubstrings(paths);
+            return uniquePaths.get(panelId);
+        } catch(IOException ex) {
+            LOGGER.error("Invalid database file path: " + ex.getMessage());
+            return "";
+        }
+    }
+
+    private boolean hasDuplicateDatabaseFileNames() {
+        List<String> files = new ArrayList<>();
+
+        for(int i = 0; i < getBasePanelCount(); i++) {
+            String fileName = getBasePanelAt(i).getDatabaseFile().getName();
+            files.add(fileName);
+        }
+        Set<String> set = new HashSet<String>(files);
+        return set.size() != files.size();
+    }
+
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
         String title = bp.getTabTitle();
         tabbedPane.add(title, bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file != null ? file.getAbsolutePath() : null);
+
+        if(hasDuplicateDatabaseFileNames()) {
+            String uniqPath = " \u2014 " + getUniquePathPart(getBasePanelCount() - 1);
+            tabbedPane.setTitleAt(getBasePanelCount() - 1, title + uniqPath);
+        }
 
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
