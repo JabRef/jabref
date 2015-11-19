@@ -148,7 +148,7 @@ class DragDropPane extends JTabbedPane {
             ((Graphics2D) g).setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER, 0.9f)); // Set transparency
             g.setFont(IconTheme.FONT.deriveFont(Font.BOLD, 24f));
-            g.drawString("\uf214", locationP.x - (moveTabArrow.getIcon().getIconWidth() / 2),
+            g.drawString(moveTabArrow.getCode(), locationP.x - (moveTabArrow.getIcon().getIconWidth() / 2),
                     locationP.y + (moveTabArrow.getIcon().getIconHeight() / 2));
 
         }
