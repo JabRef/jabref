@@ -28,6 +28,8 @@ import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -139,20 +141,15 @@ public class SixpackImporter extends ImportFormat {
                 }
                 BibtexEntryType typ = EntryTypes.getType(fields[1].toLowerCase());
                 if (typ == null) {
-                    String type = "";
                     if (fields[1].equals("Masterthesis")) {
-                        type = "mastersthesis";
+                        typ = BibtexEntryTypes.MASTERSTHESIS;
+                    } else if (fields[1].equals("PhD-Thesis")) {
+                        typ = BibtexEntryTypes.PHDTHESIS;
+                    } else if (fields[1].equals("miscellaneous")) {
+                        typ = BibtexEntryTypes.MISC;
+                    } else if (fields[1].equals("Conference")) {
+                        typ = BibtexEntryTypes.PROCEEDINGS;
                     }
-                    if (fields[1].equals("PhD-Thesis")) {
-                        type = "phdthesis";
-                    }
-                    if (fields[1].equals("miscellaneous")) {
-                        type = "misc";
-                    }
-                    if (fields[1].equals("Conference")) {
-                        type = "proceedings";
-                    }
-                    typ = EntryTypes.getType(type.toLowerCase());
                 }
                 entry = new BibtexEntry(IdGenerator.next(), typ);
                 String fld;

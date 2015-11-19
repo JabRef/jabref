@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.*;
@@ -83,7 +82,7 @@ public class JstorImporter extends ImportFormat {
             BibtexEntry be = new BibtexEntry(IdGenerator.next());
             try {
                 if (fields[0].equals("FLA")) {
-                    be.setType(EntryTypes.getType("article"));
+                    be.setType(BibtexEntryTypes.ARTICLE);
                 }
                 ImportFormatReader.setIfNecessary(be, "title", fields[2]);
                 ImportFormatReader.setIfNecessary(be, "author", AuthorList.fixAuthor_lastNameFirst(fields[4].replaceAll("; ", " and ")));

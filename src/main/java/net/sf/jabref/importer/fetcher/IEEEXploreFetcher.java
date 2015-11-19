@@ -45,6 +45,7 @@ import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.util.Util;
 
 public class IEEEXploreFetcher implements EntryFetcher {
@@ -508,34 +509,34 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")
                         || typeName.equalsIgnoreCase("MIT Press Journals")
                         || typeName.equalsIgnoreCase("Alcatel-Lucent Journal")) {
-                    type = EntryTypes.getType("article");
+                    type = BibtexEntryTypes.ARTICLE;
                     sourceField = "journal";
                 } else if (typeName.equalsIgnoreCase("IEEE Conference Publications")
                         || typeName.equalsIgnoreCase("IET Conference Publications")
                         || typeName.equalsIgnoreCase("VDE Conference Publications")) {
-                    type = EntryTypes.getType("inproceedings");
+                    type = BibtexEntryTypes.INPROCEEDINGS;
                     sourceField = "booktitle";
                 } else if (typeName.equalsIgnoreCase("IEEE Standards") || typeName.equalsIgnoreCase("Standards")) {
-                    type = EntryTypes.getType("standard");
+                    type = BibtexEntryTypes.STANDARD;
                     sourceField = "number";
                 } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
-                    type = EntryTypes.getType("electronic");
+                    type = BibtexEntryTypes.ELECTRONIC;
                     sourceField = "note";
                 } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")
                         || typeName.equalsIgnoreCase("MIT Press eBook Chapters")
                         || typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
-                    type = EntryTypes.getType("incollection");
+                    type = BibtexEntryTypes.INCOLLECTION;
                     sourceField = "booktitle";
                 } else if (typeName.equalsIgnoreCase("Morgan and Claypool eBooks")) {
-                    type = EntryTypes.getType("book");
+                    type = BibtexEntryTypes.BOOK;
                     sourceField = "note";
                 }
             }
 
             if (type == null) {
-                type = EntryTypes.getType("misc");
+                type = BibtexEntryTypes.MISC;
                 sourceField = "note";
-                IEEEXploreFetcher.LOGGER.warn("Type detection failed. Use MISC instead. Type string: " + text);
+                IEEEXploreFetcher.LOGGER.warn("Type detection failed. Using MISC instead. Type string: " + text);
                 unparseable++;
             }
 
