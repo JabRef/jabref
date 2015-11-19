@@ -34,7 +34,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -242,8 +241,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JToggleButton fetcherToggle;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
-    private final AbstractAction
-            close = new CloseDatabaseAction();
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
     private final AbstractAction newDatabaseAction = new NewDatabaseAction(this);
@@ -544,7 +541,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void init() {
-        tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
+        tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern, closeDatabaseAction);
 
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
@@ -1195,7 +1192,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(fileHistory);
 
         file.addSeparator();
-        file.add(close);
+        file.add(closeDatabaseAction);
         file.add(quit);
         mb.add(file);
         //edit.add(test);
@@ -1524,18 +1521,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions = new LinkedList<>();
-        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors,
-                mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, saveSelectedAsPlain, undo,
-                redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
-                selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
-                makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
-                incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
+        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
+                saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, delete, copy, paste, mark, unmark,
+                unmarkAll, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
+                toggleGroups, toggleSearch, makeKeyAction, normalSearch, mergeEntries, cleanupEntries,
+                exportToClipboard, incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
                 openPdf, openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
-                closeDatabaseAction, switchPreview, checkIntegrity,
-                toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
-                abbreviateMedline, unabbreviate, exportAll, exportSelected,
+                closeDatabaseAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
+                databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected,
                 importCurrent, saveAll, dbConnect, dbExport, focusTable));
 
         openDatabaseOnlyActions.addAll(fetcherActions);
@@ -1663,7 +1658,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             String uniqPath = paths.get(i);
             File file = getBasePanelAt(i).getDatabaseFile();
 
-            if (file != null && !uniqPath.equals(file.getName())) {
+            if ((file != null) && !uniqPath.equals(file.getName())) {
                 // remove filename
                 uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
