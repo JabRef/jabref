@@ -1,7 +1,8 @@
 package net.sf.jabref.export.layout.format;
 
 import junit.framework.Assert;
-import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.exporter.layout.format.RemoveBracketsAddComma;
 import org.junit.Before;
 import org.junit.Test;
 
