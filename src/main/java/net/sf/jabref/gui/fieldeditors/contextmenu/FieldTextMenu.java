@@ -12,7 +12,7 @@ import net.sf.jabref.gui.actions.CopyAction;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.NameListNormalizer;
+import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
 
 public class FieldTextMenu implements MouseListener {
     private final FieldEditor field;
@@ -91,7 +91,7 @@ public class FieldTextMenu implements MouseListener {
                 return;
             }
             String input = field.getText();
-            field.setText(NameListNormalizer.normalizeAuthorList(input));
+            field.setText(new AuthorsFormatter().format(input));
         }
     }
 }
