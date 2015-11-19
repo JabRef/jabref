@@ -22,9 +22,9 @@ public class AuthorsMinifierTest {
     public void minifyAuthorNames() {
         expectCorrect("Simon Harrer", "Simon Harrer");
         expectCorrect("Simon Harrer and others", "Simon Harrer and others");
-        expectCorrect("Simon Harrer and Jörg Lenhard", "Simon Harrer and Jörg Lenhard");
-        expectCorrect("Simon Harrer and Jörg Lenhard and Guido Wirtz", "Simon Harrer and others");
-        expectCorrect("Simon Harrer and Jörg Lenhard and Guido Wirtz and others", "Simon Harrer and others");
+        expectCorrect("Simon Harrer and JÃ¶rg Lenhard", "Simon Harrer and JÃ¶rg Lenhard");
+        expectCorrect("Simon Harrer and JÃ¶rg Lenhard and Guido Wirtz", "Simon Harrer and others");
+        expectCorrect("Simon Harrer and JÃ¶rg Lenhard and Guido Wirtz and others", "Simon Harrer and others");
     }
 
     @Test
