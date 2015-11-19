@@ -531,6 +531,18 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         }
                     });
                     return button;
+                } else if ((fieldExtras != null) && fieldExtras.equals("yesno")) {
+                    String[] options = {"", "Yes", "No"};
+                    JComboBox<String> yesno = new JComboBox<>(options);
+                    yesno.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+
+                            editor.setText(((String) yesno.getSelectedItem()).toLowerCase());
+                        }
+                    });
+                    return yesno;
                 } else {
                     return null;
                 }

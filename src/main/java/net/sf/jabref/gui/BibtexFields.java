@@ -233,6 +233,20 @@ public class BibtexFields {
         dummy.setDisplayable(false);
         add(dummy);
 
+        // IEEEtranBSTCTL fields
+        String[] ieeetranbstctlyesnofields = {"ctluse_article_number", "ctluse_paper", "ctluse_url",
+                "ctluseforced_etal", "ctluse_alt_spacing", "ctldash_repeated_names"};
+        for (int i = 0; i < ieeetranbstctlyesnofields.length; i ++) {
+            dummy = new BibtexSingleField(ieeetranbstctlyesnofields[i], false);
+            dummy.setExtras("yesno");
+            add(dummy);
+        }
+
+        String[] ieeetranbstctlnumfields = {"ctlmax_names_forced_etal", "ctlnames_show_etal", "ctlalt_stretch_factor"};
+        for (int i = 0; i < ieeetranbstctlnumfields.length; i++) {
+            add(new BibtexSingleField(ieeetranbstctlnumfields[i], false).setNumeric(true));
+        }
+
         // collect all public fields for the PUBLIC_FIELDS array
         Vector<String> pFields = new Vector<>(fieldSet.size());
         for (BibtexSingleField sField : fieldSet.values()) {
