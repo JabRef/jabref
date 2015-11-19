@@ -46,7 +46,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Tweak of preference defaults
    - Autolink requires that the filename starts with the given BibTeX key and the default filename patterns is key followed by title
    - Default sorting changed
-   - Default label pattern changed from [auth][year] to [authors3][year]
+   - Default label pattern changed from `[auth][year]` to `[authors3][year]`
  - Feature: case changers now leave protected areas (enclosed with curly brakets) alone
  - BREAKING: The BibTeX key generator settings from previous versions are lost
  - BREAKING: LabelPatterns `[auth.etal]`, `[authEtAl]`, `[authors]`, `[authorsN]`, `[authorLast]` and more to omit spaces and commas (and work as described at http://jabref.sourceforge.net/help/LabelPatterns.php)
