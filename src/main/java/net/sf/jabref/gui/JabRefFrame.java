@@ -693,32 +693,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    // The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+    /**
+     * The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+     */
     public void openAction(String filePath) {
         File file = new File(filePath);
-
-        // Check if the file is already open.
-        for (int i = 0; i < this.getTabbedPane().getTabCount(); i++) {
-            BasePanel bp = this.getBasePanelAt(i);
-            if ((bp.getDatabaseFile() != null) && bp.getDatabaseFile().equals(file)) {
-                //The file is already opened, so just raising its tab.
-                this.getTabbedPane().setSelectedComponent(bp);
-                return;
-            }
-        }
-
-        if (file.exists()) {
-            // Run the actual open in a thread to prevent the program
-            // locking until the file is loaded.
-            final File theFile = new File(filePath);
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    open.openIt(theFile, true);
-                }
-            });
-        }
+        // all the logic is done in openIt. Even raising an existing panel
+        open.openFile(file, true);
     }
 
     // General info dialog.  The MacAdapter calls this method when "About"
@@ -1662,7 +1643,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // remove filename
                 uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
-            } else if(file != null && uniqPath.equals(file.getName())) {
+            } else if((file != null) && uniqPath.equals(file.getName())) {
                 // set original filename (again)
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
             }
@@ -2069,19 +2050,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             }
                         }
                     }
-                    int i0 = tabbedPane.getTabCount();
                     String[] names = prefs.getStringArray("savedSession");
+                    ArrayList<File> filesToOpen = new ArrayList<>();
                     for (int i = 0; i < names.length; i++) {
-                        if (!currentFiles.contains(names[i])) {
-                            File file = new File(names[i]);
-                            if (file.exists()) {
-                                LOGGER.debug("Opening last edited file:" + file.getName());
-                                open.openIt(file, i == 0);
-                            }
-                        }
+                        filesToOpen.add(new File(names[i]));
                     }
-                    output(Localization.lang("Files opened") + ": " +
-                            (tabbedPane.getTabCount() - i0));
+                    open.openFiles(filesToOpen, true);
                     running = false;
                 }
             });
