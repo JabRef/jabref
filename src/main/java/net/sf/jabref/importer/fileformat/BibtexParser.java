@@ -888,13 +888,12 @@ public class BibtexParser {
         for (BibtexEntry be : database.getEntries()) {
             if (be.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
-                Object o = entryTypes.get(be.getType().getName().toLowerCase());
-                if (o != null) {
-                    EntryType type = (EntryType) o;
+                EntryType type = entryTypes.get(be.getType().getName().toLowerCase());
+                if (type != null) {
                     be.setType(type);
                 } else {
-                    _pr.addWarning(Localization.lang("unknown entry type") + ": "
- + be.getType().getName() + ":"
+                    // migrate other
+                    _pr.addWarning(Localization.lang("unknown entry type") + ": " + be.getType().getName() + ":"
                             + be.getCiteKey()
                                     + " . " + Localization.lang("Type set to 'other'")
                                     + ".");

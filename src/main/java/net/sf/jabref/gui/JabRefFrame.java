@@ -1684,21 +1684,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     /**
-     * Signal closing of the current tab. Standard warnings will be given if the
-     * database has been changed.
-     */
-    public void closeCurrentTab() {
-        closeDatabaseAction.actionPerformed(null);
-    }
-
-    /**
-     * Close the current tab without giving any warning if the database has been changed.
-     */
-    public void closeCurrentTabNoWarning() {
-        closeDatabaseAction.close();
-    }
-
-    /**
      * Creates icons for the disabled state for all JMenuItems with FontBasedIcons in the given menuElement.
      * This is necessary as Swing is not able to generate default disabled icons for font based icons.
      *
@@ -1823,8 +1808,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             setWindowTitle();
             updateEnabledState(); // FIXME: Man, this is what I call a bug that this is not called.
             output(Localization.lang("Closed database") + '.');
-            // FIXME: why?
-            System.gc(); // Test
+            // update tab titles
+            updateAllTabTitles();
         }
     }
 
