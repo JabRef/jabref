@@ -29,9 +29,9 @@ public class CustomEntryType implements EntryType {
 
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final String name;
-    private String[] required;
+    private final String[] required;
     private final String[] optional;
-    private String[] priOpt;
+    private final String[] priOpt;
 
     public CustomEntryType(String name, List<String> required, List<String> priOpt, List<String> secOpt) {
         this(name, required.toArray(new String[required.size()]), priOpt.toArray(new String[priOpt.size()]),
@@ -54,17 +54,7 @@ public class CustomEntryType implements EntryType {
     }
 
     public CustomEntryType(String name, String required, String optional) {
-        this.name = EntryUtil.capitalizeFirst(name);
-        if (required.isEmpty()) {
-            this.required = new String[0];
-        } else {
-            this.required = required.split(";");
-        }
-        if (optional.isEmpty()) {
-            this.optional = new String[0];
-        } else {
-            this.optional = optional.split(";");
-        }
+        this(name, required.split(";"), optional.split(";"), new String[0]);
     }
 
     @Override
