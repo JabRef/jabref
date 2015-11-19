@@ -74,4 +74,8 @@ public class Abbreviations {
         }
 
     }
+
+    public static String toggleAbbreviation(String text) {
+        return journalAbbrev.getNextAbbreviation(text).orElse(text);
+    }
 }

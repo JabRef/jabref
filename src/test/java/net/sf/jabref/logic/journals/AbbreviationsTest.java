@@ -27,16 +27,16 @@ public class AbbreviationsTest {
         Abbreviations.initializeJournalNames(Globals.prefs);
         String textAbrv = "#IEEE_J_PROC#";
         String textFull = "Proceedings of the IEEE";
-        assertEquals(textAbrv, Abbreviations.journalAbbrev.getNextAbbreviation(textFull).orElse(textFull));
-        assertEquals(textFull, Abbreviations.journalAbbrev.getNextAbbreviation(textAbrv).orElse(textAbrv));
+        assertEquals(textAbrv, Abbreviations.toggleAbbreviation(textFull));
+        assertEquals(textFull, Abbreviations.toggleAbbreviation(textAbrv));
 
         Globals.prefs.putBoolean(JabRefPreferences.USE_IEEE_ABRV, false);
         Abbreviations.initializeJournalNames(Globals.prefs);
         textAbrv = "Proc. IEEE";
         String textAbrv2 = "Proc IEEE";
-        assertEquals(textAbrv, Abbreviations.journalAbbrev.getNextAbbreviation(textFull).orElse(textFull));
-        assertEquals(textAbrv2, Abbreviations.journalAbbrev.getNextAbbreviation(textAbrv).orElse(textAbrv));
-        assertEquals(textFull, Abbreviations.journalAbbrev.getNextAbbreviation(textAbrv2).orElse(textAbrv2));
+        assertEquals(textAbrv, Abbreviations.toggleAbbreviation(textFull));
+        assertEquals(textAbrv2, Abbreviations.toggleAbbreviation(textAbrv));
+        assertEquals(textFull, Abbreviations.toggleAbbreviation(textAbrv2));
 
         Globals.prefs.putBoolean(JabRefPreferences.USE_IEEE_ABRV, oldIEEEsetting);
     }
