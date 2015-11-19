@@ -12,7 +12,6 @@ import java.io.Writer;
 import java.util.Iterator;
 
 public class CustomEntryTypesManager {
-
     private static final Log LOGGER = LogFactory.getLog(CustomEntryTypesManager.class);
 
     /**
