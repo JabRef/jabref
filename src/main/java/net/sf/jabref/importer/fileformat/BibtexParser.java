@@ -888,7 +888,7 @@ public class BibtexParser {
         for (BibtexEntry be : database.getEntries()) {
             if (be.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
-                String name = be.getType().getName();
+                String name = EntryUtil.capitalizeFirst(be.getType().getName());
                 EntryType type = entryTypes.get(name.toLowerCase());
                 if (type != null) {
                     be.setType(type);

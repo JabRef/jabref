@@ -58,7 +58,7 @@ public class LayoutTest {
 
     @Test
     public void testLayoutBibtextype() throws Exception {
-        Assert.assertEquals("Misc", layout("\\bibtextype", "@unknown{bla, author={This\nis\na\ntext}}"));
+        Assert.assertEquals("Unknown", layout("\\bibtextype", "@unknown{bla, author={This\nis\na\ntext}}"));
         Assert.assertEquals("Article", layout("\\bibtextype", "@article{bla, author={This\nis\na\ntext}}"));
         Assert.assertEquals("Misc", layout("\\bibtextype", "@misc{bla, author={This\nis\na\ntext}}"));
     }
