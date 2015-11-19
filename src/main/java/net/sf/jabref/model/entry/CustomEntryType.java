@@ -41,6 +41,7 @@ public class CustomEntryType implements EntryType {
     public CustomEntryType(String name, String[] required, String[] priOpt, String[] secOpt) {
         this.name = EntryUtil.capitalizeFirst(name);
         this.priOpt = priOpt;
+        this.required = required;
         optional = EntryUtil.arrayConcat(priOpt, secOpt);
     }
 
