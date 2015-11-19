@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.CharMatcher;
+
 public class StringUtil {
 
     // contains all possible line breaks, not omitting any break such as "\\n"
@@ -173,7 +175,8 @@ public class StringUtil {
 
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
-        addWrappedLine(result, lines[0].replaceAll("\\s+$", ""), wrapAmount);
+        // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
+        addWrappedLine(result, CharMatcher.WHITESPACE.trimTrailingFrom(lines[0]), wrapAmount); // See
         for (int i = 1; i < lines.length; i++) {
 
             if (!lines[i].trim().equals("")) {
@@ -181,9 +184,8 @@ public class StringUtil {
                 result.append('\t');
                 result.append(Globals.NEWLINE);
                 result.append('\t');
-                String line = lines[i];
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-                line = line.replaceAll("\\s+$", "");
+                String line = CharMatcher.WHITESPACE.trimTrailingFrom(lines[i]);
                 addWrappedLine(result, line, wrapAmount);
             } else {
                 result.append(Globals.NEWLINE);
