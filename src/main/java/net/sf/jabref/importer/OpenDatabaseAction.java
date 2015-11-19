@@ -84,10 +84,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         List<File> filesToOpen = new ArrayList<>();
-        //File fileToOpen = null;
 
         if (showDialog) {
-
             String[] chosen = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib", true);
             if (chosen != null) {
@@ -97,65 +95,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }
                 }
             }
-
-            /*
-            String chosenFile = Globals.getNewFile(frame,
-                    new File(Globals.prefs.get("workingDirectory")), ".bib",
-                    JFileChooser.OPEN_DIALOG, true);
-
-            if (chosenFile != null) {
-                fileToOpen = new File(chosenFile);
-            }*/
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
             filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
         }
 
-        BasePanel toRaise = null;
-        int initialCount = filesToOpen.size();
-        int removed = 0;
-
-        // Check if any of the files are already open:
-        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
-            File file = iterator.next();
-            for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-                BasePanel bp = frame.getBasePanelAt(i);
-                if ((bp.getDatabaseFile() != null) && bp.getDatabaseFile().equals(file)) {
-                    iterator.remove();
-                    removed++;
-                    // See if we removed the final one. If so, we must perhaps
-                    // raise the BasePanel in question:
-                    if (removed == initialCount) {
-                        toRaise = bp;
-                    }
-                    break;
-                }
-            }
-        }
-
-        // Run the actual open in a thread to prevent the program
-        // locking until the file is loaded.
-        if (!filesToOpen.isEmpty()) {
-            final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    for (File theFile : theFiles) {
-                        openIt(theFile, true);
-                    }
-                }
-            });
-            for (File theFile : theFiles) {
-                frame.getFileHistory().newFile(theFile.getPath());
-            }
-        }
-        // If no files are remaining to open, this could mean that a file was
-        // already open. If so, we may have to raise the correct tab:
-        else if (toRaise != null) {
-            frame.output(Localization.lang("File '%0' is already open.", toRaise.getDatabaseFile().getPath()));
-            frame.getTabbedPane().setSelectedComponent(toRaise);
-        }
+        openFiles(filesToOpen, true);
     }
 
 
@@ -180,7 +125,77 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     }
 
 
-    public void openIt(File file, boolean raisePanel) {
+    /**
+     * Opens the given file. If null or 404, nothing happens
+     *
+     * @param file the file, may be null or not existing
+     */
+    public void openFile(File file, boolean raisePanel) {
+        List<File> filesToOpen = new ArrayList<>();
+        filesToOpen.add(file);
+        openFiles(filesToOpen, raisePanel);
+    }
+
+    /**
+     * Opens the given files. If one of it is null or 404, nothing happens
+     *
+     * @param file the file, may be null or not existing
+     */
+    public void openFiles(List<File> filesToOpen, boolean raisePanel) {
+        BasePanel toRaise = null;
+        int initialCount = filesToOpen.size();
+        int removed = 0;
+
+        // Check if any of the files are already open:
+        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
+            File file = iterator.next();
+            for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
+                BasePanel bp = frame.getBasePanelAt(i);
+                if ((bp.getDatabaseFile() != null) && bp.getDatabaseFile().equals(file)) {
+                    iterator.remove();
+                    removed++;
+                    // See if we removed the final one. If so, we must perhaps
+                    // raise the BasePanel in question:
+                    if (removed == initialCount) {
+                        toRaise = bp;
+                    }
+                    // no more bps to check, we found a matching one
+                    break;
+                }
+            }
+        }
+
+        // Run the actual open in a thread to prevent the program
+        // locking until the file is loaded.
+        if (!filesToOpen.isEmpty()) {
+            final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                    for (File theFile : theFiles) {
+                        openTheFile(theFile, raisePanel);
+                    }
+                }
+            });
+            for (File theFile : theFiles) {
+                frame.getFileHistory().newFile(theFile.getPath());
+            }
+        }
+        // If no files are remaining to open, this could mean that a file was
+        // already open. If so, we may have to raise the correct tab:
+        else if (toRaise != null) {
+            frame.output(Localization.lang("File '%0' is already open.", toRaise.getDatabaseFile().getPath()));
+            frame.getTabbedPane().setSelectedComponent(toRaise);
+        }
+
+        frame.output(Localization.lang("Files opened") + ": " + (filesToOpen.size()));
+    }
+
+    /**
+     * @param file the file, may be null or not existing
+     */
+    private void openTheFile(File file, boolean raisePanel) {
         if ((file != null) && file.exists()) {
             File fileToLoad = file;
             frame.output(Localization.lang("Opening") + ": '" + file.getPath() + "'");
