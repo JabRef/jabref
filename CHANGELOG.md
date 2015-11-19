@@ -76,6 +76,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Fixed: When reconfiguring the BibTeX key generator, changes are applied instantly without requiring a restart of JabRef
  - Fixed #250: No hard line breaks after 70 chars in serialized JabRef meta data
  - Fixed [bug 1296](https://sourceforge.net/p/jabref/bugs/1296/): External links in the help open in the standard browser
+ - Fixed behavior of opening files: If an existing database is opened, it is focused now instead of opening it twice.
 
 ### Removed
  - Entry type 'Other' is not selectable anymore as it is no real entry type. Will be converted to 'Misc'.
