@@ -95,7 +95,7 @@ public abstract class DBImporter extends DBImporterExporter {
                 while (rsDatabase.next()) {
                     BibtexDatabase database = new BibtexDatabase();
                     // Find entry type IDs and their mappings to type names:
-                    HashMap<String, BibtexEntryType> types = new HashMap<>();
+                    HashMap<String, EntryType> types = new HashMap<>();
                     try (ResultSet rsEntryType = SQLUtil.queryAllFromTable(conn, "entry_types")) {
                         while (rsEntryType.next()) {
                             types.put(rsEntryType.getString("entry_types_id"),

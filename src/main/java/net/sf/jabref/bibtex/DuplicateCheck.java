@@ -70,7 +70,7 @@ public class DuplicateCheck {
         }
 
         // The check if they have the same required fields:
-        String[] fields = one.getType().getRequiredFields().toArray(new String[0]);
+        String[] fields = one.getType().getRequiredFieldsFlat().toArray(new String[0]);
         double[] req;
         if (fields == null) {
             req = new double[]{0., 0.};

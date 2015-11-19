@@ -9,11 +9,10 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BibtexEntryTests {
-
-    private BibtexEntry entry;
-
-
     @Before
     public void setup() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -21,12 +20,11 @@ public class BibtexEntryTests {
 
     @Test
     public void testDefaultConstructor() {
-        entry = new BibtexEntry();
+        BibtexEntry entry = new BibtexEntry();
     }
 
     @Test
     public void testGetPublicationDate() {
-
         Assert.assertEquals("2003-02",
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }"))
                         .getPublicationDate());
@@ -46,6 +44,50 @@ public class BibtexEntryTests {
         Assert.assertEquals("2003-12",
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }"))
                         .getPublicationDate());
+    }
 
+    @Test
+    public void allFieldsPresentDefault() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        e.setField("author", "abc");
+        e.setField("title", "abc");
+        e.setField("journal", "abc");
+        List<String> requiredFields = new ArrayList<>();
+
+        requiredFields.add("author");
+        requiredFields.add("title");
+        Assert.assertTrue(e.allFieldsPresent(requiredFields, null));
+
+        requiredFields.add("year");
+        Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
+    }
+
+    @Test
+    public void allFieldsPresentOr() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        e.setField("author", "abc");
+        e.setField("title", "abc");
+        e.setField("journal", "abc");
+        List<String> requiredFields = new ArrayList<>();
+
+        // XOR required
+        requiredFields.add("journal/year");
+        Assert.assertTrue(e.allFieldsPresent(requiredFields, null));
+
+        requiredFields.add("year/address");
+        Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
+    }
+
+    @Test
+    public void hasAllRequiredFields() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        e.setField("author", "abc");
+        e.setField("title", "abc");
+        e.setField("journal", "abc");
+
+        Assert.assertFalse(e.hasAllRequiredFields(null));
+
+        e.setField("year", "2015");
+        Assert.assertTrue(e.hasAllRequiredFields(null));
     }
 }

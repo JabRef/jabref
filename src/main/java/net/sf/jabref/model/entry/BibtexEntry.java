@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +48,7 @@ public class BibtexEntry {
 
     private String id;
 
-    private BibtexEntryType type;
+    private EntryType type;
 
     private Map<String, String> fields = new HashMap<>();
 
@@ -66,7 +67,7 @@ public class BibtexEntry {
         this(id, BibtexEntryTypes.OTHER);
     }
 
-    public BibtexEntry(String id, BibtexEntryType type) {
+    public BibtexEntry(String id, EntryType type) {
         Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
 
         this.id = id;
@@ -102,23 +103,23 @@ public class BibtexEntry {
      * complete.
      */
     public boolean hasAllRequiredFields(BibtexDatabase database) {
-        return type.hasAllRequiredFields(this, database);
+        return allFieldsPresent(type.getRequiredFields(), database);
     }
 
     /**
      * Returns this entry's type.
      */
-    public BibtexEntryType getType() {
+    public EntryType getType() {
         return type;
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(BibtexEntryType type) {
+    public void setType(EntryType type) {
         Objects.requireNonNull(type, "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
 
-        BibtexEntryType oldType = this.type;
+        EntryType oldType = this.type;
 
         try {
             // We set the type before throwing the changeEvent, to enable
@@ -277,6 +278,13 @@ public class BibtexEntry {
         return fields.get(KEY_FIELD);
     }
 
+    public boolean hasCiteKey() {
+        if(getCiteKey() == null || getCiteKey().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Sets a number of fields simultaneously. The given HashMap contains field
      * names as keys, each mapped to the value to set.
@@ -349,9 +357,20 @@ public class BibtexEntry {
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     boolean allFieldsPresent(String[] allFields, BibtexDatabase database) {
+        final String orSeparator = "/";
+
         for (String field : allFields) {
-            if (BibtexDatabase.getResolvedField(field, this, database) == null) {
-                return false;
+            // OR fields
+            if(field.contains(orSeparator)) {
+                String[] altFields = field.split(orSeparator);
+
+                if (!atLeastOnePresent(altFields, database)) {
+                    return false;
+                }
+            } else {
+                if (BibtexDatabase.getResolvedField(field, this, database) == null) {
+                    return false;
+                }
             }
         }
         return true;
@@ -361,8 +380,8 @@ public class BibtexEntry {
         return allFieldsPresent(allFields.toArray(new String[allFields.size()]), database);
     }
 
-    boolean atLeastOnePresent(String[] oneFields, BibtexDatabase database) {
-        for (String field : oneFields) {
+    private boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
+        for (String field : fields) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
             if ((value != null) && !value.isEmpty()) {
                 return true;

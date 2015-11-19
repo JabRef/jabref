@@ -29,27 +29,25 @@ Modified for use in JabRef.
 */
 package net.sf.jabref.model.entry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Abstract base class for all BibTex entry types.
  */
-public abstract class BibtexEntryType implements EntryType {
+public abstract class BibLatexEntryType implements EntryType {
     private final List<String> requiredFields;
     private final List<String> optionalFields;
 
-    public BibtexEntryType() {
+    public BibLatexEntryType() {
         requiredFields = new ArrayList<>();
         optionalFields = new ArrayList<>();
-    }
 
-    void addAllOptional(String... fieldNames) {
-        optionalFields.addAll(Arrays.asList(fieldNames));
-    }
-
-    void addAllRequired(String... fieldNames) {
-        requiredFields.addAll(Arrays.asList(fieldNames));
+        // key is always required
+        requiredFields.add("bibtexkey");
     }
 
     @Override
@@ -62,9 +60,12 @@ public abstract class BibtexEntryType implements EntryType {
         return Collections.unmodifiableList(requiredFields);
     }
 
-    @Override
-    public int compareTo(EntryType o) {
-        return getName().compareTo(o.getName());
+    void addAllOptional(String... fieldNames) {
+        optionalFields.addAll(Arrays.asList(fieldNames));
+    }
+
+    void addAllRequired(String... fieldNames) {
+        requiredFields.addAll(Arrays.asList(fieldNames));
     }
 
     public List<String> getPrimaryOptionalFields() {
@@ -88,5 +89,10 @@ public abstract class BibtexEntryType implements EntryType {
             return false;
         }
         return primaryFields.contains(field);
+    }
+
+    @Override
+    public int compareTo(EntryType o) {
+        return getName().compareTo(o.getName());
     }
 }

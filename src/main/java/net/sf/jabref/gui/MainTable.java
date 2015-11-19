@@ -45,7 +45,7 @@ import net.sf.jabref.gui.util.IsMarkedComparator;
 import net.sf.jabref.gui.util.RankingFieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -70,6 +70,7 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
  *
  */
 public class MainTable extends JTable {
+    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -103,8 +104,6 @@ public class MainTable extends JTable {
     private static final int OTHER = 3;
     private static final int BOOLEAN = 4;
     public static final int ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
-
-    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     static {
         MainTable.updateRenderers();
@@ -497,17 +496,16 @@ public class MainTable extends JTable {
     private int getCellStatus(int row, int col) {
         try {
             BibtexEntry be = sortedForGrouping.get(row);
-            BibtexEntryType type = be.getType();
+            EntryType type = be.getType();
             String columnName = getColumnName(col).toLowerCase();
-            if (columnName.equals(BibtexEntry.KEY_FIELD) || type.isRequired(columnName)) {
+            if (columnName.equals(BibtexEntry.KEY_FIELD) || type.getRequiredFieldsFlat().contains(columnName)) {
                 return MainTable.REQUIRED;
             }
-            if (type.isOptional(columnName)) {
+            if (type.getOptionalFields().contains(columnName)) {
                 return MainTable.OPTIONAL;
             }
             return MainTable.OTHER;
         } catch (NullPointerException ex) {
-            //System.out.println("Exception: getCellStatus");
             return MainTable.OTHER;
         }
     }

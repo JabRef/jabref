@@ -35,6 +35,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,7 +45,6 @@ import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.util.Util;
 
 public class IEEEXploreFetcher implements EntryFetcher {
@@ -332,7 +332,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up publication field
-        BibtexEntryType type = entry.getType();
+        EntryType type = entry.getType();
         String sourceField = "";
         if (type.getName().equals("Article")) {
             sourceField = "journal";
@@ -491,7 +491,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             piv = endIndex;
             String text = allText.substring(index, endIndex);
 
-            BibtexEntryType type = null;
+            EntryType type = null;
             String sourceField = null;
 
             String typeName = "";

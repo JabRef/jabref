@@ -60,7 +60,7 @@ public class BibtexParser {
 
     private final PushbackReader pushbackReader;
     private BibtexDatabase database;
-    private HashMap<String, BibtexEntryType> entryTypes;
+    private HashMap<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
     private final FieldContentParser fieldContentParser = new FieldContentParser();
@@ -180,7 +180,7 @@ public class BibtexParser {
                 }
                 skipWhitespace();
                 String entryType = parseTextToken();
-                BibtexEntryType tp = EntryTypes.getType(entryType);
+                EntryType tp = EntryTypes.getType(entryType);
                 boolean isEntry = tp != null;
                 // The entry type name was not recognized. This can mean
                 // that it is a string, preamble, or comment. If so,
@@ -398,7 +398,7 @@ public class BibtexParser {
         return parseBracketedText().toString();
     }
 
-    private BibtexEntry parseEntry(BibtexEntryType tp) throws IOException {
+    private BibtexEntry parseEntry(EntryType tp) throws IOException {
         String id = IdGenerator.next();
         BibtexEntry result = new BibtexEntry(id, tp);
         skipWhitespace();
@@ -890,7 +890,7 @@ public class BibtexParser {
                 // Look up the unknown type name in our map of parsed types:
                 Object o = entryTypes.get(be.getType().getName().toLowerCase());
                 if (o != null) {
-                    BibtexEntryType type = (BibtexEntryType) o;
+                    EntryType type = (EntryType) o;
                     be.setType(type);
                 } else {
                     _pr.addWarning(Localization.lang("unknown entry type") + ": "

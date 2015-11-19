@@ -15,7 +15,9 @@
 */
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class is used to represent an unknown entry type, e.g. encountered
@@ -25,12 +27,19 @@ import net.sf.jabref.model.database.BibtexDatabase;
  * are found. In the meantime, the entries will be assigned an
  * UnknownEntryType giving the name.
  */
-public class UnknownEntryType extends BibtexEntryType {
-
+public class UnknownEntryType implements EntryType {
     private final String name;
+    private final List<String> requiredFields;
+    private final List<String> optionalFields;
 
     public UnknownEntryType(String name) {
         this.name = name;
+
+        requiredFields = new ArrayList<>();
+        optionalFields = new ArrayList<>();
+
+        // key is always required
+        requiredFields.add("bibtexkey");
     }
 
     @Override
@@ -38,10 +47,26 @@ public class UnknownEntryType extends BibtexEntryType {
         return name;
     }
 
-
     @Override
-    public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-        return true;
+    public List<String> getOptionalFields() {
+        return Collections.unmodifiableList(optionalFields);
     }
 
+    @Override
+    public List<String> getRequiredFields() {
+        return Collections.unmodifiableList(requiredFields);
+    }
+
+    public List<String> getPrimaryOptionalFields() {
+        return getOptionalFields();
+    }
+
+    public List<String> getSecondaryOptionalFields() {
+        return Collections.unmodifiableList(new ArrayList<>(0));
+    }
+
+    @Override
+    public int compareTo(EntryType o) {
+        return getName().compareTo(o.getName());
+    }
 }

@@ -30,7 +30,6 @@ import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.jempbox.impl.DateConverter;
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -230,7 +229,7 @@ public class XMPUtil {
                 String value = dict.getString(key);
                 key = key.substring("bibtex/".length());
                 if (key.equals("entrytype")) {
-                    BibtexEntryType type = EntryTypes.getStandardType(value);
+                    EntryType type = EntryTypes.getStandardType(value);
                     if (type != null) {
                         entry.setType(type);
                     }
@@ -430,7 +429,7 @@ public class XMPUtil {
         if ((l != null) && !l.isEmpty()) {
             s = l.get(0);
             if (s != null) {
-                BibtexEntryType type = EntryTypes.getStandardType(s);
+                EntryType type = EntryTypes.getStandardType(s);
                 if (type != null) {
                     entry.setType(type);
                 }

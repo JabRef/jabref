@@ -33,9 +33,9 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -287,7 +287,7 @@ public class PdfContentImporter extends ImportFormat {
             String pages = null;
             // year is a class variable as the method extractYear() uses it;
             String publisher = null;
-            BibtexEntryType type = BibtexEntryTypes.INPROCEEDINGS;
+            EntryType type = BibtexEntryTypes.INPROCEEDINGS;
 
             final String lineBreak = System.lineSeparator();
 

@@ -38,6 +38,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
 
 /*
@@ -277,7 +278,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            return new ParserResult(database, new MetaData(), new HashMap<String, BibtexEntryType>());
+            return new ParserResult(database, new MetaData(), new HashMap<String, EntryType>());
 
         }
     }

@@ -63,10 +63,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.model.entry.EntryConverter;
+import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -95,7 +92,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     // A reference to the entry this object works on.
     private BibtexEntry entry;
 
-    private final BibtexEntryType type;
+    private final EntryType type;
 
     // The action concerned with closing the window.
     private final CloseAction closeAction;
@@ -229,8 +226,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
             } else {
-                optPan = new EntryEditorTab(frame, panel,
-                        entry.getType().getPrimaryOptionalFields(), this,
+                optPan = new EntryEditorTab(frame, panel, entry.getType().getPrimaryOptionalFields(), this,
                         false, true, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
@@ -304,7 +300,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         srcPanel.setFocusCycleRoot(true);
     }
 
-    public BibtexEntryType getType() {
+    public EntryType getType() {
         return type;
     }
 
@@ -1590,12 +1586,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class ChangeTypeAction extends AbstractAction {
 
-        final BibtexEntryType changeType;
+        final EntryType changeType;
 
         final BasePanel changeTypePanel;
 
 
-        public ChangeTypeAction(BibtexEntryType type, BasePanel bp) {
+        public ChangeTypeAction(EntryType type, BasePanel bp) {
             super(type.getName());
             this.changeType = type;
             changeTypePanel = bp;

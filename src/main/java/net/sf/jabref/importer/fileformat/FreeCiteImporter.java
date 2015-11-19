@@ -33,12 +33,12 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.model.entry.EntryType;
 
 /**
  * This importer parses text format citations using the online API of FreeCite -
@@ -117,7 +117,7 @@ public class FreeCiteImporter extends ImportFormat {
 
                     BibtexEntry e = new BibtexEntry();
                     // fallback type
-                    BibtexEntryType type = BibtexEntryTypes.INPROCEEDINGS;
+                    EntryType type = BibtexEntryTypes.INPROCEEDINGS;
 
                     while (!((parser.getEventType() == XMLStreamConstants.END_ELEMENT)
                             && parser.getLocalName().equals("citation"))) {

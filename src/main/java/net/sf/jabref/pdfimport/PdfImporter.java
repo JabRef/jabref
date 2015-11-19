@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,7 +56,6 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.util.Util;
 
 /**
@@ -321,7 +321,7 @@ public class PdfImporter {
         // We want to center the dialog, to make it look nicer.
         PositionWindow.placeDialog(etd, frame);
         etd.setVisible(true);
-        BibtexEntryType type = etd.getChoice();
+        EntryType type = etd.getChoice();
 
         if (type != null) { // Only if the dialog was not cancelled.
             String id = IdGenerator.next();
