@@ -90,6 +90,11 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Remove "edit preamble" from toolbar
  - Remove support to the move-to-SysTray action
 
+## 2.80 - never released
+
+Version 2.80 was intended as intermediate step to JabRef 3.0.
+Since much functionality has changed during development, a release of this version was skipped.
+
 ## [dev_2.11] - unreleased
 
 ### Fixed
