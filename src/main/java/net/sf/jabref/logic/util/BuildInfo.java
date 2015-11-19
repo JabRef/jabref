@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class BuildInfo {
@@ -30,11 +31,15 @@ public class BuildInfo {
     public BuildInfo(String path) {
         Properties properties = new Properties();
 
-        try {
-            properties.load(getClass().getResourceAsStream(path));
+        String versionFromProps = "";
+
+        try (InputStream stream = getClass().getResourceAsStream(path)) {
+            properties.load(stream);
+            versionFromProps = properties.getProperty("version", "dev");
         } catch (IOException | NullPointerException ignored) {
         }
-        version = properties.getProperty("version", "dev");
+
+        version = versionFromProps;
     }
 
     public String getVersion() {
