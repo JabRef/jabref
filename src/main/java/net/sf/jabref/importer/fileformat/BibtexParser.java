@@ -892,12 +892,11 @@ public class BibtexParser {
                 if (type != null) {
                     be.setType(type);
                 } else {
-                    // migrate other
                     _pr.addWarning(Localization.lang("unknown entry type") + ": " + be.getType().getName() + ":"
                             + be.getCiteKey()
-                                    + " . " + Localization.lang("Type set to 'other'")
+                                    + " . " + Localization.lang("Type set to '@MISC'")
                                     + ".");
-                    be.setType(BibtexEntryTypes.OTHER);
+                    be.setType(BibtexEntryTypes.MISC);
                 }
             }
         }

@@ -64,7 +64,7 @@ public class BibtexEntry {
     }
 
     public BibtexEntry(String id) {
-        this(id, BibtexEntryTypes.OTHER);
+        this(id, BibtexEntryTypes.MISC);
     }
 
     public BibtexEntry(String id, EntryType type) {

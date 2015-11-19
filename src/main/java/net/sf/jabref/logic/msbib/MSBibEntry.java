@@ -924,7 +924,7 @@ class MSBibEntry {
     }
 
     private EntryType mapMSBibToBibtexType(String msbib) {
-        EntryType bibtex = BibtexEntryTypes.OTHER;
+        EntryType bibtex = BibtexEntryTypes.MISC;
         if (msbib.equals("Book")) {
             bibtex = BibtexEntryTypes.BOOK;
         } else if (msbib.equals("BookSection")) {
@@ -936,7 +936,7 @@ class MSBibEntry {
         } else if (msbib.equals("Report")) {
             bibtex = BibtexEntryTypes.TECHREPORT;
         } else if (msbib.equals("InternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("ElectronicSource") || msbib.equals("Art") || msbib.equals("SoundRecording") || msbib.equals("Performance") || msbib.equals("Film") || msbib.equals("Interview") || msbib.equals("Patent") || msbib.equals("Case")) {
-            bibtex = BibtexEntryTypes.OTHER;
+            bibtex = BibtexEntryTypes.MISC;
         } else {
             bibtex = BibtexEntryTypes.MISC;
         }

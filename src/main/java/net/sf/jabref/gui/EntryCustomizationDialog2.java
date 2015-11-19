@@ -382,7 +382,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 if (newType != null) {
                     entry.setType(newType);
                 } else {
-                    entry.setType(BibtexEntryTypes.OTHER);
+                    entry.setType(BibtexEntryTypes.MISC);
                 }
             }
         }
