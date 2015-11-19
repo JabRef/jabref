@@ -1667,6 +1667,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // remove filename
                 uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+            } else if(file != null && uniqPath.equals(file.getName())) {
+                // set original filename (again)
+                tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
             }
         }
     }

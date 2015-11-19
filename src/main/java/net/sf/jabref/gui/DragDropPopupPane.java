@@ -94,5 +94,4 @@ public class DragDropPopupPane extends DragDropPane {
         // remove selected tab
         remove(getSelectedIndex());
     }
-
 }
