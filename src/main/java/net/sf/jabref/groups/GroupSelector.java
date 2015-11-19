@@ -597,7 +597,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             moveNodeLeftPopupAction.setNode(node);
             moveNodeRightPopupAction.setNode(node);
             // add/remove entries to/from group
-            BibtexEntry[] selection = frame.basePanel().getSelectedEntries();
+            BibtexEntry[] selection = frame.getCurrentBasePanel().getSelectedEntries();
             if (selection.length > 0) {
                 if (node.getGroup().supportsAdd() && !node.getGroup().containsAll(selection)) {
                     addToGroup.setNode(node);

@@ -315,7 +315,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                     java.util.List<String> unresolvedKeys = OpenOfficePanel.ooBase.refreshCiteMarkers
                             (databases, OpenOfficePanel.style);
                     OpenOfficePanel.ooBase.rebuildBibTextSection(databases, OpenOfficePanel.style);
-                    //ooBase.sync(frame.basePanel().database(), style);
+                    //ooBase.sync(frame.getCurrentBasePanel().database(), style);
                     if (!unresolvedKeys.isEmpty()) {
                         JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                 unresolvedKeys.get(0)), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
@@ -395,10 +395,10 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
                     //ooBase.testFrameHandling();
 
-                    //ooBase.combineCiteMarkers(frame.basePanel().database(), style);
+                    //ooBase.combineCiteMarkers(frame.getCurrentBasePanel().database(), style);
                     //insertUsingBST();
                     //ooBase.testFootnote();
-                    //ooBase.refreshCiteMarkers(frame.basePanel().database(), style);
+                    //ooBase.refreshCiteMarkers(frame.getCurrentBasePanel().database(), style);
                     //ooBase.createBibTextSection(true);
                     //ooBase.clearBibTextSectionContent();
                 } catch (Exception e) {
@@ -470,11 +470,11 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private java.util.List<BibtexDatabase> getBaseList() {
         java.util.List<BibtexDatabase> databases = new ArrayList<>();
         if (Globals.prefs.getBoolean("useAllOpenBases")) {
-            for (int i = 0; i < OpenOfficePanel.frame.baseCount(); i++) {
-                databases.add(OpenOfficePanel.frame.baseAt(i).database());
+            for (int i = 0; i < OpenOfficePanel.frame.getBasePanelCount(); i++) {
+                databases.add(OpenOfficePanel.frame.getBasePanelAt(i).database());
             }
         } else {
-            databases.add(OpenOfficePanel.frame.basePanel().database());
+            databases.add(OpenOfficePanel.frame.getCurrentBasePanel().database());
         }
 
         return databases;
@@ -782,7 +782,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
         }
 
-        BasePanel panel = OpenOfficePanel.frame.basePanel();
+        BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
         final BibtexDatabase database = panel.database();
         if (panel != null) {
             BibtexEntry[] entries = panel.getSelectedEntries();
@@ -824,7 +824,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             if (hadBib)
                 ooBase.clearBibTextSectionContent();
               */
-            BasePanel panel = OpenOfficePanel.frame.basePanel();
+            BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
             final BibtexDatabase database = panel.database();
             Map<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<>();
             if (panel != null) {
@@ -861,7 +861,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     public void insertUsingBST() {
         try {
-            BasePanel panel = OpenOfficePanel.frame.basePanel();
+            BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
             final BibtexDatabase database = panel.database();
             if (panel != null) {
                 BibtexEntry[] entries = panel.getSelectedEntries();
@@ -950,7 +950,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     private void pushEntries(boolean inParenthesis, BibtexEntry[] entries) {
 
-        final BibtexDatabase database = OpenOfficePanel.frame.basePanel().database();
+        final BibtexDatabase database = OpenOfficePanel.frame.getCurrentBasePanel().database();
         if (entries.length > 0) {
 
             String pageInfo = null;

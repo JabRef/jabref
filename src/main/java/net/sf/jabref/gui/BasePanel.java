@@ -24,8 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
@@ -96,7 +98,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
-
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
     public static final int SHOWING_NOTHING = 0;
@@ -107,7 +108,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     /*
      * The database shown in this panel.
      */
-    public BibtexDatabase database;
+    private BibtexDatabase database;
 
     private int mode;
     private EntryEditor currentEditor;
@@ -239,6 +240,26 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     }
 
+    public String getTabTitle() {
+        String title;
+
+        if (getDatabaseFile() == null) {
+            title = GUIGlobals.untitledTitle;
+
+            if (!database().getEntries().isEmpty()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                // This also happens internally at basepanel to ensure consistency line 224
+                title = title + '*';
+            }
+        } else {
+            title = getDatabaseFile().getName();
+        }
+
+        return title;
+    }
+
     public boolean isBaseChanged() {
         return baseChanged;
     }
@@ -247,12 +268,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return mode;
     }
 
-    //Done by MrDlib
     public void setMode(int mode) {
         this.mode = mode;
     }
-
-    //Done by MrDlib
 
     public BibtexDatabase database() {
         return database;
@@ -2254,8 +2272,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
-            if (getFile() != null) {
-                frame.setTabTitle(BasePanel.this, getFile().getName(), getFile().getAbsolutePath());
+            if (getDatabaseFile() != null) {
+                frame.setTabTitle(BasePanel.this, getDatabaseFile().getName(), getDatabaseFile().getAbsolutePath());
             } else {
                 frame.setTabTitle(BasePanel.this, GUIGlobals.untitledTitle, null);
             }
@@ -2566,7 +2584,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //LOGGER.debug("File '"+file.getPath()+"' has been modified.");
         updatedExternally = true;
 
-        final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this, BasePanel.this.getFile());
+        final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this, BasePanel.this.getDatabaseFile());
 
         // Adding the sidepane component is Swing work, so we must do this in the Swing
         // thread:
@@ -2582,7 +2600,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     sidePaneManager.hideComponent(FileUpdatePanel.NAME);
                     sidePaneManager.unregisterComponent(FileUpdatePanel.NAME);
                 }
-                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, getFile(), scanner);
+                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, getDatabaseFile(), scanner);
                 sidePaneManager.register(FileUpdatePanel.NAME, pan);
                 sidePaneManager.show(FileUpdatePanel.NAME);
                 //setUpdatedExternally(false);
@@ -2591,7 +2609,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         };
 
         // Test: running scan automatically in background
-        if ((BasePanel.this.getFile() != null) && !FileBasedLock.waitForFileLock(BasePanel.this.getFile(), 10)) {
+        if ((BasePanel.this.getDatabaseFile() != null) && !FileBasedLock.waitForFileLock(BasePanel.this.getDatabaseFile(), 10)) {
             // The file is locked even after the maximum wait. Do nothing.
             LOGGER.error("File updated externally, but change scan failed because the file is locked.");
             // Perturb the stored timestamp so successive checks are made:
@@ -2611,7 +2629,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     @Override
     public void fileRemoved() {
-        LOGGER.info("File '" + getFile().getPath() + "' has been deleted.");
+        LOGGER.info("File '" + getDatabaseFile().getPath() + "' has been deleted.");
     }
 
     /**
@@ -2650,7 +2668,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      *
      * @return The relevant File, or null if none is defined.
      */
-    public File getFile() {
+    public File getDatabaseFile() {
         return metaData.getFile();
     }
 

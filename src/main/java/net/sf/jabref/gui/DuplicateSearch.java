@@ -54,13 +54,13 @@ public class DuplicateSearch implements Runnable {
 
         boolean autoRemoveExactDuplicates = false;
         panel.output(Localization.lang("Searching for duplicates..."));
-        Object[] keys = panel.database.getKeySet().toArray();
+        Object[] keys = panel.getDatabase().getKeySet().toArray();
         if (keys.length < 2) {
             return;
         }
         bes = new BibtexEntry[keys.length];
         for (int i = 0; i < keys.length; i++) {
-            bes[i] = panel.database.getEntryById((String) keys[i]);
+            bes[i] = panel.getDatabase().getEntryById((String) keys[i]);
         }
 
         SearcherRunnable st = new SearcherRunnable();
@@ -139,16 +139,16 @@ public class DuplicateSearch implements Runnable {
                 // Now, do the actual removal:
                 if (!toRemove.isEmpty()) {
                     for (BibtexEntry entry : toRemove) {
-                        panel.database.removeEntry(entry.getId());
-                        ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
+                        panel.getDatabase().removeEntry(entry.getId());
+                        ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
                     }
                     panel.markBaseChanged();
                 }
                 // and adding merged entries:
                 if (!toAdd.isEmpty()) {
                     for (BibtexEntry entry : toAdd) {
-                        panel.database.insertEntry(entry);
-                        ce.addEdit(new UndoableInsertEntry(panel.database, entry, panel));
+                        panel.getDatabase().insertEntry(entry);
+                        ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     }
                     panel.markBaseChanged();
                 }

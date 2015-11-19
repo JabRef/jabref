@@ -189,7 +189,7 @@ public class FromAuxDialog
         int toSelect = -1;
         for (int i = 0; i < len; i++) {
             dbChooser.addItem(parentTabbedPane.getTitleAt(i));
-            if (parent.baseAt(i) == parent.basePanel()) {
+            if (parent.getBasePanelAt(i) == parent.getCurrentBasePanel()) {
                 toSelect = i;
             }
         }
@@ -242,8 +242,8 @@ public class FromAuxDialog
 
     private void select_actionPerformed() {
         BibtexDatabase db = getGenerateDB();
-        MainTable mainTable = JabRef.jrf.basePanel().mainTable;
-        BibtexDatabase database = JabRef.jrf.basePanel().getDatabase();
+        MainTable mainTable = JabRef.jrf.getCurrentBasePanel().mainTable;
+        BibtexDatabase database = JabRef.jrf.getCurrentBasePanel().getDatabase();
         mainTable.clearSelection();
         for (BibtexEntry newEntry : db.getEntries()) {
             // the entries are not the same objects as in the original database

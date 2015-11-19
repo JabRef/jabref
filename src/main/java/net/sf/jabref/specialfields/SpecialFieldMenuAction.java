@@ -35,6 +35,6 @@ public class SpecialFieldMenuAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        frame.basePanel().runCommand(actionName);
+        frame.getCurrentBasePanel().runCommand(actionName);
     }
 }

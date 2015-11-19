@@ -62,7 +62,7 @@ class DatabaseFileLookup {
             throw new IllegalArgumentException("Passing a 'null' BibtexDatabase.");
         }
         entries = aDatabase.getEntries();
-        possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
+        possibleFilePaths = JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
     }
 
     /**

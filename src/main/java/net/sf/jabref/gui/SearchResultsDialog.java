@@ -157,7 +157,7 @@ public class SearchResultsDialog {
                     = new TransferableBibtexEntry(bes);
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
-                            .setContents(trbe, frame.basePanel());
+                            .setContents(trbe, frame.getCurrentBasePanel());
                     frame.output(Localization.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
                             + Localization.lang("entries")
                             : "1 " + Localization.lang("entry") + '.'));
@@ -489,8 +489,8 @@ public class SearchResultsDialog {
                 if (field.equals("author") || field.equals("editor")) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
-                    if (frame.basePanel() != null) {
-                        return frame.basePanel().tableFormat.formatName
+                    if (frame.getCurrentBasePanel() != null) {
+                        return frame.getCurrentBasePanel().tableFormat.formatName
                                 (entry.getField(field));
                     }
                 }

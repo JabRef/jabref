@@ -609,7 +609,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            BasePanel panel = frame.basePanel();
+            BasePanel panel = frame.getCurrentBasePanel();
             if (panel == null) {
                 return;
             }
@@ -651,7 +651,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            BasePanel panel = frame.basePanel();
+            BasePanel panel = frame.getCurrentBasePanel();
             if (panel == null) {
                 return;
             }

@@ -238,7 +238,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AutoCompleter autoComp = JabRef.jrf.basePanel().getAutoCompleters().get("keywords");
+        AutoCompleter autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);
@@ -274,7 +274,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        BasePanel bp = frame.basePanel();
+        BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;
         }
@@ -410,7 +410,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     private void fillKeyWordList() {
-        BasePanel bp = frame.basePanel();
+        BasePanel bp = frame.getCurrentBasePanel();
         BibtexEntry[] entries = bp.getSelectedEntries();
 
         // fill dialog with values

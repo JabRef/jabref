@@ -369,8 +369,8 @@ public class JabRefDesktop {
                 UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD,
                         oldValue, newValue);
                 entry.setField(Globals.FILE_FIELD, newValue);
-                frame.basePanel().undoManager.addEdit(ce);
-                frame.basePanel().markBaseChanged();
+                frame.getCurrentBasePanel().undoManager.addEdit(ce);
+                frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
                 return openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
             } else {

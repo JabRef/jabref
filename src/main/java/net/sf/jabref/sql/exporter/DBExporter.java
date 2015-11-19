@@ -489,7 +489,7 @@ public abstract class DBExporter extends DBImporterExporter {
      * if (out instanceof Connection) { Object response =
      * SQLUtil.processQueryWithResults(out,
      * "SELECT database_id FROM jabref_database WHERE md5_path=md5('" +
-     * metaData.getFile().getAbsolutePath() + "');"); ResultSet rs =
+     * metaData.getDatabaseFile().getAbsolutePath() + "');"); ResultSet rs =
      * ((Statement) response).getResultSet(); if (rs.next()) return
      * rs.getInt("database_id"); else { insertJabRefDatabase(metaData, out,
      * dbName); return getDatabaseIDByPath(metaData, out, dbName); } } // in

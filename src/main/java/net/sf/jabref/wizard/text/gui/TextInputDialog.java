@@ -488,7 +488,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         if (importedEntries != null) {
             Util.setAutomaticFields(importedEntries, false, false, true);
             for (BibtexEntry e : importedEntries) {
-                JabRef.jrf.basePanel().insertEntry(e);
+                JabRef.jrf.getCurrentBasePanel().insertEntry(e);
             }
             return true;
         } else {

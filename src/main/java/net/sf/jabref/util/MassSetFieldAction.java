@@ -90,7 +90,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         rename = new JRadioButton(Localization.lang("Rename field to") + ":");
         rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
 
-        allFields = frame.basePanel().database().getAllVisibleFields();
+        allFields = frame.getCurrentBasePanel().database().getAllVisibleFields();
 
         for (String f : allFields) {
             field.addItem(f);
@@ -205,7 +205,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        BasePanel bp = frame.basePanel();
+        BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;
         }

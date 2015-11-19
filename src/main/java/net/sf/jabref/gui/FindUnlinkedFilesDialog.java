@@ -599,7 +599,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             @Override
             public void run() {
                 List<String> errors = new LinkedList<>();
-                int count = creatorManager.addEntriesFromFiles(fileList, database, frame.basePanel(),
+                int count = creatorManager.addEntriesFromFiles(fileList, database, frame.getCurrentBasePanel(),
                         entryType,
                         checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
 
@@ -637,7 +637,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonClose.setVisible(true);
         disOrEnableDialog(true);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        frame.basePanel().markBaseChanged();
+        frame.getCurrentBasePanel().markBaseChanged();
     }
 
     /**
@@ -1035,7 +1035,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         if ((userObject instanceof FileNodeWrapper) && node.isLeaf()) {
                             FileNodeWrapper fnw = (FileNodeWrapper) userObject;
                             try {
-                                JabRefDesktop.openExternalViewer(JabRef.jrf.basePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
+                                JabRefDesktop.openExternalViewer(JabRef.jrf.getCurrentBasePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
                                 LOGGER.info("Error opening file", e1);
                             }

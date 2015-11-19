@@ -80,8 +80,8 @@ public class WaitForSaveOperation implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         boolean anySaving = false;
-        for (int i = 0; i < frame.baseCount(); i++) {
-            if (frame.baseAt(i).isSaving()) {
+        for (int i = 0; i < frame.getBasePanelCount(); i++) {
+            if (frame.getBasePanelAt(i).isSaving()) {
                 anySaving = true;
                 break;
             }

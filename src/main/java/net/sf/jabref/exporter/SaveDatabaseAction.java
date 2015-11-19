@@ -65,7 +65,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         success = false;
         cancelled = false;
         fileLockedError = false;
-        if (panel.getFile() == null) {
+        if (panel.getDatabaseFile() == null) {
             saveAs();
         } else {
 
@@ -95,12 +95,12 @@ public class SaveDatabaseAction extends AbstractWorker {
                         @Override
                         public void run() {
 
-                            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
+                            if (!FileBasedLock.waitForFileLock(panel.getDatabaseFile(), 10)) {
                                 // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                                 LOGGER.error("File locked, this will be trouble.");
                             }
 
-                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getFile());
+                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getDatabaseFile());
                             JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                             if (scanner.changesFound()) {
                                 scanner.displayResult(new ChangeScanner.DisplayResultCallback() {
@@ -152,11 +152,10 @@ public class SaveDatabaseAction extends AbstractWorker {
     public void update() {
         if (success) {
             // Reset title of tab
-            frame.setTabTitle(panel, panel.getFile().getName(),
-                    panel.getFile().getAbsolutePath());
-            frame.output(Localization.lang("Saved database") + " '"
-                    + panel.getFile().getPath() + "'.");
+            frame.setTabTitle(panel, panel.getTabTitle(), panel.getDatabaseFile().getAbsolutePath());
+            frame.output(Localization.lang("Saved database") + " '" + panel.getDatabaseFile().getPath() + "'.");
             frame.setWindowTitle();
+            frame.updateAllTabTitles();
         } else if (!cancelled) {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.
@@ -169,7 +168,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (cancelled || (panel.getFile() == null)) {
+        if (cancelled || (panel.getDatabaseFile() == null)) {
             return;
         }
 
@@ -182,13 +181,13 @@ public class SaveDatabaseAction extends AbstractWorker {
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();
 
-            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
+            if (!FileBasedLock.waitForFileLock(panel.getDatabaseFile(), 10)) {
                 success = false;
                 fileLockedError = true;
             }
             else {
                 // Now save the database:
-                success = saveDatabase(panel.getFile(), false, panel.getEncoding());
+                success = saveDatabase(panel.getDatabaseFile(), false, panel.getEncoding());
 
                 try {
                     Globals.fileUpdateMonitor.updateTimeStamp(panel.getFileMonitorHandle());
@@ -389,7 +388,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             // Register so we get notifications about outside changes to the file.
             try {
-                panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel, panel.getFile()));
+                panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel, panel.getDatabaseFile()));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

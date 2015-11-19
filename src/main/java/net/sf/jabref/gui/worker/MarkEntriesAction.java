@@ -68,7 +68,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
 
     @Override
     public void run() {
-        BasePanel panel = frame.basePanel();
+        BasePanel panel = frame.getCurrentBasePanel();
         BibtexEntry[] bes = panel.getSelectedEntries();
 
         // used at update() to determine output string
@@ -92,11 +92,11 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
             outputStr = Localization.lang("No entries selected.");
             break;
         case 1:
-            frame.basePanel().markBaseChanged();
+            frame.getCurrentBasePanel().markBaseChanged();
             outputStr = Localization.lang("Marked selected entry");
             break;
         default:
-            frame.basePanel().markBaseChanged();
+            frame.getCurrentBasePanel().markBaseChanged();
             outputStr = Localization.lang("Marked all %0 selected entries", Integer.toString(besLength));
             break;
         }

@@ -50,6 +50,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibtexDatabase {
+    private static final Log LOGGER = LogFactory.getLog(BibtexDatabase.class);
 
     private final Map<String, BibtexEntry> entries = new ConcurrentHashMap<>();
 
@@ -60,8 +61,6 @@ public class BibtexDatabase {
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
     private boolean followCrossrefs = true;
-
-    private static final Log LOGGER = LogFactory.getLog(BibtexDatabase.class);
 
     /**
      * use a map instead of a set since i need to know how many of each key is

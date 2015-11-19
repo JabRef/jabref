@@ -50,7 +50,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        panel = frame.basePanel();
+        panel = frame.getCurrentBasePanel();
 
         // Check if a BasePanel exists:
         if (panel == null) {

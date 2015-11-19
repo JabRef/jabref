@@ -33,18 +33,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
+import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -62,6 +58,7 @@ import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -126,10 +123,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             IntegrityCheck check = new IntegrityCheck();
-            List<IntegrityMessage> messages = check.checkBibtexDatabase(basePanel().database());
+            List<IntegrityMessage> messages = check.checkBibtexDatabase(getCurrentBasePanel().database());
 
             if (messages.isEmpty()) {
-                JOptionPane.showMessageDialog(basePanel(), Localization.lang("No problems found."));
+                JOptionPane.showMessageDialog(getCurrentBasePanel(), Localization.lang("No problems found."));
             } else {
                 // prepare data model
                 Object[][] model = new Object[messages.size()][3];
@@ -144,7 +141,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // construct view
                 JTable table = new JTable(
                         model,
-                        new Object[] {"key", "field", "message"}
+                        new Object[]{"key", "field", "message"}
                 );
 
                 table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -157,7 +154,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         if (!e.getValueIsAdjusting()) {
                             String citeKey = (String) model[table.getSelectedRow()][0];
                             String fieldName = (String) model[table.getSelectedRow()][1];
-                            basePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
+                            getCurrentBasePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
                         }
                     }
                 });
@@ -255,7 +252,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction donationAction = new DonateAction();
     private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), helpDiag,
             GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
- prefs.getKey(KeyBinds.HELP));
+            prefs.getKey(KeyBinds.HELP));
     private final AbstractAction contents = new HelpAction(Localization.menuTitle("Help contents"), helpDiag,
             GUIGlobals.helpContents, Localization.lang("Help contents"),
             IconTheme.JabRefIcon.HELP_CONTENTS.getIcon());
@@ -365,10 +362,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.HIDE_SHOW_TOOLBAR));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Hide/show toolbar"));
         }
+
         @Override
         public void actionPerformed(ActionEvent e) {
             tlb.setVisible(!tlb.isVisible());
-        }};
+        }
+    };
     private final AbstractAction toggleGroups = new GeneralAction(Actions.TOGGLE_GROUPS,
             Localization.menuTitle("Toggle groups interface"),
             Localization.lang("Toggle groups interface"),
@@ -498,7 +497,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
 
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
-FindUnlinkedFilesDialog.ACTION_COMMAND,
+            FindUnlinkedFilesDialog.ACTION_COMMAND,
             FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
             prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION)
     );
@@ -518,7 +517,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey(KeyBinds.NEW_ENTRY));
     // @formatter:off
-    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[] {
+    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[]{
             new NewEntryAction(this, "article", prefs.getKey(KeyBinds.NEW_ARTICLE)),
             new NewEntryAction(this, "book", prefs.getKey(KeyBinds.NEW_BOOK)),
             new NewEntryAction(this, "phdthesis", prefs.getKey(KeyBinds.NEW_PHDTHESIS)),
@@ -611,7 +610,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             public void stateChanged(ChangeEvent e) {
                 markActiveBasePanel();
 
-                BasePanel bp = basePanel();
+                BasePanel bp = getCurrentBasePanel();
                 if (bp != null) {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
                     searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
@@ -648,7 +647,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     /**
      * Tries to open a browser with the given URL
-     *
+     * <p>
      * All errors are logged
      *
      * @param url the url to open
@@ -665,14 +664,14 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     public void setWindowTitle() {
         // Set window title:
-        BasePanel bp = basePanel();
+        BasePanel bp = getCurrentBasePanel();
         if (bp == null) {
             setTitle(GUIGlobals.frameTitle);
             return;
         }
         String star = bp.isBaseChanged() ? "*" : "";
-        if (bp.getFile() != null) {
-            setTitle(GUIGlobals.frameTitle + " - " + bp.getFile().getPath() + star);
+        if (bp.getDatabaseFile() != null) {
+            setTitle(GUIGlobals.frameTitle + " - " + bp.getDatabaseFile().getPath() + star);
         } else {
             setTitle(GUIGlobals.frameTitle + " - " + GUIGlobals.untitledTitle + star);
         }
@@ -703,8 +702,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
         // Check if the file is already open.
         for (int i = 0; i < this.getTabbedPane().getTabCount(); i++) {
-            BasePanel bp = this.baseAt(i);
-            if ((bp.getFile() != null) && bp.getFile().equals(file)) {
+            BasePanel bp = this.getBasePanelAt(i);
+            if ((bp.getDatabaseFile() != null) && bp.getDatabaseFile().equals(file)) {
                 //The file is already opened, so just raising its tab.
                 this.getTabbedPane().setSelectedComponent(bp);
                 return;
@@ -777,8 +776,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
         dispose();
 
-        if (basePanel() != null) {
-            basePanel().saveDividerLocation();
+        if (getCurrentBasePanel() != null) {
+            getCurrentBasePanel().saveDividerLocation();
         }
 
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
@@ -819,7 +818,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
         // Let the search interface store changes to prefs.
         // But which one? Let's use the one that is visible.
-        if (basePanel() != null) {
+        if (getCurrentBasePanel() != null) {
             searchManager.updatePrefs();
         }
 
@@ -854,15 +853,15 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         Vector<String> filenames = new Vector<>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (baseAt(i).isBaseChanged()) {
+                if (getBasePanelAt(i).isBaseChanged()) {
                     tabbedPane.setSelectedIndex(i);
                     Object[] options = {Localization.lang("Save changes"),
                             Localization.lang("Discard changes"),
                             Localization.lang("Return to JabRef")};
                     String filename;
 
-                    if (baseAt(i).getFile() != null) {
-                        filename = baseAt(i).getFile().getAbsolutePath();
+                    if (getBasePanelAt(i).getDatabaseFile() != null) {
+                        filename = getBasePanelAt(i).getDatabaseFile().getAbsolutePath();
                     } else {
                         filename = GUIGlobals.untitledTitle;
                     }
@@ -878,8 +877,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                     if (answer == JOptionPane.YES_OPTION) {
                         // The user wants to save.
                         try {
-                            //basePanel().runCommand("save");
-                            SaveDatabaseAction saveAction = new SaveDatabaseAction(basePanel());
+                            //getCurrentBasePanel().runCommand("save");
+                            SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
                             saveAction.runCommand();
                             if (saveAction.isCancelled() || !saveAction.isSuccess()) {
                                 // The action was either cancelled or unsuccessful.
@@ -896,8 +895,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                     }
                 }
 
-                if (baseAt(i).getFile() != null) {
-                    filenames.add(baseAt(i).getFile().getAbsolutePath());
+                if (getBasePanelAt(i).getDatabaseFile() != null) {
+                    filenames.add(getBasePanelAt(i).getDatabaseFile().getAbsolutePath());
                 }
             }
         }
@@ -905,7 +904,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         if (close) {
 
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (baseAt(i).isSaving()) {
+                if (getBasePanelAt(i).isSaving()) {
                     // There is a database still being saved, so we need to wait.
                     WaitForSaveOperation w = new WaitForSaveOperation(this);
                     w.show(); // This method won't return until cancelled or the save operation is done.
@@ -1018,11 +1017,11 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
      *
      * @param i Index of base
      */
-    public BasePanel baseAt(int i) {
+    public BasePanel getBasePanelAt(int i) {
         return (BasePanel) tabbedPane.getComponentAt(i);
     }
 
-    public void showBaseAt(int i) {
+    public void showBasePanelAt(int i) {
         tabbedPane.setSelectedIndex(i);
     }
 
@@ -1033,14 +1032,14 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
     /**
      * Returns the currently viewed BasePanel.
      */
-    public BasePanel basePanel() {
+    public BasePanel getCurrentBasePanel() {
         return (BasePanel) tabbedPane.getSelectedComponent();
     }
 
     /**
      * @return the BasePanel count.
      */
-    public int baseCount() {
+    public int getBasePanelCount() {
         return tabbedPane.getComponentCount();
     }
 
@@ -1390,7 +1389,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
     public void addParserResult(ParserResult pr, boolean raisePanel) {
         if (pr.toOpenTab()) {
             // Add the entries to the open tab.
-            BasePanel panel = basePanel();
+            BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
                 addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
@@ -1514,7 +1513,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     public void stopShowingSearchResults() {
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            baseAt(i).stopShowingSearchResults();
+            getBasePanelAt(i).stopShowingSearchResults();
         }
     }
 
@@ -1577,7 +1576,6 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
 
     private int previousTabCount = -1;
 
-
     /**
      * Enable or Disable all actions based on the number of open tabs.
      * <p>
@@ -1609,14 +1607,13 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         // We want to notify all tabs about the changes to
         // avoid problems when changing the column set.
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            BasePanel bf = baseAt(i);
+            BasePanel bf = getBasePanelAt(i);
 
             // Update tables:
-            if (bf.database != null) {
+            if (bf.getDatabase() != null) {
                 bf.setupMainPanel();
 
             }
-
         }
     }
 
@@ -1634,26 +1631,53 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         return bp;
     }
 
-    public void addTab(BasePanel bp, File file, boolean raisePanel) {
-        String title;
-        if (file == null) {
-            title = GUIGlobals.untitledTitle;
-            if (!bp.database().getEntries().isEmpty()) {
-                // if the database is not empty and no file is assigned,
-                // the database came from an import and has to be treated somehow
-                // -> mark as changed
-                // This also happens internally at basepanel to ensure consistency
-                title = title + '*';
+
+    private List<String> collectDatabaseFilePaths() {
+        List<String> dbPaths = new ArrayList<>(getBasePanelCount());
+
+        for (int i = 0; i < getBasePanelCount(); i++) {
+            try {
+                // db file exists
+                if(getBasePanelAt(i).getDatabaseFile() == null) {
+                    dbPaths.add("");
+                } else {
+                    dbPaths.add(getBasePanelAt(i).getDatabaseFile().getCanonicalPath());
+                }
+            } catch (IOException ex) {
+                LOGGER.error("Invalid database file path: " + ex.getMessage());
             }
-        } else {
-            title = file.getName();
         }
-        // idea: "<html><div style='padding:2px 5px;'>" + title + "</div></html>" instead of "title" to get some space around.
-        // However, this causes https://sourceforge.net/p/jabref/bugs/1293/
-        // Therefore, plain "title" is used
-        tabbedPane.add(title, bp);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1,
-                file != null ? file.getAbsolutePath() : null);
+        return dbPaths;
+    }
+
+    private List<String> getUniquePathParts() {
+        List<String> dbPaths = collectDatabaseFilePaths();
+        List<String> uniquePaths = FileUtil.uniquePathSubstrings(dbPaths);
+
+        return uniquePaths;
+    }
+
+    public void updateAllTabTitles() {
+        List<String> paths = getUniquePathParts();
+        for (int i = 0; i < getBasePanelCount(); i++) {
+            String uniqPath = paths.get(i);
+            File file = getBasePanelAt(i).getDatabaseFile();
+
+            if (file != null && !uniqPath.equals(file.getName())) {
+                // remove filename
+                uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
+                tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+            }
+        }
+    }
+
+    public void addTab(BasePanel bp, File file, boolean raisePanel) {
+        // add tab
+        tabbedPane.add(bp.getTabTitle(), bp);
+        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file != null ? file.getAbsolutePath() : null);
+        // update all tab titles
+        updateAllTabTitles();
+
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
         }
@@ -1678,16 +1702,16 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
      * Creates icons for the disabled state for all JMenuItems with FontBasedIcons in the given menuElement.
      * This is necessary as Swing is not able to generate default disabled icons for font based icons.
      *
-     * @param menuElement   the menuElement for which disabled icons should be generated
+     * @param menuElement the menuElement for which disabled icons should be generated
      */
     public void createDisabledIconsForMenuEntries(MenuElement menuElement) {
-        for(MenuElement subElement : menuElement.getSubElements()) {
-            if((subElement instanceof JMenu) || (subElement instanceof JPopupMenu)) {
+        for (MenuElement subElement : menuElement.getSubElements()) {
+            if ((subElement instanceof JMenu) || (subElement instanceof JPopupMenu)) {
                 createDisabledIconsForMenuEntries(subElement);
             } else if (subElement instanceof JMenuItem) {
                 JMenuItem item = (JMenuItem) subElement;
-                if(item.getIcon() instanceof IconTheme.FontBasedIcon) {
-                    item.setDisabledIcon(((IconTheme.FontBasedIcon)item.getIcon()).createDisabledIcon());
+                if (item.getIcon() instanceof IconTheme.FontBasedIcon) {
+                    item.setDisabledIcon(((IconTheme.FontBasedIcon) item.getIcon()).createDisabledIcon());
                 }
             }
         }
@@ -1752,11 +1776,11 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             // Ask here if the user really wants to close, if the base
             // has not been saved since last save.
             boolean close = true;
-            if (basePanel() == null) { // when it is initially empty
+            if (getCurrentBasePanel() == null) { // when it is initially empty
                 return; // nbatada nov 7
             }
 
-            if (basePanel().isBaseChanged()) {
+            if (getCurrentBasePanel().isBaseChanged()) {
                 int answer = JOptionPane.showConfirmDialog(JabRefFrame.this,
                         Localization.lang("Database has changed. Do you want to save before closing?"),
                         Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
@@ -1766,7 +1790,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                 if (answer == JOptionPane.YES_OPTION) {
                     // The user wants to save.
                     try {
-                        SaveDatabaseAction saveAction = new SaveDatabaseAction(basePanel());
+                        SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
                         saveAction.runCommand();
                         if (saveAction.isCancelled() || !saveAction.isSuccess()) {
                             // The action either not cancelled or unsuccessful.
@@ -1789,7 +1813,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         }
 
         public void close() {
-            BasePanel pan = basePanel();
+            BasePanel pan = getCurrentBasePanel();
             pan.cleanUp();
             AutoSaveManager.deleteAutoSaveFile(pan); // Delete autosave
             tabbedPane.remove(pan);
@@ -1832,22 +1856,21 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
      * @param entries   The entries to add.
      * @param openInNew Should the entries be imported into a new database?
      */
-    private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries,
- final boolean openInNew) {
-            SwingUtilities.invokeLater(new Runnable() {
+    private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries, final boolean openInNew) {
+        SwingUtilities.invokeLater(new Runnable() {
 
-                @Override
-                public void run() {
-                    ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
-                            panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"),
-                            openInNew);
-                    diag.addEntries(entries);
-                    diag.entryListComplete();
-                    PositionWindow.placeDialog(diag, JabRefFrame.this);
-                    diag.setVisible(true);
-                    diag.toFront();
-                }
-            });
+            @Override
+            public void run() {
+                ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
+                        panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"),
+                        openInNew);
+                diag.addEntries(entries);
+                diag.entryListComplete();
+                PositionWindow.placeDialog(diag, JabRefFrame.this);
+                diag.setVisible(true);
+                diag.toFront();
+            }
+        });
     }
 
     public FileHistory getFileHistory() {
@@ -1861,7 +1884,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
      */
     public void setPreviewActive(boolean enabled) {
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            baseAt(i).setPreviewActive(enabled);
+            getBasePanelAt(i).setPreviewActive(enabled);
         }
     }
 
@@ -2002,14 +2025,14 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                         if (answer == JOptionPane.YES_OPTION) {
                             // The user wants to save.
                             try {
-                                basePanel().runCommand(Actions.SAVE);
+                                getCurrentBasePanel().runCommand(Actions.SAVE);
                             } catch (Throwable ignored) {
                                 // Ignored
                             }
                         }
                     }
-                    if (baseAt(i).getFile() != null) {
-                        filenames.add(baseAt(i).getFile().getPath());
+                    if (getBasePanelAt(i).getDatabaseFile() != null) {
+                        filenames.add(getBasePanelAt(i).getDatabaseFile().getPath());
                     }
                 }
             }
@@ -2058,8 +2081,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
                     HashSet<String> currentFiles = new HashSet<>();
                     if (tabbedPane.getTabCount() > 0) {
                         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                            if (baseAt(i).getFile() != null) {
-                                currentFiles.add(baseAt(i).getFile().getPath());
+                            if (getBasePanelAt(i).getDatabaseFile() != null) {
+                                currentFiles.add(getBasePanelAt(i).getDatabaseFile().getPath());
                             }
                         }
                     }
@@ -2091,7 +2114,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
         public ChangeTabAction(boolean next) {
             // @formatter:off
             putValue(Action.NAME, next ? Localization.menuTitle("Next tab") :
-                Localization.menuTitle("Previous tab"));
+                    Localization.menuTitle("Previous tab"));
             // @formatter:on
             this.next = next;
             putValue(Action.ACCELERATOR_KEY,
@@ -2214,7 +2237,7 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             if (propertiesDialog == null) {
                 propertiesDialog = new DatabasePropertiesDialog(JabRefFrame.this);
             }
-            propertiesDialog.setPanel(basePanel());
+            propertiesDialog.setPanel(getCurrentBasePanel());
             PositionWindow.placeDialog(propertiesDialog, JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }
@@ -2235,10 +2258,10 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             JabRefPreferences.getInstance();
             if (bibtexKeyPatternDialog == null) {
                 // if no instance of BibtexKeyPatternDialog exists, create new one
-                bibtexKeyPatternDialog = new BibtexKeyPatternDialog(JabRefFrame.this, basePanel());
+                bibtexKeyPatternDialog = new BibtexKeyPatternDialog(JabRefFrame.this, getCurrentBasePanel());
             } else {
                 // BibtexKeyPatternDialog allows for updating content based on currently selected panel
-                bibtexKeyPatternDialog.setPanel(basePanel());
+                bibtexKeyPatternDialog.setPanel(getCurrentBasePanel());
             }
             PositionWindow.placeDialog(bibtexKeyPatternDialog, JabRefFrame.this);
             bibtexKeyPatternDialog.setVisible(true);
@@ -2259,8 +2282,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize + 1);
             Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize + 1);
-            for (int i = 0; i < baseCount(); i++) {
-                baseAt(i).updateTableFont();
+            for (int i = 0; i < getBasePanelCount(); i++) {
+                getBasePanelAt(i).updateTableFont();
             }
         }
     }
@@ -2281,8 +2304,8 @@ FindUnlinkedFilesDialog.ACTION_COMMAND,
             GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize - 1);
             Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize - 1);
-            for (int i = 0; i < baseCount(); i++) {
-                baseAt(i).updateTableFont();
+            for (int i = 0; i < getBasePanelCount(); i++) {
+                getBasePanelAt(i).updateTableFont();
             }
         }
     }

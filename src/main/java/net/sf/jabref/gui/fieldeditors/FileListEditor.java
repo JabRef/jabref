@@ -437,7 +437,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                             + " " + Localization.lang("No files found."));
 
                     // auto download file as no file found before
-                    frame.basePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
+                    frame.getCurrentBasePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
                 }
                 // reset
                 auto.setEnabled(true);
@@ -462,7 +462,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
         }
         DownloadExternalFile def = new DownloadExternalFile(frame,
-                frame.basePanel().metaData(), bibtexKey);
+                frame.getCurrentBasePanel().metaData(), bibtexKey);
         try {
             def.download(this);
         } catch (IOException ex) {

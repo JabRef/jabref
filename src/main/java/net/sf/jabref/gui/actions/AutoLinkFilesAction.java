@@ -35,14 +35,14 @@ public class AutoLinkFilesAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent event) {
         ArrayList<BibtexEntry> entries = new ArrayList<>();
-        Collections.addAll(entries, JabRef.jrf.basePanel().getSelectedEntries());
+        Collections.addAll(entries, JabRef.jrf.getCurrentBasePanel().getSelectedEntries());
         if (entries.isEmpty()) {
-            JabRef.jrf.basePanel().output(Localization.lang("No entries selected."));
+            JabRef.jrf.getCurrentBasePanel().output(Localization.lang("No entries selected."));
             return;
         }
         JDialog diag = new JDialog(JabRef.jrf, true);
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
-        Runnable runnable = Util.autoSetLinks(entries, nc, null, null, JabRef.jrf.basePanel().metaData(), new ActionListener() {
+        Runnable runnable = Util.autoSetLinks(entries, nc, null, null, JabRef.jrf.getCurrentBasePanel().metaData(), new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -50,8 +50,8 @@ public class AutoLinkFilesAction extends AbstractAction {
                     // entry has been updated in Util.autoSetLinks, only treat nc and status message
                     if (nc.hasEdits()) {
                         nc.end();
-                        JabRef.jrf.basePanel().undoManager.addEdit(nc);
-                        JabRef.jrf.basePanel().markBaseChanged();
+                        JabRef.jrf.getCurrentBasePanel().undoManager.addEdit(nc);
+                        JabRef.jrf.getCurrentBasePanel().markBaseChanged();
                     }
                     JabRef.jrf.output(Localization.lang("Finished autosetting external links."));
                 } else {
