@@ -58,8 +58,7 @@ public class CustomEntryType implements EntryType {
         if (required.isEmpty()) {
             this.required = new String[0];
         } else {
-            parseRequiredFields(required);
-
+            this.required = required.split(";");
         }
         if (optional.isEmpty()) {
             this.optional = new String[0];
@@ -71,10 +70,6 @@ public class CustomEntryType implements EntryType {
     @Override
     public int compareTo(EntryType o) {
         return getName().compareTo(o.getName());
-    }
-
-    private void parseRequiredFields(String req) {
-        String[] parts = req.split(";");
     }
 
     @Override
