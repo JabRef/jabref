@@ -226,6 +226,7 @@ public class JabRefPreferences {
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
     public static final String HISTORY_SIZE = "historySize";
+    public static final String RECENT_FILES = "recentFiles";
     public static final String GENERAL_FIELDS = "generalFields";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";

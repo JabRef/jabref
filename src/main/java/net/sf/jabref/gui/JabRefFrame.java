@@ -221,7 +221,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     + ':', SwingConstants.LEFT);
     private final JProgressBar progressBar = new JProgressBar();
 
-    private final FileHistory fileHistory = new FileHistory(prefs, this);
+    private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 
     // The help window.
     public final HelpDialog helpDiag = new HelpDialog(this);
@@ -1837,7 +1837,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         });
     }
 
-    public FileHistory getFileHistory() {
+    public FileHistoryMenu getFileHistory() {
         return fileHistory;
     }
 
