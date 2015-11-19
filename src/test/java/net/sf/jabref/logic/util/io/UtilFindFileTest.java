@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.AssertUtil;
 import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.testutils.AssertUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.FileBasedTestCase;
 import org.junit.Assert;
