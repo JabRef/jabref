@@ -56,14 +56,13 @@ public class SearchBar extends JPanel {
     }
 
     private final BasePanel basePanel;
-    private final SearchObservable searchObservable;
+    // TODO make final
+    private SearchObservable searchObservable = new SearchObservable();
 
     private JSearchTextField searchField;
 
     private JRadioButtonMenuItem modeFloat, modeLiveFilter;
-
     private JMenu settings;
-    private JCheckBoxMenuItem highlightWords, autoComplete;
 
     private final JCheckBox caseSensitive;
     private final JCheckBox regularExp;
@@ -81,11 +80,13 @@ public class SearchBar extends JPanel {
      *
      * @param frame the main window
      */
-    public SearchBar(BasePanel basePanel, SearchObservable searchObservable) {
+    public SearchBar(BasePanel basePanel) {
         super();
 
         this.basePanel = basePanel;
-        this.searchObservable = searchObservable;
+        //TODO observable
+        //this.searchObservable = searchObservable;
+
         worker = new SearchWorker(basePanel);
 
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
@@ -101,12 +102,8 @@ public class SearchBar extends JPanel {
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
         openCurrentResultsInDialog.addActionListener(ae -> {
             SearchResultsDialog searchDialog = new SearchResultsDialog(basePanel.frame(), Localization.lang("Search results in database %0 for %1",
-                    basePanel.getFile().getName(), this.getSearchQuery().toString()));
-            for (BibtexEntry entry : basePanel.getDatabase().getEntries()) {
-                if (entry.isSearchHit()) {
-                    searchDialog.addEntry(entry, basePanel);
-                }
-            }
+                    basePanel.getDatabaseFile().getName(), this.getSearchQuery().toString()));
+            basePanel.getDatabase().getEntries().stream().filter(BibtexEntry::isSearchHit).forEach(entry -> searchDialog.addEntry(entry, basePanel));
             searchDialog.selectFirstEntry();
             searchDialog.setVisible(true);
         });
@@ -118,7 +115,7 @@ public class SearchBar extends JPanel {
         this.add(searchIcon);
         initSearchField();
         this.add(searchField);
-        JButton button = new JButton(Localization.lang("Settings"));
+        JButton button = new JButton(Localization.lang("View"));
         JPopupMenu settingsMenu = createSettingsMenu();
         button.addActionListener(l -> {
             settingsMenu.show(button, 0, button.getHeight());
@@ -165,13 +162,6 @@ public class SearchBar extends JPanel {
         initSearchModeMenu();
         menu.add(getSearchModeMenuItem(SearchMode.FILTER));
         menu.add(getSearchModeMenuItem(SearchMode.FLOAT));
-        menu.addSeparator();
-        highlightWords = new JCheckBoxMenuItem(Localization.lang("Highlight Words"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS));
-        highlightWords.addActionListener(ae -> updatePrefs());
-        autoComplete = new JCheckBoxMenuItem(Localization.lang("Autocomplete names"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE));
-        autoComplete.addActionListener(ae -> updatePrefs());
-        menu.add(highlightWords);
-        menu.add(autoComplete);
         return menu;
     }
 
@@ -184,15 +174,14 @@ public class SearchBar extends JPanel {
             // Create menu items
             switch (mode) {
             case FLOAT:
-                modeFloat = new JRadioButtonMenuItem(mode.getDisplayName(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FLOAT));
+                modeFloat = new JRadioButtonMenuItem(String.format("%s - %s", mode.getDisplayName(), mode.getToolTipText()),
+                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FLOAT));
                 break;
             case FILTER:
-                modeLiveFilter = new JRadioButtonMenuItem(mode.getDisplayName(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_LIVE_FILTER));
+                modeLiveFilter = new JRadioButtonMenuItem(String.format("%s - %s", mode.getDisplayName(), mode.getToolTipText()),
+                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_LIVE_FILTER));
                 break;
             }
-
-            // Set tooltips on menu items
-            getSearchModeMenuItem(mode).setToolTipText(mode.getToolTipText());
 
             // Add menu item to group
             searchMethod.add(getSearchModeMenuItem(mode));
@@ -290,9 +279,6 @@ public class SearchBar extends JPanel {
 
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE, caseSensitive.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_REG_EXP, regularExp.isSelected());
-
-        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS, highlightWords.isSelected());
-        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE, autoComplete.isSelected());
     }
 
     /**

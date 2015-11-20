@@ -31,7 +31,7 @@ class GlobalSearchWorker extends AbstractWorker {
     public void run() {
         // Search all databases
         for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-            BasePanel basePanel = frame.baseAt(i);
+            BasePanel basePanel = frame.getBasePanelAt(i);
             for (BibtexEntry entry : basePanel.getDatabase().getEntries()) {
                 if (searchQuery.isMatch(entry)) {
                     dialog.addEntry(entry, basePanel);

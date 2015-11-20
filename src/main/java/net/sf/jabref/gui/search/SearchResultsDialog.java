@@ -47,7 +47,6 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.IconComparator;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.PreviewPanel;
