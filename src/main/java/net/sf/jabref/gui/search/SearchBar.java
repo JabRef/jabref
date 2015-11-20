@@ -123,7 +123,8 @@ public class SearchBar extends JPanel {
         toolBar.add(button);
         toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);
-        JButton globalSearch = new JButton(Localization.lang("Search in all open databases"));
+        JButton globalSearch = new JButton(Localization.lang("Search globally"));
+        globalSearch.setToolTipText(Localization.lang("Search in all open databases"));
         globalSearch.addActionListener(l -> {
             AbstractWorker worker = new GlobalSearchWorker(basePanel.frame(), getSearchQuery());
             worker.run();
