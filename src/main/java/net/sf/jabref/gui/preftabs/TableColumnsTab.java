@@ -161,7 +161,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return col == 0 ? Localization.lang("Field name") : Localization.lang("Column width");
+                // @formatter:off
+                return col == 0 ? Localization.lang("Field name") :
+                    Localization.lang("Column width");
+                // @formatter:on
             }
 
             @Override
@@ -606,7 +609,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            BasePanel panel = frame.basePanel();
+            BasePanel panel = frame.getCurrentBasePanel();
             if (panel == null) {
                 return;
             }
@@ -648,7 +651,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            BasePanel panel = frame.basePanel();
+            BasePanel panel = frame.getCurrentBasePanel();
             if (panel == null) {
                 return;
             }

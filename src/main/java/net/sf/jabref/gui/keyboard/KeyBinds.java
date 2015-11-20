@@ -33,7 +33,6 @@ public class KeyBinds {
     public static final String CLOSE_DATABASE = "Close database";
     public static final String CLOSE_DIALOG = "Close dialog";
     public static final String CLOSE_ENTRY_EDITOR = "Close entry editor";
-    public static final String CLOSE_PREAMBLE_EDITOR = "Close preamble editor";
     public static final String COPY = "Copy";
     public static final String COPY_BIB_TE_X_KEY = "Copy BibTeX key";
     public static final String COPY_BIB_TE_X_KEY_AND_TITLE = "Copy BibTeX key and title";
@@ -51,10 +50,6 @@ public class KeyBinds {
     public static final String ENTRY_EDITOR_PREVIOUS_PANEL = "Entry editor, previous panel";
     public static final String ENTRY_EDITOR_PREVIOUS_PANEL_2 = "Entry editor, previous panel 2";
     public static final String ENTRY_EDITOR_STORE_FIELD = "Entry editor, store field";
-    public static final String FETCH_AR_XIV_ORG = "Fetch ArXiv.org";
-    public static final String FETCH_INSPIRE = "Fetch INSPIRE";
-    public static final String FETCH_MEDLINE = "Fetch Medline";
-    public static final String FETCH_SPIRES = "Fetch SPIRES";
     public static final String FILE_LIST_EDITOR_MOVE_ENTRY_DOWN = "File list editor, move entry down";
     public static final String FILE_LIST_EDITOR_MOVE_ENTRY_UP = "File list editor, move entry up";
     public static final String FOCUS_ENTRY_TABLE = "Focus entry table";
@@ -87,6 +82,7 @@ public class KeyBinds {
     public static final String PASTE = "Paste";
     public static final String PREAMBLE_EDITOR_STORE_CHANGES = "Preamble editor, store changes";
     public static final String PREVIOUS_TAB = "Previous tab";
+    public static final String PRINT_ENTRY_PREVIEW = "Print entry preview";
     public static final String PUSH_TO_APPLICATION = "Push to application";
     public static final String QUIT_JAB_REF = "Quit JabRef";
     public static final String REDO = "Redo";
@@ -98,15 +94,8 @@ public class KeyBinds {
     public static final String SAVE_DATABASE_AS = "Save database as ...";
     public static final String SAVE_SESSION = "Save session";
     public static final String SEARCH = "Search";
-    public static final String SEARCH_ACM_PORTAL = "Search ACM Portal";
-    public static final String SEARCH_ADS = "Search ADS";
-    public static final String SEARCH_IEEE_XPLORE = "Search IEEEXplore";
-    public static final String SEARCH_JSTOR = "Search JSTOR";
-    public static final String SEARCH_SCIENCE_DIRECT = "Search ScienceDirect";
     public static final String SELECT_ALL = "Select all";
     public static final String STRING_DIALOG_ADD_STRING = "String dialog, add string";
-    public static final String STRING_DIALOG_MOVE_STRING_DOWN = "String dialog, move string down";
-    public static final String STRING_DIALOG_MOVE_STRING_UP = "String dialog, move string up";
     public static final String STRING_DIALOG_REMOVE_STRING = "String dialog, remove string";
     public static final String SWITCH_PREVIEW_LAYOUT = "Switch preview layout";
     public static final String SYNCHRONIZE_FILES = "Synchronize files";
@@ -115,6 +104,7 @@ public class KeyBinds {
     public static final String UNABBREVIATE = "Unabbreviate";
     public static final String UNDO = "Undo";
     public static final String UNMARK_ENTRIES = "Unmark entries";
+    public static final String WEB_SEARCH = "Web search";
     public static final String WRITE_XMP = "Write XMP";
 
     private final HashMap<String, String> keyBindMap = new HashMap<>();
@@ -149,12 +139,11 @@ public class KeyBinds {
         keyBindMap.put(AUTOGENERATE_BIB_TE_X_KEYS, "ctrl G");
         keyBindMap.put(SEARCH, "ctrl F");
         keyBindMap.put(CLOSE_DIALOG, "ESCAPE");
-        keyBindMap.put(CLOSE_ENTRY_EDITOR, "ESCAPE");
-        keyBindMap.put(CLOSE_PREAMBLE_EDITOR, "ESCAPE");
         keyBindMap.put(BACK_HELP_DIALOG, "LEFT");
         keyBindMap.put(FORWARD_HELP_DIALOG, "RIGHT");
         keyBindMap.put(PREAMBLE_EDITOR_STORE_CHANGES, "alt S");
         keyBindMap.put(CLEAR_SEARCH, "ESCAPE");
+        keyBindMap.put(CLOSE_ENTRY_EDITOR, "ESCAPE");
         keyBindMap.put(ENTRY_EDITOR_NEXT_PANEL, "ctrl TAB");//"ctrl PLUS");//"shift Right");
         keyBindMap.put(ENTRY_EDITOR_PREVIOUS_PANEL, "ctrl shift TAB");//"ctrl MINUS");
         keyBindMap.put(ENTRY_EDITOR_NEXT_PANEL_2, "ctrl PLUS");//"ctrl PLUS");//"shift Right");
@@ -164,8 +153,6 @@ public class KeyBinds {
         keyBindMap.put(ENTRY_EDITOR_STORE_FIELD, "alt S");
         keyBindMap.put(STRING_DIALOG_ADD_STRING, "ctrl N");
         keyBindMap.put(STRING_DIALOG_REMOVE_STRING, "shift DELETE");
-        keyBindMap.put(STRING_DIALOG_MOVE_STRING_UP, "ctrl UP");
-        keyBindMap.put(STRING_DIALOG_MOVE_STRING_DOWN, "ctrl DOWN");
         keyBindMap.put(SAVE_SESSION, "F11");
         keyBindMap.put(LOAD_SESSION, "F12");
         keyBindMap.put(COPY_CITE_BIB_TE_X_KEY, "ctrl K");
@@ -185,23 +172,15 @@ public class KeyBinds {
         keyBindMap.put(EDIT_ENTRY, "ctrl E");
         keyBindMap.put(MARK_ENTRIES, "ctrl M");
         keyBindMap.put(UNMARK_ENTRIES, "ctrl shift M");
-        keyBindMap.put(FETCH_MEDLINE, "F5");
-        keyBindMap.put(SEARCH_SCIENCE_DIRECT, "ctrl F5");
-        keyBindMap.put(SEARCH_ADS, "ctrl shift F6");
+        keyBindMap.put(WEB_SEARCH, "F5");
         keyBindMap.put(NEW_FROM_PLAIN_TEXT, "ctrl shift N");
         keyBindMap.put(SYNCHRONIZE_FILES, "ctrl F4");
         keyBindMap.put(FOCUS_ENTRY_TABLE, "ctrl shift E");
         keyBindMap.put(ABBREVIATE, "ctrl alt A");
         keyBindMap.put(UNABBREVIATE, "ctrl alt shift A");
-        keyBindMap.put(SEARCH_IEEE_XPLORE, "alt F8");
-        keyBindMap.put(SEARCH_ACM_PORTAL, "ctrl shift F8");
-        keyBindMap.put(FETCH_AR_XIV_ORG, "shift F8");
-        keyBindMap.put(SEARCH_JSTOR, "shift F9");
         keyBindMap.put(CLEANUP, "ctrl shift F7");
         keyBindMap.put(WRITE_XMP, "ctrl F7");
         keyBindMap.put(NEW_FILE_LINK, "ctrl N");
-        keyBindMap.put(FETCH_SPIRES, "ctrl F8");
-        keyBindMap.put(FETCH_INSPIRE, "ctrl F2");
         keyBindMap.put(BACK, "alt LEFT");
         keyBindMap.put(FORWARD, "alt RIGHT");
         keyBindMap.put(IMPORT_INTO_CURRENT_DATABASE, "ctrl I");
@@ -215,6 +194,7 @@ public class KeyBinds {
         keyBindMap.put(FILE_LIST_EDITOR_MOVE_ENTRY_UP, "ctrl UP");
         keyBindMap.put(FILE_LIST_EDITOR_MOVE_ENTRY_DOWN, "ctrl DOWN");
         keyBindMap.put(HIDE_SHOW_TOOLBAR, "ctrl alt T");
+        keyBindMap.put(PRINT_ENTRY_PREVIEW, "alt P");
     }
 
     public String get(String key) {

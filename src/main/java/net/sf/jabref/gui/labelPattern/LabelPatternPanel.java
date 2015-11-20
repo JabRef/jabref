@@ -32,18 +32,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryUtil;
 
 public class LabelPatternPanel extends JPanel {
 
@@ -120,7 +120,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(btnDefault, con);
         pan.add(btnDefault);
 
-        for (String s : BibtexEntryType.getAllTypes()) {
+        for (String s : EntryTypes.getAllTypes()) {
             textFields.put(s, addEntryType(pan, s, y));
             y++;
         }
@@ -180,7 +180,7 @@ public class LabelPatternPanel extends JPanel {
 
     private JTextField addEntryType(Container c, String name, int y) {
 
-        JLabel lab = new JLabel(StringUtil.capitalizeFirst(name));
+        JLabel lab = new JLabel(EntryUtil.capitalizeFirst(name));
         name = name.toLowerCase();
         con.gridx = 0;
         con.gridy = y;

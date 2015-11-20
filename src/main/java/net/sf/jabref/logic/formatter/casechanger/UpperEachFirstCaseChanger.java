@@ -1,12 +1,13 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class UpperEachFirstCaseChanger implements Formatter {
 
     @Override
     public String getName() {
-        return "Upper Each First";
+        return Localization.lang("Upper Each First");
     }
 
     /**

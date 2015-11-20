@@ -26,9 +26,9 @@ import java.util.*;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -443,7 +443,7 @@ public class RepecNepImporter extends ImportFormat {
                 }
                 if (isStartOfWorkingPaper()) {
                     BibtexEntry be = new BibtexEntry(IdGenerator.next());
-                    be.setType(BibtexEntryType.getType("techreport"));
+                    be.setType(EntryTypes.getType("techreport"));
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be);
                     if (startsWithKeyword(RepecNepImporter.recognizedFields)) {
@@ -475,7 +475,6 @@ public class RepecNepImporter extends ImportFormat {
             message += e.getMessage();
             LOGGER.error(message, e);
             if (!(e instanceof IOException)) {
-                e.printStackTrace();
                 e = new IOException(message);
             }
             throw (IOException) e;

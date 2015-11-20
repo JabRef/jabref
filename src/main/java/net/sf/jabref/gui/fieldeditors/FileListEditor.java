@@ -48,12 +48,12 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -81,7 +81,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         this.metaData = metaData;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
-        label = new FieldNameLabel(" " + StringUtil.capitalizeFirst(fieldName) + " ");
+        label = new FieldNameLabel(" " + EntryUtil.capitalizeFirst(fieldName) + " ");
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);
@@ -187,7 +187,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         });
 
         // Add input/action pair for moving an entry up:
-        getInputMap().put(Globals.prefs.getKey("File list editor, move entry up"), "move up");
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.FILE_LIST_EDITOR_MOVE_ENTRY_UP), "move up");
         getActionMap().put("move up", new AbstractAction() {
 
             @Override
@@ -197,7 +197,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         });
 
         // Add input/action pair for moving an entry down:
-        getInputMap().put(Globals.prefs.getKey("File list editor, move entry down"), "move down");
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.FILE_LIST_EDITOR_MOVE_ENTRY_DOWN), "move down");
         getActionMap().put("move down", new AbstractAction() {
 
             @Override
@@ -425,7 +425,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
+        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
@@ -438,7 +438,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                             + " " + Localization.lang("No files found."));
 
                     // auto download file as no file found before
-                    frame.basePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
+                    frame.getCurrentBasePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
                 }
                 // reset
                 auto.setEnabled(true);
@@ -463,7 +463,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
         }
         DownloadExternalFile def = new DownloadExternalFile(frame,
-                frame.basePanel().metaData(), bibtexKey);
+                frame.getCurrentBasePanel().metaData(), bibtexKey);
         try {
             def.download(this);
         } catch (IOException ex) {

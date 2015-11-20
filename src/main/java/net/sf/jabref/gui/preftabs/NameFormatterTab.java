@@ -27,9 +27,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.format.NameFormatter;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
@@ -141,7 +141,10 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return col == 0 ? Localization.lang("Formatter Name") : Localization.lang("Format String");
+                // @formatter:off
+                return col == 0 ? Localization.lang("Formatter Name") :
+                    Localization.lang("Format String");
+                // @formatter:on
             }
 
             @Override

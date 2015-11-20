@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,11 +18,15 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -34,9 +38,11 @@ class EntryDeleteChange extends Change {
     BibtexEntry diskEntry;
     private final JScrollPane sp;
 
+    private static final Log LOGGER = LogFactory.getLog(EntryDeleteChange.class);
+
 
     public EntryDeleteChange(BibtexEntry memEntry, BibtexEntry tmpEntry) {
-        super("Deleted entry");
+        super(Localization.lang("Deleted entry"));
         this.memEntry = memEntry;
         this.tmpEntry = tmpEntry;
 
@@ -47,8 +53,7 @@ class EntryDeleteChange extends Change {
         // Check if it has been modified locally, since last tempfile was saved.
         boolean isModifiedLocally = !(matchWithTmp > 1);
 
-        //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
-        //        +" Modifications agree: "+modificationsAgree);
+        LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally);
 
         PreviewPanel pp = new PreviewPanel(null, memEntry, null, new MetaData(), Globals.prefs.get(JabRefPreferences.PREVIEW_0));
         sp = new JScrollPane(pp);

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -59,9 +59,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
     /**
-     * This method is used if the focus listener should call another focus listener
-     * after finishing. This is needed because the autocomplete listener must
-     * run before the focus listener responsible for storing the current edit.
+     * This method is used if the focus listener should call another focus listener after finishing. This is needed
+     * because the autocomplete listener must run before the focus listener responsible for storing the current edit.
      *
      * @param listener The listener to call.
      */
@@ -70,9 +69,10 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
     /**
-     * This setting determines whether the autocomplete listener should consume the Enter key
-     * stroke when it leads to accepting a completion. If set to false, the JTextComponent will receive
-     * the Enter key press after the completion is done. The default value if true.
+     * This setting determines whether the autocomplete listener should consume the Enter key stroke when it leads to
+     * accepting a completion. If set to false, the JTextComponent will receive the Enter key press after the completion
+     * is done. The default value if true.
+     *
      * @param t true to indicate that the Enter key should be consumed, false that it should be forwarded
      */
     public void setConsumeEnterKey(boolean t) {
@@ -98,8 +98,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         else if ((e.getKeyCode() == KeyEvent.VK_PAGE_DOWN) && (toSetIn != null)) {
             cycle((JTextComponent) e.getSource(), 1);
             e.consume();
-        }
-        else if ((e.getKeyCode() == KeyEvent.VK_PAGE_UP) && (toSetIn != null)) {
+        } else if ((e.getKeyCode() == KeyEvent.VK_PAGE_UP) && (toSetIn != null)) {
             cycle((JTextComponent) e.getSource(), -1);
             e.consume();
         }
@@ -148,26 +147,24 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         //int cp = oldSelectionEnd - deletedChars;
         alltext.insert(oldSelectionStart, toSetIn.substring(1));
 
-        //Util.pr(alltext.toString());
+        LOGGER.debug(alltext.toString());
         comp.setText(alltext.toString());
         //comp.setCaretPosition(cp+toSetIn.length()-1);
         comp.select(oldSelectionStart, (oldSelectionStart + toSetIn.length()) - 1);
         lastCaretPosition = comp.getCaretPosition();
-        //System.out.println("ToSetIn: '"+toSetIn+"'");
+        LOGGER.debug("ToSetIn: '" + toSetIn + "'");
     }
 
     /**
-     * If user cancels autocompletion by
-     *   a) entering another letter than the completed word (and there is no other auto completion)
-     *   b) space
-     * the casing of the letters has to be kept
-     * 
-     * Global variable "lastBeginning" keeps track of typed letters.
-     * We rely on this variable to reconstruct the text 
-     * 
+     * If user cancels autocompletion by a) entering another letter than the completed word (and there is no other auto
+     * completion) b) space the casing of the letters has to be kept
+     *
+     * Global variable "lastBeginning" keeps track of typed letters. We rely on this variable to reconstruct the text
+     *
      * @param wordSeperatorTyped indicates whether the user has typed a white space character or a
      */
-    private void setUnmodifiedTypedLetters(JTextComponent comp, boolean lastBeginningContainsTypedCharacter, boolean wordSeperatorTyped) {
+    private void setUnmodifiedTypedLetters(JTextComponent comp, boolean lastBeginningContainsTypedCharacter,
+            boolean wordSeperatorTyped) {
         if (lastBeginning == null) {
             LOGGER.debug("No last beginning found");
             // There was no previous input (if the user typed a word, where no autocompletion is available)
@@ -201,9 +198,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             endIndex++;
         }
         String text = comp.getText();
-        comp.setText(text.substring(0, endIndex).
-                concat(lastBeginning).
-                concat(text.substring(lastCaretPosition)));
+        comp.setText(text.substring(0, endIndex).concat(lastBeginning).concat(text.substring(lastCaretPosition)));
         if (lastBeginningContainsTypedCharacter) {
             // the current letter is NOT contained in comp.getText()
             // Thus, cursor position also did not get updated
@@ -214,18 +209,19 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
     /**
-     * Start a new completion attempt
-     * (instead of treating a continuation of an existing word or an interrupt of the current word)
+     * Start a new completion attempt (instead of treating a continuation of an existing word or an interrupt of the
+     * current word)
      */
     private void startCompletion(StringBuffer currentword, KeyEvent e) {
         JTextComponent comp = (JTextComponent) e.getSource();
 
-        String[] completed = findCompletions(currentword.toString(), comp);
+        String[] completed = findCompletions(currentword.toString());
         String prefix = completer.getPrefix();
-        String cWord = (prefix != null) && (!prefix.isEmpty()) ?
-                currentword.toString().substring(prefix.length()) : currentword.toString();
+        String cWord = (prefix != null) && (!prefix.isEmpty()) ? currentword.toString()
+                .substring(prefix.length()) : currentword.toString();
 
-        LOGGER.debug("StartCompletion currentword: >" + currentword + "'<' prefix: >" + prefix + "'<' cword: >"  + cWord + '<');
+        LOGGER.debug("StartCompletion currentword: >" + currentword + "'<' prefix: >" + prefix + "'<' cword: >" + cWord
+                + '<');
 
         int no = 0; // We use the first word in the array of completions.
         if ((completed != null) && (completed.length > 0)) {
@@ -273,7 +269,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
         if ((e.getModifiers() | InputEvent.SHIFT_MASK) == InputEvent.SHIFT_MASK) {
             // plain key or SHIFT + key is pressed, no handling of CTRL+key,  META+key, ...
-            if (Character.isLetter(ch) || Character.isDigit(ch) || (Character.isWhitespace(ch) && completer.isSingleUnitField())) {
+            if (Character.isLetter(ch) || Character.isDigit(ch)
+                    || (Character.isWhitespace(ch) && completer.isSingleUnitField())) {
                 JTextComponent comp = (JTextComponent) e.getSource();
 
                 if (toSetIn == null) {
@@ -286,8 +283,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                 // If keyword is "TODO" and user types "tO", then this is treated as "continue" as the "O" matches the "O"
                 // If keyword is "TODO" and user types "To", then this is treated as "discont" as the "o" does NOT match the "O".
 
-                if ((toSetIn != null) && (toSetIn.length() > 1) &&
-                        (ch == toSetIn.charAt(1))) {
+                if ((toSetIn != null) && (toSetIn.length() > 1) && (ch == toSetIn.charAt(1))) {
                     // User continues on the word that was suggested.
                     LOGGER.debug("cont");
 
@@ -305,7 +301,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                         //System.out.println("Added char: '"+toSetIn+"'");
                         //System.out.println("LastBeginning: '"+lastBeginning+"'");
 
-                        lastCompletions = findCompletions(lastBeginning, comp);
+                        lastCompletions = findCompletions(lastBeginning);
                         lastShownCompletion = 0;
                         for (int i = 0; i < lastCompletions.length; i++) {
                             String lastCompletion = lastCompletions[i];
@@ -324,8 +320,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                             // "space" indicates that the user does NOT want the autocompletion,
                             // but the typed word
                             String text = comp.getText();
-                            comp.setText(text.substring(0, lastCaretPosition - lastBeginning.length())
-                                    + lastBeginning
+                            comp.setText(text.substring(0, lastCaretPosition - lastBeginning.length()) + lastBeginning
                                     + text.substring(lastCaretPosition));
                             // there is no selected text, therefore we are not updating the selection
                             toSetIn = null;
@@ -334,14 +329,13 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                     }
                 }
 
-                if ((toSetIn != null) && ((toSetIn.length() <= 1) ||
-                        (ch != toSetIn.charAt(1)))) {
+                if ((toSetIn != null) && ((toSetIn.length() <= 1) || (ch != toSetIn.charAt(1)))) {
                     // User discontinues the word that was suggested.
                     lastBeginning = lastBeginning + ch;
 
                     LOGGER.debug("discont toSetIn: >" + toSetIn + "'<' lastBeginning: >" + lastBeginning + '<');
 
-                    String[] completed = findCompletions(lastBeginning, comp);
+                    String[] completed = findCompletions(lastBeginning);
                     if ((completed != null) && (completed.length > 0)) {
                         lastShownCompletion = 0;
                         lastCompletions = completed;
@@ -352,10 +346,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                         int lastLen = toSetIn.length() - 1;
                         toSetIn = sno.substring(lastBeginning.length() - 1);
                         String text = comp.getText();
-                        //Util.pr(""+lastLen);
                         //we do not use toSetIn as we want to obey the casing of "sno"
-                        comp.setText(text.substring(0, (lastCaretPosition - lastLen - lastBeginning.length()) + 1)
-                                + sno
+                        comp.setText(text.substring(0, (lastCaretPosition - lastLen - lastBeginning.length()) + 1) + sno
                                 + text.substring(lastCaretPosition));
                         int startSelect = (lastCaretPosition + 1) - lastLen;
                         int endSelect = (lastCaretPosition + toSetIn.length()) - lastLen;
@@ -399,7 +391,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                 }
 
                 LOGGER.debug("No letter/digit/whitespace or CHAR_UNDEFINED");
-                // replace displayed letters with typed letters 
+                // replace displayed letters with typed letters
                 setUnmodifiedTypedLetters((JTextComponent) e.getSource(), false, !Character.isISOControl(ch));
                 resetAutoCompletion();
                 return;
@@ -417,7 +409,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         lastBeginning = null;
     }
 
-    private String[] findCompletions(String beginning, JTextComponent comp) {
+    private String[] findCompletions(String beginning) {
         return completer.complete(beginning);
     }
 
@@ -442,16 +434,17 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                 while ((piv >= 0) && !Character.isWhitespace(upToCaret.charAt(piv))) {
                     piv--;
                 }
-                // priv points to whitespace char or priv is -1
-                // copy everything from the next char up to the end of "upToCaret" 
+                // piv points to whitespace char or piv is -1
+                // copy everything from the next char up to the end of "upToCaret"
                 res.append(upToCaret.substring(piv + 1));
             } else {
                 // For fields such as "journal" it is more reasonable to try to complete on the entire
                 // text field content, so we skip the searching and keep the entire part up to the caret:
                 res.append(upToCaret);
             }
-            //Util.pr("AutoCompListener: "+res.toString());
+            LOGGER.debug("AutoCompListener: " + res.toString());
         } catch (BadLocationException ignore) {
+            // Ignored
         }
 
         return res;

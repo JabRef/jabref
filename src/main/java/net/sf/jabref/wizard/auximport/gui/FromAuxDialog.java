@@ -63,6 +63,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.wizard.auximport.AuxSubGenerator;
 
@@ -169,7 +170,7 @@ public class FromAuxDialog
         // Key bindings:
         ActionMap am = statusPanel.getActionMap();
         InputMap im = statusPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs().getKey("Close dialog"), "close");
+        im.put(parent.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             private static final long serialVersionUID = -4511569209048851343L;
@@ -188,7 +189,7 @@ public class FromAuxDialog
         int toSelect = -1;
         for (int i = 0; i < len; i++) {
             dbChooser.addItem(parentTabbedPane.getTitleAt(i));
-            if (parent.baseAt(i) == parent.basePanel()) {
+            if (parent.getBasePanelAt(i) == parent.getCurrentBasePanel()) {
                 toSelect = i;
             }
         }
@@ -241,8 +242,8 @@ public class FromAuxDialog
 
     private void select_actionPerformed() {
         BibtexDatabase db = getGenerateDB();
-        MainTable mainTable = JabRef.jrf.basePanel().mainTable;
-        BibtexDatabase database = JabRef.jrf.basePanel().getDatabase();
+        MainTable mainTable = JabRef.jrf.getCurrentBasePanel().mainTable;
+        BibtexDatabase database = JabRef.jrf.getCurrentBasePanel().getDatabase();
         mainTable.clearSelection();
         for (BibtexEntry newEntry : db.getEntries()) {
             // the entries are not the same objects as in the original database

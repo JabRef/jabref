@@ -30,7 +30,9 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.util.PositionWindow;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -88,7 +90,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         rename = new JRadioButton(Localization.lang("Rename field to") + ":");
         rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
 
-        allFields = frame.basePanel().database().getAllVisibleFields();
+        allFields = frame.getCurrentBasePanel().database().getAllVisibleFields();
 
         for (String f : allFields) {
             field.addItem(f);
@@ -184,7 +186,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
     }
 
@@ -203,7 +205,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        BasePanel bp = frame.basePanel();
+        BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;
         }
@@ -214,7 +216,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         }
         cancelled = true;
         prepareDialog(entries.length > 0);
-        Util.placeDialog(diag, frame);
+        PositionWindow.placeDialog(diag, frame);
         diag.setVisible(true);
         if (cancelled) {
             return;

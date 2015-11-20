@@ -18,11 +18,11 @@ package net.sf.jabref.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.TreeSet;
@@ -50,12 +50,14 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexString;
@@ -66,20 +68,19 @@ class StringDialog extends JDialog {
     private final BibtexDatabase base;
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private final JabRefPreferences prefs;
     private Object[] strings;
 
     JLabel lab;
     private final StringTable table;
     private final HelpAction helpAction;
 
+    private PositionWindow pw;
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibtexDatabase base, JabRefPreferences prefs) {
         super(frame);
         this.frame = frame;
         this.panel = panel;
         this.base = base;
-        this.prefs = prefs;
 
         sortStrings();
 
@@ -103,9 +104,6 @@ class StringDialog extends JDialog {
             }
         });
 
-        setLocation(prefs.getInt(JabRefPreferences.STRINGS_POS_X), prefs.getInt(JabRefPreferences.STRINGS_POS_Y));
-        setSize(prefs.getInt(JabRefPreferences.STRINGS_SIZE_X), prefs.getInt(JabRefPreferences.STRINGS_SIZE_Y));
-
         JPanel pan = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
         pan.setLayout(gbl);
@@ -126,22 +124,22 @@ class StringDialog extends JDialog {
         JToolBar tlb = new JToolBar();
         InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = tlb.getActionMap();
-        im.put(prefs.getKey("String dialog, add string"), "add");
+        im.put(prefs.getKey(KeyBinds.STRING_DIALOG_ADD_STRING), "add");
         NewStringAction newStringAction = new NewStringAction(this);
         am.put("add", newStringAction);
-        im.put(prefs.getKey("String dialog, remove string"), "remove");
+        im.put(prefs.getKey(KeyBinds.STRING_DIALOG_REMOVE_STRING), "remove");
         RemoveStringAction removeStringAction = new RemoveStringAction(this);
         am.put("remove", removeStringAction);
-        im.put(prefs.getKey("Save database"), "save");
+        im.put(prefs.getKey(KeyBinds.SAVE_DATABASE), "save");
         am.put("save", saveAction);
-        im.put(prefs.getKey("Close dialog"), "close");
+        im.put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
-        im.put(prefs.getKey("Help"), "help");
+        im.put(prefs.getKey(KeyBinds.HELP), "help");
         am.put("help", helpAction);
-        im.put(prefs.getKey("Undo"), "undo");
+        im.put(prefs.getKey(KeyBinds.UNDO), "undo");
         UndoAction undoAction = new UndoAction();
         am.put("undo", undoAction);
-        im.put(prefs.getKey("Redo"), "redo");
+        im.put(prefs.getKey(KeyBinds.REDO), "redo");
         RedoAction redoAction = new RedoAction();
         am.put("redo", redoAction);
 
@@ -153,14 +151,30 @@ class StringDialog extends JDialog {
         conPane.add(tlb, BorderLayout.NORTH);
         conPane.add(pan, BorderLayout.CENTER);
 
-        if (panel.getFile() != null) {
-            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " + panel.getFile().getName());
+        if (panel.getDatabaseFile() != null) {
+            setTitle(GUIGlobals.stringsTitle + ": " + panel.getDatabaseFile().getName());
         } else {
-            // @formatter:off
-            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": "
-                    + Localization.lang(GUIGlobals.untitledTitle));
-            // @formatter:on
+            setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
         }
+        pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
+                JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
+        pw.setWindowPosition();
+
+        // Set up a ComponentListener that saves the last size and position of the dialog
+        addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+        });
     }
 
 
@@ -181,9 +195,9 @@ class StringDialog extends JDialog {
             cm.getColumn(0).setPreferredWidth(800);
             cm.getColumn(1).setPreferredWidth(2000);
             sp.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
-            getInputMap().put(frame.prefs.getKey("Close dialog"), "close");
+            getInputMap().put(frame.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
             getActionMap().put("close", closeAction);
-            getInputMap().put(frame.prefs.getKey("Help"), "help");
+            getInputMap().put(frame.prefs.getKey(KeyBinds.HELP), "help");
             getActionMap().put("help", helpAction);
         }
 
@@ -346,12 +360,6 @@ class StringDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             panel.stringsClosing();
             dispose();
-            Point p = getLocation();
-            Dimension d = getSize();
-            prefs.putInt(JabRefPreferences.STRINGS_POS_X, p.x);
-            prefs.putInt(JabRefPreferences.STRINGS_POS_Y, p.y);
-            prefs.putInt(JabRefPreferences.STRINGS_SIZE_X, d.width);
-            prefs.putInt(JabRefPreferences.STRINGS_SIZE_Y, d.height);
         }
     }
 
@@ -398,7 +406,7 @@ class StringDialog extends JDialog {
                 BibtexString bs = new BibtexString(newId, name, "");
 
                 // Store undo information:
-                panel.undoManager.addEdit(new UndoableInsertString(panel, panel.database, bs));
+                panel.undoManager.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
 
                 base.addString(bs);
                 refreshTable();

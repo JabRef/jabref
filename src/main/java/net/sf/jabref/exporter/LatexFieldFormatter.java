@@ -19,7 +19,6 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.importer.fileformat.FieldContentParser;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.util.Vector;
@@ -141,9 +140,10 @@ public class LatexFieldFormatter {
                 pos2 = content.indexOf('#', pos1 + 1);
                 if (pos2 == -1) {
                     if (!neverFailOnHashes) {
-                        throw new IllegalArgumentException(Localization.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + '\n' +
-                                Localization.lang("In JabRef, use pairs of # characters to indicate a string.") + '\n' +
-                                Localization.lang("Note that the entry causing the problem has been selected."));
+                        throw new IllegalArgumentException(
+                                "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
+                                        + "In JabRef, use pairs of # characters to indicate a string.\n"
+                                        + "Note that the entry causing the problem has been selected.");
                     } else {
                         pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     }

@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
 
 /**
  * Importer for records downloaded from CSA: Cambridge Scientific Abstracts
@@ -260,7 +260,7 @@ public class CsaImporter extends ImportFormat {
 
                     BibtexEntry b =
                             new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
-                                    BibtexEntryTypes.getEntryType(Type));
+                                    EntryTypes.getBibtexEntryType(Type));
 
                     // create one here
                     b.setField(hm);

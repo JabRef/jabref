@@ -138,11 +138,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "Google Scholar";
-    }
-
-    @Override
     public String getHelpPage() {
         return "GoogleScholarHelp.html";
     }

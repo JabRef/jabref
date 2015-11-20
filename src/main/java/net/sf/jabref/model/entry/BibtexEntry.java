@@ -24,13 +24,20 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import net.sf.jabref.*;
-import net.sf.jabref.logic.id.IdGenerator;
-import net.sf.jabref.logic.util.date.MonthUtil;
-import net.sf.jabref.model.database.BibtexDatabase;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.model.database.BibtexDatabase;
 
 public class BibtexEntry {
     private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
@@ -41,7 +48,7 @@ public class BibtexEntry {
 
     private String id;
 
-    private BibtexEntryType type;
+    private EntryType type;
 
     private Map<String, String> fields = new HashMap<>();
 
@@ -57,10 +64,10 @@ public class BibtexEntry {
     }
 
     public BibtexEntry(String id) {
-        this(id, BibtexEntryTypes.OTHER);
+        this(id, BibtexEntryTypes.MISC);
     }
 
-    public BibtexEntry(String id, BibtexEntryType type) {
+    public BibtexEntry(String id, EntryType type) {
         Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
 
         this.id = id;
@@ -81,10 +88,6 @@ public class BibtexEntry {
         return type.getRequiredFields();
     }
 
-    public String[] getUserDefinedFields() {
-        return Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
-    }
-
     /**
      * Returns an set containing the names of all fields that are
      * set for this particular entry.
@@ -100,23 +103,23 @@ public class BibtexEntry {
      * complete.
      */
     public boolean hasAllRequiredFields(BibtexDatabase database) {
-        return type.hasAllRequiredFields(this, database);
+        return allFieldsPresent(type.getRequiredFields(), database);
     }
 
     /**
      * Returns this entry's type.
      */
-    public BibtexEntryType getType() {
+    public EntryType getType() {
         return type;
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(BibtexEntryType type) {
-        Objects.requireNonNull(type, "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
+    public void setType(EntryType type) {
+        Objects.requireNonNull(type, "Every BibtexEntry must have a type.");
 
-        BibtexEntryType oldType = this.type;
+        EntryType oldType = this.type;
 
         try {
             // We set the type before throwing the changeEvent, to enable
@@ -130,27 +133,6 @@ public class BibtexEntry {
             pve.printStackTrace();
         }
 
-    }
-
-    /**
-     * Prompts the entry to call BibtexEntryType.getType(String) with
-     * its current type name as argument, and sets its type according
-     * to what is returned. This method is called when a user changes
-     * the type customization, to make sure all entries are set with
-     * current types.
-     *
-     * @return true if the entry could find a type, false if not (in
-     * this case the type will have been set to
-     * BibtexEntryTypes.TYPELESS).
-     */
-    public boolean updateType() {
-        BibtexEntryType newType = BibtexEntryType.getType(type.getName());
-        if (newType != null) {
-            type = newType;
-            return true;
-        }
-        type = BibtexEntryTypes.TYPELESS;
-        return false;
     }
 
     /**
@@ -246,7 +228,7 @@ public class BibtexEntry {
 
 
                 @Override
-                public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
+                public StringBuffer format(Date dDate, StringBuffer toAppendTo, FieldPosition fieldPosition) {
                     throw new UnsupportedOperationException();
                 }
 
@@ -289,11 +271,18 @@ public class BibtexEntry {
         return null;
     }
 
+    /**
+     * Returns the bibtex key, or null if it is not set.
+     */
     public String getCiteKey() {
-        if(!fields.containsKey(KEY_FIELD)) {
-            return null;
-        }
         return fields.get(KEY_FIELD);
+    }
+
+    public boolean hasCiteKey() {
+        if(getCiteKey() == null || getCiteKey().isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -362,25 +351,36 @@ public class BibtexEntry {
      * database argument is given, this method will try to look up missing fields in
      * entries linked by the "crossref" field, if any.
      *
-     * @param fields   An array of field names to be checked.
+     * @param allFields   An array of field names to be checked.
      * @param database The database in which to look up crossref'd entries, if any. This
      *                 argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    boolean allFieldsPresent(String[] fields, BibtexDatabase database) {
-        for (String field : fields) {
-            if (BibtexDatabase.getResolvedField(field, this, database) == null) {
-                return false;
+    boolean allFieldsPresent(String[] allFields, BibtexDatabase database) {
+        final String orSeparator = "/";
+
+        for (String field : allFields) {
+            // OR fields
+            if(field.contains(orSeparator)) {
+                String[] altFields = field.split(orSeparator);
+
+                if (!atLeastOnePresent(altFields, database)) {
+                    return false;
+                }
+            } else {
+                if (BibtexDatabase.getResolvedField(field, this, database) == null) {
+                    return false;
+                }
             }
         }
         return true;
     }
 
-    boolean allFieldsPresent(List<String> fields, BibtexDatabase database) {
-        return allFieldsPresent(fields.toArray(new String[0]), database);
+    boolean allFieldsPresent(List<String> allFields, BibtexDatabase database) {
+        return allFieldsPresent(allFields.toArray(new String[allFields.size()]), database);
     }
 
-    boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
+    private boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
         for (String field : fields) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
             if ((value != null) && !value.isEmpty()) {
@@ -422,7 +422,7 @@ public class BibtexEntry {
 
     @Override
     public String toString() {
-        return getType().getName() + ':' + getField(KEY_FIELD);
+        return getType().getName() + ':' + getCiteKey();
     }
 
     public boolean isSearchHit() {
@@ -463,5 +463,30 @@ public class BibtexEntry {
             return text;
         }
         return text.substring(0, maxCharacters + 1) + "...";
+    }
+
+    /**
+     * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
+     *
+     * @param entry
+     * @return will return the publication date of the entry or null if no year was found.
+     */
+    public String getPublicationDate() {
+
+        Object o = getField("year");
+        if (o == null) {
+            return null;
+        }
+
+        String year = YearUtil.toFourDigitYear(o.toString());
+
+        o = getField("month");
+        if (o != null) {
+            MonthUtil.Month month = MonthUtil.getMonth(o.toString());
+            if (month.isValid()) {
+                return year + "-" + month.twoDigitNumber;
+            }
+        }
+        return year;
     }
 }

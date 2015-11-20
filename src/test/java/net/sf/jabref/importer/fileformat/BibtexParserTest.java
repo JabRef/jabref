@@ -45,7 +45,7 @@ public class BibtexParserTest {
             new BibtexParser(null);
             Assert.fail("Should not accept null.");
         } catch (NullPointerException ignored) {
-
+            // Ignored
         }
     }
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,14 +15,14 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.EntryUtil;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -63,7 +63,7 @@ public class TextField extends JTextField implements FieldEditor {
             addFocusListener(new FieldEditorFocusListener());
         }
         this.fieldName = fieldName;
-        label = new FieldNameLabel(' ' + StringUtil.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(' ' + EntryUtil.capitalizeFirst(this.fieldName) + ' ');
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 
@@ -177,13 +177,7 @@ public class TextField extends JTextField implements FieldEditor {
         Document doc = getDocument();
 
         // Listen for undo and redo events
-        doc.addUndoableEditListener(new UndoableEditListener() {
-
-            @Override
-            public void undoableEditHappened(UndoableEditEvent evt) {
-                undo.addEdit(evt.getEdit());
-            }
-        });
+        doc.addUndoableEditListener(evt -> undo.addEdit(evt.getEdit()));
 
         // Create an undo action and add it to the text component
         getActionMap().put("Undo", new AbstractAction("Undo") {
@@ -201,10 +195,10 @@ public class TextField extends JTextField implements FieldEditor {
         });
 
         // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.prefs.getKey("Undo"), "Undo");
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
-        getActionMap().put("Redo", new AbstractAction("Redo") {
+        getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
 
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -219,6 +213,6 @@ public class TextField extends JTextField implements FieldEditor {
         });
 
         // Bind the redo action to ctl-Y
-        getInputMap().put(Globals.prefs.getKey("Redo"), "Redo");
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.REDO), "Redo");
     }
 }

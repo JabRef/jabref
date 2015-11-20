@@ -27,6 +27,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,12 +42,7 @@ import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.CustomEntryType;
 
 public class FileActions {
 
@@ -137,8 +135,8 @@ public class FileActions {
                 fw.write(formatted);
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException(
-                        Localization.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + '\n'
-                        + Localization.lang("Before saving, please edit any strings containing the # character."));
+                        "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
+                                + "Before saving, please edit any strings containing the # character.");
             }
 
         } else {
@@ -170,7 +168,7 @@ public class FileActions {
             boolean checkSearch, boolean checkGroup, String encoding, boolean suppressBackup)
                     throws SaveException {
 
-        TreeMap<String, BibtexEntryType> types = new TreeMap<>();
+        TreeMap<String, EntryType> types = new TreeMap<>();
 
         boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
         if (suppressBackup) {
@@ -189,21 +187,21 @@ public class FileActions {
             // saving failed, no matter what the reason was
             // (and they won't just quit JabRef thinking
             // everything worked and loosing data)
-            throw new SaveException(e.getMessage());
+            throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
 
         // Get our data stream. This stream writes only to a temporary file,
         // until committed.
-        try (VerifyingWriter fw = session.getWriter()) {
+        try (VerifyingWriter writer = session.getWriter()) {
 
             // Write signature.
-            FileActions.writeBibFileHeader(fw, encoding);
+            FileActions.writeBibFileHeader(writer, encoding);
 
             // Write preamble if there is one.
-            FileActions.writePreamble(fw, database.getPreamble());
+            FileActions.writePreamble(writer, database.getPreamble());
 
             // Write strings if there are any.
-            FileActions.writeStrings(fw, database);
+            FileActions.writeStrings(writer, database);
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
@@ -213,48 +211,48 @@ public class FileActions {
 
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
-            for (BibtexEntry be : sorter) {
-                exceptionCause = be;
+            for (BibtexEntry entry : sorter) {
+                exceptionCause = entry;
 
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                BibtexEntryType tp = be.getType();
+                EntryType entryType = entry.getType();
 
-                if (BibtexEntryType.getStandardType(tp.getName()) == null) {
-                    types.put(tp.getName(), tp);
+                if (EntryTypes.getStandardType(entryType.getName()) == null) {
+                    types.put(entryType.getName(), entryType);
                 }
 
                 // Check if the entry should be written.
                 boolean write = true;
 
-                if (checkSearch && !FileActions.nonZeroField(be, BibtexFields.SEARCH)) {
+                if (checkSearch && !FileActions.nonZeroField(entry, BibtexFields.SEARCH)) {
                     write = false;
                 }
 
-                if (checkGroup && !FileActions.nonZeroField(be, BibtexFields.GROUPSEARCH)) {
+                if (checkGroup && !FileActions.nonZeroField(entry, BibtexFields.GROUPSEARCH)) {
                     write = false;
                 }
 
                 if (write) {
-                    bibtexEntryWriter.write(be, fw);
-                    fw.write(Globals.NEWLINE);
+                    bibtexEntryWriter.write(entry, writer);
+                    writer.write(Globals.NEWLINE);
                 }
             }
 
             // Write meta data.
             if (metaData != null) {
-                metaData.writeMetaData(fw);
+                metaData.writeMetaData(writer);
             }
 
             // Write type definitions, if any:
             if (!types.isEmpty()) {
-                for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
-                    BibtexEntryType type = stringBibtexEntryTypeEntry.getValue();
+                for (Map.Entry<String, EntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
+                    EntryType type = stringBibtexEntryTypeEntry.getValue();
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
-                        tp.save(fw);
-                        fw.write(Globals.NEWLINE);
+                        CustomEntryTypesManager.save(tp, writer);
+                        writer.write(Globals.NEWLINE);
                     }
                 }
 
@@ -263,7 +261,7 @@ public class FileActions {
             ex.printStackTrace();
             session.cancel();
             // repairAfterError(file, backup, INIT_OK);
-            throw new SaveException(ex.getMessage(), exceptionCause);
+            throw new SaveException(ex.getMessage(), ex.getLocalizedMessage(), exceptionCause);
         }
 
         return session;
@@ -359,7 +357,7 @@ public class FileActions {
     public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
             File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding, DatabaseSaveType saveType) throws SaveException {
 
-        TreeMap<String, BibtexEntryType> types = new TreeMap<>(); // Map
+        TreeMap<String, EntryType> types = new TreeMap<>(); // Map
         // to
         // collect
         // entry
@@ -374,7 +372,7 @@ public class FileActions {
         try {
             session = new SaveSession(file, encoding, backup);
         } catch (IOException e) {
-            throw new SaveException(e.getMessage());
+            throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
 
         // Define our data stream.
@@ -410,8 +408,8 @@ public class FileActions {
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                BibtexEntryType tp = be.getType();
-                if (BibtexEntryType.getStandardType(tp.getName()) == null) {
+                EntryType tp = be.getType();
+                if (EntryTypes.getStandardType(tp.getName()) == null) {
                     types.put(tp.getName(), tp);
                 }
 
@@ -426,9 +424,9 @@ public class FileActions {
 
             // Write type definitions, if any:
             if (!types.isEmpty()) {
-                for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
+                for (Map.Entry<String, EntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
                     CustomEntryType tp = (CustomEntryType) stringBibtexEntryTypeEntry.getValue();
-                    tp.save(fw);
+                    CustomEntryTypesManager.save(tp, fw);
                     fw.write(Globals.NEWLINE);
                 }
 
@@ -436,7 +434,7 @@ public class FileActions {
         } catch (Throwable ex) {
             session.cancel();
             //repairAfterError(file, backup, status);
-            throw new SaveException(ex.getMessage(), be);
+            throw new SaveException(ex.getMessage(), ex.getLocalizedMessage(), be);
         }
 
         return session;
@@ -458,14 +456,14 @@ public class FileActions {
             try {
                 reader = new InputStreamReader(reso.openStream());
             } catch (FileNotFoundException ex) {
-                throw new IOException(Localization.lang("Could not find layout file") + ": '" + name + "'.");
+                throw new IOException("Cannot find layout file: '" + name + "'.");
             }
         } else {
             File f = new File(name);
             try {
                 reader = new FileReader(f);
             } catch (FileNotFoundException ex) {
-                throw new IOException(Localization.lang("Could not find layout file") + ": '" + name + "'.");
+                throw new IOException("Cannot find layout file: '" + name + "'.");
             }
         }
 

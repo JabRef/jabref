@@ -67,7 +67,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -79,15 +80,16 @@ import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.gui.util.IconComparator;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -250,7 +252,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         glTable.setDefaultRenderer(JLabel.class, renderer);
         glTable.setDefaultRenderer(String.class, renderer);
-        glTable.getInputMap().put(Globals.prefs.getKey("Delete"), "delete");
+        glTable.getInputMap().put(Globals.prefs.getKey(KeyBinds.DELETE), "delete");
         DeleteListener deleteListener = new DeleteListener();
         glTable.getActionMap().put("delete", deleteListener);
 
@@ -362,7 +364,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         };
         ActionMap am = contentPane.getActionMap();
         InputMap im = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
     }
@@ -732,7 +734,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 boolean groupingCanceled = false;
 
                 // Set owner/timestamp if options are enabled:
-                Util.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
+                net.sf.jabref.util.Util.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
 
                 // Check if we should unmark entries before adding the new ones:
@@ -752,7 +754,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // If this entry should be added to any groups, do it now:
                     Set<GroupTreeNode> groups = groupAdditions.get(entry);
                     if (!groupingCanceled && (groups != null)) {
-                        if (entry.getField(BibtexEntry.KEY_FIELD) == null) {
+                        if (entry.getCiteKey() == null) {
                             // The entry has no key, so it can't be added to the
                             // group.
                             // The best course of action is probably to ask the
@@ -771,7 +773,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         }
 
                         // If the key existed, or exists now, go ahead:
-                        if (entry.getField(BibtexEntry.KEY_FIELD) != null) {
+                        if (entry.getCiteKey() != null) {
                             for (GroupTreeNode node : groups) {
                                 if (node.getGroup().supportsAdd()) {
                                     // Add the entry:
@@ -1098,7 +1100,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(
                             ImportInspectionDialog.this, other, first,
                             DuplicateResolverDialog.INSPECTION);
-                    Util.placeDialog(diag, ImportInspectionDialog.this);
+                    PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
                     if (diag.getSelected() == DuplicateResolverDialog.KEEP_UPPER) {
@@ -1146,7 +1148,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 if (other != null) {
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(
                             ImportInspectionDialog.this, first, other, DuplicateResolverDialog.DUPLICATE_SEARCH);
-                    Util.placeDialog(diag, ImportInspectionDialog.this);
+                    PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
                     int answer = diag.getSelected();
@@ -1283,7 +1285,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
-            JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, localModel, metaData, new ActionListener() {
+            JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entry, localModel, metaData, new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -1372,7 +1374,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // buttons:
             AttachFileDialog diag = new AttachFileDialog(ImportInspectionDialog.this, metaData,
                     entry, fileType);
-            Util.placeDialog(diag, ImportInspectionDialog.this);
+            PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
             diag.setVisible(true);
             // After the dialog has closed, if it wasn't cancelled, list the
             // field:
@@ -1494,7 +1496,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return Localization.lang("Keep");
             }
             if (i >= PAD) {
-                return StringUtil.capitalizeFirst(fields[i - PAD]);
+                return EntryUtil.capitalizeFirst(fields[i - PAD]);
             }
             return "";
         }

@@ -1,10 +1,12 @@
 package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.EntryUtil;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -30,14 +32,14 @@ public class NewEntryAction extends MnemonicAwareAction {
     public NewEntryAction(JabRefFrame jabRefFrame, String type_) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, StringUtil.capitalizeFirst(type_));
+        putValue(Action.NAME, EntryUtil.capitalizeFirst(type_));
         type = type_;
     }
 
     public NewEntryAction(JabRefFrame jabRefFrame, String type_, KeyStroke key) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, StringUtil.capitalizeFirst(type_));
+        putValue(Action.NAME, EntryUtil.capitalizeFirst(type_));
         putValue(Action.ACCELERATOR_KEY, key);
         type = type_;
     }
@@ -47,9 +49,9 @@ public class NewEntryAction extends MnemonicAwareAction {
         String thisType = type;
         if (thisType == null) {
             EntryTypeDialog etd = new EntryTypeDialog(jabRefFrame);
-            Util.placeDialog(etd, jabRefFrame);
+            PositionWindow.placeDialog(etd, jabRefFrame);
             etd.setVisible(true);
-            BibtexEntryType tp = etd.getChoice();
+            EntryType tp = etd.getChoice();
             if (tp == null) {
                 return;
             }
@@ -58,7 +60,7 @@ public class NewEntryAction extends MnemonicAwareAction {
 
         if (jabRefFrame.tabbedPane.getTabCount() > 0) {
             ((BasePanel) jabRefFrame.tabbedPane.getSelectedComponent())
-                    .newEntry(BibtexEntryType.getType(thisType));
+                    .newEntry(EntryTypes.getType(thisType));
         } else {
             LOGGER.info("Action 'New entry' must be disabled when no " + "database is open.");
         }

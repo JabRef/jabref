@@ -39,9 +39,13 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;
+import net.sf.jabref.gui.util.FirstColumnComparator;
+import net.sf.jabref.gui.util.IconComparator;
+import net.sf.jabref.gui.util.IsMarkedComparator;
+import net.sf.jabref.gui.util.RankingFieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -66,6 +70,7 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
  *
  */
 public class MainTable extends JTable {
+    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -78,7 +83,7 @@ public class MainTable extends JTable {
     private final boolean tableColorCodes;
     private boolean showingFloatSearch;
     private boolean showingFloatGrouping;
-    private final EventSelectionModel<BibtexEntry> selectionModel;
+    private final EventSelectionModel<BibtexEntry> localSelectionModel;
     private final TableComparatorChooser<BibtexEntry> comparatorChooser;
     private final JScrollPane pane;
     private Comparator<BibtexEntry> searchComparator;
@@ -99,8 +104,6 @@ public class MainTable extends JTable {
     private static final int OTHER = 3;
     private static final int BOOLEAN = 4;
     public static final int ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
-
-    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     static {
         MainTable.updateRenderers();
@@ -131,12 +134,12 @@ public class MainTable extends JTable {
         searchComparator = null;//new HitOrMissComparator(searchMatcher);
         groupComparator = null;//new HitOrMissComparator(groupMatcher);
 
-        EventTableModel<BibtexEntry> tableModel = new EventTableModel<BibtexEntry>(sortedForGrouping, tableFormat);
+        EventTableModel<BibtexEntry> tableModel = new EventTableModel<>(sortedForGrouping, tableFormat);
         setModel(tableModel);
 
         tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
-        selectionModel = new EventSelectionModel<BibtexEntry>(sortedForGrouping);
-        setSelectionModel(selectionModel);
+        localSelectionModel = new EventSelectionModel<>(sortedForGrouping);
+        setSelectionModel(localSelectionModel);
         pane = new JScrollPane(this);
         pane.setBorder(BorderFactory.createEmptyBorder());
         pane.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
@@ -493,17 +496,16 @@ public class MainTable extends JTable {
     private int getCellStatus(int row, int col) {
         try {
             BibtexEntry be = sortedForGrouping.get(row);
-            BibtexEntryType type = be.getType();
+            EntryType type = be.getType();
             String columnName = getColumnName(col).toLowerCase();
-            if (columnName.equals(BibtexEntry.KEY_FIELD) || type.isRequired(columnName)) {
+            if (columnName.equals(BibtexEntry.KEY_FIELD) || type.getRequiredFieldsFlat().contains(columnName)) {
                 return MainTable.REQUIRED;
             }
-            if (type.isOptional(columnName)) {
+            if (type.getOptionalFields().contains(columnName)) {
                 return MainTable.OPTIONAL;
             }
             return MainTable.OTHER;
         } catch (NullPointerException ex) {
-            //System.out.println("Exception: getCellStatus");
             return MainTable.OTHER;
         }
     }
@@ -516,7 +518,7 @@ public class MainTable extends JTable {
      *   and then <code>.unlock()</code>
      */
     public EventList<BibtexEntry> getSelected() {
-        return selectionModel.getSelected();
+        return localSelectionModel.getSelected();
     }
 
     /**
@@ -525,7 +527,7 @@ public class MainTable extends JTable {
      * @param row the row to select
      */
     public void setSelected(int row) {
-        selectionModel.setSelectionInterval(row, row);
+        localSelectionModel.setSelectionInterval(row, row);
     }
 
     /**
@@ -533,7 +535,7 @@ public class MainTable extends JTable {
      * @param row the row to add to the selection
      */
     public void addSelection(int row) {
-        this.selectionModel.addSelectionInterval(row, row);
+        this.localSelectionModel.addSelectionInterval(row, row);
     }
 
     public int findEntry(BibtexEntry entry) {

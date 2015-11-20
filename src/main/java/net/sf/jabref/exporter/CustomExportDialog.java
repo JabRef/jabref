@@ -27,9 +27,10 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -126,7 +127,7 @@ class CustomExportDialog extends JDialog {
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs().getKey("Close dialog"), "close");
+        im.put(parent.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.
@@ -194,7 +195,7 @@ class CustomExportDialog extends JDialog {
         //pack();
         setSize(600, 170);
 
-        Util.placeDialog(this, parent);
+        PositionWindow.placeDialog(this, parent);
     }
 
     public boolean okPressed() {

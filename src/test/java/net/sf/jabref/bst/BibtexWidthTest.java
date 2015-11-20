@@ -33,13 +33,7 @@ import org.junit.Test;
 public class BibtexWidthTest {
 
     void assertBibtexWidth(final int i, final String string) {
-        Assert.assertEquals(i, BibtexWidth.width(string, new Warn() {
-
-            @Override
-            public void warn(String s) {
-                Assert.fail("Should not Warn! Width should be " + i + " for " + string);
-            }
-        }));
+        Assert.assertEquals(i, BibtexWidth.width(string));
     }
 
     @Test

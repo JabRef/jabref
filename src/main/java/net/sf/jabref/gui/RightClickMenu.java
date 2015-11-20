@@ -31,7 +31,8 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -219,8 +220,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      */
     private void populateTypeMenu() {
         typeMenu.removeAll();
-        for (String key : BibtexEntryType.getAllTypes()) {
-            typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(key), panel));
+        for (String key : EntryTypes.getAllTypes()) {
+            typeMenu.add(new ChangeTypeAction(EntryTypes.getType(key), panel));
         }
     }
 
@@ -242,7 +243,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      */
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-        BibtexEntry[] bes = panel.getSelectedEntries();
         panel.storeCurrentEdit();
         GroupTreeNode groups = panel.metaData().getGroups();
         if (groups == null) {
@@ -412,7 +412,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             try {
                 panel.runCommand(command);
             } catch (Throwable ex) {
-                LOGGER.debug("Could not execute command " + command + ".", ex);
+                LOGGER.debug("Cannot execute command " + command + ".", ex);
             }
         }
     }
@@ -420,11 +420,11 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
     static class ChangeTypeAction extends AbstractAction {
 
-        final BibtexEntryType type;
+        final EntryType type;
         final BasePanel panel;
 
 
-        public ChangeTypeAction(BibtexEntryType type, BasePanel bp) {
+        public ChangeTypeAction(EntryType type, BasePanel bp) {
             super(type.getName());
             this.type = type;
             panel = bp;

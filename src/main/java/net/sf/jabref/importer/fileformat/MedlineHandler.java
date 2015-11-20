@@ -22,9 +22,9 @@ import java.util.TreeSet;
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.IdGenerator;
 
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -107,23 +107,19 @@ class MedlineHandler extends DefaultHandler
     }
 
     @Override
-    public void startElement(String uri, String localName, String qName, Attributes atts)
-    {
+    public void startElement(String uri, String localName, String qName, Attributes atts) {
         //		public void startElement(String localName, Attributes atts) {
         // Get the number of attribute
         if (localName.equals("PubmedArticle")) {
-        }
-        else if (localName.equals("ArticleTitle")) {
+            // Do nothing
+        } else if (localName.equals("ArticleTitle")) {
             inTitle = true;
             title = "";
-        }
-        else if (localName.equals("PubDate")) {
+        } else if (localName.equals("PubDate")) {
             inPubDate = true;
-        }
-        else if (localName.equals("Year") && inPubDate) {
+        } else if (localName.equals("Year") && inPubDate) {
             inYear = true;
-        }
-        else if (localName.equals("MedlineDate") && inPubDate) {
+        } else if (localName.equals("MedlineDate") && inPubDate) {
             inMedlineDate = true;
         } // medline date does not have 4 digit dates instead it has multiyear etc
         else if (localName.equals("MedlineTA")) {
@@ -132,36 +128,27 @@ class MedlineHandler extends DefaultHandler
         } //journal name
         else if (localName.equals("Month") && inPubDate) {
             inMonth = true;
-        }
-        else if (localName.equals("Volume")) {
+        } else if (localName.equals("Volume")) {
             inVolume = true;
-        }
-        else if (localName.equals("Language")) {
+        } else if (localName.equals("Language")) {
             inLanguage = true;
-        }
-        else if (localName.equals("PublicationStatus")) {
+        } else if (localName.equals("PublicationStatus")) {
             inPst = true;
-        }
-        else if (localName.equals("AuthorList")) {
+        } else if (localName.equals("AuthorList")) {
             inAuthorList = true;
             authors.clear();
-        }
-        else if (localName.equals("MeshHeading")) {
+        } else if (localName.equals("MeshHeading")) {
             inMeshHeader = true;
             majorTopic = "";
             minorTopics = "";
-        }
-        else if (localName.equals("DescriptorName")) {
+        } else if (localName.equals("DescriptorName")) {
             inDescriptorName = true;
-        }
-        else if (localName.equals("QualifierName")) {
+        } else if (localName.equals("QualifierName")) {
             inQualifierName = true;
-        }
-        else if (localName.equals("Author")) {
+        } else if (localName.equals("Author")) {
             inAuthor = true;
             author = "";
-        }
-        else if (localName.equals("CollectiveName")) {
+        } else if (localName.equals("CollectiveName")) {
             inForename = true;
             forename = "";
         } // Morten A. 20040513.
@@ -172,35 +159,27 @@ class MedlineHandler extends DefaultHandler
                 inPubMedID = true;
                 pubmedid = "";
             }
-        }
-        else if (localName.equals("LastName")) {
+        } else if (localName.equals("LastName")) {
             inLastName = true;
             lastName = "";
-        }
-        else if (localName.equals("ForeName") || localName.equals("FirstName")) {
+        } else if (localName.equals("ForeName") || localName.equals("FirstName")) {
             inForename = true;
             forename = "";
-        }
-        else if (localName.equals("Suffix")) {
+        } else if (localName.equals("Suffix")) {
             inSuffix = true;
             suffix = "";
-        }
-        else if (localName.equals("Issue")) {
+        } else if (localName.equals("Issue")) {
             inIssue = true;
-        }
-        else if (localName.equals("MedlinePgn")) {
+        } else if (localName.equals("MedlinePgn")) {
             inMedlinePgn = true;
-        }//pagenumber
+        } //pagenumber
         else if (localName.equals("URL")) {
             inUrl = true;
-        }
-        else if (localName.equals("Initials")) {
+        } else if (localName.equals("Initials")) {
             inInitials = true;
-        }
-        else if (localName.equals("AbstractText")) {
+        } else if (localName.equals("AbstractText")) {
             inAbstractText = true;
-        }
-        else if (localName.equals("ArticleId")) {
+        } else if (localName.equals("ArticleId")) {
             for (int i = 0; i < atts.getLength(); i++) {
                 String value = atts.getValue(i);
                 if (value.equals("doi")) {
@@ -212,8 +191,7 @@ class MedlineHandler extends DefaultHandler
                 }
 
             }
-        }
-        else if (localName.equals("Affiliation")) {
+        } else if (localName.equals("Affiliation")) {
             inAffiliation = true;
         }
 
@@ -266,7 +244,7 @@ class MedlineHandler extends DefaultHandler
             String keywords = sb.toString();
 
             BibtexEntry b = new BibtexEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
-            BibtexEntryTypes.getEntryType("article")); // id assumes an existing database so don't create one here
+            EntryTypes.getBibtexEntryType("article")); // id assumes an existing database so don't create one here
             if (!author.equals("")) {
                 b.setField("author", MedlineHandler.htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));

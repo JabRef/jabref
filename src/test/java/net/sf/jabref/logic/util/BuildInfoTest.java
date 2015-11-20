@@ -10,7 +10,7 @@ public class BuildInfoTest {
     @Test
     public void testDefaults() {
         BuildInfo buildInfo = new BuildInfo("asdf");
-        assertEquals("dev", buildInfo.getVersion());
+        assertEquals("*unknown*", buildInfo.getVersion());
     }
 
     @Test

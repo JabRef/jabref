@@ -50,12 +50,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.gui.FocusRequester;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 /**
  * Dialog to allow users to choose a file contained in a ZIP file.
@@ -270,7 +270,7 @@ class ZipFileChooser extends JDialog {
         JPanel mainPanel = new JPanel();
         //ActionMap am = mainPanel.getActionMap();
         //InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        //im.put(prefs.getKey("Close dialog"), "close");
+        //im.put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         //am.put("close", closeAction);
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(sp, BorderLayout.CENTER);
@@ -284,7 +284,7 @@ class ZipFileChooser extends JDialog {
         getContentPane().add(optionsPanel, BorderLayout.SOUTH);
         this.setSize(getSize());
         pack();
-        Util.placeDialog(this, owner);
+        PositionWindow.placeDialog(this, owner);
         new FocusRequester(table);
     }
 }

@@ -120,11 +120,6 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getKeyName() {
-        return "ISBNtoBibTeX";
-    }
-
-    @Override
     public String getHelpPage() {
         return "ISBNtoBibTeXHelp.html";
     }

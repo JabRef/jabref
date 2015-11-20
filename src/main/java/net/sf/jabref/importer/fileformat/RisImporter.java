@@ -23,12 +23,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.logic.util.date.MonthUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.*;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -262,8 +260,8 @@ public class RisImporter extends ImportFormat {
 
                 hm.put("pages", startPage + "--" + endPage);
             }
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
-                    .getEntryType(type)); // id assumes an existing database so don't
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getBibtexEntryType(type)); // id assumes an existing database so don't
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();

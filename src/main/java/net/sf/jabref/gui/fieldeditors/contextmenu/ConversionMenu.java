@@ -43,7 +43,7 @@ public class ConversionMenu extends JMenu {
 
         // create menu items, one for each case changer
         for (final Converters.Converter converter : Converters.ALL) {
-            JMenuItem menuItem = new JMenuItem(Localization.lang(converter.getName()));
+            JMenuItem menuItem = new JMenuItem(converter.getName());
             menuItem.addActionListener(new ActionListener() {
 
                 @Override

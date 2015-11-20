@@ -31,15 +31,20 @@ public class ReadStatus extends SpecialField {
 
     private ReadStatus() {
         ArrayList<SpecialFieldValue> values = new ArrayList<>();
-        values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null, Localization.lang("No read status information")));
+        // @formatter:off
+        values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null,
+                Localization.lang("No read status information")));
         Icon tmpicon;
         tmpicon = IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
         // DO NOT TRANSLATE "read" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead",
-                Localization.lang("Set read status to read"), tmpicon, Localization.lang("Read status read")));
+                Localization.lang("Set read status to read"), tmpicon,
+                Localization.lang("Read status read")));
         tmpicon = IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
         values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed",
-                Localization.lang("Set read status to skimmed"), tmpicon, Localization.lang("Read status skimmed")));
+                Localization.lang("Set read status to skimmed"), tmpicon,
+                Localization.lang("Read status skimmed")));
+        // @formatter:on
         this.setValues(values);
         TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";
     }

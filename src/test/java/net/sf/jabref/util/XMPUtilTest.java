@@ -10,7 +10,7 @@ import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.apache.jempbox.xmp.*;
@@ -37,9 +37,7 @@ import java.util.*;
  * @author Christopher Oezbek <oezi@oezi.de>
  */
 public class XMPUtilTest {
-
     public static final String SRC_TEST_ESOURCES_ENCRYPTED_PDF = "src/test/resources/encrypted.pdf";
-
 
     /**
      * Wrap bibtex-data (<bibtex:author>...) into an rdf:Description.
@@ -304,7 +302,7 @@ public class XMPUtilTest {
         Assert.assertEquals("2003", e.getField("year"));
         Assert.assertEquals("Beach sand convolution by surf-wave optimzation", e
                 .getField("title"));
-        Assert.assertEquals(BibtexEntryTypes.OTHER, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.MISC, e.getType());
 
     }
 
@@ -331,7 +329,7 @@ public class XMPUtilTest {
         Assert.assertEquals("OezbekC06", e.getCiteKey());
         Assert.assertEquals("2003", e.getField("year"));
         Assert.assertEquals("�pt�mz�t��n", e.getField("title"));
-        Assert.assertEquals(BibtexEntryTypes.OTHER, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.MISC, e.getType());
     }
 
     /**
@@ -414,7 +412,7 @@ public class XMPUtilTest {
         Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getField("author"));
         Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e
                 .getField("editor"));
-        Assert.assertEquals(BibtexEntryTypes.OTHER, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.MISC, e.getType());
     }
 
     /**
@@ -457,9 +455,9 @@ public class XMPUtilTest {
                 // PDMetadata.getInputStreamAsString() does not work
 
                 // Convert to UTF8 and make available for metadata.
-                InputStreamReader is = new InputStreamReader(meta
-                        .createInputStream(), "UTF8");
-                return XMPUtilTest.slurp(is).trim(); // Trim to kill padding end-newline.
+                try(InputStreamReader is = new InputStreamReader(meta.createInputStream(), "UTF8")) {
+                    return XMPUtilTest.slurp(is).trim(); // Trim to kill padding end-newline.
+                }
             }
         } finally {
             if (document != null) {

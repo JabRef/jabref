@@ -31,13 +31,13 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.XMLChars;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -923,8 +923,8 @@ class MSBibEntry {
         map.put(type, allAuthors);
     }
 
-    private BibtexEntryType mapMSBibToBibtexType(String msbib) {
-        BibtexEntryType bibtex = BibtexEntryTypes.OTHER;
+    private EntryType mapMSBibToBibtexType(String msbib) {
+        EntryType bibtex;
         if (msbib.equals("Book")) {
             bibtex = BibtexEntryTypes.BOOK;
         } else if (msbib.equals("BookSection")) {
@@ -936,7 +936,7 @@ class MSBibEntry {
         } else if (msbib.equals("Report")) {
             bibtex = BibtexEntryTypes.TECHREPORT;
         } else if (msbib.equals("InternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("ElectronicSource") || msbib.equals("Art") || msbib.equals("SoundRecording") || msbib.equals("Performance") || msbib.equals("Film") || msbib.equals("Interview") || msbib.equals("Patent") || msbib.equals("Case")) {
-            bibtex = BibtexEntryTypes.OTHER;
+            bibtex = BibtexEntryTypes.MISC;
         } else {
             bibtex = BibtexEntryTypes.MISC;
         }

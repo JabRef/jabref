@@ -15,9 +15,10 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
+import javax.swing.*;
+
 import net.sf.jabref.gui.GUIGlobals;
 
-import javax.swing.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 

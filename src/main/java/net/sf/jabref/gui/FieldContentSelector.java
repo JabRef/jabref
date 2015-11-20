@@ -35,8 +35,8 @@ import com.jgoodies.looks.Options;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 /**
  * A combo-box and a manage button that will add selected strings to an
@@ -170,7 +170,7 @@ public class FieldContentSelector extends JComponent {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ContentSelectorDialog2 csd = new ContentSelectorDialog2(FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData, editor.getFieldName());
-                Util.placeDialog(csd, FieldContentSelector.this.frame);
+                PositionWindow.placeDialog(csd, FieldContentSelector.this.frame);
 
                 // Calling setVisible(true) will open the modal dialog and block
                 // for the dialog to close.

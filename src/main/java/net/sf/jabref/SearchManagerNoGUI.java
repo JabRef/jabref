@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.importer.*;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -55,7 +54,7 @@ class SearchManagerNoGUI {
                 Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
 
         if (!searchQuery.isValidQuery()) {
-            LOGGER.warn(Localization.lang("Search failed: illegal search expression"));
+            LOGGER.warn("Search failed: illegal search expression");
             return base;
         }
 

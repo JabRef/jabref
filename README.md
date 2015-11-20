@@ -3,8 +3,8 @@
 [![CircleCI](https://img.shields.io/circleci/project/JabRef/jabref.svg)](https://circleci.com/gh/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
+[![Coverity Status](https://badges.ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)](https://ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)
-[![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Donation](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?item_name=JabRef+Bibliography+Manager&cmd=_donations&lc=US&currency_code=EUR&business=jabrefmail%40gmail.com)
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=koppor&url=https%3A%2F%2Fgithub.com%2FJabRef%2Fjabref&title=JabRef&language=Java&tags=github&category=software)
 [![Download JabRef](https://img.shields.io/sourceforge/dw/jabref.svg)](http://sourceforge.net/projects/jabref/files/jabref/)
@@ -13,7 +13,6 @@ This version is a development version. Features may not work as expected.
 
 The branch of this README file is `master`.
 The intention of this branch is to move JabRef forward to modern technologies such as Java8 and JavaFX.
-The development version will be called `v2.80` and is meant as preparation to the `v3.0` release.
 
 The last version with Java6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 

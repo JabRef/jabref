@@ -1,12 +1,10 @@
 package net.sf.jabref.logic.cleanup;
 
-import junit.framework.Assert;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class PageNumbersCleanupTest {
     private BibtexEntry entry;

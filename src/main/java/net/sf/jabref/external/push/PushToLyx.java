@@ -102,16 +102,14 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
             @Override
             public void run() {
-                try {
-                    FileWriter fw = new FileWriter(lyxpipe);
-                    BufferedWriter lyx_out = new BufferedWriter(fw);
+                try (FileWriter fw = new FileWriter(lyxpipe); BufferedWriter lyx_out = new BufferedWriter(fw)) {
                     String citeStr;
 
                     citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
                     lyx_out.write(citeStr + "\n");
 
                     lyx_out.close();
-
+                    fw.close();
                 } catch (IOException excep) {
                     couldNotCall = true;
                 }

@@ -31,7 +31,6 @@ import net.sf.jabref.exporter.layout.format.NameFormatter;
 import net.sf.jabref.exporter.layout.format.NotFoundFormatter;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.logic.l10n.Encodings;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.Util;
@@ -394,7 +393,7 @@ class LayoutEntry {
                     return (LayoutFormatter) Class.forName(className).newInstance();
                 }
             } catch (ClassNotFoundException ex) {
-                throw new Exception(Localization.lang("Formatter not found") + ": " + className);
+                throw new Exception("Formatter not found: " + className);
             } catch (InstantiationException ex) {
                 throw new Exception(className + " cannot be instantiated.");
             } catch (IllegalAccessException ex) {

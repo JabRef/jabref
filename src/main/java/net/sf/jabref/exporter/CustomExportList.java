@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -25,7 +25,6 @@ import net.sf.jabref.Globals;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.BasicEventList;
-import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class handles user defined custom export formats. They are initially
@@ -39,15 +38,14 @@ public class CustomExportList {
 
     private final EventList<String[]> list;
     private final SortedList<String[]> sorted;
-    private final TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
-    private Object[] array;
+    private final TreeMap<String, ExportFormat> formats = new TreeMap<>();
 
     private static final Log LOGGER = LogFactory.getLog(CustomExportList.class);
 
 
     public CustomExportList(Comparator<String[]> comp) {
-        list = new BasicEventList<String[]>();
-        sorted = new SortedList<String[]>(list, comp);
+        list = new BasicEventList<>();
+        sorted = new SortedList<>(list, comp);
     }
 
     public TreeMap<String, ExportFormat> getCustomExportFormats() {
@@ -76,8 +74,7 @@ public class CustomExportList {
                 list.add(s);
             } else {
                 String customExportFormat = Globals.prefs.get("customExportFormat" + i);
-                LOGGER.error(Localization.lang("Error initializing custom export format from string '%0'",
-                        customExportFormat));
+                LOGGER.error("Error initializing custom export format from string " + customExportFormat);
             }
             i++;
         }

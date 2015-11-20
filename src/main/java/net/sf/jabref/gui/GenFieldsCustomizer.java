@@ -25,6 +25,7 @@ import javax.swing.border.TitledBorder;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
@@ -115,7 +116,7 @@ public class GenFieldsCustomizer extends JDialog {
         // Key bindings:
         ActionMap am = buttons.getActionMap();
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             @Override

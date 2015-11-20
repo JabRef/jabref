@@ -22,12 +22,9 @@ import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.*;
 
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.*;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchema;
 import org.w3c.dom.Element;
@@ -304,11 +301,11 @@ public class XMPSchemaBibtex extends XMPSchema {
     public BibtexEntry getBibtexEntry() {
 
         String type = getTextProperty("entrytype");
-        BibtexEntryType t;
+        EntryType t;
         if (type != null) {
-            t = BibtexEntryType.getStandardType(type);
+            t = EntryTypes.getStandardType(type);
         } else {
-            t = BibtexEntryTypes.OTHER;
+            t = BibtexEntryTypes.MISC;
         }
 
         BibtexEntry e = new BibtexEntry(IdGenerator.next(), t);

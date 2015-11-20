@@ -10,6 +10,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.URLUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.Util;
 
@@ -43,7 +44,7 @@ public class JabRefDesktop {
 
             // Check that the file exists:
             if ((file == null) || !file.exists()) {
-                throw new IOException(Localization.lang("File not found") + " (" + fieldName + "): '" + link + "'.");
+                throw new IOException("File not found (" + fieldName + "): '" + link + "'.");
             }
             link = file.getCanonicalPath();
 
@@ -69,7 +70,7 @@ public class JabRefDesktop {
         } else if (fieldName.equals("eprint")) {
             fieldName = "url";
 
-            link = Util.sanitizeUrl(link);
+            link = URLUtil.sanitizeUrl(link);
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
@@ -305,8 +306,11 @@ public class JabRefDesktop {
             String link, UnknownExternalFileType fileType) throws IOException {
 
         String cancelMessage = Localization.lang("Unable to open file.");
+        // @formatter:off
         String[] options = new String[] {Localization.lang("Define '%0'", fileType.getName()),
-                Localization.lang("Change file type"), Localization.lang("Cancel")};
+                Localization.lang("Change file type"),
+                Localization.lang("Cancel")};
+        // @formatter:on
         String defOption = options[0];
         int answer = JOptionPane.showOptionDialog(frame, Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
                         fileType.getName()),
@@ -365,8 +369,8 @@ public class JabRefDesktop {
                 UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD,
                         oldValue, newValue);
                 entry.setField(Globals.FILE_FIELD, newValue);
-                frame.basePanel().undoManager.addEdit(ce);
-                frame.basePanel().markBaseChanged();
+                frame.getCurrentBasePanel().undoManager.addEdit(ce);
+                frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
                 return openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
             } else {
@@ -428,7 +432,7 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openBrowser(String url) throws IOException {
-        url = Util.sanitizeUrl(url);
+        url = URLUtil.sanitizeUrl(url);
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
     }

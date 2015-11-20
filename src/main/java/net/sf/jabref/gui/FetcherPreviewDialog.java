@@ -23,6 +23,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import net.sf.jabref.*;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -128,7 +129,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         };
         ActionMap am = centerPan.getActionMap();
         InputMap im = centerPan.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
         pack();

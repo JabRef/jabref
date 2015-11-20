@@ -20,8 +20,11 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -77,7 +80,7 @@ public class SynchronizeFileField extends AbstractWorker {
         if (optDiag == null) {
             optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.metaData(), fieldName);
         }
-        Util.placeDialog(optDiag, panel.frame());
+        PositionWindow.placeDialog(optDiag, panel.frame());
         optDiag.setVisible(true);
         if (optDiag.canceled()) {
             goOn = false;
@@ -219,9 +222,12 @@ public class SynchronizeFileField extends AbstractWorker {
 
                         // Unless we deleted this link, see if its file type is recognized:
                         if (!deleted && (flEntry.getType() instanceof UnknownExternalFileType)) {
-                            String[] options = new String[]
-                                    {Localization.lang("Define '%0'", flEntry.getType().getName()),
-                                            Localization.lang("Change file type"), Localization.lang("Cancel")};
+                            // @formatter:off
+                            String[] options = new String[] {
+                                    Localization.lang("Define '%0'", flEntry.getType().getName()),
+                                    Localization.lang("Change file type"),
+                                    Localization.lang("Cancel")};
+                            // @formatter:on
                             String defOption = options[0];
                             int answer = JOptionPane.showOptionDialog(panel.frame(), Localization.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
                                     flEntry.getType().getName()),
@@ -298,7 +304,6 @@ public class SynchronizeFileField extends AbstractWorker {
 
     static class OptionsDialog extends JDialog {
 
-        private static final long serialVersionUID = 1909919286125256934L;
         final JRadioButton autoSetUnset;
         final JRadioButton autoSetAll;
         final JRadioButton autoSetNone;
@@ -325,8 +330,6 @@ public class SynchronizeFileField extends AbstractWorker {
 
             Action closeAction = new AbstractAction() {
 
-                private static final long serialVersionUID = -8834440705768095070L;
-
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     dispose();
@@ -337,7 +340,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
             InputMap im = cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
             ActionMap am = cancel.getActionMap();
-            im.put(Globals.prefs.getKey("Close dialog"), "close");
+            im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
             am.put("close", closeAction);
 
             autoSetUnset = new JRadioButton(Localization.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);
@@ -351,11 +354,10 @@ public class SynchronizeFileField extends AbstractWorker {
 
             FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
             FormBuilder builder = FormBuilder.create().layout(layout);
-            description = new JLabel("<HTML>" +
-                    Localization.lang(//"This function helps you keep your external %0 links up-to-date." +
-                            "Attempt to autoset %0 links for your entries. Autoset works if "
-                            + "a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.", fn)
-            + "</HTML>");
+            description = new JLabel("<HTML>" + Localization.lang(
+                    "Attempt to autoset %0 links for your entries. Autoset works if "
+                            + "a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.",
+                    fn) + "</HTML>");
 
             builder.addSeparator(Localization.lang("Autoset")).xy(1, 1);
             builder.add(description).xy(1, 3);

@@ -191,17 +191,13 @@ public class FileUpdateMonitor implements Runnable {
 
         public boolean copy() {
 
-            //Util.pr("<copy file=\""+tmpFile.getPath()+"\">");
             boolean res = false;
             try {
                 res = FileUtil.copyFile(file, tmpFile, true);
             } catch (IOException ex) {
                 LOGGER.info("Cannot copy to temporary file '" + tmpFile.getPath() + '\'', ex);
             }
-            //Util.pr("</copy>");
             return res;
-
-            //return true;
         }
 
         /**

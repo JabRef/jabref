@@ -16,13 +16,16 @@
 package net.sf.jabref.importer;
 
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -33,6 +36,7 @@ import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -55,8 +59,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static final ArrayList<PostOpenAction> postOpenActions =
-            new ArrayList<PostOpenAction>();
+    private static final ArrayList<PostOpenAction> postOpenActions = new ArrayList<>();
+
 
     static {
         // Add the action for checking for new custom entry types loaded from
@@ -68,25 +72,22 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         OpenDatabaseAction.postOpenActions.add(new HandleDuplicateWarnings());
     }
 
-
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
         super(IconTheme.JabRefIcon.OPEN.getIcon());
         this.frame = frame;
         this.showDialog = showDialog;
         putValue(Action.NAME, Localization.menuTitle("Open database"));
-        putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Open database"));
+        putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.OPEN_DATABASE));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX database"));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        List<File> filesToOpen = new ArrayList<File>();
-        //File fileToOpen = null;
+        List<File> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
-
-            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
-                    true);
+            String[] chosen = FileDialogs.getMultipleFiles(frame,
+                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib", true);
             if (chosen != null) {
                 for (String aChosen : chosen) {
                     if (aChosen != null) {
@@ -94,65 +95,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }
                 }
             }
-
-            /*
-            String chosenFile = Globals.getNewFile(frame,
-                    new File(Globals.prefs.get("workingDirectory")), ".bib",
-                    JFileChooser.OPEN_DIALOG, true);
-
-            if (chosenFile != null) {
-                fileToOpen = new File(chosenFile);
-            }*/
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
-            filesToOpen.add(new File(StringUtil.makeBibtexExtension(e.getActionCommand())));
+            filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
         }
 
-        BasePanel toRaise = null;
-        int initialCount = filesToOpen.size();
-        int removed = 0;
-
-        // Check if any of the files are already open:
-        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
-            File file = iterator.next();
-            for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-                BasePanel bp = frame.baseAt(i);
-                if ((bp.getFile() != null) && bp.getFile().equals(file)) {
-                    iterator.remove();
-                    removed++;
-                    // See if we removed the final one. If so, we must perhaps
-                    // raise the BasePanel in question:
-                    if (removed == initialCount) {
-                        toRaise = bp;
-                    }
-                    break;
-                }
-            }
-        }
-
-        // Run the actual open in a thread to prevent the program
-        // locking until the file is loaded.
-        if (!filesToOpen.isEmpty()) {
-            final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    for (File theFile : theFiles) {
-                        openIt(theFile, true);
-                    }
-                }
-            });
-            for (File theFile : theFiles) {
-                frame.getFileHistory().newFile(theFile.getPath());
-            }
-        }
-        // If no files are remaining to open, this could mean that a file was
-        // already open. If so, we may have to raise the correct tab:
-        else if (toRaise != null) {
-            frame.output(Localization.lang("File '%0' is already open.", toRaise.getFile().getPath()));
-            frame.getTabbedPane().setSelectedComponent(toRaise);
-        }
+        openFiles(filesToOpen, true);
     }
 
 
@@ -177,7 +125,85 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     }
 
 
-    public void openIt(File file, boolean raisePanel) {
+    /**
+     * Opens the given file. If null or 404, nothing happens
+     *
+     * @param file the file, may be null or not existing
+     */
+    public void openFile(File file, boolean raisePanel) {
+        List<File> filesToOpen = new ArrayList<>();
+        filesToOpen.add(file);
+        openFiles(filesToOpen, raisePanel);
+    }
+
+    public void openFilesAsStringList(List<String> fileNamesToOpen, boolean raisePanel) {
+        List<File> filesToOpen = new ArrayList<>();
+        for (String fileName : fileNamesToOpen) {
+            filesToOpen.add(new File(fileName));
+        }
+        openFiles(filesToOpen, raisePanel);
+    }
+
+    /**
+     * Opens the given files. If one of it is null or 404, nothing happens
+     *
+     * @param filesToOpen the filesToOpen, may be null or not existing
+     */
+    public void openFiles(List<File> filesToOpen, boolean raisePanel) {
+        BasePanel toRaise = null;
+        int initialCount = filesToOpen.size();
+        int removed = 0;
+
+        // Check if any of the files are already open:
+        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
+            File file = iterator.next();
+            for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
+                BasePanel bp = frame.getBasePanelAt(i);
+                if ((bp.getDatabaseFile() != null) && bp.getDatabaseFile().equals(file)) {
+                    iterator.remove();
+                    removed++;
+                    // See if we removed the final one. If so, we must perhaps
+                    // raise the BasePanel in question:
+                    if (removed == initialCount) {
+                        toRaise = bp;
+                    }
+                    // no more bps to check, we found a matching one
+                    break;
+                }
+            }
+        }
+
+        // Run the actual open in a thread to prevent the program
+        // locking until the file is loaded.
+        if (!filesToOpen.isEmpty()) {
+            final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                    for (File theFile : theFiles) {
+                        openTheFile(theFile, raisePanel);
+                    }
+                }
+            });
+            for (File theFile : theFiles) {
+                frame.getFileHistory().newFile(theFile.getPath());
+            }
+        }
+        // If no files are remaining to open, this could mean that a file was
+        // already open. If so, we may have to raise the correct tab:
+        else if (toRaise != null) {
+            frame.output(Localization.lang("File '%0' is already open.", toRaise.getDatabaseFile().getPath()));
+            frame.getTabbedPane().setSelectedComponent(toRaise);
+        }
+
+        frame.output(Localization.lang("Files opened") + ": " + (filesToOpen.size()));
+    }
+
+    /**
+     * @param file the file, may be null or not existing
+     */
+    private void openTheFile(File file, boolean raisePanel) {
         if ((file != null) && file.exists()) {
             File fileToLoad = file;
             frame.output(Localization.lang("Opening") + ": '" + file.getPath() + "'");
@@ -191,11 +217,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             } else if (autoSaveFound) {
                 // We have found a newer autosave, but we are not allowed to use it without
                 // prompting.
-                int answer = JOptionPane.showConfirmDialog(null, "<html>" +
-                        Localization.lang("An autosave file was found for this database. This could indicate ")
-                        + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.") + "<br>"
-                        + Localization.lang("Do you want to recover the database from the autosave file?") + "</html>",
-                        Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
+                int answer = JOptionPane.showConfirmDialog(null,
+                        "<html>" + Localization
+                                .lang("An autosave file was found for this database. This could indicate ")
+                        + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.")
+                        + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
+                        + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     fileToLoad = AutoSaveManager.getAutoSaveFile(file);
                     tryingAutosave = true;
@@ -211,22 +238,23 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 if (FileBasedLock.hasLockFile(file)) {
                     long modTime = FileBasedLock.getLockFileTimeStamp(file);
-                    if ((modTime != -1) && ((System.currentTimeMillis() - modTime)
-                            > SaveSession.LOCKFILE_CRITICAL_AGE)) {
+                    if ((modTime != -1)
+                            && ((System.currentTimeMillis() - modTime) > SaveSession.LOCKFILE_CRITICAL_AGE)) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
-                        int answer = JOptionPane.showConfirmDialog(null, "<html>" + Localization.lang("Error opening file")
-                                + " '" + fileName + "'. " + Localization.lang("File is locked by another JabRef instance.")
-                                + "<p>" + Localization.lang("Do you want to override the file lock?"),
+                        int answer = JOptionPane.showConfirmDialog(null,
+                                "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
+                                        + Localization.lang("File is locked by another JabRef instance.") + "<p>"
+                                        + Localization.lang("Do you want to override the file lock?"),
                                 Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
                         if (answer == JOptionPane.YES_OPTION) {
                             FileBasedLock.deleteLockFile(file);
                         } else {
                             return;
                         }
-                    }
-                    else if (!FileBasedLock.waitForFileLock(file, 10)) {
-                        JOptionPane.showMessageDialog(null, Localization.lang("Error opening file")
-                                + " '" + fileName + "'. " + Localization.lang("File is locked by another JabRef instance."),
+                    } else if (!FileBasedLock.waitForFileLock(file, 10)) {
+                        JOptionPane.showMessageDialog(null,
+                                Localization.lang("Error opening file") + " '" + fileName + "'. "
+                                        + Localization.lang("File is locked by another JabRef instance."),
                                 Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
@@ -243,13 +271,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 }
                 if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                     JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
-                            Localization.lang("Error"),
-                            JOptionPane.ERROR_MESSAGE);
+                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
 
-                    String message = "<html>" + errorMessage + "<p>" +
-                            (tryingAutosave ? Localization.lang("Error opening autosave of '%0'. Trying to load '%0' instead.", file.getName())
-                                    : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/) + "</html>";
-                    JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
+                    String message = "<html>" + errorMessage + "<p>"
+                            + (tryingAutosave ? Localization.lang(
+                                    "Error opening autosave of '%0'. Trying to load '%0' instead.",
+                                    file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
+                            + "</html>";
+                    JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"),
+                            JOptionPane.ERROR_MESSAGE);
 
                     if (tryingAutosave) {
                         tryingAutosave = false;
@@ -286,13 +316,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     }
 
     /**
-     * Go through the list of post open actions, and perform those that need
-     * to be performed.
+     * Go through the list of post open actions, and perform those that need to be performed.
+     *
      * @param panel The BasePanel where the database is shown.
      * @param pr The result of the bib file parse operation.
      */
-    public static void performPostOpenActions(BasePanel panel, ParserResult pr,
-            boolean mustRaisePanel) {
+    public static void performPostOpenActions(BasePanel panel, ParserResult pr, boolean mustRaisePanel) {
         for (PostOpenAction action : OpenDatabaseAction.postOpenActions) {
             if (action.isActionNecessary(pr)) {
                 if (mustRaisePanel) {
@@ -303,8 +332,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
     }
 
-    public BasePanel addNewDatabase(ParserResult pr, final File file,
-            boolean raisePanel) {
+    public BasePanel addNewDatabase(ParserResult pr, final File file, boolean raisePanel) {
 
         String fileName = file.getPath();
         BibtexDatabase db = pr.getDatabase();
@@ -330,8 +358,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // (duplicate key warnings). I don't think this is a big problem for normal situations,
                     // and it may possibly be a bug in the Swing code.
                     JOptionPane.showMessageDialog(frame, wrn.toString(),
-                            Localization.lang("Warnings") + " (" + file.getName() + ")",
-                            JOptionPane.WARNING_MESSAGE);
+                            Localization.lang("Warnings") + " (" + file.getName() + ")", JOptionPane.WARNING_MESSAGE);
                 }
             });
         }
@@ -340,141 +367,109 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // file is set to null inside the EventDispatcherThread
         SwingUtilities.invokeLater(new OpenItSwingHelper(bp, file, raisePanel));
 
-        frame.output(Localization.lang("Opened database") + " '" + fileName +
-                "' " + Localization.lang("with") + " " +
-                db.getEntryCount() + " " + Localization.lang("entries") + ".");
+        frame.output(Localization.lang("Opened database") + " '" + fileName + "' " + Localization.lang("with") + " "
+                + db.getEntryCount() + " " + Localization.lang("entries") + ".");
 
         return bp;
     }
 
-    public static ParserResult loadDatabase(File fileToOpen, String encoding)
-            throws IOException {
-
-        // First we make a quick check to see if this looks like a BibTeX file:
-        Reader reader;// = ImportFormatReader.getReader(fileToOpen, encoding);
-        //if (!BibtexParser.isRecognizedFormat(reader))
-        //    return null;
-
-        // The file looks promising. Reinitialize the reader and go on:
-        //reader = getReader(fileToOpen, encoding);
+    /**
+     * Opens a new database.
+     */
+    public static ParserResult loadDatabase(File fileToOpen, String fallbackEncoding) throws IOException {
 
         // We want to check if there is a JabRef signature in the file, because that would tell us
         // which character encoding is used. However, to read the signature we must be using a compatible
         // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
-        // read it regardless of encoding, with either UTF8 or UTF-16. That's the hypothesis, at any rate.
+        // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
         // 8 bit is most likely, so we try that first:
-        Reader utf8Reader = ImportFormatReader.getUTF8Reader(fileToOpen);
-        String suppliedEncoding = OpenDatabaseAction.checkForEncoding(utf8Reader);
-        utf8Reader.close();
+        Optional<String> suppliedEncoding = Optional.empty();
+        try (Reader utf8Reader = ImportFormatReader.getUTF8Reader(fileToOpen)) {
+            suppliedEncoding = OpenDatabaseAction.getSuppliedEncoding(utf8Reader);
+        }
         // Now if that didn't get us anywhere, we check with the 16 bit encoding:
-        if (suppliedEncoding == null) {
-            Reader utf16Reader = ImportFormatReader.getUTF16Reader(fileToOpen);
-            suppliedEncoding = OpenDatabaseAction.checkForEncoding(utf16Reader);
-            utf16Reader.close();
-        }
-
-        if (suppliedEncoding != null) {
-            try {
-                reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
-                encoding = suppliedEncoding; // Just so we put the right info into the ParserResult.
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
+        if (!suppliedEncoding.isPresent()) {
+            try (Reader utf16Reader = ImportFormatReader.getUTF16Reader(fileToOpen)) {
+                suppliedEncoding = OpenDatabaseAction.getSuppliedEncoding(utf16Reader);
             }
-        } else {
-            // We couldn't find a header with info about encoding. Use default:
-            reader = ImportFormatReader.getReader(fileToOpen, encoding);
         }
 
-        BibtexParser bp = new BibtexParser(reader);
+        // Open and parse file
+        try (InputStreamReader reader = openFile(fileToOpen, suppliedEncoding, fallbackEncoding)) {
+            BibtexParser bp = new BibtexParser(reader);
 
-        ParserResult pr = bp.parse();
-        pr.setEncoding(encoding);
-        pr.setFile(fileToOpen);
+            ParserResult pr = bp.parse();
+            pr.setEncoding(reader.getEncoding());
+            pr.setFile(fileToOpen);
 
-        if (SpecialFieldsUtils.keywordSyncEnabled()) {
-            for (BibtexEntry entry : pr.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
+            if (SpecialFieldsUtils.keywordSyncEnabled()) {
+                for (BibtexEntry entry : pr.getDatabase().getEntries()) {
+                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
+                }
+                LOGGER.info("Synchronized special fields based on keywords");
             }
-            LOGGER.info(Localization.lang("Synchronized special fields based on keywords"));
-        }
 
-        if (!pr.getMetaData().isGroupTreeValid()) {
-            pr.addWarning(Localization.lang("Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
-        }
+            if (!pr.getMetaData().isGroupTreeValid()) {
+                pr.addWarning(Localization.lang(
+                        "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
+            }
 
-        return pr;
+            return pr;
+        }
     }
 
-    private static String checkForEncoding(Reader reader) {
-        String suppliedEncoding = null;
-        StringBuilder headerText = new StringBuilder();
-        try {
-            boolean keepon = true;
-            int piv = 0;
-            int offset = 0;
-            int c;
+    /**
+     * Opens the file with the provided encoding. If this fails (or no encoding is provided), then the fallback encoding
+     * will be used.
+     */
+    private static InputStreamReader openFile(File fileToOpen, Optional<String> encoding, String fallbackEncoding)
+            throws IOException {
+        if (encoding.isPresent()) {
+            try {
+                return ImportFormatReader.getReader(fileToOpen, encoding.get());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                // The supplied encoding didn't work out, so we use the fallback.
+                return ImportFormatReader.getReader(fileToOpen, fallbackEncoding);
+            }
+        } else {
+            // We couldn't find a header with info about encoding. Use fallback:
+            return ImportFormatReader.getReader(fileToOpen, fallbackEncoding);
 
-            while (keepon) {
-                c = reader.read();
-                if ((piv == 0) && ((c == '%') || Character.isWhitespace((char) c))) {
-                    offset++;
-                } else {
-                    headerText.append((char) c);
-                    if (c == Globals.SIGNATURE.charAt(piv)) {
-                        piv++;
-                    } else {
-                        //if (((char)c) == '@')
-                        keepon = false;
-                    }
+        }
+    }
+
+    /**
+     * Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
+     */
+    private static Optional<String> getSuppliedEncoding(Reader reader) {
+        try {
+            BufferedReader br = new BufferedReader(reader);
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+
+                // Line does not start with %, so there are no comment lines for us and we can stop parsing
+                if (!line.startsWith("%")) {
+                    return Optional.empty();
                 }
 
-                found: if (piv == Globals.SIGNATURE.length()) {
-                    keepon = false;
+                // Only keep the part after %
+                line = line.substring(1).trim();
 
-                    //if (headerText.length() > GUIGlobals.SIGNATURE.length())
-                    //    System.out.println("'"+headerText.toString().substring(0, headerText.length()-GUIGlobals.SIGNATURE.length())+"'");
-                    // Found the signature. The rest of the line is unknown, so we skip
-                    // it:
-                    while (reader.read() != '\n') {
-                        // keep reading
-                    }
-                    // If the next line starts with something like "% ", handle this:
-                    while (((c = reader.read()) == '%') || Character.isWhitespace((char) c)) {
-                        // keep reading
-                    }
-                    // Then we must skip the "Encoding: ". We may already have read the first
-                    // character:
-                    if ((char) c != Globals.encPrefix.charAt(0)) {
-                        break found;
-                    }
-
-                    for (int i = 1; i < Globals.encPrefix.length(); i++) {
-                        if (reader.read() != Globals.encPrefix.charAt(i))
-                         {
-                            break found; // No,
-                        // it
-                        // doesn't
-                        // seem
-                        // to
-                        // match.
-                        }
-                    }
-
-                    // If ok, then read the rest of the line, which should contain the
-                    // name
-                    // of the encoding:
-                    StringBuilder sb = new StringBuilder();
-
-                    while ((c = reader.read()) != '\n') {
-                        sb.append((char) c);
-                    }
-
-                    suppliedEncoding = sb.toString();
+                if (line.startsWith(Globals.SIGNATURE)) {
+                    // Signature line, so keep reading and skip to next line
+                } else if (line.startsWith(Globals.encPrefix)) {
+                    // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
+                    return Optional.of(line.substring(Globals.encPrefix.length()).trim());
+                } else {
+                    // Line not recognized so stop parsing
+                    return Optional.empty();
                 }
             }
         } catch (IOException ignored) {
+            // Ignored
         }
-        return suppliedEncoding != null ? suppliedEncoding.trim() : null;
+        return Optional.empty();
     }
 }

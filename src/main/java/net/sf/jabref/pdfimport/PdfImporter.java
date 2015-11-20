@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,23 +39,23 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryTypeDialog;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.FocusRequester;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.util.Util;
 
 /**
@@ -211,7 +212,7 @@ public class PdfImporter {
 
                     if ((localRes == null) || localRes.isEmpty()) {
                         // import failed -> generate default entry
-                        LOGGER.info(Localization.lang("Import failed"));
+                        LOGGER.info("Import failed");
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -241,7 +242,7 @@ public class PdfImporter {
                         in = new FileInputStream(file);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        LOGGER.info(Localization.lang("Import failed"), e);
+                        LOGGER.info("Import failed", e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -251,7 +252,7 @@ public class PdfImporter {
                         localRes = contentImporter.importEntries(in, status);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        LOGGER.info(Localization.lang("Import failed"), e);
+                        LOGGER.info("Import failed", e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -318,9 +319,9 @@ public class PdfImporter {
         // Find out what type is wanted.
         EntryTypeDialog etd = new EntryTypeDialog(frame);
         // We want to center the dialog, to make it look nicer.
-        Util.placeDialog(etd, frame);
+        PositionWindow.placeDialog(etd, frame);
         etd.setVisible(true);
-        BibtexEntryType type = etd.getChoice();
+        EntryType type = etd.getChoice();
 
         if (type != null) { // Only if the dialog was not cancelled.
             String id = IdGenerator.next();
@@ -369,7 +370,7 @@ public class PdfImporter {
                 new FocusRequester(panel.getEntryEditor(be));
                 return be;
             } catch (KeyCollisionException ex) {
-                LOGGER.info("Key collision occured", ex);
+                LOGGER.info("Key collision occurred", ex);
             }
         }
         return null;

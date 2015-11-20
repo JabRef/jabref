@@ -12,6 +12,10 @@ import net.sf.jabref.logic.journals.Abbreviation;
 
 public class ContentAutoCompleters extends AutoCompleters {
 
+    public ContentAutoCompleters() {
+        // Empty AutoCompleter completes nothing
+    }
+
     public ContentAutoCompleters(BibtexDatabase database, MetaData metaData) {
         String[] completeFields = Globals.prefs.getStringArray(JabRefPreferences.AUTO_COMPLETE_FIELDS);
         for (String field : completeFields) {

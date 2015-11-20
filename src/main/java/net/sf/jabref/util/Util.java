@@ -45,9 +45,6 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.*;
-import net.sf.jabref.logic.util.date.MonthUtil;
-import net.sf.jabref.logic.util.date.YearUtil;
 import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -69,6 +66,7 @@ import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.OpenFileFilter;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
@@ -110,69 +108,6 @@ public class Util {
     }
 
     /**
-     * This method translates a field or string from Bibtex notation, with possibly text contained in " " or { }, and
-     * string references, concatenated by '#' characters, into Bibkeeper notation, where string references are enclosed
-     * in a pair of '#' characters.
-     */
-    public static String parseField(String content) {
-        if (content.isEmpty()) {
-            return content;
-        }
-
-        String[] strings = content.split("#");
-        StringBuilder result = new StringBuilder();
-        for (String string : strings) {
-            String s = string.trim();
-            if (!s.isEmpty()) {
-                char c = s.charAt(0);
-                // String reference or not?
-                if ((c == '{') || (c == '"')) {
-                    result.append(StringUtil.shaveString(string));
-                } else {
-                    // This part should normally be a string reference, but if it's
-                    // a pure number, it is not.
-                    String s2 = StringUtil.shaveString(s);
-
-                    try {
-                        Integer.parseInt(s2);
-                        result.append(s2);
-                    } catch (NumberFormatException e) {
-                        result.append('#').append(s2).append('#');
-                    }
-                }
-            }
-        }
-        return result.toString();
-    }
-
-    /**
-     * Will return the publication date of the given bibtex entry in conformance to ISO 8601, i.e. either YYYY or
-     * YYYY-MM.
-     *
-     * @param entry
-     * @return will return the publication date of the entry or null if no year was found.
-     */
-    // TODO: Should be instance method of BibTexEntry
-    public static String getPublicationDate(BibtexEntry entry) {
-
-        Object o = entry.getField("year");
-        if (o == null) {
-            return null;
-        }
-
-        String year = YearUtil.toFourDigitYear(o.toString());
-
-        o = entry.getField("month");
-        if (o != null) {
-            MonthUtil.Month month = MonthUtil.getMonth(o.toString());
-            if (month.isValid()) {
-                return year + "-" + month.twoDigitNumber;
-            }
-        }
-        return year;
-    }
-
-    /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is
      * acceptable for bibtex.
      *
@@ -206,18 +141,18 @@ public class Util {
             }
         }
 
-        // Replace non-english characters like umlauts etc. with a sensible
+        // Replace non-English characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
 
-        return Util.replaceSpecialCharacters(newKey.toString());
+        return net.sf.jabref.util.Util.replaceSpecialCharacters(newKey.toString());
     }
 
     /**
-     * Replace non-english characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
      * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
      */
     public static String replaceSpecialCharacters(String s) {
-        for (Map.Entry<String, String> chrAndReplace : Util.UNICODE_CHAR_MAP.entrySet()) {
+        for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
             s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
         }
         return s;
@@ -233,7 +168,7 @@ public class Util {
                 String fieldValue = o.toString().trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
                 while (tok.hasMoreTokens()) {
-                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -258,7 +193,7 @@ public class Util {
             if (o != null) {
                 tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
-                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -293,63 +228,6 @@ public class Util {
         }
 
         return res;
-    }
-
-    /**
-     * Make sure an URL is "portable", in that it doesn't contain bad characters that break the open command in some
-     * OSes.
-     *
-     * A call to this method will also remove \\url{} enclosings and clean Doi links.
-     *
-     * @param link :the URL to sanitize.
-     * @return Sanitized URL
-     */
-    public static String sanitizeUrl(String link) {
-        link = link.trim();
-
-        // First check if it is enclosed in \\url{}. If so, remove the wrapper.
-        if (link.startsWith("\\url{") && link.endsWith("}")) {
-            link = link.substring(5, link.length() - 1);
-        }
-
-        // DOI cleanup
-        // converts doi-only link to full http address
-        // Morten Alver 6 Nov 2012: this extracts a nonfunctional Doi from some complete
-        // http addresses (e.g. http://onlinelibrary.wiley.com/doi/10.1002/rra.999/abstract, where
-        // the trailing "/abstract" is included but doesn't lead to a resolvable Doi).
-        // To prevent mangling of working URLs I'm disabling this check if the link is already
-        // a full http link:
-        // TODO: not sure if this is allowed
-        if (link.matches("^doi:/*.*")) {
-            // Remove 'doi:'
-            link = link.replaceFirst("^doi:/*", "");
-            link = new DOI(link).getURLAsASCIIString();
-        }
-
-        Optional<DOI> doi = DOI.build(link);
-        if (doi.isPresent() && !link.matches("^https?://.*")) {
-            link = doi.get().getURLAsASCIIString();
-        }
-
-        // FIXME: everything below is really flawed atm
-        link = link.replaceAll("\\+", "%2B");
-
-        try {
-            link = URLDecoder.decode(link, "UTF-8");
-        } catch (UnsupportedEncodingException ignored) {
-            // Ignored
-        }
-
-        /**
-         * Fix for: [ 1574773 ] sanitizeUrl() breaks ftp:// and file:///
-         *
-         * http://sourceforge.net/tracker/index.php?func=detail&aid=1574773&group_id=92314&atid=600306
-         */
-        try {
-            return new URI(null, link, null).toASCIIString();
-        } catch (URISyntaxException e) {
-            return link;
-        }
     }
 
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
@@ -413,7 +291,7 @@ public class Util {
 
                         }
                     } else {
-                        // Incorrecly terminated open brace
+                        // Incorrectly terminated open brace
                         result.add(new String[] {method});
                     }
                 } else {
@@ -442,10 +320,10 @@ public class Util {
 
 
     public static String expandBrackets(String bracketString, BibtexEntry entry, BibtexDatabase database) {
-        Matcher m = Util.squareBracketsPattern.matcher(bracketString);
+        Matcher m = net.sf.jabref.util.Util.squareBracketsPattern.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            String replacement = Util.getFieldAndFormat(m.group(), entry, database);
+            String replacement = net.sf.jabref.util.Util.getFieldAndFormat(m.group(), entry, database);
             if (replacement == null) {
                 replacement = "";
             }
@@ -467,7 +345,7 @@ public class Util {
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
 
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = Util.dateFormatter.getCurrentDate();
+        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
         boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER);
         boolean globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
 
@@ -480,7 +358,7 @@ public class Util {
         for (BibtexEntry curEntry : bibs) {
             boolean setOwner = globalSetOwner && (overwriteOwner || (curEntry.getField(BibtexFields.OWNER) == null));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (curEntry.getField(timeStampField) == null));
-            Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+            net.sf.jabref.util.Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
             if (markEntries) {
                 EntryMarker.markEntry(curEntry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
             }
@@ -497,12 +375,12 @@ public class Util {
      */
     public static void setAutomaticFields(BibtexEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = Util.dateFormatter.getCurrentDate();
+        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER) && (overwriteOwner || (entry.getField(BibtexFields.OWNER) == null));
         boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && (overwriteTimestamp || (entry.getField(timeStampField) == null));
 
-        Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+        net.sf.jabref.util.Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
 
     private static void setAutomaticFields(BibtexEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStampField, String timeStamp) {
@@ -531,7 +409,7 @@ public class Util {
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
-        return Util.upgradePdfPsToFile(database.getEntryMap().values(), fields);
+        return net.sf.jabref.util.Util.upgradePdfPsToFile(database.getEntryMap().values(), fields);
     }
 
     /**
@@ -714,7 +592,7 @@ public class Util {
                 continue;
             }
             // If we are not allowed to overwrite values, check if there is a
-            // nonempy value already for this entry for the new field:
+            // non-empty value already for this entry for the new field:
             String valInNewField = entry.getField(newField);
             if (!overwriteValues && (valInNewField != null) && !valInNewField.isEmpty()) {
                 continue;
@@ -761,17 +639,6 @@ public class Util {
     }
 
     /**
-     * Static equals that can also return the right result when one of the objects is null.
-     *
-     * @param one The object whose equals method is called if the first is not null.
-     * @param two The object passed to the first one if the first is not null.
-     * @return <code>one == null ? two == null : one.equals(two);</code>
-     */
-    public static boolean equals(Object one, Object two) {
-        return one == null ? two == null : one.equals(two);
-    }
-
-    /**
      * Run an AbstractWorker's methods using Spin features to put each method on the correct thread.
      *
      * @param worker The worker to run.
@@ -811,7 +678,7 @@ public class Util {
         try {
             layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
         } catch (Exception e) {
-            Util.LOGGER.info(Localization.lang("Wrong Format").concat(" ").concat(e.toString()), e);
+            net.sf.jabref.util.Util.LOGGER.info("Wrong format " + e.getMessage(), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);
@@ -834,7 +701,7 @@ public class Util {
         // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
         // if nothing is found, " " is likely to be the separating char.
         // solution by RisKeywords.java: s.split(",[ ]*")
-        StringTokenizer tok = new StringTokenizer(keywords, Util.SEPARATING_CHARS_NOSPACE);
+        StringTokenizer tok = new StringTokenizer(keywords, net.sf.jabref.util.Util.SEPARATING_CHARS_NOSPACE);
         while (tok.hasMoreTokens()) {
             String word = tok.nextToken().trim();
             res.add(word);
@@ -843,7 +710,7 @@ public class Util {
     }
 
     public static ArrayList<String> getSeparatedKeywords(BibtexEntry be) {
-        return Util.getSeparatedKeywords(be.getField("keywords"));
+        return net.sf.jabref.util.Util.getSeparatedKeywords(be.getField("keywords"));
     }
 
     public static void putKeywords(BibtexEntry entry, ArrayList<String> keywords, NamedCompound ce) {
@@ -876,7 +743,7 @@ public class Util {
      * @param ce indicates the undo named compound. May be null
      */
     public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
-        Util.updateField(be, field, newValue, ce, false);
+        net.sf.jabref.util.Util.updateField(be, field, newValue, ce, false);
     }
 
     /**
@@ -909,7 +776,7 @@ public class Util {
     public static void bindCloseDialogKeyToCancelAction(JRootPane rootPane, Action cancelAction) {
         InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = rootPane.getActionMap();
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
     }
 
@@ -922,7 +789,7 @@ public class Util {
      */
     public static String getResults(URL source) throws IOException {
 
-        return Util.getResultsWithEncoding(source.openConnection(), null);
+        return net.sf.jabref.util.Util.getResultsWithEncoding(source.openConnection(), null);
     }
 
     /**
@@ -934,7 +801,7 @@ public class Util {
      */
     public static String getResults(URLConnection source) throws IOException {
 
-        return Util.getResultsWithEncoding(source, null);
+        return net.sf.jabref.util.Util.getResultsWithEncoding(source, null);
     }
 
     /**
@@ -945,7 +812,7 @@ public class Util {
      * @throws IOException
      */
     public static String getResultsWithEncoding(URL source, String encoding) throws IOException {
-        return Util.getResultsWithEncoding(source.openConnection(), encoding);
+        return net.sf.jabref.util.Util.getResultsWithEncoding(source.openConnection(), encoding);
     }
     /**
      * Download the URL using specified encoding and return contents as a String.
@@ -1013,8 +880,8 @@ public class Util {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String timestamp = Util.dateFormatter.getCurrentDate();
-        Util.updateField(entry, timeStampField, timestamp, ce);
+        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
+        net.sf.jabref.util.Util.updateField(entry, timeStampField, timestamp, ce);
         return ce;
     }
 
@@ -1081,7 +948,7 @@ public class Util {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
                 } else {
-                    result = Util.findAssociatedFiles(entries, extensions, dirs);
+                    result = net.sf.jabref.util.Util.findAssociatedFiles(entries, extensions, dirs);
                 }
 
                 boolean foundAny = false;
@@ -1194,7 +1061,7 @@ public class Util {
         final Collection<BibtexEntry> entries = new ArrayList<>();
         entries.add(entry);
 
-        return Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
+        return net.sf.jabref.util.Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
     }
 
     /**
@@ -1320,7 +1187,7 @@ public class Util {
         return fieldValue;
     }
 
-    // Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
+    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
     public static Pattern getPatternForWords(List<String> words) {
         if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
             return Pattern.compile("");
@@ -1328,7 +1195,7 @@ public class Util {
 
         boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP);
 
-        // compile the words to a regex in the form (w1) | (w2) | (w3)
+        // compile the words to a regular expression in the form (w1) | (w2) | (w3)
         String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");
         for (int i = 1; i < words.size(); i++) {
             searchPattern = searchPattern.concat("|(").concat(regExSearch ? words.get(i) : Pattern.quote(words.get(i)))

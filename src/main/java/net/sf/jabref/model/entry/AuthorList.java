@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.util.Util;
-
 import java.util.HashSet;
 import java.util.Vector;
 import java.util.WeakHashMap;
@@ -1025,12 +1023,14 @@ public class AuthorList {
                 return false;
             }
             Author a = (Author) o;
-            return Util.equals(firstPart, a.firstPart)
-                    && Util.equals(firstAbbr, a.firstAbbr)
-                    && Util.equals(vonPart, a.vonPart)
-                    && Util.equals(lastPart, a.lastPart)
-                    && Util.equals(jrPart, a.jrPart);
+            return EntryUtil.equals(firstPart, a.firstPart)
+                    && EntryUtil.equals(firstAbbr, a.firstAbbr)
+                    && EntryUtil.equals(vonPart, a.vonPart)
+                    && EntryUtil.equals(lastPart, a.lastPart)
+                    && EntryUtil.equals(jrPart, a.jrPart);
         }
+
+
 
         /**
          * Creates the Author object. If any part of the name is absent, <CODE>null</CODE>

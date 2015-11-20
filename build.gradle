@@ -3,9 +3,10 @@ import org.gradle.internal.os.OperatingSystem
 plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.2'
     id "edu.sc.seis.launch4j" version "1.1.4"
-    id "com.github.kt3k.coveralls" version "2.4.0"
+    id "com.github.kt3k.coveralls" version "2.4.0x"
     id "edu.sc.seis.macAppBundle" version "2.1.1"
     id "com.github.youribonnaffe.gradle.format" version "1.2"
+    id "com.coverity.ondemand" version "1.4.742"
 }
 
 apply plugin: "java"
@@ -15,9 +16,20 @@ apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply from: 'eclipse.gradle'
 
+// HACK to disable coverityCheck task when not on CI server
+// necessary as coverity automatically adds check.dependsOn coverityCheck
+gradle.taskGraph.whenReady { taskGraph ->
+    def tasks = taskGraph.getAllTasks()
+    if (System.env.CI == null) {
+        tasks.findAll {it.name.startsWith('coverityCheck')}.each { task ->
+                task.enabled = false
+        }
+    }
+}
+
 group = "net.sf.jabref"
-version = "2.80dev"
-project.ext.threeDotVersion = "2.80.0.0"
+version = "3.0dev"
+project.ext.threeDotVersion = "3.0.0.0"
 project.ext.nsisExec = hasProperty("nsisExec") ? getProperty("nsisExec") : "C:/Program Files/NSIS/makensis.exe"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -26,6 +38,7 @@ mainClassName = "net.sf.jabref.JabRefMain"
 task wrapper(type: Wrapper) {
     gradleVersion = '2.8'
 }
+
 
 repositories {
     jcenter()
@@ -61,7 +74,7 @@ dependencies {
     compile 'org.antlr:antlr4-runtime:4.5.1-1'
 
     compile 'mysql:mysql-connector-java:5.1.37'
-    compile 'org.postgresql:postgresql:9.4-1204-jdbc42'
+    compile 'org.postgresql:postgresql:9.4-1205-jdbc42'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])

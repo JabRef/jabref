@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,17 +15,10 @@
  */
 package net.sf.jabref.external.push;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -33,12 +26,34 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.logic.l10n.Localization;
+
 /**
- * Customized UI component for pushing to external applications. Has a selection popup
- * menu to change the selected external application.
- * This class implements the ActionListener interface. When actionPerformed() is
- * invoked, the currently selected PushToApplication is activated. The actionPerformed()
- * method can be called with a null argument.
+ * Customized UI component for pushing to external applications. Has a selection popup menu to change the selected
+ * external application. This class implements the ActionListener interface. When actionPerformed() is invoked, the
+ * currently selected PushToApplication is activated. The actionPerformed() method can be called with a null argument.
  */
 public class PushToApplicationButton implements ActionListener {
 
@@ -56,6 +71,7 @@ public class PushToApplicationButton implements ActionListener {
     private final JPopupMenu optPopup = new JPopupMenu();
     private final JMenuItem settings = new JMenuItem(Localization.lang("Settings"));
 
+
     public PushToApplicationButton(JabRefFrame frame, List<PushToApplication> pushActions) {
         this.frame = frame;
         this.pushActions = pushActions;
@@ -68,19 +84,18 @@ public class PushToApplicationButton implements ActionListener {
 
         menuButton = new JButton(PushToApplicationButton.ARROW_ICON);
         menuButton.setMargin(new Insets(0, 0, 0, 0));
-        menuButton.setPreferredSize(new Dimension(menuButton.getIcon().getIconWidth(),
-                menuButton.getIcon().getIconHeight()));
+        menuButton.setPreferredSize(
+                new Dimension(menuButton.getIcon().getIconWidth(), menuButton.getIcon().getIconHeight()));
         menuButton.addActionListener(new MenuButtonActionListener());
         menuButton.setToolTipText(Localization.lang("Select external application"));
         pushButton = new JButton();
-        if (Globals.prefs.hasKey("pushToApplication")) {
-            String appSelected = Globals.prefs.get("pushToApplication");
-            for (int i = 0; i < pushActions.size(); i++) {
-                PushToApplication toApp = pushActions.get(i);
-                if (toApp.getName().equals(appSelected)) {
-                    selected = i;
-                    break;
-                }
+
+        // Set the last used external application
+        String appSelected = Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
+        for (int i = 0; i < pushActions.size(); i++) {
+            if (pushActions.get(i).getApplicationName().equals(appSelected)) {
+                selected = i;
+                break;
             }
         }
 
@@ -92,7 +107,6 @@ public class PushToApplicationButton implements ActionListener {
         comp.setOpaque(false);
         comp.add(pushButton, BorderLayout.CENTER);
         comp.add(menuButton, BorderLayout.EAST);
-        //comp.setBorder(BorderFactory.createLineBorder(Color.gray));
         comp.setMaximumSize(comp.getPreferredSize());
 
         optPopup.add(settings);
@@ -119,8 +133,7 @@ public class PushToApplicationButton implements ActionListener {
         popup = new JPopupMenu();
         int j = 0;
         for (PushToApplication application : pushActions) {
-            JMenuItem item = new JMenuItem(application.getApplicationName(),
-                    application.getIcon());
+            JMenuItem item = new JMenuItem(application.getApplicationName(), application.getIcon());
             item.setToolTipText(application.getTooltip());
             item.addActionListener(new PopupItemActionListener(j));
             popup.add(item);
@@ -130,22 +143,26 @@ public class PushToApplicationButton implements ActionListener {
 
     /**
      * Update the PushButton to default to the given application.
+     *
      * @param i The List index of the application to default to.
      */
     private void setSelected(int i) {
-        this.selected = i;
+        selected = i;
         PushToApplication toApp = pushActions.get(i);
         pushButton.setIcon(toApp.getIcon());
         pushButton.setToolTipText(toApp.getTooltip());
         pushButton.setPreferredSize(buttonDim);
 
-        Globals.prefs.put("pushToApplication", toApp.getName());
+        // Store the last used application
+        Globals.prefs.put(JabRefPreferences.PUSH_TO_APPLICATION, toApp.getApplicationName());
+
         mAction.setTitle(toApp.getApplicationName());
         mAction.setIcon(toApp.getIcon());
     }
 
     /**
      * Get the toolbar component for the push button.
+     *
      * @return The component.
      */
     public Component getComponent() {
@@ -220,10 +237,8 @@ public class PushToApplicationButton implements ActionListener {
         // Key bindings:
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
-
-            private static final long serialVersionUID = -4839826710086306753L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -281,14 +296,12 @@ public class PushToApplicationButton implements ActionListener {
 
     class MenuAction extends MnemonicAwareAction {
 
-        private static final long serialVersionUID = -4339280220347418559L;
-
         public MenuAction() {
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Push to application"));
+            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.PUSH_TO_APPLICATION));
         }
 
         public void setTitle(String appName) {
-            putValue(Action.NAME, Localization.lang("Push entries to external application (%0)", appName));
+            putValue(Action.NAME, Localization.menuTitle("Push entries to external application (%0)", appName));
         }
 
         @Override

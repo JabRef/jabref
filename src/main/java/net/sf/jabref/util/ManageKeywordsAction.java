@@ -47,6 +47,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
@@ -57,6 +58,7 @@ import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.util.PositionWindow;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -220,10 +222,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             @Override
             public void keyTyped(KeyEvent arg0) {
+                // Do nothing
             }
 
             @Override
             public void keyReleased(KeyEvent arg0) {
+                // Do nothing
             }
 
             @Override
@@ -234,7 +238,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AutoCompleter<String> autoComp = JabRef.jrf.basePanel().getAutoCompleters().get("keywords");
+        AutoCompleter<String> autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);
@@ -242,10 +246,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             @Override
             public void keyTyped(KeyEvent e) {
+                // Do nothing
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
+                // Do nothing
             }
 
             @Override
@@ -259,7 +265,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
@@ -268,7 +274,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        BasePanel bp = frame.basePanel();
+        BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;
         }
@@ -287,7 +293,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         fillKeyWordList();
 
         diag.pack();
-        Util.placeDialog(diag, frame);
+        PositionWindow.placeDialog(diag, frame);
         diag.setVisible(true);
         if (cancelled) {
             return;
@@ -404,7 +410,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     private void fillKeyWordList() {
-        BasePanel bp = frame.basePanel();
+        BasePanel bp = frame.getCurrentBasePanel();
         BibtexEntry[] entries = bp.getSelectedEntries();
 
         // fill dialog with values

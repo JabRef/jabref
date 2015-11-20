@@ -30,12 +30,15 @@ import javax.swing.event.CaretListener;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.util.PositionWindow;
+
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -146,7 +149,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(frame.prefs().getKey("Close dialog"), "close");
+        im.put(frame.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         ButtonGroup bg = new ButtonGroup();
@@ -185,7 +188,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
         updateComponents();
         pack();
-        Util.placeDialog(this, frame);
+        PositionWindow.placeDialog(this, frame);
     }
 
     @Override

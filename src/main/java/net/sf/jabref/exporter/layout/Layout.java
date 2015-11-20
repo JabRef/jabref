@@ -62,7 +62,7 @@ public class Layout {
                         blockEntries = null;
                     } else {
                         LOGGER.debug(blockStart + '\n' + si.s);
-                        LOGGER.warn("Nested field entries are not implemented !!!");
+                        LOGGER.warn("Nested field entries are not implemented!");
                         Thread.dumpStack();
                     }
                 }
@@ -77,7 +77,7 @@ public class Layout {
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        LOGGER.warn("Nested field entries are not implemented !!!");
+                        LOGGER.warn("Nested field entries are not implemented!");
                         Thread.dumpStack();
                     }
                 }

@@ -45,6 +45,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

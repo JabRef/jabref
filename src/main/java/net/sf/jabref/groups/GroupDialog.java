@@ -25,6 +25,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
+import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
@@ -253,7 +255,7 @@ class GroupDialog extends JDialog {
         setResizable(false);
         updateComponents();
         setLayoutForSelectedGroup();
-        Util.placeDialog(this, jabrefFrame);
+        PositionWindow.placeDialog(this, jabrefFrame);
 
         // add listeners
         ItemListener radioButtonItemListener = new ItemListener() {
@@ -277,7 +279,7 @@ class GroupDialog extends JDialog {
         };
         m_cancel.addActionListener(cancelAction);
         builderAll.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.prefs.getKey("Close dialog"), "close");
+                .put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         builderAll.getPanel().getActionMap().put("close", cancelAction);
 
         m_ok.addActionListener(new ActionListener() {

@@ -25,6 +25,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -101,16 +102,14 @@ class PreambleEditor extends JDialog {
 
     private void setupJTextComponent(javax.swing.text.JTextComponent ta) {
         // Set up key bindings and focus listener for the FieldEditor.
-        ta.getInputMap().put(prefs.getKey("Close preamble editor"), "close");
+        ta.getInputMap().put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         ta.getActionMap().put("close", closeAction);
-        ta.getInputMap().put(prefs.getKey("Preamble editor, store changes"), "store");
+        ta.getInputMap().put(prefs.getKey(KeyBinds.PREAMBLE_EDITOR_STORE_CHANGES), "store");
         ta.getActionMap().put("store", storeFieldAction);
-        ta.getInputMap().put(prefs.getKey("Close preamble editor"), "close");
-        ta.getActionMap().put("close", closeAction);
 
-        ta.getInputMap().put(prefs.getKey("Undo"), "undo");
+        ta.getInputMap().put(prefs.getKey(KeyBinds.UNDO), "undo");
         ta.getActionMap().put(Actions.UNDO, undoAction);
-        ta.getInputMap().put(prefs.getKey("Redo"), "redo");
+        ta.getInputMap().put(prefs.getKey(KeyBinds.REDO), "redo");
         ta.getActionMap().put(Actions.REDO, redoAction);
 
         ta.addFocusListener(new FieldListener());

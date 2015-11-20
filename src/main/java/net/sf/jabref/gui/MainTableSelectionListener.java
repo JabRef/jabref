@@ -30,6 +30,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -78,7 +79,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     private long lastPressedTime;
 
     private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
-    
+
     //private int lastCharPressed = -1;
 
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
@@ -412,7 +413,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                                 panel.metaData(), type);
                         boolean success = item.openLink();
                         if (!success) {
-                            panel.output(Globals.lang("Unable to open link."));
+                            panel.output(Localization.lang("Unable to open link."));
                         } */
                         //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
                     }

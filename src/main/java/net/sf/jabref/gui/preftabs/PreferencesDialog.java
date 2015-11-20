@@ -47,8 +47,8 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.MainTable;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.util.Util;
 
 /**
@@ -182,10 +182,10 @@ public class PreferencesDialog extends JDialog {
                     return;
                 }
                 File file = new File(filename);
-                if (!file.exists()
-                        || (JOptionPane.showConfirmDialog(PreferencesDialog.this, '\'' + file.getName()
-                        + "' " + Localization.lang("exists. Overwrite file?"),
-                        Localization.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
+                if (!file.exists() || (JOptionPane.showConfirmDialog(PreferencesDialog.this,
+                        Localization.lang("'%0' exists. Overwrite file?", file.getName()),
+                        Localization.lang("Export preferences"),
+                        JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
 
                     try {
                         prefs.exportPreferences(filename);
@@ -213,7 +213,7 @@ public class PreferencesDialog extends JDialog {
                 try {
                     prefs.importPreferences(filename);
                     setValues();
-                    BibtexEntryType.loadCustomEntryTypes(prefs);
+                    CustomEntryTypesManager.loadCustomEntryTypes(prefs);
                     ExportFormats.initAllExports();
                     frame.removeCachedEntryEditors();
                     Globals.prefs.updateEntryEditorTabList();

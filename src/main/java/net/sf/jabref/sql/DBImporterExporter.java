@@ -11,10 +11,12 @@ import net.sf.jabref.MetaData;
 
 public class DBImporterExporter {
 
-    public void removeDB(DBImportExportDialog dialogo, String dbName, Connection conn, MetaData metadata) throws SQLException {
+    public void removeDB(DBImportExportDialog dialogo, String dbName, Connection conn, MetaData metadata)
+            throws SQLException {
         if (dialogo.removeAction) {
             if ((dialogo.selectedInt <= 0) && dialogo.isExporter()) {
-                JOptionPane.showMessageDialog(dialogo.getDiag(), "Please select a DB to be removed", "SQL Export", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(dialogo.getDiag(), "Please select a DB to be removed", "SQL Export",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
                 removeAGivenDB(conn, getDatabaseIDByName(metadata, conn, dbName));
             }
@@ -22,29 +24,27 @@ public class DBImporterExporter {
     }
 
     /**
-     * Returns a Jabref Database ID from the database in case the DB is already
-     * exported. In case the bib was already exported before, the method returns
-     * the id, otherwise it calls the method that inserts a new row and returns
-     * the ID for this new database
+     * Returns a Jabref Database ID from the database in case the DB is already exported. In case the bib was already
+     * exported before, the method returns the id, otherwise it calls the method that inserts a new row and returns the
+     * ID for this new database
      *
-     * @param metaData
-     *            The MetaData object containing the database information
-     * @param out
-     *            The output (PrintStream or Connection) object to which the DML
-     *            should be written.
+     * @param metaData The MetaData object containing the database information
+     * @param out The output (PrintStream or Connection) object to which the DML should be written.
      * @return The ID of database row of the jabref database being exported
      * @throws SQLException
      */
     protected int getDatabaseIDByName(MetaData metaData, Object out, String dbName) throws SQLException {
 
         if (out instanceof Connection) {
-            Object response = SQLUtil.processQueryWithResults(out, "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';");
-            ResultSet rs = ((Statement) response).getResultSet();
-            if (rs.next()) {
-                return rs.getInt("database_id");
-            } else {
-                insertJabRefDatabase(metaData, out, dbName);
-                return getDatabaseIDByName(metaData, out, dbName);
+            Object response = SQLUtil.processQueryWithResults(out,
+                    "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';");
+            try (ResultSet rs = ((Statement) response).getResultSet()) {
+                if (rs.next()) {
+                    return rs.getInt("database_id");
+                } else {
+                    insertJabRefDatabase(metaData, out, dbName);
+                    return getDatabaseIDByName(metaData, out, dbName);
+                }
             }
         }
         // in case of text export there will be only 1 bib exported
@@ -60,14 +60,10 @@ public class DBImporterExporter {
     }
 
     /**
-     * Removes all records for the database being exported in case it was
-     * exported before.
+     * Removes all records for the database being exported in case it was exported before.
      *
-     * @param out
-     *            The output (PrintStream or Connection) object to which the DML
-     *            should be written.
-     * @param database_id
-     *            Id of the database being exported.
+     * @param out The output (PrintStream or Connection) object to which the DML should be written.
+     * @param database_id Id of the database being exported.
      * @throws SQLException
      */
     protected void removeAllRecordsForAGivenDB(Object out, int database_id) throws SQLException {
@@ -77,14 +73,10 @@ public class DBImporterExporter {
     }
 
     /**
-     * This method creates a new row into jabref_database table enabling to
-     * export more than one .bib
+     * This method creates a new row into jabref_database table enabling to export more than one .bib
      *
-     * @param metaData
-     *            The MetaData object containing the groups information
-     * @param out
-     *            The output (PrintStream or Connection) object to which the DML
-     *            should be written.
+     * @param metaData The MetaData object containing the groups information
+     * @param out The output (PrintStream or Connection) object to which the DML should be written.
      *
      * @throws SQLException
      */
@@ -95,7 +87,8 @@ public class DBImporterExporter {
         } else {
             path = metaData.getFile().getAbsolutePath();
         }
-        SQLUtil.processQuery(out, "INSERT INTO jabref_database(database_name, md5_path) VALUES ('" + dbName + "', md5('" + path + "'));");
+        SQLUtil.processQuery(out,
+                "INSERT INTO jabref_database(database_name, md5_path) VALUES ('" + dbName + "', md5('" + path + "'));");
     }
 
 }

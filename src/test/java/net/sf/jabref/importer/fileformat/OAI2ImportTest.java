@@ -3,8 +3,8 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.fetcher.OAI2Fetcher;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.IdGenerator;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class OAI2ImportTest {
     public void setUp() throws Exception {
         parserFactory = SAXParserFactory.newInstance();
         saxParser = parserFactory.newSAXParser();
-        be = new BibtexEntry(IdGenerator.next(), BibtexEntryType.getType("article"));
+        be = new BibtexEntry(IdGenerator.next(), EntryTypes.getType("article"));
         handler = new OAI2Handler(be);
     }
 

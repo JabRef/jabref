@@ -1,8 +1,8 @@
 package net.sf.jabref.logic.formatter;
 
-import junit.framework.Assert;
 import net.sf.jabref.logic.formatter.bibtexfields.PageNumbersFormatter;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,6 +27,11 @@ public class PageNumbersFormatterTest {
     @Test
     public void formatPageNumbersCommaSeparated() {
         expectCorrect("1,2,3", "1,2,3");
+    }
+
+    @Test
+    public void formatPageNumbersPlusRange() {
+        expectCorrect("43+", "43+");
     }
 
     @Test
