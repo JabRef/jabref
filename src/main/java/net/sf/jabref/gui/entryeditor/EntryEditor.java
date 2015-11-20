@@ -62,6 +62,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.gui.journals.JournalAbbreviationsUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.search.SearchTextListener;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.*;
@@ -541,8 +542,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        // TODO SIMON
-        // frame.getSearchBar().addSearchListener((SearchTextListener) source);
+        panel.getSearchBar().getSearchObservable().addSearchListener((SearchTextListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);

@@ -159,7 +159,7 @@ class EntryEditorTab {
             } else {
                 fieldEditor = new TextArea(fields[i], null);
                 // TODO SIMON
-                // frame.getSearchBar().addSearchListener((TextArea) fieldEditor);
+                bPanel.getSearchBar().getSearchObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
             

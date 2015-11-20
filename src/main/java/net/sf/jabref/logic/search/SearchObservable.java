@@ -54,14 +54,18 @@ public class SearchObservable {
      *
      * @param searchText the search query
      */
-    public void fireSearchlistenerEvent(String searchText) {
+    public void fireSearchlistenerEvent(SearchQuery searchQuery) {
         // Parse the search string to words
-        if ((searchText == null) || (searchText.isEmpty())) {
+        if(searchQuery == null || !searchQuery.isContainsBasedSearch()) {
             words = Collections.emptyList();
         } else {
-            words = getSearchwords(searchText);
+            words = getSearchwords(searchQuery.query);
         }
 
+        update();
+    }
+
+    private void update() {
         // Fire an event for every listener
         for (SearchTextListener s : listeners) {
             s.searchText(words);

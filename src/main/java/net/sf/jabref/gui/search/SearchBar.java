@@ -56,18 +56,15 @@ public class SearchBar extends JPanel {
     }
 
     private final BasePanel basePanel;
-    // TODO make final
-    private SearchObservable searchObservable = new SearchObservable();
+    private final SearchObservable searchObservable;
 
-    private JSearchTextField searchField;
+    private final JSearchTextField searchField;
 
-    private JRadioButtonMenuItem modeFloat, modeLiveFilter;
-    private JMenu settings;
+    private JRadioButtonMenuItem modeFloat;
+    private JRadioButtonMenuItem modeLiveFilter;
 
     private final JCheckBox caseSensitive;
     private final JCheckBox regularExp;
-
-    private final JButton openCurrentResultsInDialog;
 
     private final JLabel currentResults = new JLabel("");
 
@@ -84,8 +81,7 @@ public class SearchBar extends JPanel {
         super();
 
         this.basePanel = basePanel;
-        //TODO observable
-        //this.searchObservable = searchObservable;
+        this.searchObservable = new SearchObservable();
 
         worker = new SearchWorker(basePanel);
 
@@ -98,7 +94,7 @@ public class SearchBar extends JPanel {
         regularExp.addItemListener(ae -> performSearch());
         regularExp.addItemListener(ae -> updatePrefs());
 
-        openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
+        JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
         openCurrentResultsInDialog.addActionListener(ae -> {
             SearchResultsDialog searchDialog = new SearchResultsDialog(basePanel.frame(), Localization.lang("Search results in database %0 for %1",
@@ -113,13 +109,11 @@ public class SearchBar extends JPanel {
 
         JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
         this.add(searchIcon);
-        initSearchField();
+        this.searchField = initSearchField();
         this.add(searchField);
         JButton button = new JButton(Localization.lang("View"));
         JPopupMenu settingsMenu = createSettingsMenu();
-        button.addActionListener(l -> {
-            settingsMenu.show(button, 0, button.getHeight());
-        });
+        button.addActionListener(l -> settingsMenu.show(button, 0, button.getHeight()));
 
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(false);
@@ -194,8 +188,8 @@ public class SearchBar extends JPanel {
     /**
      * Initializes the search text field
      */
-    private void initSearchField() {
-        searchField = new JSearchTextField();
+    private JSearchTextField initSearchField() {
+        JSearchTextField searchField = new JSearchTextField();
         searchField.setTextWhenNotFocused(Localization.lang("Search..."));
         searchField.setColumns(30);
 
@@ -230,6 +224,8 @@ public class SearchBar extends JPanel {
                 LogFactory.getLog(SearchBar.class).debug("Text updated: " + e.toString());
             }
         });
+
+        return searchField;
     }
 
     /**
@@ -322,7 +318,7 @@ public class SearchBar extends JPanel {
             searchField.setText("");
             searchField.setBackground(Color.WHITE);
 
-            searchObservable.fireSearchlistenerEvent("");
+            searchObservable.fireSearchlistenerEvent(null);
 
             this.currentResults.setText("");
         });
@@ -332,13 +328,8 @@ public class SearchBar extends JPanel {
      * Performs a new search based on the current search query.
      */
     private void performSearch() {
-        String searchText = searchField.getText();
-
-        // Notify others about the search
-        searchObservable.fireSearchlistenerEvent(searchText);
-
         // An empty search field should cause the search to be cleared.
-        if (searchText.isEmpty()) {
+        if (searchField.getText().isEmpty()) {
             clearSearch();
             return;
         }
@@ -348,6 +339,10 @@ public class SearchBar extends JPanel {
         }
 
         SearchQuery searchQuery = getSearchQuery();
+
+        // Notify others about the search
+        // TODO SIMON should be done in update method
+        searchObservable.fireSearchlistenerEvent(getSearchQuery());
 
         if (!searchQuery.isValidQuery()) {
             basePanel.output(Localization.lang("Search failed: illegal search expression"));
@@ -369,4 +364,7 @@ public class SearchBar extends JPanel {
         this.autoCompleteSupport.setAutoCompleter(searchCompleter);
     }
 
+    public SearchObservable getSearchObservable() {
+        return searchObservable;
+    }
 }
