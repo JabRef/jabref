@@ -41,9 +41,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
@@ -59,8 +61,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -99,6 +100,8 @@ import osx.macadapter.MacAdapter;
 public class JabRefFrame extends JFrame implements OutputPrinter {
     private static final long serialVersionUID = 1L;
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
+
+    private static final boolean biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
 
     final JSplitPane contentPane = new JSplitPane();
 
@@ -514,23 +517,36 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey(KeyBinds.NEW_ENTRY));
     // @formatter:off
-    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[]{
-            new NewEntryAction(this, "article", prefs.getKey(KeyBinds.NEW_ARTICLE)),
-            new NewEntryAction(this, "book", prefs.getKey(KeyBinds.NEW_BOOK)),
-            new NewEntryAction(this, "phdthesis", prefs.getKey(KeyBinds.NEW_PHDTHESIS)),
-            new NewEntryAction(this, "inbook", prefs.getKey(KeyBinds.NEW_INBOOK)),
-            new NewEntryAction(this, "mastersthesis", prefs.getKey(KeyBinds.NEW_MASTERSTHESIS)),
-            new NewEntryAction(this, "proceedings", prefs.getKey(KeyBinds.NEW_PROCEEDINGS)),
-            new NewEntryAction(this, "inproceedings"),
-            new NewEntryAction(this, "conference"),
-            new NewEntryAction(this, "incollection"),
-            new NewEntryAction(this, "booklet"),
-            new NewEntryAction(this, "manual"),
-            new NewEntryAction(this, "techreport"),
-            new NewEntryAction(this, "unpublished", prefs.getKey(KeyBinds.NEW_UNPUBLISHED)),
-            new NewEntryAction(this, "misc")};
-    // @formatter:on
+    private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
 
+    private List<NewEntryAction> getNewEntryActions() {
+        List<NewEntryAction> actions = new ArrayList<>();
+
+        if (biblatexMode) {
+            for (String key : EntryTypes.getAllTypes()) {
+                actions.add(new NewEntryAction(this, key));
+            }
+        } else {
+            // Bibtex
+            for (EntryType type : BibtexEntryTypes.ALL) {
+                KeyStroke keyStroke = ChangeEntryTypeMenu.entryShortCuts.get(type.getName());
+                if(keyStroke != null) {
+                    actions.add(new NewEntryAction(this, type.getName(), keyStroke));
+                } else {
+                    actions.add(new NewEntryAction(this, type.getName()));
+                }
+            }
+            // ieeetran
+            for (EntryType type : IEEETranEntryTypes.ALL) {
+                actions.add(new NewEntryAction(this, type.getName()));
+            }
+            // custom types
+            for (EntryType type : CustomEntryTypesManager.ALL) {
+                actions.add(new NewEntryAction(this, type.getName()));
+            }
+        }
+        return actions;
+    }
 
     public JabRefFrame(JabRef jabRef) {
         this.jabRef = jabRef;
@@ -1283,10 +1299,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(view);
 
         bibtex.add(newEntryAction);
-        for (NewEntryAction aNewSpecificEntryAction : newSpecificEntryAction) {
-            newSpec.add(aNewSpecificEntryAction);
+
+        for(NewEntryAction a : newSpecificEntryAction) {
+            newSpec.add(a);
         }
+
         bibtex.add(newSpec);
+
         bibtex.add(plainTextImport);
         bibtex.addSeparator();
         bibtex.add(editEntry);
@@ -1347,6 +1366,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(helpMenu);
 
         createDisabledIconsForMenuEntries(mb);
+    }
+
+
+    private static void createEntryTypeSection(JMenu menu, String title, java.util.List<NewEntryAction> actions) {
+        // bibtex
+        JMenuItem header = new JMenuItem(title);
+        Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());
+        header.setFont(font);
+        header.setEnabled(false);
+        menu.add(header);
+
+        for (NewEntryAction action : actions) {
+            menu.add(action);
+        }
     }
 
     public static JMenu subMenu(String name) {
@@ -1515,7 +1548,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         openDatabaseOnlyActions.addAll(fetcherActions);
 
-        openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
+        openDatabaseOnlyActions.addAll(newSpecificEntryAction);
 
         severalDatabasesOnlyActions = new LinkedList<>();
         severalDatabasesOnlyActions.addAll(Arrays

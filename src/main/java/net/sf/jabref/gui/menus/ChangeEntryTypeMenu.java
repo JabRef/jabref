@@ -5,6 +5,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.ChangeTypeAction;
+import net.sf.jabref.gui.actions.NewEntryAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -13,9 +15,22 @@ import net.sf.jabref.model.entry.IEEETranEntryTypes;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChangeEntryTypeMenu {
     private static final boolean biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
+    public static final Map<String, KeyStroke> entryShortCuts = new HashMap<>();
+
+    static {
+        entryShortCuts.put(BibtexEntryTypes.ARTICLE.getName(), Globals.prefs.getKey(KeyBinds.NEW_ARTICLE));
+        entryShortCuts.put(BibtexEntryTypes.BOOK.getName(), Globals.prefs.getKey(KeyBinds.NEW_BOOK));
+        entryShortCuts.put(BibtexEntryTypes.PHDTHESIS.getName(), Globals.prefs.getKey(KeyBinds.NEW_PHDTHESIS));
+        entryShortCuts.put(BibtexEntryTypes.INBOOK.getName(), Globals.prefs.getKey(KeyBinds.NEW_MASTERSTHESIS));
+        entryShortCuts.put(BibtexEntryTypes.INBOOK.getName(), Globals.prefs.getKey(KeyBinds.NEW_INBOOK));
+        entryShortCuts.put(BibtexEntryTypes.PROCEEDINGS.getName(), Globals.prefs.getKey(KeyBinds.NEW_PROCEEDINGS));
+        entryShortCuts.put(BibtexEntryTypes.UNPUBLISHED.getName(), Globals.prefs.getKey(KeyBinds.NEW_UNPUBLISHED));
+    }
 
     public static JMenu getChangeEntryTypeMenu(BasePanel panel) {
         JMenu menu = new JMenu(Localization.lang("Change entry type"));
