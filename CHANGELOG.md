@@ -58,6 +58,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Feature: New LabelPattern `[keywordsN]`, where N is optional. Returns the first N keywords. If no N is specified ("`[keywords]`"), all keywords are returned. Spaces are removed.
  - Update supported LookAndFeels
  - Show replaced journal abbreviations on console
+ - Integrated [GVK-Plugin](http://www.gbv.de/wikis/cls/Jabref-GVK-Plugin)
 
 ### Fixed
  - Fixed the bug that the file encoding was not correctly determined from the first (or second) line
