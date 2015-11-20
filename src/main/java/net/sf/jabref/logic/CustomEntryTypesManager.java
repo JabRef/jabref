@@ -4,16 +4,20 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class CustomEntryTypesManager {
     private static final Log LOGGER = LogFactory.getLog(CustomEntryTypesManager.class);
 
+    public static final List<EntryType> ALL = new ArrayList<>();
     /**
      * Load all custom entry types from preferences. This method is
      * called from JabRef when the program starts.
@@ -23,6 +27,7 @@ public class CustomEntryTypesManager {
         CustomEntryType type;
         while ((type = prefs.getCustomEntryType(number)) != null) {
             EntryTypes.addOrModifyCustomEntryType(type);
+            ALL.add(type);
             number++;
         }
     }
@@ -37,10 +42,10 @@ public class CustomEntryTypesManager {
         int number = 0;
 
         while (iterator.hasNext()) {
-            Object o = EntryTypes.getType(iterator.next());
-            if (o instanceof CustomEntryType) {
+            EntryType entryType = EntryTypes.getType(iterator.next());
+            if (entryType instanceof CustomEntryType) {
                 // Store this entry type.
-                prefs.storeCustomEntryType((CustomEntryType) o, number);
+                prefs.storeCustomEntryType((CustomEntryType) entryType, number);
                 number++;
             }
         }
@@ -81,7 +86,5 @@ public class CustomEntryTypesManager {
             LOGGER.info("Ill-formed entrytype comment in BibTeX file.", ex);
             return null;
         }
-
     }
-
 }

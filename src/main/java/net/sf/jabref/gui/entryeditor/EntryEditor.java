@@ -49,6 +49,7 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
@@ -1010,7 +1011,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
 
     private class TypeButton extends JButton {
-
         public TypeButton() {
             super(IconTheme.JabRefIcon.EDIT.getIcon());
             setToolTipText(Localization.lang("Change entry type"));
@@ -1018,16 +1018,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JPopupMenu typeMenu = new JPopupMenu();
-                    for (String s : EntryTypes.getAllTypes()) {
-                        typeMenu.add(new ChangeTypeAction(EntryTypes.getType(s), panel));
-                    }
-
-                    typeMenu.show(ths, 0, 0);
+                    showChangeEntryTypePopupMenu();
                 }
             });
         }
+    }
 
+    private void showChangeEntryTypePopupMenu() {
+        JPopupMenu typeMenu = ChangeEntryTypeMenu.getChangeentryTypePopupMenu(panel);
+        typeMenu.show(ths, 0, 0);
     }
 
     private class TypeLabel extends JLabel {
@@ -1059,11 +1058,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
 
                 private void handleTypeChange() {
-                    JPopupMenu typeMenu = new JPopupMenu();
-                    for (String s : EntryTypes.getAllTypes()) {
-                        typeMenu.add(new ChangeTypeAction(EntryTypes.getType(s), panel));
-                    }
-                    typeMenu.show(ths, 0, 0);
+                    showChangeEntryTypePopupMenu();
                 }
             });
         }

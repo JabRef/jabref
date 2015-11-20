@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -28,11 +28,16 @@ import net.sf.jabref.groups.*;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.actions.ChangeTypeAction;
+import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IEEETranEntryTypes;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -52,18 +57,17 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private final MetaData metaData;
     private final JMenu groupAddMenu = new JMenu(Localization.lang("Add to group"));
     private final JMenu groupRemoveMenu = new JMenu(Localization.lang("Remove from group"));
-    private final JMenu groupMoveMenu = new JMenu(Localization.lang("Assign exclusively to group")); // JZTODO lyrics
-    private final JMenu typeMenu = new JMenu(Localization.lang("Change entry type"));
+    private final JMenu groupMoveMenu = new JMenu(Localization.lang("Assign exclusively to group"));
+    private JMenu typeMenu;
     private final JMenuItem groupAdd;
     private final JMenuItem groupRemove;
     private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Localization.lang("Float marked entries"),
             Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
-
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
         panel = panel_;
         metaData = metaData_;
-
+        typeMenu = ChangeEntryTypeMenu.getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
         boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
 
@@ -176,14 +180,13 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.MERGE_DOI, Localization.lang("Get BibTeX data from DOI")) {
             {
-                if(!(isFieldSetForSelectedEntry("doi"))) {
+                if (!(isFieldSetForSelectedEntry("doi"))) {
                     this.setEnabled(false);
                 }
             }
         });
 
         addSeparator();
-        populateTypeMenu();
 
         add(typeMenu);
         add(new GeneralAction(Actions.PLAIN_TEXT_IMPORT, Localization.lang("Plain text import")));
@@ -212,17 +215,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         // create disabledIcons for all menu entries
         frame.createDisabledIconsForMenuEntries(this);
-    }
-
-    /**
-     * Remove all types from the menu. Then cycle through all available
-     * types, and add them.
-     */
-    private void populateTypeMenu() {
-        typeMenu.removeAll();
-        for (String key : EntryTypes.getAllTypes()) {
-            typeMenu.add(new ChangeTypeAction(EntryTypes.getType(key), panel));
-        }
     }
 
     /**
@@ -414,25 +406,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             } catch (Throwable ex) {
                 LOGGER.debug("Cannot execute command " + command + ".", ex);
             }
-        }
-    }
-
-
-    static class ChangeTypeAction extends AbstractAction {
-
-        final EntryType type;
-        final BasePanel panel;
-
-
-        public ChangeTypeAction(EntryType type, BasePanel bp) {
-            super(type.getName());
-            this.type = type;
-            panel = bp;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent evt) {
-            panel.changeType(type);
         }
     }
 

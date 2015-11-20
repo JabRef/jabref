@@ -528,8 +528,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             new NewEntryAction(this, "manual"),
             new NewEntryAction(this, "techreport"),
             new NewEntryAction(this, "unpublished", prefs.getKey(KeyBinds.NEW_UNPUBLISHED)),
-            new NewEntryAction(this, "misc"),
-            new NewEntryAction(this, "other")};
+            new NewEntryAction(this, "misc")};
     // @formatter:on
 
 

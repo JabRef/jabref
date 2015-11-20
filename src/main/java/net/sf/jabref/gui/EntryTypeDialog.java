@@ -28,6 +28,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.*;
@@ -90,6 +91,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
+            panel.add(createEntryGroupPanel("Custom", CustomEntryTypesManager.ALL));
         }
 
         return panel;
