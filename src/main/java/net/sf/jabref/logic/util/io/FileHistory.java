@@ -16,6 +16,7 @@
 
 package net.sf.jabref.logic.util.io;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import net.sf.jabref.JabRefPreferences;
@@ -29,11 +30,7 @@ public class FileHistory {
     public FileHistory(JabRefPreferences prefs) {
         this.prefs = prefs;
         String[] old = prefs.getStringArray(JabRefPreferences.RECENT_FILES);
-        if ((old != null) && (old.length > 0)) {
-            for (int i = 0; i < old.length; i++) {
-                history.addFirst(old[i]);
-            }
-        }
+        history.addAll(Arrays.asList(old));
     }
 
     public int size() {
@@ -47,14 +44,7 @@ public class FileHistory {
      */
 
     public void newFile(String filename) {
-        int i = 0;
-        while (i < history.size()) {
-            if (history.get(i).equals(filename)) {
-                history.remove(i);
-                i--;
-            }
-            i++;
-        }
+        history.remove(filename);
         history.addFirst(filename);
         while (history.size() > prefs.getInt(JabRefPreferences.HISTORY_SIZE)) {
             history.removeLast();
@@ -66,22 +56,12 @@ public class FileHistory {
     }
 
     public void removeItem(String filename) {
-        int i = 0;
-        while (i < history.size()) {
-            if (history.get(i).equals(filename)) {
-                history.remove(i);
-                return;
-            }
-            i++;
-        }
+        history.remove(filename);
     }
 
     public void storeHistory() {
         if (!history.isEmpty()) {
-            String[] names = new String[history.size()];
-            for (int i = 0; i < names.length; i++) {
-                names[i] = history.get(i);
-            }
+            String[] names = history.toArray(new String[history.size()]);
             prefs.putStringArray(JabRefPreferences.RECENT_FILES, names);
         }
     }
