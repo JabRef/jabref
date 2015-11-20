@@ -19,6 +19,12 @@ public class AuthorsMinifierTest {
     }
 
     @Test
+    public void returnsFormatterName() {
+        Assert.assertNotNull(formatter.getName());
+        Assert.assertNotEquals("", formatter.getName());
+    }
+
+    @Test
     public void minifyAuthorNames() {
         expectCorrect("Simon Harrer", "Simon Harrer");
         expectCorrect("Simon Harrer and others", "Simon Harrer and others");

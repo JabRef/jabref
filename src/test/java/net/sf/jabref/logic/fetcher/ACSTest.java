@@ -22,6 +22,11 @@ public class ACSTest {
         entry = new BibtexEntry();
     }
 
+    @Test
+    public void doiNotPresent() throws IOException {
+        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
     @Test(expected = NullPointerException.class)
     public void rejectNullParameter() throws IOException {
         finder.findFullText(null);

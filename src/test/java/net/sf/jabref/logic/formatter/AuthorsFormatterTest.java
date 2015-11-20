@@ -22,6 +22,12 @@ public class AuthorsFormatterTest {
     }
 
     @Test
+    public void returnsFormatterName() {
+        Assert.assertNotNull(formatter.getName());
+        Assert.assertNotEquals("", formatter.getName());
+    }
+
+    @Test
     public void testNormalizeAuthorList() {
         expectCorrect("Staci D Bilbo", "Bilbo, Staci D.");
         expectCorrect("Staci D. Bilbo", "Staci D. Bilbo"); // TODO strange behaviour

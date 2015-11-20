@@ -20,6 +20,12 @@ public class PageNumbersFormatterTest {
     }
 
     @Test
+    public void returnsFormatterName() {
+        Assert.assertNotNull(formatter.getName());
+        Assert.assertNotEquals("", formatter.getName());
+    }
+
+    @Test
     public void formatPageNumbers() {
         expectCorrect("1-2", "1--2");
     }
