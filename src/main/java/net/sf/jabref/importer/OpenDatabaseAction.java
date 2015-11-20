@@ -89,12 +89,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         if (showDialog) {
 
-            String[] chosen = FileDialogs.getMultipleFiles(frame,
+            String[] chosenStrings = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib", true);
-            if (chosen != null) {
-                for (String aChosen : chosen) {
-                    if (aChosen != null) {
-                        filesToOpen.add(new File(aChosen));
+            if (chosenStrings != null) {
+                for (String chosen : chosenStrings) {
+                    if (chosen != null) {
+                        filesToOpen.add(new File(chosen));
                     }
                 }
             }
@@ -154,20 +154,20 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     class OpenItSwingHelper implements Runnable {
 
-        final BasePanel bp;
+        final BasePanel basePanel;
         final boolean raisePanel;
         final File file;
 
 
-        OpenItSwingHelper(BasePanel bp, File file, boolean raisePanel) {
-            this.bp = bp;
+        OpenItSwingHelper(BasePanel basePanel, File file, boolean raisePanel) {
+            this.basePanel = basePanel;
             this.raisePanel = raisePanel;
             this.file = file;
         }
 
         @Override
         public void run() {
-            frame.addTab(bp, file, raisePanel);
+            frame.addTab(basePanel, file, raisePanel);
 
         }
     }
@@ -207,9 +207,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
 
                 if (FileBasedLock.hasLockFile(file)) {
-                    long modTime = FileBasedLock.getLockFileTimeStamp(file);
-                    if ((modTime != -1)
-                            && ((System.currentTimeMillis() - modTime) > SaveSession.LOCKFILE_CRITICAL_AGE)) {
+                    long modificationTime = FileBasedLock.getLockFileTimeStamp(file);
+                    if ((modificationTime != -1)
+                            && ((System.currentTimeMillis() - modificationTime) > SaveSession.LOCKFILE_CRITICAL_AGE)) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
                         int answer = JOptionPane.showConfirmDialog(null,
                                 "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
@@ -230,15 +230,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }
 
                 }
-                ParserResult pr;
+                ParserResult result;
                 String errorMessage = null;
                 try {
-                    pr = OpenDatabaseAction.loadDatabase(fileToLoad, encoding);
+                    result = OpenDatabaseAction.loadDatabase(fileToLoad, encoding);
                 } catch (Exception ex) {
                     errorMessage = ex.getMessage();
-                    pr = null;
+                    result = null;
                 }
-                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+                if ((result == null) || (result == ParserResult.INVALID_FORMAT)) {
                     JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
 
@@ -261,7 +261,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     done = true;
                 }
 
-                final BasePanel panel = addNewDatabase(pr, file, raisePanel);
+                final BasePanel panel = addNewDatabase(result, file, raisePanel);
                 if (tryingAutosave) {
                     panel.markNonUndoableBaseChanged();
                 }
@@ -271,12 +271,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // if we found new entry types that can be imported, or checking
                 // if the database contents should be modified due to new features
                 // in this version of JabRef:
-                final ParserResult prf = pr;
+                final ParserResult finalReferenceToResult = result;
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
-                        OpenDatabaseAction.performPostOpenActions(panel, prf, true);
+                        OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true);
                     }
                 });
             }
@@ -288,58 +288,58 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * Go through the list of post open actions, and perform those that need to be performed.
      *
      * @param panel The BasePanel where the database is shown.
-     * @param pr    The result of the bib file parse operation.
+     * @param result    The result of the bib file parse operation.
      */
-    public static void performPostOpenActions(BasePanel panel, ParserResult pr, boolean mustRaisePanel) {
+    public static void performPostOpenActions(BasePanel panel, ParserResult result, boolean mustRaisePanel) {
         for (PostOpenAction action : OpenDatabaseAction.postOpenActions) {
-            if (action.isActionNecessary(pr)) {
+            if (action.isActionNecessary(result)) {
                 if (mustRaisePanel) {
                     panel.frame().getTabbedPane().setSelectedComponent(panel);
                 }
-                action.performAction(panel, pr);
+                action.performAction(panel, result);
             }
         }
     }
 
-    public BasePanel addNewDatabase(ParserResult pr, final File file, boolean raisePanel) {
+    public BasePanel addNewDatabase(ParserResult result, final File file, boolean raisePanel) {
 
         String fileName = file.getPath();
-        BibtexDatabase db = pr.getDatabase();
-        MetaData meta = pr.getMetaData();
+        BibtexDatabase database = result.getDatabase();
+        MetaData meta = result.getMetaData();
 
-        if (pr.hasWarnings()) {
-            final String[] wrns = pr.warnings();
+        if (result.hasWarnings()) {
+            final String[] warnings = result.warnings();
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 @Override
                 public void run() {
-                    StringBuilder wrn = new StringBuilder();
-                    for (int i = 0; i < wrns.length; i++) {
-                        wrn.append(i + 1).append(". ").append(wrns[i]).append("\n");
+                    StringBuilder warningString = new StringBuilder();
+                    for (int i = 0; i < warnings.length; i++) {
+                        warningString.append(i + 1).append(". ").append(warnings[i]).append("\n");
                     }
 
-                    if (wrn.length() > 0) {
-                        wrn.deleteCharAt(wrn.length() - 1);
+                    if (warningString.length() > 0) {
+                        warningString.deleteCharAt(warningString.length() - 1);
                     }
                     // Note to self or to someone else: The following line causes an
                     // ArrayIndexOutOfBoundsException in situations with a large number of
                     // warnings; approx. 5000 for the database I opened when I observed the problem
                     // (duplicate key warnings). I don't think this is a big problem for normal situations,
                     // and it may possibly be a bug in the Swing code.
-                    JOptionPane.showMessageDialog(frame, wrn.toString(),
+                    JOptionPane.showMessageDialog(frame, warningString.toString(),
                             Localization.lang("Warnings") + " (" + file.getName() + ")", JOptionPane.WARNING_MESSAGE);
                 }
             });
         }
-        BasePanel bp = new BasePanel(frame, db, file, meta, pr.getEncoding());
+        BasePanel basePanel = new BasePanel(frame, database, file, meta, result.getEncoding());
 
         // file is set to null inside the EventDispatcherThread
-        SwingUtilities.invokeLater(new OpenItSwingHelper(bp, file, raisePanel));
+        SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, file, raisePanel));
 
         frame.output(Localization.lang("Opened database") + " '" + fileName + "' " + Localization.lang("with") + " "
-                + db.getEntryCount() + " " + Localization.lang("entries") + ".");
+                + database.getEntryCount() + " " + Localization.lang("entries") + ".");
 
-        return bp;
+        return basePanel;
     }
 
     /**
@@ -401,7 +401,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             try {
                 return ImportFormatReader.getReader(fileToOpen, encoding.get());
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.error("Could not open file " + fileToOpen, ex);
                 // The supplied encoding didn't work out, so we use the fallback.
                 return ImportFormatReader.getReader(fileToOpen, fallbackEncoding);
             }
