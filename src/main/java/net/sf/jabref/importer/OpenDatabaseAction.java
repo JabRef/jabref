@@ -374,25 +374,29 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         // Open and parse file
         try (InputStreamReader reader = openFile(fileToOpen, suppliedEncoding, fallbackEncoding)) {
-            BibtexParser bp = new BibtexParser(reader);
+            BibtexParser parser = new BibtexParser(reader);
 
-            ParserResult pr = bp.parse();
-            pr.setEncoding(Charset.forName(reader.getEncoding()).name());
-            pr.setFile(fileToOpen);
+            ParserResult result = parser.parse();
+            /*
+            * The InputStreamReader might return 'UTF8', which is a wrong representation.
+            * Charset does the correct translation
+             */
+            result.setEncoding(Charset.forName(reader.getEncoding()).name());
+            result.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
-                for (BibtexEntry entry : pr.getDatabase().getEntries()) {
+                for (BibtexEntry entry : result.getDatabase().getEntries()) {
                     SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
                 }
                 LOGGER.info("Synchronized special fields based on keywords");
             }
 
-            if (!pr.getMetaData().isGroupTreeValid()) {
-                pr.addWarning(Localization.lang(
+            if (!result.getMetaData().isGroupTreeValid()) {
+                result.addWarning(Localization.lang(
                         "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
             }
 
-            return pr;
+            return result;
         }
     }
 
