@@ -344,20 +344,20 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 @Override
                 public void run() {
-                    StringBuilder warningStrin = new StringBuilder();
+                    StringBuilder warningString = new StringBuilder();
                     for (int i = 0; i < warnings.length; i++) {
-                        warningStrin.append(i + 1).append(". ").append(warnings[i]).append("\n");
+                        warningString.append(i + 1).append(". ").append(warnings[i]).append("\n");
                     }
 
-                    if (warningStrin.length() > 0) {
-                        warningStrin.deleteCharAt(warningStrin.length() - 1);
+                    if (warningString.length() > 0) {
+                        warningString.deleteCharAt(warningString.length() - 1);
                     }
                     // Note to self or to someone else: The following line causes an
                     // ArrayIndexOutOfBoundsException in situations with a large number of
                     // warnings; approx. 5000 for the database I opened when I observed the problem
                     // (duplicate key warnings). I don't think this is a big problem for normal situations,
                     // and it may possibly be a bug in the Swing code.
-                    JOptionPane.showMessageDialog(frame, warningStrin.toString(),
+                    JOptionPane.showMessageDialog(frame, warningString.toString(),
                             Localization.lang("Warnings") + " (" + file.getName() + ")", JOptionPane.WARNING_MESSAGE);
                 }
             });
