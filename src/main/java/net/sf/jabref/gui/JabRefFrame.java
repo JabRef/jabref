@@ -2294,30 +2294,4 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JOptionPane.showMessageDialog(this, message);
     }
 
-  // Copied from org.pushingpixels.lafwidget.LafWidgetSupport
-  // http://jarvis.cs.ucdavis.edu/code_essence/functions/5829321
-  // We need to use reflection to change the tabAreaInsets since a TappedPaneUI does not provide an easier way to set this
-  private void setTabAreaInsets(JTabbedPane tabbedPane, Insets tabAreaInsets) {
-	  TabbedPaneUI ui = tabbedPane.getUI();
-	  if (ui instanceof BasicTabbedPaneUI) {
-		  try {
-			  Class<?> clazz = ui.getClass();
-			  while (clazz != null) {
-				  try {
-					  Field fld = clazz.getDeclaredField("tabAreaInsets");
-					  if (fld != null) {
-						  fld.setAccessible(true);
-						  fld.set(ui, tabAreaInsets);
-						  return;
-					  }
-				  } catch (NoSuchFieldException nsfe) {
-				  }
-				  clazz = clazz.getSuperclass();
-			  }
-		  } catch (Throwable t) {
-			  // ignore all fall through
-		  }
-	  }
-	  throw new UnsupportedOperationException();
-  }
 }

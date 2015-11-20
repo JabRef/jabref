@@ -102,10 +102,6 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         this.enabled = enabled;
     }
 
-    private void instantiatePreviews() {
-
-    }
-
     public void updatePreviews() {
         try {
             previewPanel[0].readLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
