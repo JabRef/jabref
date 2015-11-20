@@ -302,7 +302,7 @@ public class XMPUtilTest {
         Assert.assertEquals("2003", e.getField("year"));
         Assert.assertEquals("Beach sand convolution by surf-wave optimzation", e
                 .getField("title"));
-        Assert.assertEquals(BibtexEntryTypes.OTHER, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.MISC, e.getType());
 
     }
 
@@ -329,7 +329,7 @@ public class XMPUtilTest {
         Assert.assertEquals("OezbekC06", e.getCiteKey());
         Assert.assertEquals("2003", e.getField("year"));
         Assert.assertEquals("�pt�mz�t��n", e.getField("title"));
-        Assert.assertEquals(BibtexEntryTypes.OTHER, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.MISC, e.getType());
     }
 
     /**
@@ -412,7 +412,7 @@ public class XMPUtilTest {
         Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getField("author"));
         Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e
                 .getField("editor"));
-        Assert.assertEquals(BibtexEntryTypes.OTHER, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.MISC, e.getType());
     }
 
     /**

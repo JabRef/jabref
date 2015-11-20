@@ -20,7 +20,7 @@ public class AuthorsMinifier implements Formatter {
      * <example>
      *     Stefan Kolb -> Stefan Kolb
      *     Stefan Kolb and Simon Harrer -> Stefan Kolb and Simon Harrer
-     *     Stefan Kolb and Simon Harrer and Jörg Lenhard -> Stefan Kolb and others
+     *     Stefan Kolb and Simon Harrer and JÃ¶rg Lenhard -> Stefan Kolb and others
      * </example>
      */
     public String format(String value) {

@@ -1353,10 +1353,11 @@ public class JabRefPreferences {
             return null;
         }
         if (priOpt == null) {
-            return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt);
+            return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(opt));
         }
-        String[] secOpt = EntryUtil.getRemainder(opt, priOpt);
-        return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secOpt);
+        List<String> secondary = EntryUtil.getRemainder(Arrays.asList(opt), Arrays.asList(priOpt));
+        String[] secOpt = secondary.toArray(new String[secondary.size()]);
+        return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(priOpt), Arrays.asList(secOpt));
 
     }
 

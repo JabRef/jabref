@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+ - Unknown entry types will be converted to 'Misc' (was 'Other' before).
  - EntryTypes are now clustered per group on the 'new entry' GUI screen.
  - Tab shows the minimal unique folder name substring if multiple database files share the same name
  - Added a page numbers integrity checker
@@ -45,7 +46,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Tweak of preference defaults
    - Autolink requires that the filename starts with the given BibTeX key and the default filename patterns is key followed by title
    - Default sorting changed
-   - Default label pattern changed from [auth][year] to [authors3][year]
+   - Default label pattern changed from `[auth][year]` to `[authors3][year]`
  - Feature: case changers now leave protected areas (enclosed with curly brakets) alone
  - BREAKING: The BibTeX key generator settings from previous versions are lost
  - BREAKING: LabelPatterns `[auth.etal]`, `[authEtAl]`, `[authors]`, `[authorsN]`, `[authorLast]` and more to omit spaces and commas (and work as described at http://jabref.sourceforge.net/help/LabelPatterns.php)
@@ -75,9 +76,10 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Fixed: When reconfiguring the BibTeX key generator, changes are applied instantly without requiring a restart of JabRef
  - Fixed #250: No hard line breaks after 70 chars in serialized JabRef meta data
  - Fixed [bug 1296](https://sourceforge.net/p/jabref/bugs/1296/): External links in the help open in the standard browser
+ - Fixed behavior of opening files: If an existing database is opened, it is focused now instead of opening it twice.
 
 ### Removed
- - Entry type 'Other' is not selectable anymore as it is no real entry type.
+ - Entry type 'Other' is not selectable anymore as it is no real entry type. Will be converted to 'Misc'.
  - BREAKING: Remove plugin functionality.
  - The key bindings for searching specific databases are removed
  - Remove option to toggle native file dialog on mac by making JabRef always use native file dialogs on mac

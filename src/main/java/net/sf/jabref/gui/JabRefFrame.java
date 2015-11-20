@@ -34,7 +34,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -42,9 +41,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
@@ -60,8 +61,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -100,6 +100,8 @@ import osx.macadapter.MacAdapter;
 public class JabRefFrame extends JFrame implements OutputPrinter {
     private static final long serialVersionUID = 1L;
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
+
+    private static final boolean biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
 
     final JSplitPane contentPane = new JSplitPane();
 
@@ -242,8 +244,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JToggleButton fetcherToggle;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
-    private final AbstractAction
-            close = new CloseDatabaseAction();
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
     private final AbstractAction newDatabaseAction = new NewDatabaseAction(this);
@@ -517,24 +517,36 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey(KeyBinds.NEW_ENTRY));
     // @formatter:off
-    private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[]{
-            new NewEntryAction(this, "article", prefs.getKey(KeyBinds.NEW_ARTICLE)),
-            new NewEntryAction(this, "book", prefs.getKey(KeyBinds.NEW_BOOK)),
-            new NewEntryAction(this, "phdthesis", prefs.getKey(KeyBinds.NEW_PHDTHESIS)),
-            new NewEntryAction(this, "inbook", prefs.getKey(KeyBinds.NEW_INBOOK)),
-            new NewEntryAction(this, "mastersthesis", prefs.getKey(KeyBinds.NEW_MASTERSTHESIS)),
-            new NewEntryAction(this, "proceedings", prefs.getKey(KeyBinds.NEW_PROCEEDINGS)),
-            new NewEntryAction(this, "inproceedings"),
-            new NewEntryAction(this, "conference"),
-            new NewEntryAction(this, "incollection"),
-            new NewEntryAction(this, "booklet"),
-            new NewEntryAction(this, "manual"),
-            new NewEntryAction(this, "techreport"),
-            new NewEntryAction(this, "unpublished", prefs.getKey(KeyBinds.NEW_UNPUBLISHED)),
-            new NewEntryAction(this, "misc"),
-            new NewEntryAction(this, "other")};
-    // @formatter:on
+    private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
 
+    private List<NewEntryAction> getNewEntryActions() {
+        List<NewEntryAction> actions = new ArrayList<>();
+
+        if (biblatexMode) {
+            for (String key : EntryTypes.getAllTypes()) {
+                actions.add(new NewEntryAction(this, key));
+            }
+        } else {
+            // Bibtex
+            for (EntryType type : BibtexEntryTypes.ALL) {
+                KeyStroke keyStroke = ChangeEntryTypeMenu.entryShortCuts.get(type.getName());
+                if(keyStroke != null) {
+                    actions.add(new NewEntryAction(this, type.getName(), keyStroke));
+                } else {
+                    actions.add(new NewEntryAction(this, type.getName()));
+                }
+            }
+            // ieeetran
+            for (EntryType type : IEEETranEntryTypes.ALL) {
+                actions.add(new NewEntryAction(this, type.getName()));
+            }
+            // custom types
+            for (EntryType type : CustomEntryTypesManager.ALL) {
+                actions.add(new NewEntryAction(this, type.getName()));
+            }
+        }
+        return actions;
+    }
 
     public JabRefFrame(JabRef jabRef) {
         this.jabRef = jabRef;
@@ -544,7 +556,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void init() {
-        tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
+        tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern, closeDatabaseAction);
 
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
@@ -696,32 +708,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    // The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+    /**
+     * The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+     */
     public void openAction(String filePath) {
         File file = new File(filePath);
-
-        // Check if the file is already open.
-        for (int i = 0; i < this.getTabbedPane().getTabCount(); i++) {
-            BasePanel bp = this.getBasePanelAt(i);
-            if ((bp.getDatabaseFile() != null) && bp.getDatabaseFile().equals(file)) {
-                //The file is already opened, so just raising its tab.
-                this.getTabbedPane().setSelectedComponent(bp);
-                return;
-            }
-        }
-
-        if (file.exists()) {
-            // Run the actual open in a thread to prevent the program
-            // locking until the file is loaded.
-            final File theFile = new File(filePath);
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    open.openIt(theFile, true);
-                }
-            });
-        }
+        // all the logic is done in openIt. Even raising an existing panel
+        open.openFile(file, true);
     }
 
     // General info dialog.  The MacAdapter calls this method when "About"
@@ -1195,7 +1188,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(fileHistory);
 
         file.addSeparator();
-        file.add(close);
+        file.add(closeDatabaseAction);
         file.add(quit);
         mb.add(file);
         //edit.add(test);
@@ -1306,10 +1299,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(view);
 
         bibtex.add(newEntryAction);
-        for (NewEntryAction aNewSpecificEntryAction : newSpecificEntryAction) {
-            newSpec.add(aNewSpecificEntryAction);
+
+        for(NewEntryAction a : newSpecificEntryAction) {
+            newSpec.add(a);
         }
+
         bibtex.add(newSpec);
+
         bibtex.add(plainTextImport);
         bibtex.addSeparator();
         bibtex.add(editEntry);
@@ -1370,6 +1366,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(helpMenu);
 
         createDisabledIconsForMenuEntries(mb);
+    }
+
+
+    private static void createEntryTypeSection(JMenu menu, String title, java.util.List<NewEntryAction> actions) {
+        // bibtex
+        JMenuItem header = new JMenuItem(title);
+        Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());
+        header.setFont(font);
+        header.setEnabled(false);
+        menu.add(header);
+
+        for (NewEntryAction action : actions) {
+            menu.add(action);
+        }
     }
 
     public static JMenu subMenu(String name) {
@@ -1524,23 +1534,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions = new LinkedList<>();
-        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors,
-                mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, saveSelectedAsPlain, undo,
-                redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
-                selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
-                makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
-                incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
+        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
+                saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, delete, copy, paste, mark, unmark,
+                unmarkAll, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
+                toggleGroups, toggleSearch, makeKeyAction, normalSearch, mergeEntries, cleanupEntries,
+                exportToClipboard, incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
                 openPdf, openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
-                closeDatabaseAction, switchPreview, checkIntegrity,
-                toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
-                abbreviateMedline, unabbreviate, exportAll, exportSelected,
+                closeDatabaseAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
+                databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected,
                 importCurrent, saveAll, dbConnect, dbExport, focusTable));
 
         openDatabaseOnlyActions.addAll(fetcherActions);
 
-        openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
+        openDatabaseOnlyActions.addAll(newSpecificEntryAction);
 
         severalDatabasesOnlyActions = new LinkedList<>();
         severalDatabasesOnlyActions.addAll(Arrays
@@ -1663,10 +1671,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             String uniqPath = paths.get(i);
             File file = getBasePanelAt(i).getDatabaseFile();
 
-            if (file != null && !uniqPath.equals(file.getName())) {
+            if ((file != null) && !uniqPath.equals(file.getName())) {
                 // remove filename
                 uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+            } else if((file != null) && uniqPath.equals(file.getName())) {
+                // set original filename (again)
+                tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
             }
         }
     }
@@ -1681,21 +1692,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
         }
-    }
-
-    /**
-     * Signal closing of the current tab. Standard warnings will be given if the
-     * database has been changed.
-     */
-    public void closeCurrentTab() {
-        closeDatabaseAction.actionPerformed(null);
-    }
-
-    /**
-     * Close the current tab without giving any warning if the database has been changed.
-     */
-    public void closeCurrentTabNoWarning() {
-        closeDatabaseAction.close();
     }
 
     /**
@@ -1823,8 +1819,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             setWindowTitle();
             updateEnabledState(); // FIXME: Man, this is what I call a bug that this is not called.
             output(Localization.lang("Closed database") + '.');
-            // FIXME: why?
-            System.gc(); // Test
+            // update tab titles
+            updateAllTabTitles();
         }
     }
 
@@ -2086,19 +2082,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             }
                         }
                     }
-                    int i0 = tabbedPane.getTabCount();
                     String[] names = prefs.getStringArray("savedSession");
+                    ArrayList<File> filesToOpen = new ArrayList<>();
                     for (int i = 0; i < names.length; i++) {
-                        if (!currentFiles.contains(names[i])) {
-                            File file = new File(names[i]);
-                            if (file.exists()) {
-                                LOGGER.debug("Opening last edited file:" + file.getName());
-                                open.openIt(file, i == 0);
-                            }
-                        }
+                        filesToOpen.add(new File(names[i]));
                     }
-                    output(Localization.lang("Files opened") + ": " +
-                            (tabbedPane.getTabCount() - i0));
+                    open.openFiles(filesToOpen, true);
                     running = false;
                 }
             });

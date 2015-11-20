@@ -130,6 +130,6 @@ public class EntryTypes {
         if (o != null) {
             return o;
         }
-        return BibtexEntryTypes.OTHER;
+        return BibtexEntryTypes.MISC;
     }
 }

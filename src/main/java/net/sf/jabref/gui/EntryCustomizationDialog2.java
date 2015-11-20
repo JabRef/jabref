@@ -321,9 +321,6 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 opt2Lists.remove(name);
             }
         }
-        //messageLabel.setText("'"+type.getName()+"' "+
-        //        Globals.lang("is a standard type."));
-
     }
 
     private static boolean equalLists(List<String> one, List<String> two) {
@@ -381,8 +378,6 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 EntryType newType = EntryTypes.getType(entry.getType().getName());
                 if (newType != null) {
                     entry.setType(newType);
-                } else {
-                    entry.setType(BibtexEntryTypes.TYPELESS);
                 }
             }
         }
@@ -396,7 +391,6 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
             frame.getTabbedPane().getComponentAt(i);
         }
-
     }
 
 

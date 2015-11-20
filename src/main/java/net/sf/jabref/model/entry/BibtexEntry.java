@@ -64,7 +64,7 @@ public class BibtexEntry {
     }
 
     public BibtexEntry(String id) {
-        this(id, BibtexEntryTypes.OTHER);
+        this(id, BibtexEntryTypes.MISC);
     }
 
     public BibtexEntry(String id, EntryType type) {
@@ -117,7 +117,7 @@ public class BibtexEntry {
      * Sets this entry's type.
      */
     public void setType(EntryType type) {
-        Objects.requireNonNull(type, "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
+        Objects.requireNonNull(type, "Every BibtexEntry must have a type.");
 
         EntryType oldType = this.type;
 

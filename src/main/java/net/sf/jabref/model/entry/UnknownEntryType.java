@@ -37,9 +37,6 @@ public class UnknownEntryType implements EntryType {
 
         requiredFields = new ArrayList<>();
         optionalFields = new ArrayList<>();
-
-        // key is always required
-        requiredFields.add("bibtexkey");
     }
 
     @Override

@@ -85,10 +85,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         List<File> filesToOpen = new ArrayList<>();
-        //File fileToOpen = null;
 
         if (showDialog) {
-
             String[] chosenStrings = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib", true);
             if (chosenStrings != null) {
@@ -98,18 +96,67 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }
                 }
             }
-
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
             filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
         }
 
+        openFiles(filesToOpen, true);
+    }
+
+
+    class OpenItSwingHelper implements Runnable {
+
+        final BasePanel bp;
+        final boolean raisePanel;
+        final File file;
+
+
+        OpenItSwingHelper(BasePanel bp, File file, boolean raisePanel) {
+            this.bp = bp;
+            this.raisePanel = raisePanel;
+            this.file = file;
+        }
+
+        @Override
+        public void run() {
+            frame.addTab(bp, file, raisePanel);
+
+        }
+    }
+
+
+    /**
+     * Opens the given file. If null or 404, nothing happens
+     *
+     * @param file the file, may be null or not existing
+     */
+    public void openFile(File file, boolean raisePanel) {
+        List<File> filesToOpen = new ArrayList<>();
+        filesToOpen.add(file);
+        openFiles(filesToOpen, raisePanel);
+    }
+
+    public void openFilesAsStringList(List<String> fileNamesToOpen, boolean raisePanel) {
+        List<File> filesToOpen = new ArrayList<>();
+        for (String fileName : fileNamesToOpen) {
+            filesToOpen.add(new File(fileName));
+        }
+        openFiles(filesToOpen, raisePanel);
+    }
+
+    /**
+     * Opens the given files. If one of it is null or 404, nothing happens
+     *
+     * @param filesToOpen the filesToOpen, may be null or not existing
+     */
+    public void openFiles(List<File> filesToOpen, boolean raisePanel) {
         BasePanel toRaise = null;
         int initialCount = filesToOpen.size();
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
+        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel bp = frame.getBasePanelAt(i);
@@ -121,6 +168,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     if (removed == initialCount) {
                         toRaise = bp;
                     }
+                    // no more bps to check, we found a matching one
                     break;
                 }
             }
@@ -135,7 +183,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 @Override
                 public void run() {
                     for (File theFile : theFiles) {
-                        openIt(theFile, true);
+                        openTheFile(theFile, raisePanel);
                     }
                 }
             });
@@ -149,31 +197,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             frame.output(Localization.lang("File '%0' is already open.", toRaise.getDatabaseFile().getPath()));
             frame.getTabbedPane().setSelectedComponent(toRaise);
         }
+
+        frame.output(Localization.lang("Files opened") + ": " + (filesToOpen.size()));
     }
 
-
-    class OpenItSwingHelper implements Runnable {
-
-        final BasePanel basePanel;
-        final boolean raisePanel;
-        final File file;
-
-
-        OpenItSwingHelper(BasePanel basePanel, File file, boolean raisePanel) {
-            this.basePanel = basePanel;
-            this.raisePanel = raisePanel;
-            this.file = file;
-        }
-
-        @Override
-        public void run() {
-            frame.addTab(basePanel, file, raisePanel);
-
-        }
-    }
-
-
-    public void openIt(File file, boolean raisePanel) {
+    /**
+     * @param file the file, may be null or not existing
+     */
+    private void openTheFile(File file, boolean raisePanel) {
         if ((file != null) && file.exists()) {
             File fileToLoad = file;
             frame.output(Localization.lang("Opening") + ": '" + file.getPath() + "'");
@@ -190,9 +221,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 int answer = JOptionPane.showConfirmDialog(null,
                         "<html>" + Localization
                                 .lang("An autosave file was found for this database. This could indicate ")
-                                + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.")
-                                + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
-                                + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
+                        + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.")
+                        + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
+                        + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     fileToLoad = AutoSaveManager.getAutoSaveFile(file);
                     tryingAutosave = true;
@@ -207,9 +238,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
 
                 if (FileBasedLock.hasLockFile(file)) {
-                    long modificationTime = FileBasedLock.getLockFileTimeStamp(file);
-                    if ((modificationTime != -1)
-                            && ((System.currentTimeMillis() - modificationTime) > SaveSession.LOCKFILE_CRITICAL_AGE)) {
+                    long modTime = FileBasedLock.getLockFileTimeStamp(file);
+                    if ((modTime != -1)
+                            && ((System.currentTimeMillis() - modTime) > SaveSession.LOCKFILE_CRITICAL_AGE)) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
                         int answer = JOptionPane.showConfirmDialog(null,
                                 "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
@@ -230,22 +261,23 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }
 
                 }
-                ParserResult result;
+                ParserResult pr;
                 String errorMessage = null;
                 try {
-                    result = OpenDatabaseAction.loadDatabase(fileToLoad, encoding);
+                    pr = OpenDatabaseAction.loadDatabase(fileToLoad, encoding);
                 } catch (Exception ex) {
+                    //ex.printStackTrace();
                     errorMessage = ex.getMessage();
-                    result = null;
+                    pr = null;
                 }
-                if ((result == null) || (result == ParserResult.INVALID_FORMAT)) {
+                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                     JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
 
                     String message = "<html>" + errorMessage + "<p>"
                             + (tryingAutosave ? Localization.lang(
-                            "Error opening autosave of '%0'. Trying to load '%0' instead.",
-                            file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
+                                    "Error opening autosave of '%0'. Trying to load '%0' instead.",
+                                    file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
                             + "</html>";
                     JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"),
                             JOptionPane.ERROR_MESSAGE);
@@ -261,7 +293,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     done = true;
                 }
 
-                final BasePanel panel = addNewDatabase(result, file, raisePanel);
+                final BasePanel panel = addNewDatabase(pr, file, raisePanel);
                 if (tryingAutosave) {
                     panel.markNonUndoableBaseChanged();
                 }
@@ -271,12 +303,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // if we found new entry types that can be imported, or checking
                 // if the database contents should be modified due to new features
                 // in this version of JabRef:
-                final ParserResult finalReferenceToResult = result;
+                final ParserResult prf = pr;
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
-                        OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true);
+                        OpenDatabaseAction.performPostOpenActions(panel, prf, true);
                     }
                 });
             }
@@ -288,58 +320,58 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * Go through the list of post open actions, and perform those that need to be performed.
      *
      * @param panel The BasePanel where the database is shown.
-     * @param result    The result of the bib file parse operation.
+     * @param pr The result of the bib file parse operation.
      */
-    public static void performPostOpenActions(BasePanel panel, ParserResult result, boolean mustRaisePanel) {
+    public static void performPostOpenActions(BasePanel panel, ParserResult pr, boolean mustRaisePanel) {
         for (PostOpenAction action : OpenDatabaseAction.postOpenActions) {
-            if (action.isActionNecessary(result)) {
+            if (action.isActionNecessary(pr)) {
                 if (mustRaisePanel) {
                     panel.frame().getTabbedPane().setSelectedComponent(panel);
                 }
-                action.performAction(panel, result);
+                action.performAction(panel, pr);
             }
         }
     }
 
-    public BasePanel addNewDatabase(ParserResult result, final File file, boolean raisePanel) {
+    public BasePanel addNewDatabase(ParserResult pr, final File file, boolean raisePanel) {
 
         String fileName = file.getPath();
-        BibtexDatabase database = result.getDatabase();
-        MetaData meta = result.getMetaData();
+        BibtexDatabase db = pr.getDatabase();
+        MetaData meta = pr.getMetaData();
 
-        if (result.hasWarnings()) {
-            final String[] warnings = result.warnings();
+        if (pr.hasWarnings()) {
+            final String[] wrns = pr.warnings();
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 @Override
                 public void run() {
-                    StringBuilder warningString = new StringBuilder();
-                    for (int i = 0; i < warnings.length; i++) {
-                        warningString.append(i + 1).append(". ").append(warnings[i]).append("\n");
+                    StringBuilder wrn = new StringBuilder();
+                    for (int i = 0; i < wrns.length; i++) {
+                        wrn.append(i + 1).append(". ").append(wrns[i]).append("\n");
                     }
 
-                    if (warningString.length() > 0) {
-                        warningString.deleteCharAt(warningString.length() - 1);
+                    if (wrn.length() > 0) {
+                        wrn.deleteCharAt(wrn.length() - 1);
                     }
                     // Note to self or to someone else: The following line causes an
                     // ArrayIndexOutOfBoundsException in situations with a large number of
                     // warnings; approx. 5000 for the database I opened when I observed the problem
                     // (duplicate key warnings). I don't think this is a big problem for normal situations,
                     // and it may possibly be a bug in the Swing code.
-                    JOptionPane.showMessageDialog(frame, warningString.toString(),
+                    JOptionPane.showMessageDialog(frame, wrn.toString(),
                             Localization.lang("Warnings") + " (" + file.getName() + ")", JOptionPane.WARNING_MESSAGE);
                 }
             });
         }
-        BasePanel basePanel = new BasePanel(frame, database, file, meta, result.getEncoding());
+        BasePanel bp = new BasePanel(frame, db, file, meta, pr.getEncoding());
 
         // file is set to null inside the EventDispatcherThread
-        SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, file, raisePanel));
+        SwingUtilities.invokeLater(new OpenItSwingHelper(bp, file, raisePanel));
 
         frame.output(Localization.lang("Opened database") + " '" + fileName + "' " + Localization.lang("with") + " "
-                + database.getEntryCount() + " " + Localization.lang("entries") + ".");
+                + db.getEntryCount() + " " + Localization.lang("entries") + ".");
 
-        return basePanel;
+        return bp;
     }
 
     /**
@@ -365,29 +397,25 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         // Open and parse file
         try (InputStreamReader reader = openFile(fileToOpen, suppliedEncoding, fallbackEncoding)) {
-            BibtexParser parser = new BibtexParser(reader);
+            BibtexParser bp = new BibtexParser(reader);
 
-            ParserResult result = parser.parse();
-            /*
-            * The InputStreamReader might return 'UTF8', which is a wrong representation.
-            * Charset does the correct translation
-             */
-            result.setEncoding(Charset.forName(reader.getEncoding()).name());
-            result.setFile(fileToOpen);
+            ParserResult pr = bp.parse();
+            pr.setEncoding(Charset.forName(reader.getEncoding()).name());
+            pr.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
-                for (BibtexEntry entry : result.getDatabase().getEntries()) {
+                for (BibtexEntry entry : pr.getDatabase().getEntries()) {
                     SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
                 }
                 LOGGER.info("Synchronized special fields based on keywords");
             }
 
-            if (!result.getMetaData().isGroupTreeValid()) {
-                result.addWarning(Localization.lang(
+            if (!pr.getMetaData().isGroupTreeValid()) {
+                pr.addWarning(Localization.lang(
                         "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
             }
 
-            return result;
+            return pr;
         }
     }
 
@@ -401,7 +429,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             try {
                 return ImportFormatReader.getReader(fileToOpen, encoding.get());
             } catch (Exception ex) {
-                LOGGER.error("Could not open file " + fileToOpen, ex);
+                ex.printStackTrace();
                 // The supplied encoding didn't work out, so we use the fallback.
                 return ImportFormatReader.getReader(fileToOpen, fallbackEncoding);
             }

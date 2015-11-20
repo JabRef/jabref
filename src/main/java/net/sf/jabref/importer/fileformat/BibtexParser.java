@@ -245,7 +245,7 @@ public class BibtexParser {
                             // A custom entry type can also be stored in a
                             // "@comment"
                             CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
-                            entryTypes.put(typ.getName().toLowerCase(), typ);
+                            entryTypes.put(typ.getName(), typ);
                         } else {
                             // FIXME: user comments are simply dropped
                             // at least, we log that we ignored the comment
@@ -258,7 +258,7 @@ public class BibtexParser {
                         // at the bottom of the file. So we use an
                         // UnknownEntryType
                         // to remember the type name by.
-                        tp = new UnknownEntryType(entryType.toLowerCase());
+                        tp = new UnknownEntryType(EntryUtil.capitalizeFirst(entryType));
                         isEntry = true;
                     }
                 }
@@ -888,17 +888,15 @@ public class BibtexParser {
         for (BibtexEntry be : database.getEntries()) {
             if (be.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
-                Object o = entryTypes.get(be.getType().getName().toLowerCase());
-                if (o != null) {
-                    EntryType type = (EntryType) o;
+                String name = be.getType().getName();
+                EntryType type = entryTypes.get(name);
+                if (type != null) {
                     be.setType(type);
                 } else {
-                    _pr.addWarning(Localization.lang("unknown entry type") + ": "
- + be.getType().getName() + ":"
-                            + be.getCiteKey()
-                                    + " . " + Localization.lang("Type set to 'other'")
-                                    + ".");
-                    be.setType(BibtexEntryTypes.OTHER);
+                    _pr.addWarning(
+                            Localization.lang("Unknown entry type")
+                                    + ": " + name + "; key: " + be.getCiteKey()
+                            );
                 }
             }
         }
