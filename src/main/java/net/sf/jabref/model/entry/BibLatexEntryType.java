@@ -45,9 +45,6 @@ public abstract class BibLatexEntryType implements EntryType {
     public BibLatexEntryType() {
         requiredFields = new ArrayList<>();
         optionalFields = new ArrayList<>();
-
-        // key is always required
-        requiredFields.add("bibtexkey");
     }
 
     @Override
