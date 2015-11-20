@@ -897,13 +897,6 @@ public class BibtexParser {
                             Localization.lang("Unknown entry type")
                                     + ": " + name + "; key: " + be.getCiteKey()
                             );
-
-                    be.setType(new BibtexEntryType() {
-                        @Override
-                        public String getName() {
-                            return name;
-                        }
-                    });
                 }
             }
         }
