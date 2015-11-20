@@ -72,7 +72,9 @@ public class ChangeEntryTypeMenu {
         Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());
         header.setFont(font);
         header.setEnabled(false);
-        menu.add(header);
+        if(!types.isEmpty()) {
+            menu.add(header);
+        }
 
         for (EntryType type : types) {
             menu.add(new ChangeTypeAction(type, panel));
