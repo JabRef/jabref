@@ -44,7 +44,7 @@ public class ChangeEntryTypeMenu {
             createEntryTypeSection(panel, menu, "BibTeX Entries", BibtexEntryTypes.ALL);
             menu.addSeparator();
             // ieeetran
-            createEntryTypeSection(panel, menu, "IEETran Entries", IEEETranEntryTypes.ALL);
+            createEntryTypeSection(panel, menu, "IEEETran Entries", IEEETranEntryTypes.ALL);
             menu.addSeparator();
             // custom types
             createEntryTypeSection(panel, menu, "Custom Entries", CustomEntryTypesManager.ALL);
