@@ -52,15 +52,15 @@ public class BibtexFields {
     public static final String OWNER = "owner";
     public static final String TIMESTAMP = "timestamp"; // it's also definied at the JabRefPreferences class
     private static final String ENTRYTYPE = "entrytype";
-    public static final String EXTRA_YES_NO = "yesNo";
-    public static final String EXTRA_URL = "url";
-    public static final String EXTRA_DATEPICKER = "datepicker";
-    public static final String EXTRA_JOURNAL_NAMES = "journalNames";
-    public static final String EXTRA_EXTERNAL = "external";
-    public static final String EXTRA_BROWSE = "browse";
-    public static final String EXTRA_BROWSE_DOC = "browseDoc";
-    public static final String EXTRA_BROWSE_DOC_ZIP = "browseDocZip";
-    public static final String EXTRA_SET_OWNER = "setOwner";
+    public static final String EXTRA_YES_NO = "yesNo"; // Blank/Yes/No Combo-box
+    public static final String EXTRA_URL = "url"; // Drop target for URL
+    public static final String EXTRA_DATEPICKER = "datepicker"; // Calendar button and double-click in field to set current date
+    public static final String EXTRA_JOURNAL_NAMES = "journalNames"; // Journal abbreviation button
+    public static final String EXTRA_EXTERNAL = "external"; // Open external viewer on double-click
+    public static final String EXTRA_BROWSE = "browse"; // Browse button, file dialog
+    public static final String EXTRA_BROWSE_DOC = "browseDoc"; // Browse button, file dialog with extension .fieldname
+    public static final String EXTRA_BROWSE_DOC_ZIP = "browseDocZip"; // Browse button, file dialog with extension .fieldname, .fieldname.bz2, .filedname.gz
+    public static final String EXTRA_SET_OWNER = "setOwner"; // Button to set owner to current used
 
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
             {"author", "title", "year", BibtexEntry.KEY_FIELD};
