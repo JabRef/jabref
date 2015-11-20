@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -376,7 +377,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             BibtexParser bp = new BibtexParser(reader);
 
             ParserResult pr = bp.parse();
-            pr.setEncoding(getEncodingFromStream(reader));
+            pr.setEncoding(Charset.forName(reader.getEncoding()).name());
             pr.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
@@ -392,17 +393,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             }
 
             return pr;
-        }
-    }
-
-
-    private static String getEncodingFromStream(InputStreamReader reader) {
-        String encoding = reader.getEncoding();
-        // compatibility hack to transfrom the UTF8 string to the version we expect
-        if (encoding == "UTF8") {
-            return "UTF-8";
-        } else {
-            return encoding;
         }
     }
 
