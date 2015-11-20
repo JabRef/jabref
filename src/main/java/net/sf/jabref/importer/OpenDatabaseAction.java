@@ -99,14 +99,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 }
             }
 
-            /*
-            String chosenFile = Globals.getNewFile(frame,
-                    new File(Globals.prefs.get("workingDirectory")), ".bib",
-                    JFileChooser.OPEN_DIALOG, true);
-
-            if (chosenFile != null) {
-                fileToOpen = new File(chosenFile);
-            }*/
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
             filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
@@ -243,7 +235,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 try {
                     pr = OpenDatabaseAction.loadDatabase(fileToLoad, encoding);
                 } catch (Exception ex) {
-                    //ex.printStackTrace();
                     errorMessage = ex.getMessage();
                     pr = null;
                 }
