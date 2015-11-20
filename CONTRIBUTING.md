@@ -8,7 +8,7 @@ We also have [guidelines for setting up a local workspace](https://github.com/Ja
 For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
 It contains steps to get started with JabRef development.
 
-In case you have any questions, you can use our [GITTER channel](https://gitter.im/JabRef/jabref) or use our [developers mailinglist](https://lists.sourceforge.net/lists/listinfo/jabref-devel).
+In case you have any questions, you can use our [developers mailinglist](https://lists.sourceforge.net/lists/listinfo/jabref-devel).
 
 
 ## Formal requirements for a pull request
