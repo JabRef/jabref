@@ -500,13 +500,7 @@ public class BibtexEntry {
         String oldValue = this.getField("keywords");
         String newValue;
         if (!keywords.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (String keyword : keywords) {
-                sb.append(keyword);
-                sb.append(", ");
-            }
-            sb.delete(sb.length() - 2, sb.length());
-            newValue = sb.toString();
+            newValue = String.join(", ", keywords);
         } else {
             newValue = null;
         }

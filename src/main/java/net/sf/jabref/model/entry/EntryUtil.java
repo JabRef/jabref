@@ -69,24 +69,6 @@ public class EntryUtil {
     }
 
     /**
-	 * Concatenate two String arrays
-	 *
-	 * @param array1
-	 *            the first string array
-	 * @param array2
-	 *            the second string array
-	 * @return The concatenation of array1 and array2
-	 */
-	public static String[] arrayConcat(String[] array1, String[] array2) {
-		int len1 = array1.length;
-		int len2 = array2.length;
-		String[] union = new String[len1 + len2];
-		System.arraycopy(array1, 0, union, 0, len1);
-		System.arraycopy(array2, 0, union, len1, len2);
-		return union;
-	}
-
-    /**
      * @param keywords a String of keywords
      * @return an ArrayList containing the keywords. An emtpy list if keywords are null or empty
      */

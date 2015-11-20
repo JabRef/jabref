@@ -140,7 +140,41 @@ public class BibtexEntryTests {
         Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
 
         BibtexEntry be2 = new BibtexEntry();
+        Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());
+        be2.addKeyword("");
+        Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());
         be2.addKeywords(be.getSeparatedKeywords());
         Assert.assertArrayEquals(expected2, be2.getSeparatedKeywords().toArray());
+    }
+
+    @Test
+    public void testGroupAndSearchHits() {
+        BibtexEntry be = new BibtexEntry();
+        be.setGroupHit(true);
+        Assert.assertTrue(be.isGroupHit());
+        be.setGroupHit(false);
+        Assert.assertFalse(be.isGroupHit());
+        be.setSearchHit(true);
+        Assert.assertTrue(be.isSearchHit());
+        be.setSearchHit(false);
+        Assert.assertFalse(be.isSearchHit());
+
+    }
+
+    @Test
+    public void testCiteKeyAndID() {
+        BibtexEntry be = new BibtexEntry();
+        Assert.assertFalse(be.hasCiteKey());
+        be.setField("author", "Albert Einstein");
+        be.setField(BibtexEntry.KEY_FIELD, "Einstein1931");
+        Assert.assertTrue(be.hasCiteKey());
+        Assert.assertEquals("Einstein1931", be.getCiteKey());
+        Assert.assertEquals("Albert Einstein", be.getField("author"));
+        be.clearField("author");
+        Assert.assertNull(be.getField("author"));
+
+        String id = IdGenerator.next();
+        be.setId(id);
+        Assert.assertEquals(id, be.getId());
     }
 }
