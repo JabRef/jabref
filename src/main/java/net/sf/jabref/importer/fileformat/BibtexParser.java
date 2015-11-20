@@ -245,7 +245,7 @@ public class BibtexParser {
                             // A custom entry type can also be stored in a
                             // "@comment"
                             CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
-                            entryTypes.put(typ.getName().toLowerCase(), typ);
+                            entryTypes.put(typ.getName(), typ);
                         } else {
                             // FIXME: user comments are simply dropped
                             // at least, we log that we ignored the comment
@@ -258,7 +258,7 @@ public class BibtexParser {
                         // at the bottom of the file. So we use an
                         // UnknownEntryType
                         // to remember the type name by.
-                        tp = new UnknownEntryType(entryType.toLowerCase());
+                        tp = new UnknownEntryType(EntryUtil.capitalizeFirst(entryType));
                         isEntry = true;
                     }
                 }
@@ -888,8 +888,8 @@ public class BibtexParser {
         for (BibtexEntry be : database.getEntries()) {
             if (be.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
-                String name = EntryUtil.capitalizeFirst(be.getType().getName());
-                EntryType type = entryTypes.get(name.toLowerCase());
+                String name = be.getType().getName();
+                EntryType type = entryTypes.get(name);
                 if (type != null) {
                     be.setType(type);
                 } else {

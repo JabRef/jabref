@@ -16,7 +16,10 @@
 package net.sf.jabref.model.entry;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,32 +32,26 @@ public class CustomEntryType implements EntryType {
 
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final String name;
-    private final String[] required;
-    private final String[] optional;
-    private final String[] priOpt;
+    private final List<String> required;
+    private final List<String> optional;
+    private final List<String> primaryOptional;
 
-    public CustomEntryType(String name, List<String> required, List<String> priOpt, List<String> secOpt) {
-        this(name, required.toArray(new String[required.size()]), priOpt.toArray(new String[priOpt.size()]),
-                secOpt.toArray(new String[secOpt.size()]));
-    }
-
-    public CustomEntryType(String name, String[] required, String[] priOpt, String[] secOpt) {
+    public CustomEntryType(String name, List<String> required, List<String> primaryOptional, List<String> secondaryOptional) {
         this.name = EntryUtil.capitalizeFirst(name);
-        this.priOpt = priOpt;
+        this.primaryOptional = primaryOptional;
         this.required = required;
-        optional = EntryUtil.arrayConcat(priOpt, secOpt);
+        this.optional = Stream.concat(primaryOptional.stream(), secondaryOptional.stream()).collect(Collectors.toList());
     }
 
     public CustomEntryType(String name, List<String> required, List<String> optional) {
-        this(name, required.toArray(new String[required.size()]), optional.toArray(new String[optional.size()]));
-    }
-
-    public CustomEntryType(String name, String[] required, String[] optional) {
-        this(name, required, optional, new String[0]);
+        this.name = EntryUtil.capitalizeFirst(name);
+        this.required = required;
+        this.optional = optional;
+        this.primaryOptional = optional;
     }
 
     public CustomEntryType(String name, String required, String optional) {
-        this(name, required.split(";"), optional.split(";"), new String[0]);
+        this(name, Arrays.asList(required.split(";")), Arrays.asList(optional.split(";")));
     }
 
     @Override
@@ -69,22 +66,22 @@ public class CustomEntryType implements EntryType {
 
     @Override
     public List<String> getOptionalFields() {
-        return Arrays.asList(optional);
+        return Collections.unmodifiableList(optional);
     }
 
     @Override
     public List<String> getRequiredFields() {
-        return Arrays.asList(required);
+        return Collections.unmodifiableList(required);
     }
 
     @Override
     public List<String> getPrimaryOptionalFields() {
-        return Arrays.asList(priOpt);
+        return Collections.unmodifiableList(primaryOptional);
     }
 
     @Override
     public List<String> getSecondaryOptionalFields() {
-        return Arrays.asList(EntryUtil.getRemainder(optional, priOpt));
+        return Collections.unmodifiableList(EntryUtil.getRemainder(optional, primaryOptional));
     }
 
     /**
@@ -95,14 +92,13 @@ public class CustomEntryType implements EntryType {
     public String getRequiredFieldsString() {
         StringBuilder serialization = new StringBuilder();
 
-        for (int i = 0; i < required.length; i++) {
-            serialization.append(required[i]);
+        for (int i = 0; i < required.size(); i++) {
+            serialization.append(required.get(i));
 
-            if (i < (required.length - 1)) {
+            if (i < (required.size() - 1)) {
                 serialization.append(';');
             }
         }
         return serialization.toString();
     }
-
 }

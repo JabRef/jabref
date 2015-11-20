@@ -1,6 +1,7 @@
 package net.sf.jabref.model.entry;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EntryUtil {
 
@@ -33,12 +34,12 @@ public class EntryUtil {
      * @param subset The subset of values.
      * @return The remainder that is not part of the subset.
      */
-    public static String[] getRemainder(String[] all, String[] subset) {
-    	if (subset.length == 0) {
+    public static List<String> getRemainder(List<String> all, List<String> subset) {
+    	if (subset.size() == 0) {
     		return all;
     	}
     	if (all.equals(subset)) {
-    		return new String[0];
+    		return new ArrayList<>();
     	}
 
         ArrayList<String> al = new ArrayList<>();
@@ -54,24 +55,6 @@ public class EntryUtil {
                 al.add(anAll);
             }
         }
-        return al.toArray(new String[al.size()]);
+        return al;
     }
-
-    /**
-	 * Concatenate two String arrays
-	 *
-	 * @param array1
-	 *            the first string array
-	 * @param array2
-	 *            the second string array
-	 * @return The concatenation of array1 and array2
-	 */
-	public static String[] arrayConcat(String[] array1, String[] array2) {
-		int len1 = array1.length;
-		int len2 = array2.length;
-		String[] union = new String[len1 + len2];
-		System.arraycopy(array1, 0, union, 0, len1);
-		System.arraycopy(array2, 0, union, len1, len2);
-		return union;
-	}
 }
