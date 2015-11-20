@@ -30,7 +30,9 @@ public class FileHistory {
     public FileHistory(JabRefPreferences prefs) {
         this.prefs = prefs;
         String[] old = prefs.getStringArray(JabRefPreferences.RECENT_FILES);
-        history.addAll(Arrays.asList(old));
+        if (old != null) {
+            history.addAll(Arrays.asList(old));
+        }
     }
 
     public int size() {
