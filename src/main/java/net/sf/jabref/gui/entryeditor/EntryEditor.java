@@ -423,7 +423,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         // timestamp or a other field with datepicker command
         if (fieldName.equals(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD))
-                || ((fieldExtras != null) && fieldExtras.equals("datepicker"))) {
+                || ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_DATEPICKER))) {
             // double click AND datefield => insert the current date (today)
             ((JTextArea) editor).addMouseListener(new MouseAdapter() {
 
@@ -438,19 +438,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             });
 
             // insert a datepicker, if the extras field contains this command
-            if ((fieldExtras != null) && fieldExtras.equals("datepicker")) {
+            if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_DATEPICKER)) {
                 DatePickerButton datePicker = new DatePickerButton(editor);
                 return datePicker.getDatePicker();
             }
         }
 
-        if ((fieldExtras != null) && fieldExtras.equals("external")) {
+        if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_EXTERNAL)) {
 
             // Add external viewer listener for "pdf" and "url" fields.
             ((JComponent) editor).addMouseListener(new ExternalViewerListener());
 
             return null;
-        } else if ((fieldExtras != null) && fieldExtras.equals("journalNames")) {
+        } else if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_JOURNAL_NAMES)) {
             // Add controls for switching between abbreviated and full journal
             // names.
             // If this field also has a FieldContentSelector, we need to combine
@@ -475,7 +475,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 return ws;
             } else {
-                if ((fieldExtras != null) && fieldExtras.equals("browse")) {
+                if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_BROWSE)) {
                     JButton but = new JButton(Localization.lang("Browse"));
                     ((JComponent) editor).addMouseListener(new ExternalViewerListener());
 
@@ -503,11 +503,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                     return but;
 
-                } else if ((fieldExtras != null) && (fieldExtras.equals("browseDoc") || fieldExtras.equals("browseDocZip"))) {
+                } else if ((fieldExtras != null) && (fieldExtras.equals(BibtexFields.EXTRA_BROWSE_DOC)
+                        || fieldExtras.equals(BibtexFields.EXTRA_BROWSE_DOC_ZIP))) {
 
                     final String ext = '.' + fieldName.toLowerCase();
                     final OpenFileFilter off;
-                    if (fieldExtras.equals("browseDocZip")) {
+                    if (fieldExtras.equals(BibtexFields.EXTRA_BROWSE_DOC_ZIP)) {
                         off = new OpenFileFilter(new String[]{ext, ext + ".gz", ext + ".bz2"});
                     } else {
                         off = new OpenFileFilter(new String[]{ext});
@@ -515,12 +516,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                     return new ExternalFilePanel(frame, panel.metaData(), this, fieldName,
                             off, editor);
-                } else if ((fieldExtras != null) && fieldExtras.equals("url")) {
+                } else if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_URL)) {
                     ((JComponent) editor).setDropTarget(new DropTarget((Component) editor,
                             DnDConstants.ACTION_NONE, new SimpleUrlDragDrop(editor, storeFieldAction)));
 
                     return null;
-                } else if ((fieldExtras != null) && fieldExtras.equals("setOwner")) {
+                } else if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_SET_OWNER)) {
                     JButton button = new JButton(Localization.lang("Auto"));
                     button.addActionListener(new ActionListener() {
 
@@ -531,7 +532,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         }
                     });
                     return button;
-                } else if ((fieldExtras != null) && fieldExtras.equals("yesno")) {
+                } else if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_YES_NO)) {
                     String[] options = {"", "Yes", "No"};
                     JComboBox<String> yesno = new JComboBox<>(options);
                     yesno.addActionListener(new ActionListener() {

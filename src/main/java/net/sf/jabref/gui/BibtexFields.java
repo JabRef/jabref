@@ -52,6 +52,15 @@ public class BibtexFields {
     public static final String OWNER = "owner";
     public static final String TIMESTAMP = "timestamp"; // it's also definied at the JabRefPreferences class
     private static final String ENTRYTYPE = "entrytype";
+    public static final String EXTRA_YES_NO = "yesNo";
+    public static final String EXTRA_URL = "url";
+    public static final String EXTRA_DATEPICKER = "datepicker";
+    public static final String EXTRA_JOURNAL_NAMES = "journalNames";
+    public static final String EXTRA_EXTERNAL = "external";
+    public static final String EXTRA_BROWSE = "browse";
+    public static final String EXTRA_BROWSE_DOC = "browseDoc";
+    public static final String EXTRA_BROWSE_DOC_ZIP = "browseDocZip";
+    public static final String EXTRA_SET_OWNER = "setOwner";
 
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
             {"author", "title", "year", BibtexEntry.KEY_FIELD};
@@ -88,10 +97,10 @@ public class BibtexFields {
         add(new BibtexSingleField("institution", true, GUIGlobals.MEDIUM_W));
 
         dummy = new BibtexSingleField("journal", true, GUIGlobals.SMALL_W);
-        dummy.setExtras("journalNames");
+        dummy.setExtras(EXTRA_JOURNAL_NAMES);
         add(dummy);
         dummy = new BibtexSingleField("journaltitle", true, GUIGlobals.SMALL_W);
-        dummy.setExtras("journalNames");
+        dummy.setExtras(EXTRA_JOURNAL_NAMES);
         add(dummy);
 
         add(new BibtexSingleField("key", true));
@@ -159,7 +168,7 @@ public class BibtexFields {
         add(dummy);
 
         dummy = new BibtexSingleField("doi", true, GUIGlobals.SMALL_W);
-        dummy.setExtras("external");
+        dummy.setExtras(EXTRA_EXTERNAL);
         add(dummy);
         add(new BibtexSingleField("eid", true, GUIGlobals.SMALL_W));
 
@@ -174,15 +183,15 @@ public class BibtexFields {
         add(new BibtexSingleField("abstract", false, GUIGlobals.LARGE_W, 400));
 
         dummy = new BibtexSingleField("url", false, GUIGlobals.SMALL_W);
-        dummy.setExtras("external");
+        dummy.setExtras(EXTRA_EXTERNAL);
         add(dummy);
 
         dummy = new BibtexSingleField("pdf", false, GUIGlobals.SMALL_W);
-        dummy.setExtras("browseDoc");
+        dummy.setExtras(EXTRA_BROWSE_DOC);
         add(dummy);
 
         dummy = new BibtexSingleField("ps", false, GUIGlobals.SMALL_W);
-        dummy.setExtras("browseDocZip");
+        dummy.setExtras(EXTRA_BROWSE_DOC_ZIP);
         add(dummy);
         add(new BibtexSingleField("comment", false, GUIGlobals.MEDIUM_W));
         add(new BibtexSingleField("keywords", false, GUIGlobals.SMALL_W));
@@ -202,12 +211,12 @@ public class BibtexFields {
         add(dummy);
 
         dummy = new BibtexSingleField(BibtexFields.OWNER, false, GUIGlobals.SMALL_W);
-        dummy.setExtras("setOwner");
+        dummy.setExtras(EXTRA_SET_OWNER);
         dummy.setPrivate();
         add(dummy);
 
         dummy = new BibtexSingleField(BibtexFields.TIMESTAMP, false, GUIGlobals.SMALL_W);
-        dummy.setExtras("datepicker");
+        dummy.setExtras(EXTRA_DATEPICKER);
         dummy.setPrivate();
         add(dummy);
 
@@ -238,7 +247,7 @@ public class BibtexFields {
                 "ctluseforced_etal", "ctluse_alt_spacing", "ctldash_repeated_names"};
         for (int i = 0; i < ieeetranbstctlyesnofields.length; i ++) {
             dummy = new BibtexSingleField(ieeetranbstctlyesnofields[i], false);
-            dummy.setExtras("yesno");
+            dummy.setExtras(EXTRA_YES_NO);
             add(dummy);
         }
 
@@ -252,7 +261,7 @@ public class BibtexFields {
         for (BibtexSingleField sField : fieldSet.values()) {
             if (sField.isPublic()) {
                 pFields.add(sField.getFieldName());
-                // or export the complet BibtexSingleField ?
+                // or export the complete BibtexSingleField ?
                 // BibtexSingleField.toString() { return fieldname ; }
             }
         }
