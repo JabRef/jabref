@@ -228,7 +228,12 @@ public class JSONEntryParser {
 
         // URL
         if (springerJsonEntry.has("url")) {
-            entry.setField("url", springerJsonEntry.getJSONArray("url").getJSONObject(0).optString("value"));
+            JSONArray urlarray = springerJsonEntry.optJSONArray("url");
+            if (urlarray != null) {
+                entry.setField("url", urlarray.getJSONObject(0).optString("value"));
+            } else {
+                entry.setField("url", springerJsonEntry.optString("url"));
+            }
         }
 
         // Date
