@@ -174,7 +174,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.comment.format_block_comments=false
         org.eclipse.jdt.core.formatter.comment.format_header=false
         org.eclipse.jdt.core.formatter.comment.format_html=true
-        org.eclipse.jdt.core.formatter.comment.format_javadoc_comments=true
+        org.eclipse.jdt.core.formatter.comment.format_javadoc_comments=false
         org.eclipse.jdt.core.formatter.comment.format_line_comments=false
         org.eclipse.jdt.core.formatter.comment.format_source_code=true
         org.eclipse.jdt.core.formatter.comment.indent_parameter_description=true
