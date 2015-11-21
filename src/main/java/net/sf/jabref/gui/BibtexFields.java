@@ -62,6 +62,7 @@ public class BibtexFields {
     public static final String EXTRA_BROWSE_DOC = "browseDoc"; // Browse button, file dialog with extension .fieldname
     public static final String EXTRA_BROWSE_DOC_ZIP = "browseDocZip"; // Browse button, file dialog with extension .fieldname, .fieldname.bz2, .filedname.gz
     public static final String EXTRA_SET_OWNER = "setOwner"; // Button to set owner to current used
+    public static final String EXTRA_MONTH = "month"; // Button to show the months and set abbreviation
 
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
             {"author", "title", "year", BibtexEntry.KEY_FIELD};
@@ -105,7 +106,9 @@ public class BibtexFields {
         add(dummy);
 
         add(new BibtexSingleField("key", true));
-        add(new BibtexSingleField("month", true, GUIGlobals.SMALL_W));
+        dummy = new BibtexSingleField("month", true, GUIGlobals.SMALL_W);
+        dummy.setExtras(EXTRA_MONTH);
+        add(dummy);
         add(new BibtexSingleField("note", true, GUIGlobals.MEDIUM_W));
         add(new BibtexSingleField("number", true, GUIGlobals.SMALL_W, 60).setNumeric(true));
         add(new BibtexSingleField("organization", true, GUIGlobals.MEDIUM_W));
@@ -453,7 +456,7 @@ public class BibtexFields {
         // the fieldname
         private String name;
 
-        // contains the standard, privat, displayable, writable infos
+        // contains the standard, private, displayable, writable infos
         // default is: not standard, public, displayable and writable
         private int flag = BibtexSingleField.DISPLAYABLE | BibtexSingleField.WRITEABLE;
 
