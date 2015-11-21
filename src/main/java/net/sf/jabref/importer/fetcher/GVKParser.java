@@ -3,24 +3,40 @@
  */
 package net.sf.jabref.importer.fetcher;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.IdGenerator;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class GVKParser {
 
+    public List<BibtexEntry> parseEntries(InputStream is)
+            throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document content = dbuild.parse(is);
+        return this.parseEntries(content);
+    }
+
     public List<BibtexEntry> parseEntries(Document content) {
         List<BibtexEntry> result = new LinkedList<>();
+
+        // used for creating test cases
+        // XMLUtil.printDocument(content);
 
         // Namespace srwNamespace = Namespace.getNamespace("srw","http://www.loc.gov/zing/srw/");
 
@@ -28,15 +44,16 @@ public class GVKParser {
         //Element root = content.getDocumentElement();
         Element root = (Element) content.getElementsByTagName("zs:searchRetrieveResponse").item(0);
         Element srwrecords = getChild("zs:records", root);
+        if (srwrecords == null) {
+            // no records found -> return empty list
+            return result;
+        }
         List<Element> records = getChildren("zs:record", srwrecords);
-
         for (Element record : records) {
             Element e = getChild("zs:recordData", record);
             e = getChild("record", e);
-
             result.add(parseEntry(e));
         }
-
         return result;
     }
 
@@ -59,6 +76,7 @@ public class GVKParser {
         String ppn = null;
         String booktitle = null;
         String url = null;
+        String note = null;
 
         String quelle = "";
         String mak = "";
@@ -90,7 +108,7 @@ public class GVKParser {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
-                if (!(author == null)) {
+                if (author != null) {
                     author = author.concat(" and ");
                 } else {
                     author = "";
@@ -102,7 +120,7 @@ public class GVKParser {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
-                if (!(author == null)) {
+                if (author != null) {
                     author = author.concat(" and ");
                 } else {
                     author = "";
@@ -115,7 +133,7 @@ public class GVKParser {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
-                if (!(editor == null)) {
+                if (editor != null) {
                     editor = editor.concat(" and ");
                 } else {
                     editor = "";
@@ -149,6 +167,27 @@ public class GVKParser {
 
             }
 
+            // 036D seems to contain more information than the other fields
+            // overwrite information using that field
+            // 036D also contains information normally found in 036E
+            if (datafield.getAttribute("tag").equals("036D")) {
+                // 021 might have been present
+                if (title != null) {
+                    // convert old title (contained in "a" of 021A) to volume
+                    if (title.startsWith("@")) {
+                        // "@" indicates a number
+                        title = title.substring(1);
+                    } else {
+                        // we nevertheless keep the old title data
+                    }
+                    number = title;
+                }
+                //title and subtitle
+                title = getSubfield("a", datafield);
+                subtitle = getSubfield("d", datafield);
+                volume = getSubfield("l", datafield);
+            }
+
             //series and number
             if (datafield.getAttribute("tag").equals("036E")) {
                 series = getSubfield("a", datafield);
@@ -158,6 +197,11 @@ public class GVKParser {
                 if (kor != null) {
                     series = series + " / " + kor;
                 }
+            }
+
+            //note
+            if (datafield.getAttribute("tag").equals("037A")) {
+                note = getSubfield("a", datafield);
             }
 
             //edition
@@ -207,7 +251,6 @@ public class GVKParser {
              * eigentlich überflüssig), während bei
              * Buchbeiträgen Verlag und Ort wichtig sind
              * (sonst in Kategorie 033A).
-
              */
             if (datafield.getAttribute("tag").equals("027D")) {
                 journal = getSubfield("a", datafield);
@@ -275,19 +318,16 @@ public class GVKParser {
         }
 
         // Nichtsortierzeichen entfernen
-        if (!(author == null)) {
+        if (author != null) {
             author = removeSortCharacters(author);
         }
-
-        if (!(editor == null)) {
+        if (editor != null) {
             editor = removeSortCharacters(editor);
         }
-
-        if (!(title == null)) {
+        if (title != null) {
             title = removeSortCharacters(title);
         }
-
-        if (!(subtitle == null)) {
+        if (subtitle != null) {
             subtitle = removeSortCharacters(subtitle);
         }
 
@@ -302,13 +342,9 @@ public class GVKParser {
             if (quelle.contains("ZDB-ID")) {
                 entryType = "article";
             }
-        }
-
-        if (mak.equals("")) {
+        } else if (mak.equals("")) {
             entryType = "misc";
-        }
-
-        if (mak.startsWith("O")) {
+        } else if (mak.startsWith("O")) {
             entryType = "online";
         }
 
@@ -322,70 +358,70 @@ public class GVKParser {
         BibtexEntry result = new BibtexEntry(IdGenerator.next(), EntryTypes.getType(entryType));
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
-
-        if (!(author == null)) {
+        if (author != null) {
             result.setField("author", ImportFormatReader.expandAuthorInitials(author));
         }
-        if (!(editor == null)) {
+        if (editor != null) {
             result.setField("editor", ImportFormatReader.expandAuthorInitials(editor));
         }
-        if (!(title == null)) {
+        if (title != null) {
             result.setField("title", title);
         }
-        if (!(subtitle == null)) {
+        if (subtitle != null) {
             result.setField("subtitle", subtitle);
         }
-        if (!(publisher == null)) {
+        if (publisher != null) {
             result.setField("publisher", publisher);
         }
-        if (!(year == null)) {
+        if (year != null) {
             result.setField("year", year);
         }
-        if (!(address == null)) {
+        if (address != null) {
             result.setField("address", address);
         }
-        if (!(series == null)) {
+        if (series != null) {
             result.setField("series", series);
         }
-        if (!(edition == null)) {
+        if (edition != null) {
             result.setField("edition", edition);
         }
-        if (!(isbn == null)) {
+        if (isbn != null) {
             result.setField("isbn", isbn);
         }
-        if (!(issn == null)) {
+        if (issn != null) {
             result.setField("issn", issn);
         }
-        if (!(number == null)) {
+        if (number != null) {
             result.setField("number", number);
         }
-        if (!(pagetotal == null)) {
+        if (pagetotal != null) {
             result.setField("pagetotal", pagetotal);
         }
-        if (!(pages == null)) {
+        if (pages != null) {
             result.setField("pages", pages);
         }
-        if (!(volume == null)) {
+        if (volume != null) {
             result.setField("volume", volume);
         }
-        if (!(journal == null)) {
+        if (journal != null) {
             result.setField("journal", journal);
         }
-        if (!(ppn == null)) {
+        if (ppn != null) {
             result.setField("ppn_GVK", ppn);
         }
-        if (!(url == null)) {
+        if (url != null) {
             result.setField("url", url);
+        }
+        if (note != null) {
+            result.setField("note", note);
         }
 
         if (entryType.equals("article")) {
-            if (!(journal == null)) {
+            if (journal != null) {
                 result.setField("journal", journal);
             }
-        }
-
-        if (entryType.equals("incollection")) {
-            if (!(booktitle == null)) {
+        } else if (entryType.equals("incollection")) {
+            if (booktitle != null) {
                 result.setField("booktitle", booktitle);
             }
         }
@@ -446,4 +482,5 @@ public class GVKParser {
         input = input.replaceAll("\\@", "");
         return input;
     }
+
 }

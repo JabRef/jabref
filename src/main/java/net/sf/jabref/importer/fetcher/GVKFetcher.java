@@ -14,13 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import net.sf.jabref.importer.ImportInspector;
@@ -152,7 +149,7 @@ public class GVKFetcher implements EntryFetcher {
     }
 
     private List<BibtexEntry> fetchGVK(String query) {
-        List<BibtexEntry> result = null;
+        List<BibtexEntry> result;
 
         String urlPrefix = "http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=";
         String urlQuery = query;
@@ -170,9 +167,7 @@ public class GVKFetcher implements EntryFetcher {
             }
             URL url = uri.toURL();
             try (InputStream is = url.openStream()) {
-                DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                Document content = dbuild.parse(is);
-                result = (new GVKParser()).parseEntries(content);
+                result = (new GVKParser()).parseEntries(is);
             }
         } catch (IOException e) {
             LOGGER.error("GVK plugin: An I/O exception occurred", e);
