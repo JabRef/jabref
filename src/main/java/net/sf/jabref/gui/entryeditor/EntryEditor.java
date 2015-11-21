@@ -556,8 +556,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
-
-                            editor.setText((MonthUtil.getMonthByNumber(month.getSelectedIndex()).bibtexFormat));
+                            int monthnumber = month.getSelectedIndex();
+                            if (monthnumber >= 1) {
+                                if (prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+                                    editor.setText(String.valueOf(monthnumber));
+                                } else {
+                                    editor.setText((MonthUtil.getMonthByNumber(monthnumber).bibtexFormat));
+                                }
+                            } else {
+                                editor.setText("");
+                            }
                             updateField(editor);
                             month.setSelectedIndex(0);
                         }
