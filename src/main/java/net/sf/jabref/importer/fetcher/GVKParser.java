@@ -62,7 +62,7 @@ public class GVKParser {
         String editor = null;
         String title = null;
         String publisher = null;
-        String year = null;
+        String date = null;
         String address = null;
         String series = null;
         String edition = null;
@@ -153,14 +153,14 @@ public class GVKParser {
                 address = getSubfield("p", datafield);
             }
 
-            //year
+            //date
             if (datafield.getAttribute("tag").equals("011@")) {
-                year = getSubfield("a", datafield);
+                date = getSubfield("a", datafield);
             }
 
-            //year, volume, number, pages (year bei Zeitschriften (evtl. redundant mit 011@))
+            //date, volume, number, pages (year bei Zeitschriften (evtl. redundant mit 011@))
             if (datafield.getAttribute("tag").equals("031A")) {
-                year = getSubfield("j", datafield);
+                date = getSubfield("j", datafield);
                 volume = getSubfield("e", datafield);
                 number = getSubfield("a", datafield);
                 pages = getSubfield("h", datafield);
@@ -373,8 +373,8 @@ public class GVKParser {
         if (publisher != null) {
             result.setField("publisher", publisher);
         }
-        if (year != null) {
-            result.setField("year", year);
+        if (date != null) {
+            result.setField("date", date);
         }
         if (address != null) {
             result.setField("address", address);
