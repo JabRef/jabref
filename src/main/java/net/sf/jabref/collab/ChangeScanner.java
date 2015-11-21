@@ -120,7 +120,7 @@ public class ChangeScanner implements Runnable {
 
             scanEntries(sInMem, sInTemp, sOnDisk);
 
-            scanGroups(mdInMem, mdInTemp, mdOnDisk);
+            scanGroups(mdInTemp, mdOnDisk);
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -515,7 +515,7 @@ public class ChangeScanner implements Runnable {
      * This method only detects whether a change took place or not. It does not determine the type of change. This would
      * be possible, but difficult to do properly, so I rather only report the change.
      */
-    private void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
+    private void scanGroups(MetaData onTmp, MetaData onDisk) {
         final GroupTreeNode groupsTmp = onTmp.getGroups();
         final GroupTreeNode groupsDisk = onDisk.getGroups();
         if ((groupsTmp == null) && (groupsDisk == null)) {

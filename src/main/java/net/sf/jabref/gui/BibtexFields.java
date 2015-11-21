@@ -236,7 +236,7 @@ public class BibtexFields {
         // collect all public fields for the PUBLIC_FIELDS array
         Vector<String> pFields = new Vector<>(fieldSet.size());
         for (BibtexSingleField sField : fieldSet.values()) {
-            if (sField.isPublic()) {
+            if (!sField.isPrivate()) {
                 pFields.add(sField.getFieldName());
                 // or export the complet BibtexSingleField ?
                 // BibtexSingleField.toString() { return fieldname ; }
@@ -559,14 +559,6 @@ public class BibtexFields {
 
         public boolean isPrivate() {
             return isSet(BibtexSingleField.PRIVATE);
-        }
-
-        public void setPublic() {
-            setFlag(false, BibtexSingleField.PRIVATE);
-        }
-
-        public boolean isPublic() {
-            return !isSet(BibtexSingleField.PRIVATE);
         }
 
         public void setDisplayable(boolean value) {
