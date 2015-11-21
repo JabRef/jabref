@@ -691,21 +691,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         }
     }
 
-    /**
-     * @param deletion != addition
-     */
-    public void updateGroupContentIfEnabled(boolean deletion) {
-        if ((groupsTree == null) || (groupsTree.getSelectionCount() == 0)) {
-            return;
-        }
-        if (!this.editModeIndicator) {
-            // add button selected
-            return;
-        }
-        GroupTreeNode curNode = (GroupTreeNode) (groupsTree.getSelectionPaths())[0].getLastPathComponent();
-        updateGroupContent(curNode);
-    }
-
     private void annotationEvent(GroupTreeNode node) {
         LOGGER.info("Performing annotation " + node);
         if (editModeIndicator) {
@@ -715,10 +700,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             updateSelections();
         }
     }
-
-    //    private void annotationEvent() {
-    //        this.annotationEvent((GroupTreeNode) ((groupsTree.getSelectionPaths())[0].getLastPathComponent()));
-    //    }
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
@@ -946,10 +927,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         public NodeAction(String s) {
             super(s);
-        }
-
-        public GroupTreeNode getNode() {
-            return m_node;
         }
 
         public void setNode(GroupTreeNode node) {

@@ -190,20 +190,6 @@ public class GUIGlobals {
     }
 
     /**
-     * returns the path to language independent help files
-     */
-    public static String getLocaleHelpPath() {
-        JabRefPreferences prefs = JabRefPreferences.getInstance();
-        String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
-        if (middle.equals("en/")) {
-            middle = ""; // English in base help dir.
-        }
-
-        return GUIGlobals.helpPre + middle;
-    }
-
-
-    /**
      * Perform initializations that are only used in graphical mode. This is to prevent
      * the "Xlib: connection to ":0.0" refused by server" error when access to the X server
      * on Un*x is unavailable.
