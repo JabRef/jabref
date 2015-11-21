@@ -1,9 +1,6 @@
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,7 +47,15 @@ public class IEEETranEntryTypes {
                 public String getName() {
                     return "IEEEtranBSTCTL";
                 }
-            };
+
+    };
+
+
+    public static final String[] IEEETRANBSTCTL_YES_NO_FIELDS = {"ctluse_article_number", "ctluse_paper", "ctluse_url",
+            "ctluseforced_etal", "ctluse_alt_spacing", "ctldash_repeated_names"};
+
+    public static final String[] IEEETRANBSTCTL_NUMERIC_FIELDS = {"ctlmax_names_forced_etal", "ctlnames_show_etal",
+            "ctlalt_stretch_factor"};
 
     /**
      * The periodical entry type is used for journals and magazines.

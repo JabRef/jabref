@@ -38,6 +38,7 @@ import java.util.HashSet;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.IEEETranEntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.io.TXMLReader;
 
@@ -243,17 +244,14 @@ public class BibtexFields {
         add(dummy);
 
         // IEEEtranBSTCTL fields
-        String[] ieeetranbstctlyesnofields = {"ctluse_article_number", "ctluse_paper", "ctluse_url",
-                "ctluseforced_etal", "ctluse_alt_spacing", "ctldash_repeated_names"};
-        for (int i = 0; i < ieeetranbstctlyesnofields.length; i ++) {
-            dummy = new BibtexSingleField(ieeetranbstctlyesnofields[i], false);
+        for (String yesNoField : IEEETranEntryTypes.IEEETRANBSTCTL_YES_NO_FIELDS) {
+            dummy = new BibtexSingleField(yesNoField, false);
             dummy.setExtras(EXTRA_YES_NO);
             add(dummy);
         }
 
-        String[] ieeetranbstctlnumfields = {"ctlmax_names_forced_etal", "ctlnames_show_etal", "ctlalt_stretch_factor"};
-        for (int i = 0; i < ieeetranbstctlnumfields.length; i++) {
-            add(new BibtexSingleField(ieeetranbstctlnumfields[i], false).setNumeric(true));
+        for (String numericField : IEEETranEntryTypes.IEEETRANBSTCTL_NUMERIC_FIELDS) {
+            add(new BibtexSingleField(numericField, false).setNumeric(true));
         }
 
         // collect all public fields for the PUBLIC_FIELDS array
