@@ -65,7 +65,6 @@ import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.*;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -542,9 +541,36 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         public void actionPerformed(ActionEvent actionEvent) {
 
                             editor.setText(((String) yesno.getSelectedItem()).toLowerCase());
+                            updateField(editor);
                         }
                     });
                     return yesno;
+                } else if (BibtexFields.EXTRA_MONTH.equals(fieldExtras)) {
+                    final String[] options = new String[13];
+                    options[0] = Localization.lang("Select");
+                    for (int i = 1; i <= 12; i++) {
+                        options[i] = MonthUtil.getMonthByNumber(i).fullName;
+                    }
+                    JComboBox<String> month = new JComboBox<>(options);
+                    month.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            int monthnumber = month.getSelectedIndex();
+                            if (monthnumber >= 1) {
+                                if (prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+                                    editor.setText(String.valueOf(monthnumber));
+                                } else {
+                                    editor.setText((MonthUtil.getMonthByNumber(monthnumber).bibtexFormat));
+                                }
+                            } else {
+                                editor.setText("");
+                            }
+                            updateField(editor);
+                            month.setSelectedIndex(0);
+                        }
+                    });
+                    return month;
                 } else {
                     return null;
                 }

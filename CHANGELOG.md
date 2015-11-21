@@ -14,6 +14,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Changed
  - Better support for IEEEtranBSTCTL entries
+ - Quick selection of month in entry editor
  - Unknown entry types will be converted to 'Misc' (was 'Other' before).
  - EntryTypes are now clustered per group on the 'new entry' GUI screen.
  - Tab shows the minimal unique folder name substring if multiple database files share the same name
