@@ -77,9 +77,9 @@ public class BibtexEntryTypes {
     public static final EntryType CONFERENCE = new BibtexEntryType() {
 
         {
+            addAllRequired("author", "title", "booktitle", "year");
             addAllOptional("editor", "volume", "number", "series", "pages", "address", "month", "organization",
                     "publisher", "note");
-            addAllRequired("author", "title", "booktitle", "year");
         }
 
         @Override
@@ -97,8 +97,8 @@ public class BibtexEntryTypes {
     public static final EntryType INBOOK = new BibtexEntryType() {
 
         {
-            addAllOptional("volume", "number", "series", "type", "address", "edition", "month", "note");
             addAllRequired("chapter/pages", "title", "publisher", "year", "author/editor");
+            addAllOptional("volume", "number", "series", "type", "address", "edition", "month", "note");
         }
 
         @Override
@@ -135,9 +135,9 @@ public class BibtexEntryTypes {
     public static final EntryType INPROCEEDINGS = new BibtexEntryType() {
 
         {
+            addAllRequired("author", "title", "booktitle", "year");
             addAllOptional("editor", "volume", "number", "series", "pages", "address", "month", "organization",
                     "publisher", "note");
-            addAllRequired("author", "title", "booktitle", "year");
         }
 
         @Override
@@ -154,8 +154,8 @@ public class BibtexEntryTypes {
     public static final EntryType MANUAL = new BibtexEntryType() {
 
         {
-            addAllOptional("author", "organization", "address", "edition", "month", "year", "note");
             addAllRequired("title");
+            addAllOptional("author", "organization", "address", "edition", "month", "year", "note");
         }
 
         @Override
@@ -173,8 +173,8 @@ public class BibtexEntryTypes {
     public static final EntryType MASTERSTHESIS = new BibtexEntryType() {
 
         {
-            addAllOptional("type", "address", "month", "note");
             addAllRequired("author", "title", "school", "year");
+            addAllOptional("type", "address", "month", "note");
         }
 
         @Override
@@ -210,8 +210,8 @@ public class BibtexEntryTypes {
     public static final EntryType PHDTHESIS = new BibtexEntryType() {
 
         {
-            addAllOptional("type", "address", "month", "note");
             addAllRequired("author", "title", "school", "year");
+            addAllOptional("type", "address", "month", "note");
         }
 
         @Override
@@ -229,9 +229,9 @@ public class BibtexEntryTypes {
     public static final EntryType PROCEEDINGS = new BibtexEntryType() {
 
         {
+            addAllRequired("title", "year");
             addAllOptional("editor", "volume", "number", "series", "address", "publisher", "note", "month",
                     "organization");
-            addAllRequired("title", "year");
         }
 
         @Override
@@ -249,8 +249,8 @@ public class BibtexEntryTypes {
     public static final EntryType TECHREPORT = new BibtexEntryType() {
 
         {
-            addAllOptional("type", "number", "address", "month", "note");
             addAllRequired("author", "title", "institution", "year");
+            addAllOptional("type", "number", "address", "month", "note");
         }
 
         @Override
@@ -268,8 +268,8 @@ public class BibtexEntryTypes {
     public static final EntryType UNPUBLISHED = new BibtexEntryType() {
 
         {
-            addAllOptional("month", "year");
             addAllRequired("author", "title", "note");
+            addAllOptional("month", "year");
         }
 
         @Override

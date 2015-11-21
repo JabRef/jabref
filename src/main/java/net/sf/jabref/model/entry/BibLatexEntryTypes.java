@@ -39,11 +39,11 @@ public class BibLatexEntryTypes {
 
 
         {
+            addAllRequired("author", "title", "journaltitle", "date");
             addAllOptional("translator", "annotator", "commentator", "subtitle", "titleaddon", "editor", "editora",
                     "editorb", "editorc", "journalsubtitle", "issuetitle", "issuesubtitle", "language", "origlanguage",
                     "series", "volume", "number", "eid", "issue", "month", "year", "pages", "version", "note", "issn",
                     "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
-            addAllRequired("author", "title", "journaltitle", "date");
         }
 
         @Override
@@ -67,12 +67,12 @@ public class BibLatexEntryTypes {
 
 
         {
+            addAllRequired("author", "title", "date");
             addAllOptional("editor", "editora", "editorb", "editorc", "translator", "annotator", "commentator",
                     "introduction", "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
                     "maintitleaddon", "language", "origlanguage", "volume", "part", "edition", "volumes", "series",
                     "number", "month", "year", "note", "publisher", "location", "isbn", "chapter", "pages", "pagetotal",
                     "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
-            addAllRequired("author", "title", "date");
         }
 
         @Override
@@ -95,13 +95,13 @@ public class BibLatexEntryTypes {
 
 
         {
+            addAllRequired("author", "title", "booktitle", "date");
             addAllOptional("bookauthor", "editor", "editora", "editorb", "editorc", "translator", "annotator",
                     "commentator", "introduction", "foreword", "afterword", "subtitle", "titleaddon", "maintitle",
                     "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon", "language", "origlanguage",
                     "volume", "part", "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn",
                     "chapter", "pages", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
                     "urldate", "year");
-            addAllRequired("author", "title", "booktitle", "date");
         }
 
         @Override

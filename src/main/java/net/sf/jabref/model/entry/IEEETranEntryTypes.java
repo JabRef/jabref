@@ -64,8 +64,8 @@ public class IEEETranEntryTypes {
     public static final EntryType PERIODICAL = new BibtexEntryType() {
 
         {
-            addAllOptional("editor", "language", "series", "volume", "number", "organization", "month", "note", "url");
             addAllRequired("title", "year");
+            addAllOptional("editor", "language", "series", "volume", "number", "organization", "month", "note", "url");
         }
 
         @Override
@@ -83,9 +83,9 @@ public class IEEETranEntryTypes {
     public static final EntryType PATENT = new BibtexEntryType() {
 
         {
+            addAllRequired("nationality", "number", "year/yearfiled");
             addAllOptional("author", "title", "language", "assignee", "address", "type", "number", "day", "dayfiled",
                     "month", "monthfiled", "note", "url");
-            addAllRequired("nationality", "number", "year/yearfiled");
         }
 
         @Override
@@ -103,9 +103,9 @@ public class IEEETranEntryTypes {
     public static final EntryType STANDARD = new BibtexEntryType() {
 
         {
+            addAllRequired("title", "organization/institution");
             addAllOptional("author", "language", "howpublished", "type", "number", "revision", "address", "month",
                     "year", "note", "url");
-            addAllRequired("title", "organization/institution");
         }
 
         @Override
