@@ -61,6 +61,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Update supported LookAndFeels
  - Show replaced journal abbreviations on console
  - The three options to manage file references are moved to their own separated group in the Tools menu. 
+ - Default preferences: Remote server (port 6050) always started on first JabRef instance. This prevents JabRef loaded twice when opening a bib file.
 
 ### Fixed
  - Fixed the bug that the file encoding was not correctly determined from the first (or second) line
