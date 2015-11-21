@@ -17,13 +17,21 @@ import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.IdGenerator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Strings;
+
 public class GVKParser {
+
+    private static final Log LOGGER = LogFactory.getLog(GVKParser.class);
+
 
     public List<BibtexEntry> parseEntries(InputStream is)
             throws ParserConfigurationException, SAXException, IOException {
@@ -91,20 +99,21 @@ public class GVKParser {
         while (iter.hasNext()) {
             Element datafield = iter.next();
 
-            // System.out.println(datafield.getAttributeValue("tag"));
+            String tag = datafield.getAttribute("tag");
+            LOGGER.debug("tag: " + tag);
 
             // mak
-            if (datafield.getAttribute("tag").equals("002@")) {
+            if (tag.equals("002@")) {
                 mak = getSubfield("0", datafield);
             }
 
             //ppn
-            if (datafield.getAttribute("tag").equals("003@")) {
+            if (tag.equals("003@")) {
                 ppn = getSubfield("0", datafield);
             }
 
             //author
-            if (datafield.getAttribute("tag").equals("028A")) {
+            if (tag.equals("028A")) {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
@@ -116,7 +125,7 @@ public class GVKParser {
                 author = author.concat(vorname + " " + nachname);
             }
             //author (weiterer)
-            if (datafield.getAttribute("tag").equals("028B")) {
+            if (tag.equals("028B")) {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
@@ -129,7 +138,7 @@ public class GVKParser {
             }
 
             //editor
-            if (datafield.getAttribute("tag").equals("028C")) {
+            if (tag.equals("028C")) {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
@@ -142,24 +151,24 @@ public class GVKParser {
             }
 
             //title and subtitle
-            if (datafield.getAttribute("tag").equals("021A")) {
+            if (tag.equals("021A")) {
                 title = getSubfield("a", datafield);
                 subtitle = getSubfield("d", datafield);
             }
 
             //publisher and address
-            if (datafield.getAttribute("tag").equals("033A")) {
+            if (tag.equals("033A")) {
                 publisher = getSubfield("n", datafield);
                 address = getSubfield("p", datafield);
             }
 
             //date
-            if (datafield.getAttribute("tag").equals("011@")) {
+            if (tag.equals("011@")) {
                 date = getSubfield("a", datafield);
             }
 
             //date, volume, number, pages (year bei Zeitschriften (evtl. redundant mit 011@))
-            if (datafield.getAttribute("tag").equals("031A")) {
+            if (tag.equals("031A")) {
                 date = getSubfield("j", datafield);
                 volume = getSubfield("e", datafield);
                 number = getSubfield("a", datafield);
@@ -170,7 +179,7 @@ public class GVKParser {
             // 036D seems to contain more information than the other fields
             // overwrite information using that field
             // 036D also contains information normally found in 036E
-            if (datafield.getAttribute("tag").equals("036D")) {
+            if (tag.equals("036D")) {
                 // 021 might have been present
                 if (title != null) {
                     // convert old title (contained in "a" of 021A) to volume
@@ -189,7 +198,7 @@ public class GVKParser {
             }
 
             //series and number
-            if (datafield.getAttribute("tag").equals("036E")) {
+            if (tag.equals("036E")) {
                 series = getSubfield("a", datafield);
                 number = getSubfield("l", datafield);
                 String kor = getSubfield("b", datafield);
@@ -200,17 +209,17 @@ public class GVKParser {
             }
 
             //note
-            if (datafield.getAttribute("tag").equals("037A")) {
+            if (tag.equals("037A")) {
                 note = getSubfield("a", datafield);
             }
 
             //edition
-            if (datafield.getAttribute("tag").equals("032@")) {
+            if (tag.equals("032@")) {
                 edition = getSubfield("a", datafield);
             }
 
             //isbn
-            if (datafield.getAttribute("tag").equals("004A")) {
+            if (tag.equals("004A")) {
                 String isbn_10 = getSubfield("0", datafield);
                 String isbn_13 = getSubfield("A", datafield);
 
@@ -226,7 +235,7 @@ public class GVKParser {
 
             // Hochschulschriftenvermerk
             // Bei einer Verlagsdissertation ist der Ort schon eingetragen
-            if (datafield.getAttribute("tag").equals("037C")) {
+            if (tag.equals("037C")) {
                 if (address == null) {
                     address = getSubfield("b", datafield);
                     address = removeSortCharacters(address);
@@ -252,7 +261,7 @@ public class GVKParser {
              * Buchbeiträgen Verlag und Ort wichtig sind
              * (sonst in Kategorie 033A).
              */
-            if (datafield.getAttribute("tag").equals("027D")) {
+            if (tag.equals("027D")) {
                 journal = getSubfield("a", datafield);
                 booktitle = getSubfield("a", datafield);
                 address = getSubfield("p", datafield);
@@ -260,7 +269,7 @@ public class GVKParser {
             }
 
             //pagetotal
-            if (datafield.getAttribute("tag").equals("034D")) {
+            if (tag.equals("034D")) {
                 pagetotal = getSubfield("a", datafield);
 
                 // S, S. etc. entfernen
@@ -268,7 +277,7 @@ public class GVKParser {
             }
 
             // Behandlung von Konferenzen
-            if (datafield.getAttribute("tag").equals("030F")) {
+            if (tag.equals("030F")) {
                 address = getSubfield("k", datafield);
 
                 if (!entryType.equals("proceedings")) {
@@ -292,17 +301,17 @@ public class GVKParser {
             //SRU-Schnittstelle gelieferten Daten zur
             //Quelle unvollständig sind (z.B. nicht Serie
             //und Nummer angegeben werden)
-            if (datafield.getAttribute("tag").equals("039B")) {
+            if (tag.equals("039B")) {
                 quelle = getSubfield("8", datafield);
             }
-            if (datafield.getAttribute("tag").equals("046R")) {
+            if (tag.equals("046R")) {
                 if (quelle.equals("") || (quelle == null)) {
                     quelle = getSubfield("a", datafield);
                 }
             }
 
             // URLs behandeln
-            if (datafield.getAttribute("tag").equals("009P")) {
+            if (tag.equals("009P")) {
                 if (datafield.getAttribute("occurrence").equals("03")
                         || datafield.getAttribute("occurrence").equals("05")) {
                     if (url == null) {
@@ -367,8 +376,15 @@ public class GVKParser {
         if (title != null) {
             result.setField("title", title);
         }
-        if (subtitle != null) {
-            result.setField("subtitle", subtitle);
+        if (!Strings.isNullOrEmpty(subtitle)) {
+            // ensure that first letter is an upper case letter
+            // there could be the edge case that the string is only one character long, therefore, this special treatment
+            // this is apache commons lang StringUtils.capitalize (https://commons.apache.org/proper/commons-lang/javadocs/api-release/org/apache/commons/lang3/StringUtils.html#capitalize%28java.lang.String%29), but we don't want to add an additional dependency  ('org.apache.commons:commons-lang3:3.4')
+            String newSubtitle = Character.toString(Character.toUpperCase(subtitle.charAt(0)));
+            if (subtitle.length() > 1) {
+                newSubtitle += subtitle.substring(1);
+            }
+            result.setField("subtitle", newSubtitle);
         }
         if (publisher != null) {
             result.setField("publisher", publisher);

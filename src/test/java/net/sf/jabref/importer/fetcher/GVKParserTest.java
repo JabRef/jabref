@@ -23,7 +23,7 @@ public class GVKParserTest {
             GVKParser parser = new GVKParser();
             List<BibtexEntry> entries = parser.parseEntries(is);
             Assert.assertNotNull(entries);
-            Assert.assertEquals(entries.size(), expectedSize);
+            Assert.assertEquals(expectedSize, entries.size());
             int i = 0;
             for (String resourceName : resourceNames) {
                 BibtexEntryUtil.doAssertEquals(GVKParser.class, resourceName, entries.get(i));
@@ -45,5 +45,30 @@ public class GVKParserTest {
     @Test
     public void GMP() throws Exception {
         doTest("gvk_gmp.xml", 2, Arrays.asList(new String[] {"gvk_gmp.1.bib", "gvk_gmp.2.bib"}));
+    }
+
+    @Test
+    public void subTitleTest() throws Exception {
+        try (InputStream is = GVKParser.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
+            GVKParser parser = new GVKParser();
+            List<BibtexEntry> entries = parser.parseEntries(is);
+            Assert.assertNotNull(entries);
+            Assert.assertEquals(5, entries.size());
+
+            BibtexEntry entry = entries.get(0);
+            Assert.assertEquals(null, entry.getField("subtitle"));
+
+            entry = entries.get(1);
+            Assert.assertEquals("C", entry.getField("subtitle"));
+
+            entry = entries.get(2);
+            Assert.assertEquals("Word", entry.getField("subtitle"));
+
+            entry = entries.get(3);
+            Assert.assertEquals("Word1 word2", entry.getField("subtitle"));
+
+            entry = entries.get(4);
+            Assert.assertEquals("Word1 word2", entry.getField("subtitle"));
+        }
     }
 }
