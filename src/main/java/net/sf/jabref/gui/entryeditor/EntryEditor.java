@@ -422,8 +422,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         String fieldExtras = BibtexFields.getFieldExtras(string);
 
         // timestamp or a other field with datepicker command
-        if (fieldName.equals(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD))
-                || ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_DATEPICKER))) {
+        if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldExtras)
+                || BibtexFields.EXTRA_DATEPICKER.equals(fieldExtras)) {
             // double click AND datefield => insert the current date (today)
             ((JTextArea) editor).addMouseListener(new MouseAdapter() {
 
@@ -438,19 +438,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             });
 
             // insert a datepicker, if the extras field contains this command
-            if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_DATEPICKER)) {
+            if (BibtexFields.EXTRA_DATEPICKER.equals(fieldExtras)) {
                 DatePickerButton datePicker = new DatePickerButton(editor);
                 return datePicker.getDatePicker();
             }
         }
 
-        if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_EXTERNAL)) {
+        if (BibtexFields.EXTRA_EXTERNAL.equals(fieldExtras)) {
 
             // Add external viewer listener for "pdf" and "url" fields.
             ((JComponent) editor).addMouseListener(new ExternalViewerListener());
 
             return null;
-        } else if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_JOURNAL_NAMES)) {
+        } else if (BibtexFields.EXTRA_JOURNAL_NAMES.equals(fieldExtras)) {
             // Add controls for switching between abbreviated and full journal
             // names.
             // If this field also has a FieldContentSelector, we need to combine
@@ -475,7 +475,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 return ws;
             } else {
-                if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_BROWSE)) {
+                if (BibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
                     JButton but = new JButton(Localization.lang("Browse"));
                     ((JComponent) editor).addMouseListener(new ExternalViewerListener());
 
@@ -503,12 +503,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                     return but;
 
-                } else if ((fieldExtras != null) && (fieldExtras.equals(BibtexFields.EXTRA_BROWSE_DOC)
-                        || fieldExtras.equals(BibtexFields.EXTRA_BROWSE_DOC_ZIP))) {
+                } else if (BibtexFields.EXTRA_BROWSE_DOC.equals(fieldExtras)
+                        || BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
 
                     final String ext = '.' + fieldName.toLowerCase();
                     final OpenFileFilter off;
-                    if (fieldExtras.equals(BibtexFields.EXTRA_BROWSE_DOC_ZIP)) {
+                    if (BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
                         off = new OpenFileFilter(new String[]{ext, ext + ".gz", ext + ".bz2"});
                     } else {
                         off = new OpenFileFilter(new String[]{ext});
@@ -516,12 +516,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                     return new ExternalFilePanel(frame, panel.metaData(), this, fieldName,
                             off, editor);
-                } else if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_URL)) {
+                } else if (BibtexFields.EXTRA_URL.equals(fieldExtras)) {
                     ((JComponent) editor).setDropTarget(new DropTarget((Component) editor,
                             DnDConstants.ACTION_NONE, new SimpleUrlDragDrop(editor, storeFieldAction)));
 
                     return null;
-                } else if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_SET_OWNER)) {
+                } else if (BibtexFields.EXTRA_SET_OWNER.equals(fieldExtras)) {
                     JButton button = new JButton(Localization.lang("Auto"));
                     button.addActionListener(new ActionListener() {
 
@@ -532,8 +532,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         }
                     });
                     return button;
-                } else if ((fieldExtras != null) && fieldExtras.equals(BibtexFields.EXTRA_YES_NO)) {
-                    String[] options = {"", "Yes", "No"};
+                } else if (BibtexFields.EXTRA_YES_NO.equals(fieldExtras)) {
+                    final String[] options = {"", "Yes", "No"};
                     JComboBox<String> yesno = new JComboBox<>(options);
                     yesno.addActionListener(new ActionListener() {
 
