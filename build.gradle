@@ -389,6 +389,7 @@ macAppBundle {
 }
 
 // fetch all dependencies to speedup CircleCI build
+// this is necessary until https://discuss.circleci.com/t/effective-caching-for-gradle/540 is resolved
 // see http://stackoverflow.com/a/27455099/873282 for an inspiration of this task
 // better solution: https://discuss.gradle.org/t/how-to-download-maven-dependencies-into-project-local-directory-and-set-eclipse-classpath/9851
 task getdeps(type: Copy) {
