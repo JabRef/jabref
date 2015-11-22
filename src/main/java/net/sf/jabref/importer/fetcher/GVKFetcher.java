@@ -71,7 +71,7 @@ public class GVKFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return "GVKFetcher";
+        return "GVK (Gemeinsamer Verbundkatalog)";
     }
 
     @Override
