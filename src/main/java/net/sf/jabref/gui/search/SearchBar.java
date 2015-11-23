@@ -40,6 +40,9 @@ import java.awt.*;
  */
 public class SearchBar extends JPanel {
 
+    public static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
+    public static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
+
     private SearchQuery getSearchQuery() {
         return new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
     }
@@ -47,10 +50,10 @@ public class SearchBar extends JPanel {
     public void updateResults(int matched, String description) {
         if (matched == 0) {
             this.currentResults.setText(Localization.lang("No results found."));
-            this.searchField.setBackground(Color.RED);
+            this.searchField.setBackground(NO_RESULTS_COLOR);
         } else {
             this.currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
-            this.searchField.setBackground(Color.GREEN);
+            this.searchField.setBackground(RESULTS_FOUND_COLOR);
         }
         this.searchField.setToolTipText("<html>" + description + "</html>");
     }
