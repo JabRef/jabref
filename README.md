@@ -16,6 +16,8 @@ The intention of this branch is to move JabRef forward to modern technologies su
 
 The last version with Java6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
+The development builds are available at [builds.jabref.org](http://builds.jabref.org/)
+
 ### Breaking Changes in Comparison to v2.11
 
 * No plugin support
