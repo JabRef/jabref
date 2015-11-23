@@ -25,6 +25,11 @@ public class ScienceDirectTest {
     }
 
     @Test
+    public void doiNotPresent() throws IOException {
+        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
     public void findByDOI() throws IOException {
         entry.setField("doi", "10.1016/j.aasri.2014.09.002");
 

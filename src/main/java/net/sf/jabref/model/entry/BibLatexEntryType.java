@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2003 David Weitzman, Morten O. Alver
+Copyright (C) 2015 JabRef contributors
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -36,11 +37,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Abstract base class for all BibTex entry types.
+ * Abstract base class for all BibLaTex entry types.
  */
 public abstract class BibLatexEntryType implements EntryType {
+
     private final List<String> requiredFields;
     private final List<String> optionalFields;
+
 
     public BibLatexEntryType() {
         requiredFields = new ArrayList<>();
@@ -65,18 +68,20 @@ public abstract class BibLatexEntryType implements EntryType {
         requiredFields.addAll(Arrays.asList(fieldNames));
     }
 
+    @Override
     public List<String> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
 
+    @Override
     public List<String> getSecondaryOptionalFields() {
-        List<String> optionalFields = getOptionalFields();
+        List<String> myOptionalFields = getOptionalFields();
 
-        if (optionalFields == null) {
-            return new ArrayList<>(0);
+        if (myOptionalFields == null) {
+            return Collections.EMPTY_LIST;
         }
 
-        return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
+        return myOptionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
     }
 
     private boolean isPrimary(String field) {

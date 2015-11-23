@@ -25,6 +25,11 @@ public class SpringerLinkTest {
     }
 
     @Test
+    public void doiNotPresent() throws IOException {
+        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
     public void findByDOI() throws IOException {
         entry.setField("doi", "10.1186/s13677-015-0042-8");
 

@@ -21,6 +21,12 @@ public class SuperscriptFormatterTest {
     }
 
     @Test
+    public void returnsFormatterName() {
+        Assert.assertNotNull(formatter.getName());
+        Assert.assertNotEquals("", formatter.getName());
+    }
+
+    @Test
     public void replacesSuperscript() {
         expectCorrect("1st", "1\\textsuperscript{st}");
         expectCorrect("2nd", "2\\textsuperscript{nd}");

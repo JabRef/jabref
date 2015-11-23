@@ -1,9 +1,6 @@
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,24 +10,25 @@ import java.util.List;
  * Manual, Mastersthesis, Misc, Phdthesis, Proceedings, Techreport, Unpublished
  */
 public class BibtexEntryTypes {
+
     /**
      * An article from a journal or magazine.
      *
      * Required fields: author, title, journal, year.
      * Optional fields: volume, number, pages, month, note.
      */
-    public static final EntryType ARTICLE =
-            new BibtexEntryType() {
-                {
-                    addAllRequired("author", "title", "journal", "year");
-                    addAllOptional("volume", "number", "pages", "month", "note");
-                }
+    public static final EntryType ARTICLE = new BibtexEntryType() {
 
-                @Override
-                public String getName() {
-                    return "Article";
-                }
-            };
+        {
+            addAllRequired("author", "title", "journal", "year");
+            addAllOptional("volume", "number", "pages", "month", "note");
+        }
+
+        @Override
+        public String getName() {
+            return "Article";
+        }
+    };
 
     /**
      * A book with an explicit publisher.
@@ -38,19 +36,18 @@ public class BibtexEntryTypes {
      * Required fields: author or editor, title, publisher, year.
      * Optional fields: volume or number, series, address, edition, month, note.
      */
-    public static final EntryType BOOK =
-            new BibtexEntryType() {
-                {
-                    addAllRequired("title", "publisher", "year", "author/editor");
-                    addAllOptional("volume", "number", "series", "address", "edition", "month",
-                            "note");
-                }
+    public static final EntryType BOOK = new BibtexEntryType() {
 
-                @Override
-                public String getName() {
-                    return "Book";
-                }
-            };
+        {
+            addAllRequired("title", "publisher", "year", "author/editor");
+            addAllOptional("volume", "number", "series", "address", "edition", "month", "note");
+        }
+
+        @Override
+        public String getName() {
+            return "Book";
+        }
+    };
 
     /**
      * A work that is printed and bound, but without a named publisher or sponsoring institution.
@@ -58,18 +55,18 @@ public class BibtexEntryTypes {
      * Required field: title.
      * Optional fields: author, howpublished, address, month, year, note.
      */
-    public static final EntryType BOOKLET =
-            new BibtexEntryType() {
-                {
-                    addAllRequired("title");
-                    addAllOptional("author", "howpublished", "address", "month", "year", "note");
-                }
+    public static final EntryType BOOKLET = new BibtexEntryType() {
 
-                @Override
-                public String getName() {
-                    return "Booklet";
-                }
-            };
+        {
+            addAllRequired("title");
+            addAllOptional("author", "howpublished", "address", "month", "year", "note");
+        }
+
+        @Override
+        public String getName() {
+            return "Booklet";
+        }
+    };
 
     /**
      * An article in a conference proceedings.
@@ -77,19 +74,19 @@ public class BibtexEntryTypes {
      * Required fields: author, title, booktitle, year.
      * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
      */
-    public static final EntryType CONFERENCE =
-            new BibtexEntryType() {
-                {
-                    addAllOptional("editor", "volume", "number", "series", "pages",
-                            "address", "month", "organization", "publisher", "note");
-                    addAllRequired("author", "title", "booktitle", "year");
-                }
+    public static final EntryType CONFERENCE = new BibtexEntryType() {
 
-                @Override
-                public String getName() {
-                    return "Conference";
-                }
-            };
+        {
+            addAllRequired("author", "title", "booktitle", "year");
+            addAllOptional("editor", "volume", "number", "series", "pages", "address", "month", "organization",
+                    "publisher", "note");
+        }
+
+        @Override
+        public String getName() {
+            return "Conference";
+        }
+    };
 
     /**
      * A part of a book, which may be a chapter (or section or whatever) and/or a range of pages.
@@ -97,38 +94,37 @@ public class BibtexEntryTypes {
      * Required fields: author or editor, title, chapter and/or pages, publisher, year.
      * Optional fields: volume or number, series, type, address, edition, month, note.
      */
-    public static final EntryType INBOOK =
-            new BibtexEntryType() {
-                {
-                    addAllOptional("volume", "number", "series", "type", "address", "edition",
-                            "month", "note");
-                    addAllRequired("chapter/pages", "title", "publisher", "year", "author/editor");
-                }
+    public static final EntryType INBOOK = new BibtexEntryType() {
 
-                @Override
-                public String getName() {
-                    return "InBook";
-                }
-            };
+        {
+            addAllRequired("chapter/pages", "title", "publisher", "year", "author/editor");
+            addAllOptional("volume", "number", "series", "type", "address", "edition", "month", "note");
+        }
+
+        @Override
+        public String getName() {
+            return "InBook";
+        }
+    };
 
     /**
      * A part of a book having its own title.
      * Required fields: author, title, booktitle, publisher, year.
      * Optional fields: editor, volume or number, series, type, chapter, pages, address, edition, month, note.
      */
-    public static final EntryType INCOLLECTION =
-            new BibtexEntryType() {
-                {
-                    addAllRequired("author", "title", "booktitle", "publisher", "year");
-                    addAllOptional("editor", "volume", "number", "series", "type", "chapter",
-                            "pages", "address", "edition", "month", "note");
-                }
+    public static final EntryType INCOLLECTION = new BibtexEntryType() {
 
-                @Override
-                public String getName() {
-                    return "InCollection";
-                }
-            };
+        {
+            addAllRequired("author", "title", "booktitle", "publisher", "year");
+            addAllOptional("editor", "volume", "number", "series", "type", "chapter", "pages", "address", "edition",
+                    "month", "note");
+        }
+
+        @Override
+        public String getName() {
+            return "InCollection";
+        }
+    };
 
     /**
      * An article in a conference proceedings.
@@ -136,39 +132,37 @@ public class BibtexEntryTypes {
      * Required fields: author, title, booktitle, year.
      * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
      */
-    public static final EntryType INPROCEEDINGS =
-            new BibtexEntryType() {
-                {
-                    addAllOptional("editor", "volume", "number", "series", "pages",
-                            "address", "month", "organization", "publisher", "note");
-                    addAllRequired("author", "title", "booktitle", "year");
-                }
+    public static final EntryType INPROCEEDINGS = new BibtexEntryType() {
 
-                @Override
-                public String getName() {
-                    return "InProceedings";
-                }
-            };
+        {
+            addAllRequired("author", "title", "booktitle", "year");
+            addAllOptional("editor", "volume", "number", "series", "pages", "address", "month", "organization",
+                    "publisher", "note");
+        }
+
+        @Override
+        public String getName() {
+            return "InProceedings";
+        }
+    };
 
     /**
      * Technical documentation.
      * Required field: title.
      * Optional fields: author, organization, address, edition, month, year, note.
      */
-    public static final EntryType MANUAL =
-            new BibtexEntryType() {
+    public static final EntryType MANUAL = new BibtexEntryType() {
 
-                {
-                    addAllOptional("author", "organization", "address", "edition",
-                            "month", "year", "note");
-                    addAllRequired("title");
-                }
+        {
+            addAllRequired("title");
+            addAllOptional("author", "organization", "address", "edition", "month", "year", "note");
+        }
 
-                @Override
-                public String getName() {
-                    return "Manual";
-                }
-            };
+        @Override
+        public String getName() {
+            return "Manual";
+        }
+    };
 
     /**
      * A Master's thesis.
@@ -176,19 +170,18 @@ public class BibtexEntryTypes {
      * Required fields: author, title, school, year.
      * Optional fields: type, address, month, note.
      */
-    public static final EntryType MASTERSTHESIS =
-            new BibtexEntryType() {
+    public static final EntryType MASTERSTHESIS = new BibtexEntryType() {
 
-                {
-                    addAllOptional("type", "address", "month", "note");
-                    addAllRequired("author", "title", "school", "year");
-                }
+        {
+            addAllRequired("author", "title", "school", "year");
+            addAllOptional("type", "address", "month", "note");
+        }
 
-                @Override
-                public String getName() {
-                    return "MastersThesis";
-                }
-            };
+        @Override
+        public String getName() {
+            return "MastersThesis";
+        }
+    };
 
     /**
      * Use this type when nothing else fits.
@@ -196,18 +189,17 @@ public class BibtexEntryTypes {
      * Required fields: none.
      * Optional fields: author, title, howpublished, month, year, note.
      */
-    public static final EntryType MISC =
-            new BibtexEntryType() {
+    public static final EntryType MISC = new BibtexEntryType() {
 
-                {
-                    addAllOptional("author", "title", "howpublished", "month", "year", "note");
-                }
+        {
+            addAllOptional("author", "title", "howpublished", "month", "year", "note");
+        }
 
-                @Override
-                public String getName() {
-                    return "Misc";
-                }
-            };
+        @Override
+        public String getName() {
+            return "Misc";
+        }
+    };
 
     /**
      * A PhD thesis.
@@ -215,19 +207,18 @@ public class BibtexEntryTypes {
      * Required fields: author, title, school, year.
      * Optional fields: type, address, month, note.
      */
-    public static final EntryType PHDTHESIS =
-            new BibtexEntryType() {
+    public static final EntryType PHDTHESIS = new BibtexEntryType() {
 
-                {
-                    addAllOptional("type", "address", "month", "note");
-                    addAllRequired("author", "title", "school", "year");
-                }
+        {
+            addAllRequired("author", "title", "school", "year");
+            addAllOptional("type", "address", "month", "note");
+        }
 
-                @Override
-                public String getName() {
-                    return "PhdThesis";
-                }
-            };
+        @Override
+        public String getName() {
+            return "PhdThesis";
+        }
+    };
 
     /**
      * The proceedings of a conference.
@@ -235,20 +226,19 @@ public class BibtexEntryTypes {
      * Required fields: title, year.
      * Optional fields: editor, volume or number, series, address, month, organization, publisher, note.
      */
-    public static final EntryType PROCEEDINGS =
-            new BibtexEntryType() {
+    public static final EntryType PROCEEDINGS = new BibtexEntryType() {
 
-                {
-                    addAllOptional("editor", "volume", "number", "series", "address",
-                            "publisher", "note", "month", "organization");
-                    addAllRequired("title", "year");
-                }
+        {
+            addAllRequired("title", "year");
+            addAllOptional("editor", "volume", "number", "series", "address", "publisher", "note", "month",
+                    "organization");
+        }
 
-                @Override
-                public String getName() {
-                    return "Proceedings";
-                }
-            };
+        @Override
+        public String getName() {
+            return "Proceedings";
+        }
+    };
 
     /**
      * A report published by a school or other institution, usually numbered within a series.
@@ -256,18 +246,18 @@ public class BibtexEntryTypes {
      * Required fields: author, title, institution, year.
      * Optional fields: type, number, address, month, note.
      */
-    public static final EntryType TECHREPORT =
-            new BibtexEntryType() {
-                {
-                    addAllOptional("type", "number", "address", "month", "note");
-                    addAllRequired("author", "title", "institution", "year");
-                }
+    public static final EntryType TECHREPORT = new BibtexEntryType() {
 
-                @Override
-                public String getName() {
-                    return "TechReport";
-                }
-            };
+        {
+            addAllRequired("author", "title", "institution", "year");
+            addAllOptional("type", "number", "address", "month", "note");
+        }
+
+        @Override
+        public String getName() {
+            return "TechReport";
+        }
+    };
 
     /**
      * A document having an author and title, but not formally published.
@@ -275,21 +265,19 @@ public class BibtexEntryTypes {
      * Required fields: author, title, note.
      * Optional fields: month, year.
      */
-    public static final EntryType UNPUBLISHED =
-            new BibtexEntryType() {
-                {
-                    addAllOptional("month", "year");
-                    addAllRequired("author", "title", "note");
-                }
+    public static final EntryType UNPUBLISHED = new BibtexEntryType() {
 
-                @Override
-                public String getName() {
-                    return "Unpublished";
-                }
-            };
+        {
+            addAllRequired("author", "title", "note");
+            addAllOptional("month", "year");
+        }
 
-    public static final List<EntryType> ALL = Arrays.asList(
-            ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE, INPROCEEDINGS,PROCEEDINGS,
-            MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC
-    );
+        @Override
+        public String getName() {
+            return "Unpublished";
+        }
+    };
+
+    public static final List<EntryType> ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,
+            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC);
 }

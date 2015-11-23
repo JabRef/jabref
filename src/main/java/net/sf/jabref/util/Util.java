@@ -533,7 +533,7 @@ public class Util {
         String s = BibtexFields.getFieldExtras(fieldName);
         final String ext = "." + fieldName.toLowerCase();
         final OpenFileFilter off;
-        if ("browseDocZip".equals(s)) {
+        if (BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(s)) {
             off = new OpenFileFilter(new String[] {ext, ext + ".gz", ext + ".bz2"});
         } else {
             off = new OpenFileFilter(new String[] {ext});

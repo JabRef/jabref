@@ -281,18 +281,6 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
     }
 
-    public void activate() {
-        sel.requestFocus();
-    }
-
-    /**
-     * Returns true if there have been changes to the field list. Reports true
-     * if changes have been made, regardless of whether the changes cancel each other.
-     */
-    public boolean changesMade() {
-        return changesMade;
-    }
-
     /**
      * Return the current list.
      */
@@ -318,10 +306,6 @@ class FieldSetComponent extends JPanel implements ActionListener {
      */
     public void addAdditionActionListener(ActionListener l) {
         additionListeners.add(l);
-    }
-
-    public void removeAdditionActionListener(ActionListener l) {
-        additionListeners.remove(l);
     }
 
     public void addListDataListener(ListDataListener l) {

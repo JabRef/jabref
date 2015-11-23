@@ -126,13 +126,14 @@ class HelpContent extends JTextPane {
 
         // If not available fallback to english
         if (resource == null) {
-            resource = resourceOwner.getResource(GUIGlobals.helpPre + file);
+            resource = resourceOwner.getResource(GUIGlobals.helpPre + "en/" + file);
+            LOGGER.info("No localization available for file '" + file + "'. Falling back to English.");
         }
 
         // If still not available print a warning
         if (resource == null) {
             // TODO show warning to user
-            HelpContent.LOGGER.error("Could not find html-help for file '" + file + "'.");
+            LOGGER.error("Could not find html-help for file '" + file + "'.");
             return;
         }
 
