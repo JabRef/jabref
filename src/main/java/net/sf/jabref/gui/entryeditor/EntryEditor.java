@@ -43,7 +43,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
-
 import net.sf.jabref.*;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
@@ -51,6 +50,7 @@ import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
@@ -59,7 +59,6 @@ import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.gui.journals.JournalAbbreviationsUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
@@ -168,6 +167,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private final RedoAction redoAction = new RedoAction();
 
     private final TabListener tabListener = new TabListener();
+
+    // @formatter:off
+    private final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
+            + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
+            + "<BR>" + Localization.lang("To set up, go to") + " <B>"
+            + Localization.lang("Options") + " -> "
+            + Localization.lang("Manage journal abbreviations") + "</B></HTML>";
+    // @formatter:on
 
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibtexEntry entry) {
@@ -463,8 +470,29 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 contentSelectors.add(ws);
                 controls.add(ws, BorderLayout.NORTH);
             }
-            controls.add(JournalAbbreviationsUtil.getNameSwitcher(this, editor, panel.undoManager),
-                    BorderLayout.SOUTH);
+
+            // Button to toggle abbreviated/full journal names
+            JButton button = new JButton(Localization.lang("Toggle abbreviation"));
+            button.setToolTipText(ABBREVIATION_TOOLTIP_TEXT);
+            button.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    String text = editor.getText();
+                    if (Abbreviations.journalAbbrev.isKnownName(text)) {
+                        String s = Abbreviations.toggleAbbreviation(text);
+
+                        if (s != null) {
+                            editor.setText(s);
+                            storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
+                            panel.undoManager
+                                    .addEdit(new UndoableFieldChange(getEntry(), editor.getFieldName(), text, s));
+                        }
+                    }
+                }
+            });
+
+            controls.add(button, BorderLayout.SOUTH);
             return controls;
         } else {
             if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {

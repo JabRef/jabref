@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.logic.journals;
 
 import net.sf.jabref.JabRefPreferences;
@@ -36,7 +51,7 @@ public class Abbreviations {
 
         // Read external lists
         String[] lists = jabRefPreferences.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if (lists != null && lists.length > 0) {
+        if ((lists != null) && (lists.length > 0)) {
             for (int i = lists.length - 1; i >= 0; i--) {
                 String filename = lists[i];
                 try {
@@ -50,7 +65,7 @@ public class Abbreviations {
 
         // Read personal list
         String personalJournalList = jabRefPreferences.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
-        if (personalJournalList != null && !personalJournalList.trim().isEmpty()) {
+        if ((personalJournalList != null) && !personalJournalList.trim().isEmpty()) {
             try {
                 journalAbbrev.readJournalListFromFile(new File(personalJournalList));
             } catch (FileNotFoundException e) {
@@ -58,5 +73,9 @@ public class Abbreviations {
             }
         }
 
+    }
+
+    public static String toggleAbbreviation(String text) {
+        return journalAbbrev.getNextAbbreviation(text).orElse(text);
     }
 }

@@ -45,7 +45,7 @@ public class AbbreviationTest {
     public void testIsoAndMedlineAbbreviationsAreSame() {
         Abbreviation abbreviation = new Abbreviation(" Long Name ", " L N ");
 
-        assertTrue(abbreviation.hasIsoAndMedlineAbbreviationsAreSame());
+        assertTrue(abbreviation.getIsoAbbreviation().equals(abbreviation.getMedlineAbbreviation()));
     }
 
 }
