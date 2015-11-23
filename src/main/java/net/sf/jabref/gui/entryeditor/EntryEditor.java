@@ -211,7 +211,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private void setupFieldPanels() {
         tabbed.removeAll();
         tabs.clear();
-        List<String> fieldList = entry.getRequiredFields();
+        List<String> fieldList = entry.getRequiredFieldsFlat();
 
         EntryEditorTab reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Localization.lang("Required fields"));
         if (reqPan.fileListEditor != null) {
