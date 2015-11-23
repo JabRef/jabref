@@ -198,9 +198,6 @@ public class WriteXMPAction extends AbstractWorker {
 
 
     class OptionsDialog extends JDialog {
-
-        private static final long serialVersionUID = 7459164400811785958L;
-
         final JButton okButton = new JButton(Localization.lang("Ok"));
         final JButton cancelButton = new JButton(
                 Localization.lang("Cancel"));
@@ -223,10 +220,6 @@ public class WriteXMPAction extends AbstractWorker {
             });
 
             AbstractAction cancel = new AbstractAction() {
-
-                private static final long serialVersionUID = -338601477652815366L;
-
-
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     canceled = true;

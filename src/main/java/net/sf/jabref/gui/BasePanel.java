@@ -1712,10 +1712,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.addSelectionListener(groupsHighlightListener);
 
         mainTable.getActionMap().put(Actions.CUT, new AbstractAction() {
-
-            private static final long serialVersionUID = 1L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -1726,10 +1722,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
         mainTable.getActionMap().put(Actions.COPY, new AbstractAction() {
-
-            private static final long serialVersionUID = 1L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -1740,10 +1732,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
         mainTable.getActionMap().put(Actions.PASTE, new AbstractAction() {
-
-            private static final long serialVersionUID = 1L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {

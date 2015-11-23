@@ -1097,9 +1097,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     private class TypeLabel extends JLabel {
-
-        private static final long serialVersionUID = 1L;
-
         public TypeLabel(String type) {
             super(type);
             setUI(new VerticalLabelUI(false));
@@ -1190,9 +1187,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class DeleteAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public DeleteAction() {
             super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
@@ -1216,9 +1210,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class CloseAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public CloseAction() {
             super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
@@ -1238,9 +1229,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     public class StoreFieldAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public StoreFieldAction() {
             super("Store field value");
             putValue(Action.SHORT_DESCRIPTION, "Store field value");
@@ -1403,9 +1391,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class SwitchLeftAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public SwitchLeftAction() {
             super("Switch to the panel to the left");
         }
@@ -1420,9 +1405,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class SwitchRightAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public SwitchRightAction() {
             super("Switch to the panel to the right");
         }
@@ -1437,9 +1419,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class NextEntryAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public NextEntryAction() {
             super(Localization.lang("Next entry"), IconTheme.JabRefIcon.DOWN.getIcon());
 
@@ -1468,9 +1447,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class PrevEntryAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public PrevEntryAction() {
             super(Localization.lang("Previous entry"), IconTheme.JabRefIcon.UP.getIcon());
 
@@ -1499,11 +1475,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class GenerateKeyAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         final JabRefFrame parent;
-
 
         public GenerateKeyAction(JabRefFrame parentFrame) {
             super(Localization.lang("Generate BibTeX key"), IconTheme.JabRefIcon.MAKE_KEY.getIcon());
@@ -1564,9 +1536,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class UndoAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public UndoAction() {
             super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Undo");
@@ -1579,9 +1548,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class RedoAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public RedoAction() {
             super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Redo");
@@ -1594,9 +1560,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class SaveDatabaseAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public SaveDatabaseAction() {
             super("Save database");
         }
@@ -1675,9 +1638,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
 
     private class AutoLinkAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public AutoLinkAction() {
             putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.AUTO_FILE_LINK.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Automatically set file links for this entry") + " (Alt-F)");

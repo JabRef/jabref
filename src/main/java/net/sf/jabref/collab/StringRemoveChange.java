@@ -29,10 +29,6 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 
 class StringRemoveChange extends Change {
-
-
-    private static final long serialVersionUID = 1L;
-
     private final BibtexString string;
     private final BibtexString inMem;
 

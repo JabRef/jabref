@@ -32,8 +32,6 @@ import net.sf.jabref.model.entry.BibtexEntry;
  * An Action class representing the process of invoking a PushToApplication operation.
  */
 class PushToApplicationAction extends AbstractAction implements Runnable {
-
-    private static final long serialVersionUID = 9008115216029319314L;
     private final PushToApplication operation;
     private final JabRefFrame frame;
     private BasePanel panel;

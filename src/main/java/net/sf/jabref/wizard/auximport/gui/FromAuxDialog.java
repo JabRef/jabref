@@ -71,10 +71,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class FromAuxDialog
-        extends JDialog {
-
-    private static final long serialVersionUID = -7839874395438295941L;
+public class FromAuxDialog extends JDialog {
     private final JPanel statusPanel = new JPanel();
     private final JPanel buttons = new JPanel();
     private final JButton selectInDBButton = new JButton();
@@ -172,9 +169,6 @@ public class FromAuxDialog
         InputMap im = statusPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(parent.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
-
-            private static final long serialVersionUID = -4511569209048851343L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -308,16 +302,10 @@ public class FromAuxDialog
         return auxParser.getGeneratedDatabase();
     }
 
-
-    // ---------------------------------------------------------------------------
-
     /**
      * Action used to produce a "Browse" button for one of the text fields.
      */
-    static class BrowseAction
-            extends AbstractAction {
-
-        private static final long serialVersionUID = 685593871964202310L;
+    static class BrowseAction extends AbstractAction {
         private final JTextField comp;
         private final JabRefFrame _frame;
 

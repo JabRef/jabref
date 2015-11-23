@@ -74,10 +74,6 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         columns.add("Databases");
         table = new JTable();
         DefaultTableModel model = new DefaultTableModel(rows, columns) {
-
-            private static final long serialVersionUID = 1L;
-
-
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;

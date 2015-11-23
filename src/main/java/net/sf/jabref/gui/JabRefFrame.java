@@ -98,7 +98,6 @@ import osx.macadapter.MacAdapter;
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
-    private static final long serialVersionUID = 1L;
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
     private static final boolean biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
@@ -178,9 +177,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     };
 
     class ToolBar extends JToolBar {
-
-        private static final long serialVersionUID = 1L;
-
         void addAction(Action a) {
             JButton b = new JButton(a);
             b.setText(null);

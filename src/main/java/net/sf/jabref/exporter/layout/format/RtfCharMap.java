@@ -4,9 +4,6 @@ import java.util.HashMap;
 
 
 class RtfCharMap extends HashMap<String, String> {
-
-    private static final long serialVersionUID = 1L;
-    
     public RtfCharMap () {
 
 
