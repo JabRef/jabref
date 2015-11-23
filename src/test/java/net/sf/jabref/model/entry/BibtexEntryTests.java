@@ -20,6 +20,7 @@ public class BibtexEntryTests {
 
     @Test
     public void testDefaultConstructor() {
+        @SuppressWarnings("unused")
         BibtexEntry entry = new BibtexEntry();
     }
 
@@ -89,5 +90,33 @@ public class BibtexEntryTests {
 
         e.setField("year", "2015");
         Assert.assertTrue(e.hasAllRequiredFields(null));
+    }
+
+    @Test
+    public void isNullOrEmptyCiteKey() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        Assert.assertFalse(e.hasCiteKey());
+        e.setField(BibtexEntry.KEY_FIELD, "");
+        Assert.assertFalse(e.hasCiteKey());
+        e.setField(BibtexEntry.KEY_FIELD, null);
+        Assert.assertFalse(e.hasCiteKey());
+        e.setField(BibtexEntry.KEY_FIELD, "key");
+        Assert.assertTrue(e.hasCiteKey());
+        e.clearField(BibtexEntry.KEY_FIELD);
+        Assert.assertFalse(e.hasCiteKey());
+    }
+
+    /**
+     * Simple test for the canonical format
+     */
+    @Test
+    public void canonicalFormat() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        e.setField(BibtexEntry.KEY_FIELD, "key");
+        e.setField("author", "abc");
+        e.setField("title", "def");
+        e.setField("journal", "hij");
+        String canonicalForm = e.toString();
+        Assert.assertEquals("@article{key,\n  author = {abc},\n  journal = {hij},\n  title = {def}\n}", canonicalForm);
     }
 }

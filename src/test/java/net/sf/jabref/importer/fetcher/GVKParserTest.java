@@ -12,7 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import net.sf.jabref.bibtex.BibtexEntryUtil;
+import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 public class GVKParserTest {
@@ -26,7 +26,7 @@ public class GVKParserTest {
             Assert.assertEquals(expectedSize, entries.size());
             int i = 0;
             for (String resourceName : resourceNames) {
-                BibtexEntryUtil.doAssertEquals(GVKParser.class, resourceName, entries.get(i));
+                BibtexEntryAssert.assertEquals(GVKParser.class, resourceName, entries.get(i));
                 i++;
             }
         }

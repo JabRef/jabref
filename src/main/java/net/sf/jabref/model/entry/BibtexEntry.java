@@ -26,16 +26,19 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.google.common.base.Strings;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 
@@ -190,7 +193,7 @@ public class BibtexEntry {
     public String getFieldOrAlias(String name) {
         String fieldValue = getField(name);
 
-        if ((fieldValue != null) && !fieldValue.isEmpty()) {
+        if (!Strings.isNullOrEmpty(fieldValue)) {
             return fieldValue;
         }
 
@@ -279,10 +282,7 @@ public class BibtexEntry {
     }
 
     public boolean hasCiteKey() {
-        if(getCiteKey() == null || getCiteKey().isEmpty()) {
-            return false;
-        }
-        return true;
+        return !Strings.isNullOrEmpty(getCiteKey());
     }
 
     /**
@@ -420,9 +420,45 @@ public class BibtexEntry {
         return clone;
     }
 
+    /**
+     * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
+     * as is
+     *
+     * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
+     */
     @Override
     public String toString() {
-        return getType().getName() + ':' + getCiteKey();
+        StringBuilder sb = new StringBuilder();
+        try (Formatter formatter = new Formatter(sb, Locale.US)) {
+            String citeKey = Strings.nullToEmpty(this.getCiteKey());
+            formatter.format("@%s{%s,\n", this.getType().getName().toLowerCase(Locale.US), citeKey);
+
+            // we have to introduce a new Map as fields are stored case-sensitive in JabRef (see https://github.com/koppor/jabref/issues/45).
+            Map<String, String> mapFieldToValue = new HashMap<>();
+
+            // determine sorted fields -- all fields lower case
+            SortedSet<String> sortedFields = new TreeSet<>();
+            for (String fieldName : this.getFieldNames()) {
+                // JabRef stores the key in the field KEY_FIELD, which must not be serialized
+                if (!fieldName.equals(KEY_FIELD)) {
+                    String lowerCaseFieldName = fieldName.toLowerCase(Locale.US);
+                    sortedFields.add(lowerCaseFieldName);
+                    mapFieldToValue.put(lowerCaseFieldName, this.getField(fieldName));
+                }
+            }
+
+            for (String fieldName : sortedFields) {
+                formatter.format("  %s = {%s},\n", fieldName, mapFieldToValue.get(fieldName));
+            }
+
+            if (!sortedFields.isEmpty()) {
+                // remove last ","
+                sb.deleteCharAt(sb.length() - 2);
+            }
+
+            sb.append("}");
+        }
+        return sb.toString();
     }
 
     public boolean isSearchHit() {
