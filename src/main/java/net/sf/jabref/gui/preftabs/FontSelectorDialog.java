@@ -258,10 +258,6 @@ public class FontSelectorDialog extends JDialog {
            |  working on introducing this in the table view.      |
            -------------------------------------------------------- */
         preview = new JLabel(Localization.lang("Font Preview")) {
-
-            private static final long serialVersionUID = -4191591634265068189L;
-
-
             @Override
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;

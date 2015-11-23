@@ -169,9 +169,6 @@ public class DBConnectDialog extends JDialog {
         pwdPassword.addActionListener(connectAction);
 
         AbstractAction cancelAction = new AbstractAction() {
-
-            private static final long serialVersionUID = 812282483921018251L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);

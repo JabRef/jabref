@@ -7,8 +7,10 @@ import net.sf.jabref.model.entry.*;
 import java.util.*;
 
 public class EntryTypes {
+
     private static final TreeMap<String, EntryType> ALL_TYPES = new TreeMap<>();
     private static final TreeMap<String, EntryType> STANDARD_TYPES;
+
 
     static {
         // Put the standard entry types into the type map.
@@ -58,15 +60,14 @@ public class EntryTypes {
 
     private static void initBibtexEntryTypes() {
         // BibTex
-        for(EntryType type: BibtexEntryTypes.ALL) {
+        for (EntryType type : BibtexEntryTypes.ALL) {
             ALL_TYPES.put(type.getName().toLowerCase(), type);
         }
         // IEEE types
-        for(EntryType type: IEEETranEntryTypes.ALL) {
+        for (EntryType type : IEEETranEntryTypes.ALL) {
             ALL_TYPES.put(type.getName().toLowerCase(), type);
         }
     }
-
 
     /**
      * This method returns the BibtexEntryType for the name of a type,

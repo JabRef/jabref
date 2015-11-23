@@ -43,6 +43,7 @@ import com.google.common.base.Strings;
 import net.sf.jabref.model.database.BibtexDatabase;
 
 public class BibtexEntry {
+
     private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
@@ -85,10 +86,13 @@ public class BibtexEntry {
     }
 
     /**
-     * @return an array describing the required fields for this entry. "null" if no fields are required
+     * Returns all required field names.
+     * No OR relationships are captured here.
+     *
+     * @return a List of required field name Strings
      */
-    public List<String> getRequiredFields() {
-        return type.getRequiredFields();
+    public List<String> getRequiredFieldsFlat() {
+        return type.getRequiredFieldsFlat();
     }
 
     /**
@@ -129,9 +133,7 @@ public class BibtexEntry {
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
             this.type = type;
-            firePropertyChangedEvent(TYPE_HEADER,
-                    oldType != null ? oldType.getName() : null,
-                    type.getName());
+            firePropertyChangedEvent(TYPE_HEADER, oldType != null ? oldType.getName() : null, type.getName());
         } catch (PropertyVetoException pve) {
             pve.printStackTrace();
         }
@@ -224,6 +226,7 @@ public class BibtexEntry {
 
             // Create date format matching dates with year and month
             DateFormat df = new DateFormat() {
+
                 static final String FORMAT1 = "yyyy-MM-dd";
                 static final String FORMAT2 = "yyyy-MM";
                 final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
@@ -333,8 +336,7 @@ public class BibtexEntry {
     public void clearField(String name) {
 
         if (BibtexEntry.ID_FIELD.equals(name)) {
-            throw new IllegalArgumentException("The field name '" + name +
-                    "' is reserved");
+            throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
         Object oldValue = fields.get(name);
         fields.remove(name);
@@ -361,7 +363,7 @@ public class BibtexEntry {
 
         for (String field : allFields) {
             // OR fields
-            if(field.contains(orSeparator)) {
+            if (field.contains(orSeparator)) {
                 String[] altFields = field.split(orSeparator);
 
                 if (!atLeastOnePresent(altFields, database)) {
@@ -380,8 +382,8 @@ public class BibtexEntry {
         return allFieldsPresent(allFields.toArray(new String[allFields.size()]), database);
     }
 
-    private boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
-        for (String field : fields) {
+    private boolean atLeastOnePresent(String[] fieldsToCheck, BibtexDatabase database) {
+        for (String field : fieldsToCheck) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
             if ((value != null) && !value.isEmpty()) {
                 return true;
@@ -390,7 +392,8 @@ public class BibtexEntry {
         return false;
     }
 
-    private void firePropertyChangedEvent(String fieldName, Object oldValue, Object newValue) throws PropertyVetoException {
+    private void firePropertyChangedEvent(String fieldName, Object oldValue, Object newValue)
+            throws PropertyVetoException {
         changeSupport.fireVetoableChange(new PropertyChangeEvent(this, fieldName, oldValue, newValue));
     }
 
@@ -484,10 +487,7 @@ public class BibtexEntry {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{
-                getField("author"),
-                getField("title"),
-                getField("year")};
+        String[] s = new String[] {getField("author"), getField("title"), getField("year")};
 
         for (int i = 0; i < s.length; ++i) {
             if (s[i] == null) {

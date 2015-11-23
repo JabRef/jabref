@@ -105,7 +105,6 @@ public class SynchronizeFileField extends AbstractWorker {
                 + (checkExisting ? sel.length : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        int brokenLinks = 0;
         final NamedCompound ce = new NamedCompound(Localization.lang("Autoset %0 field", fieldName));
 
         //final OpenFileFilter off = Util.getFileFilterForField(fieldName);
@@ -217,7 +216,6 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // Cancel
                                 break mainLoop;
                             }
-                            brokenLinks++;
                         }
 
                         // Unless we deleted this link, see if its file type is recognized:

@@ -47,9 +47,6 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
  * Displays an BibtexEntry using the given layout format.
  */
 public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchTextListener, EntryContainer {
-
-    private static final long serialVersionUID = 1L;
-
     /**
      * The bibtex entry currently shown
      */
@@ -201,9 +198,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
 
     class PrintAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public PrintAction() {
             super(Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getIcon());
 
@@ -253,9 +247,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
 
     class CloseAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1L;
-
         public CloseAction() {
             super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
@@ -329,9 +320,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private JEditorPane createPreviewPane() {
         JEditorPane previewPane = new JEditorPane() {
-
-            private static final long serialVersionUID = 1L;
-
             @Override
             public Dimension getPreferredScrollableViewportSize() {
                 return getPreferredSize();

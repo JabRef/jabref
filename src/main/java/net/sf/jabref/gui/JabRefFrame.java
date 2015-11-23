@@ -98,7 +98,6 @@ import osx.macadapter.MacAdapter;
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
-    private static final long serialVersionUID = 1L;
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
     private static final boolean biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
@@ -178,9 +177,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     };
 
     class ToolBar extends JToolBar {
-
-        private static final long serialVersionUID = 1L;
-
         void addAction(Action a) {
             JButton b = new JButton(a);
             b.setText(null);
@@ -412,11 +408,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Open file"),
             prefs.getKey(KeyBinds.OPEN_FILE),
             IconTheme.JabRefIcon.FILE.getIcon());
-    private final AbstractAction openPdf = new GeneralAction(Actions.OPEN_FILE,
-            Localization.menuTitle("Open PDF or PS"),
-            Localization.lang("Open PDF or PS"),
-            prefs.getKey(KeyBinds.OPEN_PDF_OR_PS),
-            IconTheme.JabRefIcon.PDF_FILE.getIcon());
     private final AbstractAction openUrl = new GeneralAction(Actions.OPEN_URL,
             Localization.menuTitle("Open URL or DOI"),
             Localization.lang("Open URL or DOI"),
@@ -1260,7 +1251,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         search.add(dupliCheck);
         search.add(resolveDuplicateKeys);
         //search.add(strictDupliCheck);
-        search.add(autoSetFile);
         search.addSeparator();
         search.add(generalFetcher.getAction());
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
@@ -1328,9 +1318,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.addSeparator();
         tools.add(openFolder);
         tools.add(openFile);
-        tools.add(openPdf);
         tools.add(openUrl);
         //tools.add(openSpires);
+        tools.addSeparator();
+        tools.add(autoSetFile);
         tools.add(findUnlinkedFiles);
         tools.add(autoLinkFile);
         tools.addSeparator();
@@ -1540,7 +1531,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 toggleGroups, toggleSearch, makeKeyAction, normalSearch, mergeEntries, cleanupEntries,
                 exportToClipboard, incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
-                openPdf, openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
+                openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
                 closeDatabaseAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
                 databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected,

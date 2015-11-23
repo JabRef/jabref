@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,7 +17,6 @@ package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -56,17 +55,6 @@ public class AttachFileDialog extends JDialog {
     private final BibtexEntry entry;
     private final MetaData metaData;
     private boolean cancelled = true; // Default to true, so a pure close operation implies Cancel.
-
-
-    public AttachFileDialog(Frame parent, MetaData metaData, BibtexEntry entry, String fieldName) {
-        super(parent, true);
-        this.metaData = metaData;
-        this.entry = entry;
-        this.fieldName = fieldName;
-        this.editor = new TextField(fieldName, entry.getField(fieldName), false);
-
-        initGui();
-    }
 
     public AttachFileDialog(Dialog parent, MetaData metaData, BibtexEntry entry, String fieldName) {
         super(parent, true);

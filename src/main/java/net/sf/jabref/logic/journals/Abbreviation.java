@@ -29,10 +29,6 @@ public class Abbreviation implements Comparable<Abbreviation> {
         return getIsoAbbreviation().replaceAll("\\.", " ").replaceAll("  ", " ").trim();
     }
 
-    public boolean hasIsoAndMedlineAbbreviationsAreSame() {
-        return getIsoAbbreviation().equals(getMedlineAbbreviation());
-    }
-
     @Override
     public int compareTo(Abbreviation toCompare) {
         return name.compareTo(toCompare.name);
@@ -53,14 +49,6 @@ public class Abbreviation implements Comparable<Abbreviation> {
     @Override
     public String toString() {
         return String.format("Abbreviation{name=%s, iso=%s, medline=%s}", name, getIsoAbbreviation(), getMedlineAbbreviation());
-    }
-
-    public String toPropertiesLine() {
-        return String.format("%s = %s", name, getAbbreviation());
-    }
-
-    public String getAbbreviation() {
-        return abbreviation;
     }
 
     @Override

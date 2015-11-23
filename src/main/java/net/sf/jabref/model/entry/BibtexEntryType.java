@@ -36,8 +36,10 @@ import java.util.stream.Collectors;
  * Abstract base class for all BibTex entry types.
  */
 public abstract class BibtexEntryType implements EntryType {
+
     private final List<String> requiredFields;
     private final List<String> optionalFields;
+
 
     public BibtexEntryType() {
         requiredFields = new ArrayList<>();
@@ -67,18 +69,20 @@ public abstract class BibtexEntryType implements EntryType {
         return getName().compareTo(o.getName());
     }
 
+    @Override
     public List<String> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
 
+    @Override
     public List<String> getSecondaryOptionalFields() {
-        List<String> optionalFields = getOptionalFields();
+        List<String> locOptionalFields = getOptionalFields();
 
-        if (optionalFields == null) {
-            return new ArrayList<>(0);
+        if (locOptionalFields == null) {
+            return Collections.EMPTY_LIST;
         }
 
-        return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
+        return locOptionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
     }
 
     private boolean isPrimary(String field) {

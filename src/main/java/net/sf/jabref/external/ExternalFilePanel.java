@@ -63,9 +63,6 @@ import net.sf.jabref.logic.xmp.XMPUtil;
  *
  */
 public class ExternalFilePanel extends JPanel {
-
-    private static final long serialVersionUID = 3653290879640642718L;
-
     private EntryEditor entryEditor;
 
     private final JabRefFrame frame;

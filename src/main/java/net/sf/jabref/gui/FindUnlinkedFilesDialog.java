@@ -276,10 +276,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private void initializeActions() {
 
         actionSelectAll = new AbstractAction(Localization.lang("Select all")) {
-
-            private static final long serialVersionUID = 9153126361571985383L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -290,10 +286,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
         };
 
         actionUnselectAll = new AbstractAction(Localization.lang("Unselect all")) {
-
-            private static final long serialVersionUID = -9012913268030356450L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -304,10 +296,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
         };
 
         actionExpandTree = new AbstractAction(Localization.lang("Expand all")) {
-
-            private static final long serialVersionUID = -4794088095435302433L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -316,10 +304,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
         };
 
         actionCollapseTree = new AbstractAction(Localization.lang("Collapse all")) {
-
-            private static final long serialVersionUID = 6007246730370326456L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -612,7 +596,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                                 progressBarImporting.setString(counter + " of " + progressBarImporting.getMaximum());
                             }
                         }, errors);
-                importFinishedHandler(count, errors);
+                importFinishedHandler(errors);
             }
         });
 
@@ -622,7 +606,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      *
      * @param errors
      */
-    private void importFinishedHandler(int count, List<String> errors) {
+    private void importFinishedHandler(List<String> errors) {
 
         if ((errors != null) && !errors.isEmpty()) {
 
@@ -1083,7 +1067,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
              * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
              */
             @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof EntryFromFileCreator) {
                     EntryFromFileCreator creator = (EntryFromFileCreator) value;
@@ -1143,9 +1128,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     public static class CheckableTreeNode extends DefaultMutableTreeNode {
 
-        private static final long serialVersionUID = -1131241777605570737L;
         private boolean isSelected;
-        private JCheckBox checkbox;
+        private final JCheckBox checkbox;
 
 
         public CheckableTreeNode(Object userObject) {
@@ -1158,14 +1142,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
          */
         public JCheckBox getCheckbox() {
             return checkbox;
-        }
-
-        /**
-         * @param checkbox
-         *            the checkbox to set
-         */
-        public void setCheckbox(JCheckBox checkbox) {
-            this.checkbox = checkbox;
         }
 
         public void check() {

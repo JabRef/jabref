@@ -72,8 +72,6 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 public class MainTable extends JTable {
     private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
-    private static final long serialVersionUID = 1L;
-
     private final MainTableFormat tableFormat;
     private final BasePanel panel;
     private final SortedList<BibtexEntry> sortedForMarking;

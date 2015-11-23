@@ -13,6 +13,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+ - Better support for IEEEtranBSTCTL entries
+ - Quick selection of month in entry editor
  - Unknown entry types will be converted to 'Misc' (was 'Other' before).
  - EntryTypes are now clustered per group on the 'new entry' GUI screen.
  - Tab shows the minimal unique folder name substring if multiple database files share the same name
@@ -59,6 +61,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Update supported LookAndFeels
  - Show replaced journal abbreviations on console
  - Integrated [GVK-Plugin](http://www.gbv.de/wikis/cls/Jabref-GVK-Plugin)
+ - The three options to manage file references are moved to their own separated group in the Tools menu. 
 
 ### Fixed
  - Fixed the bug that the file encoding was not correctly determined from the first (or second) line
@@ -95,6 +98,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Remove support for key bindings per external application by allowing only the key binding "push to application" for the currently selected external application.
  - Remove "edit preamble" from toolbar
  - Remove support to the move-to-SysTray action
+ - Remove option Tools -> Open PDF or PS which is replaced by Tools -> Open File
 
 ## 2.80 - never released
 

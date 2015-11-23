@@ -199,10 +199,6 @@ public class DuplicateResolverDialog extends JDialog {
         dispose();
     }
 
-    public boolean isBlocking() {
-        return block;
-    }
-
     public int getSelected() {
         return status;
     }

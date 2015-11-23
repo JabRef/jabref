@@ -50,9 +50,6 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  * Dialog to manage custom importers.
  */
 public class ImportCustomizationDialog extends JDialog {
-
-    private static final long serialVersionUID = 1L;
-
     private final JabRefFrame frame;
 
     private JTable customImporterTable;

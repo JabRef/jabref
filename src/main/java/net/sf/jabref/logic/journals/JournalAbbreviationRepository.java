@@ -142,12 +142,4 @@ public class JournalAbbreviationRepository {
         Abbreviation abbr = abbreviation.get();
         return Optional.of(abbr.getIsoAbbreviation());
     }
-
-    public String toPropertiesString() {
-        StringBuilder sb = new StringBuilder();
-        for (Abbreviation abbreviation : getAbbreviations()) {
-            sb.append(String.format("%s%n", abbreviation.toPropertiesLine()));
-        }
-        return sb.toString();
-    }
 }

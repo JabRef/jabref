@@ -36,7 +36,6 @@ public class JournalAbbreviationRepositoryTest {
         assertTrue(repository.isKnownName("L N"));
         assertFalse(repository.isKnownName("?"));
 
-        assertEquals(String.format("Long Name = L. N.%n"), repository.toPropertiesString());
     }
 
     @Test
@@ -78,7 +77,6 @@ public class JournalAbbreviationRepositoryTest {
         assertEquals(1, repository.size());
         assertEquals("LA. N.", repository.getIsoAbbreviation("Long Name").orElse("WRONG"));
 
-        assertEquals("Long Name = LA. N.", repository.getAbbreviations().first().toPropertiesLine());
     }
 
 }
