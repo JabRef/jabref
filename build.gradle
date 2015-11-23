@@ -333,6 +333,7 @@ task releaseWindows(dependsOn: "launch4j") {
     doLast {
         copy {
             from("$projectDir/LICENSE")
+            from("$projectDir/buildres/JabRef.VisualElementsManifest.xml")		
             from("$projectDir/README.md")
             from("$buildDir/launch4j/JabRef.exe")
             into("$buildDir/nsis")
