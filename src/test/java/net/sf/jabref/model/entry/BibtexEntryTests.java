@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 
 import java.util.ArrayList;
@@ -20,8 +21,11 @@ public class BibtexEntryTests {
 
     @Test
     public void testDefaultConstructor() {
-        @SuppressWarnings("unused")
         BibtexEntry entry = new BibtexEntry();
+        // we have to use `getType("misc")` in the case of biblatex mode
+        Assert.assertEquals(EntryTypes.getType("misc"), entry.getType());
+        Assert.assertNotNull(entry.getId());
+        Assert.assertNull(entry.getField("author"));
     }
 
     @Test

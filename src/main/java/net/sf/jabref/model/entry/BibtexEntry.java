@@ -37,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.common.base.Strings;
 
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibtexDatabase;
 
 public class BibtexEntry {
@@ -65,7 +66,7 @@ public class BibtexEntry {
     }
 
     public BibtexEntry(String id) {
-        this(id, BibtexEntryTypes.MISC);
+        this(id, EntryTypes.getBibtexEntryType("misc"));
     }
 
     public BibtexEntry(String id, EntryType type) {
