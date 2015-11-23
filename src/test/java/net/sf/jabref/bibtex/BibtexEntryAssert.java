@@ -12,6 +12,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fetcher.GVKParser;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.CanonicalBibtexEntry;
 
 public class BibtexEntryAssert {
 
@@ -62,6 +63,7 @@ public class BibtexEntryAssert {
      */
     private static void assertEquals(BibtexEntry shouldBeEntry, BibtexEntry entry) {
         // use the canonical string representation to compare the entries
-        Assert.assertEquals(shouldBeEntry.toString(), entry.toString());
+        Assert.assertEquals(CanonicalBibtexEntry.getCanonicalRepresentation(shouldBeEntry),
+                CanonicalBibtexEntry.getCanonicalRepresentation(entry));
     }
 }

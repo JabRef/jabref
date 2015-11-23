@@ -106,17 +106,4 @@ public class BibtexEntryTests {
         Assert.assertFalse(e.hasCiteKey());
     }
 
-    /**
-     * Simple test for the canonical format
-     */
-    @Test
-    public void canonicalFormat() {
-        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
-        e.setField(BibtexEntry.KEY_FIELD, "key");
-        e.setField("author", "abc");
-        e.setField("title", "def");
-        e.setField("journal", "hij");
-        String canonicalForm = e.toString();
-        Assert.assertEquals("@article{key,\n  author = {abc},\n  journal = {hij},\n  title = {def}\n}", canonicalForm);
-    }
 }
