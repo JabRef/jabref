@@ -1,4 +1,4 @@
-package net.sf.jabref.util;
+package net.sf.jabref.logic.util.io;
 
 import java.io.StringWriter;
 
@@ -21,6 +21,9 @@ public class XMLUtil {
     private static final Log LOGGER = LogFactory.getLog(XMLUtil.class);
 
 
+    /**
+     * Prints out the document to standard out. Used to generate files for test cases.
+     */
     public static void printDocument(Document doc) {
         // code by http://stackoverflow.com/a/10356322/873282
         try {
