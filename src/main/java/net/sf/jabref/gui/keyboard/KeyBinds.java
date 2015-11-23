@@ -77,7 +77,6 @@ public class KeyBinds {
     public static final String OPEN_DATABASE = "Open database";
     public static final String OPEN_FILE = "Open file";
     public static final String OPEN_FOLDER = "Open folder";
-    public static final String OPEN_PDF_OR_PS = "Open PDF or PS";
     public static final String OPEN_SPIRES_ENTRY = "Open SPIRES entry";
     public static final String OPEN_URL_OR_DOI = "Open URL or DOI";
     public static final String PASTE = "Paste";
@@ -168,7 +167,6 @@ public class KeyBinds {
         keyBindMap.put(DELETE, "DELETE");
         keyBindMap.put(OPEN_FILE, "F4");
         keyBindMap.put(OPEN_FOLDER, "ctrl shift O");
-        keyBindMap.put(OPEN_PDF_OR_PS, "shift F5");
         keyBindMap.put(OPEN_URL_OR_DOI, "F3");
         keyBindMap.put(OPEN_SPIRES_ENTRY, "ctrl F3");
         keyBindMap.put(TOGGLE_ENTRY_PREVIEW, "ctrl F9");

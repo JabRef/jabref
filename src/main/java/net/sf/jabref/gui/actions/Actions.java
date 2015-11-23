@@ -38,7 +38,6 @@ public class Actions {
     public static final String MERGE_DOI = "mergeWithDOI";
     public static final String MOVE_TO_GROUP = "moveToGroup";
     public static final String OPEN_EXTERNAL_FILE = "openExternalFile";
-    public static final String OPEN_FILE = "openFile";
     public static final String OPEN_FOLDER = "openFolder";
     public static final String OPEN_SPIRES = "openSpires";
     public static final String OPEN_URL = "openUrl";
