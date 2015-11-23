@@ -1256,7 +1256,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         search.add(dupliCheck);
         search.add(resolveDuplicateKeys);
         //search.add(strictDupliCheck);
-        search.add(autoSetFile);
         search.addSeparator();
         search.add(generalFetcher.getAction());
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
@@ -1327,6 +1326,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(openPdf);
         tools.add(openUrl);
         //tools.add(openSpires);
+        tools.addSeparator();
+        tools.add(autoSetFile);
         tools.add(findUnlinkedFiles);
         tools.add(autoLinkFile);
         tools.addSeparator();
