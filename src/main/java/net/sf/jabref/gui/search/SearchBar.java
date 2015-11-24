@@ -26,6 +26,7 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
+import net.sf.jabref.logic.search.SearchQueryLocalizer;
 import net.sf.jabref.logic.search.SearchTextObservable;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.Log;
@@ -104,7 +105,7 @@ public class SearchBar extends JPanel {
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
         openCurrentResultsInDialog.addActionListener(ae -> {
             SearchResultsDialog searchDialog = new SearchResultsDialog(basePanel.frame(), Localization.lang("Search results in database %0 for %1",
-                    basePanel.getDatabaseFile().getName(), this.getSearchQuery().toString()));
+                    basePanel.getDatabaseFile().getName(), SearchQueryLocalizer.localize(this.getSearchQuery())));
             basePanel.getDatabase().getEntries().stream().filter(BibtexEntry::isSearchHit).forEach(entry -> searchDialog.addEntry(entry, basePanel));
             searchDialog.selectFirstEntry();
             searchDialog.setVisible(true);
@@ -271,18 +272,7 @@ public class SearchBar extends JPanel {
      * Focuses the search field if it is not focused. Otherwise, cycles to the next search type.
      */
     public void focus() {
-        if (searchField.hasFocus()) {
-
-            switch (getSearchMode()) {
-            case FLOAT:
-                setSearchMode(SearchMode.FILTER);
-                break;
-            case FILTER:
-                setSearchMode(SearchMode.FLOAT);
-                break;
-
-            }
-        } else {
+        if (!searchField.hasFocus()) {
             searchField.requestFocus();
         }
     }
@@ -318,7 +308,7 @@ public class SearchBar extends JPanel {
         }
 
         SearchQuery searchQuery = getSearchQuery();
-        LOGGER.info("Searching " + searchQuery.toString() + " in " + basePanel.getTabTitle());
+        LOGGER.debug("Searching " + searchQuery.toString() + " in " + basePanel.getTabTitle());
 
         if (!searchQuery.isValidQuery()) {
             basePanel.output(Localization.lang("Search failed: illegal search expression"));

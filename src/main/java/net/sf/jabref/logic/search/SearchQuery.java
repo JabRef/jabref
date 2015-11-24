@@ -51,17 +51,17 @@ public class SearchQuery {
 
     private String getCaseSensitiveDescription() {
         if (caseSensitive) {
-            return Localization.lang("case sensitive");
+            return "case sensitive";
         } else {
-            return Localization.lang("case insensitive");
+            return "case insensitive";
         }
     }
 
     private String getRegularExpressionDescription() {
         if (regularExpression) {
-            return Localization.lang("regular expression");
+            return "regular expression";
         } else {
-            return Localization.lang("plain text");
+            return "plain text";
         }
     }
 
