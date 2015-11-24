@@ -548,7 +548,7 @@ public class JabRefPreferences {
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_MODE_LIVE_FILTER, Boolean.TRUE);
 
-        defaults.put(SEARCH_REG_EXP, Boolean.TRUE);
+        defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_PANE_POS_X, 0);
         defaults.put(SEARCH_PANE_POS_Y, 0);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
