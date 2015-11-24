@@ -1,8 +1,18 @@
 import org.gradle.internal.os.OperatingSystem
 
+buildscript {
+    repositories {
+        maven {
+            url 'http://maven.ej-technologies.com/repository'
+        }
+    }
+    dependencies {
+        classpath group: 'com.install4j', name: 'gradle-plugin', version: '6.0'
+    }
+}
+
 plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.2'
-    id "edu.sc.seis.launch4j" version "1.1.4"
     id "com.github.kt3k.coveralls" version "2.4.0x"
     id "edu.sc.seis.macAppBundle" version "2.1.1"
     id "com.github.youribonnaffe.gradle.format" version "1.2"
@@ -14,6 +24,8 @@ apply plugin: "application"
 apply plugin: "project-report"
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'install4j'
+
 apply from: 'eclipse.gradle'
 
 // HACK to disable coverityCheck task when not on CI server
@@ -30,10 +42,14 @@ gradle.taskGraph.whenReady { taskGraph ->
 group = "net.sf.jabref"
 version = "3.0dev"
 project.ext.threeDotVersion = "3.0.0.0"
-project.ext.nsisExec = hasProperty("nsisExec") ? getProperty("nsisExec") : "C:/Program Files/NSIS/makensis.exe"
+project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = "net.sf.jabref.JabRefMain"
+
+install4j {
+    installDir = file(project.ext.install4jDir)
+}
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.9'
@@ -78,8 +94,6 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
-
-    compile 'net.java.dev.jna:jna:4.2.1'
 
     compile 'com.google.guava:guava:18.0'
 
@@ -258,8 +272,6 @@ shadowJar {
     classifier 'fat'
 }
 
-
-
 /*
  * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
  */
@@ -293,22 +305,27 @@ if (hasProperty('dev')) {
     project.version += "--snapshot--" + infoString
 }
 
-task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar"]) {
+// has to be defined AFTER 'dev' things to have the correct project.version
+task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
+    projectFile = file('jabref.install4j')
+    variables = [
+        versionFourDots: project.ext.threeDotVersion,
+        buildFileName: jar.archiveName,
+        version: project.version
+    ]
+
+    doLast {
+        copy {
+            from "build/install4j"
+            into "build/releases"
+        }
+    }
+}
+
+task release(dependsOn: ["media", "releaseJar"]) {
     group = 'JabRef - Release'
     description 'Creates a release for all target platforms.'
 }
-
-launch4j {
-    mainClassName = project.mainClassName
-    version = project.ext.threeDotVersion
-    textVersion = project.version
-    jar = "../libs/JabRef-${project.version}-fat.jar"
-    icon = "${projectDir}/src/main/resources/images/icons/JabRef.ico"
-    copyright = "JabRef developers"
-    initialHeapSize = 32
-    maxHeapSize = 512
-}
-createExe.dependsOn "shadowJar"
 
 task releaseJar(dependsOn: "shadowJar") {
     group = 'JabRef - Release'
@@ -324,69 +341,6 @@ task releaseJar(dependsOn: "shadowJar") {
             }
         }
     }
-}
-
-task releaseWindows(dependsOn: "launch4j") {
-    group = 'JabRef - Release'
-    description "Creates a Windows release."
-
-    doLast {
-        copy {
-            from("$projectDir/LICENSE")
-            from("$projectDir/buildres/JabRef.VisualElementsManifest.xml")		
-            from("$projectDir/README.md")
-            from("$buildDir/launch4j/JabRef.exe")
-            into("$buildDir/nsis")
-        }
-        if (OperatingSystem.current().isWindows()) {
-            exec {
-               commandLine project.ext.nsisExec, "/DVERSION=${version}", "${projectDir}/buildres/nsis/setup.nsi"
-            }
-        } else {
-            exec {
-                commandLine project.ext.nsisExec, "-DVERSION=${version}", "${projectDir}/buildres/nsis/setup.nsi"
-            }
-        }
-        copy {
-            from("$buildDir/nsis/JabRefSetup-${version}.exe")
-            from("$buildDir/nsis/JabRef.exe")
-            into("$buildDir/releases")
-        }
-    }
-}
-
-if(!OperatingSystem.current().isMacOsX()) {
-    // disable this task as it requires a command line tool only available on Mac OS X
-    createDmg.enabled = false
-}
-
-task releaseMac(dependsOn: "createAppZip") {
-    group = 'JabRef - Release'
-    description "Creates an OSX release."
-
-    doLast {
-        copy {
-            from "$buildDir/distributions/JabRef-${project.version}.zip"
-            into "$buildDir/releases"
-            rename { String fileName ->
-                fileName.replace('.zip', '-OSX.zip')
-            }
-        }
-    }
-}
-
-macAppBundle {
-    mainClassName = project.mainClassName
-    icon = "src/main/resources/images/icons/JabRef-Logo.icns"
-    highResolutionCapable = true
-
-    def map = [
-            "CFBundleTypeName"      : "BibTeX file",
-            "CFBundleTypeRole"      : "Editor",
-            "CFBundleTypeIconFile"  : "JabRef-Logo.icns",
-            "CFBundleTypeExtensions": ["bib"]
-    ]
-    bundleExtras.put("CFBundleDocumentTypes", [map])
 }
 
 // fetch all dependencies to speedup CircleCI build

@@ -33,7 +33,6 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.nativeext.PinToTaskbar;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -78,12 +77,6 @@ public class JabRef {
 
 
     public void start(String[] args) {
-        // Native extensions
-        if (OS.isWindows7OrLater()) {
-            // activate pin to taskbar for Windows 7 and up
-            PinToTaskbar.enablePinToTaskbar();
-        }
-
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         if (prefs.getBoolean(JabRefPreferences.USE_PROXY)) {

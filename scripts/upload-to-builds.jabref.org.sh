@@ -25,7 +25,10 @@ if [ "snapshot" != "$branch" ] ; then
   command="${command}mkdir $branch\ncd $branch\n"
 fi
 
-command="${command}mput build/releases/*\nexit"
+#only upload [Jr]ab[Rr]ef*, not md5sums, updates.xml, etc.
+command="${command}mput build/releases/jabref*\n"
+command="${command}mput build/releases/JabRef*\n"
+command="${command}exit\n"
 
 # now $command is complete
 
