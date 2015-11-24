@@ -22,6 +22,8 @@ import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.search.SearchTextListener;
 import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -38,6 +40,8 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
+
+    private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
 
     private List<String> wordsToHighlight;
 
@@ -68,13 +72,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         Document doc = getDocument();
 
         // Listen for undo and redo events
-        doc.addUndoableEditListener(new UndoableEditListener() {
-
-            @Override
-            public void undoableEditHappened(UndoableEditEvent evt) {
-                undo.addEdit(evt.getEdit());
-            }
-        });
+        doc.addUndoableEditListener(evt -> undo.addEdit(evt.getEdit()));
 
         // Create an undo action and add it to the text component
         getActionMap().put("Undo", new AbstractAction("Undo") {
@@ -158,7 +156,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
                 highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
             } catch (BadLocationException ble) {
                 // should not occur if matcher works right
-                System.out.println(ble);
+                LOGGER.warn("Highlighting not possible, bad location", ble);
             }
         }
 

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SearchObservable {
+public class SearchTextObservable {
 
     private final ArrayList<SearchTextListener> listeners = new ArrayList<>();
 

@@ -62,4 +62,5 @@ public class JSearchTextField extends JTextField implements FocusListener {
     public void focusLost(FocusEvent e) {
         this.repaint();
     }
+
 }

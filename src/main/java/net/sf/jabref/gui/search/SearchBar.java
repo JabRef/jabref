@@ -25,23 +25,27 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchObservable;
 import net.sf.jabref.logic.search.SearchQuery;
+import net.sf.jabref.logic.search.SearchTextObservable;
 import net.sf.jabref.model.entry.BibtexEntry;
+import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * The search bar at the top of the screen allowing the user to search his database.
  */
 public class SearchBar extends JPanel {
 
+    private static final Log LOGGER = LogFactory.getLog(SearchBar.class);
+
     public static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
     public static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
+    private final JButton openCurrentResultsInDialog;
+    private final JButton globalSearch;
 
     private SearchQuery getSearchQuery() {
         return new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
@@ -56,10 +60,13 @@ public class SearchBar extends JPanel {
             this.searchField.setBackground(RESULTS_FOUND_COLOR);
         }
         this.searchField.setToolTipText("<html>" + description + "</html>");
+
+        globalSearch.setEnabled(true);
+        openCurrentResultsInDialog.setEnabled(true);
     }
 
     private final BasePanel basePanel;
-    private final SearchObservable searchObservable;
+    private final SearchTextObservable searchTextObservable;
 
     private final JSearchTextField searchField;
 
@@ -73,8 +80,6 @@ public class SearchBar extends JPanel {
 
     AutoCompleteSupport<String> autoCompleteSupport;
 
-    private final SearchWorker worker;
-
     /**
      * Initializes the search bar.
      *
@@ -83,10 +88,8 @@ public class SearchBar extends JPanel {
     public SearchBar(BasePanel basePanel) {
         super();
 
-        this.basePanel = basePanel;
-        this.searchObservable = new SearchObservable();
-
-        worker = new SearchWorker(basePanel);
+        this.basePanel = Objects.requireNonNull(basePanel);
+        this.searchTextObservable = new SearchTextObservable();
 
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
 
@@ -97,7 +100,7 @@ public class SearchBar extends JPanel {
         regularExp.addItemListener(ae -> performSearch());
         regularExp.addItemListener(ae -> updatePrefs());
 
-        JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
+        openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
         openCurrentResultsInDialog.addActionListener(ae -> {
             SearchResultsDialog searchDialog = new SearchResultsDialog(basePanel.frame(), Localization.lang("Search results in database %0 for %1",
@@ -106,6 +109,7 @@ public class SearchBar extends JPanel {
             searchDialog.selectFirstEntry();
             searchDialog.setVisible(true);
         });
+        openCurrentResultsInDialog.setEnabled(false);
 
         // Init controls
         setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -126,13 +130,14 @@ public class SearchBar extends JPanel {
         toolBar.add(button);
         toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);
-        JButton globalSearch = new JButton(Localization.lang("Search globally"));
+        globalSearch = new JButton(Localization.lang("Search globally"));
         globalSearch.setToolTipText(Localization.lang("Search in all open databases"));
         globalSearch.addActionListener(l -> {
             AbstractWorker worker = new GlobalSearchWorker(basePanel.frame(), getSearchQuery());
             worker.run();
             worker.update();
         });
+        globalSearch.setEnabled(false);
         toolBar.add(globalSearch);
         toolBar.addSeparator();
         toolBar.add(new HelpAction(basePanel.frame().helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
@@ -148,7 +153,7 @@ public class SearchBar extends JPanel {
         for (Component component : container.getComponents()) {
             component.setBackground(Color.WHITE);
 
-            if(component instanceof Container) {
+            if (component instanceof Container) {
                 paintBackgroundWhite((Container) component);
             }
         }
@@ -185,7 +190,7 @@ public class SearchBar extends JPanel {
             searchMethod.add(getSearchModeMenuItem(mode));
 
             // Listen to selection changed events
-            getSearchModeMenuItem(mode).addChangeListener(e -> performSearch());
+            getSearchModeMenuItem(mode).addItemListener(e -> performSearch());
         }
     }
 
@@ -208,26 +213,7 @@ public class SearchBar extends JPanel {
         searchField.addActionListener(e -> performSearch());
 
         // Subscribe to changes to the text in the search field in order to "live search"
-        // TODO: With this implementation "onSearchTextChanged" gets called two times when setText() is invoked (once for removing the initial string and then again for inserting the new one). This happens for example when an autocompletion is accepted.
-        searchField.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                LogFactory.getLog(SearchBar.class).debug("Text insert: " + e.toString());
-                onSearchTextChanged();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                LogFactory.getLog(SearchBar.class).debug("Text remove: " + e.toString());
-                onSearchTextChanged();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                LogFactory.getLog(SearchBar.class).debug("Text updated: " + e.toString());
-            }
-        });
+        JTextFieldChangeListenerUtil.addChangeListener(searchField, e -> performSearch());
 
         return searchField;
     }
@@ -240,9 +226,9 @@ public class SearchBar extends JPanel {
         case FLOAT:
             return modeFloat;
         case FILTER:
+        default:
             return modeLiveFilter;
         }
-        return null;
     }
 
     /**
@@ -302,30 +288,23 @@ public class SearchBar extends JPanel {
     }
 
     /**
-     * Reacts to the change of the search text. A change in the search query results in an immediate search in
-     * incremental or live filter search mode.
-     */
-    private void onSearchTextChanged() {
-        if ((getSearchMode() == SearchMode.FILTER) || (getSearchMode() == SearchMode.FLOAT)) {
-            // wait until the text is changed
-            SwingUtilities.invokeLater(this::performSearch);
-        }
-    }
-
-    /**
-     * Clears (asynchronously) the current search. This includes resetting the search text.
+     * Clears the current search. This includes resetting the search text.
      */
     private void clearSearch() {
-        SwingUtilities.invokeLater(() -> {
-            worker.restart();
+        searchField.setText("");
+        searchField.setBackground(Color.WHITE);
 
-            searchField.setText("");
-            searchField.setBackground(Color.WHITE);
+        searchTextObservable.fireSearchlistenerEvent(null);
 
-            searchObservable.fireSearchlistenerEvent(null);
+        this.currentResults.setText("");
 
-            this.currentResults.setText("");
-        });
+        if (basePanel.isShowingFloatSearch()) {
+            basePanel.mainTable.stopShowingFloatSearch();
+        }
+        basePanel.showAllEntries();
+
+        globalSearch.setEnabled(false);
+        openCurrentResultsInDialog.setEnabled(false);
     }
 
     /**
@@ -338,15 +317,8 @@ public class SearchBar extends JPanel {
             return;
         }
 
-        if (basePanel == null) {
-            return;
-        }
-
         SearchQuery searchQuery = getSearchQuery();
-
-        // Notify others about the search
-        // TODO SIMON should be done in update method
-        searchObservable.fireSearchlistenerEvent(getSearchQuery());
+        LOGGER.info("Searching " + searchQuery.toString() + " in " + basePanel.getTabTitle());
 
         if (!searchQuery.isValidQuery()) {
             basePanel.output(Localization.lang("Search failed: illegal search expression"));
@@ -354,7 +326,7 @@ public class SearchBar extends JPanel {
             return;
         }
 
-        worker.initSearch(searchQuery, getSearchMode());
+        SearchWorker worker = new SearchWorker(basePanel, searchQuery, getSearchMode());
         worker.getWorker().run();
         worker.getCallBack().update();
     }
@@ -368,7 +340,13 @@ public class SearchBar extends JPanel {
         this.autoCompleteSupport.setAutoCompleter(searchCompleter);
     }
 
-    public SearchObservable getSearchObservable() {
-        return searchObservable;
+    public SearchTextObservable getSearchTextObservable() {
+        return searchTextObservable;
+    }
+
+    public boolean isStillValidQuery(SearchQuery query) {
+        return query.query.equals(this.searchField.getText())
+                && query.regularExpression == regularExp.isSelected()
+                && query.caseSensitive == caseSensitive.isSelected();
     }
 }

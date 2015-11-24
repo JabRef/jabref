@@ -169,23 +169,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private SaveDatabaseAction saveAction;
 
-    private boolean showingSearch;
-
-    public boolean sortingBySearchResults;
-    public boolean coloringBySearchResults;
-    public boolean hidingNonHits;
     public boolean sortingByGroup;
     public boolean sortingByCiteSeerResults;
     public boolean coloringByGroup;
-
-    int lastSearchHits = -1; // The number of hits in the latest search.
-    // Potential use in hiding non-hits completely.
 
     // MetaData parses, keeps and writes meta data.
     public final MetaData metaData;
 
     private final HashMap<String, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
+
     private final SearchBar searchBar;
 
     // Returns a collection of AutoCompleters, which are populated from the current database
@@ -1733,26 +1726,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    /*
-    public void refreshTable() {
-        //System.out.println("hiding="+hidingNonHits+"\tlastHits="+lastSearchHits);
-        // This method is called by EntryTypeForm when a field value is
-        // stored. The table is scheduled for repaint.
-        entryTable.assureNotEditing();
-        //entryTable.invalidate();
-        BibtexEntry[] bes = entryTable.getSelectedEntries();
-    if (hidingNonHits)
-        tableModel.update(lastSearchHits);
-    else
-        tableModel.update();
-    //tableModel.remap();
-        if ((bes != null) && (bes.length > 0))
-            selectEntries(bes, 0);
-
-    //long toc = System.currentTimeMillis();
-    //	LOGGER.debug("Refresh took: "+(toc-tic)+" ms");
-    } */
-
     public void updatePreamble() {
         if (preambleEditor != null) {
             preambleEditor.updatePreamble();
@@ -1966,16 +1939,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * given focus afterwards.
      */
     public void highlightEntry(final BibtexEntry be) {
-        //SwingUtilities.invokeLater(new Thread() {
-        //     public void run() {
         final int row = mainTable.findEntry(be);
         if (row >= 0) {
             mainTable.setRowSelectionInterval(row, row);
             //entryTable.setActiveRow(row);
             mainTable.ensureVisible(row);
         }
-        //     }
-        //});
     }
 
     /**
@@ -1990,33 +1959,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 splitPane.getHeight() - splitPane.getDividerLocation());
         selectionListener.entryEditorClosing(editor);
     }
-
-    /**
-     * This method selects the given enties. If an entryEditor is shown, it is given focus afterwards.
-     */
-    /*public void selectEntries(final BibtexEntry[] bes, final int toScrollTo) {
-
-        SwingUtilities.invokeLater(new Thread() {
-             public void run() {
-                 int rowToScrollTo = 0;
-                 entryTable.revalidate();
-                 entryTable.clearSelection();
-                 loop: for (int i=0; i<bes.length; i++) {
-                    if (bes[i] == null)
-                        continue loop;
-                    int row = tableModel.getNumberFromName(bes[i].getId());
-                    if (i==toScrollTo)
-                    rowToScrollTo = row;
-                    if (row >= 0)
-                        entryTable.addRowSelectionIntervalQuietly(row, row);
-                 }
-                 entryTable.ensureVisible(rowToScrollTo);
-                 Component comp = splitPane.getBottomComponent();
-                 //if (comp instanceof EntryEditor)
-                 //    comp.requestFocus();
-             }
-        });
-    } */
 
     /**
      * Closes the entry editor if it is showing the given entry.
@@ -2125,52 +2067,25 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.scrollToCenter(pos, 0);
     }
 
-    /* *
-     * Selects all entries with a non-zero value in the field
-     * @param field <code>String</code> field name.
+    /**
+     * used to cache whether filtering is on/off as this information cannot be retrieved from the FilterList
      */
-    /*    public void selectResults(String field) {
-          LinkedList intervals = new LinkedList();
-          int prevStart = -1, prevToSel = 0;
-          // First we build a list of intervals to select, without touching the table.
-          for (int i = 0; i < entryTable.getRowCount(); i++) {
-            String value = (String) (database.getEntryById
-                                     (tableModel.getIdForRow(i)))
-                .getField(field);
-            if ( (value != null) && !value.equals("0")) {
-              if (prevStart < 0)
-                prevStart = i;
-              prevToSel = i;
-            }
-            else if (prevStart >= 0) {
-              intervals.add(new int[] {prevStart, prevToSel});
-              prevStart = -1;
-            }
-          }
-          // Then select those intervals, if any.
-          if (intervals.size() > 0) {
-            entryTable.setSelectionListenerEnabled(false);
-            entryTable.clearSelection();
-            for (Iterator i=intervals.iterator(); i.hasNext();) {
-              int[] interval = (int[])i.next();
-              entryTable.addRowSelectionInterval(interval[0], interval[1]);
-            }
-            entryTable.setSelectionListenerEnabled(true);
-          }
-      */
+    private boolean isFilteringActive = false;
 
-    public void setSearchMatcher(SearchMatcher matcher) {
-        searchFilterList.setMatcher(matcher);
-        showingSearch = true;
+    public void showOnlyMatchedEntries() {
+        if(!isFilteringActive) {
+            searchFilterList.setMatcher(SearchMatcher.INSTANCE);
+        }
+    }
+
+    public void showAllEntries() {
+        if(isFilteringActive) {
+            searchFilterList.setMatcher(NoSearchMatcher.INSTANCE);
+        }
     }
 
     public void setGroupMatcher(Matcher<BibtexEntry> matcher) {
         groupFilterList.setMatcher(matcher);
-    }
-
-    public void stopShowingSearchResults() {
-        searchFilterList.setMatcher(NoSearchMatcher.INSTANCE);
-        showingSearch = false;
     }
 
     public void stopShowingGroup() {
@@ -2184,15 +2099,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public boolean isShowingFloatSearch() {
         return mainTable.isShowingFloatSearch();
-    }
-
-    /**
-     * Query whether this BasePanel is in the mode where a filter search result is shown.
-     *
-     * @return true if showing filter search, false otherwise.
-     */
-    public boolean isShowingFilterSearch() {
-        return showingSearch;
     }
 
     public BibtexDatabase getDatabase() {

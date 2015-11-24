@@ -19,7 +19,7 @@ public class ContentAutoCompleters extends AutoCompleters {
     public ContentAutoCompleters(BibtexDatabase database, MetaData metaData) {
         String[] completeFields = Globals.prefs.getStringArray(JabRefPreferences.AUTO_COMPLETE_FIELDS);
         for (String field : completeFields) {
-            AutoCompleter autoCompleter = AutoCompleterFactory.getFor(field);
+            AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(field);
             put(field, autoCompleter);
         }
 
