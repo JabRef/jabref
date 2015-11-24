@@ -129,8 +129,8 @@ public class MainTable extends JTable {
 
         searchMatcher = null;
         groupMatcher = null;
-        searchComparator = null;//new HitOrMissComparator(searchMatcher);
-        groupComparator = null;//new HitOrMissComparator(groupMatcher);
+        searchComparator = null;
+        groupComparator = null;
 
         EventTableModel<BibtexEntry> tableModel = new EventTableModel<>(sortedForGrouping, tableFormat);
         setModel(tableModel);
@@ -156,9 +156,6 @@ public class MainTable extends JTable {
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
 
         this.tableColumnListener = new PersistenceTableColumnListener(this);
-        /*if (Globals.prefs.getBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY)) {
-            getColumnModel().addColumnModelListener(this.tableColumnListener );
-        }*/
 
         // TODO: Figure out, whether this call is needed.
         getSelected();
@@ -200,6 +197,7 @@ public class MainTable extends JTable {
         searchMatcher = m;
         searchComparator = new HitOrMissComparator(m);
         refreshSorting();
+
         scrollTo(0);
     }
 

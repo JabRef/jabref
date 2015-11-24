@@ -82,9 +82,11 @@ class SearchWorker extends AbstractWorker {
         switch (mode) {
         case FLOAT:
             basePanel.mainTable.showFloatSearch(SearchMatcher.INSTANCE);
+            basePanel.showAllEntries();
             break;
         case FILTER:
             basePanel.showOnlyMatchedEntries();
+            basePanel.mainTable.stopShowingFloatSearch();
             break;
         }
 
