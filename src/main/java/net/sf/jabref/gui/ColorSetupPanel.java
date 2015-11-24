@@ -124,8 +124,6 @@ public class ColorSetupPanel extends JPanel {
      * Includes a method to produce a Default button for this setting.
      */
     class ColorButton extends JButton implements Icon {
-
-        private static final long serialVersionUID = -1974112633706382299L;
         private Color color = Color.white;
         private final String key;
         private final String name;

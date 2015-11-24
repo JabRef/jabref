@@ -83,9 +83,6 @@ public class FileListEntryEditor {
         this.metaData = metaData;
 
         AbstractAction okAction = new AbstractAction() {
-
-            private static final long serialVersionUID = -1277323545446098878L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 // If OK button is disabled, ignore this event:
@@ -163,9 +160,6 @@ public class FileListEntryEditor {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
-
-            private static final long serialVersionUID = 5291749955917931883L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();

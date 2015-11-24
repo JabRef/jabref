@@ -81,10 +81,13 @@ public class BibtexEntry {
     }
 
     /**
-     * @return an array describing the required fields for this entry. "null" if no fields are required
+     * Returns all required field names.
+     * No OR relationships are captured here.
+     *
+     * @return a List of required field name Strings
      */
-    public List<String> getRequiredFields() {
-        return type.getRequiredFields();
+    public List<String> getRequiredFieldsFlat() {
+        return type.getRequiredFieldsFlat();
     }
 
     /**

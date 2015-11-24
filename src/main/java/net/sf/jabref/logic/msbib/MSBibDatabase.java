@@ -34,11 +34,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * Microsoft Word bibliography.
+ *
+ * See http://www.ecma-international.org/publications/standards/Ecma-376.htm
+ */
 public class MSBibDatabase {
+    private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
 
     private Set<MSBibEntry> entries;
-
-    private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
 
     public MSBibDatabase() {
         // maybe make this sorted later...

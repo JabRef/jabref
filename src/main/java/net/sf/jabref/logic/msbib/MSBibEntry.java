@@ -29,6 +29,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -62,9 +63,9 @@ import org.w3c.dom.NodeList;
  * @version 2.0.0
  * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
  * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
+ * See http://www.ecma-international.org/publications/standards/Ecma-376.htm
  */
 class MSBibEntry {
-
     private static final Log LOGGER = LogFactory.getLog(MSBibEntry.class);
 
     private String sourceType = "Misc";
@@ -154,17 +155,11 @@ class MSBibEntry {
 
     private final String bcol = "b:";
 
-
-    private MSBibEntry() {
-    }
-
     public MSBibEntry(BibtexEntry bibtex) {
-        this();
         populateFromBibtex(bibtex);
     }
 
     public MSBibEntry(Element entry, String bcol) {
-        this();
         populateFromXml(entry, bcol);
     }
 
@@ -316,7 +311,9 @@ class MSBibEntry {
         }
 
         if (bibtex.getField("title") != null) {
-            title = bibtex.getField("title");
+            String temp = bibtex.getField("title");
+            // TODO: remove LaTex syntax
+            title = new RemoveBrackets().format(temp);
         }
         if (bibtex.getField("year") != null) {
             year = bibtex.getField("year");

@@ -70,6 +70,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Feature: New LabelPattern `[keywordsN]`, where N is optional. Returns the first N keywords. If no N is specified ("`[keywords]`"), all keywords are returned. Spaces are removed.
  - Update supported LookAndFeels
  - Show replaced journal abbreviations on console
+ - The three options to manage file references are moved to their own separated group in the Tools menu. 
 
 ### Fixed
  - Fixed the bug that the file encoding was not correctly determined from the first (or second) line
@@ -110,6 +111,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Remove option to disable autocompleters for search and make this always one
  - Remove option to highlight matches and make this always one when not using regex or grammar-based search
  
+ - Remove option Tools -> Open PDF or PS which is replaced by Tools -> Open File
+
 ## 2.80 - never released
 
 Version 2.80 was intended as intermediate step to JabRef 3.0.

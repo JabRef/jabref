@@ -73,9 +73,6 @@ import com.jgoodies.forms.layout.FormLayout;
  * * Either set field, or clear field.
  */
 public class ManageKeywordsAction extends MnemonicAwareAction {
-
-    private static final long serialVersionUID = -5234432936032780873L;
-
     private final JabRefFrame frame;
 
     private JDialog diag;
@@ -161,9 +158,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
-
-            private static final long serialVersionUID = -4623988526737916508L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 cancelled = true;

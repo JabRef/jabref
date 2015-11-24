@@ -130,7 +130,7 @@ public class BibtexEntryWriter {
         boolean hasWritten = writeField(entry, out, "title", false);
         writtenFields.add("title");
 
-        if (entry.getRequiredFields() != null) {
+        if (entry.getRequiredFieldsFlat() != null) {
             List<String> requiredFields = getRequiredFieldsSorted(entry);
             for (String value : requiredFields) {
                 if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
@@ -173,9 +173,9 @@ public class BibtexEntryWriter {
         String entryTypeName = entry.getType().getName();
         List<String> sortedFields = requiredFieldsSorted.get(entryTypeName);
 
-        // put into chache if necessary
+        // put into cache if necessary
         if (sortedFields == null) {
-            sortedFields = new ArrayList<>(entry.getRequiredFields());
+            sortedFields = new ArrayList<>(entry.getRequiredFieldsFlat());
             Collections.sort(sortedFields);
             requiredFieldsSorted.put(entryTypeName, sortedFields);
         }
@@ -214,7 +214,7 @@ public class BibtexEntryWriter {
         written.add(BibtexEntry.KEY_FIELD);
         boolean hasWritten = false;
         // Write required fields first.
-        List<String> fields = entry.getRequiredFields();
+        List<String> fields = entry.getRequiredFieldsFlat();
         if (fields != null) {
             for (String value : fields) {
                 hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
