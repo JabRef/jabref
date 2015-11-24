@@ -34,6 +34,9 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Objects;
 
 /**
@@ -202,6 +205,16 @@ public class SearchBar extends JPanel {
         JSearchTextField searchField = new JSearchTextField();
         searchField.setTextWhenNotFocused(Localization.lang("Search..."));
         searchField.setColumns(30);
+
+        searchField.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if(e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE) {
+                    basePanel.mainTable.requestFocus();
+                }
+            }
+        });
 
         // Add autocompleter
         autoCompleteSupport = new AutoCompleteSupport<>(searchField);
