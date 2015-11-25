@@ -37,7 +37,7 @@ public class Layout {
 
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
-    public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception {
+    public Layout(Vector<StringInt> parsedEntries, String classPrefix) {
         StringInt si;
         Vector<LayoutEntry> tmpEntries = new Vector<>(parsedEntries.size());
 

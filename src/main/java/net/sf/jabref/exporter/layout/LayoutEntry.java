@@ -60,7 +60,7 @@ class LayoutEntry {
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
 
-    public LayoutEntry(StringInt si, String classPrefix_) throws Exception {
+    public LayoutEntry(StringInt si, String classPrefix_) {
         type = si.i;
         classPrefix = classPrefix_;
 
@@ -96,7 +96,7 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) throws Exception {
+    public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) {
         classPrefix = classPrefix_;
         String blockStart;
         String blockEnd;

@@ -1675,7 +1675,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // otherwise set the bottom component to null.
         if (mode == BasePanel.SHOWING_PREVIEW) {
             mode = BasePanel.SHOWING_NOTHING;
-            int row = mainTable.findEntry(currentPreview.entry);
+            int row = mainTable.findEntry(currentPreview.getEntry());
             if (row >= 0) {
                 mainTable.setRowSelectionInterval(row, row);
             }
