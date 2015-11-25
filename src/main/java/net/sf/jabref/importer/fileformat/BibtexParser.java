@@ -281,7 +281,7 @@ public class BibtexParser {
                             parserResult
                                     .addWarning(Localization.lang("Empty BibTeX key") + ": "
                                     + be.getAuthorTitleYear(40) + " ("
-                                    + Localization.lang("grouping may not work for this entry") + ")");
+                                    + Localization.lang("Grouping may not work for this entry.") + ")");
                         }
                     } catch (IOException ex) {
                         LOGGER.warn("Could not parse entry", ex);
