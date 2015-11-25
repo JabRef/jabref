@@ -4,15 +4,13 @@ machine:
 
 dependencies:
   pre:
-    - sudo apt-get update; sudo apt-get install nsis git
-    - wget http://www.mirrorservice.org/sites/downloads.sourceforge.net/l/la/launch4j/launch4j-3/3.8/launch4j-3.8-linux.tgz
-    - tar xzf launch4j-3.8-linux.tgz
-    - chmod +x launch4j/launch4j
-    - wget http://nsis.sourceforge.net/mediawiki/images/5/54/WinShell.zip
-    - unzip WinShell.zip
-    - sudo cp Plugins/x86-ansi/WinShell.dll /usr/share/nsis/Plugins/
+    - scripts/prepare-install4j.sh
+    - install4j6/bin/install4jc --verbose --license=$INSTALL4J_KEY
   override:
     - TERM=dumb ./gradlew getdeps
+  cache_directories:
+    - "~/.install4j6"
+    - "~/downloads"
 
 test:
   override:
@@ -23,7 +21,7 @@ test:
     - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
     - TERM=dumb ./gradlew jacocoTestReport coveralls
     - bash <(curl -s https://codecov.io/bash)
-    - export PATH=$PATH:`pwd`/launch4j && TERM=dumb ./gradlew -Pdev=true -PnsisExec="/usr/bin/makensis" release --stacktrace
+    - TERM=dumb ./gradlew -Pdev=true -Pinstall4jDir="install4j6" release --stacktrace
     - timeout 580 scripts/upload-to-builds.jabref.org.sh || exit 0
 
 general:

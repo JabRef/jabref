@@ -77,11 +77,6 @@ Project: Glazed Lists
 URL:     http://www.glazedlists.com/
 License: LPGL 2.1! (not explicitly, but no comments in the source header) and MPL
 
-Id:      net.java.dev.jna:jna
-Project: Java Native Access (JNA)
-URL:     https://github.com/twall/jna
-License: LGPL 2.1+ and Apache 2.0
-
 Id:      org.apache.pdfbox:fontbox
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org

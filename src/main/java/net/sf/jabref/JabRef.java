@@ -33,7 +33,6 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.nativeext.PinToTaskbar;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -78,12 +77,6 @@ public class JabRef {
 
 
     public void start(String[] args) {
-        // Native extensions
-        if (OS.isWindows7OrLater()) {
-            // activate pin to taskbar for Windows 7 and up
-            PinToTaskbar.enablePinToTaskbar();
-        }
-
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         if (prefs.getBoolean(JabRefPreferences.USE_PROXY)) {
@@ -213,7 +206,7 @@ public class JabRef {
                 Globals.prefs.importPreferences(cli.getPreferencesImport());
                 CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
                 ExportFormats.initAllExports();
-            } catch (IOException ex) {
+            } catch (JabRefException ex) {
                 LOGGER.error("Cannot import preferences", ex);
             }
         }
@@ -407,7 +400,7 @@ public class JabRef {
         if (cli.isPreferencesExport()) {
             try {
                 Globals.prefs.exportPreferences(cli.getPreferencesExport());
-            } catch (IOException ex) {
+            } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
             }
         }

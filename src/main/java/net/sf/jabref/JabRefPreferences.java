@@ -406,8 +406,8 @@ public class JabRefPreferences {
             if (new File("jabref.xml").exists()) {
                 importPreferences("jabref.xml");
             }
-        } catch (IOException e) {
-            LOGGER.info("Could not import preferences from jabref.xml: " + e.getLocalizedMessage(), e);
+        } catch (JabRefException e) {
+            LOGGER.warn("Could not import preferences from jabref.xml: " + e.getMessage(), e);
         }
 
         // load user preferences
@@ -1153,8 +1153,8 @@ public class JabRefPreferences {
         if (getBoolean(MEMORY_STICK_MODE)) {
             try {
                 exportPreferences("jabref.xml");
-            } catch (IOException e) {
-                LOGGER.info("Could not save preferences for memory stick mode: " + e.getLocalizedMessage(), e);
+            } catch (JabRefException e) {
+                LOGGER.warn("Could not export preferences for memory stick mode: " + e.getMessage(), e);
             }
         }
         try {
@@ -1618,12 +1618,12 @@ public class JabRefPreferences {
      *
      * @param filename String File to export to
      */
-    public void exportPreferences(String filename) throws IOException {
+    public void exportPreferences(String filename) throws JabRefException {
         File f = new File(filename);
         try (OutputStream os = new FileOutputStream(f)) {
             prefs.exportSubtree(os);
-        } catch (BackingStoreException ex) {
-            throw new IOException(ex);
+        } catch (BackingStoreException | IOException ex) {
+            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"), ex);
         }
     }
 
@@ -1631,13 +1631,16 @@ public class JabRefPreferences {
      * Imports Preferences from an XML file.
      *
      * @param filename String File to import from
+     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException
+     *                         or an IOException
      */
-    public void importPreferences(String filename) throws IOException {
+    public void importPreferences(String filename) throws JabRefException {
         File f = new File(filename);
         try (InputStream is = new FileInputStream(f)) {
             Preferences.importPreferences(is);
-        } catch (InvalidPreferencesFormatException ex) {
-            throw new IOException(ex);
+        } catch (InvalidPreferencesFormatException | IOException ex) {
+            throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
+                    ex);
         }
     }
 

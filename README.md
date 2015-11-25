@@ -8,6 +8,8 @@
 [![Donation](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?item_name=JabRef+Bibliography+Manager&cmd=_donations&lc=US&currency_code=EUR&business=jabrefmail%40gmail.com)
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=koppor&url=https%3A%2F%2Fgithub.com%2FJabRef%2Fjabref&title=JabRef&language=Java&tags=github&category=software)
 [![Download JabRef](https://img.shields.io/sourceforge/dw/jabref.svg)](http://sourceforge.net/projects/jabref/files/jabref/)
+[![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/pr)](http://www.issuestats.com/github/jabref/jabref)
+[![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/issue)](http://www.issuestats.com/github/jabref/jabref)
 
 This version is a development version. Features may not work as expected.
 
@@ -17,6 +19,8 @@ The intention of this branch is to move JabRef forward to modern technologies su
 The last version with Java6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
 The development builds are available at [builds.jabref.org](http://builds.jabref.org/)
+
+We use [install4j], the multi-platform installer builder.
 
 ### Breaking Changes in Comparison to v2.11
 
@@ -101,16 +105,15 @@ For IntelliJ IDEA, just import the project via a Gradle Import by pointing at th
 
 ## Release Process
 
-Requires
- * [launch4j](http://launch4j.sourceforge.net/) available in PATH
- * [NSIS](http://nsis.sourceforge.net) with the [WinShell plug-in](http://nsis.sourceforge.net/WinShell_plug-in).
+Requires [install4j].
+We've got an [Open Source License](https://www.ej-technologies.com/buy/install4j/openSource).
+
+We switched from [launch4j](http://launch4j.sourceforge.net/) and [NSIS](http://nsis.sourceforge.net), because install4j allows for JRE bundling and the taskbar pinning just works.
 
 To get a list of all targets, use `gradlew tasks`.
 ```
-release - Creates a release for all target platforms.
 releaseJar - Creates a Jar release.
-releaseMac - Creates an OSX release.
-releaseWindows - Creates a Windows executable and installer.
+media - Creates executables and installers.
 ```
 
 To set the path to your local NSIS executable pass it via a Gradle property:
@@ -138,3 +141,5 @@ See the [LICENSE](LICENSE) for full details.
 
 JabRef also uses libraries distributed by other parties.
 See [external libraries](external-libraries.txt) for details.
+
+  [install4j]: https://www.ej-technologies.com/products/install4j/overview.html
