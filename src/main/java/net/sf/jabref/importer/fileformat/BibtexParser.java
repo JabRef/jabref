@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +56,7 @@ import org.apache.commons.logging.LogFactory;
 public class BibtexParser {
     private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
 
-    private final PushbackReader pushbackReader;
+    private PushbackReader pushbackReader;
     private BibtexDatabase database;
     private HashMap<String, EntryType> entryTypes;
     private boolean eof;
@@ -67,6 +65,8 @@ public class BibtexParser {
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
     private final boolean autoDoubleBraces;
+    private List<String> fileContent = new LinkedList<>();
+
 
     public BibtexParser(Reader in) {
         Objects.requireNonNull(in);
@@ -76,6 +76,7 @@ public class BibtexParser {
         }
         autoDoubleBraces = Globals.prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES);
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
+        preProcessReader();
     }
 
     /**
@@ -88,6 +89,19 @@ public class BibtexParser {
         BibtexParser parser = new BibtexParser(in);
         return parser.parse();
     }
+
+    private void preProcessReader(){
+        StringBuilder file = new StringBuilder();
+        Scanner scanner = new Scanner(pushbackReader);
+        while(scanner.hasNextLine()){
+            String next = scanner.nextLine();
+            file.append(next+System.lineSeparator());
+            fileContent.add(next);
+        }
+        System.out.println(file);
+        pushbackReader = new PushbackReader(new StringReader(file.toString()), BibtexParser.LOOKAHEAD);
+    }
+
 
     /**
      * Parses BibtexEntries from the given string and returns the collection of all entries found.
