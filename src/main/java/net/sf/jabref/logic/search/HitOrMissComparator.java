@@ -39,6 +39,6 @@ public class HitOrMissComparator implements Comparator<BibtexEntry> {
             return 0;
         }
 
-        return Boolean.compare(hitOrMiss.matches(o1), hitOrMiss.matches(o2));
+        return Boolean.compare(hitOrMiss.matches(o2), hitOrMiss.matches(o1));
     }
 }
