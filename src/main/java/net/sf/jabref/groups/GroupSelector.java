@@ -710,7 +710,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         final TreePath[] selection = groupsTree.getSelectionPaths();
         if ((selection == null) || (selection.length == 0) || ((selection.length == 1)
                 && (((GroupTreeNode) selection[0].getLastPathComponent()).getGroup() instanceof AllEntriesGroup))) {
-            panel.stopShowingGroup();
+            panel.getFilterGroupToggle().stop();
             panel.mainTable.stopShowingFloatGrouping();
             if (showOverlappingGroups.isSelected()) {
                 groupsTree.setHighlight2Cells(null);
@@ -784,11 +784,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             // Show the result in the chosen way:
             if (hideNonHits.isSelected()) {
                 panel.mainTable.stopShowingFloatGrouping(); // Turn off shading, if active.
-                panel.setGroupMatcher(GroupMatcher.INSTANCE); // Turn on filtering.
+                panel.getFilterGroupToggle().start(); // Turn on filtering.
 
             } else if (grayOut.isSelected()) {
-                panel.stopShowingGroup(); // Turn off filtering, if active.
-                panel.mainTable.showFloatGrouping(GroupMatcher.INSTANCE); // Turn on shading.
+                panel.getFilterGroupToggle().stop(); // Turn off filtering, if active.
+                panel.mainTable.showFloatGrouping(); // Turn on shading.
             }
 
             if (showOverlappingGroupsP) {
@@ -889,7 +889,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     @Override
     public void componentClosing() {
         if (panel != null) {// panel may be null if no file is open any more
-            panel.stopShowingGroup();
+            panel.getFilterGroupToggle().stop();
             panel.mainTable.stopShowingFloatGrouping();
         }
         frame.groupToggle.setSelected(false);

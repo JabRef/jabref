@@ -1495,7 +1495,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public void stopShowingSearchResults() {
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            getBasePanelAt(i).stopShowingFilterSearch();
+            getBasePanelAt(i).getFilterSearchToggle().stop();
         }
     }
 

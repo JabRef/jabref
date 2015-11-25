@@ -130,7 +130,7 @@ public class JabRefPreferences {
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
-    public static final String SEARCH_MODE_LIVE_FILTER = "searchModeLiveFilter";
+    public static final String SEARCH_MODE_FILTER = "searchModeFilter";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String DEFAULT_AUTO_SORT = "defaultAutoSort";
     public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
@@ -546,7 +546,7 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
-        defaults.put(SEARCH_MODE_LIVE_FILTER, Boolean.TRUE);
+        defaults.put(SEARCH_MODE_FILTER, Boolean.TRUE);
 
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_PANE_POS_X, 0);
@@ -651,7 +651,7 @@ public class JabRefPreferences {
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
-        defaults.put(SEARCH_MODE_FLOAT, Boolean.TRUE);
+        defaults.put(SEARCH_MODE_FLOAT, Boolean.FALSE);
         defaults.put(DEFAULT_LABEL_PATTERN, "[authors3][year]");
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
         defaults.put(ACTIVE_PREVIEW, 0);

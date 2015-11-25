@@ -47,38 +47,21 @@ public class SearchBar extends JPanel {
 
     public static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
     public static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
+
     private final JButton openCurrentResultsInDialog;
     private final JButton globalSearch;
-
-    private SearchQuery getSearchQuery() {
-        return new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
-    }
-
-    public void updateResults(int matched, String description) {
-        if (matched == 0) {
-            this.currentResults.setText(Localization.lang("No results found."));
-            this.searchField.setBackground(NO_RESULTS_COLOR);
-        } else {
-            this.currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
-            this.searchField.setBackground(RESULTS_FOUND_COLOR);
-        }
-        this.searchField.setToolTipText("<html>" + description + "</html>");
-
-        globalSearch.setEnabled(true);
-        openCurrentResultsInDialog.setEnabled(true);
-    }
+    private final JButton searchModeButton;
 
     private final BasePanel basePanel;
-    private final SearchTextObservable searchTextObservable;
 
+    private final SearchTextObservable searchTextObservable;
     private final JSearchTextField searchField;
 
-    private JRadioButtonMenuItem modeFloat;
-    private JRadioButtonMenuItem modeLiveFilter;
+    private SearchMode searchMode = getSearchModeFromSettings();
 
     private final JCheckBox caseSensitive;
-    private final JCheckBox regularExp;
 
+    private final JCheckBox regularExp;
     private final JLabel currentResults = new JLabel("");
 
     AutoCompleteSupport<String> autoCompleteSupport;
@@ -98,10 +81,10 @@ public class SearchBar extends JPanel {
 
         caseSensitive = new JCheckBox(Localization.lang("Match case"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
         caseSensitive.addItemListener(ae -> performSearch());
-        caseSensitive.addItemListener(ae -> updatePrefs());
+        caseSensitive.addItemListener(ae -> updatePreferences());
         regularExp = new JCheckBox(Localization.lang("Regex"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
         regularExp.addItemListener(ae -> performSearch());
-        regularExp.addItemListener(ae -> updatePrefs());
+        regularExp.addItemListener(ae -> updatePreferences());
 
         openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
@@ -121,16 +104,17 @@ public class SearchBar extends JPanel {
         this.add(searchIcon);
         this.searchField = initSearchField();
         this.add(searchField);
-        JButton button = new JButton(Localization.lang("View"));
-        JPopupMenu settingsMenu = createSettingsMenu();
-        button.addActionListener(l -> settingsMenu.show(button, 0, button.getHeight()));
+
+        searchModeButton = new JButton();
+        updateSearchModeButtonText();
+        searchModeButton.addActionListener((l) -> toggleSearchModeAndSearch());
 
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(false);
         toolBar.add(regularExp);
         toolBar.add(caseSensitive);
         toolBar.addSeparator();
-        toolBar.add(button);
+        toolBar.add(searchModeButton);
         toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);
         globalSearch = new JButton(Localization.lang("Search globally"));
@@ -162,39 +146,26 @@ public class SearchBar extends JPanel {
         }
     }
 
-    private JPopupMenu createSettingsMenu() {
-        // Populate popup menu and add it to search button
-        JPopupMenu menu = new JPopupMenu("Settings");
-        initSearchModeMenu();
-        menu.add(getSearchModeMenuItem(SearchMode.FILTER));
-        menu.add(getSearchModeMenuItem(SearchMode.FLOAT));
-        return menu;
+    private static SearchMode getSearchModeFromSettings() {
+        if(Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FILTER)) {
+            return SearchMode.FILTER;
+        } else if(Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FLOAT)) {
+            return SearchMode.FLOAT;
+        } else {
+            return SearchMode.FILTER;
+        }
     }
 
-    /**
-     * Initializes the popup menu items controlling the search mode
-     */
-    private void initSearchModeMenu() {
-        ButtonGroup searchMethod = new ButtonGroup();
-        for (SearchMode mode : SearchMode.values()) {
-            // Create menu items
-            switch (mode) {
-            case FLOAT:
-                modeFloat = new JRadioButtonMenuItem(String.format("%s - %s", mode.getDisplayName(), mode.getToolTipText()),
-                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FLOAT));
-                break;
-            case FILTER:
-                modeLiveFilter = new JRadioButtonMenuItem(String.format("%s - %s", mode.getDisplayName(), mode.getToolTipText()),
-                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_LIVE_FILTER));
-                break;
-            }
+    private void toggleSearchModeAndSearch() {
+        this.searchMode = searchMode == SearchMode.FILTER ? SearchMode.FLOAT : SearchMode.FILTER;
+        updatePreferences();
+        updateSearchModeButtonText();
+        performSearch();
+    }
 
-            // Add menu item to group
-            searchMethod.add(getSearchModeMenuItem(mode));
-
-            // Listen to selection changed events
-            getSearchModeMenuItem(mode).addItemListener(e -> performSearch());
-        }
+    private void updateSearchModeButtonText() {
+        searchModeButton.setText(searchMode.getDisplayName());
+        searchModeButton.setToolTipText(searchMode.getToolTipText());
     }
 
     /**
@@ -232,49 +203,11 @@ public class SearchBar extends JPanel {
     }
 
     /**
-     * Returns the item in the popup menu of the search button corresponding to the given search mode
-     */
-    private JRadioButtonMenuItem getSearchModeMenuItem(SearchMode mode) {
-        switch (mode) {
-        case FLOAT:
-            return modeFloat;
-        case FILTER:
-        default:
-            return modeLiveFilter;
-        }
-    }
-
-    /**
-     * Switches to another search mode.
-     *
-     * @param mode the new search mode
-     */
-    private void setSearchMode(SearchMode mode) {
-        getSearchModeMenuItem(mode).setSelected(true);
-    }
-
-    /**
-     * Returns the currently activated search mode.
-     *
-     * @return current search mode
-     */
-    private SearchMode getSearchMode() {
-        if (modeFloat.isSelected()) {
-            return SearchMode.FLOAT;
-        }
-        if (modeLiveFilter.isSelected()) {
-            return SearchMode.FILTER;
-        }
-
-        return SearchMode.FILTER;
-    }
-
-    /**
      * Save current settings.
      */
-    public void updatePrefs() {
-        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_FLOAT, modeFloat.isSelected());
-        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_LIVE_FILTER, modeLiveFilter.isSelected());
+    public void updatePreferences() {
+        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_FLOAT, searchMode == SearchMode.FLOAT);
+        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_FILTER, searchMode == SearchMode.FILTER);
 
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE, caseSensitive.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_REG_EXP, regularExp.isSelected());
@@ -300,10 +233,8 @@ public class SearchBar extends JPanel {
 
         this.currentResults.setText("");
 
-        if (basePanel.isShowingFloatSearch()) {
-            basePanel.mainTable.stopShowingFloatSearch();
-        }
-        basePanel.stopShowingFilterSearch();
+        basePanel.stopShowingFloatSearch();
+        basePanel.getFilterSearchToggle().stop();
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
@@ -328,7 +259,7 @@ public class SearchBar extends JPanel {
             return;
         }
 
-        SearchWorker worker = new SearchWorker(basePanel, searchQuery, getSearchMode());
+        SearchWorker worker = new SearchWorker(basePanel, searchQuery, searchMode);
         worker.getWorker().run();
         worker.getCallBack().update();
     }
@@ -350,5 +281,25 @@ public class SearchBar extends JPanel {
         return query.query.equals(this.searchField.getText())
                 && query.regularExpression == regularExp.isSelected()
                 && query.caseSensitive == caseSensitive.isSelected();
+    }
+
+    private SearchQuery getSearchQuery() {
+        return new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
+    }
+
+    public void updateResults(int matched, String description) {
+        if (matched == 0) {
+            // nothing found
+            this.currentResults.setText(Localization.lang("No results found."));
+            this.searchField.setBackground(NO_RESULTS_COLOR);
+        } else {
+            // specific set found, could be all
+            this.currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
+            this.searchField.setBackground(RESULTS_FOUND_COLOR);
+        }
+        this.searchField.setToolTipText("<html>" + description + "</html>");
+
+        globalSearch.setEnabled(true);
+        openCurrentResultsInDialog.setEnabled(true);
     }
 }

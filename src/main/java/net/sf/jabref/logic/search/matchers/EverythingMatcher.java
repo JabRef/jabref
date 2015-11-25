@@ -23,9 +23,9 @@ import ca.odell.glazedlists.matchers.Matcher;
  * Matcher that accepts all entries. Used for filtering when so search is
  * active.
  */
-public class NoSearchMatcher implements Matcher<BibtexEntry> {
+public class EverythingMatcher implements Matcher<BibtexEntry> {
 
-    public static final Matcher<BibtexEntry> INSTANCE = new NoSearchMatcher();
+    public static final Matcher<BibtexEntry> INSTANCE = new EverythingMatcher();
 
     @Override
     public boolean matches(BibtexEntry object) {

@@ -11,6 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Not reusable. Always create a new instance for each search!
+ */
 class SearchWorker extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(SearchWorker.class);
@@ -35,10 +38,6 @@ class SearchWorker extends AbstractWorker {
      */
     @Override
     public void run() {
-        // clear
-        this.hits = 0;
-        this.matchedEntries.clear();
-
         // Search the current database
         for (BibtexEntry entry : basePanel.getDatabase().getEntries()) {
             boolean hit = searchQuery.isMatch(entry);
@@ -66,26 +65,22 @@ class SearchWorker extends AbstractWorker {
             entry.setSearchHit(false);
         }
 
-        // mark matched
-        for(BibtexEntry entry : matchedEntries) {
+        for (BibtexEntry entry : this.matchedEntries) {
             entry.setSearchHit(true);
         }
 
-        // resets showing any search results
-        if (basePanel.isShowingFloatSearch()) {
-            basePanel.mainTable.stopShowingFloatSearch();
-        }
-        basePanel.stopShowingFilterSearch();
+        basePanel.stopShowingFloatSearch();
+        basePanel.getFilterSearchToggle().stop();
 
         // Show the result in the chosen way:
         switch (mode) {
         case FLOAT:
-            basePanel.stopShowingFilterSearch();
+            basePanel.getFilterSearchToggle().stop();
             basePanel.startShowingFloatSearch();
             break;
         case FILTER:
             basePanel.stopShowingFloatSearch();
-            basePanel.startShowingFilterSearch();
+            basePanel.getFilterSearchToggle().start();
             break;
         }
 

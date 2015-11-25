@@ -33,6 +33,7 @@ import net.sf.jabref.exporter.FileActions.DatabaseSaveType;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.*;
+import net.sf.jabref.groups.GroupMatcher;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.Actions;
@@ -60,7 +61,7 @@ import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.logic.search.matchers.NoSearchMatcher;
+import net.sf.jabref.logic.search.matchers.EverythingMatcher;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -181,6 +182,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private final SearchBar searchBar;
 
+    private final StartStopListAction<BibtexEntry> filterSearchToggle;
+
+    private final StartStopListAction<BibtexEntry> filterGroupToggle;;
+
     // Returns a collection of AutoCompleters, which are populated from the current database
     public ContentAutoCompleters getAutoCompleters() {
         return autoCompleters;
@@ -216,6 +221,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         db.addDatabaseChangeListener(new GroupTreeUpdater());
 
+
         if (file == null) {
             if (!database.getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
@@ -232,6 +238,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         }
 
+        filterSearchToggle = new StartStopListAction<>(searchFilterList, SearchMatcher.INSTANCE, EverythingMatcher.INSTANCE);
+        filterGroupToggle = new StartStopListAction<>(groupFilterList, GroupMatcher.INSTANCE, EverythingMatcher.INSTANCE);
     }
 
     public String getTabTitle() {
@@ -1518,8 +1526,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         database.addDatabaseChangeListener(eventList);
         database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
-        groupFilterList = new FilterList<>(eventList.getTheList(), NoSearchMatcher.INSTANCE);
-        searchFilterList = new FilterList<>(groupFilterList, NoSearchMatcher.INSTANCE);
+        groupFilterList = new FilterList<>(eventList.getTheList(), EverythingMatcher.INSTANCE);
+        searchFilterList = new FilterList<>(groupFilterList, EverythingMatcher.INSTANCE);
         tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
         mainTable = new MainTable(tableFormat, searchFilterList, frame, this);
@@ -2067,32 +2075,46 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.scrollToCenter(pos, 0);
     }
 
-    /**
-     * used to cache whether filtering is on/off as this information cannot be retrieved from the FilterList
-     */
-    private boolean isFilteringActive = false;
+    public StartStopListAction<BibtexEntry> getFilterSearchToggle() {
+        return filterSearchToggle;
+    }
 
-    public void startShowingFilterSearch() {
-        if(!isFilteringActive) {
-            searchFilterList.setMatcher(SearchMatcher.INSTANCE);
-            isFilteringActive = true;
+    public StartStopListAction<BibtexEntry> getFilterGroupToggle() {
+        return filterGroupToggle;
+    }
+
+    public static class StartStopListAction<E> {
+        private final FilterList<E> list;
+        private final Matcher<E> active;
+        private final Matcher<E> inactive;
+
+        private boolean isActive = false;
+
+        private StartStopListAction(FilterList<E> list, Matcher<E> active, Matcher<E> inactive) {
+            this.list = list;
+            this.active = active;
+            this.inactive = inactive;
+        }
+
+        public void start() {
+            if(!isActive) {
+                list.setMatcher(active);
+                isActive = true;
+            }
+        }
+
+        public void stop() {
+            if(isActive) {
+                list.setMatcher(inactive);
+                isActive = false;
+            }
+        }
+
+        public boolean isActive() {
+            return isActive;
         }
     }
 
-    public void stopShowingFilterSearch() {
-        if(isFilteringActive) {
-            searchFilterList.setMatcher(NoSearchMatcher.INSTANCE);
-            isFilteringActive = false;
-        }
-    }
-
-    public void setGroupMatcher(Matcher<BibtexEntry> matcher) {
-        groupFilterList.setMatcher(matcher);
-    }
-
-    public void stopShowingGroup() {
-        groupFilterList.setMatcher(NoSearchMatcher.INSTANCE);
-    }
 
     /**
      * Query whether this BasePanel is in the mode where a float search result is shown.
@@ -2108,7 +2130,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void startShowingFloatSearch() {
-        mainTable.showFloatSearch(SearchMatcher.INSTANCE);
+        mainTable.showFloatSearch();
     }
 
     public BibtexDatabase getDatabase() {

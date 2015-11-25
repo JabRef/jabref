@@ -36,6 +36,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.groups.GroupMatcher;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;
@@ -44,6 +45,7 @@ import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.gui.util.IsMarkedComparator;
 import net.sf.jabref.gui.util.RankingFieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
+import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
@@ -80,7 +82,7 @@ public class MainTable extends JTable {
     private final SortedList<BibtexEntry> sortedForGrouping;
     private final boolean tableColorCodes;
     private boolean isFloatSearchActive;
-    private boolean showingFloatGrouping;
+    private boolean isFloatGroupingActive;
     private final EventSelectionModel<BibtexEntry> localSelectionModel;
     private final TableComparatorChooser<BibtexEntry> comparatorChooser;
     private final JScrollPane pane;
@@ -174,52 +176,58 @@ public class MainTable extends JTable {
 
     public void refreshSorting() {
         sortedForMarking.getReadWriteLock().writeLock().lock();
-        if (Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES)) {
-            sortedForMarking.setComparator(markingComparator);
-        } else {
-            sortedForMarking.setComparator(null);
+        try {
+            if (Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES)) {
+                sortedForMarking.setComparator(markingComparator);
+            } else {
+                sortedForMarking.setComparator(null);
+            }
+        } finally {
+            sortedForMarking.getReadWriteLock().writeLock().unlock();
         }
-        sortedForMarking.getReadWriteLock().writeLock().unlock();
+
         sortedForSearch.getReadWriteLock().writeLock().lock();
-        sortedForSearch.setComparator(searchComparator);
-        sortedForSearch.getReadWriteLock().writeLock().unlock();
+        try {
+            sortedForSearch.setComparator(searchComparator);
+        } finally {
+            sortedForSearch.getReadWriteLock().writeLock().unlock();
+        }
+
         sortedForGrouping.getReadWriteLock().writeLock().lock();
-        sortedForGrouping.setComparator(groupComparator);
-        sortedForGrouping.getReadWriteLock().writeLock().unlock();
+        try {
+            sortedForGrouping.setComparator(groupComparator);
+        } finally {
+            sortedForGrouping.getReadWriteLock().writeLock().unlock();
+        }
     }
 
     /**
      * Adds a sorting rule that floats hits to the top, and causes non-hits to be grayed out:
      * @param m The Matcher that determines if an entry is a hit or not.
      */
-    public void showFloatSearch(Matcher<BibtexEntry> m) {
-        isFloatSearchActive = true;
-        searchMatcher = m;
-        searchComparator = new HitOrMissComparator(m);
-        refreshSorting();
+    public void showFloatSearch() {
+        if(!isFloatSearchActive) {
+            isFloatSearchActive = true;
 
-        scrollTo(0);
+            searchMatcher = SearchMatcher.INSTANCE;
+            searchComparator = new HitOrMissComparator(searchMatcher);
+            refreshSorting();
+
+            scrollTo(0);
+        }
     }
 
     /**
      * Removes sorting by search results, and graying out of non-hits.
      */
     public void stopShowingFloatSearch() {
-        isFloatSearchActive = false;
-        searchMatcher = null;
-        searchComparator = null;
-        refreshSorting();
-    }
+        if(isFloatSearchActive) {
+            isFloatSearchActive = false;
 
-    /**
-     * Adds a sorting rule that floats group hits to the top, and causes non-hits to be grayed out:
-     * @param m The Matcher that determines if an entry is a in the current group selection or not.
-     */
-    public void showFloatGrouping(Matcher<BibtexEntry> m) {
-        showingFloatGrouping = true;
-        groupMatcher = m;
-        groupComparator = new HitOrMissComparator(m);
-        refreshSorting();
+            searchMatcher = null;
+            searchComparator = null;
+            refreshSorting();
+        }
     }
 
     public boolean isFloatSearchActive() {
@@ -227,14 +235,36 @@ public class MainTable extends JTable {
     }
 
     /**
+     * Adds a sorting rule that floats group hits to the top, and causes non-hits to be grayed out:
+     * @param m The Matcher that determines if an entry is a in the current group selection or not.
+     */
+    public void showFloatGrouping() {
+        if(!isFloatGroupingActive) {
+            isFloatGroupingActive = true;
+
+            groupMatcher = GroupMatcher.INSTANCE;
+            groupComparator = new HitOrMissComparator(groupMatcher);
+            refreshSorting();
+        }
+    }
+
+    /**
      * Removes sorting by group, and graying out of non-hits.
      */
     public void stopShowingFloatGrouping() {
-        showingFloatGrouping = false;
-        groupMatcher = null;
-        groupComparator = null;
-        refreshSorting();
+        if(isFloatGroupingActive) {
+            isFloatGroupingActive = false;
+
+            groupMatcher = null;
+            groupComparator = null;
+            refreshSorting();
+        }
     }
+
+    public boolean isFloatGroupingActive() {
+        return isFloatGroupingActive;
+    }
+
 
     public EventList<BibtexEntry> getTableRows() {
         return sortedForGrouping;
@@ -259,7 +289,7 @@ public class MainTable extends JTable {
         if (!isFloatSearchActive || matches(row, searchMatcher)) {
             score++;
         }
-        if (!showingFloatGrouping || matches(row, groupMatcher)) {
+        if (!isFloatGroupingActive || matches(row, groupMatcher)) {
             score += 2;
         }
 
@@ -435,23 +465,26 @@ public class MainTable extends JTable {
         }; // descending
 
         sortedForTable.getReadWriteLock().writeLock().lock();
-        for (int i = 0; i < sortFields.length; i++) {
-            int index = -1;
-            if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX)) {
-                index = tableFormat.getColumnIndex(sortFields[i]);
-            } else {
-                for (int j = 0; j < tableFormat.getColumnCount(); j++) {
-                    if (sortFields[i].equals(tableFormat.getColumnType(j))) {
-                        index = j;
-                        break;
+        try {
+            for (int i = 0; i < sortFields.length; i++) {
+                int index = -1;
+                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX)) {
+                    index = tableFormat.getColumnIndex(sortFields[i]);
+                } else {
+                    for (int j = 0; j < tableFormat.getColumnCount(); j++) {
+                        if (sortFields[i].equals(tableFormat.getColumnType(j))) {
+                            index = j;
+                            break;
+                        }
                     }
                 }
+                if (index >= 0) {
+                    comparatorChooser.appendComparator(index, 0, sortDirections[i]);
+                }
             }
-            if (index >= 0) {
-                comparatorChooser.appendComparator(index, 0, sortDirections[i]);
-            }
+        } finally {
+            sortedForTable.getReadWriteLock().writeLock().unlock();
         }
-        sortedForTable.getReadWriteLock().writeLock().unlock();
 
         // Add action listener so we can remember the sort order:
         comparatorChooser.addSortActionListener(new ActionListener() {
@@ -535,7 +568,6 @@ public class MainTable extends JTable {
     }
 
     public int findEntry(BibtexEntry entry) {
-        //System.out.println(sortedForGrouping.indexOf(entry));
         return sortedForGrouping.indexOf(entry);
     }
 
@@ -552,7 +584,6 @@ public class MainTable extends JTable {
             BibtexEntry be = sortedForGrouping.get(row);
             return be.hasAllRequiredFields(panel.database());
         } catch (NullPointerException ex) {
-            //System.out.println("Exception: isComplete");
             return true;
         }
     }
@@ -562,7 +593,6 @@ public class MainTable extends JTable {
             BibtexEntry be = sortedForGrouping.get(row);
             return EntryMarker.isMarked(be);
         } catch (NullPointerException ex) {
-            //System.out.println("Exception: isMarked");
             return 0;
         }
     }
