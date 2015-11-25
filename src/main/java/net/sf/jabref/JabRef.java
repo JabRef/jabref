@@ -206,7 +206,7 @@ public class JabRef {
                 Globals.prefs.importPreferences(cli.getPreferencesImport());
                 CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
                 ExportFormats.initAllExports();
-            } catch (IOException ex) {
+            } catch (JabRefException ex) {
                 LOGGER.error("Cannot import preferences", ex);
             }
         }
@@ -400,7 +400,7 @@ public class JabRef {
         if (cli.isPreferencesExport()) {
             try {
                 Globals.prefs.exportPreferences(cli.getPreferencesExport());
-            } catch (IOException ex) {
+            } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
             }
         }
