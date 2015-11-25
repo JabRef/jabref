@@ -833,10 +833,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     } else {
                         filename = GUIGlobals.untitledTitle;
                     }
-                    int answer = JOptionPane.showOptionDialog(JabRefFrame.this,
-                            Localization.lang("Database %0 has changed.", filename),
-                            Localization.lang("Unsaved changes"), JOptionPane.YES_NO_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+                    int answer = showSaveDialog(filename);
 
                     if ((answer == JOptionPane.CANCEL_OPTION) ||
                             (answer == JOptionPane.CLOSED_OPTION)) {
@@ -1753,9 +1750,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
 
             if (getCurrentBasePanel().isBaseChanged()) {
-                int answer = JOptionPane.showConfirmDialog(JabRefFrame.this,
-                        Localization.lang("Database has changed. Do you want to save before closing?"),
-                        Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
+
+                String filename;
+
+                if (getCurrentBasePanel().getDatabaseFile() != null) {
+                    filename = getCurrentBasePanel().getDatabaseFile().getAbsolutePath();
+                } else {
+                    filename = GUIGlobals.untitledTitle;
+                }
+
+                int answer = showSaveDialog(filename);
                 if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
                     close = false; // The user has cancelled.
                 }
@@ -2316,4 +2320,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JOptionPane.showMessageDialog(this, message);
     }
 
+    private int showSaveDialog(String filename) {
+        Object[] options = {Localization.lang("Save changes"),
+                Localization.lang("Discard changes"),
+                Localization.lang("Return to JabRef")};
+
+        return JOptionPane.showOptionDialog(JabRefFrame.this,
+                Localization.lang("Database '%0' has changed.", filename),
+                Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+    }
 }
