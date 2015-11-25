@@ -153,7 +153,7 @@ class PdfPreviewPanel extends JPanel {
 
     private void clearPreview() {
         this.picLabel.setIcon(null);
-        this.picLabel.setText(Localization.lang("No preview available"));
+        this.picLabel.setText(Localization.lang("No preview available."));
     }
 
 }
