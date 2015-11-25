@@ -256,7 +256,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
             JOptionPane.showMessageDialog
-                    (frame, Localization.lang("Could not save file")
+                    (frame, Localization.lang("Could not save file.")
                             + ".\n" + ex.getMessage(),
                             Localization.lang("Save database"),
                             JOptionPane.ERROR_MESSAGE);

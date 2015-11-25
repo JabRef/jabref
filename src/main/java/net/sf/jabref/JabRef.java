@@ -352,7 +352,7 @@ public class JabRef {
                                 }
                                 session.commit();
                             } catch (SaveException ex) {
-                                System.err.println(Localization.lang("Could not save file") + " '" + data[0] + "': "
+                                System.err.println(Localization.lang("Could not save file.") + "\n"
                                         + ex.getLocalizedMessage());
                             }
                         }
@@ -439,7 +439,7 @@ public class JabRef {
                                 }
                                 session.commit();
                             } catch (SaveException ex) {
-                                System.err.println(Localization.lang("Could not save file") + " '" + subName + "': "
+                                System.err.println(Localization.lang("Could not save file.") + "\n"
                                         + ex.getLocalizedMessage());
                             }
 
