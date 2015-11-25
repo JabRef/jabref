@@ -2072,15 +2072,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     private boolean isFilteringActive = false;
 
-    public void showOnlyMatchedEntries() {
+    public void startShowingFilterSearch() {
         if(!isFilteringActive) {
             searchFilterList.setMatcher(SearchMatcher.INSTANCE);
+            isFilteringActive = true;
         }
     }
 
-    public void showAllEntries() {
+    public void stopShowingFilterSearch() {
         if(isFilteringActive) {
             searchFilterList.setMatcher(NoSearchMatcher.INSTANCE);
+            isFilteringActive = false;
         }
     }
 
@@ -2098,7 +2100,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @return true if showing float search, false otherwise.
      */
     public boolean isShowingFloatSearch() {
-        return mainTable.isShowingFloatSearch();
+        return mainTable.isFloatSearchActive();
+    }
+
+    public void stopShowingFloatSearch() {
+        mainTable.stopShowingFloatSearch();
+    }
+
+    public void startShowingFloatSearch() {
+        mainTable.showFloatSearch(SearchMatcher.INSTANCE);
     }
 
     public BibtexDatabase getDatabase() {

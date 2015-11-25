@@ -3,7 +3,6 @@ package net.sf.jabref.gui.search;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,17 +75,17 @@ class SearchWorker extends AbstractWorker {
         if (basePanel.isShowingFloatSearch()) {
             basePanel.mainTable.stopShowingFloatSearch();
         }
-        basePanel.showAllEntries();
+        basePanel.stopShowingFilterSearch();
 
         // Show the result in the chosen way:
         switch (mode) {
         case FLOAT:
-            basePanel.mainTable.showFloatSearch(SearchMatcher.INSTANCE);
-            basePanel.showAllEntries();
+            basePanel.stopShowingFilterSearch();
+            basePanel.startShowingFloatSearch();
             break;
         case FILTER:
-            basePanel.showOnlyMatchedEntries();
-            basePanel.mainTable.stopShowingFloatSearch();
+            basePanel.stopShowingFloatSearch();
+            basePanel.startShowingFilterSearch();
             break;
         }
 

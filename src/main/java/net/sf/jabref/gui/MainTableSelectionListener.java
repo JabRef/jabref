@@ -106,8 +106,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         try {
             previewPanel[0].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
             previewPanel[1].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            LOGGER.debug("error while updating preview", e);
         }
     }
 

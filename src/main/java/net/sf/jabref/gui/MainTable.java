@@ -79,7 +79,7 @@ public class MainTable extends JTable {
     private final SortedList<BibtexEntry> sortedForSearch;
     private final SortedList<BibtexEntry> sortedForGrouping;
     private final boolean tableColorCodes;
-    private boolean showingFloatSearch;
+    private boolean isFloatSearchActive;
     private boolean showingFloatGrouping;
     private final EventSelectionModel<BibtexEntry> localSelectionModel;
     private final TableComparatorChooser<BibtexEntry> comparatorChooser;
@@ -193,7 +193,7 @@ public class MainTable extends JTable {
      * @param m The Matcher that determines if an entry is a hit or not.
      */
     public void showFloatSearch(Matcher<BibtexEntry> m) {
-        showingFloatSearch = true;
+        isFloatSearchActive = true;
         searchMatcher = m;
         searchComparator = new HitOrMissComparator(m);
         refreshSorting();
@@ -205,7 +205,7 @@ public class MainTable extends JTable {
      * Removes sorting by search results, and graying out of non-hits.
      */
     public void stopShowingFloatSearch() {
-        showingFloatSearch = false;
+        isFloatSearchActive = false;
         searchMatcher = null;
         searchComparator = null;
         refreshSorting();
@@ -222,8 +222,8 @@ public class MainTable extends JTable {
         refreshSorting();
     }
 
-    public boolean isShowingFloatSearch() {
-        return showingFloatSearch;
+    public boolean isFloatSearchActive() {
+        return isFloatSearchActive;
     }
 
     /**
@@ -256,7 +256,7 @@ public class MainTable extends JTable {
 
         int status = getCellStatus(row, column);
 
-        if (!showingFloatSearch || matches(row, searchMatcher)) {
+        if (!isFloatSearchActive || matches(row, searchMatcher)) {
             score++;
         }
         if (!showingFloatGrouping || matches(row, groupMatcher)) {
@@ -583,7 +583,7 @@ public class MainTable extends JTable {
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount())) && !showingFloatSearch)) {
+        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount())) && !isFloatSearchActive)) {
             scrollToCenter(row, 1);
         }
 

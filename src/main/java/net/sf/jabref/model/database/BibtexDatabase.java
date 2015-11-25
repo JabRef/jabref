@@ -570,8 +570,7 @@ public class BibtexDatabase {
      *                 The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
-    public static String getResolvedField(String field, BibtexEntry bibtex,
-            BibtexDatabase database) {
+    public static String getResolvedField(String field, BibtexEntry bibtex, BibtexDatabase database) {
 
         if (field.equals("bibtextype")) {
             return bibtex.getType().getName();

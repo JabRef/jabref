@@ -36,7 +36,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.Objects;
 
 /**
@@ -304,7 +303,7 @@ public class SearchBar extends JPanel {
         if (basePanel.isShowingFloatSearch()) {
             basePanel.mainTable.stopShowingFloatSearch();
         }
-        basePanel.showAllEntries();
+        basePanel.stopShowingFilterSearch();
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);

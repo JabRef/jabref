@@ -59,18 +59,24 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     /**
      * The bibtex entry currently shown
      */
-    private BibtexEntry entry;
-
-    private MetaData metaData;
+    private Optional<BibtexEntry> entry = Optional.empty();
 
     /**
      * If a database is set, the preview will attempt to resolve strings in the
      * previewed entry using that database.
      */
-    private Optional<BibtexDatabase> database;
+    private Optional<BibtexDatabase> database = Optional.empty();
 
+    private Optional<Layout> layout = Optional.empty();
 
-    private Layout layout;
+    /**
+     * must not be null, must always be set during constructor, but can change over time
+     */
+    private MetaData metaData;
+
+    /**
+     * must not be null, must always be set during constructor, but can change over time
+     */
     private String layoutFile;
 
     private final Optional<PdfPreviewPanel> pdfPreviewPanel;
@@ -161,6 +167,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         this.metaData = Objects.requireNonNull(metaData);
         this.layoutFile = Objects.requireNonNull(layoutFile);
+        updateLayout();
 
         this.closeAction = new CloseAction();
         this.printAction = new PrintAction();
@@ -289,49 +296,49 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         this.metaData = metaData;
     }
 
-    public void updateLayout(String layoutFormat) throws Exception {
+    public void updateLayout(String layoutFormat) throws IOException {
         layoutFile = layoutFormat;
         updateLayout();
     }
 
-    private void updateLayout() throws IOException {
+    private void updateLayout() {
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
-        layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+        try {
+            layout = Optional.of(new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE));
+        } catch (IOException e) {
+            layout = Optional.empty();
+            LOGGER.debug("no layout could be set", e);
+        }
     }
 
     public void setLayout(Layout layout) {
-        this.layout = layout;
+        this.layout = Optional.of(layout);
     }
 
     public void setEntry(BibtexEntry newEntry) {
-        if (newEntry != entry) {
-            if (entry != null) {
-                entry.removePropertyChangeListener(this);
-            }
+        if(entry.isPresent() && entry.get() != newEntry) {
+            entry.ifPresent(e -> e.removePropertyChangeListener(this));
             newEntry.addPropertyChangeListener(this);
         }
-        entry = newEntry;
-        try {
-            updateLayout();
-            update();
-        } catch (StringIndexOutOfBoundsException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            LOGGER.debug("exception occurred while reading layout", ex);
-        }
+        entry = Optional.ofNullable(newEntry);
+
+        updateLayout();
+        update();
     }
 
     @Override
     public BibtexEntry getEntry() {
-        return this.entry;
+        return this.entry.orElse(null);
     }
 
     public void update() {
         StringBuilder sb = new StringBuilder();
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
-        if (entry != null) {
-            sb.append(layout.doLayout(entry, database.orElse(null), wordsToHighlight));
-        }
+        entry.ifPresent(entry ->
+                layout.ifPresent(layout ->
+                        sb.append(layout.doLayout(entry, database.orElse(null), wordsToHighlight))
+                )
+        );
         String newValue = sb.toString();
 
         previewPane.setText(newValue);
@@ -342,7 +349,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         SwingUtilities.invokeLater(() -> bar.setValue(0));
 
         // update pdf preview
-        pdfPreviewPanel.ifPresent(p -> p.updatePanel(entry));
+        pdfPreviewPanel.ifPresent(p -> p.updatePanel(entry.orElse(null)));
     }
 
     /**
@@ -384,7 +391,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
                 public void run() {
                     try {
                         PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                        pras.add(new JobName(entry.getCiteKey(), null));
+                        pras.add(new JobName(entry.map(BibtexEntry::getCiteKey).orElse("NO ENTRY"), null));
                         previewPane.print(null, null, true, null, pras, false);
 
                     } catch (PrinterException e) {
