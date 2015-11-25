@@ -57,7 +57,7 @@ public class DOAJFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         shouldContinue = true;
         try {
-            status.setStatus(Localization.lang("Searching DOAJ..."));
+            status.setStatus(Localization.lang("Searching..."));
             HttpResponse<JsonNode> jsonResponse;
             jsonResponse = Unirest.get(searchURL + query + "?pageSize=1").header("accept", "application/json").asJson();
             JSONObject jo = jsonResponse.getBody().getObject();
@@ -73,7 +73,7 @@ public class DOAJFetcher implements EntryFetcher {
                                         Integer.toString(hits));
 
                         if (strCount == null) {
-                            status.setStatus(Localization.lang("DOAJ search canceled"));
+                            status.setStatus(Localization.lang("Search canceled"));
                             return false;
                         }
 
@@ -112,11 +112,12 @@ public class DOAJFetcher implements EntryFetcher {
                 return true;
             } else {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
-                        Localization.lang("Search DOAJ"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "DOAJ"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
         } catch (UnirestException e) {
             LOGGER.warn("Problem searching DOAJ", e);
+            status.setStatus(Localization.lang("%0 search canceled", "DOAJ"));
             return false;
         }
 

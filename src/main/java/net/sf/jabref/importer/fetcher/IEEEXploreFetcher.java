@@ -88,6 +88,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
     private static final String START_URL = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
 
+    private static final String DIALOG_TITLE = Localization.lang("Search %0", "IEEEXplore");
+
 
     // Common words in IEEE Xplore that should always be
 
@@ -135,19 +137,19 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             if (page.contains("You have entered an invalid search")) {
                 status.showMessage(Localization.lang("You have entered an invalid search '%0'.", terms),
-                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                        DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
             if (page.contains("Bad request")) {
                 status.showMessage(Localization.lang("Bad Request '%0'.", terms),
-                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                        DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
             if (page.contains("No results were found.")) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'", terms),
-                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                        DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
@@ -155,7 +157,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 // @formatter:off
                 status.showMessage(
                         Localization.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
-                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                       DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 // @formatter:on
                 return false;
             }
@@ -167,7 +169,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 // @formatter:off
                 status.showMessage(Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
                         new String[] {String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)}),
-                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                        DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 // @formatter:on
             }
 
@@ -177,9 +179,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
             e.printStackTrace();
         } catch (ConnectException e) {
             status.showMessage(Localization.lang("Connection to IEEEXplore failed"),
-                    Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
+                    DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(e.getMessage(), Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
         }
         return false;
