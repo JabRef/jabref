@@ -57,6 +57,8 @@ public class BibtexEntry {
     private boolean searchHit;
     private boolean groupHit;
 
+    private String serialization;
+
 
     public BibtexEntry() {
         this(IdGenerator.next());
@@ -486,5 +488,13 @@ public class BibtexEntry {
             }
         }
         return year;
+    }
+
+    public void setSerialization(String serialization){
+        this.serialization = serialization;
+    }
+
+    public String getSerialization(){
+        return serialization;
     }
 }

@@ -90,12 +90,12 @@ public class BibtexParser {
         return parser.parse();
     }
 
-    private void preProcessReader(){
+    private void preProcessReader() {
         StringBuilder file = new StringBuilder();
         Scanner scanner = new Scanner(pushbackReader);
-        while(scanner.hasNextLine()){
+        while (scanner.hasNextLine()) {
             String next = scanner.nextLine();
-            file.append(next+System.lineSeparator());
+            file.append(next + System.lineSeparator());
             fileContent.add(next);
         }
         System.out.println(file);
@@ -294,8 +294,8 @@ public class BibtexParser {
                         } else if ((be.getCiteKey() == null) || be.getCiteKey().equals("")) {
                             parserResult
                                     .addWarning(Localization.lang("Empty BibTeX key") + ": "
-                                    + be.getAuthorTitleYear(40) + " ("
-                                    + Localization.lang("grouping may not work for this entry") + ")");
+                                            + be.getAuthorTitleYear(40) + " ("
+                                            + Localization.lang("grouping may not work for this entry") + ")");
                         }
                     } catch (IOException ex) {
                         LOGGER.warn("Could not parse entry", ex);
@@ -450,7 +450,31 @@ public class BibtexParser {
         }
 
         consume('}', ')');
+        setStringRepresenationFromFile(result);
         return result;
+    }
+
+    private void setStringRepresenationFromFile(BibtexEntry entry) {
+        String key = entry.getCiteKey();
+        StringBuilder fileRepresenation = new StringBuilder();
+        boolean currentLineBelongsToEntry = false;
+
+        for (String line : fileContent) {
+            //if we find the key, the entry starts
+            if(line.contains(key)){
+                currentLineBelongsToEntry = true;
+                //if we find a new entry, the current one stops. Whitespaces after an entry belong to the entry
+            } else if(line.contains("@")) {
+                currentLineBelongsToEntry = false;
+            }
+
+            if(currentLineBelongsToEntry){
+                fileRepresenation.append(line + System.lineSeparator());
+            }
+
+        }
+
+        entry.setSerialization(fileRepresenation.toString());
     }
 
     private void parseField(BibtexEntry entry) throws IOException {
@@ -910,7 +934,7 @@ public class BibtexParser {
                     _pr.addWarning(
                             Localization.lang("Unknown entry type")
                                     + ": " + name + "; key: " + be.getCiteKey()
-                            );
+                    );
                 }
             }
         }
