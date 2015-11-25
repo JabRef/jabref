@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ public class BibtexEntryTests {
     @Test
     public void testDefaultConstructor() {
         BibtexEntry entry = new BibtexEntry();
+        // we have to use `getType("misc")` in the case of biblatex mode
+        Assert.assertEquals(EntryTypes.getType("misc"), entry.getType());
+        Assert.assertNotNull(entry.getId());
+        Assert.assertNull(entry.getField("author"));
     }
 
     @Test
@@ -90,4 +95,19 @@ public class BibtexEntryTests {
         e.setField("year", "2015");
         Assert.assertTrue(e.hasAllRequiredFields(null));
     }
+
+    @Test
+    public void isNullOrEmptyCiteKey() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        Assert.assertFalse(e.hasCiteKey());
+        e.setField(BibtexEntry.KEY_FIELD, "");
+        Assert.assertFalse(e.hasCiteKey());
+        e.setField(BibtexEntry.KEY_FIELD, null);
+        Assert.assertFalse(e.hasCiteKey());
+        e.setField(BibtexEntry.KEY_FIELD, "key");
+        Assert.assertTrue(e.hasCiteKey());
+        e.clearField(BibtexEntry.KEY_FIELD);
+        Assert.assertFalse(e.hasCiteKey());
+    }
+
 }

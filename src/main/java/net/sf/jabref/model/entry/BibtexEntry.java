@@ -35,6 +35,9 @@ import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.base.Strings;
+
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibtexDatabase;
 
 public class BibtexEntry {
@@ -63,7 +66,7 @@ public class BibtexEntry {
     }
 
     public BibtexEntry(String id) {
-        this(id, BibtexEntryTypes.MISC);
+        this(id, EntryTypes.getBibtexEntryType("misc"));
     }
 
     public BibtexEntry(String id, EntryType type) {
@@ -190,7 +193,7 @@ public class BibtexEntry {
     public String getFieldOrAlias(String name) {
         String fieldValue = getField(name);
 
-        if ((fieldValue != null) && !fieldValue.isEmpty()) {
+        if (!Strings.isNullOrEmpty(fieldValue)) {
             return fieldValue;
         }
 
@@ -280,10 +283,7 @@ public class BibtexEntry {
     }
 
     public boolean hasCiteKey() {
-        if ((getCiteKey() == null) || getCiteKey().isEmpty()) {
-            return false;
-        }
-        return true;
+        return !Strings.isNullOrEmpty(getCiteKey());
     }
 
     /**
@@ -421,9 +421,15 @@ public class BibtexEntry {
         return clone;
     }
 
+    /**
+     * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
+     * as is
+     *
+     * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
+     */
     @Override
     public String toString() {
-        return getType().getName() + ':' + getCiteKey();
+        return CanonicalBibtexEntry.getCanonicalRepresentation(this);
     }
 
     public boolean isSearchHit() {
