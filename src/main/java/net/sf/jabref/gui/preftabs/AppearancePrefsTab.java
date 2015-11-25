@@ -203,13 +203,13 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public boolean validateSettings() {
         // Test if font size is a number:
         if (!validateIntegerField(Localization.lang("Menu and label font size"), fontSize.getText(),
-                Localization.lang("Changed font settings"))) {
+                Localization.lang("Invalid setting"))) {
             return false;
         }
 
         // Test if row padding is a number:
         if (!validateIntegerField(Localization.lang("Table row height padding"), rowPadding.getText(),
-                Localization.lang("Changed table appearance settings"))) {
+                Localization.lang("Invalid setting"))) {
             return false;
         }
 
