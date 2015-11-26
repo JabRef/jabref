@@ -31,6 +31,7 @@ public class EntryFetchers {
         entryFetchers.add(new DBLPFetcher());
         entryFetchers.add(new DiVAtoBibTeXFetcher());
         entryFetchers.add(new DOItoBibTeXFetcher());
+        entryFetchers.add(new GVKFetcher());
         entryFetchers.add(new IEEEXploreFetcher());
         entryFetchers.add(new INSPIREFetcher());
         entryFetchers.add(new ISBNtoBibTeXFetcher());

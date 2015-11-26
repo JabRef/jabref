@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+ - Updated to support OpenOffice 4 and LibreOffice 5
  - Better support for IEEEtranBSTCTL entries
  - Quick selection of month in entry editor
  - Unknown entry types will be converted to 'Misc' (was 'Other' before).
@@ -70,6 +71,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Feature: New LabelPattern `[keywordsN]`, where N is optional. Returns the first N keywords. If no N is specified ("`[keywords]`"), all keywords are returned. Spaces are removed.
  - Update supported LookAndFeels
  - Show replaced journal abbreviations on console
+ - Integrated [GVK-Plugin](http://www.gbv.de/wikis/cls/Jabref-GVK-Plugin)
  - The three options to manage file references are moved to their own separated group in the Tools menu. 
 
 ### Fixed
