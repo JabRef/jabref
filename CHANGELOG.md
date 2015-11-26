@@ -14,6 +14,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Changed
  - Updated to support OpenOffice 4 and LibreOffice 5
+ - Add toolbar icon for deleting an entry, and move menu item for this action to BibTeX
  - Better support for IEEEtranBSTCTL entries
  - Quick selection of month in entry editor
  - Unknown entry types will be converted to 'Misc' (was 'Other' before).

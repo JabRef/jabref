@@ -252,7 +252,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         glTable.setDefaultRenderer(JLabel.class, renderer);
         glTable.setDefaultRenderer(String.class, renderer);
-        glTable.getInputMap().put(Globals.prefs.getKey(KeyBinds.DELETE), "delete");
+        glTable.getInputMap().put(Globals.prefs.getKey(KeyBinds.DELETE_ENTRY), "delete");
         DeleteListener deleteListener = new DeleteListener();
         glTable.getActionMap().put("delete", deleteListener);
 
@@ -881,7 +881,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     class DeleteListener extends AbstractAction {
 
         public DeleteListener() {
-            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getSmallIcon());
+            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon());
         }
 
         @Override

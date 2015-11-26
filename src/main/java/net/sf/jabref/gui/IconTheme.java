@@ -76,7 +76,7 @@ public class IconTheme {
         MARK_ENTRIES("\uf1a6") /*css: bookmark */,
         UNMARK_ENTRIES("\uf1a9") /*css: bookmark-outline */,
         REFRESH("\uf4ef") /*css: refresh */,
-        DELETE("\uf28d") /*css: delete */,
+        DELETE_ENTRY("\uf28d") /*css: delete */,
         SEARCH("\uf401") /*css: magnify */,
         PREFERENCES("\uf529") /*css: settings */,
         HELP("\uf396") /*css: help-circle*/,

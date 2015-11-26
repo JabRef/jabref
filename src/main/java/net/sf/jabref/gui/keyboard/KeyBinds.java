@@ -39,7 +39,7 @@ public class KeyBinds {
     public static final String COPY_CITE_BIB_TE_X_KEY = "Copy \\cite{BibTeX key}";
     public static final String CUT = "Cut";
     public static final String DECREASE_TABLE_FONT_SIZE = "Decrease table font size";
-    public static final String DELETE = "Delete";
+    public static final String DELETE_ENTRY = "Delete entry";
     public static final String EDIT_ENTRY = "Edit entry";
     public static final String EDIT_PREAMBLE = "Edit preamble";
     public static final String EDIT_STRINGS = "Edit strings";
@@ -164,7 +164,7 @@ public class KeyBinds {
         keyBindMap.put(NEXT_TAB, "ctrl PAGE_DOWN");
         keyBindMap.put(PREVIOUS_TAB, "ctrl PAGE_UP");
         keyBindMap.put(REPLACE_STRING, "ctrl R");
-        keyBindMap.put(DELETE, "DELETE");
+        keyBindMap.put(DELETE_ENTRY, "DELETE");
         keyBindMap.put(OPEN_FILE, "F4");
         keyBindMap.put(OPEN_FOLDER, "ctrl shift O");
         keyBindMap.put(OPEN_URL_OR_DOI, "F3");
