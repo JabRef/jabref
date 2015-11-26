@@ -1778,14 +1778,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    @SuppressWarnings("unused")
-    public void moveFocusToEntryEditor() {
-        Component c = splitPane.getBottomComponent();
-        if (c instanceof EntryEditor) {
-            new FocusRequester(c);
-        }
-    }
-
     private boolean isShowingEditor() {
         return (splitPane.getBottomComponent() != null) && (splitPane.getBottomComponent() instanceof EntryEditor);
     }
@@ -1849,8 +1841,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else {
             splitPane.setDividerLocation(
                     splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
-            //new FocusRequester(form);
-            //form.requestFocus();
         }
 
         newEntryShowing(be);
