@@ -275,8 +275,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
             Localization.menuTitle("Save selected as ..."), Localization.lang("Save selected as ..."));
     private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
-            Localization.menuTitle("Save selected as plain BibTeX ..."),
-            Localization.lang("Save selected as plain BibTeX ..."));
+            Localization.menuTitle("Save selected as plain BibTeX..."),
+            Localization.lang("Save selected as plain BibTeX..."));
     private final AbstractAction exportAll = ExportFormats.getExportAction(this, false);
     private final AbstractAction exportSelected = ExportFormats.getExportAction(this, true);
     private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
