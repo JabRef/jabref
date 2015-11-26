@@ -740,7 +740,7 @@ public class JabRefPreferences {
         defaults.put(WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
         defaults.put(WRITEFIELD_WRAPFIELD, Boolean.FALSE);
 
-        defaults.put(RemotePreferences.USE_REMOTE_SERVER, Boolean.FALSE);
+        defaults.put(RemotePreferences.USE_REMOTE_SERVER, Boolean.TRUE);
         defaults.put(RemotePreferences.REMOTE_SERVER_PORT, 6050);
 
         defaults.put(PERSONAL_JOURNAL_LIST, null);
