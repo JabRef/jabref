@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,7 +21,6 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JComponent;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.logic.l10n.Localization;
 
 abstract class Change extends DefaultMutableTreeNode {
 
@@ -34,16 +33,12 @@ abstract class Change extends DefaultMutableTreeNode {
     }
 
     Change(String name) {
-        this.name = Localization.lang(name);
-    }
-
-    private String getName() {
-        return name;
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return getName();
+        return name;
     }
 
     public boolean isAccepted() {
@@ -60,7 +55,7 @@ abstract class Change extends DefaultMutableTreeNode {
      * @return boolean false if the parent overrides by not being accepted.
      */
     public boolean isAcceptable() {
-        if (getParent() != null && getParent() instanceof Change) {
+        if ((getParent() != null) && (getParent() instanceof Change)) {
             return ((Change) getParent()).isAccepted();
         } else {
             return true;

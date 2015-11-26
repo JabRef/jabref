@@ -53,7 +53,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.menuTitle("Insert selected citations into %d", getApplicationName());
+        return Localization.menuTitle("Push entries to external application (%0)", getApplicationName());
     }
 
     @Override
@@ -86,11 +86,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         catch (IOException excep) {
             couldNotCall = true;
 
-            // @formatter:off
-            LOGGER.warn(Localization.lang("Error") + ": "
-                    + Localization.lang("Could not call executable") + " '"
-                    + commandPath + "'.", excep);
-            // @formatter:on
+            LOGGER.warn("Error: Could not call executable '" + commandPath + "'.", excep);
         }
     }
 

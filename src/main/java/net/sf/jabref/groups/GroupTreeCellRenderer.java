@@ -114,7 +114,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
             } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
-                for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()) {
+                for (BibtexEntry entry : JabRef.jrf.getCurrentBasePanel().getDatabase().getEntries()) {
                     if (group.contains(entry)) {
                         hits++;
                     }

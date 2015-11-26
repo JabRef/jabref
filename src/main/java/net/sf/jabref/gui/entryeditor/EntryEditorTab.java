@@ -35,6 +35,7 @@ import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 
@@ -95,18 +96,18 @@ class EntryEditorTab {
         InputMap inputMap = panel.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = panel.getActionMap();
 
-        inputMap.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
         actionMap.put("prev", parent.prevEntryAction);
-        inputMap.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_ENTRY), "next");
         actionMap.put("next", parent.nextEntryAction);
 
-        inputMap.put(Globals.prefs.getKey("Entry editor, store field"), "store");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", parent.storeFieldAction);
-        inputMap.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
-        inputMap.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL), "right");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL_2), "right");
         actionMap.put("left", parent.switchLeftAction);
-        inputMap.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
-        inputMap.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
         actionMap.put("right", parent.switchRightAction);
         inputMap.put(Globals.prefs.getKey(KeyBinds.HELP), "help");
         actionMap.put("help", parent.helpAction);
@@ -198,7 +199,7 @@ class EntryEditorTab {
         // Add the edit field for Bibtex-key.
         if (addKeyField) {
             final TextField textField = new TextField(BibtexEntry.KEY_FIELD, parent
-                    .getEntry().getField(BibtexEntry.KEY_FIELD), true);
+.getEntry().getCiteKey(), true);
             setupJTextComponent(textField, null);
 
             editors.put("bibtexkey", textField);
@@ -382,18 +383,18 @@ class EntryEditorTab {
         InputMap inputMap = component.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = component.getActionMap();
 
-        inputMap.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
         actionMap.put("prev", parent.prevEntryAction);
-        inputMap.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_ENTRY), "next");
         actionMap.put("next", parent.nextEntryAction);
 
-        inputMap.put(Globals.prefs.getKey("Entry editor, store field"), "store");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", parent.storeFieldAction);
-        inputMap.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
-        inputMap.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL), "right");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL_2), "right");
         actionMap.put("left", parent.switchLeftAction);
-        inputMap.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
-        inputMap.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
+        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
         actionMap.put("right", parent.switchRightAction);
         inputMap.put(Globals.prefs.getKey(KeyBinds.HELP), "help");
         actionMap.put("help", parent.helpAction);

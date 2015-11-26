@@ -29,7 +29,7 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.bibtex.EntryTypes;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -261,8 +261,8 @@ public class MedlinePlainImporter extends ImportFormat {
                 hm.put("comment", comment);
             }
 
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
-                    .getEntryType(type)); // id assumes an existing database so don't
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getBibtexEntryType(type)); // id assumes an existing database so don't
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();

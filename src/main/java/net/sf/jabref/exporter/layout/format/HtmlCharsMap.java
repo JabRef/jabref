@@ -3,9 +3,6 @@ package net.sf.jabref.exporter.layout.format;
 import java.util.HashMap;
 
 class HtmlCharsMap extends HashMap<String, String> {
-
-    private static final long serialVersionUID = 1L;
-
     public HtmlCharsMap() {
         // HTML named entities from #192 - #255 (UNICODE Latin-1)
         put("`A", "&Agrave;"); // #192

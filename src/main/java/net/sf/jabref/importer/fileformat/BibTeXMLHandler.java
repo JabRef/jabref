@@ -17,9 +17,10 @@ package net.sf.jabref.importer.fileformat;
 
 import java.util.ArrayList;
 
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -97,7 +98,7 @@ class BibTeXMLHandler extends DefaultHandler {
                 raw.equals("bibtex:unpublished") ||
                 raw.equals("bibtex:misc") ||
                 raw.equals("bibtex:other")) {
-            BibtexEntryType tp = BibtexEntryType.getType(local);
+            EntryType tp = EntryTypes.getType(local);
             b.setType(tp);
         }
         currentChars = "";

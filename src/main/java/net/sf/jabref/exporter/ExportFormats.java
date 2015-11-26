@@ -162,7 +162,10 @@ public class ExportFormats {
             public ExportAction(JabRefFrame frame, boolean selectedOnly) {
                 this.frame = frame;
                 this.selectedOnly = selectedOnly;
-                putValue(Action.NAME, selectedOnly ? Localization.menuTitle("Export selected entries") : Localization.menuTitle("Export"));
+                // @formatter:off
+                putValue(Action.NAME, selectedOnly ? Localization.menuTitle("Export selected entries") :
+                    Localization.menuTitle("Export"));
+                // @formatter:on
             }
 
             @Override
@@ -186,16 +189,16 @@ public class ExportFormats {
                     file = new File(path);
                     if (file.exists()) {
                         // Warn that the file exists:
-                        if (JOptionPane.showConfirmDialog(frame, '\'' + file.getName() + "' "
-                                + Localization.lang("exists. Overwrite file?"), Localization.lang("Export"),
-                                JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                        if (JOptionPane.showConfirmDialog(frame,
+                                Localization.lang("'%0' exists. Overwrite file?", file.getName()),
+                                Localization.lang("Export"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
                             return;
                         }
                     }
                     final IExportFormat format = eff.getExportFormat();
                     Set<String> entryIds = null;
                     if (selectedOnly) {
-                        BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
+                        BibtexEntry[] selected = frame.getCurrentBasePanel().getSelectedEntries();
                         entryIds = new HashSet<>();
                         for (BibtexEntry bibtexEntry : selected) {
                             entryIds.add(bibtexEntry.getId());
@@ -205,10 +208,10 @@ public class ExportFormats {
                     // Set the global variable for this database's file directory before exporting,
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
-                    Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
+                    Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().metaData()
                             .getFileDirectory(Globals.FILE_FIELD);
                     // Also store the database's file in a global variable:
-                    Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
+                    Globals.prefs.databaseFile = frame.getCurrentBasePanel().metaData().getFile();
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
@@ -225,10 +228,10 @@ public class ExportFormats {
                         @Override
                         public void run() {
                             try {
-                                format.performExport(frame.basePanel().database(),
-                                        frame.basePanel().metaData(),
+                                format.performExport(frame.getCurrentBasePanel().database(),
+                                        frame.getCurrentBasePanel().metaData(),
                                         finFile.getPath(), frame
-                                                .basePanel().getEncoding(), finEntryIDs);
+                                                .getCurrentBasePanel().getEncoding(), finEntryIDs);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                                 if (ex.getMessage() == null) {

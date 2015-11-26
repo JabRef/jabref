@@ -15,16 +15,11 @@
 */
 package net.sf.jabref.model.entry;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibtexDatabase;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,72 +27,36 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This class is used to represent customized entry types.
  */
-public class CustomEntryType extends BibtexEntryType {
+public class CustomEntryType implements EntryType {
+    private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final String name;
-    private String[] required;
-    private final String[] optional;
-    private String[] priOpt;
-    private String[][] reqSets; // Sets of either-or required fields, if any
+    private final List<String> required;
+    private final List<String> optional;
+    private final List<String> primaryOptional;
 
-    private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
-
-    public CustomEntryType(String name, List<String> required, List<String> priOpt, List<String> secOpt) {
-        this(name, required.toArray(new String[required.size()]), priOpt.toArray(new String[priOpt.size()]),
-                secOpt.toArray(new String[secOpt.size()]));
-    }
-
-    public CustomEntryType(String name, String[] required, String[] priOpt, String[] secOpt) {
-        this.name = StringUtil.capitalizeFirst(name);
-        parseRequiredFields(required);
-        this.priOpt = priOpt;
-        optional = StringUtil.arrayConcat(priOpt, secOpt);
+    public CustomEntryType(String name, List<String> required, List<String> primaryOptional, List<String> secondaryOptional) {
+        this.name = EntryUtil.capitalizeFirst(name);
+        this.primaryOptional = primaryOptional;
+        this.required = required;
+        this.optional = Stream.concat(primaryOptional.stream(), secondaryOptional.stream()).collect(Collectors.toList());
     }
 
     public CustomEntryType(String name, List<String> required, List<String> optional) {
-        this(name, required.toArray(new String[required.size()]), optional.toArray(new String[optional.size()]));
+        this.name = EntryUtil.capitalizeFirst(name);
+        this.required = required;
+        this.optional = optional;
+        this.primaryOptional = optional;
     }
 
-    public CustomEntryType(String name, String[] required, String[] optional) {
-        this(name, required, optional, new String[0]);
+    public CustomEntryType(String name, String required, String optional) {
+        this(name, Arrays.asList(required.split(";")), Arrays.asList(optional.split(";")));
     }
 
-    private CustomEntryType(String name, String required, String optional) {
-        this.name = StringUtil.capitalizeFirst(name);
-        if (required.isEmpty()) {
-            this.required = new String[0];
-        } else {
-            parseRequiredFields(required);
-
-        }
-        if (optional.isEmpty()) {
-            this.optional = new String[0];
-        } else {
-            this.optional = optional.split(";");
-        }
-    }
-
-    private void parseRequiredFields(String req) {
-        String[] parts = req.split(";");
-        parseRequiredFields(parts);
-    }
-
-    private void parseRequiredFields(String[] parts) {
-        ArrayList<String> fields = new ArrayList<>();
-        ArrayList<String[]> sets = new ArrayList<>();
-        for (String part : parts) {
-            String[] subParts = part.split("/");
-            Collections.addAll(fields, subParts);
-            // Check if we have either/or fields:
-            if (subParts.length > 1) {
-                sets.add(subParts);
-            }
-        }
-        required = fields.toArray(new String[fields.size()]);
-        if (!sets.isEmpty()) {
-            reqSets = sets.toArray(new String[sets.size()][]);
-        }
+    @Override
+    public int compareTo(EntryType o) {
+        return getName().compareTo(o.getName());
     }
 
     @Override
@@ -107,84 +66,22 @@ public class CustomEntryType extends BibtexEntryType {
 
     @Override
     public List<String> getOptionalFields() {
-        return Arrays.asList(optional);
+        return Collections.unmodifiableList(optional);
     }
 
     @Override
     public List<String> getRequiredFields() {
-        return Arrays.asList(required);
+        return Collections.unmodifiableList(required);
     }
 
     @Override
     public List<String> getPrimaryOptionalFields() {
-        return Arrays.asList(priOpt);
+        return Collections.unmodifiableList(primaryOptional);
     }
 
     @Override
     public List<String> getSecondaryOptionalFields() {
-        return Arrays.asList(StringUtil.getRemainder(optional, priOpt));
-    }
-
-    @Override
-    public List<String> getRequiredFieldsForCustomization() {
-        return Arrays.asList(getRequiredFieldsString().split(";"));
-    }
-
-    /**
-     * Check whether this entry's required fields are set, taking crossreferenced entries and
-     * either-or fields into account:
-     *
-     * @param entry    The entry to check.
-     * @param database The entry's database.
-     * @return True if required fields are set, false otherwise.
-     */
-    @Override
-    public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-        // First check if the bibtex key is set:
-        if (entry.getField(BibtexEntry.KEY_FIELD) == null) {
-            return false;
-        }
-        // Then check other fields:
-        boolean[] isSet = new boolean[required.length];
-        // First check for all fields, whether they are set here or in a crossref'd entry:
-        for (int i = 0; i < required.length; i++) {
-            isSet[i] = BibtexDatabase.getResolvedField(required[i], entry, database) != null;
-        }
-        // Then go through all fields. If a field is not set, see if it is part of an either-or
-        // set where another field is set. If not, return false:
-        for (int i = 0; i < required.length; i++) {
-            if (!isSet[i]) {
-                if (!isCoupledFieldSet(required[i], entry, database)) {
-                    return false;
-                }
-            }
-        }
-        // Passed all fields, so return true:
-        return true;
-    }
-
-    private boolean isCoupledFieldSet(String field, BibtexEntry entry, BibtexDatabase database) {
-        if (reqSets == null) {
-            return false;
-        }
-        for (String[] reqSet : reqSets) {
-            boolean takesPart = false;
-            boolean oneSet = false;
-            for (String aReqSet : reqSet) {
-                // If this is the field we're looking for, note that the field is part of the set:
-                if (aReqSet.equalsIgnoreCase(field)) {
-                    takesPart = true;
-                } else if (BibtexDatabase.getResolvedField(aReqSet, entry, database) != null) {
-                    oneSet = true;
-                }
-            }
-            // Ths the field is part of the set, and at least one other field is set, return true:
-            if (takesPart && oneSet) {
-                return true;
-            }
-        }
-        // No hits, so return false:
-        return false;
+        return Collections.unmodifiableList(EntryUtil.getRemainder(optional, primaryOptional));
     }
 
     /**
@@ -193,70 +90,15 @@ public class CustomEntryType extends BibtexEntryType {
      * @return Description of required field set for storage in preferences or bib file.
      */
     public String getRequiredFieldsString() {
-        StringBuilder sb = new StringBuilder();
-        int reqSetsPiv = 0;
-        for (int i = 0; i < required.length; i++) {
-            if ((reqSets == null) || (reqSetsPiv == reqSets.length)) {
-                sb.append(required[i]);
-            } else if (required[i].equals(reqSets[reqSetsPiv][0])) {
-                for (int j = 0; j < reqSets[reqSetsPiv].length; j++) {
-                    sb.append(reqSets[reqSetsPiv][j]);
-                    if (j < (reqSets[reqSetsPiv].length - 1)) {
-                        sb.append('/');
-                    }
-                }
-                // Skip next n-1 fields:
-                i += reqSets[reqSetsPiv].length - 1;
-                reqSetsPiv++;
-            } else {
-                sb.append(required[i]);
-            }
-            if (i < (required.length - 1)) {
-                sb.append(';');
-            }
+        StringBuilder serialization = new StringBuilder();
 
-        }
-        return sb.toString();
-    }
+        for (int i = 0; i < required.size(); i++) {
+            serialization.append(required.get(i));
 
-    public void save(Writer out) throws IOException {
-        out.write("@comment{");
-        out.write(ENTRYTYPE_FLAG);
-        out.write(getName());
-        out.write(": req[");
-        out.write(getRequiredFieldsString());
-        out.write("] opt[");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < optional.length; i++) {
-            sb.append(optional[i]);
-            if (i < (optional.length - 1)) {
-                sb.append(';');
+            if (i < (required.size() - 1)) {
+                serialization.append(';');
             }
         }
-        out.write(sb.toString());
-        out.write("]}" + Globals.NEWLINE);
-    }
-
-    public static CustomEntryType parseEntryType(String comment) {
-        try {
-            String rest;
-            rest = comment.substring(ENTRYTYPE_FLAG.length());
-            int nPos = rest.indexOf(':');
-            String name = rest.substring(0, nPos);
-            rest = rest.substring(nPos + 2);
-
-            int rPos = rest.indexOf(']');
-            if (rPos < 4) {
-                throw new IndexOutOfBoundsException();
-            }
-            String reqFields = rest.substring(4, rPos);
-            int oPos = rest.indexOf(']', rPos + 1);
-            String optFields = rest.substring(rPos + 6, oPos);
-            return new CustomEntryType(name, reqFields, optFields);
-        } catch (IndexOutOfBoundsException ex) {
-            LOGGER.info("Ill-formed entrytype comment in BibTeX file.", ex);
-            return null;
-        }
-
+        return serialization.toString();
     }
 }

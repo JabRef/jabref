@@ -24,9 +24,10 @@ import java.util.HashMap;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -136,8 +137,7 @@ public class SixpackImporter extends ImportFormat {
                 {
                     continue; // Avoid ArrayIndexOutOfBoundsException
                 }
-                BibtexEntryType typ = BibtexEntryType
-                        .getType(fields[1].toLowerCase());
+                EntryType typ = EntryTypes.getType(fields[1].toLowerCase());
                 if (typ == null) {
                     String type = "";
                     if (fields[1].equals("Masterthesis")) {
@@ -152,7 +152,7 @@ public class SixpackImporter extends ImportFormat {
                     if (fields[1].equals("Conference")) {
                         type = "proceedings";
                     }
-                    typ = BibtexEntryType.getType(type.toLowerCase());
+                    typ = EntryTypes.getType(type.toLowerCase());
                 }
                 entry = new BibtexEntry(IdGenerator.next(), typ);
                 String fld;

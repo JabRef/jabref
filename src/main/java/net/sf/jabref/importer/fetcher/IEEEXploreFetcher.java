@@ -34,16 +34,17 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.util.Util;
 
 public class IEEEXploreFetcher implements EntryFetcher {
@@ -133,22 +134,29 @@ public class IEEEXploreFetcher implements EntryFetcher {
             String page = Util.getResults(url);
 
             if (page.contains("You have entered an invalid search")) {
-                status.showMessage(Localization.lang("You have entered an invalid search '%0'.", terms), Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("You have entered an invalid search '%0'.", terms),
+                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
             if (page.contains("Bad request")) {
-                status.showMessage(Localization.lang("Bad Request '%0'.", terms), Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("Bad Request '%0'.", terms),
+                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
             if (page.contains("No results were found.")) {
-                status.showMessage(Localization.lang("No entries found for the search string '%0'", terms), Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("No entries found for the search string '%0'", terms),
+                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
             if (page.contains("Error Page")) {
-                status.showMessage(Localization.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."), Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                // @formatter:off
+                status.showMessage(
+                        Localization.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
+                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                // @formatter:on
                 return false;
             }
 
@@ -168,9 +176,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ConnectException e) {
-            status.showMessage(Localization.lang("Connection to IEEEXplore failed"), Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("Connection to IEEEXplore failed"),
+                    Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang(e.getMessage()), Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(e.getMessage(), Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
         }
         return false;
@@ -184,11 +193,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
     @Override
     public String getHelpPage() {
         return "IEEEXploreHelp.html";
-    }
-
-    @Override
-    public String getKeyName() {
-        return "IEEEXplore";
     }
 
     /**
@@ -213,7 +217,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
         }
     }
-
 
     private BibtexEntry cleanup(BibtexEntry entry) {
         if (entry == null) {
@@ -304,7 +307,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         date += ",";
                     }
                 } else {
-                    date = "#" + mm.group(2).substring(0, 3) + "# " + mm.group(1) + "--#" + mm.group(4).substring(0, 3) + "# " + mm.group(3) + ",";
+                    date = "#" + mm.group(2).substring(0, 3) + "# " + mm.group(1) + "--#" + mm.group(4).substring(0, 3)
+                            + "# " + mm.group(3) + ",";
                 }
             }
             //date = date.trim();
@@ -328,7 +332,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up publication field
-        BibtexEntryType type = entry.getType();
+        EntryType type = entry.getType();
         String sourceField = "";
         if (type.getName().equals("Article")) {
             sourceField = "journal";
@@ -360,7 +364,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     entry.clearField("number");
                 }
             } else {
-                fullName = fullName.replace("Conference Proceedings", "Proceedings").replace("Proceedings of", "Proceedings").replace("Proceedings.", "Proceedings");
+                fullName = fullName.replace("Conference Proceedings", "Proceedings")
+                        .replace("Proceedings of", "Proceedings").replace("Proceedings.", "Proceedings");
                 fullName = fullName.replaceAll("International", "Int.");
                 fullName = fullName.replaceAll("Symposium", "Symp.");
                 fullName = fullName.replaceAll("Conference", "Conf.");
@@ -432,7 +437,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     fullName = fullName.replaceAll(", " + year + "\\.?", "");
                 }
 
-                if (!fullName.contains("Abstract") && !fullName.contains("Summaries") && !fullName.contains("Conference Record")) {
+                if (!fullName.contains("Abstract") && !fullName.contains("Summaries")
+                        && !fullName.contains("Conference Record")) {
                     fullName = "Proc. " + fullName;
                 }
             }
@@ -485,43 +491,49 @@ public class IEEEXploreFetcher implements EntryFetcher {
             piv = endIndex;
             String text = allText.substring(index, endIndex);
 
-            BibtexEntryType type = null;
+            EntryType type = null;
             String sourceField = null;
 
             String typeName = "";
             Matcher typeMatcher = typePattern.matcher(text);
             if (typeMatcher.find()) {
                 typeName = typeMatcher.group(1);
-                if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines") || typeName.equalsIgnoreCase("IEEE Early Access Articles") ||
-                        typeName.equalsIgnoreCase("IET Journals &amp; Magazines") || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines") ||
-                        typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines") ||
-                        typeName.equalsIgnoreCase("TUP Journals &amp; Magazines") || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines") ||
-                        typeName.equalsIgnoreCase("MIT Press Journals") || typeName.equalsIgnoreCase("Alcatel-Lucent Journal")) {
-                    type = BibtexEntryType.getType("article");
+                if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines")
+                        || typeName.equalsIgnoreCase("IEEE Early Access Articles")
+                        || typeName.equalsIgnoreCase("IET Journals &amp; Magazines")
+                        || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines")
+                        || typeName.equalsIgnoreCase("AVS Journals &amp; Magazines")
+                        || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines")
+                        || typeName.equalsIgnoreCase("TUP Journals &amp; Magazines")
+                        || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")
+                        || typeName.equalsIgnoreCase("MIT Press Journals")
+                        || typeName.equalsIgnoreCase("Alcatel-Lucent Journal")) {
+                    type = EntryTypes.getType("article");
                     sourceField = "journal";
-                } else
-                    if (typeName.equalsIgnoreCase("IEEE Conference Publications") || typeName.equalsIgnoreCase("IET Conference Publications") || typeName.equalsIgnoreCase("VDE Conference Publications")) {
-                        type = BibtexEntryType.getType("inproceedings");
-                        sourceField = "booktitle";
-                    } else if (typeName.equalsIgnoreCase("IEEE Standards") || typeName.equalsIgnoreCase("Standards")) {
-                        type = BibtexEntryType.getType("standard");
-                        sourceField = "number";
-                    } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
-                        type = BibtexEntryType.getType("electronic");
-                        sourceField = "note";
-                    } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") ||
-                            typeName.equalsIgnoreCase("MIT Press eBook Chapters") ||
-                            typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
-                        type = BibtexEntryType.getType("incollection");
-                        sourceField = "booktitle";
-                    } else if (typeName.equalsIgnoreCase("Morgan and Claypool eBooks")) {
-                        type = BibtexEntryType.getType("book");
-                        sourceField = "note";
-                    }
+                } else if (typeName.equalsIgnoreCase("IEEE Conference Publications")
+                        || typeName.equalsIgnoreCase("IET Conference Publications")
+                        || typeName.equalsIgnoreCase("VDE Conference Publications")) {
+                    type = EntryTypes.getType("inproceedings");
+                    sourceField = "booktitle";
+                } else if (typeName.equalsIgnoreCase("IEEE Standards") || typeName.equalsIgnoreCase("Standards")) {
+                    type = EntryTypes.getType("standard");
+                    sourceField = "number";
+                } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
+                    type = EntryTypes.getType("electronic");
+                    sourceField = "note";
+                } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")
+                        || typeName.equalsIgnoreCase("MIT Press eBook Chapters")
+                        || typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
+                    type = EntryTypes.getType("incollection");
+                    sourceField = "booktitle";
+                } else if (typeName.equalsIgnoreCase("Morgan and Claypool eBooks")) {
+                    type = EntryTypes.getType("book");
+                    sourceField = "note";
+                }
             }
 
             if (type == null) {
-                type = BibtexEntryType.getType("misc");
+                type = EntryTypes.getType("misc");
                 sourceField = "note";
                 IEEEXploreFetcher.LOGGER.warn("Type detection failed. Use MISC instead. Type string: " + text);
                 unparseable++;
@@ -554,7 +566,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     entry.setField(field, htmlConverter.format(fieldMatcher.group(1)));
                     if (field.equals("title") && fieldMatcher.find()) {
                         String sec_title = htmlConverter.format(fieldMatcher.group(1));
-                        if (entry.getType() == BibtexEntryType.getStandardType("standard")) {
+                        if (entry.getType() == EntryTypes.getStandardType("standard")) {
                             sec_title = sec_title.replaceAll("IEEE Std ", "");
                         }
                         entry.setField(sourceField, sec_title);
@@ -586,8 +598,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 entry.setField("author", authorString);
             }
 
-            if ((entry.getType() == BibtexEntryType.getStandardType("inproceedings")) && entry.getField("author").equals("")) {
-                entry.setType(BibtexEntryType.getStandardType("proceedings"));
+            if ((entry.getType() == EntryTypes.getStandardType("inproceedings"))
+                    && entry.getField("author").equals("")) {
+                entry.setType(EntryTypes.getStandardType("proceedings"));
             }
 
             if (includeAbstract) {
@@ -622,14 +635,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind < 0) {
-            IEEEXploreFetcher.LOGGER.debug(page);
-            throw new IOException(Localization.lang("Could not parse number of hits"));
+            LOGGER.debug(page);
+            throw new IOException("Cannot parse number of hits");
         }
         String substring = page.substring(ind, page.length());
         Matcher m = pattern.matcher(substring);
         if (m.find()) {
             return Integer.parseInt(m.group(1));
         }
-        throw new IOException(Localization.lang("Could not parse number of hits"));
+        throw new IOException("Cannot parse number of hits");
     }
 }

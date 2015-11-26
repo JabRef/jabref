@@ -35,8 +35,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
@@ -178,10 +178,12 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(wrapFieldLine);
         builder.nextLine();
         //for LWang_AdjustableFieldOrder
-        String[] _rbs0 = {"Save fields sorted in alphabetic order (as in versions 2.10+)", "Save fields in unsorted order (as until version 2.9.2)", "Save fields in user-defined order"};
+        String[] _rbs0 = {Localization.lang("Save fields sorted in alphabetic order (as in versions 2.10+)"),
+                Localization.lang("Save fields in unsorted order (as until version 2.9.2)"),
+                Localization.lang("Save fields in user-defined order")};
         ArrayList<String> _rbs = new ArrayList<>();
         for (String _rb : _rbs0) {
-            _rbs.add(Localization.lang(_rb));
+            _rbs.add(_rb);
         }
         bgFieldOrderStyle = createRadioBg(_rbs);
         userDefinedFieldOrder = new JTextField(this.prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future

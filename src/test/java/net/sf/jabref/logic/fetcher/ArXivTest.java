@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
-
 public class ArXivTest {
     ArXiv finder;
     BibtexEntry entry;
@@ -19,6 +17,11 @@ public class ArXivTest {
     public void setup() {
         finder = new ArXiv();
         entry = new BibtexEntry();
+    }
+
+    @Test
+    public void doiNotPresent() throws IOException {
+        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test(expected = NullPointerException.class)

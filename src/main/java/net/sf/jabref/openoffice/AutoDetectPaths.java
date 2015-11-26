@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -27,13 +27,13 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 
 /**
- * Tools for automatically detecting jar and executable paths to OpenOffice.
+ * Tools for automatically detecting jar and executable paths to OpenOffice and/or LibreOffice.
  */
 public class AutoDetectPaths extends AbstractWorker {
 
@@ -94,15 +94,19 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
+            List<File> sofficeFiles = new ArrayList<>();
             for (File dir : progFiles) {
                 sOffice = findFileDir(dir, "soffice.exe");
                 if (sOffice != null) {
-                    break;
+                    sofficeFiles.add(sOffice);
                 }
             }
             if (sOffice == null) {
-                JOptionPane.showMessageDialog(parent, Localization.lang("Unable to autodetect OpenOffice installation. Please choose the installation directory manually."),
-                        Localization.lang("Could not find OpenOffice installation"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(parent,
+                        Localization
+                                .lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."),
+                        Localization.lang("Could not find OpenOffice/LibreOffice installation"),
+                        JOptionPane.INFORMATION_MESSAGE);
                 JFileChooser jfc = new JFileChooser(new File("C:\\"));
                 jfc.setDialogType(JFileChooser.OPEN_DIALOG);
                 jfc.setFileFilter(new javax.swing.filechooser.FileFilter() {
@@ -127,6 +131,32 @@ public class AutoDetectPaths extends AbstractWorker {
                 return false;
             }
 
+            if (sofficeFiles.size() > 1) {
+                // More than one file found
+                DefaultListModel<File> mod = new DefaultListModel<>();
+                for (File tmpfile : sofficeFiles) {
+                    mod.addElement(tmpfile);
+                }
+                JList<File> fileList = new JList<>(mod);
+                fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                fileList.setSelectedIndex(0);
+                FormBuilder b = FormBuilder.create()
+                        .layout(new FormLayout("left:pref", "pref, 2dlu, pref, 4dlu, pref"));
+                b.add(Localization.lang("Found more than one OpenOffice/LibreOffice executable.")).xy(1, 1);
+                b.add(Localization.lang("Please choose which one to connect to:")).xy(1, 3);
+                b.add(fileList).xy(1, 5);
+                int answer = JOptionPane.showConfirmDialog(null, b.getPanel(),
+                        Localization.lang("Choose OpenOffice/LibreOffice executable"),
+                        JOptionPane.OK_CANCEL_OPTION);
+                if (answer == JOptionPane.CANCEL_OPTION) {
+                    return false;
+                } else {
+                    sOffice = fileList.getSelectedValue();
+                }
+
+            } else {
+                sOffice = sofficeFiles.get(0);
+            }
             Globals.prefs.put("ooExecutablePath", new File(sOffice, "soffice.exe").getPath());
             File unoil = findFileDir(sOffice.getParentFile(), "unoil.jar");
             if (fileSearchCancelled) {
@@ -136,7 +166,7 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            if (unoil != null && jurt != null) {
+            if ((unoil != null) && (jurt != null)) {
                 Globals.prefs.put("ooUnoilPath", unoil.getPath());
                 Globals.prefs.put("ooJurtPath", jurt.getPath());
                 return true;
@@ -175,7 +205,7 @@ public class AutoDetectPaths extends AbstractWorker {
                 if (fileSearchCancelled) {
                     return false;
                 }
-                if (unoil != null && jurt != null) {
+                if ((unoil != null) && (jurt != null)) {
                     Globals.prefs.put("ooUnoilPath", unoil.getPath());
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
@@ -207,14 +237,14 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            if (inUsr != null && inOpt == null) {
+            if ((inUsr != null) && (inOpt == null)) {
                 return setupPreferencesForOO(usrRoot, inUsr);
             }
-            else if (inOpt != null && inUsr == null) {
+            else if ((inOpt != null) && (inUsr == null)) {
                 Globals.prefs.put("ooExecutablePath", new File(inOpt, "soffice.bin").getPath());
                 File unoil = findFileDir(new File("/opt"), "unoil.jar");
                 File jurt = findFileDir(new File("/opt"), "jurt.jar");
-                if (unoil != null && jurt != null) {
+                if ((unoil != null) && (jurt != null)) {
                     Globals.prefs.put("ooUnoilPath", unoil.getPath());
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
@@ -228,11 +258,15 @@ public class AutoDetectPaths extends AbstractWorker {
                 ButtonGroup bg = new ButtonGroup();
                 bg.add(optRB);
                 bg.add(usrRB);
-                DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref", ""));
-                b.append(Localization.lang("Found more than one OpenOffice executable. Please choose which one to connect to:"));
-                b.append(optRB);
-                b.append(usrRB);
-                int answer = JOptionPane.showConfirmDialog(null, b.getPanel(), Localization.lang("Choose OpenOffice executable"),
+                FormBuilder b = FormBuilder.create()
+                        .layout(new FormLayout("left:pref", "pref, 2dlu, pref, 2dlu, pref "));
+                b.add(Localization
+                        .lang("Found more than one OpenOffice/LibreOffice executable. Please choose which one to connect to:"))
+                        .xy(1, 1);
+                b.add(optRB).xy(1, 3);
+                b.add(usrRB).xy(1, 5);
+                int answer = JOptionPane.showConfirmDialog(null, b.getPanel(),
+                        Localization.lang("Choose OpenOffice/LibreOffice executable"),
                         JOptionPane.OK_CANCEL_OPTION);
                 if (answer == JOptionPane.CANCEL_OPTION) {
                     return false;
@@ -262,7 +296,7 @@ public class AutoDetectPaths extends AbstractWorker {
         if (fileSearchCancelled) {
             return false;
         }
-        if (unoil != null && jurt != null) {
+        if ((unoil != null) && (jurt != null)) {
             Globals.prefs.put("ooUnoilPath", unoil.getPath());
             Globals.prefs.put("ooJurtPath", jurt.getPath());
             return true;
@@ -278,17 +312,31 @@ public class AutoDetectPaths extends AbstractWorker {
      *   find the Program files dir in localized Windows installations.
      */
     private static java.util.List<File> findProgramFilesDir() {
-        List<File> dirList = new ArrayList<File>();
-        File root = new File("C:\\");
-        File[] dirs = root.listFiles(new FileFilter() {
+        List<String> sourceList = new ArrayList<>();
+        List<File> dirList = new ArrayList<>();
 
-            @Override
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        });
-        for (File dir : dirs) {
-            if (dir.getName().toLowerCase().equals("program files") || dir.getName().toLowerCase().equals("program files (x86)")) {
+         // 64-bits first
+        String progFiles = System.getenv("ProgramFiles");
+        if (progFiles != null) {
+            sourceList.add(progFiles);
+        }
+
+        // Then 32-bits
+        progFiles = System.getenv("ProgramFiles(x86)");
+        if (progFiles != null) {
+            sourceList.add(progFiles);
+        }
+
+        for (String rootPath : sourceList) {
+            File root = new File(rootPath);
+            File[] dirs = root.listFiles(new FileFilter() {
+
+                @Override
+                public boolean accept(File file) {
+                    return file.isDirectory();
+                }
+            });
+            for (File dir : dirs) {
                 dirList.add(dir);
             }
         }
@@ -339,9 +387,9 @@ public class AutoDetectPaths extends AbstractWorker {
         return result;
     }
 
-    public JDialog showProgressDialog(JDialog parent, String title, String message, boolean includeCancelButton) {
+    public JDialog showProgressDialog(JDialog progressParent, String title, String message, boolean includeCancelButton) {
         fileSearchCancelled = false;
-        final JDialog prog;
+        final JDialog progressDialog;
         JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(new ActionListener() {
@@ -352,21 +400,21 @@ public class AutoDetectPaths extends AbstractWorker {
                 ((JButton) event.getSource()).setEnabled(false);
             }
         });
-        prog = new JDialog(parent, title, false);
+        progressDialog = new JDialog(progressParent, title, false);
         bar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         bar.setIndeterminate(true);
         if (includeCancelButton) {
-            prog.add(cancel, BorderLayout.SOUTH);
+            progressDialog.add(cancel, BorderLayout.SOUTH);
         }
-        prog.add(new JLabel(message), BorderLayout.NORTH);
-        prog.add(bar, BorderLayout.CENTER);
-        prog.pack();
-        prog.setLocationRelativeTo(null);//parent);
+        progressDialog.add(new JLabel(message), BorderLayout.NORTH);
+        progressDialog.add(bar, BorderLayout.CENTER);
+        progressDialog.pack();
+        progressDialog.setLocationRelativeTo(null);//parent);
         //SwingUtilities.invokeLater(new Runnable() {
         //    public void run() {
-        prog.setVisible(true);
+        progressDialog.setVisible(true);
         //    }
         //});
-        return prog;
+        return progressDialog;
     }
 }

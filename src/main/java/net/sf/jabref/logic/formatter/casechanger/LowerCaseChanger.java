@@ -1,12 +1,13 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class LowerCaseChanger implements Formatter {
 
     @Override
     public String getName() {
-        return "lower";
+        return Localization.lang("lower");
     }
 
     /**

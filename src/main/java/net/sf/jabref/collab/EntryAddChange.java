@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -23,7 +23,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
@@ -34,7 +35,7 @@ class EntryAddChange extends Change {
 
 
     public EntryAddChange(BibtexEntry diskEntry) {
-        super("Added entry");
+        super(Localization.lang("Added entry"));
         this.diskEntry = diskEntry;
 
         PreviewPanel pp = new PreviewPanel(null, diskEntry, null, new MetaData(), Globals.prefs.get(JabRefPreferences.PREVIEW_0));

@@ -45,22 +45,17 @@ public class RemoteListenerServer implements Runnable {
     public void run() {
         try {
             while (!Thread.interrupted()) {
-                try {
-                    Socket socket = serverSocket.accept();
+                try (Socket socket = serverSocket.accept()) {
                     socket.setSoTimeout(ONE_SECOND_TIMEOUT);
 
                     Protocol protocol = new Protocol(socket);
-                    try {
-                        protocol.sendMessage(Protocol.IDENTIFIER);
-                        String message = protocol.receiveMessage();
-                        if (message.isEmpty()) {
-                            continue;
-                        }
-                        messageHandler.handleMessage(message);
-                    } finally {
-                        protocol.close();
-                        socket.close();
+                    protocol.sendMessage(Protocol.IDENTIFIER);
+                    String message = protocol.receiveMessage();
+                    protocol.close();
+                    if (message.isEmpty()) {
+                        continue;
                     }
+                    messageHandler.handleMessage(message);
 
                 } catch (SocketException ex) {
                     return;

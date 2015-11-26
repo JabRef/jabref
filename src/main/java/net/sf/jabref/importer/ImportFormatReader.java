@@ -19,8 +19,7 @@ import java.io.*;
 import java.util.*;
 
 import net.sf.jabref.importer.fileformat.*;
-import net.sf.jabref.logic.id.IdGenerator;
-import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.Log;
@@ -128,26 +127,16 @@ public class ImportFormatReader {
     }
 
     public List<BibtexEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
-        List<BibtexEntry> result = null;
-        InputStream stream = null;
-        try {
-            File file = new File(filename);
-            stream = new FileInputStream(file);
+        File file = new File(filename);
+
+        try (InputStream stream = new FileInputStream(file)) {
 
             if (!importer.isRecognizedFormat(stream)) {
-                throw new IOException(Localization.lang("Wrong file format"));
+                throw new IOException("Wrong file format");
             }
 
-            stream = new FileInputStream(file);
-
-            result = importer.importEntries(stream, status);
-        } finally {
-            if (stream != null) {
-                stream.close();
-            }
+            return importer.importEntries(stream, status);
         }
-
-        return result;
     }
 
     public static BibtexDatabase createDatabase(Collection<BibtexEntry> bibentries) {
@@ -344,20 +333,17 @@ public class ImportFormatReader {
         }
     }
 
-    public static Reader getUTF8Reader(File f) throws IOException {
+    public static InputStreamReader getUTF8Reader(File f) throws IOException {
         return getReader(f, "UTF-8");
     }
 
-    public static Reader getUTF16Reader(File f) throws IOException {
+    public static InputStreamReader getUTF16Reader(File f) throws IOException {
         return getReader(f, "UTF-16");
     }
 
-    public static Reader getReader(File f, String encoding)
+    public static InputStreamReader getReader(File f, String encoding)
             throws IOException {
-        InputStreamReader reader;
-        reader = new InputStreamReader(new FileInputStream(f), encoding);
-
-        return reader;
+        return new InputStreamReader(new FileInputStream(f), encoding);
     }
 
     public static Reader getReaderDefaultEncoding(InputStream in)

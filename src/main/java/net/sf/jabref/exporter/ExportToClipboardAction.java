@@ -24,8 +24,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JList;
@@ -49,19 +49,22 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class ExportToClipboardAction extends AbstractWorker {
 
-    private String message;
     private final JabRefFrame frame;
     private final BibtexDatabase database;
 
+    /**
+     * written by run() and read by update()
+     */
+    private String message;
 
     public ExportToClipboardAction(JabRefFrame frame, BibtexDatabase database) {
-        this.frame = frame;
-        this.database = database;
+        this.frame = Objects.requireNonNull(frame);
+        this.database = Objects.requireNonNull(database);
     }
 
     @Override
     public void run() {
-        BasePanel panel = frame.basePanel();
+        BasePanel panel = frame.getCurrentBasePanel();
         if (panel == null) {
             return;
         }
@@ -71,55 +74,39 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        Map<String, IExportFormat> m = ExportFormats.getExportFormats();
-        IExportFormat[] formats = new ExportFormat[m.size()];
-        String[] array = new String[formats.length];
-
-        int piv = 0;
-        for (IExportFormat format : m.values()) {
-            formats[piv] = format;
-            array[piv] = format.getDisplayName();
-            piv++;
+        List<IExportFormat> exportFormats = new LinkedList<>(ExportFormats.getExportFormats().values());
+        Collections.sort(exportFormats, (e1, e2) -> e1.getDisplayName().compareTo(e2.getDisplayName()));
+        String[] exportFormatDisplayNames = new String[exportFormats.size()];
+        for (int i = 0; i < exportFormats.size(); i++) {
+            IExportFormat exportFormat = exportFormats.get(i);
+            exportFormatDisplayNames[i] = exportFormat.getDisplayName();
         }
 
-        JList<String> list = new JList<>(array);
+        JList<String> list = new JList<>(exportFormatDisplayNames);
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        int answer = JOptionPane.showOptionDialog(frame, list, Localization.lang("Select format"),
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null,
-                new String[] {Localization.lang("Ok"), Localization.lang("Cancel")},
-                Localization.lang("Ok"));
-
+        int answer = JOptionPane.showOptionDialog(frame, list, Localization.lang("Select export format"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                // @formatter:off
+                new String[] {Localization.lang("Export with selected format"),
+                        Localization.lang("Return to JabRef")},
+                Localization.lang("Export with selected format"));
+                // @formatter:on
         if (answer == JOptionPane.NO_OPTION) {
             return;
         }
 
-        IExportFormat format = formats[list.getSelectedIndex()];
+        IExportFormat format = exportFormats.get(list.getSelectedIndex());
 
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
+        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().metaData()
                 .getFileDirectory(Globals.FILE_FIELD);
         // Also store the database's file in a global variable:
-        Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
+        Globals.prefs.databaseFile = frame.getCurrentBasePanel().metaData().getFile();
 
-        /*final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
-        String dir = null;
-        if (custom) {
-            int index = list.getSelectedIndex() - Globals.STANDARD_EXPORT_COUNT;
-            dir = (String) (Globals.prefs.customExports.getElementAt(index)[1]);
-            File f = new File(dir);
-            lfName = f.getName();
-            lfName = lfName.substring(0, lfName.indexOf("."));
-            // Remove filename - we want the directory only.
-            dir = f.getParent() + System.getProperty("file.separator");
-        }
-        final String format = lfName,
-                directory = dir;
-        */
         File tmp = null;
         Reader reader = null;
         try {
@@ -143,12 +130,8 @@ public class ExportToClipboardAction extends AbstractWorker {
             while ((s = reader.read()) != -1) {
                 sb.append((char) s);
             }
-            ClipboardOwner owner = new ClipboardOwner() {
-
-                @Override
-                public void lostOwnership(Clipboard clipboard, Transferable content) {
-                    // Do nothing
-                }
+            ClipboardOwner owner = (clipboard, content) -> {
+                // Do nothing
             };
             //StringSelection ss = new StringSelection(sw.toString());
             RtfSelection rs = new RtfSelection(sb.toString());

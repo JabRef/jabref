@@ -65,7 +65,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         success = false;
         cancelled = false;
         fileLockedError = false;
-        if (panel.getFile() == null) {
+        if (panel.getDatabaseFile() == null) {
             saveAs();
         } else {
 
@@ -82,17 +82,12 @@ public class SaveDatabaseAction extends AbstractWorker {
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, opts, opts[0]);
                 // @formatter:on
-                //  int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
-                // +"Are you sure you want to save?"), Globals.lang("File updated externally"),
-                // JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
                 if (answer == JOptionPane.CANCEL_OPTION) {
                     cancelled = true;
                     return;
                 }
                 else if (answer == JOptionPane.YES_OPTION) {
-                    //try {
-
                     cancelled = true;
 
                     JabRefExecutorService.INSTANCE.execute(new Runnable() {
@@ -100,12 +95,12 @@ public class SaveDatabaseAction extends AbstractWorker {
                         @Override
                         public void run() {
 
-                            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
+                            if (!FileBasedLock.waitForFileLock(panel.getDatabaseFile(), 10)) {
                                 // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                                 LOGGER.error("File locked, this will be trouble.");
                             }
 
-                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getFile());
+                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getDatabaseFile());
                             JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                             if (scanner.changesFound()) {
                                 scanner.displayResult(new ChangeScanner.DisplayResultCallback() {
@@ -157,11 +152,10 @@ public class SaveDatabaseAction extends AbstractWorker {
     public void update() {
         if (success) {
             // Reset title of tab
-            frame.setTabTitle(panel, panel.getFile().getName(),
-                    panel.getFile().getAbsolutePath());
-            frame.output(Localization.lang("Saved database") + " '"
-                    + panel.getFile().getPath() + "'.");
+            frame.setTabTitle(panel, panel.getTabTitle(), panel.getDatabaseFile().getAbsolutePath());
+            frame.output(Localization.lang("Saved database") + " '" + panel.getDatabaseFile().getPath() + "'.");
             frame.setWindowTitle();
+            frame.updateAllTabTitles();
         } else if (!cancelled) {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.
@@ -174,7 +168,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (cancelled || (panel.getFile() == null)) {
+        if (cancelled || (panel.getDatabaseFile() == null)) {
             return;
         }
 
@@ -187,17 +181,13 @@ public class SaveDatabaseAction extends AbstractWorker {
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();
 
-            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
+            if (!FileBasedLock.waitForFileLock(panel.getDatabaseFile(), 10)) {
                 success = false;
                 fileLockedError = true;
             }
             else {
                 // Now save the database:
-                success = saveDatabase(panel.getFile(), false, panel.getEncoding());
-
-                //Util.pr("Testing resolve string... BasePanel line 237");
-                //Util.pr("Resolve aq: "+database.resolveString("aq"));
-                //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
+                success = saveDatabase(panel.getDatabaseFile(), false, panel.getEncoding());
 
                 try {
                     Globals.fileUpdateMonitor.updateTimeStamp(panel.getFileMonitorHandle());
@@ -288,7 +278,10 @@ public class SaveDatabaseAction extends AbstractWorker {
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
+                    // @formatter:off
+                    new String[] {Localization.lang("Save"), tryDiff,
+                            Localization.lang("Cancel")}, tryDiff);
+                    // @formatter:on
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
@@ -376,10 +369,9 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             f = new File(chosenFile);
             // Check if the file already exists:
-            if (f.exists() && (JOptionPane.showConfirmDialog
-                    (frame, '\'' + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
-                            Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-                        != JOptionPane.OK_OPTION)) {
+            if (f.exists() && (JOptionPane.showConfirmDialog(frame,
+                    Localization.lang("'%0' exists. Overwrite file?", f.getName()),
+                    Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)) {
                 f = null;
             }
         }
@@ -396,7 +388,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             // Register so we get notifications about outside changes to the file.
             try {
-                panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel, panel.getFile()));
+                panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel, panel.getDatabaseFile()));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

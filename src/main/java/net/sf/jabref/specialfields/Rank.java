@@ -29,8 +29,11 @@ public class Rank extends SpecialField {
         TEXT_DONE_PATTERN = "Set rank to '%0' for %1 entries";
 
         ArrayList<SpecialFieldValue> values = new ArrayList<>();
-        //lab.setName("i");
-        values.add(new SpecialFieldValue(this, null, "clearRank", Localization.lang("Clear rank"), null, Localization.lang("No rank information")));
+        // lab.setName("i");
+        // @formatter:off
+        values.add(new SpecialFieldValue(this, null, "clearRank", Localization.lang("Clear rank"), null,
+                Localization.lang("No rank information")));
+        // @formatter:on
         // DO NOT TRANSLATE "rank1" etc. as this makes the .bib files non portable
         values.add(new SpecialFieldValue(this, "rank1", "setRank1", "", IconTheme.JabRefIcon.RANK1.getSmallIcon(), Localization.lang("One star")));
         values.add(new SpecialFieldValue(this, "rank2", "setRank2", "", IconTheme.JabRefIcon.RANK2.getSmallIcon(), Localization.lang("Two stars")));

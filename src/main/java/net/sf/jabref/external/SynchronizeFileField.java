@@ -23,6 +23,8 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -78,7 +80,7 @@ public class SynchronizeFileField extends AbstractWorker {
         if (optDiag == null) {
             optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.metaData(), fieldName);
         }
-        Util.placeDialog(optDiag, panel.frame());
+        PositionWindow.placeDialog(optDiag, panel.frame());
         optDiag.setVisible(true);
         if (optDiag.canceled()) {
             goOn = false;
@@ -103,7 +105,6 @@ public class SynchronizeFileField extends AbstractWorker {
                 + (checkExisting ? sel.length : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        int brokenLinks = 0;
         final NamedCompound ce = new NamedCompound(Localization.lang("Autoset %0 field", fieldName));
 
         //final OpenFileFilter off = Util.getFileFilterForField(fieldName);
@@ -215,14 +216,16 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // Cancel
                                 break mainLoop;
                             }
-                            brokenLinks++;
                         }
 
                         // Unless we deleted this link, see if its file type is recognized:
                         if (!deleted && (flEntry.getType() instanceof UnknownExternalFileType)) {
-                            String[] options = new String[]
-                                    {Localization.lang("Define '%0'", flEntry.getType().getName()),
-                                            Localization.lang("Change file type"), Localization.lang("Cancel")};
+                            // @formatter:off
+                            String[] options = new String[] {
+                                    Localization.lang("Define '%0'", flEntry.getType().getName()),
+                                    Localization.lang("Change file type"),
+                                    Localization.lang("Cancel")};
+                            // @formatter:on
                             String defOption = options[0];
                             int answer = JOptionPane.showOptionDialog(panel.frame(), Localization.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
                                     flEntry.getType().getName()),
@@ -349,11 +352,10 @@ public class SynchronizeFileField extends AbstractWorker {
 
             FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
             FormBuilder builder = FormBuilder.create().layout(layout);
-            description = new JLabel("<HTML>" +
-                    Localization.lang(//"This function helps you keep your external %0 links up-to-date." +
-                            "Attempt to autoset %0 links for your entries. Autoset works if "
-                            + "a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.", fn)
-            + "</HTML>");
+            description = new JLabel("<HTML>" + Localization.lang(
+                    "Attempt to autoset %0 links for your entries. Autoset works if "
+                            + "a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.",
+                    fn) + "</HTML>");
 
             builder.addSeparator(Localization.lang("Autoset")).xy(1, 1);
             builder.add(description).xy(1, 3);

@@ -30,7 +30,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 public class UndoableFieldChange extends AbstractUndoableEdit {
     private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
-    
+
     private final BibtexEntry entry;
     private final String field;
     private final String oldValue;
@@ -52,12 +52,18 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + Localization.lang("change field");
+        // @formatter:off
+        return Localization.lang("Undo") + ": " +
+                Localization.lang("change field");
+        // @formatter:on
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + Localization.lang("change field");
+        // @formatter:off
+        return Localization.lang("Redo") + ": " +
+                Localization.lang("change field");
+        // @formatter:on
     }
 
     @Override

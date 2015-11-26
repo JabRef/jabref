@@ -1,6 +1,4 @@
-package net.sf.jabref.sql;
-
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -15,6 +13,8 @@ package net.sf.jabref.sql;
  with this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+package net.sf.jabref.sql;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.gui.JabRefFrame;
@@ -54,7 +54,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     private final JTable table;
 
     // IMPORT
-    public final List<String> listOfDBs = new ArrayList<String>();
+    public final List<String> listOfDBs = new ArrayList<>();
     public boolean moreThanOne;
     // EXPORT
     public String selectedDB = "";
@@ -70,14 +70,10 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     public DBImportExportDialog(JabRefFrame frame, Vector<Vector<String>> rows, DialogType dialogType) {
         this.dialogType = dialogType;
 
-        Vector<String> columns = new Vector<String>();
+        Vector<String> columns = new Vector<>();
         columns.add("Databases");
         table = new JTable();
         DefaultTableModel model = new DefaultTableModel(rows, columns) {
-
-            private static final long serialVersionUID = 1L;
-
-
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -223,8 +219,8 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     }
 
     private void importAction() {
-        int[] selectedInt = table.getSelectedRows();
-        for (int aSelectedInt : selectedInt) {
+        int[] selInt = table.getSelectedRows();
+        for (int aSelectedInt : selInt) {
             listOfDBs.add((String) table.getValueAt(aSelectedInt, 0));
             moreThanOne = true;
         }

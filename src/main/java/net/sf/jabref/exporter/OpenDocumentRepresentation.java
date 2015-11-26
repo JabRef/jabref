@@ -53,16 +53,15 @@ class OpenDocumentRepresentation {
     private static final Log LOGGER = LogFactory.getLog(OpenDocumentRepresentation.class);
 
 
-    @SuppressWarnings("unchecked")
     public OpenDocumentRepresentation(BibtexDatabase database, Set<String> keySet) {
         this.database = database;
         // Make a list of comparators for sorting the entries:
-        List<FieldComparator> comparators = new ArrayList<FieldComparator>();
+        List<FieldComparator> comparators = new ArrayList<>();
         comparators.add(new FieldComparator("author"));
         comparators.add(new FieldComparator("year"));
         comparators.add(new FieldComparator(BibtexEntry.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
-        BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
+        BasicEventList<BibtexEntry> entryList = new BasicEventList<>();
 
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:

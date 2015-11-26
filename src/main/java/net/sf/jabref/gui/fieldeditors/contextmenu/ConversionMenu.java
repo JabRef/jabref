@@ -32,8 +32,6 @@ import java.awt.event.ActionListener;
  * Menu to show up on right-click in a text field for converting text formats
  */
 public class ConversionMenu extends JMenu {
-
-    private static final long serialVersionUID = 8553688191031156265L;
     private final JTextComponent parent;
 
 
@@ -43,7 +41,7 @@ public class ConversionMenu extends JMenu {
 
         // create menu items, one for each case changer
         for (final Converters.Converter converter : Converters.ALL) {
-            JMenuItem menuItem = new JMenuItem(Localization.lang(converter.getName()));
+            JMenuItem menuItem = new JMenuItem(converter.getName());
             menuItem.addActionListener(new ActionListener() {
 
                 @Override

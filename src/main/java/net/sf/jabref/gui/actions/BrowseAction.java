@@ -15,9 +15,9 @@
 */
 package net.sf.jabref.gui.actions;
 
-import net.sf.jabref.gui.FocusRequester;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -29,9 +29,6 @@ import java.io.File;
  * Action used to produce a "Browse" button for one of the text fields.
  */
 public class BrowseAction extends AbstractAction {
-
-    private static final long serialVersionUID = 3007593430933681310L;
-
     private final JFrame frame;
     private final JTextField comp;
     private final boolean dir;

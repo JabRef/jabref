@@ -15,17 +15,15 @@
 */
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * This class defines entry types for BibLatex support.
+ * @see http://mirrors.concertpass.com/tex-archive/macros/latex/contrib/biblatex/doc/biblatex.pdf
  */
-
-class BibLatexEntryTypes {
+public class BibLatexEntryTypes {
 
     /*
         "rare" fields?
@@ -33,21 +31,19 @@ class BibLatexEntryTypes {
             "issuetitle", "issuesubtitle", "origlanguage", "version", "addendum"
 
      */
+    public static final BibLatexEntryType ARTICLE = new BibLatexEntryType() {
 
-    public static final BibtexEntryType ARTICLE = new BibtexEntryType() {
+        private final List<String> primaryOptionalFields = Collections.unmodifiableList(
+                Arrays.asList(new String[] {"subtitle", "editor", "series", "volume", "number", "eid", "issue", "pages",
+                        "note", "issn", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "editor", "series", "volume", "number", "eid", "issue", "pages", "note", "issn",
-                "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
 
         {
-            addAllOptional("translator", "annotator", "commentator", "subtitle", "titleaddon",
-                    "editor", "editora", "editorb", "editorc", "journalsubtitle", "issuetitle",
-                    "issuesubtitle", "language", "origlanguage", "series", "volume", "number",
-                    "eid", "issue", "month", "year", "pages", "version", "note", "issn",
-                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
-                    "urldate");
             addAllRequired("author", "title", "journaltitle", "date");
+            addAllOptional("translator", "annotator", "commentator", "subtitle", "titleaddon", "editor", "editora",
+                    "editorb", "editorc", "journalsubtitle", "issuetitle", "issuesubtitle", "language", "origlanguage",
+                    "series", "volume", "number", "eid", "issue", "month", "year", "pages", "version", "note", "issn",
+                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
         }
 
         @Override
@@ -60,29 +56,23 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType BOOK = new BibtexEntryType() {
+    public static final BibLatexEntryType BOOK = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"editor",
-                "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "volume", "edition",
-                "publisher", "isbn", "chapter", "pages", "pagetotal", "doi", "eprint", "eprintclass", "eprinttype",
-                "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"editor", "subtitle", "titleaddon", "maintitle",
+                        "mainsubtitle", "maintitleaddon", "volume", "edition", "publisher", "isbn", "chapter", "pages",
+                        "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
-            addAllOptional("editor", "editora", "editorb", "editorc", "translator",
-                    "annotator", "commentator", "introduction",
-                    "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
-                    "maintitleaddon", "language", "origlanguage", "volume", "part",
-                    "edition", "volumes", "series", "number", "month", "year", "note", "publisher",
-                    "location", "isbn", "chapter", "pages", "pagetotal", "addendum", "pubstate",
-                    "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
             addAllRequired("author", "title", "date");
+            addAllOptional("editor", "editora", "editorb", "editorc", "translator", "annotator", "commentator",
+                    "introduction", "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
+                    "maintitleaddon", "language", "origlanguage", "volume", "part", "edition", "volumes", "series",
+                    "number", "month", "year", "note", "publisher", "location", "isbn", "chapter", "pages", "pagetotal",
+                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
         }
 
         @Override
@@ -94,30 +84,24 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType INBOOK = new BibtexEntryType() {
+    public static final BibLatexEntryType INBOOK = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{
-                "bookauthor", "editor", "subtitle", "titleaddon", "maintitle",
-                "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon", "volume",
-                "edition", "publisher", "isbn", "chapter", "pages", "doi", "eprint", "eprintclass",
-                "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays
+                .asList(new String[] {"bookauthor", "editor", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
+                        "maintitleaddon", "booksubtitle", "booktitleaddon", "volume", "edition", "publisher", "isbn",
+                        "chapter", "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
-            addAllOptional("bookauthor", "editor", "editora", "editorb", "editorc",
-                    "translator", "annotator", "commentator", "introduction", "foreword", "afterword",
-                    "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
-                    "booksubtitle", "booktitleaddon", "language", "origlanguage", "volume", "part",
-                    "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn",
-                    "chapter", "pages", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-                    "eprinttype", "url", "urldate", "year");
             addAllRequired("author", "title", "booktitle", "date");
+            addAllOptional("bookauthor", "editor", "editora", "editorb", "editorc", "translator", "annotator",
+                    "commentator", "introduction", "foreword", "afterword", "subtitle", "titleaddon", "maintitle",
+                    "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon", "language", "origlanguage",
+                    "volume", "part", "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn",
+                    "chapter", "pages", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
+                    "urldate", "year");
         }
 
         @Override
@@ -129,21 +113,16 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType BOOKINBOOK = new BibtexEntryType() {
+    public static final BibLatexEntryType BOOKINBOOK = new BibLatexEntryType() {
 
         @Override
         public String getName() {
             return "BookInBook";
         }
 
-        // Same fields as "INBOOK" according to Biblatex 1.0: 
+        // Same fields as "INBOOK" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
             return BibLatexEntryTypes.INBOOK.getRequiredFields();
@@ -158,21 +137,16 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INBOOK.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType SUPPBOOK = new BibtexEntryType() {
+    public static final BibLatexEntryType SUPPBOOK = new BibLatexEntryType() {
 
         @Override
         public String getName() {
             return "SuppBook";
         }
 
-        // Same fields as "INBOOK" according to Biblatex 1.0: 
+        // Same fields as "INBOOK" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
             return BibLatexEntryTypes.INBOOK.getRequiredFields();
@@ -187,24 +161,20 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INBOOK.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType BOOKLET = new BibtexEntryType() {
+    public static final BibLatexEntryType BOOKLET = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "howpublished", "chapter", "pages", "doi", "eprint",
-                "eprintclass", "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "titleaddon", "howpublished", "chapter",
+                        "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("author", "editor", "title", "date");
-            addAllOptional("subtitle", "titleaddon", "language", "howpublished", "type", "note",
-                    "location", "chapter", "year", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
-                    "eprintclass", "eprinttype", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "language", "howpublished", "type", "note", "location", "chapter",
+                    "year", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype",
+                    "url", "urldate");
         }
 
         @Override
@@ -216,29 +186,23 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType COLLECTION = new BibtexEntryType() {
+    public static final BibLatexEntryType COLLECTION = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{
-                "translator", "subtitle", "titleaddon", "maintitle",
-                "mainsubtitle", "maintitleaddon", "volume",
-                "edition", "publisher", "isbn", "chapter", "pages", "doi", "eprint", "eprintclass",
-                "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"translator", "subtitle", "titleaddon", "maintitle",
+                        "mainsubtitle", "maintitleaddon", "volume", "edition", "publisher", "isbn", "chapter", "pages",
+                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("editor", "title", "date");
-            addAllOptional("editora", "editorb", "editorc", "translator", "annotator",
-                    "commentator", "introduction", "foreword", "afterword", "subtitle", "titleaddon",
-                    "maintitle", "mainsubtitle", "maintitleaddon", "language", "origlanguage", "volume",
-                    "part", "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn",
-                    "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-                    "eprinttype", "url", "urldate", "year");
+            addAllOptional("editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
+                    "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
+                    "language", "origlanguage", "volume", "part", "edition", "volumes", "series", "number", "note",
+                    "publisher", "location", "isbn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi",
+                    "eprint", "eprintclass", "eprinttype", "url", "urldate", "year");
         }
 
         @Override
@@ -250,29 +214,23 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType INCOLLECTION = new BibtexEntryType() {
+    public static final BibLatexEntryType INCOLLECTION = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{
-                "translator", "subtitle", "titleaddon", "maintitle",
-                "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon", "volume",
-                "edition", "publisher", "isbn", "chapter", "pages", "doi", "eprint", "eprintclass",
-                "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections.unmodifiableList(
+                Arrays.asList(new String[] {"translator", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
+                        "maintitleaddon", "booksubtitle", "booktitleaddon", "volume", "edition", "publisher", "isbn",
+                        "chapter", "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("author", "editor", "title", "booktitle", "date");
-            addAllOptional("editora", "editorb", "editorc", "translator", "annotator",
-                    "commentator", "introduction", "foreword", "afterword", "subtitle", "titleaddon",
-                    "maintitle", "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon",
-                    "language", "origlanguage", "volume", "part", "edition", "volumes", "series", "number",
-                    "note", "publisher", "location", "isbn", "chapter", "pages", "addendum", "pubstate", "doi",
-                    "eprint", "eprintclass", "eprinttype", "url", "urldate", "year");
+            addAllOptional("editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
+                    "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
+                    "booksubtitle", "booktitleaddon", "language", "origlanguage", "volume", "part", "edition",
+                    "volumes", "series", "number", "note", "publisher", "location", "isbn", "chapter", "pages",
+                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate", "year");
         }
 
         @Override
@@ -284,21 +242,16 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType SUPPCOLLECTION = new BibtexEntryType() {
+    public static final BibLatexEntryType SUPPCOLLECTION = new BibLatexEntryType() {
 
         @Override
         public String getName() {
             return "SuppCollection";
         }
 
-        // Treated as alias of "INCOLLECTION" according to Biblatex 1.0: 
+        // Treated as alias of "INCOLLECTION" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
             return BibLatexEntryTypes.INCOLLECTION.getRequiredFields();
@@ -313,26 +266,20 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INCOLLECTION.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType MANUAL = new BibtexEntryType() {
+    public static final BibLatexEntryType MANUAL = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "edition", "publisher", "isbn", "chapter",
-                "pages", "doi", "eprint", "eprintclass",
-                "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "titleaddon", "edition", "publisher", "isbn",
+                        "chapter", "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("author", "editor", "title", "date");
-            addAllOptional("subtitle", "titleaddon", "language", "edition", "type", "series",
-                    "number", "version", "note", "organization", "publisher", "location", "isbn", "chapter",
-                    "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-                    "eprinttype", "url", "urldate", "year");
+            addAllOptional("subtitle", "titleaddon", "language", "edition", "type", "series", "number", "version",
+                    "note", "organization", "publisher", "location", "isbn", "chapter", "pages", "pagetotal",
+                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate", "year");
         }
 
         @Override
@@ -344,24 +291,20 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType MISC = new BibtexEntryType() {
+    public static final BibLatexEntryType MISC = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "howpublished", "location", "doi", "eprint", "eprintclass",
-                "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "titleaddon", "howpublished", "location",
+                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("author", "editor", "title", "date");
-            addAllOptional("subtitle", "titleaddon", "language", "howpublished", "type",
-                    "version", "note", "organization", "location", "month", "year", "addendum",
-                    "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "language", "howpublished", "type", "version", "note",
+                    "organization", "location", "month", "year", "addendum", "pubstate", "doi", "eprint", "eprintclass",
+                    "eprinttype", "url", "urldate");
         }
 
         @Override
@@ -373,24 +316,19 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType ONLINE = new BibtexEntryType() {
+    public static final BibLatexEntryType ONLINE = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "note", "organization", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections.unmodifiableList(
+                Arrays.asList(new String[] {"subtitle", "titleaddon", "note", "organization", "urldate"}));
+
 
         {
             addAllRequired("author", "editor", "title", "date", "url");
-            addAllOptional("subtitle", "titleaddon", "language", "version", "note",
-                    "organization", "month", "year", "addendum", "pubstate", "urldate");
+            addAllOptional("subtitle", "titleaddon", "language", "version", "note", "organization", "month", "year",
+                    "addendum", "pubstate", "urldate");
         }
-
 
         @Override
         public String getName() {
@@ -401,23 +339,19 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType PATENT = new BibtexEntryType() {
+    public static final BibLatexEntryType PATENT = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"holder",
+        private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[] {
+                "holder",
                 "subtitle", "titleaddon", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("author", "title", "number", "date");
-            addAllOptional("holder", "subtitle", "titleaddon", "type", "version", "location", "note",
-                    "month", "year", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-                    "eprinttype", "url", "urldate");
+            addAllOptional("holder", "subtitle", "titleaddon", "type", "version", "location", "note", "month", "year",
+                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
         }
 
         @Override
@@ -429,25 +363,20 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType PERIODICAL = new BibtexEntryType() {
+    public static final BibLatexEntryType PERIODICAL = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "issuetitle", "issuesubtitle", "issn", "doi", "eprint", "eprintclass",
-                "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "issuetitle", "issuesubtitle", "issn", "doi",
+                        "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("editor", "title", "date");
-            addAllOptional("editora", "editorb", "editorc", "subtitle", "issuetitle",
-                    "issuesubtitle", "language", "series", "volume", "number", "issue", "month", "year",
-                    "note", "issn", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
-                    "urldate");
+            addAllOptional("editora", "editorb", "editorc", "subtitle", "issuetitle", "issuesubtitle", "language",
+                    "series", "volume", "number", "issue", "month", "year", "note", "issn", "addendum", "pubstate",
+                    "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
         }
 
         @Override
@@ -459,21 +388,16 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType SUPPPERIODICAL = new BibtexEntryType() {
+    public static final BibLatexEntryType SUPPPERIODICAL = new BibLatexEntryType() {
 
         @Override
         public String getName() {
             return "SuppPeriodical";
         }
 
-        // Treated as alias of "ARTICLE" according to Biblatex 1.0: 
+        // Treated as alias of "ARTICLE" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
             return BibLatexEntryTypes.ARTICLE.getRequiredFields();
@@ -488,27 +412,22 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.ARTICLE.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType PROCEEDINGS = new BibtexEntryType() {
+    public static final BibLatexEntryType PROCEEDINGS = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "maintitle", "mainsubtitle",
-                "maintitleaddon", "eventtitle", "volume", "publisher", "isbn", "chapter", "pages",
-                "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "titleaddon", "maintitle", "mainsubtitle",
+                        "maintitleaddon", "eventtitle", "volume", "publisher", "isbn", "chapter", "pages", "pagetotal",
+                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("editor", "title", "date");
-            addAllOptional("subtitle", "titleaddon", "maintitle", "mainsubtitle",
-                    "maintitleaddon", "eventtitle", "eventdate", "venue", "language", "volume", "part",
-                    "volumes", "series", "number", "note", "organization", "publisher", "location", "month",
-                    "year", "isbn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
-                    "eprintclass", "eprinttype", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "eventtitle",
+                    "eventdate", "venue", "language", "volume", "part", "volumes", "series", "number", "note",
+                    "organization", "publisher", "location", "month", "year", "isbn", "chapter", "pages", "pagetotal",
+                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
         }
 
         @Override
@@ -520,28 +439,23 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType INPROCEEDINGS = new BibtexEntryType() {
+    public static final BibLatexEntryType INPROCEEDINGS = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "maintitle", "mainsubtitle",
-                "maintitleaddon", "booksubtitle", "booktitleaddon", "eventtitle", "volume",
-                "publisher", "isbn", "chapter", "pages",
-                "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "titleaddon", "maintitle", "mainsubtitle",
+                        "maintitleaddon", "booksubtitle", "booktitleaddon", "eventtitle", "volume", "publisher", "isbn",
+                        "chapter", "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("author", "editor", "title", "booktitle", "date");
-            addAllOptional("subtitle", "titleaddon", "maintitle", "mainsubtitle",
-                    "maintitleaddon", "booksubtitle", "booktitleaddon", "eventtitle", "eventdate", "venue",
-                    "language", "volume", "part", "volumes", "series", "number", "note", "organization",
-                    "publisher", "location", "month", "year", "isbn", "chapter", "pages", "addendum",
-                    "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "booksubtitle",
+                    "booktitleaddon", "eventtitle", "eventdate", "venue", "language", "volume", "part", "volumes",
+                    "series", "number", "note", "organization", "publisher", "location", "month", "year", "isbn",
+                    "chapter", "pages", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
+                    "urldate");
         }
 
         @Override
@@ -553,21 +467,16 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType REFERENCE = new BibtexEntryType() {
+    public static final BibLatexEntryType REFERENCE = new BibLatexEntryType() {
 
         @Override
         public String getName() {
             return "Reference";
         }
 
-        // Treated as alias of "COLLECTION" according to Biblatex 1.0: 
+        // Treated as alias of "COLLECTION" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
             return BibLatexEntryTypes.COLLECTION.getRequiredFields();
@@ -582,21 +491,16 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.COLLECTION.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType INREFERENCE = new BibtexEntryType() {
+    public static final BibLatexEntryType INREFERENCE = new BibLatexEntryType() {
 
         @Override
         public String getName() {
             return "InReference";
         }
 
-        // Treated as alias of "INCOLLECTION" according to Biblatex 1.0: 
+        // Treated as alias of "INCOLLECTION" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
             return BibLatexEntryTypes.INCOLLECTION.getRequiredFields();
@@ -611,24 +515,20 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INCOLLECTION.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType REPORT = new BibtexEntryType() {
+    public static final BibLatexEntryType REPORT = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "number", "isrn", "chapter", "pages", "pagetotal", "doi",
-                "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "titleaddon", "number", "isrn", "chapter",
+                        "pages", "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("author", "title", "type", "institution", "date");
-            addAllOptional("subtitle", "titleaddon", "language", "number", "version", "note",
-                    "location", "month", "year", "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi",
-                    "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "language", "number", "version", "note", "location", "month",
+                    "year", "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
+                    "eprintclass", "eprinttype", "url", "urldate");
         }
 
         @Override
@@ -640,14 +540,9 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType SET = new BibtexEntryType() {
+    public static final BibLatexEntryType SET = new BibLatexEntryType() {
 
         {
             addAllRequired("entryset", "crossref");
@@ -657,24 +552,20 @@ class BibLatexEntryTypes {
         public String getName() {
             return "Set";
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType THESIS = new BibtexEntryType() {
+    public static final BibLatexEntryType THESIS = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "chapter", "pages", "pagetotal", "doi", "eprint",
-                "eprintclass", "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "titleaddon", "chapter", "pages", "pagetotal",
+                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             addAllRequired("author", "title", "type", "institution", "date");
-            addAllOptional("subtitle", "titleaddon", "language", "note", "location", "month", "year",
-                    "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-                    "eprinttype", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "language", "note", "location", "month", "year", "chapter",
+                    "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
+                    "urldate");
         }
 
         @Override
@@ -686,22 +577,18 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType UNPUBLISHED = new BibtexEntryType() {
+    public static final BibLatexEntryType UNPUBLISHED = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "howpublished", "pubstate", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections.unmodifiableList(
+                Arrays.asList(new String[] {"subtitle", "titleaddon", "howpublished", "pubstate", "url", "urldate"}));
+
 
         {
             addAllRequired("author", "title", "date");
-            addAllOptional("subtitle", "titleaddon", "language", "howpublished", "note",
-                    "location", "month", "year", "addendum", "pubstate", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "language", "howpublished", "note", "location", "month", "year",
+                    "addendum", "pubstate", "url", "urldate");
         }
 
         @Override
@@ -713,23 +600,18 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     // === Type aliases: ===
 
-    public static final BibtexEntryType CONFERENCE = new BibtexEntryType() {
+    public static final BibLatexEntryType CONFERENCE = new BibLatexEntryType() {
 
         @Override
         public String getName() {
             return "Conference";
         }
 
-        // Treated as alias of "INPROCEEDINGS" according to Biblatex 1.0: 
+        // Treated as alias of "INPROCEEDINGS" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
             return BibLatexEntryTypes.INPROCEEDINGS.getRequiredFields();
@@ -744,21 +626,16 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INPROCEEDINGS.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType ELECTRONIC = new BibtexEntryType() {
+    public static final BibLatexEntryType ELECTRONIC = new BibLatexEntryType() {
 
         @Override
         public String getName() {
             return "Electronic";
         }
 
-        // Treated as alias of "ONLINE" according to Biblatex 1.0: 
+        // Treated as alias of "ONLINE" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
             return BibLatexEntryTypes.ONLINE.getRequiredFields();
@@ -773,25 +650,21 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.ONLINE.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType MASTERSTHESIS = new BibtexEntryType() {
+    public static final BibLatexEntryType MASTERSTHESIS = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "type", "chapter", "pages", "pagetotal", "doi", "eprint",
-                "eprintclass", "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "titleaddon", "type", "chapter", "pages",
+                        "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             // Treated as alias of "THESIS", except "type" field is optional
             addAllRequired("author", "title", "institution", "date");
-            addAllOptional("subtitle", "titleaddon", "type", "language", "note", "location", "month", "year",
-                    "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-                    "eprinttype", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "type", "language", "note", "location", "month", "year", "chapter",
+                    "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
+                    "urldate");
         }
 
         @Override
@@ -799,30 +672,25 @@ class BibLatexEntryTypes {
             return "MastersThesis";
         }
 
-
         @Override
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType PHDTHESIS = new BibtexEntryType() {
+    public static final BibLatexEntryType PHDTHESIS = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "type", "chapter", "pages", "pagetotal", "doi", "eprint",
-                "eprintclass", "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections
+                .unmodifiableList(Arrays.asList(new String[] {"subtitle", "titleaddon", "type", "chapter", "pages",
+                        "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             // Treated as alias of "THESIS", except "type" field is optional
             addAllRequired("author", "title", "institution", "date");
-            addAllOptional("subtitle", "titleaddon", "type", "language", "note", "location", "month", "year",
-                    "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-                    "eprinttype", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "type", "language", "note", "location", "month", "year", "chapter",
+                    "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
+                    "urldate");
         }
 
         @Override
@@ -834,25 +702,21 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType TECHREPORT = new BibtexEntryType() {
+    public static final BibLatexEntryType TECHREPORT = new BibLatexEntryType() {
 
-        private List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(new String[]{"subtitle",
-                "titleaddon", "type", "number", "isrn", "chapter", "pages", "pagetotal",
-                "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+        private final List<String> primaryOptionalFields = Collections.unmodifiableList(
+                Arrays.asList(new String[] {"subtitle", "titleaddon", "type", "number", "isrn", "chapter", "pages",
+                        "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"}));
+
 
         {
             // Treated as alias of "REPORT", except "type" field is optional
             addAllRequired("author", "title", "institution", "date");
-            addAllOptional("subtitle", "titleaddon", "type", "language", "number", "version", "note",
-                    "location", "month", "year", "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate",
-                    "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllOptional("subtitle", "titleaddon", "type", "language", "number", "version", "note", "location",
+                    "month", "year", "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
+                    "eprintclass", "eprinttype", "url", "urldate");
         }
 
         @Override
@@ -864,21 +728,16 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return primaryOptionalFields;
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
-    public static final BibtexEntryType WWW = new BibtexEntryType() {
+    public static final BibLatexEntryType WWW = new BibLatexEntryType() {
 
         @Override
         public String getName() {
             return "WWW";
         }
 
-        // Treated as alias of "ONLINE" according to Biblatex 1.0: 
+        // Treated as alias of "ONLINE" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
             return BibLatexEntryTypes.ONLINE.getRequiredFields();
@@ -893,34 +752,23 @@ class BibLatexEntryTypes {
         public List<String> getPrimaryOptionalFields() {
             return BibLatexEntryTypes.ONLINE.getPrimaryOptionalFields();
         }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
     };
 
     /**
      * This type is used for IEEEtran.bst to control various
      * be repeated or not. Not a very elegant solution, but it works...
      */
-    public static final BibtexEntryType IEEETRANBSTCTL = new BibtexEntryType() {
+    public static final BibLatexEntryType IEEETRANBSTCTL = new BibLatexEntryType() {
 
         {
-            addAllOptional("ctluse_article_number", "ctluse_paper", "ctluse_forced_etal",
-                    "ctlmax_names_forced_etal", "ctlnames_show_etal", "ctluse_alt_spacing",
-                    "ctlalt_stretch_factor", "ctldash_repeated_names", "ctlname_format_string",
-                    "ctlname_latex_cmd", "ctlname_url_prefix");
+            addAllOptional("ctluse_article_number", "ctluse_paper", "ctluse_forced_etal", "ctluse_url",
+                    "ctlmax_names_forced_etal", "ctlnames_show_etal", "ctluse_alt_spacing", "ctlalt_stretch_factor",
+                    "ctldash_repeated_names", "ctlname_format_string", "ctlname_latex_cmd", "ctlname_url_prefix");
         }
 
         @Override
         public String getName() {
             return "IEEEtranBSTCTL";
-        }
-
-        @Override
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return true;
         }
     };
 }

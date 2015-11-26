@@ -58,6 +58,7 @@ import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.util.PositionWindow;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -72,9 +73,6 @@ import com.jgoodies.forms.layout.FormLayout;
  * * Either set field, or clear field.
  */
 public class ManageKeywordsAction extends MnemonicAwareAction {
-
-    private static final long serialVersionUID = -5234432936032780873L;
-
     private final JabRefFrame frame;
 
     private JDialog diag;
@@ -160,9 +158,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
-
-            private static final long serialVersionUID = -4623988526737916508L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 cancelled = true;
@@ -221,10 +216,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             @Override
             public void keyTyped(KeyEvent arg0) {
+                // Do nothing
             }
 
             @Override
             public void keyReleased(KeyEvent arg0) {
+                // Do nothing
             }
 
             @Override
@@ -235,7 +232,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AutoCompleter autoComp = JabRef.jrf.basePanel().getAutoCompleters().get("keywords");
+        AutoCompleter autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);
@@ -243,10 +240,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             @Override
             public void keyTyped(KeyEvent e) {
+                // Do nothing
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
+                // Do nothing
             }
 
             @Override
@@ -269,7 +268,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        BasePanel bp = frame.basePanel();
+        BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;
         }
@@ -288,7 +287,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         fillKeyWordList();
 
         diag.pack();
-        Util.placeDialog(diag, frame);
+        PositionWindow.placeDialog(diag, frame);
         diag.setVisible(true);
         if (cancelled) {
             return;
@@ -405,7 +404,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     private void fillKeyWordList() {
-        BasePanel bp = frame.basePanel();
+        BasePanel bp = frame.getCurrentBasePanel();
         BibtexEntry[] entries = bp.getSelectedEntries();
 
         // fill dialog with values

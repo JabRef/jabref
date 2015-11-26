@@ -29,9 +29,7 @@ Modified for use in JabRef
  */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.bibtex.EntrySorter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.model.entry.MonthUtil;
 
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
@@ -52,6 +50,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibtexDatabase {
+    private static final Log LOGGER = LogFactory.getLog(BibtexDatabase.class);
 
     private final Map<String, BibtexEntry> entries = new ConcurrentHashMap<>();
 
@@ -62,8 +61,6 @@ public class BibtexDatabase {
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
     private boolean followCrossrefs = true;
-
-    private static final Log LOGGER = LogFactory.getLog(BibtexDatabase.class);
 
     /**
      * use a map instead of a set since i need to know how many of each key is
@@ -245,7 +242,7 @@ public class BibtexDatabase {
     public synchronized void addString(BibtexString string)
             throws KeyCollisionException {
         if (hasStringLabel(string.getName())) {
-            throw new KeyCollisionException(Localization.lang("A string with this label already exists"));
+            throw new KeyCollisionException("A string with this label already exists");
         }
 
         if (bibtexStrings.containsKey(string.getId())) {
@@ -489,7 +486,7 @@ public class BibtexDatabase {
             }
         }
         if (duplicate) {
-            LOGGER.warn(Localization.lang("Warning there is a duplicate key") + ':' + newKey);
+            LOGGER.warn("Warning there is a duplicate key: " + newKey);
         }
         return duplicate;
     }

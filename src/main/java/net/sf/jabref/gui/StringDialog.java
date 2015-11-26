@@ -18,11 +18,11 @@ package net.sf.jabref.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.TreeSet;
@@ -55,8 +55,9 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexString;
@@ -67,20 +68,19 @@ class StringDialog extends JDialog {
     private final BibtexDatabase base;
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private final JabRefPreferences prefs;
     private Object[] strings;
 
     JLabel lab;
     private final StringTable table;
     private final HelpAction helpAction;
 
+    private PositionWindow pw;
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibtexDatabase base, JabRefPreferences prefs) {
         super(frame);
         this.frame = frame;
         this.panel = panel;
         this.base = base;
-        this.prefs = prefs;
 
         sortStrings();
 
@@ -103,9 +103,6 @@ class StringDialog extends JDialog {
                 return super.accept(c) && (c instanceof StringTable);
             }
         });
-
-        setLocation(prefs.getInt(JabRefPreferences.STRINGS_POS_X), prefs.getInt(JabRefPreferences.STRINGS_POS_Y));
-        setSize(prefs.getInt(JabRefPreferences.STRINGS_SIZE_X), prefs.getInt(JabRefPreferences.STRINGS_SIZE_Y));
 
         JPanel pan = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
@@ -154,14 +151,30 @@ class StringDialog extends JDialog {
         conPane.add(tlb, BorderLayout.NORTH);
         conPane.add(pan, BorderLayout.CENTER);
 
-        if (panel.getFile() != null) {
-            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " + panel.getFile().getName());
+        if (panel.getDatabaseFile() != null) {
+            setTitle(GUIGlobals.stringsTitle + ": " + panel.getDatabaseFile().getName());
         } else {
-            // @formatter:off
-            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": "
-                    + Localization.lang(GUIGlobals.untitledTitle));
-            // @formatter:on
+            setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
         }
+        pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
+                JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
+        pw.setWindowPosition();
+
+        // Set up a ComponentListener that saves the last size and position of the dialog
+        addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+        });
     }
 
 
@@ -347,12 +360,6 @@ class StringDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             panel.stringsClosing();
             dispose();
-            Point p = getLocation();
-            Dimension d = getSize();
-            prefs.putInt(JabRefPreferences.STRINGS_POS_X, p.x);
-            prefs.putInt(JabRefPreferences.STRINGS_POS_Y, p.y);
-            prefs.putInt(JabRefPreferences.STRINGS_SIZE_X, d.width);
-            prefs.putInt(JabRefPreferences.STRINGS_SIZE_Y, d.height);
         }
     }
 
@@ -399,7 +406,7 @@ class StringDialog extends JDialog {
                 BibtexString bs = new BibtexString(newId, name, "");
 
                 // Store undo information:
-                panel.undoManager.addEdit(new UndoableInsertString(panel, panel.database, bs));
+                panel.undoManager.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
 
                 base.addString(bs);
                 refreshTable();

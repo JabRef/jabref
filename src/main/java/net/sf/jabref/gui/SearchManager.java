@@ -230,8 +230,8 @@ public class SearchManager extends SidePaneComponent
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Globals.prefs.putBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE, searchAutoComplete.isSelected());
-                if (SearchManager.this.frame.basePanel() != null) {
-                    SearchManager.this.frame.basePanel().updateSearchManager();
+                if (SearchManager.this.frame.getCurrentBasePanel() != null) {
+                    SearchManager.this.frame.getCurrentBasePanel().updateSearchManager();
                 }
 
             }
@@ -538,7 +538,7 @@ public class SearchManager extends SidePaneComponent
             worker.getCallBack().update();
             escape.setEnabled(true);
 
-            frame.basePanel().mainTable.setSelected(0);
+            frame.getCurrentBasePanel().mainTable.setSelected(0);
         }
     }
 
@@ -568,7 +568,7 @@ public class SearchManager extends SidePaneComponent
             } else {
                 // Search all databases:
                 for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-                    BasePanel p = frame.baseAt(i);
+                    BasePanel p = frame.getBasePanelAt(i);
                     for (BibtexEntry entry : p.getDatabase().getEntries()) {
 
                         boolean hit = rule.applyRule(searchTerm, entry);
@@ -602,7 +602,7 @@ public class SearchManager extends SidePaneComponent
                 instantiateSearchDialog();
                 searchDialog.clear();
                 for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-                    BasePanel p = frame.baseAt(i);
+                    BasePanel p = frame.getBasePanelAt(i);
                     for (BibtexEntry entry : p.getDatabase().getEntries()) {
                         if (entry.isSearchHit()) {
                             searchDialog.addEntry(entry, p);
@@ -799,7 +799,10 @@ public class SearchManager extends SidePaneComponent
      * the type of search that will happen on click.
      */
     private void updateSearchButtonText() {
-        search.setText(isSpecificSearch() ? Localization.lang("Search specified field(s)") : Localization.lang("Search all fields"));
+        // @formatter:off
+        search.setText(isSpecificSearch() ? Localization.lang("Search specified field(s)") :
+            Localization.lang("Search all fields"));
+        // @formatter:on
     }
 
     private boolean isSpecificSearch() {

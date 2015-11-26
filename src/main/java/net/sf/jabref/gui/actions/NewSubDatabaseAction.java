@@ -4,8 +4,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
 
 import javax.swing.*;
@@ -16,7 +16,7 @@ import java.awt.event.ActionEvent;
  */
 public class NewSubDatabaseAction extends MnemonicAwareAction {
 
-    private JabRefFrame jabRefFrame;
+    private final JabRefFrame jabRefFrame;
 
     public NewSubDatabaseAction(JabRefFrame jabRefFrame) {
         super(IconTheme.JabRefIcon.NEW.getIcon());
@@ -31,7 +31,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
 
         FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.tabbedPane);
 
-        Util.placeDialog(dialog, jabRefFrame);
+        PositionWindow.placeDialog(dialog, jabRefFrame);
         dialog.setVisible(true);
 
         if (dialog.generatePressed()) {
@@ -39,7 +39,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
                     dialog.getGenerateDB(), // database
                     null, // file
                     new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)); // meta data
-            jabRefFrame.tabbedPane.add(Localization.lang(GUIGlobals.untitledTitle), bp);
+            jabRefFrame.tabbedPane.add(GUIGlobals.untitledTitle, bp);
             jabRefFrame.tabbedPane.setSelectedComponent(bp);
             jabRefFrame.output(Localization.lang("New database created."));
         }

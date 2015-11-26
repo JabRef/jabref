@@ -41,9 +41,6 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 
 class FileListEditorTransferHandler extends TransferHandler {
-
-    private static final long serialVersionUID = 1L;
-
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
     private final JabRefFrame frame;
@@ -132,7 +129,7 @@ class FileListEditorTransferHandler extends TransferHandler {
                             }
                             if (fileType != null) {
                                 if (droppedFileHandler == null) {
-                                    droppedFileHandler = new DroppedFileHandler(frame, frame.basePanel());
+                                    droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());
                                 }
                                 droppedFileHandler.handleDroppedfile(name, fileType, true, entryContainer.getEntry());
                             }

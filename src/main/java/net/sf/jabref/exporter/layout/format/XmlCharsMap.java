@@ -3,9 +3,6 @@ package net.sf.jabref.exporter.layout.format;
 import java.util.HashMap;
 
 class XmlCharsMap extends HashMap<String, String> {
-
-    private static final long serialVersionUID = 1L;
-
     public XmlCharsMap() {
         put("\\{\\\\\\\"\\{a\\}\\}", "&#x00E4;");
         put("\\{\\\\\\\"\\{A\\}\\}", "&#x00C4;");

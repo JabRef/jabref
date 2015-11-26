@@ -32,98 +32,18 @@ package net.sf.jabref.model.entry;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.database.BibtexDatabase;
-
 /**
- * Provides a list of known entry types
- * <p>
- * The list of optional and required fields is derived from http://en.wikipedia.org/wiki/BibTeX#Entry_types
+ * Abstract base class for all BibTex entry types.
  */
-public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
+public abstract class BibtexEntryType implements EntryType {
 
-    public abstract String getName();
+    private final List<String> requiredFields;
+    private final List<String> optionalFields;
 
-    private static final TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<>();
-    private static final TreeMap<String, BibtexEntryType> STANDARD_TYPES;
 
-    static {
-        // Put the standard entry types into the type map.
-        Globals.prefs = JabRefPreferences.getInstance();
-        if (!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-            ALL_TYPES.put("article", BibtexEntryTypes.ARTICLE);
-            ALL_TYPES.put("inbook", BibtexEntryTypes.INBOOK);
-            ALL_TYPES.put("book", BibtexEntryTypes.BOOK);
-            ALL_TYPES.put("booklet", BibtexEntryTypes.BOOKLET);
-            ALL_TYPES.put("incollection", BibtexEntryTypes.INCOLLECTION);
-            ALL_TYPES.put("conference", BibtexEntryTypes.CONFERENCE);
-            ALL_TYPES.put("inproceedings", BibtexEntryTypes.INPROCEEDINGS);
-            ALL_TYPES.put("proceedings", BibtexEntryTypes.PROCEEDINGS);
-            ALL_TYPES.put("manual", BibtexEntryTypes.MANUAL);
-            ALL_TYPES.put("mastersthesis", BibtexEntryTypes.MASTERSTHESIS);
-            ALL_TYPES.put("phdthesis", BibtexEntryTypes.PHDTHESIS);
-            ALL_TYPES.put("techreport", BibtexEntryTypes.TECHREPORT);
-            ALL_TYPES.put("unpublished", BibtexEntryTypes.UNPUBLISHED);
-            ALL_TYPES.put("patent", BibtexEntryTypes.PATENT);
-            ALL_TYPES.put("standard", BibtexEntryTypes.STANDARD);
-            ALL_TYPES.put("electronic", BibtexEntryTypes.ELECTRONIC);
-            ALL_TYPES.put("periodical", BibtexEntryTypes.PERIODICAL);
-            ALL_TYPES.put("misc", BibtexEntryTypes.MISC);
-            ALL_TYPES.put("other", BibtexEntryTypes.OTHER);
-            ALL_TYPES.put("ieeetranbstctl", BibtexEntryTypes.IEEETRANBSTCTL);
-        } else {
-            ALL_TYPES.put("article", BibLatexEntryTypes.ARTICLE);
-            ALL_TYPES.put("book", BibLatexEntryTypes.BOOK);
-            ALL_TYPES.put("inbook", BibLatexEntryTypes.INBOOK);
-            ALL_TYPES.put("bookinbook", BibLatexEntryTypes.BOOKINBOOK);
-            ALL_TYPES.put("suppbook", BibLatexEntryTypes.SUPPBOOK);
-            ALL_TYPES.put("booklet", BibLatexEntryTypes.BOOKLET);
-            ALL_TYPES.put("collection", BibLatexEntryTypes.COLLECTION);
-            ALL_TYPES.put("incollection", BibLatexEntryTypes.INCOLLECTION);
-            ALL_TYPES.put("suppcollection", BibLatexEntryTypes.SUPPCOLLECTION);
-            ALL_TYPES.put("manual", BibLatexEntryTypes.MANUAL);
-            ALL_TYPES.put("misc", BibLatexEntryTypes.MISC);
-            ALL_TYPES.put("online", BibLatexEntryTypes.ONLINE);
-            ALL_TYPES.put("patent", BibLatexEntryTypes.PATENT);
-            ALL_TYPES.put("periodical", BibLatexEntryTypes.PERIODICAL);
-            ALL_TYPES.put("suppperiodical", BibLatexEntryTypes.SUPPPERIODICAL);
-            ALL_TYPES.put("proceedings", BibLatexEntryTypes.PROCEEDINGS);
-            ALL_TYPES.put("inproceedings", BibLatexEntryTypes.INPROCEEDINGS);
-            ALL_TYPES.put("reference", BibLatexEntryTypes.REFERENCE);
-            ALL_TYPES.put("inreference", BibLatexEntryTypes.INREFERENCE);
-            ALL_TYPES.put("report", BibLatexEntryTypes.REPORT);
-            ALL_TYPES.put("set", BibLatexEntryTypes.SET);
-            ALL_TYPES.put("thesis", BibLatexEntryTypes.THESIS);
-            ALL_TYPES.put("unpublished", BibLatexEntryTypes.UNPUBLISHED);
-            ALL_TYPES.put("conference", BibLatexEntryTypes.CONFERENCE);
-            ALL_TYPES.put("electronic", BibLatexEntryTypes.ELECTRONIC);
-            ALL_TYPES.put("mastersthesis", BibLatexEntryTypes.MASTERSTHESIS);
-            ALL_TYPES.put("phdthesis", BibLatexEntryTypes.PHDTHESIS);
-            ALL_TYPES.put("techreport", BibLatexEntryTypes.TECHREPORT);
-            ALL_TYPES.put("www", BibLatexEntryTypes.WWW);
-            ALL_TYPES.put("ieeetranbstctl", BibLatexEntryTypes.IEEETRANBSTCTL);
-        }
-        // We need a record of the standard types, in case the user wants
-        // to remove a customized version. Therefore we clone the map.
-        STANDARD_TYPES = new TreeMap<>(ALL_TYPES);
-    }
-
-    private List<String> requiredFields = new ArrayList<>();
-
-    private List<String> optionalFields = new ArrayList<>();
-
-    @Override
-    public int compareTo(BibtexEntryType o) {
-        return getName().compareTo(o.getName());
-    }
-
-    public List<String> getOptionalFields() {
-        return Collections.unmodifiableList(optionalFields);
-    }
-
-    public List<String> getRequiredFields() {
-        return Collections.unmodifiableList(requiredFields);
+    public BibtexEntryType() {
+        requiredFields = new ArrayList<>();
+        optionalFields = new ArrayList<>();
     }
 
     void addAllOptional(String... fieldNames) {
@@ -134,47 +54,35 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         requiredFields.addAll(Arrays.asList(fieldNames));
     }
 
+    @Override
+    public List<String> getOptionalFields() {
+        return Collections.unmodifiableList(optionalFields);
+    }
+
+    @Override
+    public List<String> getRequiredFields() {
+        return Collections.unmodifiableList(requiredFields);
+    }
+
+    @Override
+    public int compareTo(EntryType o) {
+        return getName().compareTo(o.getName());
+    }
+
+    @Override
     public List<String> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
 
+    @Override
     public List<String> getSecondaryOptionalFields() {
-        List<String> optionalFields = getOptionalFields();
+        List<String> locOptionalFields = getOptionalFields();
 
-        if (optionalFields == null) {
-            return new ArrayList<>(0);
+        if (locOptionalFields == null) {
+            return Collections.EMPTY_LIST;
         }
 
-        return optionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
-    }
-
-    public abstract boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
-
-    public String[] getUtilityFields() {
-        return new String[]{"search"};
-    }
-
-    public boolean isRequired(String field) {
-        List<String> requiredFields = getRequiredFields();
-        if (requiredFields == null) {
-            return false;
-        }
-        for (String requiredField : requiredFields) {
-            if (requiredField.equals(field)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isOptional(String field) {
-        List<String> optionalFields = getOptionalFields();
-
-        if (optionalFields == null) {
-            return false;
-        }
-
-        return Arrays.asList(optionalFields).contains(field);
+        return locOptionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
     }
 
     private boolean isPrimary(String field) {
@@ -183,117 +91,6 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         if (primaryFields == null) {
             return false;
         }
-
-        return Arrays.asList(primaryFields).contains(field);
-    }
-
-    public boolean isVisibleAtNewEntryDialog() {
-        return true;
-    }
-
-
-    /**
-     * This method returns the BibtexEntryType for the name of a type,
-     * or null if it does not exist.
-     */
-    public static BibtexEntryType getType(String name) {
-
-        BibtexEntryType entryType = ALL_TYPES.get(name.toLowerCase(Locale.US));
-        if (entryType == null) {
-            return null;
-        } else {
-            return entryType;
-        }
-    }
-
-    /**
-     * This method returns the standard BibtexEntryType for the
-     * name of a type, or null if it does not exist.
-     */
-    public static BibtexEntryType getStandardType(String name) {
-
-        BibtexEntryType entryType = STANDARD_TYPES.get(name.toLowerCase());
-        if (entryType == null) {
-            return null;
-        } else {
-            return entryType;
-        }
-    }
-
-    public static void addOrModifyCustomEntryType(CustomEntryType type) {
-        ALL_TYPES.put(type.getName().toLowerCase(Locale.US), type);
-    }
-
-    public static Set<String> getAllTypes() {
-        return ALL_TYPES.keySet();
-    }
-
-    public static Collection<BibtexEntryType> getAllValues() {
-        return ALL_TYPES.values();
-    }
-
-    /**
-     * Removes a customized entry type from the type map. If this type
-     * overrode a standard type, we reinstate the standard one.
-     *
-     * @param name The customized entry type to remove.
-     */
-    public static void removeType(String name) {
-
-        String toLowerCase = name.toLowerCase();
-
-        ALL_TYPES.remove(toLowerCase);
-
-        if (STANDARD_TYPES.get(toLowerCase) != null) {
-            // In this case the user has removed a customized version
-            // of a standard type. We reinstate the standard type.
-            addOrModifyCustomEntryType((CustomEntryType) STANDARD_TYPES.get(toLowerCase));
-        }
-    }
-
-    /**
-     * Load all custom entry types from preferences. This method is
-     * called from JabRef when the program starts.
-     */
-    public static void loadCustomEntryTypes(JabRefPreferences prefs) {
-        int number = 0;
-        CustomEntryType type;
-        while ((type = prefs.getCustomEntryType(number)) != null) {
-            addOrModifyCustomEntryType(type);
-            number++;
-        }
-    }
-
-    /**
-     * Iterate through all entry types, and store those that are
-     * custom defined to preferences. This method is called from
-     * JabRefFrame when the program closes.
-     */
-    public static void saveCustomEntryTypes(JabRefPreferences prefs) {
-        Iterator<String> iterator = ALL_TYPES.keySet().iterator();
-        int number = 0;
-
-        while (iterator.hasNext()) {
-            Object o = ALL_TYPES.get(iterator.next());
-            if (o instanceof CustomEntryType) {
-                // Store this entry type.
-                prefs.storeCustomEntryType((CustomEntryType) o, number);
-                number++;
-            }
-        }
-        // Then, if there are more 'old' custom types defined, remove these
-        // from preferences. This is necessary if the number of custom types
-        // has decreased.
-        prefs.purgeCustomEntryTypes(number);
-    }
-
-    /**
-     * Get an array of the required fields in a form appropriate for the entry customization
-     * dialog - that is, the either-or fields together and separated by slashes.
-     *
-     * @return Array of the required fields in a form appropriate for the entry customization dialog.
-     */
-    public List<String> getRequiredFieldsForCustomization() {
-        return getRequiredFields();
+        return primaryFields.contains(field);
     }
 }

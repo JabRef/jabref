@@ -23,13 +23,14 @@ import java.util.HashMap;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.model.entry.EntryType;
 
 public class ParserResult {
     public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
     public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
     private final BibtexDatabase base;
     private MetaData metaData;
-    private final HashMap<String, BibtexEntryType> entryTypes;
+    private final HashMap<String, EntryType> entryTypes;
 
     private File file;
     private final ArrayList<String> warnings = new ArrayList<>();
@@ -49,10 +50,10 @@ public class ParserResult {
     private int jabrefMinorVersion;
 
     public ParserResult(Collection<BibtexEntry> entries) {
-        this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, BibtexEntryType>());
+        this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, EntryType>());
     }
 
-    public ParserResult(BibtexDatabase base, MetaData metaData, HashMap<String, BibtexEntryType> entryTypes) {
+    public ParserResult(BibtexDatabase base, MetaData metaData, HashMap<String, EntryType> entryTypes) {
         this.base = base;
         this.metaData = metaData;
         this.entryTypes = entryTypes;
@@ -120,7 +121,7 @@ public class ParserResult {
         this.metaData = md;
     }
 
-    public HashMap<String, BibtexEntryType> getEntryTypes() {
+    public HashMap<String, EntryType> getEntryTypes() {
         return entryTypes;
     }
 

@@ -15,16 +15,10 @@ This file is manually kept in sync with build.gradle and the binary jars contain
 
 Id:      material-design-icons.font
 Project: Material Design Icons
-Version: v1.2.64
+Version: v1.3.41
 URL:     https://materialdesignicons.com/
 License: SIL Open Font License, Version 1.1
 Note:    Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
-
-Id:      crystal.icons
-Project: Crystal Icons
-URL:     https://commons.wikimedia.org/wiki/Crystal_Clear
-License: LGPL
-Note:    Icons not available any more at the original page http://everaldo.com/crystal/
 
 
 # Libraries
@@ -82,11 +76,6 @@ Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists
 URL:     http://www.glazedlists.com/
 License: LPGL 2.1! (not explicitly, but no comments in the source header) and MPL
-
-Id:      net.java.dev.jna:jna
-Project: Java Native Access (JNA)
-URL:     https://github.com/twall/jna
-License: LGPL 2.1+ and Apache 2.0
 
 Id:      org.apache.pdfbox:fontbox
 Project: Apache PDFBox

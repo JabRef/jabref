@@ -28,7 +28,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -88,7 +88,7 @@ public class DroppedFileHandler {
         FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref", "bottom:14pt,pref,pref,pref,pref");
         layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
         FormBuilder builder = FormBuilder.create().layout(layout);
-        
+
         builder.add(linkInPlace).xyw(1, 1, 4);
         builder.add(destDirLabel).xyw(1, 2, 4);
         builder.add(copyRadioButton).xyw(2, 3, 3);
@@ -270,15 +270,15 @@ public class DroppedFileHandler {
             return false;
         }
 
-        if (xmpEntriesInFile == null || xmpEntriesInFile.isEmpty()) {
+        if ((xmpEntriesInFile == null) || xmpEntriesInFile.isEmpty()) {
             return false;
         }
 
         JLabel confirmationMessage = new JLabel(
                 Localization.lang("The PDF contains one or several bibtex-records.\nDo you want to import these as new entries into the current database?"));
 
-        int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage, Localization.lang(
-                        "XMP metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
+        int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage,
+                Localization.lang("XMP metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
         if (reply == JOptionPane.CANCEL_OPTION) {
@@ -293,10 +293,10 @@ public class DroppedFileHandler {
         /*
          * TODO Extract Import functionality from ImportMenuItem then we could
          * do:
-         * 
+         *
          * ImportMenuItem importer = new ImportMenuItem(frame, (mainTable ==
          * null), new PdfXmpImporter());
-         * 
+         *
          * importer.automatedImport(new String[] { fileName });
          */
 
@@ -343,7 +343,7 @@ public class DroppedFileHandler {
     //
     private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
                                                  BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
-       
+
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
         String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
@@ -450,13 +450,13 @@ public class DroppedFileHandler {
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
             String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
-            String absFilename = !new File(filename).isAbsolute() && dirs.length > 0 ?
+            String absFilename = !new File(filename).isAbsolute() && (dirs.length > 0) ?
                     FileUtil.expandFilename(filename, dirs).getAbsolutePath() : filename;
 
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
                 // Find the absolute filename for this existing link:
-                String absName = !new File(flEntry.getLink()).isAbsolute() && dirs.length > 0 ?
+                String absName = !new File(flEntry.getLink()).isAbsolute() && (dirs.length > 0) ?
                         FileUtil.expandFilename(flEntry.getLink(), dirs).getAbsolutePath() : flEntry.getLink();
                 System.out.println("absName: " + absName);
                 // If the filenames are equal, we don't need to link, so we simply return:
@@ -509,7 +509,8 @@ public class DroppedFileHandler {
         File toFile = new File(dirs[found] + System.getProperty("file.separator") + destFilename);
         if (toFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame,
-                    toFile.getAbsolutePath() + " exists. Overwrite?", "Overwrite file?",
+                    Localization.lang("'%0' exists. Overwrite file?", toFile.getAbsolutePath()),
+                    Localization.lang("Overwrite file?"),
                     JOptionPane.YES_NO_OPTION);
             if (answer == JOptionPane.NO_OPTION) {
                 return false;
@@ -518,8 +519,10 @@ public class DroppedFileHandler {
 
         if (!fromFile.renameTo(toFile)) {
             JOptionPane.showMessageDialog(frame,
-                    "There was an error moving the file. Please move the file manually and link in place.",
-                    "Error moving file", JOptionPane.ERROR_MESSAGE);
+                    // @formatter:off
+                    Localization.lang("There was an error moving the file. Please move the file manually and link in place."),
+                    Localization.lang("Error moving file"), JOptionPane.ERROR_MESSAGE);
+                    // @formatter:on
             return false;
         } else {
             return true;
@@ -563,9 +566,9 @@ public class DroppedFileHandler {
         }
 
         if (destFile.exists()) {
-            int answer = JOptionPane.showConfirmDialog(frame, "'" + destFile.getPath() + "' "
-                            + Localization.lang("exists. Overwrite?"), Localization.lang("File exists"),
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            int answer = JOptionPane.showConfirmDialog(frame,
+                    Localization.lang("'%0' exists. Overwrite file?", destFile.getPath()),
+                    Localization.lang("File exists"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.NO_OPTION) {
                 return false;
             }

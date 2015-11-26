@@ -44,6 +44,7 @@ import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.CustomEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,10 +90,10 @@ public class JabRefPreferences {
     public static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeight";
     public static final String AUTO_RESIZE_MODE = "autoResizeMode";
     public static final String WINDOW_MAXIMISED = "windowMaximised";
-    public static final String SIZE_Y = "sizeY";
-    public static final String SIZE_X = "sizeX";
-    public static final String POS_Y = "posY";
-    public static final String POS_X = "posX";
+    public static final String SIZE_Y = "mainWindowSizeY";
+    public static final String SIZE_X = "mainWindowSizeX";
+    public static final String POS_Y = "mainWindowPosY";
+    public static final String POS_X = "mainWindowPosX";
     public static final String VIM_SERVER = "vimServer";
     public static final String VIM = "vim";
     public static final String LYXPIPE = "lyxpipe";
@@ -146,6 +147,10 @@ public class JabRefPreferences {
     public static final String DUPLICATES_SIZE_X = "duplicatesSizeX";
     public static final String DUPLICATES_POS_Y = "duplicatesPosY";
     public static final String DUPLICATES_POS_X = "duplicatesPosX";
+    public static final String MERGEENTRIES_SIZE_Y = "mergeEntriesSizeY";
+    public static final String MERGEENTRIES_SIZE_X = "mergeEntriesSizeX";
+    public static final String MERGEENTRIES_POS_Y = "mergeEntriesPosY";
+    public static final String MERGEENTRIES_POS_X = "mergeEntriesPosX";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String BACKUP = "backup";
@@ -221,6 +226,7 @@ public class JabRefPreferences {
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
     public static final String HISTORY_SIZE = "historySize";
+    public static final String RECENT_FILES = "recentFiles";
     public static final String GENERAL_FIELDS = "generalFields";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
@@ -282,7 +288,6 @@ public class JabRefPreferences {
     public static final String IMPORT_INSPECTION_DIALOG_WIDTH = "importInspectionDialogWidth";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
-    public static final String USE_NATIVE_FILE_DIALOG_ON_MAC = "useNativeFileDialogOnMac";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
@@ -323,6 +328,8 @@ public class JabRefPreferences {
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String USE_CONVERT_TO_EQUATION = "useConvertToEquation";
     public static final String USE_IEEE_ABRV = "useIEEEAbrv";
+
+    public static final String PUSH_TO_APPLICATION = "pushToApplication";
 
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
@@ -407,8 +414,8 @@ public class JabRefPreferences {
             if (new File("jabref.xml").exists()) {
                 importPreferences("jabref.xml");
             }
-        } catch (IOException e) {
-            LOGGER.info("Could not import preferences from jabref.xml: " + e.getLocalizedMessage(), e);
+        } catch (JabRefException e) {
+            LOGGER.warn("Could not import preferences from jabref.xml: " + e.getMessage(), e);
         }
 
         // load user preferences
@@ -452,6 +459,7 @@ public class JabRefPreferences {
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
 
         }
+        defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
         defaults.put(USE_PROXY, Boolean.FALSE);
         defaults.put(PROXY_HOSTNAME, "my proxy host");
         defaults.put(PROXY_PORT, "my proxy port");
@@ -539,6 +547,10 @@ public class JabRefPreferences {
         defaults.put(DUPLICATES_POS_Y, 0);
         defaults.put(DUPLICATES_SIZE_X, 800);
         defaults.put(DUPLICATES_SIZE_Y, 600);
+        defaults.put(MERGEENTRIES_POS_X, 0);
+        defaults.put(MERGEENTRIES_POS_Y, 0);
+        defaults.put(MERGEENTRIES_SIZE_X, 800);
+        defaults.put(MERGEENTRIES_SIZE_Y, 600);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
         defaults.put(CASE_SENSITIVE_SEARCH, Boolean.FALSE);
@@ -736,8 +748,6 @@ public class JabRefPreferences {
         defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
-        defaults.put(USE_NATIVE_FILE_DIALOG_ON_MAC, Boolean.FALSE);
-
         defaults.put(LAST_USED_EXPORT, null);
         defaults.put(SIDE_PANE_WIDTH, -1);
 
@@ -784,7 +794,7 @@ public class JabRefPreferences {
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
         //defaults.put("confirmAutoRemoveExactDuplicates", Boolean.TRUE);
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
-        //Util.pr(System.getProperty("java.io.tempdir"));
+        LOGGER.debug("Temporary directory: " + System.getProperty("java.io.tempdir"));
         //defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
         defaults.put(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
         defaults.put(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
@@ -1159,8 +1169,8 @@ public class JabRefPreferences {
         if (getBoolean(MEMORY_STICK_MODE)) {
             try {
                 exportPreferences("jabref.xml");
-            } catch (IOException e) {
-                LOGGER.info("Could not save preferences for memory stick mode: " + e.getLocalizedMessage(), e);
+            } catch (JabRefException e) {
+                LOGGER.warn("Could not export preferences for memory stick mode: " + e.getMessage(), e);
             }
         }
         try {
@@ -1344,10 +1354,11 @@ public class JabRefPreferences {
             return null;
         }
         if (priOpt == null) {
-            return new CustomEntryType(StringUtil.capitalizeFirst(name), req, opt);
+            return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(opt));
         }
-        String[] secOpt = StringUtil.getRemainder(opt, priOpt);
-        return new CustomEntryType(StringUtil.capitalizeFirst(name), req, priOpt, secOpt);
+        List<String> secondary = EntryUtil.getRemainder(Arrays.asList(opt), Arrays.asList(priOpt));
+        String[] secOpt = secondary.toArray(new String[secondary.size()]);
+        return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(priOpt), Arrays.asList(secOpt));
 
     }
 
@@ -1357,13 +1368,18 @@ public class JabRefPreferences {
         list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall", IconTheme.JabRefIcon.FILE.getSmallIcon()));
         list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_WORD.getSmallIcon()));
         list.add(new ExternalFileType("Word 2007+", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_WORD.getSmallIcon()));
-        list.add(new ExternalFileType("OpenDocument text", "odt", "application/vnd.oasis.opendocument.text", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType(Localization.lang("OpenDocument text"), "odt",
+                "application/vnd.oasis.opendocument.text", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
         list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", "openoffice", IconTheme.JabRefIcon.FILE_EXCEL.getSmallIcon()));
         list.add(new ExternalFileType("Excel 2007+", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "oocalc", "openoffice", IconTheme.JabRefIcon.FILE_EXCEL.getSmallIcon()));
-        list.add(new ExternalFileType("OpenDocument spreadsheet", "ods", "application/vnd.oasis.opendocument.spreadsheet", "oocalc", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType(Localization.lang("OpenDocument spreadsheet"), "ods",
+                "application/vnd.oasis.opendocument.spreadsheet", "oocalc", "openoffice",
+                IconTheme.getImage("openoffice")));
         list.add(new ExternalFileType("PowerPoint", "ppt", "application/vnd.ms-powerpoint", "ooimpress", "openoffice", IconTheme.JabRefIcon.FILE_POWERPOINT.getSmallIcon()));
         list.add(new ExternalFileType("PowerPoint 2007+", "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress", "openoffice", IconTheme.JabRefIcon.FILE_POWERPOINT.getSmallIcon()));
-        list.add(new ExternalFileType("OpenDocument presentation", "odp", "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType(Localization.lang("OpenDocument presentation"), "odp",
+                "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice",
+                IconTheme.getImage("openoffice")));
         list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
         list.add(new ExternalFileType("PNG image", "png", "image/png", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType("GIF image", "gif", "image/gif", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
@@ -1372,7 +1388,8 @@ public class JabRefPreferences {
         list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
         list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
         list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
-        list.add(new ExternalFileType("TIFF image", "tiff", "image/tiff", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
+        list.add(new ExternalFileType(Localization.lang("TIFF image"), "tiff", "image/tiff", "gimp", "picture",
+                IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
         list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
         list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
@@ -1617,17 +1634,12 @@ public class JabRefPreferences {
      *
      * @param filename String File to export to
      */
-    public void exportPreferences(String filename) throws IOException {
+    public void exportPreferences(String filename) throws JabRefException {
         File f = new File(filename);
-        OutputStream os = new FileOutputStream(f);
-        try {
+        try (OutputStream os = new FileOutputStream(f)) {
             prefs.exportSubtree(os);
-        } catch (BackingStoreException ex) {
-            throw new IOException(ex);
-        } finally {
-            if (os != null) {
-                os.close();
-            }
+        } catch (BackingStoreException | IOException ex) {
+            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"), ex);
         }
     }
 
@@ -1635,14 +1647,16 @@ public class JabRefPreferences {
      * Imports Preferences from an XML file.
      *
      * @param filename String File to import from
+     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException
+     *                         or an IOException
      */
-    public void importPreferences(String filename) throws IOException {
+    public void importPreferences(String filename) throws JabRefException {
         File f = new File(filename);
-        InputStream is = new FileInputStream(f);
-        try {
+        try (InputStream is = new FileInputStream(f)) {
             Preferences.importPreferences(is);
-        } catch (InvalidPreferencesFormatException ex) {
-            throw new IOException(ex);
+        } catch (InvalidPreferencesFormatException | IOException ex) {
+            throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
+                    ex);
         }
     }
 
@@ -1660,9 +1674,10 @@ public class JabRefPreferences {
      * ONLY FOR TESTING!
      *
      * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
-     * @param prefs
+     *
+     * @param owPrefs
      */
-    void overwritePreferences(JabRefPreferences prefs) {
-        singleton = prefs;
+    void overwritePreferences(JabRefPreferences owPrefs) {
+        singleton = owPrefs;
     }
 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,14 +15,14 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.EntryUtil;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -63,7 +63,7 @@ public class TextField extends JTextField implements FieldEditor {
             addFocusListener(new FieldEditorFocusListener());
         }
         this.fieldName = fieldName;
-        label = new FieldNameLabel(' ' + StringUtil.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(' ' + EntryUtil.capitalizeFirst(this.fieldName) + ' ');
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 
@@ -204,7 +204,7 @@ public class TextField extends JTextField implements FieldEditor {
         getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
-        getActionMap().put("Redo", new AbstractAction("Redo") {
+        getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
 
             @Override
             public void actionPerformed(ActionEvent evt) {

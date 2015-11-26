@@ -3,8 +3,6 @@ package net.sf.jabref.logic.util.strings;
 import java.util.HashMap;
 
 public class UnicodeCharMap extends HashMap<String, String> {
-    private static final long serialVersionUID = 1L;
-
     public UnicodeCharMap() {
         put("\u00C0", "A");
         put("\u00C1", "A");

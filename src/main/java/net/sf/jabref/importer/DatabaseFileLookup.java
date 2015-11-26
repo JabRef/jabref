@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.sf.jabref.importer;
 
 import java.io.File;
@@ -18,17 +33,17 @@ import net.sf.jabref.gui.FileListTableModel;
  * This class provides some functionality to search in a {@link BibtexDatabase} for
  * files. <br>
  * <br>
- * 
- * 
+ *
+ *
  * @author Nosh&Dan
  * @version 09.11.2008 | 21:21:41
- * 
+ *
  */
 class DatabaseFileLookup {
 
     private static final String KEY_FILE_FIELD = "file";
 
-    private final HashMap<File, Boolean> fileToFound = new HashMap<File, Boolean>();
+    private final HashMap<File, Boolean> fileToFound = new HashMap<>();
 
     private final Collection<BibtexEntry> entries;
 
@@ -38,7 +53,7 @@ class DatabaseFileLookup {
     /**
      * Creates an instance by passing a {@link BibtexDatabase} which will be
      * used for the searches.
-     * 
+     *
      * @param aDatabase
      *            A {@link BibtexDatabase}.
      */
@@ -47,7 +62,7 @@ class DatabaseFileLookup {
             throw new IllegalArgumentException("Passing a 'null' BibtexDatabase.");
         }
         entries = aDatabase.getEntries();
-        possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
+        possibleFilePaths = JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
     }
 
     /**
@@ -58,7 +73,7 @@ class DatabaseFileLookup {
      * for the provided file for every {@link BibtexEntry} in the database. <br>
      * <br>
      * For the matching, the absolute file paths will be used.
-     * 
+     *
      * @param aFile
      *            A {@link File} Object.
      * @return <code>true</code>, if the file Object is stored in at least one
@@ -88,7 +103,7 @@ class DatabaseFileLookup {
      * Therefore the <i>file</i>-field of the bibtex-entry will be searched for
      * the absolute filepath of the searched file. <br>
      * <br>
-     * 
+     *
      * @param aFile
      *            A file that is searched in an bibtex-entry.
      * @param anEntry
@@ -98,7 +113,7 @@ class DatabaseFileLookup {
      */
     private boolean lookupEntry(File aFile, BibtexEntry anEntry) {
 
-        if (aFile == null || anEntry == null) {
+        if ((aFile == null) || (anEntry == null)) {
             return false;
         }
 
@@ -116,7 +131,7 @@ class DatabaseFileLookup {
             }
 
             File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
-            if (expandedFilename != null
+            if ((expandedFilename != null)
                     && expandedFilename.equals(aFile)) {
                 return true;
             }

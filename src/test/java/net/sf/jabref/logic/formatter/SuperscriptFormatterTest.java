@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.formatter;
 
-import junit.framework.Assert;
+
 import net.sf.jabref.logic.formatter.bibtexfields.SuperscriptFormatter;
-import net.sf.jabref.model.entry.BibtexEntry;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,6 +18,12 @@ public class SuperscriptFormatterTest {
     @After
     public void teardown() {
         formatter = null;
+    }
+
+    @Test
+    public void returnsFormatterName() {
+        Assert.assertNotNull(formatter.getName());
+        Assert.assertNotEquals("", formatter.getName());
     }
 
     @Test

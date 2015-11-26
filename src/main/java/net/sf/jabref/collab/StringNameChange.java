@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,7 +20,7 @@ import javax.swing.JLabel;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.KeyCollisionException;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexString;
@@ -33,21 +33,19 @@ import net.sf.jabref.gui.undo.UndoableStringChange;
 
 class StringNameChange extends Change {
 
-    private static final long serialVersionUID = 1L;
-    
     private final BibtexString string;
     private final String mem;
     private final String disk;
     private final String content;
     private final BibtexString tmpString;
-    
+
     private static final Log LOGGER = LogFactory.getLog(StringNameChange.class);
 
 
     public StringNameChange(BibtexString string, BibtexString tmpString,
             String mem, String tmp, String disk, String content) {
+        super(Localization.lang("Renamed string") + ": '" + tmp + '\'');
         this.tmpString = tmpString;
-        name = Localization.lang("Renamed string") + ": '" + tmp + '\'';
         this.string = string;
         this.content = content;
         this.mem = mem;

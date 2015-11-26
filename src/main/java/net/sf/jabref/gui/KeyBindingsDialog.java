@@ -172,8 +172,6 @@ class KeyBindingsDialog extends JDialog {
                 }
             }
             // second key cannot be a modifiers
-            //if ( evt.isActionKey()) {
-            //Util.pr(code);
             if ( //code.equals("Escape")
             code.equals("Tab")
                     || code.equals("Backspace")
@@ -185,7 +183,6 @@ class KeyBindingsDialog extends JDialog {
                     || code.equals("Alt")) {
                 return;
             }
-            //}
             String newKey;
             if (!mod.equals("")) {
                 newKey = mod.toLowerCase().replaceAll("\\+", " ") + " " + code;
@@ -194,7 +191,7 @@ class KeyBindingsDialog extends JDialog {
                 newKey = code;
             }
             keyTF.setText(newKey);
-            //find which key is selected and set its value int the bindHM
+            //find which key is selected and set its value in the bindHM
             String selectedFunction = table.getOriginalName(selRow);
             table.setValueAt(newKey, selRow, 1);
             table.revalidate();
@@ -272,7 +269,10 @@ class KeyBindingsDialog extends JDialog {
 
         @Override
         public String getColumnName(int col) {
-            return col == 0 ? Localization.lang("Action") : Localization.lang("Shortcut");
+            // @formatter:off
+            return col == 0 ? Localization.lang("Action") :
+                Localization.lang("Shortcut");
+            // @formatter:on
         }
 
         @Override
@@ -323,14 +323,18 @@ class KeyBindingsDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int[] selected = table.getSelectedRows();
                 if (selected.length == 0) {
-                    int answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this,
+                    int answer;
+                    // @formatter:off
+                    answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this,
                             Localization.lang("All key bindings will be reset to their defaults.") + " " +
                             Localization.lang("Continue?"),
                             Localization.lang("Resetting all key bindings"),
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE, null,
-                            new String[] {Localization.lang("Ok"), Localization.lang("Cancel")},
+                            new String[] {Localization.lang("Ok"),
+                                    Localization.lang("Cancel")},
                             Localization.lang("Ok"));
+                    // @formatter:on
                     if (answer == JOptionPane.YES_OPTION) {
                         bindHM.clear();
                         Set<Entry<String, String>> entrySet = defBinds.entrySet();

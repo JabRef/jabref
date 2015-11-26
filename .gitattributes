@@ -1,4 +1,4 @@
 gradlew eol=lf
 *.sh eol=lf
 
-CHANGELOG merge=union
+CHANGELOG.md merge=union

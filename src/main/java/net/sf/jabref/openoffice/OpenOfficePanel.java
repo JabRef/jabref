@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -129,9 +129,10 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         OpenOfficePanel.update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         OpenOfficePanel.update.setToolTipText(Localization.lang("Sync OO bibliography"));
         if (OS.WINDOWS) {
-            Globals.prefs.putDefaultValue("ooPath", "C:\\Program Files\\OpenOffice.org 3");
-            Globals.prefs.putDefaultValue("ooExecutablePath", "C:\\Program Files\\OpenOffice.org 2.3\\program\\soffice.exe");
-            Globals.prefs.putDefaultValue("ooJarsPath", "C:\\Program Files\\OpenOffice.org 2.3\\program\\classes");
+            Globals.prefs.putDefaultValue("ooPath", "C:\\Program Files\\OpenOffice.org 4");
+            Globals.prefs.putDefaultValue("ooExecutablePath",
+                    "C:\\Program Files\\OpenOffice.org 4\\program\\soffice.exe");
+            Globals.prefs.putDefaultValue("ooJarsPath", "C:\\Program Files\\OpenOffice.org 4\\program\\classes");
         } else if (OS.OS_X) {
             Globals.prefs.putDefaultValue("ooExecutablePath", "/Applications/OpenOffice.org.app/Contents/MacOS/soffice.bin");
             Globals.prefs.putDefaultValue("ooPath", "/Applications/OpenOffice.org.app");
@@ -180,7 +181,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         if (Globals.prefs.getBoolean("showOOPanel")) {
             manager.show(getName());
         }
-        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"), IconTheme.getImage("openoffice"));
+        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
+                IconTheme.getImage("openoffice"));
         item.addActionListener(new ActionListener() {
 
             @Override
@@ -315,7 +317,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                     java.util.List<String> unresolvedKeys = OpenOfficePanel.ooBase.refreshCiteMarkers
                             (databases, OpenOfficePanel.style);
                     OpenOfficePanel.ooBase.rebuildBibTextSection(databases, OpenOfficePanel.style);
-                    //ooBase.sync(frame.basePanel().database(), style);
+                    //ooBase.sync(frame.getCurrentBasePanel().database(), style);
                     if (!unresolvedKeys.isEmpty()) {
                         JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                 unresolvedKeys.get(0)), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
@@ -395,10 +397,10 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
                     //ooBase.testFrameHandling();
 
-                    //ooBase.combineCiteMarkers(frame.basePanel().database(), style);
+                    //ooBase.combineCiteMarkers(frame.getCurrentBasePanel().database(), style);
                     //insertUsingBST();
                     //ooBase.testFootnote();
-                    //ooBase.refreshCiteMarkers(frame.basePanel().database(), style);
+                    //ooBase.refreshCiteMarkers(frame.getCurrentBasePanel().database(), style);
                     //ooBase.createBibTextSection(true);
                     //ooBase.clearBibTextSectionContent();
                 } catch (Exception e) {
@@ -470,11 +472,11 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private java.util.List<BibtexDatabase> getBaseList() {
         java.util.List<BibtexDatabase> databases = new ArrayList<>();
         if (Globals.prefs.getBoolean("useAllOpenBases")) {
-            for (int i = 0; i < OpenOfficePanel.frame.baseCount(); i++) {
-                databases.add(OpenOfficePanel.frame.baseAt(i).database());
+            for (int i = 0; i < OpenOfficePanel.frame.getBasePanelCount(); i++) {
+                databases.add(OpenOfficePanel.frame.getBasePanelAt(i).database());
             }
         } else {
-            databases.add(OpenOfficePanel.frame.basePanel().database());
+            databases.add(OpenOfficePanel.frame.getCurrentBasePanel().database());
         }
 
         return databases;
@@ -495,7 +497,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         String ooBaseDirectory;
         if (auto) {
             AutoDetectPaths adp = new AutoDetectPaths(diag);
-
             if (adp.runAutodetection()) {
                 autoDetected = true;
                 dialogOkPressed = true;
@@ -531,31 +532,20 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             String ooJars = Globals.prefs.get("ooJarsPath");
             sOffice = Globals.prefs.get("ooExecutablePath");
 
-            boolean openOffice3 = true;//Globals.prefs.getBoolean("connectToOO3");
             if (OS.WINDOWS) {
-                //if (openOffice3) {
-                unoilDir = ooPath + "\\Basis\\program\\classes";
-                ooBaseDirectory = ooPath + "\\URE\\java";
+                unoilDir = ooPath + "\\program\\classes";
+                ooBaseDirectory = ooPath + "\\program\\classes";
                 sOffice = ooPath + "\\program\\soffice.exe";
-                //}
-
             }
             else if (OS.OS_X) {
-                //if (openOffice3) {
                 sOffice = ooPath + "/Contents/MacOS/soffice.bin";
                 ooBaseDirectory = ooPath + "/Contents/basis-link/ure-link/share/java";
                 unoilDir = ooPath + "/Contents/basis-link/program/classes";
-                //}
-
             }
             else {
                 // Linux:
-                //if (openOffice3) {
                 unoilDir = ooJars + "/program/classes";
                 ooBaseDirectory = ooJars + "/ure-link/share/java";
-                //sOffice = ooPath+"/program/soffice";
-                //}
-
             }
         }
 
@@ -569,7 +559,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             URL[] jarList = new URL[jarFiles.length];
             for (int i = 0; i < jarList.length; i++) {
                 if (!jarFiles[i].exists()) {
-                    throw new Exception(Localization.lang("File not found") + ": " + jarFiles[i].getPath());
+                    throw new Exception("File not found: " + jarFiles[i].getPath());
                 }
                 jarList[i] = jarFiles[i].toURI().toURL();
             }
@@ -656,19 +646,18 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
 
     private static void addURL(URL[] u) throws IOException {
-        try (URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader()) {
-            Class<URLClassLoader> sysclass = URLClassLoader.class;
+        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        Class<URLClassLoader> sysclass = URLClassLoader.class;
 
-            try {
-                Method method = sysclass.getDeclaredMethod("addURL", OpenOfficePanel.parameters);
-                method.setAccessible(true);
-                for (URL anU : u) {
-                    method.invoke(sysloader, anU);
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-                throw new IOException("Error, could not add URL to system classloader");
+        try {
+            Method method = sysclass.getDeclaredMethod("addURL", OpenOfficePanel.parameters);
+            method.setAccessible(true);
+            for (URL anU : u) {
+                method.invoke(sysloader, anU);
             }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw new IOException("Error, could not add URL to system classloader");
         }
     }
 
@@ -783,7 +772,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
         }
 
-        BasePanel panel = OpenOfficePanel.frame.basePanel();
+        BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
         final BibtexDatabase database = panel.database();
         if (panel != null) {
             BibtexEntry[] entries = panel.getSelectedEntries();
@@ -825,7 +814,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             if (hadBib)
                 ooBase.clearBibTextSectionContent();
               */
-            BasePanel panel = OpenOfficePanel.frame.basePanel();
+            BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
             final BibtexDatabase database = panel.database();
             Map<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<>();
             if (panel != null) {
@@ -862,7 +851,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     public void insertUsingBST() {
         try {
-            BasePanel panel = OpenOfficePanel.frame.basePanel();
+            BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
             final BibtexDatabase database = panel.database();
             if (panel != null) {
                 BibtexEntry[] entries = panel.getSelectedEntries();
@@ -951,7 +940,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     private void pushEntries(boolean inParenthesis, BibtexEntry[] entries) {
 
-        final BibtexDatabase database = OpenOfficePanel.frame.basePanel().database();
+        final BibtexDatabase database = OpenOfficePanel.frame.getCurrentBasePanel().database();
         if (entries.length > 0) {
 
             String pageInfo = null;

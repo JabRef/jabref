@@ -32,8 +32,6 @@ import net.sf.jabref.model.entry.BibtexEntry;
  * An Action class representing the process of invoking a PushToApplication operation.
  */
 class PushToApplicationAction extends AbstractAction implements Runnable {
-
-    private static final long serialVersionUID = 9008115216029319314L;
     private final PushToApplication operation;
     private final JabRefFrame frame;
     private BasePanel panel;
@@ -50,7 +48,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        panel = frame.basePanel();
+        panel = frame.getCurrentBasePanel();
 
         // Check if a BasePanel exists:
         if (panel == null) {
@@ -98,7 +96,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         String citeKey;
         boolean first = true;
         for (BibtexEntry bes : bibentries) {
-            citeKey = bes.getField(BibtexEntry.KEY_FIELD);
+            citeKey = bes.getCiteKey();
             // if the key is empty we give a warning and ignore this entry
             if ((citeKey == null) || citeKey.equals("")) {
                 continue;

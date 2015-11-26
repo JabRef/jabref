@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.integrity;
 
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void regexTest() {
-        assertEquals("N,NN", Pattern.compile("[^, ]+").matcher("Knuth, Donald E. ".trim()).replaceAll("N").replaceAll("\\s+",""));
+        assertEquals("N,NN", Pattern.compile("[^, ]+").matcher("Knuth, Donald E. ".trim()).replaceAll("N").replaceAll("\\s+", ""));
     }
 
     @Test
@@ -57,6 +57,22 @@ public class IntegrityCheckTest {
         assertCorrect("This is a {T}itle", IntegrityCheck.TITLE_CHECKER);
         assertCorrect("{This is a Title}", IntegrityCheck.TITLE_CHECKER);
         assertCorrect("This is a {Title}", IntegrityCheck.TITLE_CHECKER);
+        assertCorrect("{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}", IntegrityCheck.TITLE_CHECKER);
+    }
+
+    @Test
+    public void testPageNumbersChecks() {
+        assertCorrect("1--2", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("12", IntegrityCheck.PAGES_CHECKER);
+        assertWrong("1-2", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("1,2,3", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("43+", IntegrityCheck.PAGES_CHECKER);
+        assertWrong("1 2", IntegrityCheck.PAGES_CHECKER);
+        assertWrong("{1}-{2}", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("7,41,73--97", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("7,41--42,73", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("7--11,41--43,73", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect("7+,41--43,73", IntegrityCheck.PAGES_CHECKER);
     }
 
     private void assertWrong(String value, IntegrityCheck.Checker yearChecker) {

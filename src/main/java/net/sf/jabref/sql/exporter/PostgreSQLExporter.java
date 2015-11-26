@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General public static License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -22,17 +22,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
 /**
- * 
+ *
  * @author ifsteinm.
- * 
+ *
  *  Jan 20th	Extends DBExporter to provide features specific for PostgreSQL
  *  			Created after a refactory on SQLUtil
- *          
+ *
  */
 public class PostgreSQLExporter extends DBExporter {
 
@@ -43,7 +43,7 @@ public class PostgreSQLExporter extends DBExporter {
     }
 
     /**
-     * 
+     *
      * @return The singleton instance of the PostgreSQLExporter
      */
     public static PostgreSQLExporter getInstance() {
@@ -60,23 +60,24 @@ public class PostgreSQLExporter extends DBExporter {
         String drv = "org.postgresql.Driver";
 
         Class.forName(drv).newInstance();
-        Connection conn = DriverManager.getConnection(url,
-                dbstrings.getUsername(), dbstrings.getPassword());
-        ResultSet rs = ((Statement) SQLUtil.processQueryWithResults(conn,
-                "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='"
-                        + dbStrings.getDatabase() + '\'')).getResultSet();
-        rs.next();
-        if (rs.getInt("alreadyThere") == 0) {
-            SQLUtil.processQuery(conn, "CREATE DATABASE " + dbStrings.getDatabase());
+        try (Connection conn = DriverManager.getConnection(url, dbstrings.getUsername(), dbstrings.getPassword());
+                ResultSet rs = ((Statement) SQLUtil.processQueryWithResults(conn,
+                        "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='" + dbStrings.getDatabase()
+                                + '\'')).getResultSet()) {
+
+            rs.next();
+            if (rs.getInt("alreadyThere") == 0) {
+                SQLUtil.processQuery(conn, "CREATE DATABASE " + dbStrings.getDatabase());
+            }
+            rs.getStatement().close();
+            conn.close();
         }
-        rs.getStatement().close();
-        conn.close();
 
-        conn = DriverManager.getConnection(url, dbstrings.getUsername(),
-                dbstrings.getPassword());
-        createPLPGSQLFunction(conn);
+        try (Connection conn = DriverManager.getConnection(url, dbstrings.getUsername(), dbstrings.getPassword())) {
+            createPLPGSQLFunction(conn);
 
-        return conn;
+            return conn;
+        }
     }
 
     private void createPLPGSQLFunction(Connection conn) throws SQLException {
@@ -96,7 +97,7 @@ public class PostgreSQLExporter extends DBExporter {
     /**
      * Generates SQL necessary to create all tables in a MySQL database, and
      * writes it to appropriate output.
-     * 
+     *
      * @param out
      *            The output (PrintStream or Connection) object to which the DML
      *            should be written.

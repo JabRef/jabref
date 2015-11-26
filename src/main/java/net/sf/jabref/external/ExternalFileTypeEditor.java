@@ -42,8 +42,6 @@ import net.sf.jabref.logic.l10n.Localization;
  * Editor for external file types.
  */
 public class ExternalFileTypeEditor extends JDialog {
-
-    private static final long serialVersionUID = 2818719761022588069L;
     private JFrame frame;
     private JDialog dialog;
     private ArrayList<ExternalFileType> fileTypes;
@@ -102,9 +100,6 @@ public class ExternalFileTypeEditor extends JDialog {
             }
         });
         AbstractAction cancelAction = new AbstractAction() {
-
-            private static final long serialVersionUID = -4147450749465768880L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -285,9 +280,6 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     private class FileTypeTableModel extends AbstractTableModel {
-
-        private static final long serialVersionUID = 687769574139355925L;
-
         @Override
         public int getColumnCount() {
             return 5;
@@ -370,8 +362,6 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
-
-        private static final long serialVersionUID = 6828273495822942935L;
         private JabRefFrame frame;
         private JDialog dialog;
         ExternalFileTypeEditor editor;
@@ -401,8 +391,8 @@ public class ExternalFileTypeEditor extends JDialog {
             editor.setValues();
             editor.setVisible(true);
             if (frame != null) {
-                if (frame.basePanel() != null) {
-                    frame.basePanel().mainTable.repaint();
+                if (frame.getCurrentBasePanel() != null) {
+                    frame.getCurrentBasePanel().mainTable.repaint();
                 }
             }
         }

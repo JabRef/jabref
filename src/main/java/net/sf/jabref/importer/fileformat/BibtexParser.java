@@ -27,10 +27,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -58,7 +60,7 @@ public class BibtexParser {
 
     private final PushbackReader pushbackReader;
     private BibtexDatabase database;
-    private HashMap<String, BibtexEntryType> entryTypes;
+    private HashMap<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
     private final FieldContentParser fieldContentParser = new FieldContentParser();
@@ -178,7 +180,7 @@ public class BibtexParser {
                 }
                 skipWhitespace();
                 String entryType = parseTextToken();
-                BibtexEntryType tp = BibtexEntryType.getType(entryType);
+                EntryType tp = EntryTypes.getType(entryType);
                 boolean isEntry = tp != null;
                 // The entry type name was not recognized. This can mean
                 // that it is a string, preamble, or comment. If so,
@@ -242,12 +244,12 @@ public class BibtexParser {
                                 CustomEntryType.ENTRYTYPE_FLAG)) {
                             // A custom entry type can also be stored in a
                             // "@comment"
-                            CustomEntryType typ = CustomEntryType.parseEntryType(comment);
-                            entryTypes.put(typ.getName().toLowerCase(), typ);
+                            CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
+                            entryTypes.put(typ.getName(), typ);
                         } else {
                             // FIXME: user comments are simply dropped
                             // at least, we log that we ignored the comment
-                            LOGGER.info(Localization.lang("Dropped comment from database") + ":" + comment);
+                            LOGGER.info("Dropped comment from database: " + comment);
                         }
                     } else {
                         // The entry type was not recognized. This may mean that
@@ -256,7 +258,7 @@ public class BibtexParser {
                         // at the bottom of the file. So we use an
                         // UnknownEntryType
                         // to remember the type name by.
-                        tp = new UnknownEntryType(entryType.toLowerCase());
+                        tp = new UnknownEntryType(EntryUtil.capitalizeFirst(entryType));
                         isEntry = true;
                     }
                 }
@@ -283,7 +285,7 @@ public class BibtexParser {
                         }
                     } catch (IOException ex) {
                         LOGGER.warn("Could not parse entry", ex);
-                        parserResult.addWarning(Localization.lang("Error occured when parsing entry") + ": '"
+                        parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '"
                                 + ex.getMessage() + "'. " + Localization.lang("Skipped entry."));
 
                     }
@@ -396,7 +398,7 @@ public class BibtexParser {
         return parseBracketedText().toString();
     }
 
-    private BibtexEntry parseEntry(BibtexEntryType tp) throws IOException {
+    private BibtexEntry parseEntry(EntryType tp) throws IOException {
         String id = IdGenerator.next();
         BibtexEntry result = new BibtexEntry(id, tp);
         skipWhitespace();
@@ -886,16 +888,15 @@ public class BibtexParser {
         for (BibtexEntry be : database.getEntries()) {
             if (be.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
-                Object o = entryTypes.get(be.getType().getName().toLowerCase());
-                if (o != null) {
-                    BibtexEntryType type = (BibtexEntryType) o;
+                String name = be.getType().getName();
+                EntryType type = entryTypes.get(name);
+                if (type != null) {
                     be.setType(type);
                 } else {
-                    _pr.addWarning(Localization.lang("unknown entry type") + ": "
-                                    + be.getType().getName() + ":" + be.getField(BibtexEntry.KEY_FIELD)
-                                    + " . " + Localization.lang("Type set to 'other'")
-                                    + ".");
-                    be.setType(BibtexEntryTypes.OTHER);
+                    _pr.addWarning(
+                            Localization.lang("Unknown entry type")
+                                    + ": " + name + "; key: " + be.getCiteKey()
+                            );
                 }
             }
         }

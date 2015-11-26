@@ -21,16 +21,15 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
 import com.google.common.base.Strings;
+import net.sf.jabref.model.entry.EntryType;
 
 public class BibtexEntryWriter {
 
@@ -69,12 +68,11 @@ public class BibtexEntryWriter {
         // XXX JK: Look for all used field names not only defined once, since
         //         there may be some unofficial field name used.
         int max = 0;
-        for (BibtexEntryType type : BibtexEntryType.getAllValues()) {
-            if (type.getRequiredFields() != null) {
-                for (String field : type.getRequiredFields()) {
-                    max = Math.max(max, field.length());
-                }
+        for (EntryType type : EntryTypes.getAllValues()) {
+            for (String field : type.getRequiredFieldsFlat()) {
+                max = Math.max(max, field.length());
             }
+
             if (type.getOptionalFields() != null) {
                 for (String field : type.getOptionalFields()) {
                     max = Math.max(max, field.length());
@@ -132,7 +130,7 @@ public class BibtexEntryWriter {
         boolean hasWritten = writeField(entry, out, "title", false);
         writtenFields.add("title");
 
-        if (entry.getRequiredFields() != null) {
+        if (entry.getRequiredFieldsFlat() != null) {
             List<String> requiredFields = getRequiredFieldsSorted(entry);
             for (String value : requiredFields) {
                 if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
@@ -175,9 +173,9 @@ public class BibtexEntryWriter {
         String entryTypeName = entry.getType().getName();
         List<String> sortedFields = requiredFieldsSorted.get(entryTypeName);
 
-        // put into chache if necessary
+        // put into cache if necessary
         if (sortedFields == null) {
-            sortedFields = new ArrayList<>(entry.getRequiredFields());
+            sortedFields = new ArrayList<>(entry.getRequiredFieldsFlat());
             Collections.sort(sortedFields);
             requiredFieldsSorted.put(entryTypeName, sortedFields);
         }
@@ -216,7 +214,7 @@ public class BibtexEntryWriter {
         written.add(BibtexEntry.KEY_FIELD);
         boolean hasWritten = false;
         // Write required fields first.
-        List<String> fields = entry.getRequiredFields();
+        List<String> fields = entry.getRequiredFieldsFlat();
         if (fields != null) {
             for (String value : fields) {
                 hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
@@ -260,7 +258,7 @@ public class BibtexEntryWriter {
         boolean hasWritten = false;
 
         // Write user defined fields first.
-        String[] fields = entry.getUserDefinedFields();
+        String[] fields = Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
         if (fields != null) {
             //do not sort, write as it is.
             for (String value : fields) {
@@ -297,7 +295,7 @@ public class BibtexEntryWriter {
     }
 
     private void writeKeyField(BibtexEntry entry, Writer out) throws IOException {
-        String keyField = StringUtil.shaveString(entry.getField(BibtexEntry.KEY_FIELD));
+        String keyField = StringUtil.shaveString(entry.getCiteKey());
         out.write((keyField == null ? "" : keyField) + ',' + Globals.NEWLINE);
     }
 
@@ -326,7 +324,7 @@ public class BibtexEntryWriter {
             try {
                 out.write(fieldFormatter.format(field, name));
             } catch (IOException ex) {
-                throw new IOException(Localization.lang("Error in field") + " '" + name + "': " + ex.getMessage());
+                throw new IOException("Error in field '" + name + "': " + ex.getMessage());
             }
             return true;
         } else {

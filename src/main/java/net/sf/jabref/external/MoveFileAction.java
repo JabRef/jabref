@@ -63,7 +63,7 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        String[] dirs = frame.basePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
+        String[] dirs = frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
             if (new File(dirs[i]).exists()) {
@@ -80,7 +80,7 @@ public class MoveFileAction extends AbstractAction {
         if (!file.isAbsolute()) {
             file = FileUtil.expandFilename(ln, dirs);
         }
-        if (file != null && file.exists()) {
+        if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
             String extension = null;
             if (flEntry.getType() != null) {
@@ -133,10 +133,10 @@ public class MoveFileAction extends AbstractAction {
                 }
                 newFile = new File(chosenFile);
                 // Check if the file already exists:
-                if (newFile.exists() && JOptionPane.showConfirmDialog
-                        (frame, "'" + newFile.getName() + "' " + Localization.lang("exists. Overwrite file?"),
-                                Localization.lang("Move/Rename file"), JOptionPane.OK_CANCEL_OPTION)
-                            != JOptionPane.OK_OPTION) {
+                if (newFile.exists() && (JOptionPane.showConfirmDialog(frame,
+                        Localization.lang("'%0' exists. Overwrite file?", newFile.getName()),
+                        Localization.lang("Move/Rename file"),
+                        JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)) {
                     if (!toFileDir) {
                         repeat = true;
                     } else {
@@ -157,8 +157,8 @@ public class MoveFileAction extends AbstractAction {
                         // Relativise path, if possible.
                         String canPath = new File(dirs[found]).getCanonicalPath();
                         if (newFile.getCanonicalPath().startsWith(canPath)) {
-                            if (newFile.getCanonicalPath().length() > canPath.length() &&
-                                    newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar) {
+                            if ((newFile.getCanonicalPath().length() > canPath.length()) &&
+                                    (newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar)) {
                                 flEntry.setLink(newFile.getCanonicalPath().substring(1 + canPath.length()));
                             } else {
                                 flEntry.setLink(newFile.getCanonicalPath().substring(canPath.length()));

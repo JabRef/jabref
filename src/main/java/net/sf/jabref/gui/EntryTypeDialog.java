@@ -15,43 +15,42 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Collection;
 
 import javax.swing.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.*;
+import org.jdesktop.swingx.VerticalLayout;
 
+/**
+ * Dialog that prompts the user to choose a type for an entry.
+ * Returns null if cancelled.
+ */
 public class EntryTypeDialog extends JDialog implements ActionListener {
+    private EntryType type;
+    private static final int COLUMN = 3;
+    private boolean biblatexMode;
 
-    /*
-     * Dialog that prompts the user to choose a type for an entry.
-     * Returns null if cancelled.
-     */
-
-    private BibtexEntryType type;
     private final CancelAction cancelAction = new CancelAction();
-    private static final int COLNUM = 3;
-
 
     static class TypeButton extends JButton implements Comparable<TypeButton> {
+        final EntryType type;
 
-        final BibtexEntryType type;
-
-
-        public TypeButton(String label, BibtexEntryType type_) {
+        public TypeButton(String label, EntryType _type) {
             super(label);
-            type = type_;
+            type = _type;
         }
 
         @Override
@@ -60,14 +59,15 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         }
     }
 
+    public EntryTypeDialog(JabRefFrame frame) {
+        // modal dialog
+        super(frame, true);
 
-    public EntryTypeDialog(JabRefFrame baseFrame_) {
-        super(baseFrame_, true); // Set modal on.
+        biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
 
         setTitle(Localization.lang("Select entry type"));
 
         addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowClosing(WindowEvent e) {
                 cancelAction.actionPerformed(null);
@@ -75,58 +75,72 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         });
 
         getContentPane().setLayout(new BorderLayout());
-        JPanel pan = new JPanel();
-        getContentPane().add(pan, BorderLayout.CENTER);
-        JPanel buttons = new JPanel();
-        JButton // ok = new JButton("Ok"),
-        cancel = new JButton(Localization.lang("Cancel"));
-        //ok.addActionListener(this);
+        getContentPane().add(createCancelButtonBarPanel(), BorderLayout.SOUTH);
+        getContentPane().add(createEntryGroupsPanel(), BorderLayout.CENTER);
+
+        pack();
+        setResizable(false);
+    }
+
+    private JPanel createEntryGroupsPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new VerticalLayout());
+
+        if(biblatexMode) {
+            panel.add(createEntryGroupPanel("BibLateX", EntryTypes.getAllValues()));
+        } else {
+            panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
+            panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
+            panel.add(createEntryGroupPanel("Custom", CustomEntryTypesManager.ALL));
+        }
+
+        return panel;
+    }
+
+    private JPanel createCancelButtonBarPanel() {
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(this);
 
         // Make ESC close dialog, equivalent to clicking Cancel.
-        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(baseFrame_.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
         cancel.getActionMap().put("close", cancelAction);
 
-        //buttons.add(ok);
+        JPanel buttons = new JPanel();
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
-        //buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         bb.addGlue();
         bb.addButton(cancel);
         bb.addGlue();
+        return buttons;
+    }
 
-        getContentPane().add(buttons, BorderLayout.SOUTH);
-        GridBagLayout gbl = new GridBagLayout();
-        pan.setLayout(gbl);
-        GridBagConstraints con = new GridBagConstraints();
-        con.anchor = GridBagConstraints.WEST;
-        con.fill = GridBagConstraints.HORIZONTAL;
-        con.insets = new Insets(4, 4, 4, 4);
+    private JPanel createEntryGroupPanel(String groupTitle, Collection<EntryType> entries) {
+        JPanel panel = new JPanel();
+        GridBagLayout bagLayout = new GridBagLayout();
+        panel.setLayout(bagLayout);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(4, 4, 4, 4);
+        // column count
         int col = 0;
 
-        for (BibtexEntryType tp : BibtexEntryType.getAllValues()) {
-            if (tp.isVisibleAtNewEntryDialog()) {
-                TypeButton b = new TypeButton(StringUtil.capitalizeFirst(tp.getName()), tp);
-                b.addActionListener(this);
-                // Check if we should finish the row.
-                col++;
-                if (col == EntryTypeDialog.COLNUM) {
-                    col = 0;
-                    con.gridwidth = GridBagConstraints.REMAINDER;
-                } else {
-                    con.gridwidth = 1;
-                }
-                gbl.setConstraints(b, con);
-                pan.add(b);
+        for (EntryType entryType : entries) {
+            TypeButton entryButton = new TypeButton(entryType.getName(), entryType);
+            entryButton.addActionListener(this);
+            // Check if we should finish the row.
+            col++;
+            if (col == EntryTypeDialog.COLUMN) {
+                col = 0;
+                constraints.gridwidth = GridBagConstraints.REMAINDER;
+            } else {
+                constraints.gridwidth = 1;
             }
+            bagLayout.setConstraints(entryButton, constraints);
+            panel.add(entryButton);
         }
-        pan.setBorder(BorderFactory.createTitledBorder
-                (BorderFactory.createEtchedBorder(),
-                        Localization.lang("Entry types")));
-        //pan.setBackground(Color.white);
-        //buttons.setBackground(Color.white);
-        pack();
-        setResizable(false);
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), groupTitle));
+
+        return panel;
     }
 
     @Override
@@ -137,19 +151,14 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         dispose();
     }
 
-    public BibtexEntryType getChoice() {
-        //return type;
+    public EntryType getChoice() {
         return type;
     }
 
 
     class CancelAction extends AbstractAction {
-
         public CancelAction() {
             super("Cancel");
-            //  new ImageIcon(GUIGlobals.imagepath+GUIGlobals.closeIconFile));
-            //putValue(SHORT_DESCRIPTION, "Cancel");
-            //putValue(MNEMONIC_KEY, GUIGlobals.closeKeyCode);
         }
 
         @Override

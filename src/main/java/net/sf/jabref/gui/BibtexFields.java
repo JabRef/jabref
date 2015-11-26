@@ -38,10 +38,8 @@ import java.util.HashSet;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.IEEETranEntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.logic.util.io.TXMLReader;
-
-import org.w3c.dom.Element;
 
 public class BibtexFields {
 
@@ -52,6 +50,16 @@ public class BibtexFields {
     public static final String OWNER = "owner";
     public static final String TIMESTAMP = "timestamp"; // it's also definied at the JabRefPreferences class
     private static final String ENTRYTYPE = "entrytype";
+    public static final String EXTRA_YES_NO = "yesNo"; // Blank/Yes/No Combo-box
+    public static final String EXTRA_URL = "url"; // Drop target for URL
+    public static final String EXTRA_DATEPICKER = "datepicker"; // Calendar button and double-click in field to set current date
+    public static final String EXTRA_JOURNAL_NAMES = "journalNames"; // Journal abbreviation button
+    public static final String EXTRA_EXTERNAL = "external"; // Open external viewer on double-click
+    public static final String EXTRA_BROWSE = "browse"; // Browse button, file dialog
+    public static final String EXTRA_BROWSE_DOC = "browseDoc"; // Browse button, file dialog with extension .fieldname
+    public static final String EXTRA_BROWSE_DOC_ZIP = "browseDocZip"; // Browse button, file dialog with extension .fieldname, .fieldname.bz2, .filedname.gz
+    public static final String EXTRA_SET_OWNER = "setOwner"; // Button to set owner to current used
+    public static final String EXTRA_MONTH = "month"; // Button to show the months and set abbreviation
 
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
             {"author", "title", "year", BibtexEntry.KEY_FIELD};
@@ -88,14 +96,16 @@ public class BibtexFields {
         add(new BibtexSingleField("institution", true, GUIGlobals.MEDIUM_W));
 
         dummy = new BibtexSingleField("journal", true, GUIGlobals.SMALL_W);
-        dummy.setExtras("journalNames");
+        dummy.setExtras(EXTRA_JOURNAL_NAMES);
         add(dummy);
         dummy = new BibtexSingleField("journaltitle", true, GUIGlobals.SMALL_W);
-        dummy.setExtras("journalNames");
+        dummy.setExtras(EXTRA_JOURNAL_NAMES);
         add(dummy);
 
         add(new BibtexSingleField("key", true));
-        add(new BibtexSingleField("month", true, GUIGlobals.SMALL_W));
+        dummy = new BibtexSingleField("month", true, GUIGlobals.SMALL_W);
+        dummy.setExtras(EXTRA_MONTH);
+        add(dummy);
         add(new BibtexSingleField("note", true, GUIGlobals.MEDIUM_W));
         add(new BibtexSingleField("number", true, GUIGlobals.SMALL_W, 60).setNumeric(true));
         add(new BibtexSingleField("organization", true, GUIGlobals.MEDIUM_W));
@@ -159,7 +169,7 @@ public class BibtexFields {
         add(dummy);
 
         dummy = new BibtexSingleField("doi", true, GUIGlobals.SMALL_W);
-        dummy.setExtras("external");
+        dummy.setExtras(EXTRA_EXTERNAL);
         add(dummy);
         add(new BibtexSingleField("eid", true, GUIGlobals.SMALL_W));
 
@@ -174,15 +184,15 @@ public class BibtexFields {
         add(new BibtexSingleField("abstract", false, GUIGlobals.LARGE_W, 400));
 
         dummy = new BibtexSingleField("url", false, GUIGlobals.SMALL_W);
-        dummy.setExtras("external");
+        dummy.setExtras(EXTRA_EXTERNAL);
         add(dummy);
 
         dummy = new BibtexSingleField("pdf", false, GUIGlobals.SMALL_W);
-        dummy.setExtras("browseDoc");
+        dummy.setExtras(EXTRA_BROWSE_DOC);
         add(dummy);
 
         dummy = new BibtexSingleField("ps", false, GUIGlobals.SMALL_W);
-        dummy.setExtras("browseDocZip");
+        dummy.setExtras(EXTRA_BROWSE_DOC_ZIP);
         add(dummy);
         add(new BibtexSingleField("comment", false, GUIGlobals.MEDIUM_W));
         add(new BibtexSingleField("keywords", false, GUIGlobals.SMALL_W));
@@ -202,12 +212,12 @@ public class BibtexFields {
         add(dummy);
 
         dummy = new BibtexSingleField(BibtexFields.OWNER, false, GUIGlobals.SMALL_W);
-        dummy.setExtras("setOwner");
+        dummy.setExtras(EXTRA_SET_OWNER);
         dummy.setPrivate();
         add(dummy);
 
         dummy = new BibtexSingleField(BibtexFields.TIMESTAMP, false, GUIGlobals.SMALL_W);
-        dummy.setExtras("datepicker");
+        dummy.setExtras(EXTRA_DATEPICKER);
         dummy.setPrivate();
         add(dummy);
 
@@ -233,12 +243,23 @@ public class BibtexFields {
         dummy.setDisplayable(false);
         add(dummy);
 
+        // IEEEtranBSTCTL fields
+        for (String yesNoField : IEEETranEntryTypes.IEEETRANBSTCTL_YES_NO_FIELDS) {
+            dummy = new BibtexSingleField(yesNoField, false);
+            dummy.setExtras(EXTRA_YES_NO);
+            add(dummy);
+        }
+
+        for (String numericField : IEEETranEntryTypes.IEEETRANBSTCTL_NUMERIC_FIELDS) {
+            add(new BibtexSingleField(numericField, false).setNumeric(true));
+        }
+
         // collect all public fields for the PUBLIC_FIELDS array
         Vector<String> pFields = new Vector<>(fieldSet.size());
         for (BibtexSingleField sField : fieldSet.values()) {
-            if (sField.isPublic()) {
+            if (!sField.isPrivate()) {
                 pFields.add(sField.getFieldName());
-                // or export the complet BibtexSingleField ?
+                // or export the complete BibtexSingleField ?
                 // BibtexSingleField.toString() { return fieldname ; }
             }
         }
@@ -430,9 +451,9 @@ public class BibtexFields {
         private static final int WRITEABLE = 0x08; // These fields will not be saved to the .bib file.
 
         // the fieldname
-        private String name;
+        private final String name;
 
-        // contains the standard, privat, displayable, writable infos
+        // contains the standard, private, displayable, writable infos
         // default is: not standard, public, displayable and writable
         private int flag = BibtexSingleField.DISPLAYABLE | BibtexSingleField.WRITEABLE;
 
@@ -493,43 +514,6 @@ public class BibtexFields {
             length = pLength;
         }
 
-        /**
-         * the constructor reads all neccessary data from the xml file
-         */
-        public BibtexSingleField(TXMLReader reader, Element node) {
-            // default is: not standard, public, displayable and writable
-            flag = BibtexSingleField.DISPLAYABLE | BibtexSingleField.WRITEABLE;
-
-            name = reader.readStringAttribute(node, "name", "field");
-            name = name.toLowerCase();
-
-            // read the weight
-            String wStr = reader.readStringAttribute(node, "weight", null);
-            if (wStr != null) {
-                int hCode = wStr.toLowerCase().hashCode();
-                if (hCode == "small".hashCode()) {
-                    weight = GUIGlobals.SMALL_W;
-                } else if (hCode == "medium".hashCode()) {
-                    weight = GUIGlobals.MEDIUM_W;
-                } else if (hCode == "large".hashCode()) {
-                    weight = GUIGlobals.LARGE_W;
-                } else // try to convert to a double value
-                {
-                    try {
-                        weight = Double.parseDouble(wStr);
-                        if ((weight < 0.0) || (weight > GUIGlobals.MAX_FIELD_WEIGHT)) {
-                            weight = GUIGlobals.DEFAULT_FIELD_WEIGHT;
-                        }
-                    } catch (Exception e) {
-                        weight = GUIGlobals.DEFAULT_FIELD_WEIGHT;
-                    }
-                }
-            }
-            length = reader.readIntegerAttribute(node, "length", GUIGlobals.DEFAULT_FIELD_LENGTH);
-
-            extras = reader.readStringAttribute(node, "extras", null);
-        }
-
         // -----------------------------------------------------------------------
         // -----------------------------------------------------------------------
 
@@ -559,14 +543,6 @@ public class BibtexFields {
 
         public boolean isPrivate() {
             return isSet(BibtexSingleField.PRIVATE);
-        }
-
-        public void setPublic() {
-            setFlag(false, BibtexSingleField.PRIVATE);
-        }
-
-        public boolean isPublic() {
-            return !isSet(BibtexSingleField.PRIVATE);
         }
 
         public void setDisplayable(boolean value) {

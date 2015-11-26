@@ -15,20 +15,16 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
- * Adds popup functionality to DragDropPane 
- * 
+ * Adds popup functionality to DragDropPane
+ *
  * Code inspired by http://forums.devx.com/showthread.php?t=151270
  */
 public class DragDropPopupPane extends DragDropPane {
@@ -36,7 +32,8 @@ public class DragDropPopupPane extends DragDropPane {
     private JPopupMenu popupMenu;
 
 
-    public DragDropPopupPane(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
+    public DragDropPopupPane(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction,
+            AbstractAction bibtexKeyPatternAction, AbstractAction closeDatabaseAction) {
         super();
 
         addMouseListener(new java.awt.event.MouseAdapter() {
@@ -47,10 +44,11 @@ public class DragDropPopupPane extends DragDropPane {
             }
         });
 
-        initPopupMenu(manageSelectorsAction, databasePropertiesAction, bibtexKeyPatternAction);
+        initPopupMenu(manageSelectorsAction, databasePropertiesAction, bibtexKeyPatternAction, closeDatabaseAction);
     }
 
-    private void initPopupMenu(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
+    private void initPopupMenu(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction,
+            AbstractAction bibtexKeyPatternAction, AbstractAction closeDatabaseAction) {
         popupMenu = new JPopupMenu();
 
         JMenuItem databasePropertiesBtn = new JMenuItem(Localization.lang("Database properties"));
@@ -66,24 +64,12 @@ public class DragDropPopupPane extends DragDropPane {
         popupMenu.add(manageSelectorsBtn);
 
         JMenuItem closeBtn = new JMenuItem(Localization.lang("Close"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-        closeBtn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        closeSelectedTab();
-                    }
-                });
-            }
-        });
+        closeBtn.addActionListener(closeDatabaseAction);
         popupMenu.add(closeBtn);
     }
 
     private void tabClicked(MouseEvent e) {
-        if (e.getButton() != MouseEvent.BUTTON1 && e.getClickCount() == 1) { // if is right-click
+        if ((e.getButton() != MouseEvent.BUTTON1) && (e.getClickCount() == 1)) { // if is right-click
 
             // display popup near location of mouse click
             popupMenu.show(e.getComponent(), e.getX(), e.getY() - 10);
@@ -94,5 +80,4 @@ public class DragDropPopupPane extends DragDropPane {
         // remove selected tab
         remove(getSelectedIndex());
     }
-
 }

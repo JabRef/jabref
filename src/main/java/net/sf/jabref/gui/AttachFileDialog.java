@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,7 +17,6 @@ package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -33,9 +32,8 @@ import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.model.entry.EntryUtil;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,17 +56,6 @@ public class AttachFileDialog extends JDialog {
     private final MetaData metaData;
     private boolean cancelled = true; // Default to true, so a pure close operation implies Cancel.
 
-
-    public AttachFileDialog(Frame parent, MetaData metaData, BibtexEntry entry, String fieldName) {
-        super(parent, true);
-        this.metaData = metaData;
-        this.entry = entry;
-        this.fieldName = fieldName;
-        this.editor = new TextField(fieldName, entry.getField(fieldName), false);
-
-        initGui();
-    }
-
     public AttachFileDialog(Dialog parent, MetaData metaData, BibtexEntry entry, String fieldName) {
         super(parent, true);
         this.metaData = metaData;
@@ -90,7 +77,7 @@ public class AttachFileDialog extends JDialog {
     private void initGui() {
 
         final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, metaData, entry,
-                editor, Util.getFileFilterForField(fieldName));
+                editor, net.sf.jabref.util.Util.getFileFilterForField(fieldName));
 
         browse.addActionListener(new ActionListener() {
 
@@ -144,7 +131,7 @@ public class AttachFileDialog extends JDialog {
         FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         //builder.append(Util.capitalizeFirst(fieldName));//(editor.getLabel());
-        builder.appendSeparator(StringUtil.capitalizeFirst(fieldName));
+        builder.appendSeparator(EntryUtil.capitalizeFirst(fieldName));
         builder.append(editor.getTextComponent());
         builder.append(browse);
 

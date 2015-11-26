@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.logic.journals;
 
-import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -59,15 +58,15 @@ public class JournalAbbreviationRepository {
 
     public boolean isKnownName(String journalName) {
         String nameKey = Objects.requireNonNull(journalName).trim().toLowerCase();
-        return fullNameLowerCase2Abbreviation.get(nameKey) != null
-                || isoLowerCase2Abbreviation.get(nameKey) != null
-                || medlineLowerCase2Abbreviation.get(nameKey) != null;
+        return (fullNameLowerCase2Abbreviation.get(nameKey) != null)
+                || (isoLowerCase2Abbreviation.get(nameKey) != null)
+                || (medlineLowerCase2Abbreviation.get(nameKey) != null);
     }
 
     public boolean isAbbreviatedName(String journalName) {
         String nameKey = Objects.requireNonNull(journalName).trim().toLowerCase();
-        return isoLowerCase2Abbreviation.get(nameKey) != null
-                || medlineLowerCase2Abbreviation.get(nameKey) != null;
+        return (isoLowerCase2Abbreviation.get(nameKey) != null)
+                || (medlineLowerCase2Abbreviation.get(nameKey) != null);
     }
 
     /**
@@ -96,7 +95,8 @@ public class JournalAbbreviationRepository {
         if (isKnownName(abbreviation.getName())) {
             Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
             abbreviations.remove(previous);
-            LOGGER.debug(Localization.lang("Duplicate Journal Abbreviation - old one will be overwritten by new one\nOLD: %0\nNEW: %1", previous.toString(), abbreviation.toString()));
+            LOGGER.info("Duplicate journal abbreviation - old one will be overwritten by new one\nOLD: "
+                    + previous.toString() + "\nNEW: " + abbreviation.toString());
         }
 
         abbreviations.add(abbreviation);
@@ -141,13 +141,5 @@ public class JournalAbbreviationRepository {
 
         Abbreviation abbr = abbreviation.get();
         return Optional.of(abbr.getIsoAbbreviation());
-    }
-
-    public String toPropertiesString() {
-        StringBuilder sb = new StringBuilder();
-        for (Abbreviation abbreviation : getAbbreviations()) {
-            sb.append(String.format("%s%n", abbreviation.toPropertiesLine()));
-        }
-        return sb.toString();
     }
 }

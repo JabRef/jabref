@@ -22,7 +22,7 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
@@ -36,7 +36,6 @@ import javax.swing.JLabel;
  * Class defining the contents and column headers of the main table.
  */
 public class MainTableFormat implements TableFormat<BibtexEntry> {
-
     // Character separating field names that are to be used in sequence as
     // fallbacks for a single column (e.g. "author/editor" to use editor where
     // author is not set):
@@ -46,8 +45,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
-    private static final String[]
-            PDF = {"pdf", "ps"};
+    private static final String[] PDF = {"pdf", "ps"};
     private static final String[] URL_FIRST = {"url", "doi"};
     private static final String[] DOI_FIRST = {"doi", "url"};
     public static final String[] CITESEER = {"citeseerurl"};
@@ -95,6 +93,9 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS)) {
                 return getIconTypeForColumn(col)[0].substring(0, 1).toUpperCase();
             } else {
+                if(getIconTypeForColumn(col)[0].equals("ranking")) {
+                    return EntryUtil.capitalizeFirst(getIconTypeForColumn(col)[0]);
+                }
                 return null;
             }
         } else // try to find an alternative fieldname (for display)
@@ -109,17 +110,11 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 if (disName != null) {
                     sb.append(disName);
                 } else {
-                    sb.append(StringUtil.capitalizeFirst(fld[i]));
+                    sb.append(EntryUtil.capitalizeFirst(fld[i]));
                 }
             }
             return sb.toString();
-            /*String disName = BibtexFields.getFieldDisplayName(columns[col - padleft]) ;
-            if ( disName != null)
-            {
-              return disName ;
-            } */
         }
-        //return Util.capitalizeFirst(columns[col - padleft]);
     }
 
     /**

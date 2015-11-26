@@ -21,9 +21,10 @@ import java.util.Iterator;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 
 /**
  * This action checks whether any new custom entry types were loaded from this
@@ -36,7 +37,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
         // See if any custom entry types were imported, but disregard those we already know:
         for (Iterator<String> i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
             String typeName = i.next().toLowerCase();
-            if (BibtexEntryType.getType(typeName) != null) {
+            if (EntryTypes.getType(typeName) != null) {
                 i.remove();
             }
         }
@@ -62,8 +63,8 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
         if (answer == JOptionPane.YES_OPTION) {
             // Import
-            for (BibtexEntryType typ : pr.getEntryTypes().values()) {
-                BibtexEntryType.addOrModifyCustomEntryType((CustomEntryType) typ);
+            for (EntryType typ : pr.getEntryTypes().values()) {
+                EntryTypes.addOrModifyCustomEntryType((CustomEntryType) typ);
             }
         }
     }

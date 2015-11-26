@@ -3,19 +3,24 @@
 [![CircleCI](https://img.shields.io/circleci/project/JabRef/jabref.svg)](https://circleci.com/gh/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
+[![Coverity Status](https://badges.ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)](https://ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)
-[![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Donation](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?item_name=JabRef+Bibliography+Manager&cmd=_donations&lc=US&currency_code=EUR&business=jabrefmail%40gmail.com)
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=koppor&url=https%3A%2F%2Fgithub.com%2FJabRef%2Fjabref&title=JabRef&language=Java&tags=github&category=software)
 [![Download JabRef](https://img.shields.io/sourceforge/dw/jabref.svg)](http://sourceforge.net/projects/jabref/files/jabref/)
+[![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/pr)](http://www.issuestats.com/github/jabref/jabref)
+[![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/issue)](http://www.issuestats.com/github/jabref/jabref)
 
 This version is a development version. Features may not work as expected.
 
 The branch of this README file is `master`.
 The intention of this branch is to move JabRef forward to modern technologies such as Java8 and JavaFX.
-The development version will be called `v2.80` and is meant as preparation to the `v3.0` release.
 
 The last version with Java6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
+
+The development builds are available at [builds.jabref.org](http://builds.jabref.org/)
+
+We use [install4j], the multi-platform installer builder.
 
 ### Breaking Changes in Comparison to v2.11
 
@@ -100,16 +105,15 @@ For IntelliJ IDEA, just import the project via a Gradle Import by pointing at th
 
 ## Release Process
 
-Requires
- * [launch4j](http://launch4j.sourceforge.net/) available in PATH
- * [NSIS](http://nsis.sourceforge.net) with the [WinShell plug-in](http://nsis.sourceforge.net/WinShell_plug-in).
+Requires [install4j].
+We've got an [Open Source License](https://www.ej-technologies.com/buy/install4j/openSource).
+
+We switched from [launch4j](http://launch4j.sourceforge.net/) and [NSIS](http://nsis.sourceforge.net), because install4j allows for JRE bundling and the taskbar pinning just works.
 
 To get a list of all targets, use `gradlew tasks`.
 ```
-release - Creates a release for all target platforms.
 releaseJar - Creates a Jar release.
-releaseMac - Creates an OSX release.
-releaseWindows - Creates a Windows executable and installer.
+media - Creates executables and installers.
 ```
 
 To set the path to your local NSIS executable pass it via a Gradle property:
@@ -124,8 +128,8 @@ All binaries are created inside the directory `build/releases`.
 Run `gradlew -Pdev=true ANY_RELEASE_TASK` to execute any of the previously defined release tasks.
 The only difference is that the version contains the keyword *snapshot*, the *date*, the *branch name*, and the *shortend git hash*.
 
-Normal: `JabRef--2.80dev.jar`
-With `-Pdev=true`: `JabRef-2.80dev--snapshot--2015-10-26--master--d7eb10c.jar`
+Normal: `JabRef--3.0dev.jar`
+With `-Pdev=true`: `JabRef-3.0dev--snapshot--2015-11-20--master--cc4f5d1.jar`
 
 ## License
 
@@ -137,3 +141,5 @@ See the [LICENSE](LICENSE) for full details.
 
 JabRef also uses libraries distributed by other parties.
 See [external libraries](external-libraries.txt) for details.
+
+  [install4j]: https://www.ej-technologies.com/products/install4j/overview.html

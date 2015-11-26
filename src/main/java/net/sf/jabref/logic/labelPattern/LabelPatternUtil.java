@@ -408,8 +408,8 @@ public class LabelPatternUtil {
     }
 
     /**
-     * Generates a BibTeX label according to the pattern for a given entry type, and
-     * returns the <code>Bibtexentry</code> with the unique label.
+     * Generates a BibTeX label according to the pattern for a given entry type, and saves the unique label in the
+     * <code>Bibtexentry</code>.
      *
      * The given database is used to avoid duplicate keys.
      *
@@ -417,7 +417,7 @@ public class LabelPatternUtil {
      * @param entry a <code>BibtexEntry</code>
      * @return modified Bibtexentry
      */
-    public static BibtexEntry makeLabel(MetaData metaData, BibtexDatabase dBase, BibtexEntry entry) {
+    public static void makeLabel(MetaData metaData, BibtexDatabase dBase, BibtexEntry entry) {
         LabelPatternUtil.database = dBase;
         ArrayList<String> typeList;
         String key;
@@ -533,8 +533,6 @@ public class LabelPatternUtil {
                 }
             }
         }
-
-        return entry;
     }
 
     /**

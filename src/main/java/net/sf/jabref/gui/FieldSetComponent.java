@@ -73,7 +73,10 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * values. These are put into a JComboBox.
      */
     public FieldSetComponent(String title, List<String> fields, List<String> preset, boolean arrows, boolean forceLowerCase) {
-        this(title, fields, preset, "Add", "Remove", arrows, forceLowerCase);
+        // @formatter:off
+        this(title, fields, preset, Localization.lang("Add"),
+                Localization.lang("Remove"), arrows, forceLowerCase);
+        // @formatter:on
     }
 
     /**
@@ -81,14 +84,17 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * values. Replaces the JComboBox with a JTextField.
      */
     FieldSetComponent(String title, List<String> fields, boolean arrows, boolean forceLowerCase) {
-        this(title, fields, null, "Add", "Remove", arrows, forceLowerCase);
+        // @formatter:off
+        this(title, fields, null, Localization.lang("Add"),
+                Localization.lang("Remove"), arrows, forceLowerCase);
+        // @formatter:on
     }
 
     private FieldSetComponent(String title, List<String> fields, List<String> preset, String addText, String removeText,
                               boolean arrows, boolean forceLowerCase) {
         this.forceLowerCase = forceLowerCase;
-        add = new JButton(Localization.lang(addText));
-        remove = new JButton(Localization.lang(removeText));
+        add = new JButton(addText);
+        remove = new JButton(removeText);
         listModel = new DefaultListModel<>();
         JLabel title1 = null;
         if (title != null) {
@@ -275,18 +281,6 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
     }
 
-    public void activate() {
-        sel.requestFocus();
-    }
-
-    /**
-     * Returns true if there have been changes to the field list. Reports true
-     * if changes have been made, regardless of whether the changes cancel each other.
-     */
-    public boolean changesMade() {
-        return changesMade;
-    }
-
     /**
      * Return the current list.
      */
@@ -312,10 +306,6 @@ class FieldSetComponent extends JPanel implements ActionListener {
      */
     public void addAdditionActionListener(ActionListener l) {
         additionListeners.add(l);
-    }
-
-    public void removeAdditionActionListener(ActionListener l) {
-        additionListeners.remove(l);
     }
 
     public void addListDataListener(ListDataListener l) {

@@ -34,7 +34,8 @@ public class BibtexDatabaseTest {
     @Test
     public void testResolveStrings() throws IOException {
 
-        ParserResult result = BibtexParser.parse(new FileReader("src/test/resources/net/sf/jabref/util/twente.bib"));
+        try (FileReader fr = new FileReader("src/test/resources/net/sf/jabref/util/twente.bib")) {
+        ParserResult result = BibtexParser.parse(fr);
 
         BibtexDatabase db = result.getDatabase();
 
@@ -44,7 +45,6 @@ public class BibtexDatabaseTest {
 
         // Strings that are not found return just the given string.
         Assert.assertEquals("#unknown#", db.resolveForStrings("#unknown#"));
-
+        }
     }
-
 }

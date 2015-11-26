@@ -21,12 +21,14 @@ import net.sf.jabref.logic.l10n.Encodings;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
-    // contains all possible line breaks, not ommitting any break such as "\\n"
+
+    // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
 
     /**
@@ -36,58 +38,17 @@ public class StringUtil {
      * @param toShave
      * @return
      */
+
     public static String shaveString(String toShave) {
-
-        if (toShave == null) {
-            return null;
+        if ((toShave == null) || (toShave.length() == 0)) {
+            return toShave;
         }
-        char first;
-        char second;
-        int begin = 0;
-        int end = toShave.length();
-        // We start out assuming nothing will be removed.
-        boolean beginOk = false;
-        boolean endOk = false;
-        while (!beginOk) {
-            if (begin < toShave.length()) {
-                first = toShave.charAt(begin);
-                if (Character.isWhitespace(first)) {
-                    begin++;
-                } else {
-                    beginOk = true;
-                }
-            } else {
-                beginOk = true;
-            }
-
+        toShave = toShave.trim();
+        if ((toShave.startsWith("{") && toShave.endsWith("}"))
+                || (toShave.startsWith("\"") && toShave.endsWith("\""))) {
+            return toShave.substring(1, toShave.length() - 1);
         }
-        while (!endOk) {
-            if (end > (begin + 1)) {
-                first = toShave.charAt(end - 1);
-                if (Character.isWhitespace(first)) {
-                    end--;
-                } else {
-                    endOk = true;
-                }
-            } else {
-                endOk = true;
-            }
-        }
-
-        if (end > (begin + 1)) {
-            first = toShave.charAt(begin);
-            second = toShave.charAt(end - 1);
-            if (((first == '{') && (second == '}')) || ((first == '"') && (second == '"'))) {
-                begin++;
-                end--;
-            }
-        }
-        toShave = toShave.substring(begin, end);
         return toShave;
-    }
-
-    private static String rightTrim(String toTrim) {
-        return toTrim.replaceAll("\\s+$", "");
     }
 
     /**
@@ -120,54 +81,13 @@ public class StringUtil {
         return stringBuilder.append(strings[to - 1]).toString();
     }
 
+    public static String join(Collection<String> strings, String separator) {
+        String[] arr = strings.toArray(new String[strings.size()]);
+        return join(arr, separator, 0, arr.length);
+    }
+
     public static String join(String[] strings, String separator) {
         return join(strings, separator, 0, strings.length);
-    }
-
-    /**
-     * Returns the given string but with the first character turned into an
-     * upper case character.
-     * <p>
-     * Example: testTest becomes TestTest
-     *
-     * @param string The string to change the first character to upper case to.
-     * @return A string has the first character turned to upper case and the
-     * rest unchanged from the given one.
-     */
-    public static String toUpperFirstLetter(String string) {
-        if (string == null) {
-            throw new IllegalArgumentException();
-        }
-
-        if (string.isEmpty()) {
-            return string;
-        }
-
-        return Character.toUpperCase(string.charAt(0)) + string.substring(1);
-    }
-
-    /**
-     * Takes a delimited string, splits it and returns
-     *
-     * @param names a <code>String</code> value
-     * @return a <code>String[]</code> value
-     */
-    public static String[] split(String names, String delimiter) {
-        if (names == null) {
-            return null;
-        }
-        return names.split(delimiter);
-    }
-
-    public static String capitalizeFirst(String toCapitalize) {
-        // Make first character of String uppercase, and the
-        // rest lowercase.
-        if (toCapitalize.length() > 1) {
-            return toCapitalize.substring(0, 1).toUpperCase() + toCapitalize.substring(1, toCapitalize.length()).toLowerCase();
-        } else {
-            return toCapitalize.toUpperCase();
-        }
-
     }
 
     /**
@@ -191,13 +111,16 @@ public class StringUtil {
             return "";
         }
 
-        String back = orgName;
-        int hiddenChar = orgName.indexOf(".", 1); // hidden files Linux/Unix (?)
-        if (hiddenChar < 1) {
-            back = back + "." + defaultExtension;
+        if (orgName.toLowerCase().endsWith("." + defaultExtension.toLowerCase())) {
+            return orgName;
         }
 
-        return back;
+        int hiddenChar = orgName.indexOf(".", 1); // hidden files Linux/Unix (?)
+        if (hiddenChar < 1) {
+            orgName = orgName + "." + defaultExtension;
+        }
+
+        return orgName;
     }
 
     /**
@@ -220,7 +143,7 @@ public class StringUtil {
             index++;
         }
 
-        // then grab whathever is the first token (counting braces)
+        // then grab whatever is the first token (counting braces)
         while (index < text.length()) {
             c = text.charAt(index);
             if (!terminateOnEndBraceOnly && (count == 0) && Character.isWhitespace(c)) {
@@ -260,7 +183,7 @@ public class StringUtil {
                 result.append('\t');
                 String line = lines[i];
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-                line = rightTrim(line);
+                line = line.replaceAll("\\s+$", "");
                 addWrappedLine(result, line, wrapAmount);
             } else {
                 result.append(Globals.NEWLINE);
@@ -365,22 +288,6 @@ public class StringUtil {
             }
         }
         return result.toString();
-    }
-
-    /**
-     * Append '.bib' to the string unless it ends with that.
-     * <p>
-     * makeBibtexExtension("asfd") => "asdf.bib"
-     * makeBibtexExtension("asdf.bib") => "asdf.bib"
-     *
-     * @param name the string
-     * @return s or s + ".bib"
-     */
-    public static String makeBibtexExtension(String name) {
-        if (!name.toLowerCase().endsWith(".bib")) {
-            return name + ".bib";
-        }
-        return name;
     }
 
     public static String booleanToBinaryString(boolean expression) {
@@ -504,55 +411,6 @@ public class StringUtil {
         }
         return sb.toString();
     }
-
-    /**
-     * Build a String array containing all those elements of all that are not
-     * in subset.
-     * @param all The array of all values.
-     * @param subset The subset of values.
-     * @return The remainder that is not part of the subset.
-     */
-    public static String[] getRemainder(String[] all, String[] subset) {
-    	if (subset.length == 0) {
-    		return all;
-    	}
-    	if (all.equals(subset)) {
-    		return new String[0];
-    	}
-
-        ArrayList<String> al = new ArrayList<>();
-        for (String anAll : all) {
-            boolean found = false;
-            for (String aSubset : subset) {
-                if (aSubset.equals(anAll)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                al.add(anAll);
-            }
-        }
-        return al.toArray(new String[al.size()]);
-    }
-
-    /**
-	 * Concatenate two String arrays
-	 *
-	 * @param array1
-	 *            the first string array
-	 * @param array2
-	 *            the second string array
-	 * @return The concatenation of array1 and array2
-	 */
-	public static String[] arrayConcat(String[] array1, String[] array2) {
-		int len1 = array1.length;
-		int len2 = array2.length;
-		String[] union = new String[len1 + len2];
-		System.arraycopy(array1, 0, union, 0, len1);
-		System.arraycopy(array2, 0, union, len1, len2);
-		return union;
-	}
 
     /**
      * Wrap all uppercase letters, or sequences of uppercase letters, in curly

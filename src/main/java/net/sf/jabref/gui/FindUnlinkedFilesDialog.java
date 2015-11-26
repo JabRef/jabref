@@ -38,12 +38,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -84,6 +79,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -107,10 +104,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * Keys to be used for referencing this Action.
      */
     public static final String ACTION_COMMAND = "findUnlinkedFiles";
-    public static final String ACTION_MENU_TITLE = "Find unlinked files...";
+    public static final String ACTION_MENU_TITLE = Localization.menuTitle("Find unlinked files...");
     public static final String ACTION_ICON = "toggleSearch";
     public static final String ACTION_KEYBINDING_ACTION = "Find unlinked files";
-    public static final String ACTION_SHORT_DESCRIPTION = "Searches for unlinked PDF files on the file system";
+    // @formatter:off
+    public static final String ACTION_SHORT_DESCRIPTION = Localization.lang("Searches for unlinked PDF files on the file system");
+    // @formatter:on
 
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
@@ -277,10 +276,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private void initializeActions() {
 
         actionSelectAll = new AbstractAction(Localization.lang("Select all")) {
-
-            private static final long serialVersionUID = 9153126361571985383L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -291,10 +286,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
         };
 
         actionUnselectAll = new AbstractAction(Localization.lang("Unselect all")) {
-
-            private static final long serialVersionUID = -9012913268030356450L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -305,10 +296,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
         };
 
         actionExpandTree = new AbstractAction(Localization.lang("Expand all")) {
-
-            private static final long serialVersionUID = -4794088095435302433L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -317,10 +304,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
         };
 
         actionCollapseTree = new AbstractAction(Localization.lang("Collapse all")) {
-
-            private static final long serialVersionUID = 6007246730370326456L;
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -592,7 +575,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         progressBarImporting.setValue(0);
         progressBarImporting.setString("");
 
-        final BibtexEntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).entryType;
+        final EntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).entryType;
 
         threadState = new int[] {1};
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
@@ -600,7 +583,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             @Override
             public void run() {
                 List<String> errors = new LinkedList<>();
-                int count = creatorManager.addEntriesFromFiles(fileList, database, frame.basePanel(),
+                int count = creatorManager.addEntriesFromFiles(fileList, database, frame.getCurrentBasePanel(),
                         entryType,
                         checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
 
@@ -613,7 +596,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                                 progressBarImporting.setString(counter + " of " + progressBarImporting.getMaximum());
                             }
                         }, errors);
-                importFinishedHandler(count, errors);
+                importFinishedHandler(errors);
             }
         });
 
@@ -623,7 +606,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      *
      * @param errors
      */
-    private void importFinishedHandler(int count, List<String> errors) {
+    private void importFinishedHandler(List<String> errors) {
 
         if ((errors != null) && !errors.isEmpty()) {
 
@@ -638,7 +621,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonClose.setVisible(true);
         disOrEnableDialog(true);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        frame.basePanel().markBaseChanged();
+        frame.getCurrentBasePanel().markBaseChanged();
     }
 
     /**
@@ -1036,7 +1019,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         if ((userObject instanceof FileNodeWrapper) && node.isLeaf()) {
                             FileNodeWrapper fnw = (FileNodeWrapper) userObject;
                             try {
-                                JabRefDesktop.openExternalViewer(JabRef.jrf.basePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
+                                JabRefDesktop.openExternalViewer(JabRef.jrf.getCurrentBasePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
                                 LOGGER.info("Error opening file", e1);
                             }
@@ -1084,7 +1067,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
              * @see javax.swing.DefaultListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
              */
             @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof EntryFromFileCreator) {
                     EntryFromFileCreator creator = (EntryFromFileCreator) value;
@@ -1104,7 +1088,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void createEntryTypesCombobox() {
 
-        Iterator<BibtexEntryType> iterator = BibtexEntryType.getAllValues().iterator();
+        Iterator<EntryType> iterator = EntryTypes.getAllValues().iterator();
         Vector<BibtexEntryTypeWrapper> list = new Vector<>();
         list.add(new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {
@@ -1123,10 +1107,10 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private static class BibtexEntryTypeWrapper {
 
-        final BibtexEntryType entryType;
+        final EntryType entryType;
 
 
-        BibtexEntryTypeWrapper(BibtexEntryType bibtexType) {
+        BibtexEntryTypeWrapper(EntryType bibtexType) {
             this.entryType = bibtexType;
         }
 
@@ -1144,9 +1128,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     public static class CheckableTreeNode extends DefaultMutableTreeNode {
 
-        private static final long serialVersionUID = -1131241777605570737L;
         private boolean isSelected;
-        private JCheckBox checkbox;
+        private final JCheckBox checkbox;
 
 
         public CheckableTreeNode(Object userObject) {
@@ -1159,14 +1142,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
          */
         public JCheckBox getCheckbox() {
             return checkbox;
-        }
-
-        /**
-         * @param checkbox
-         *            the checkbox to set
-         */
-        public void setCheckbox(JCheckBox checkbox) {
-            this.checkbox = checkbox;
         }
 
         public void check() {

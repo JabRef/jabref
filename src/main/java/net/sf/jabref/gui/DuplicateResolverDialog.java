@@ -18,15 +18,16 @@ package net.sf.jabref.gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.*;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 // created by : ?
 //
@@ -57,17 +58,16 @@ public class DuplicateResolverDialog extends JDialog {
     private int status = DuplicateResolverDialog.NOT_CHOSEN;
     private boolean block = true;
     private MergeEntries me;
+    private PositionWindow pw;
 
     public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
         init(one, two, type);
-        Util.placeDialog(this, frame);
     }
 
     public DuplicateResolverDialog(JDialog frame, BibtexEntry one, BibtexEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
         init(one, two, type);
-        Util.placeDialog(this, frame);
     }
 
     private void init(BibtexEntry one, BibtexEntry two, int type) {
@@ -117,10 +117,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_UPPER;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(KEEP_UPPER);
             }
         });
 
@@ -128,10 +125,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_LOWER;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(KEEP_LOWER);
             }
         });
 
@@ -139,10 +133,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_BOTH;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(KEEP_BOTH);
             }
         });
 
@@ -150,10 +141,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_MERGE;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(KEEP_MERGE);
             }
         });
 
@@ -162,10 +150,7 @@ public class DuplicateResolverDialog extends JDialog {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    status = DuplicateResolverDialog.AUTOREMOVE_EXACT;
-                    block = false;
-                    savePosition();
-                    dispose();
+                    buttonPressed(AUTOREMOVE_EXACT);
                 }
             });
         }
@@ -174,10 +159,7 @@ public class DuplicateResolverDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.BREAK;
-                block = false;
-                savePosition();
-                dispose();
+                buttonPressed(BREAK);
             }
         });
 
@@ -186,25 +168,35 @@ public class DuplicateResolverDialog extends JDialog {
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 
-        setLocation(Globals.prefs.getInt(JabRefPreferences.DUPLICATES_POS_X), Globals.prefs.getInt(JabRefPreferences.DUPLICATES_POS_Y));
-        setSize(Globals.prefs.getInt(JabRefPreferences.DUPLICATES_SIZE_X), Globals.prefs.getInt(JabRefPreferences.DUPLICATES_SIZE_Y));
+        pw = new PositionWindow(this, JabRefPreferences.DUPLICATES_POS_X, JabRefPreferences.DUPLICATES_POS_Y,
+                JabRefPreferences.DUPLICATES_SIZE_X, JabRefPreferences.DUPLICATES_SIZE_Y);
+        pw.setWindowPosition();
+
+        // Set up a ComponentListener that saves the last size and position of the dialog
+        addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+        });
 
         both.requestFocus();
 
     }
 
 
-    private void savePosition() {
-        Point p = getLocation();
-        Dimension d = getSize();
-        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_POS_X, p.x);
-        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_POS_Y, p.y);
-        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_SIZE_X, d.width);
-        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_SIZE_Y, d.height);
-    }
-    
-    public boolean isBlocking() {
-        return block;
+    private void buttonPressed(int button) {
+        status = button;
+        block = false;
+        dispose();
     }
 
     public int getSelected() {

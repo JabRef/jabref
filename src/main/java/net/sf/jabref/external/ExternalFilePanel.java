@@ -63,9 +63,6 @@ import net.sf.jabref.logic.xmp.XMPUtil;
  *
  */
 public class ExternalFilePanel extends JPanel {
-
-    private static final long serialVersionUID = 3653290879640642718L;
-
     private EntryEditor entryEditor;
 
     private final JabRefFrame frame;
@@ -167,7 +164,7 @@ public class ExternalFilePanel extends JPanel {
     }
 
     private Object getKey() {
-        return getEntry().getField(BibtexEntry.KEY_FIELD);
+        return getEntry().getCiteKey();
     }
 
     private void output(String s) {
@@ -209,16 +206,15 @@ public class ExternalFilePanel extends JPanel {
                     JOptionPane.showMessageDialog(editor.getParent(),
                             Localization.lang("Error writing XMP to file: %0", e.getLocalizedMessage()),
                             Localization.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info(Localization.lang("Error writing XMP to file: %0", finalFile
-                            .getAbsolutePath()), e);
+                    // String above and below
+                    LOGGER.info("Error writing XMP to file: " + finalFile.getAbsolutePath(), e);
                     output(Localization.lang("Error writing XMP to file: %0", finalFile.getName()));
 
                 } catch (TransformerException e) {
                     JOptionPane.showMessageDialog(editor.getParent(),
                             Localization.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
                             Localization.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info(Localization.lang("Error while converting BibtexEntry to XMP %0",
-                            finalFile.getAbsolutePath()), e);
+                    LOGGER.info("Error while converting BibtexEntry to XMP " + finalFile.getAbsolutePath(), e);
                     output(Localization.lang("Error converting XMP to '%0'...", finalFile.getName()));
                 }
             }

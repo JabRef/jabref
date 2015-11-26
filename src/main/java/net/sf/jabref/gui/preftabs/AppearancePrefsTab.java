@@ -164,8 +164,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
-            if (overrideFonts.isSelected() != oldOverrideFontSize ||
-                    size != oldMenuFontSize) {
+            if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
+                    (size != oldMenuFontSize)) {
                 prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
                 JOptionPane.showMessageDialog(null,
                         Localization.lang("You have changed the menu and label font size.")
@@ -191,10 +191,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             // Test if the field value is a number:
             Integer.parseInt(fieldValue);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog
-                    (null, Localization.lang("You must enter an integer value in the text field for") + " '" +
-                            Localization.lang(fieldName) + "'", Localization.lang(errorTitle),
-                            JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'",
+                    errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;
@@ -203,12 +202,14 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     @Override
     public boolean validateSettings() {
         // Test if font size is a number:
-        if (!validateIntegerField("Menu and label font size", fontSize.getText(), "Changed font settings")) {
+        if (!validateIntegerField(Localization.lang("Menu and label font size"), fontSize.getText(),
+                Localization.lang("Changed font settings"))) {
             return false;
         }
 
         // Test if row padding is a number:
-        if (!validateIntegerField("Table row height padding", rowPadding.getText(), "Changed table appearance settings")) {
+        if (!validateIntegerField(Localization.lang("Table row height padding"), rowPadding.getText(),
+                Localization.lang("Changed table appearance settings"))) {
             return false;
         }
 

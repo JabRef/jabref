@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.util.io;
 
+import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.URLUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,4 +61,38 @@ public class URLUtilTest {
                 URLUtil.cleanGoogleSearchURL("https://www.google.fr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=ftp%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w")
         );
     }
+
+    @Test
+    public void testSanitizeUrl() {
+
+        Assert.assertEquals("http://www.vg.no", URLUtil.sanitizeUrl("http://www.vg.no"));
+        Assert.assertEquals("http://www.vg.no/fil%20e.html", URLUtil.sanitizeUrl("http://www.vg.no/fil e.html"));
+        Assert.assertEquals("http://www.vg.no/fil%20e.html", URLUtil.sanitizeUrl("http://www.vg.no/fil%20e.html"));
+        Assert.assertEquals("www.vg.no/fil%20e.html", URLUtil.sanitizeUrl("www.vg.no/fil%20e.html"));
+
+        Assert.assertEquals("www.vg.no/fil%20e.html", URLUtil.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
+
+        /**
+         * Doi Test cases
+         */
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(),
+                URLUtil.sanitizeUrl("10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(),
+                URLUtil.sanitizeUrl("doi://10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(),
+                URLUtil.sanitizeUrl("doi:/10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(),
+                URLUtil.sanitizeUrl("doi:10.1109/VLHCC.2004.20"));
+
+        /**
+         * Additional testcases provided by Hannes Restel and Micha Beckmann.
+         */
+        Assert.assertEquals("ftp://www.vg.no", URLUtil.sanitizeUrl("ftp://www.vg.no"));
+        Assert.assertEquals("file://doof.txt", URLUtil.sanitizeUrl("file://doof.txt"));
+        Assert.assertEquals("file:///", URLUtil.sanitizeUrl("file:///"));
+        Assert.assertEquals("/src/doof.txt", URLUtil.sanitizeUrl("/src/doof.txt"));
+        Assert.assertEquals("/", URLUtil.sanitizeUrl("/"));
+        Assert.assertEquals("/home/user/example.txt", URLUtil.sanitizeUrl("/home/user/example.txt"));
+    }
+
 }

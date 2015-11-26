@@ -43,6 +43,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.gui.renderer.GeneralRenderer;
+import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
@@ -51,7 +52,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import ca.odell.glazedlists.BasicEventList;
@@ -64,6 +64,7 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
+import net.sf.jabref.model.entry.EntryUtil;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -156,7 +157,7 @@ public class SearchResultsDialog {
                     = new TransferableBibtexEntry(bes);
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
-                            .setContents(trbe, frame.basePanel());
+                            .setContents(trbe, frame.getCurrentBasePanel());
                     frame.output(Localization.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
                             + Localization.lang("entries")
                             : "1 " + Localization.lang("entry") + '.'));
@@ -447,7 +448,7 @@ public class SearchResultsDialog {
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return StringUtil.capitalizeFirst(fields[column - PAD]);
+                return EntryUtil.capitalizeFirst(fields[column - PAD]);
             } else {
                 return "";
             }
@@ -488,8 +489,8 @@ public class SearchResultsDialog {
                 if (field.equals("author") || field.equals("editor")) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
-                    if (frame.basePanel() != null) {
-                        return frame.basePanel().tableFormat.formatName
+                    if (frame.getCurrentBasePanel() != null) {
+                        return frame.getCurrentBasePanel().tableFormat.formatName
                                 (entry.getField(field));
                     }
                 }
