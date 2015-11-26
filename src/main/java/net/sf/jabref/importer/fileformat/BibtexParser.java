@@ -92,13 +92,20 @@ public class BibtexParser {
 
     private void preProcessReader() {
         StringBuilder file = new StringBuilder();
-        Scanner scanner = new Scanner(pushbackReader);
+        Scanner scanner = new Scanner(pushbackReader).useDelimiter("@");
+
+        boolean isStart = true;
         while (scanner.hasNextLine()) {
-            String next = scanner.nextLine();
-            file.append(next + System.lineSeparator());
-            fileContent.add(next);
+            String next = scanner.next();
+            //do not store the encoding line
+            if (!isStart) {
+                String item = "@" + next;
+                file.append(item);
+                fileContent.add(item);
+            } else {
+                isStart = false;
+            }
         }
-        System.out.println(file);
         pushbackReader = new PushbackReader(new StringReader(file.toString()), BibtexParser.LOOKAHEAD);
     }
 
@@ -456,25 +463,16 @@ public class BibtexParser {
 
     private void setStringRepresenationFromFile(BibtexEntry entry) {
         String key = entry.getCiteKey();
-        StringBuilder fileRepresenation = new StringBuilder();
-        boolean currentLineBelongsToEntry = false;
 
-        for (String line : fileContent) {
-            //if we find the key, the entry starts
-            if(line.contains(key)){
-                currentLineBelongsToEntry = true;
-                //if we find a new entry, the current one stops. Whitespaces after an entry belong to the entry
-            } else if(line.contains("@")) {
-                currentLineBelongsToEntry = false;
-            }
+        for (String item : fileContent) {
 
-            if(currentLineBelongsToEntry){
-                fileRepresenation.append(line + System.lineSeparator());
+            if (item.contains(key)) {
+                entry.setSerialization(item);
+                return;
             }
 
         }
 
-        entry.setSerialization(fileRepresenation.toString());
     }
 
     private void parseField(BibtexEntry entry) throws IOException {
