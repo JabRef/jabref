@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -520,8 +520,9 @@ public class DroppedFileHandler {
         if (!fromFile.renameTo(toFile)) {
             JOptionPane.showMessageDialog(frame,
                     // @formatter:off
-                    Localization.lang("There was an error moving the file. Please move the file manually and link in place."),
-                    Localization.lang("Error moving file"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Could not move file %0.", toFile.getAbsolutePath()) +
+                            Localization.lang("Please move the file manually and link in place."),
+                    Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
                     // @formatter:on
             return false;
         } else {
