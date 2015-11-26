@@ -102,7 +102,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                     + Localization.lang("Could not call executable") + " '" + commandPath + "'.");
         } else if (couldNotConnect) {
             panel.output(Localization.lang("Error") + ": "
-                    + Localization.lang("Could not connect to ") + getApplicationName() + ".");
+                    + Localization.lang("Could not connect to %0", getApplicationName()) + ".");
         } else {
             panel.output(Localization.lang("Pushed citations to %0", getApplicationName()) + ".");
         }
