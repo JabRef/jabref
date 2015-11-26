@@ -1159,18 +1159,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         @Override
         public void stateChanged(ChangeEvent event) {
-
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    activateVisible();
-                }
-            });
-
-            // After the initial event train has finished, we tell the editor
-            // tab to update all
-            // its fields. This makes sure they are updated even if the tab we
+            // We tell the editor tab to update all its fields.
+            //  This makes sure they are updated even if the tab we
             // just left contained one
             // or more of the same fields as this one:
             SwingUtilities.invokeLater(new Runnable() {
