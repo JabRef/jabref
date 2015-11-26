@@ -304,7 +304,7 @@ public class SearchBar extends JPanel {
 
 
         if(grammarBasedSearch) {
-            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(Color.RED));
+            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(new Color(102,255,255)));
             searchIcon.setToolTipText(Localization.lang("Advanced search active."));
         } else {
             searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
