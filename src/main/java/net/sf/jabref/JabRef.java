@@ -691,10 +691,6 @@ public class JabRef {
             JabRef.jrf.loadSessionAction.actionPerformed(new java.awt.event.ActionEvent(JabRef.jrf, 0, ""));
         }
 
-        /*JOptionPane.showMessageDialog(null, Globals.lang("Please note that this "
-            +"is an early beta version. Do not use it without backing up your files!"),
-                Globals.lang("Beta version"), JOptionPane.WARNING_MESSAGE);*/
-
         // Start auto save timer:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_SAVE)) {
             Globals.startAutoSaveManager(JabRef.jrf);
