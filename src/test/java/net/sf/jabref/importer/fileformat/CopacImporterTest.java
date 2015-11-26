@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class CopacImporterTest {
@@ -50,7 +51,7 @@ public class CopacImporterTest {
 
     @Test
     public void testImportEntries() throws IOException {
-        Globals.prefs.put("defaultEncoding", "UTF8");
+        Globals.prefs.put("defaultEncoding", StandardCharsets.UTF_8.name());
 
         CopacImporter importer = new CopacImporter();
 
@@ -62,7 +63,7 @@ public class CopacImporterTest {
 
             Assert.assertEquals("The SIS project : software reuse with a natural language approach", entry.getField("title"));
             Assert.assertEquals(
-                    "Prechelt, Lutz and Universität Karlsruhe. Fakultät für Informatik",
+"Prechelt, Lutz and Universität Karlsruhe. Fakultät für Informatik",
                     entry.getField("author"));
             Assert.assertEquals("Interner Bericht ; Nr.2/92", entry.getField("series"));
             Assert.assertEquals("1992", entry.getField("year"));

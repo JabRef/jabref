@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 import java.util.Locale;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 
 /**
  * {@link Control} class allowing properties bundles to be in different encodings.
@@ -17,9 +18,11 @@ import java.net.URLConnection;
  *      and property files</a>
  */
 public class EncodingControl extends Control {
-    private final String encoding;
 
-    public EncodingControl(String encoding) {
+    private final Charset encoding;
+
+
+    public EncodingControl(Charset encoding) {
         this.encoding = encoding;
     }
 

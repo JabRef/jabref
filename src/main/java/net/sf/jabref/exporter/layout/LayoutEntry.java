@@ -16,6 +16,7 @@
 package net.sf.jabref.exporter.layout;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,6 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.format.NameFormatter;
 import net.sf.jabref.exporter.layout.format.NotFoundFormatter;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
-import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.Util;
@@ -338,7 +338,7 @@ class LayoutEntry {
      *            Bibtex Database
      * @return
      */
-    public String doLayout(BibtexDatabase database, String encoding) {
+    public String doLayout(BibtexDatabase database, Charset encoding) {
         if (type == LayoutHelper.IS_LAYOUT_TEXT) {
             return text;
         } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
@@ -364,9 +364,7 @@ class LayoutEntry {
 
             return field;
         } else if (type == LayoutHelper.IS_ENCODING_NAME) {
-            // Try to translate from Java encoding name to common name:
-            String commonName = Encodings.ENCODING_NAMES_LOOKUP.get(encoding);
-            return commonName != null ? commonName : encoding;
+            return encoding.displayName();
         }
         else if (type == LayoutHelper.IS_FILENAME) {
             File f = Globals.prefs.databaseFile;

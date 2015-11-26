@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -100,7 +101,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<>();
         try {
-            urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
+            urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER,
+                    URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
             int count = 1;
             String nextPage;
             while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
@@ -140,7 +142,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     private static BibtexEntry getSingleCitation(String urlString) throws IOException {
 
         URL url = new URL(urlString);
-        String cont = new URLDownload(url).downloadToString("UTF8");
+        String cont = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
 
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
         Matcher m = CiteSeerXFetcher.titlePattern.matcher(cont);

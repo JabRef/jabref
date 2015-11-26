@@ -17,6 +17,8 @@ package net.sf.jabref.exporter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import javax.xml.transform.OutputKeys;
@@ -41,10 +43,11 @@ class MSBibExportFormat extends ExportFormat {
 
     @Override
     public void performExport(final BibtexDatabase database, final MetaData metaData,
-            final String file, final String encoding, Set<String> keySet) throws IOException {
+ final String file,
+            final Charset encoding, Set<String> keySet) throws IOException {
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings
-        SaveSession ss = getSaveSession("UTF8", new File(file));
+        SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
         VerifyingWriter ps = ss.getWriter();
         MSBibDatabase md = new MSBibDatabase(database, keySet);
 

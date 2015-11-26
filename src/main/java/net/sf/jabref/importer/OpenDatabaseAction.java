@@ -235,7 +235,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 String fileName = file.getPath();
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
+                Charset encoding = Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
 
                 if (FileBasedLock.hasLockFile(file)) {
                     long modificationTIme = FileBasedLock.getLockFileTimeStamp(file);
@@ -376,14 +376,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     /**
      * Opens a new database.
      */
-    public static ParserResult loadDatabase(File fileToOpen, String fallbackEncoding) throws IOException {
+    public static ParserResult loadDatabase(File fileToOpen, Charset defaultEncoding) throws IOException {
 
         // We want to check if there is a JabRef signature in the file, because that would tell us
         // which character encoding is used. However, to read the signature we must be using a compatible
         // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
         // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
         // 8 bit is most likely, so we try that first:
-        Optional<String> suppliedEncoding = Optional.empty();
+        Optional<Charset> suppliedEncoding = Optional.empty();
         try (Reader utf8Reader = ImportFormatReader.getUTF8Reader(fileToOpen)) {
             suppliedEncoding = OpenDatabaseAction.getSuppliedEncoding(utf8Reader);
         }
@@ -395,11 +395,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
 
         // Open and parse file
-        try (InputStreamReader reader = openFile(fileToOpen, suppliedEncoding, fallbackEncoding)) {
+        try (InputStreamReader reader = openFile(fileToOpen, suppliedEncoding, defaultEncoding)) {
             BibtexParser parser = new BibtexParser(reader);
 
             ParserResult result = parser.parse();
-            result.setEncoding(Charset.forName(reader.getEncoding()).name());
+            result.setEncoding(Charset.forName(reader.getEncoding()));
             result.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
@@ -422,7 +422,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * Opens the file with the provided encoding. If this fails (or no encoding is provided), then the fallback encoding
      * will be used.
      */
-    private static InputStreamReader openFile(File fileToOpen, Optional<String> encoding, String fallbackEncoding)
+    private static InputStreamReader openFile(File fileToOpen, Optional<Charset> encoding, Charset defaultEncoding)
             throws IOException {
         if (encoding.isPresent()) {
             try {
@@ -430,11 +430,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 // The supplied encoding didn't work out, so we use the fallback.
-                return ImportFormatReader.getReader(fileToOpen, fallbackEncoding);
+                return ImportFormatReader.getReader(fileToOpen, defaultEncoding);
             }
         } else {
             // We couldn't find a header with info about encoding. Use fallback:
-            return ImportFormatReader.getReader(fileToOpen, fallbackEncoding);
+            return ImportFormatReader.getReader(fileToOpen, defaultEncoding);
 
         }
     }
@@ -442,7 +442,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     /**
      * Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
      */
-    private static Optional<String> getSuppliedEncoding(Reader reader) {
+    private static Optional<Charset> getSuppliedEncoding(Reader reader) {
         try {
             BufferedReader bufferedReader = new BufferedReader(reader);
             String line;
@@ -461,7 +461,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // Signature line, so keep reading and skip to next line
                 } else if (line.startsWith(Globals.encPrefix)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
-                    return Optional.of(line.substring(Globals.encPrefix.length()).trim());
+                    String encoding = line.substring(Globals.encPrefix.length());
+                    return Optional.of(Charset.forName(encoding));
                 } else {
                     // Line not recognized so stop parsing
                     return Optional.empty();

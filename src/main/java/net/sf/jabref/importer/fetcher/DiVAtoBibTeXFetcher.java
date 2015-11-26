@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -49,7 +50,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         String q;
         try {
-            q = URLEncoder.encode(query, "UTF-8");
+            q = URLEncoder.encode(query, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             // this should never happen
             status.setStatus(Localization.lang("Error"));
@@ -70,7 +71,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
         String bibtexString;
         try {
-            bibtexString = Util.getResultsWithEncoding(url, "UTF-8");
+            bibtexString = Util.getResultsWithEncoding(url, StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
             status.showMessage(Localization.lang("Unknown DiVA entry: '%0'.",
                             query),

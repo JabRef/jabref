@@ -17,6 +17,7 @@ package net.sf.jabref.collab;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
@@ -91,11 +92,12 @@ public class ChangeScanner implements Runnable {
             // Parse the temporary file.
             File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
             ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile,
-                    Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+                    Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)));
             inTemp = pr.getDatabase();
             mdInTemp = pr.getMetaData();
             // Parse the modified file.
-            pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+            pr = OpenDatabaseAction.loadDatabase(f,
+                    Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)));
             BibtexDatabase onDisk = pr.getDatabase();
             MetaData mdOnDisk = pr.getMetaData();
 

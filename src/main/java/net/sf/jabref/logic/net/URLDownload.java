@@ -24,6 +24,7 @@ import java.io.*;
 import java.net.CookieHandler;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 
 /**
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
@@ -100,10 +101,10 @@ public class URLDownload {
      * @throws IOException
      */
     public String downloadToString() throws IOException {
-        return downloadToString(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+        return downloadToString(Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)));
     }
 
-    public String downloadToString(String encoding) throws IOException {
+    public String downloadToString(Charset encoding) throws IOException {
 
         try (InputStream input = new BufferedInputStream(openConnection().getInputStream());
              Writer output = new StringWriter()) {
@@ -115,7 +116,7 @@ public class URLDownload {
         }
     }
 
-    private void copy(InputStream in, Writer out, String encoding) throws IOException {
+    private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
         InputStream monitoredInputStream = monitorInputStream(in);
         Reader r = new InputStreamReader(monitoredInputStream, encoding);
         try (BufferedReader read = new BufferedReader(r)) {

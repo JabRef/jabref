@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -105,7 +106,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
         String bibtexString;
         try {
-            bibtexString = Util.getResultsWithEncoding(conn, "UTF8");
+            bibtexString = Util.getResultsWithEncoding(conn, StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
 
             if (status != null) {

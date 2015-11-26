@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -43,7 +44,7 @@ public class ExportFormat implements IExportFormat {
     private String lfFileName;
     private String directory;
     private String extension;
-    String encoding; // If this value is set, it will be used to override
+    Charset encoding; // If this value is set, it will be used to override
     // the default encoding for the getCurrentBasePanel.
 
     private FileFilter fileFilter;
@@ -115,7 +116,7 @@ public class ExportFormat implements IExportFormat {
      * obtained from the basepanel.
      * @param encoding The name of the encoding to use.
      */
-    void setEncoding(String encoding) {
+    void setEncoding(Charset encoding) {
         this.encoding = encoding;
     }
 
@@ -175,7 +176,7 @@ public class ExportFormat implements IExportFormat {
     @Override
     public void performExport(final BibtexDatabase database,
             final MetaData metaData, final String file,
-            final String enc, Set<String> entryIds) throws Exception {
+            final Charset enc, Set<String> entryIds) throws Exception {
 
         File outFile = new File(file);
         SaveSession ss = null;
@@ -354,7 +355,7 @@ public class ExportFormat implements IExportFormat {
         return formatters;
     }
 
-    SaveSession getSaveSession(final String enc,
+    SaveSession getSaveSession(final Charset enc,
                                final File outFile) throws IOException {
         return new SaveSession(outFile, enc, false);
     }

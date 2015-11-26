@@ -27,6 +27,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.OutputKeys;
 import java.util.Set;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.io.File;
 
 /**
@@ -40,8 +42,9 @@ class ModsExportFormat extends ExportFormat {
 
     @Override
     public void performExport(final BibtexDatabase database, final MetaData metaData,
-            final String file, final String encoding, Set<String> keySet) throws IOException {
-        SaveSession ss = getSaveSession("UTF8", new File(file));
+ final String file,
+            final Charset encoding, Set<String> keySet) throws IOException {
+        SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
         VerifyingWriter ps = ss.getWriter();
         MODSDatabase md = new MODSDatabase(database, keySet);
 

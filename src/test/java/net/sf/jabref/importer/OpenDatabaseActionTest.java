@@ -9,10 +9,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class OpenDatabaseActionTest {
 
-    private final String defaultEncoding = "UTF-8";
+    private final Charset defaultEncoding = StandardCharsets.UTF_8;
     private final File bibNoHeader = new File(OpenDatabaseActionTest.class.getResource("headerless.bib").getFile());
     private final File bibWrongHeader = new File(
             OpenDatabaseActionTest.class.getResource("wrong-header.bib").getFile());
@@ -40,14 +42,14 @@ public class OpenDatabaseActionTest {
 
     @Test
     public void useSpecifiedEncoding() throws IOException {
-        ParserResult result = OpenDatabaseAction.loadDatabase(bibHeader, "noEncoding");
-        Assert.assertEquals("UTF-8", result.getEncoding());
+        ParserResult result = OpenDatabaseAction.loadDatabase(bibHeader, StandardCharsets.US_ASCII);
+        Assert.assertEquals(StandardCharsets.UTF_8, result.getEncoding());
     }
 
     @Test
     public void useSpecifiedEncodingWithSignature() throws IOException {
-        ParserResult result = OpenDatabaseAction.loadDatabase(bibHeaderAndSignature, "noEncoding");
-        Assert.assertEquals("UTF-8", result.getEncoding());
+        ParserResult result = OpenDatabaseAction.loadDatabase(bibHeaderAndSignature, StandardCharsets.US_ASCII);
+        Assert.assertEquals(StandardCharsets.UTF_8, result.getEncoding());
     }
 
     @Test

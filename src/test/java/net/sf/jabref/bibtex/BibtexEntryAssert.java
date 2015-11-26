@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 
@@ -47,7 +48,7 @@ public class BibtexEntryAssert {
         Assert.assertNotNull(shouldBeIs);
         Assert.assertNotNull(entry);
         ParserResult result;
-        try (Reader reader = new InputStreamReader(shouldBeIs, "UTF-8")) {
+        try (Reader reader = new InputStreamReader(shouldBeIs, StandardCharsets.UTF_8)) {
             BibtexParser parser = new BibtexParser(reader);
             result = parser.parse();
         }

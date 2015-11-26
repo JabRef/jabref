@@ -23,6 +23,7 @@ import net.sf.jabref.logic.net.URLDownload;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Convenience class for getting BibTeX entries from the BibSonomy scraper,
@@ -45,10 +46,10 @@ class BibsonomyScraper {
             entryUrl = entryUrl.replaceAll("%", "%25").replaceAll(":", "%3A").replaceAll("/", "%2F").replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + entryUrl + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
-            String bibtex = new URLDownload(url).downloadToString("UTF8");
+            String bibtex = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
             BibtexParser bp = new BibtexParser(new StringReader(bibtex));
             ParserResult pr = bp.parse();
-            if (pr != null && pr.getDatabase().getEntryCount() > 0) {
+            if ((pr != null) && (pr.getDatabase().getEntryCount() > 0)) {
                 return pr.getDatabase().getEntries().iterator().next();
             } else {
                 return null;

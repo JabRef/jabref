@@ -16,7 +16,8 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import java.nio.charset.Charset;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ public class ParserResult {
 
     private String errorMessage;
     // Which encoding was used?
-    private String encoding;
+    private Charset encoding;
 
     private boolean postponedAutosaveFound;
     private boolean invalid;
@@ -136,17 +137,17 @@ public class ParserResult {
     /**
      * Sets the variable indicating which encoding was used during parsing.
      *
-     * @param enc String the name of the encoding.
+     * @param enc the encoding.
      */
-    public void setEncoding(String enc) {
+    public void setEncoding(Charset enc) {
         encoding = enc;
     }
 
     /**
-     * Returns the name of the encoding used during parsing, or null if not specified
-     * (indicates that prefs.get(JabRefPreferences.DEFAULT_ENCODING) was used).
+     * Returns the encoding used during parsing, or null if not specified (indicates that
+     * prefs.get(JabRefPreferences.DEFAULT_ENCODING) was used).
      */
-    public String getEncoding() {
+    public Charset getEncoding() {
         return encoding;
     }
 

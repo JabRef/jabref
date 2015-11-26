@@ -33,6 +33,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1594,13 +1595,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public BasePanel addTab(BibtexDatabase db, File file, MetaData metaData, String encoding, boolean raisePanel) {
+    public BasePanel addTab(BibtexDatabase db, File file, MetaData metaData, Charset encoding, boolean raisePanel) {
         // ensure that non-null parameters are really non-null
         if (metaData == null) {
             metaData = new MetaData();
         }
         if (encoding == null) {
-            encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
+            encoding = Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
         }
 
         BasePanel bp = new BasePanel(JabRefFrame.this, db, file, metaData, encoding);

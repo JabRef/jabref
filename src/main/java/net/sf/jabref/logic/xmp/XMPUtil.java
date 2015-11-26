@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.xmp;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import javax.xml.transform.TransformerException;
@@ -1222,7 +1223,7 @@ public class XMPUtil {
                     System.err
                     .println("The given pdf does not contain any XMP-metadata.");
                 } else {
-                    XMLUtil.save(meta.getXMPDocument(), System.out, "UTF-8");
+                    XMLUtil.save(meta.getXMPDocument(), System.out, StandardCharsets.UTF_8.name());
                 }
                 break;
             }

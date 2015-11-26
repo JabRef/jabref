@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -62,7 +63,7 @@ public class INSPIREFetcher implements EntryFetcher {
     private String constructUrl(String key) {
         String identifier;
         try {
-            identifier = URLEncoder.encode(key, "UTF-8");
+            identifier = URLEncoder.encode(key, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             return "";
         }
