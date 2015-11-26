@@ -81,11 +81,11 @@ public class DBConnectDialog extends JDialog {
         rhs.add(pwdPassword);
 
         // setup label text
-        lblServerType.setText(Localization.lang("Server Type :"));
-        lblServerHostname.setText(Localization.lang("Server Hostname :"));
-        lblDatabase.setText(Localization.lang("Database :"));
-        lblUsername.setText(Localization.lang("Username :"));
-        lblPassword.setText(Localization.lang("Password :"));
+        lblServerType.setText(Localization.lang("Server Type:"));
+        lblServerHostname.setText(Localization.lang("Server Hostname:"));
+        lblDatabase.setText(Localization.lang("Database:"));
+        lblUsername.setText(Localization.lang("Username:"));
+        lblPassword.setText(Localization.lang("Password:"));
 
         // set label text alignment
         for (JLabel label : lhs) {

@@ -245,7 +245,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         TitledBorder titledBorder1 = new TitledBorder(
                 BorderFactory.createLineBorder(
                         new Color(153, 153, 153), 2),
-                Localization.lang("Input"));
+                Localization.lang("Work_options"));
         inputPanel.setBorder(titledBorder1);
         //inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
         inputPanel.setMinimumSize(new Dimension(10, 10));
@@ -292,7 +292,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         radioPanel.add(overRadio);
 
         // insert sub components
-        JLabel label1 = new JLabel(Localization.lang("Available fields"));
+        JLabel label1 = new JLabel(Localization.lang("Available BibTeX fields"));
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(label1, con);
         inputPanel.add(label1);

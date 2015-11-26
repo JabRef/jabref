@@ -253,7 +253,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
         });
 
-        OpenOfficePanel.pushEntries.setToolTipText(Localization.lang("Cite selected entries"));
+        OpenOfficePanel.pushEntries.setToolTipText(Localization.lang("Cite selected entries between parenthesis"));
         OpenOfficePanel.pushEntries.addActionListener(new ActionListener() {
 
             @Override

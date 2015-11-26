@@ -1007,7 +1007,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private class AddGroupAction extends NodeAction {
 
         public AddGroupAction() {
-            super(Localization.lang("Add Group"));
+            super(Localization.lang("Add group"));
         }
 
         @Override
@@ -1039,7 +1039,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private class AddSubgroupAction extends NodeAction {
 
         public AddSubgroupAction() {
-            super(Localization.lang("Add Subgroup"));
+            super(Localization.lang("Add subgroup"));
         }
 
         @Override

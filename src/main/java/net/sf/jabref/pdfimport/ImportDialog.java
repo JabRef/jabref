@@ -53,7 +53,7 @@ public class ImportDialog extends JDialog {
         setContentPane(contentPane);
         JPanel panel3 = new JPanel();
         panel3.setBackground(new Color(-1643275));
-        JLabel labelHeadline = new JLabel(Localization.lang("Import_Metadata_from:"));
+        JLabel labelHeadline = new JLabel(Localization.lang("Import_metadata_from:"));
         labelHeadline.setFont(new Font(labelHeadline.getFont().getName(), Font.BOLD, 14));
         JLabel labelSubHeadline = new JLabel(Localization.lang("Choose_the_source_for_the_metadata_import"));
         labelSubHeadline.setFont(new Font(labelSubHeadline.getFont().getName(), labelSubHeadline.getFont().getStyle(), 13));

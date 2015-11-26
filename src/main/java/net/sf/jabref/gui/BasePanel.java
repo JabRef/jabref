@@ -367,7 +367,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                 }
                 //entryTable.clearSelection();
-                frame.output(formatOutputMessage(Localization.lang("Cut_pr"), bes.length));
+                frame.output(formatOutputMessage(Localization.lang("Cut"), bes.length));
                 ce.end();
                 undoManager.addEdit(ce);
                 markBaseChanged();
