@@ -6,6 +6,7 @@ import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescriber;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.search.rules.ContainBasedSearchRule;
+import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 public class SearchQuery {
@@ -65,4 +66,7 @@ public class SearchQuery {
         }
     }
 
+    public boolean isGrammarBasedSearch() {
+        return this.rule instanceof GrammarBasedSearchRule;
+    }
 }

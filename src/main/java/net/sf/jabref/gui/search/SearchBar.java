@@ -65,6 +65,7 @@ public class SearchBar extends JPanel {
     private final JLabel currentResults = new JLabel("");
 
     AutoCompleteSupport<String> autoCompleteSupport;
+    private final JLabel searchIcon;
 
     /**
      * Initializes the search bar.
@@ -100,7 +101,7 @@ public class SearchBar extends JPanel {
         // Init controls
         setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
+        searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
         this.add(searchIcon);
         this.searchField = initSearchField();
         this.add(searchField);
@@ -214,7 +215,7 @@ public class SearchBar extends JPanel {
     }
 
     /**
-     * Focuses the search field if it is not focused. Otherwise, cycles to the next search type.
+     * Focuses the search field if it is not focused.
      */
     public void focus() {
         if (!searchField.hasFocus()) {
@@ -238,6 +239,8 @@ public class SearchBar extends JPanel {
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
+
+        searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
     }
 
     /**
@@ -287,7 +290,7 @@ public class SearchBar extends JPanel {
         return new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
     }
 
-    public void updateResults(int matched, String description) {
+    public void updateResults(int matched, String description, boolean grammarBasedSearch) {
         if (matched == 0) {
             // nothing found
             this.currentResults.setText(Localization.lang("No results found."));
@@ -298,6 +301,15 @@ public class SearchBar extends JPanel {
             this.searchField.setBackground(RESULTS_FOUND_COLOR);
         }
         this.searchField.setToolTipText("<html>" + description + "</html>");
+
+
+        if(grammarBasedSearch) {
+            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(Color.RED));
+            searchIcon.setToolTipText(Localization.lang("Advanced search active."));
+        } else {
+            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
+            searchIcon.setToolTipText(Localization.lang("Normal search active."));
+        }
 
         globalSearch.setEnabled(true);
         openCurrentResultsInDialog.setEnabled(true);

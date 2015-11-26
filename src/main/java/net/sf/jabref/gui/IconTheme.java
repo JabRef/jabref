@@ -225,6 +225,11 @@ public class IconTheme {
         public FontBasedIcon createSmallIcon() {
             return new FontBasedIcon(this.iconCode, this.iconColor, IconTheme.SMALL_SIZE);
         }
+
+        public FontBasedIcon createWithNewColor(Color newColor) {
+            return new FontBasedIcon(this.iconCode, newColor, this.size);
+        }
+
     }
 
 

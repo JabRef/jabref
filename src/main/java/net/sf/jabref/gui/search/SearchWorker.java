@@ -91,7 +91,7 @@ class SearchWorker extends AbstractWorker {
             }
         }
 
-        basePanel.getSearchBar().updateResults(hits, searchQuery.description);
+        basePanel.getSearchBar().updateResults(hits, searchQuery.description, searchQuery.isGrammarBasedSearch());
         basePanel.getSearchBar().getSearchTextObservable().fireSearchlistenerEvent(searchQuery);
     }
 
