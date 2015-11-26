@@ -117,7 +117,7 @@ public class DOAJFetcher implements EntryFetcher {
             }
         } catch (UnirestException e) {
             LOGGER.warn("Problem searching DOAJ", e);
-            status.setStatus(Localization.lang("%0 search canceled", "DOAJ"));
+            status.setStatus(Localization.lang("Search canceled"));
             return false;
         }
 

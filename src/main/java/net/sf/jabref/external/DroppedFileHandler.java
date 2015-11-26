@@ -520,7 +520,7 @@ public class DroppedFileHandler {
         if (!fromFile.renameTo(toFile)) {
             JOptionPane.showMessageDialog(frame,
                     // @formatter:off
-                    Localization.lang("Could not move file %0.", toFile.getAbsolutePath()) +
+                    Localization.lang("Could not move file '%0'.", toFile.getAbsolutePath()) +
                             Localization.lang("Please move the file manually and link in place."),
                     Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
                     // @formatter:on
