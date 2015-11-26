@@ -1188,7 +1188,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class DeleteAction extends AbstractAction {
         public DeleteAction() {
-            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getIcon());
+            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
         }
 

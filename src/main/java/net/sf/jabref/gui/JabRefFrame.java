@@ -286,8 +286,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Forward"), prefs.getKey(KeyBinds.FORWARD), IconTheme.JabRefIcon.RIGHT.getIcon());
     final AbstractAction back = new GeneralAction(Actions.BACK, Localization.menuTitle("Back"),
             Localization.lang("Back"), prefs.getKey(KeyBinds.BACK), IconTheme.JabRefIcon.LEFT.getIcon());
-    private final AbstractAction delete = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete"),
-            Localization.lang("Delete"), prefs.getKey(KeyBinds.DELETE), IconTheme.JabRefIcon.DELETE.getIcon());
+    final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
+            Localization.lang("Delete entry"), prefs.getKey(KeyBinds.DELETE_ENTRY), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
     private final AbstractAction copy = new EditAction(Actions.COPY, Localization.lang("Copy"),
             IconTheme.JabRefIcon.COPY.getIcon());
     private final AbstractAction paste = new EditAction(Actions.PASTE, Localization.lang("Paste"),
@@ -1182,17 +1182,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(closeDatabaseAction);
         file.add(quit);
         mb.add(file);
-        //edit.add(test);
         edit.add(undo);
         edit.add(redo);
+
         edit.addSeparator();
 
         edit.add(cut);
         edit.add(copy);
         edit.add(paste);
-        //edit.add(remove);
-        edit.add(delete);
+
         edit.addSeparator();
+
         edit.add(copyKey);
         edit.add(copyCiteKey);
         edit.add(copyKeyAndTitle);
@@ -1301,6 +1301,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         bibtex.add(editEntry);
         bibtex.add(editPreamble);
         bibtex.add(editStrings);
+        bibtex.addSeparator();
+        bibtex.add(deleteEntry);
         mb.add(bibtex);
 
         tools.add(makeKeyAction);
@@ -1433,6 +1435,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addAction(newEntryAction);
         tlb.addAction(editEntry);
         tlb.addAction(editStrings);
+        tlb.addAction(deleteEntry);
+        tlb.addSeparator();
         tlb.addAction(makeKeyAction);
         tlb.addAction(cleanupEntries);
         tlb.addAction(mergeEntries);
@@ -1526,7 +1530,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void initActions() {
         openDatabaseOnlyActions = new LinkedList<>();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
-                saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, delete, copy, paste, mark, unmark,
+                saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, deleteEntry, copy, paste, mark, unmark,
                 unmarkAll, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
                 toggleGroups, toggleSearch, makeKeyAction, normalSearch, mergeEntries, cleanupEntries,
                 exportToClipboard, incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
