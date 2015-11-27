@@ -45,6 +45,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
@@ -74,7 +75,6 @@ class ContentSelectorDialog2 extends JDialog {
     TreeSet<String> fieldSet;
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private final JButton help = new JButton(Localization.lang("Help"));
     private final JButton newField = new JButton(Localization.lang("New"));
     private final JButton removeField = new JButton(Localization.lang("Remove"));
     private final JButton newWord = new JButton(Localization.lang("New"));
@@ -132,7 +132,6 @@ class ContentSelectorDialog2 extends JDialog {
 
         wordList.addListSelectionListener(new ListSelectionListener() {
 
-            @SuppressWarnings("unused")
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 wordEditField.setText(wordList.getSelectedValue());
@@ -141,13 +140,7 @@ class ContentSelectorDialog2 extends JDialog {
             }
         });
 
-        newWord.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                newWordAction();
-            }
-        });
+        newWord.addActionListener(e -> newWordAction());
 
         wordEditFieldListener = new ActionListener() {
 
@@ -227,13 +220,7 @@ class ContentSelectorDialog2 extends JDialog {
             }
         });
 
-        fieldNameField.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                fieldNameField.transferFocus();
-            }
-        });
+        fieldNameField.addActionListener(e -> fieldNameField.transferFocus());
 
         fieldNameField.addFocusListener(new FocusAdapter() {
 
@@ -289,14 +276,6 @@ class ContentSelectorDialog2 extends JDialog {
             }
         });
 
-        help.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.helpDiag.showPage(GUIGlobals.contentSelectorHelp);
-            }
-        });
-
         ok.addActionListener(new ActionListener() {
 
             @Override
@@ -330,7 +309,6 @@ class ContentSelectorDialog2 extends JDialog {
             }
         });
 
-        @SuppressWarnings("serial")
         Action cancelAction = new AbstractAction() {
 
             @Override
@@ -548,7 +526,7 @@ class ContentSelectorDialog2 extends JDialog {
         bsb.addButton(apply);
         bsb.addButton(cancel);
         bsb.addRelatedGap();
-        bsb.addButton(help);
+        bsb.addButton(new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp).getIconButton());
         bsb.addGlue();
 
         // Add panels to dialog:
