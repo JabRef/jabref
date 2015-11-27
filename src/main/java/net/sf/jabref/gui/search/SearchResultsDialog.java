@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.search;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -42,6 +42,15 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.gui.TransferableBibtexEntry;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -61,8 +70,9 @@ import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import net.sf.jabref.model.entry.EntryUtil;
 
@@ -88,7 +98,7 @@ public class SearchResultsDialog {
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
-    private EventTableModel<BibtexEntry> model;
+    private DefaultEventTableModel<BibtexEntry> model;
     private final EventList<BibtexEntry> entries = new BasicEventList<>();
     private SortedList<BibtexEntry> sortedEntries;
     private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<>();
@@ -113,7 +123,8 @@ public class SearchResultsDialog {
                 activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
-        model = new EventTableModel<>(sortedEntries, new EntryTableFormat());
+        model = (DefaultEventTableModel<BibtexEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
+                new EntryTableFormat());
         entryTable = new JTable(model);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         entryTable.setDefaultRenderer(JLabel.class, renderer);
@@ -125,7 +136,8 @@ public class SearchResultsDialog {
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
-        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<>(sortedEntries);
+        final DefaultEventSelectionModel<BibtexEntry> selectionModel = (DefaultEventSelectionModel<BibtexEntry>) GlazedListsSwing
+                .eventSelectionModelWithThreadProxyList(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         entryTable.addMouseListener(new TableClickListener());

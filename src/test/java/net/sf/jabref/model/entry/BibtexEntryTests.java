@@ -7,12 +7,14 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BibtexEntryTests {
+
     @Before
     public void setup() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -21,29 +23,10 @@ public class BibtexEntryTests {
     @Test
     public void testDefaultConstructor() {
         BibtexEntry entry = new BibtexEntry();
-    }
-
-    @Test
-    public void testGetPublicationDate() {
-        Assert.assertEquals("2003-02",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }"))
-                        .getPublicationDate());
-
-        Assert.assertEquals("2003-03",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")).getPublicationDate());
-
-        Assert.assertEquals("2003",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}}")).getPublicationDate());
-
-        Assert.assertEquals(null,
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, month = 3 }")).getPublicationDate());
-
-        Assert.assertEquals(null,
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}")).getPublicationDate());
-
-        Assert.assertEquals("2003-12",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }"))
-                        .getPublicationDate());
+        // we have to use `getType("misc")` in the case of biblatex mode
+        Assert.assertEquals(EntryTypes.getType("misc"), entry.getType());
+        Assert.assertNotNull(entry.getId());
+        Assert.assertNull(entry.getField("author"));
     }
 
     @Test
@@ -89,5 +72,114 @@ public class BibtexEntryTests {
 
         e.setField("year", "2015");
         Assert.assertTrue(e.hasAllRequiredFields(null));
+    }
+
+    @Test
+    public void isNullOrEmptyCiteKey() {
+        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        Assert.assertFalse(e.hasCiteKey());
+        e.setField(BibtexEntry.KEY_FIELD, "");
+        Assert.assertFalse(e.hasCiteKey());
+        e.setField(BibtexEntry.KEY_FIELD, null);
+        Assert.assertFalse(e.hasCiteKey());
+        e.setField(BibtexEntry.KEY_FIELD, "key");
+        Assert.assertTrue(e.hasCiteKey());
+        e.clearField(BibtexEntry.KEY_FIELD);
+        Assert.assertFalse(e.hasCiteKey());
+    }
+
+    @Test
+    public void testGetPublicationDate() {
+
+        Assert.assertEquals("2003-02",
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }"))
+                        .getPublicationDate());
+
+        Assert.assertEquals("2003-03",
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")).getPublicationDate());
+
+        Assert.assertEquals("2003",
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}}")).getPublicationDate());
+
+        Assert.assertEquals(null,
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, month = 3 }")).getPublicationDate());
+
+        Assert.assertEquals(null,
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}")).getPublicationDate());
+
+        Assert.assertEquals("2003-12",
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }"))
+                        .getPublicationDate());
+
+    }
+
+
+    @Test
+    public void testKeywordMethods() {
+        BibtexEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
+
+        String[] expected = {"Foo",  "Bar"};
+        Assert.assertArrayEquals(expected, be.getSeparatedKeywords().toArray());
+
+        List<String> kw = be.getSeparatedKeywords();
+
+        be.addKeyword("FooBar");
+        String[] expected2 = {"Foo", "Bar", "FooBar"};
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeyword("FooBar");
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeyword("FOO");
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeyword("");
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeyword(null);
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        be.addKeywords(null);
+        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+
+        BibtexEntry be2 = new BibtexEntry();
+        Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());
+        be2.addKeyword("");
+        Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());
+        be2.addKeywords(be.getSeparatedKeywords());
+        Assert.assertArrayEquals(expected2, be2.getSeparatedKeywords().toArray());
+        be2.putKeywords(kw);
+        Assert.assertArrayEquals(expected, be2.getSeparatedKeywords().toArray());
+    }
+
+    @Test
+    public void testGroupAndSearchHits() {
+        BibtexEntry be = new BibtexEntry();
+        be.setGroupHit(true);
+        Assert.assertTrue(be.isGroupHit());
+        be.setGroupHit(false);
+        Assert.assertFalse(be.isGroupHit());
+        be.setSearchHit(true);
+        Assert.assertTrue(be.isSearchHit());
+        be.setSearchHit(false);
+        Assert.assertFalse(be.isSearchHit());
+
+    }
+
+    @Test
+    public void testCiteKeyAndID() {
+        BibtexEntry be = new BibtexEntry();
+        Assert.assertFalse(be.hasCiteKey());
+        be.setField("author", "Albert Einstein");
+        be.setField(BibtexEntry.KEY_FIELD, "Einstein1931");
+        Assert.assertTrue(be.hasCiteKey());
+        Assert.assertEquals("Einstein1931", be.getCiteKey());
+        Assert.assertEquals("Albert Einstein", be.getField("author"));
+        be.clearField("author");
+        Assert.assertNull(be.getField("author"));
+
+        String id = IdGenerator.next();
+        be.setId(id);
+        Assert.assertEquals(id, be.getId());
     }
 }

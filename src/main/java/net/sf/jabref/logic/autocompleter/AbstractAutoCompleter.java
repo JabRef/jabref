@@ -3,12 +3,10 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
-
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -16,6 +14,7 @@
 package net.sf.jabref.logic.autocompleter;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -23,15 +22,15 @@ import java.util.TreeSet;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
- * An autocompleter delivers possible completions for a given String. There are
- * different types of autocompleters for different use cases.
- *
+ * An autocompleter delivers possible completions for a given string. There are different types of autocompleters for
+ * different use cases.
+ * 
  * Example: {@link NameFieldAutoCompleter}, {@link EntireFieldAutoCompleter}
  *
  * @author kahlert, cordes, olly98
  * @see AutoCompleterFactory
  */
-abstract class AbstractAutoCompleter implements AutoCompleter {
+public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
 
     private static final int SHORTEST_WORD = 4;
 
@@ -43,8 +42,6 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
 
     // stores for a lowercase string the possible expanded strings
     private final HashMap<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<>();
-
-
 
     @Override
     public abstract void addBibtexEntry(BibtexEntry entry);
@@ -91,6 +88,10 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
      * Example: incrementLastCharacter("abc") returns "abd".
      */
     private static String incrementLastCharacter(String toIncrement) {
+        if (toIncrement.isEmpty()) {
+            return "";
+        }
+
         char lastChar = toIncrement.charAt(toIncrement.length() - 1);
         return toIncrement.substring(0, toIncrement.length() - 1) + Character.toString((char) (lastChar + 1));
     }
@@ -128,4 +129,8 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
         return "";
     }
 
+    @Override
+    public String getAutoCompleteText(String item) {
+        return item.toString();
+    }
 }

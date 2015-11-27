@@ -40,9 +40,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.logic.util.io.TXMLReader;
-
-import org.w3c.dom.Element;
 
 public class BibtexFields {
 
@@ -454,7 +451,7 @@ public class BibtexFields {
         private static final int WRITEABLE = 0x08; // These fields will not be saved to the .bib file.
 
         // the fieldname
-        private String name;
+        private final String name;
 
         // contains the standard, private, displayable, writable infos
         // default is: not standard, public, displayable and writable
@@ -515,43 +512,6 @@ public class BibtexFields {
             setFlag(pStandard, BibtexSingleField.STANDARD);
             weight = pWeight;
             length = pLength;
-        }
-
-        /**
-         * the constructor reads all neccessary data from the xml file
-         */
-        public BibtexSingleField(TXMLReader reader, Element node) {
-            // default is: not standard, public, displayable and writable
-            flag = BibtexSingleField.DISPLAYABLE | BibtexSingleField.WRITEABLE;
-
-            name = reader.readStringAttribute(node, "name", "field");
-            name = name.toLowerCase();
-
-            // read the weight
-            String wStr = reader.readStringAttribute(node, "weight", null);
-            if (wStr != null) {
-                int hCode = wStr.toLowerCase().hashCode();
-                if (hCode == "small".hashCode()) {
-                    weight = GUIGlobals.SMALL_W;
-                } else if (hCode == "medium".hashCode()) {
-                    weight = GUIGlobals.MEDIUM_W;
-                } else if (hCode == "large".hashCode()) {
-                    weight = GUIGlobals.LARGE_W;
-                } else // try to convert to a double value
-                {
-                    try {
-                        weight = Double.parseDouble(wStr);
-                        if ((weight < 0.0) || (weight > GUIGlobals.MAX_FIELD_WEIGHT)) {
-                            weight = GUIGlobals.DEFAULT_FIELD_WEIGHT;
-                        }
-                    } catch (Exception e) {
-                        weight = GUIGlobals.DEFAULT_FIELD_WEIGHT;
-                    }
-                }
-            }
-            length = reader.readIntegerAttribute(node, "length", GUIGlobals.DEFAULT_FIELD_LENGTH);
-
-            extras = reader.readStringAttribute(node, "extras", null);
         }
 
         // -----------------------------------------------------------------------

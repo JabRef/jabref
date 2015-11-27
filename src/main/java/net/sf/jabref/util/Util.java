@@ -94,8 +94,6 @@ public class Util {
 
     public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
-    private static final String SEPARATING_CHARS_NOSPACE = ";,\n";
-
     private static final UnicodeCharMap UNICODE_CHAR_MAP = new UnicodeCharMap();
 
 
@@ -689,57 +687,6 @@ public class Util {
     }
 
     /**
-     * @param keywords a String of keywords
-     * @return an ArrayList containing the keywords. An emtpy list if keywords are null or empty
-     */
-    public static ArrayList<String> getSeparatedKeywords(String keywords) {
-        ArrayList<String> res = new ArrayList<>();
-        if (keywords == null) {
-            return res;
-        }
-        // _NOSPACE is a hack to support keywords such as "choreography transactions"
-        // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
-        // if nothing is found, " " is likely to be the separating char.
-        // solution by RisKeywords.java: s.split(",[ ]*")
-        StringTokenizer tok = new StringTokenizer(keywords, net.sf.jabref.util.Util.SEPARATING_CHARS_NOSPACE);
-        while (tok.hasMoreTokens()) {
-            String word = tok.nextToken().trim();
-            res.add(word);
-        }
-        return res;
-    }
-
-    public static ArrayList<String> getSeparatedKeywords(BibtexEntry be) {
-        return net.sf.jabref.util.Util.getSeparatedKeywords(be.getField("keywords"));
-    }
-
-    public static void putKeywords(BibtexEntry entry, ArrayList<String> keywords, NamedCompound ce) {
-        // Set Keyword Field
-        String oldValue = entry.getField("keywords");
-        String newValue;
-        if (!keywords.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (String keyword : keywords) {
-                sb.append(keyword);
-                sb.append(", ");
-            }
-            sb.delete(sb.length() - 2, sb.length());
-            newValue = sb.toString();
-        } else {
-            newValue = null;
-        }
-        if ((oldValue == null) && (newValue == null)) {
-            return;
-        }
-        if ((oldValue == null) || !oldValue.equals(newValue)) {
-            entry.setField("keywords", newValue);
-            if (ce != null) {
-                ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
-            }
-        }
-    }
-
-    /**
      * @param ce indicates the undo named compound. May be null
      */
     public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
@@ -1188,21 +1135,22 @@ public class Util {
     }
 
     // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
-    public static Pattern getPatternForWords(ArrayList<String> words) {
+    public static Pattern getPatternForWords(List<String> words) {
         if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
             return Pattern.compile("");
         }
 
-        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH);
+        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP);
 
         // compile the words to a regular expression in the form (w1) | (w2) | (w3)
         String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");
         for (int i = 1; i < words.size(); i++) {
-            searchPattern = searchPattern.concat("|(").concat(regExSearch ? words.get(i) : Pattern.quote(words.get(i))).concat(")");
+            searchPattern = searchPattern.concat("|(").concat(regExSearch ? words.get(i) : Pattern.quote(words.get(i)))
+                    .concat(")");
         }
 
         Pattern pattern;
-        if (Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE)) {
             pattern = Pattern.compile(searchPattern);
         } else {
             pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);

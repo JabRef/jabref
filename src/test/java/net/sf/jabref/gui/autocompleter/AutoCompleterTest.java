@@ -27,7 +27,7 @@ public class AutoCompleterTest {
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
         // test content of stored words in autocompleter ...
-        AutoCompleter autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("author");
+        AutoCompleter<String> autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("author");
         Assert.assertTrue(autoCompleter.indexContainsWord("Hans Meiser"));
         Assert.assertTrue(autoCompleter.indexContainsWord("Meiser, Hans"));
 
@@ -46,7 +46,7 @@ public class AutoCompleterTest {
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
         // test content of stored words in autocompleter ...
-        AutoCompleter autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("journal");
+        AutoCompleter<String> autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("journal");
         Assert.assertTrue(autoCompleter.indexContainsWord("New Testtext"));
 
         TestUtils.closeJabRef();

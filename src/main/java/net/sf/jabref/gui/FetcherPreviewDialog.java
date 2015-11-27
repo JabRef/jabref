@@ -15,26 +15,42 @@
  */
 package net.sf.jabref.gui;
 
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.ButtonStackBuilder;
-import net.sf.jabref.*;
-import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonStackBuilder;
+
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  *
@@ -91,13 +107,14 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
             }
         });
 
-        EventTableModel<TableEntry> tableModelGl = new EventTableModel<>(entries,
-                new EntryTableFormat());
+        DefaultEventTableModel<TableEntry> tableModelGl = (DefaultEventTableModel<TableEntry>) GlazedListsSwing
+                .eventTableModelWithThreadProxyList(entries, new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
         glTable.setRowHeight(tableRowHeight);
         glTable.getColumnModel().getColumn(0).setMaxWidth(45);
         glTable.setPreferredScrollableViewportSize(new Dimension(1100, 600));
-        EventSelectionModel<TableEntry> selectionModel = new EventSelectionModel<>(entries);
+        DefaultEventSelectionModel<TableEntry> selectionModel = (DefaultEventSelectionModel<TableEntry>) GlazedListsSwing
+                .eventSelectionModelWithThreadProxyList(entries);
         glTable.setSelectionModel(selectionModel);
         ButtonStackBuilder builder = new ButtonStackBuilder();
         builder.addButton(selectAll);

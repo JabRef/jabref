@@ -17,6 +17,8 @@ package net.sf.jabref.exporter.layout;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -58,7 +60,7 @@ class LayoutEntry {
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
 
-    public LayoutEntry(StringInt si, String classPrefix_) throws Exception {
+    public LayoutEntry(StringInt si, String classPrefix_) {
         type = si.i;
         classPrefix = classPrefix_;
 
@@ -94,7 +96,7 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) throws Exception {
+    public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) {
         classPrefix = classPrefix_;
         String blockStart;
         String blockEnd;
@@ -177,7 +179,7 @@ class LayoutEntry {
         return doLayout(bibtex, database, null);
     }
 
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, ArrayList<String> wordsToHighlight) {
+    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, List<String> wordsToHighlight) {
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
@@ -479,16 +481,16 @@ class LayoutEntry {
      * This check is a quick hack to avoid highlighting of HTML tags It does not always work, but it does its job mostly
      *
      * @param text This is a String in which we search for different words
-     * @param toHighlight List of all words which must be highlighted
-     *
+     * @param wordsToHighlight List of all words which must be highlighted
+     * 
      * @return String that was called by the method, with HTML Tags if a word was found
      */
-    private String highlightWords(String text, ArrayList<String> toHighlight) {
-        if (toHighlight == null) {
+    private String highlightWords(String text, List<String> wordsToHighlight) {
+        if (wordsToHighlight == null) {
             return text;
         }
 
-        Matcher matcher = Util.getPatternForWords(toHighlight).matcher(text);
+        Matcher matcher = Util.getPatternForWords(wordsToHighlight).matcher(text);
 
         if (Character.isLetterOrDigit(text.charAt(0))) {
             String hlColor = HIGHLIGHT_COLOR;

@@ -611,7 +611,7 @@ class ManageJournalsPanel extends JPanel {
         private final JTextField tf;
         private final JButton browse = new JButton(Localization.lang("Browse"));
         private final JButton view = new JButton(Localization.lang("Preview"));
-        private final JButton clear = new JButton(IconTheme.JabRefIcon.DELETE.getIcon());
+        private final JButton clear = new JButton(IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
         private final JButton download = new JButton(Localization.lang("Download"));
 
 

@@ -20,9 +20,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
@@ -45,10 +45,10 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
-import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -59,6 +59,7 @@ import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -232,7 +233,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AutoCompleter autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
+        AutoCompleter<String> autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);
@@ -372,7 +373,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         BibtexEntry[] entries = bp.getSelectedEntries();
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibtexEntry entry : entries) {
-            ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
+            List<String> separatedKeywords = entry.getSeparatedKeywords();
 
             // we "intercept" with a treeset
             // pro: no duplicates
@@ -387,7 +388,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             // put keywords back
             separatedKeywords.clear();
             separatedKeywords.addAll(keywords);
-            Util.putKeywords(entry, separatedKeywords, ce);
+            String oldValue = entry.getField("keywords");
+            entry.putKeywords(separatedKeywords);
+            String updatedValue = entry.getField("keywords");
+            if ((oldValue == null) || !oldValue.equals(updatedValue)) {
+                    ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, updatedValue));
+            }
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ce);
@@ -413,7 +419,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         if (mergeKeywords.isSelected()) {
             for (BibtexEntry entry : entries) {
-                ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
+                List<String> separatedKeywords = entry.getSeparatedKeywords();
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else {
@@ -421,14 +427,14 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             // all keywords from first entry have to be added
             BibtexEntry firstEntry = entries[0];
-            ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(firstEntry);
+            List<String> separatedKeywords = firstEntry.getSeparatedKeywords();
             sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
 
             // for the remaining entries, intersection has to be used
             // this approach ensures that one empty keyword list leads to an empty set of common keywords
             for (int i = 1; i < entries.length; i++) {
                 BibtexEntry entry = entries[i];
-                separatedKeywords = Util.getSeparatedKeywords(entry);
+                separatedKeywords = entry.getSeparatedKeywords();
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
             }
         }

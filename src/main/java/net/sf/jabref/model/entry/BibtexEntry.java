@@ -35,6 +35,9 @@ import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.base.Strings;
+
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibtexDatabase;
 
 public class BibtexEntry {
@@ -65,7 +68,7 @@ public class BibtexEntry {
     }
 
     public BibtexEntry(String id) {
-        this(id, BibtexEntryTypes.MISC);
+        this(id, EntryTypes.getBibtexEntryType("misc"));
     }
 
     public BibtexEntry(String id, EntryType type) {
@@ -192,7 +195,7 @@ public class BibtexEntry {
     public String getFieldOrAlias(String name) {
         String fieldValue = getField(name);
 
-        if ((fieldValue != null) && !fieldValue.isEmpty()) {
+        if (!Strings.isNullOrEmpty(fieldValue)) {
             return fieldValue;
         }
 
@@ -282,10 +285,7 @@ public class BibtexEntry {
     }
 
     public boolean hasCiteKey() {
-        if ((getCiteKey() == null) || getCiteKey().isEmpty()) {
-            return false;
-        }
-        return true;
+        return !Strings.isNullOrEmpty(getCiteKey());
     }
 
     /**
@@ -423,9 +423,15 @@ public class BibtexEntry {
         return clone;
     }
 
+    /**
+     * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
+     * as is
+     *
+     * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
+     */
     @Override
     public String toString() {
-        return getType().getName() + ':' + getCiteKey();
+        return CanonicalBibtexEntry.getCanonicalRepresentation(this);
     }
 
     public boolean isSearchHit() {
@@ -490,11 +496,73 @@ public class BibtexEntry {
         return year;
     }
 
+
     public void setSerialization(String serialization){
         this.serialization = serialization;
     }
 
-    public String getSerialization(){
+    public String getSerialization() {
         return serialization;
+    }
+
+    public void putKeywords(List<String> keywords) {
+        Objects.requireNonNull(keywords);
+        // Set Keyword Field
+        String oldValue = this.getField("keywords");
+        String newValue;
+        if (!keywords.isEmpty()) {
+            newValue = String.join(", ", keywords);
+        } else {
+            newValue = null;
+        }
+        if ((oldValue == null) && (newValue == null)) {
+            return;
+        }
+        if ((oldValue == null) || !oldValue.equals(newValue)) {
+            this.setField("keywords", newValue);
+        }
+    }
+
+    /**
+     * Check if a keyword already exists (case insensitive), if not: add it
+     *
+     * @param keyword Keyword to add
+     */
+    public void addKeyword(String keyword) {
+        List<String> keywords = this.getSeparatedKeywords();
+        Boolean duplicate = false;
+
+        if ((keyword == null) || (keyword.length() == 0)) {
+            return;
+        }
+
+        for (String key : keywords) {
+            if (keyword.equalsIgnoreCase(key)) {
+                duplicate = true;
+                break;
+            }
+        }
+
+        if (!duplicate) {
+            keywords.add(keyword);
+            this.putKeywords(keywords);
+        }
+    }
+
+    /**
+     * Add multiple keywords to entry
+     *
+     * @param keywords Keywords to add
+     */
+    public void addKeywords(List<String> keywords) {
+        if (keywords != null) {
+            for (String keyword : keywords) {
+                this.addKeyword(keyword);
+            }
+        }
+    }
+
+    public List<String> getSeparatedKeywords() {
+        return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField("keywords"));
     }
 }

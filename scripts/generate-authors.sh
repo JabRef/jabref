@@ -51,6 +51,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
 	John Zedlewski
 	Samin Muhammad Ridwanul Karim
 	Stefan Robert
+	Bernhard Tempel
 	EOF
 
 	# %aN = author name, %aE = author email

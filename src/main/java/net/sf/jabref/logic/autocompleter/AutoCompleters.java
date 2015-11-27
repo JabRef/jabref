@@ -7,11 +7,11 @@ import java.util.HashMap;
 
 class AutoCompleters {
 
-    final HashMap<String, AutoCompleter> autoCompleters = new HashMap<>();
+    final HashMap<String, AutoCompleter<String>> autoCompleters = new HashMap<>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
-    public AutoCompleter get(String fieldName) {
+    public AutoCompleter<String> get(String fieldName) {
         return autoCompleters.get(fieldName);
     }
 
@@ -26,12 +26,12 @@ class AutoCompleters {
      * respective Completers, if any.
      */
     public void addEntry(BibtexEntry bibtexEntry) {
-        for (AutoCompleter autoCompleter : autoCompleters.values()) {
+        for (AutoCompleter<String> autoCompleter : autoCompleters.values()) {
             autoCompleter.addBibtexEntry(bibtexEntry);
         }
     }
 
-    void put(String field, AutoCompleter autoCompleter) {
+    void put(String field, AutoCompleter<String> autoCompleter) {
         autoCompleters.put(field, autoCompleter);
     }
 

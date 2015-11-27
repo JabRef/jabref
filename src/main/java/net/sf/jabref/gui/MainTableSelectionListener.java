@@ -59,12 +59,13 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class MainTableSelectionListener implements ListEventListener<BibtexEntry>, MouseListener,
         KeyListener, FocusListener {
 
-    private PreviewPanel[] previewPanel;
-    private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
-    private PreviewPanel preview;
+    private final PreviewPanel[] previewPanel;
     private final MainTable table;
     private final BasePanel panel;
     private final EventList<BibtexEntry> tableRows;
+
+    private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
+    private PreviewPanel preview;
     private boolean previewActive = Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
     private boolean workingOnPreview;
 
@@ -85,7 +86,15 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         this.table = table;
         this.panel = panel;
         this.tableRows = table.getTableRows();
-        instantiatePreviews();
+        previewPanel = new PreviewPanel[] {
+                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
+                        .get(JabRefPreferences.PREVIEW_0), true),
+                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
+                        .get(JabRefPreferences.PREVIEW_1), true)};
+
+        panel.getSearchBar().getSearchTextObservable().addSearchListener(previewPanel[0]);
+        panel.getSearchBar().getSearchTextObservable().addSearchListener(previewPanel[1]);
+
         this.preview = previewPanel[activePreview];
     }
 
@@ -93,23 +102,12 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         this.enabled = enabled;
     }
 
-    private void instantiatePreviews() {
-        previewPanel = new PreviewPanel[] {
-                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_0), true),
-                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_1), true)};
-
-        panel.frame().getSearchManager().addSearchListener(previewPanel[0]);
-        panel.frame().getSearchManager().addSearchListener(previewPanel[1]);
-    }
-
     public void updatePreviews() {
         try {
-            previewPanel[0].readLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
-            previewPanel[1].readLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
-        } catch (Exception e) {
-            e.printStackTrace();
+            previewPanel[0].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+            previewPanel[1].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
+        } catch (IOException e) {
+            LOGGER.debug("error while updating preview", e);
         }
     }
 
@@ -185,17 +183,10 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
     private void updatePreview(final BibtexEntry toShow, final boolean changedPreview, int repeats) {
         if (workingOnPreview) {
-            if (repeats > 0)
-             {
+            if (repeats > 0) {
                 return; // We've already waited once. Give up on this selection.
             }
-            Timer t = new Timer(50, new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    updatePreview(toShow, changedPreview, 1);
-                }
-            });
+            Timer t = new Timer(50, actionEvent -> updatePreview(toShow, changedPreview, 1));
             t.setRepeats(false);
             t.start();
             return;
@@ -207,27 +198,16 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         }
         final int mode = panel.getMode();
         workingOnPreview = true;
-        final Runnable update = new Runnable() {
+        SwingUtilities.invokeLater(() -> {
+            preview.setEntry(toShow);
 
-            @Override
-            public void run() {
-                // If nothing was already shown, set the preview and move the separator:
-                if (changedPreview || (mode == BasePanel.SHOWING_NOTHING)) {
-                    panel.showPreview(preview);
-                    panel.adjustSplitter();
-                }
-                workingOnPreview = false;
+            // If nothing was already shown, set the preview and move the separator:
+            if (changedPreview || (mode == BasePanel.SHOWING_NOTHING)) {
+                panel.showPreview(preview);
+                panel.adjustSplitter();
             }
-        };
-        final Runnable worker = new Runnable() {
-
-            @Override
-            public void run() {
-                preview.setEntry(toShow);
-                SwingUtilities.invokeLater(update);
-            }
-        };
-        JabRefExecutorService.INSTANCE.execute(worker);
+            workingOnPreview = false;
+        });
     }
 
     public void editSignalled() {

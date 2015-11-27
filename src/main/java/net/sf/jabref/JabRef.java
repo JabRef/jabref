@@ -154,7 +154,7 @@ public class JabRef {
             return;
         }
 
-        openWindow(loaded);
+        SwingUtilities.invokeLater(() -> openWindow(loaded));
     }
 
     private void setupLogHandlerForErrorConsole() {

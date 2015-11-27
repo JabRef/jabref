@@ -44,10 +44,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.journals.Abbreviations;
@@ -61,6 +61,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.search.SearchTextListener;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.*;
@@ -608,7 +609,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        frame.getSearchManager().addSearchListener((SearchTextListener) source);
+        panel.getSearchBar().getSearchTextObservable().addSearchListener((SearchTextListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);
@@ -1158,18 +1159,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         @Override
         public void stateChanged(ChangeEvent event) {
-
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    activateVisible();
-                }
-            });
-
-            // After the initial event train has finished, we tell the editor
-            // tab to update all
-            // its fields. This makes sure they are updated even if the tab we
+            // We tell the editor tab to update all its fields.
+            //  This makes sure they are updated even if the tab we
             // just left contained one
             // or more of the same fields as this one:
             SwingUtilities.invokeLater(new Runnable() {
@@ -1188,7 +1179,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class DeleteAction extends AbstractAction {
         public DeleteAction() {
-            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getIcon());
+            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
         }
 
@@ -1335,7 +1326,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         fieldEditor.setValidBackgroundColor();
 
                         // See if we need to update an AutoCompleter instance:
-                        AutoCompleter aComp = panel.getAutoCompleters().get(fieldEditor.getFieldName());
+                        AutoCompleter<String> aComp = panel.getAutoCompleters().get(fieldEditor.getFieldName());
                         if (aComp != null) {
                             aComp.addBibtexEntry(entry);
                         }

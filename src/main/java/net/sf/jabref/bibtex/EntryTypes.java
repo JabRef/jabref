@@ -74,11 +74,7 @@ public class EntryTypes {
      * or null if it does not exist.
      */
     public static EntryType getType(String name) {
-        EntryType entryType = ALL_TYPES.get(name.toLowerCase());
-        if (entryType == null) {
-            return null;
-        }
-        return entryType;
+        return ALL_TYPES.get(name.toLowerCase());
     }
 
     /**
@@ -86,12 +82,7 @@ public class EntryTypes {
      * name of a type, or null if it does not exist.
      */
     public static EntryType getStandardType(String name) {
-        EntryType entryType = STANDARD_TYPES.get(name.toLowerCase());
-        if (entryType == null) {
-            return null;
-        } else {
-            return entryType;
-        }
+        return STANDARD_TYPES.get(name.toLowerCase());
     }
 
     public static void addOrModifyCustomEntryType(CustomEntryType type) {

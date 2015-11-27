@@ -33,6 +33,7 @@ import net.sf.jabref.exporter.FileActions.DatabaseSaveType;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.*;
+import net.sf.jabref.groups.GroupMatcher;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.Actions;
@@ -46,6 +47,7 @@ import net.sf.jabref.gui.journals.UnabbreviateAction;
 import net.sf.jabref.gui.labelPattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
+import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.*;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -59,7 +61,7 @@ import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.logic.search.matchers.NoSearchMatcher;
+import net.sf.jabref.logic.search.matchers.EverythingMatcher;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -127,11 +129,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    // Hashtable indexing the only search auto completer
-    // required for the SearchAutoCompleterUpdater
-    private AutoCompleter searchAutoCompleter;
-
-    private AutoCompleteListener searchCompleteListener;
+    // AutoCompleter used in the search bar
+    private AutoCompleter<String> searchAutoCompleter;
 
     // The undo manager.
     public final CountingUndoManager undoManager = new CountingUndoManager(this);
@@ -171,17 +170,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private SaveDatabaseAction saveAction;
 
-    private boolean showingSearch;
-
-    public boolean sortingBySearchResults;
-    public boolean coloringBySearchResults;
-    public boolean hidingNonHits;
     public boolean sortingByGroup;
     public boolean sortingByCiteSeerResults;
     public boolean coloringByGroup;
-
-    int lastSearchHits = -1; // The number of hits in the latest search.
-    // Potential use in hiding non-hits completely.
 
     // MetaData parses, keeps and writes meta data.
     public final MetaData metaData;
@@ -189,6 +180,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final HashMap<String, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
 
+    private final SearchBar searchBar;
+
+    private final StartStopListAction<BibtexEntry> filterSearchToggle;
+
+    private final StartStopListAction<BibtexEntry> filterGroupToggle;;
+
+    // Returns a collection of AutoCompleters, which are populated from the current database
     public ContentAutoCompleters getAutoCompleters() {
         return autoCompleters;
     }
@@ -209,13 +207,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.frame = frame;
         database = db;
 
+        searchBar = new SearchBar(this);
+
+
         setupMainPanel();
+
+        this.add(searchBar, BorderLayout.NORTH);
+
         setupActions();
 
         metaData.setFile(file);
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         db.addDatabaseChangeListener(new GroupTreeUpdater());
+
 
         if (file == null) {
             if (!database.getEntries().isEmpty()) {
@@ -233,6 +238,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         }
 
+        filterSearchToggle = new StartStopListAction<>(searchFilterList, SearchMatcher.INSTANCE, EverythingMatcher.INSTANCE);
+        filterGroupToggle = new StartStopListAction<>(groupFilterList, GroupMatcher.INSTANCE, EverythingMatcher.INSTANCE);
     }
 
     public String getTabTitle() {
@@ -742,26 +749,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
-        actions.put(Actions.SEARCH, (BaseAction) () -> {
-            sidePaneManager.show("search");
-            frame.searchToggle.setSelected(true);
-            frame.getSearchManager().startSearch();
-        });
-
-        actions.put(Actions.TOGGLE_SEARCH, (BaseAction) () -> {
-            sidePaneManager.toggle("search");
-            boolean on = sidePaneManager.isComponentVisible("search");
-            frame.searchToggle.setSelected(on);
-            if (on) {
-                frame.getSearchManager().startSearch();
-            }
-        });
-
-        actions.put(Actions.INC_SEARCH, (BaseAction) () -> {
-            sidePaneManager.show("search");
-            frame.searchToggle.setSelected(true);
-            frame.getSearchManager().startIncrementalSearch();
-        });
+        actions.put(Actions.SEARCH, (BaseAction) searchBar::focus);
 
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, (BaseAction) () -> {
@@ -1425,6 +1413,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return null;
     }
 
+    public SearchBar getSearchBar() {
+        return searchBar;
+    }
+
     /**
      * This listener is used to add a new entry to a group (or a set of groups) in case the Group View is selected and
      * one or more groups are marked
@@ -1534,8 +1526,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         database.addDatabaseChangeListener(eventList);
         database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
-        groupFilterList = new FilterList<>(eventList.getTheList(), NoSearchMatcher.INSTANCE);
-        searchFilterList = new FilterList<>(groupFilterList, NoSearchMatcher.INSTANCE);
+        groupFilterList = new FilterList<>(eventList.getTheList(), EverythingMatcher.INSTANCE);
+        searchFilterList = new FilterList<>(groupFilterList, EverythingMatcher.INSTANCE);
         tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
         mainTable = new MainTable(tableFormat, searchFilterList, frame, this);
@@ -1691,7 +1683,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // otherwise set the bottom component to null.
         if (mode == BasePanel.SHOWING_PREVIEW) {
             mode = BasePanel.SHOWING_NOTHING;
-            int row = mainTable.findEntry(currentPreview.entry);
+            int row = mainTable.findEntry(currentPreview.getEntry());
             if (row >= 0) {
                 mainTable.setRowSelectionInterval(row, row);
             }
@@ -1732,7 +1724,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void updateSearchManager() {
-        frame.getSearchManager().setAutoCompleteListener(searchCompleteListener);
+        searchBar.setAutoCompleter(searchAutoCompleter);
     }
 
     private void instantiateSearchAutoCompleter() {
@@ -1740,29 +1732,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         for (BibtexEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);
         }
-        searchCompleteListener = new AutoCompleteListener(searchAutoCompleter);
-        searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
     }
-
-    /*
-    public void refreshTable() {
-        //System.out.println("hiding="+hidingNonHits+"\tlastHits="+lastSearchHits);
-        // This method is called by EntryTypeForm when a field value is
-        // stored. The table is scheduled for repaint.
-        entryTable.assureNotEditing();
-        //entryTable.invalidate();
-        BibtexEntry[] bes = entryTable.getSelectedEntries();
-    if (hidingNonHits)
-        tableModel.update(lastSearchHits);
-    else
-        tableModel.update();
-    //tableModel.remap();
-        if ((bes != null) && (bes.length > 0))
-            selectEntries(bes, 0);
-
-    //long toc = System.currentTimeMillis();
-    //	LOGGER.debug("Refresh took: "+(toc-tic)+" ms");
-    } */
 
     public void updatePreamble() {
         if (preambleEditor != null) {
@@ -1805,14 +1775,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             return ((EntryEditor) c).lastSourceAccepted();
         } else {
             return true;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public void moveFocusToEntryEditor() {
-        Component c = splitPane.getBottomComponent();
-        if (c instanceof EntryEditor) {
-            new FocusRequester(c);
         }
     }
 
@@ -1879,8 +1841,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else {
             splitPane.setDividerLocation(
                     splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
-            //new FocusRequester(form);
-            //form.requestFocus();
         }
 
         newEntryShowing(be);
@@ -1977,16 +1937,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * given focus afterwards.
      */
     public void highlightEntry(final BibtexEntry be) {
-        //SwingUtilities.invokeLater(new Thread() {
-        //     public void run() {
         final int row = mainTable.findEntry(be);
         if (row >= 0) {
             mainTable.setRowSelectionInterval(row, row);
             //entryTable.setActiveRow(row);
             mainTable.ensureVisible(row);
         }
-        //     }
-        //});
     }
 
     /**
@@ -2001,33 +1957,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 splitPane.getHeight() - splitPane.getDividerLocation());
         selectionListener.entryEditorClosing(editor);
     }
-
-    /**
-     * This method selects the given enties. If an entryEditor is shown, it is given focus afterwards.
-     */
-    /*public void selectEntries(final BibtexEntry[] bes, final int toScrollTo) {
-
-        SwingUtilities.invokeLater(new Thread() {
-             public void run() {
-                 int rowToScrollTo = 0;
-                 entryTable.revalidate();
-                 entryTable.clearSelection();
-                 loop: for (int i=0; i<bes.length; i++) {
-                    if (bes[i] == null)
-                        continue loop;
-                    int row = tableModel.getNumberFromName(bes[i].getId());
-                    if (i==toScrollTo)
-                    rowToScrollTo = row;
-                    if (row >= 0)
-                        entryTable.addRowSelectionIntervalQuietly(row, row);
-                 }
-                 entryTable.ensureVisible(rowToScrollTo);
-                 Component comp = splitPane.getBottomComponent();
-                 //if (comp instanceof EntryEditor)
-                 //    comp.requestFocus();
-             }
-        });
-    } */
 
     /**
      * Closes the entry editor if it is showing the given entry.
@@ -2136,57 +2065,46 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.scrollToCenter(pos, 0);
     }
 
-    /* *
-     * Selects all entries with a non-zero value in the field
-     * @param field <code>String</code> field name.
-     */
-    /*    public void selectResults(String field) {
-          LinkedList intervals = new LinkedList();
-          int prevStart = -1, prevToSel = 0;
-          // First we build a list of intervals to select, without touching the table.
-          for (int i = 0; i < entryTable.getRowCount(); i++) {
-            String value = (String) (database.getEntryById
-                                     (tableModel.getIdForRow(i)))
-                .getField(field);
-            if ( (value != null) && !value.equals("0")) {
-              if (prevStart < 0)
-                prevStart = i;
-              prevToSel = i;
+    public StartStopListAction<BibtexEntry> getFilterSearchToggle() {
+        return filterSearchToggle;
+    }
+
+    public StartStopListAction<BibtexEntry> getFilterGroupToggle() {
+        return filterGroupToggle;
+    }
+
+    public static class StartStopListAction<E> {
+        private final FilterList<E> list;
+        private final Matcher<E> active;
+        private final Matcher<E> inactive;
+
+        private boolean isActive = false;
+
+        private StartStopListAction(FilterList<E> list, Matcher<E> active, Matcher<E> inactive) {
+            this.list = list;
+            this.active = active;
+            this.inactive = inactive;
+        }
+
+        public void start() {
+            if(!isActive) {
+                list.setMatcher(active);
+                isActive = true;
             }
-            else if (prevStart >= 0) {
-              intervals.add(new int[] {prevStart, prevToSel});
-              prevStart = -1;
+        }
+
+        public void stop() {
+            if(isActive) {
+                list.setMatcher(inactive);
+                isActive = false;
             }
-          }
-          // Then select those intervals, if any.
-          if (intervals.size() > 0) {
-            entryTable.setSelectionListenerEnabled(false);
-            entryTable.clearSelection();
-            for (Iterator i=intervals.iterator(); i.hasNext();) {
-              int[] interval = (int[])i.next();
-              entryTable.addRowSelectionInterval(interval[0], interval[1]);
-            }
-            entryTable.setSelectionListenerEnabled(true);
-          }
-      */
+        }
 
-    public void setSearchMatcher(SearchMatcher matcher) {
-        searchFilterList.setMatcher(matcher);
-        showingSearch = true;
+        public boolean isActive() {
+            return isActive;
+        }
     }
 
-    public void setGroupMatcher(Matcher<BibtexEntry> matcher) {
-        groupFilterList.setMatcher(matcher);
-    }
-
-    public void stopShowingSearchResults() {
-        searchFilterList.setMatcher(NoSearchMatcher.INSTANCE);
-        showingSearch = false;
-    }
-
-    public void stopShowingGroup() {
-        groupFilterList.setMatcher(NoSearchMatcher.INSTANCE);
-    }
 
     /**
      * Query whether this BasePanel is in the mode where a float search result is shown.
@@ -2194,16 +2112,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @return true if showing float search, false otherwise.
      */
     public boolean isShowingFloatSearch() {
-        return mainTable.isShowingFloatSearch();
+        return mainTable.isFloatSearchActive();
     }
 
-    /**
-     * Query whether this BasePanel is in the mode where a filter search result is shown.
-     *
-     * @return true if showing filter search, false otherwise.
-     */
-    public boolean isShowingFilterSearch() {
-        return showingSearch;
+    public void stopShowingFloatSearch() {
+        mainTable.stopShowingFloatSearch();
+    }
+
+    public void startShowingFloatSearch() {
+        mainTable.showFloatSearch();
     }
 
     public BibtexDatabase getDatabase() {

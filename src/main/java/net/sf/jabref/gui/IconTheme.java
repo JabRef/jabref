@@ -76,7 +76,7 @@ public class IconTheme {
         MARK_ENTRIES("\uf1a6") /*css: bookmark */,
         UNMARK_ENTRIES("\uf1a9") /*css: bookmark-outline */,
         REFRESH("\uf4ef") /*css: refresh */,
-        DELETE("\uf28d") /*css: delete */,
+        DELETE_ENTRY("\uf28d") /*css: delete */,
         SEARCH("\uf401") /*css: magnify */,
         PREFERENCES("\uf529") /*css: settings */,
         HELP("\uf396") /*css: help-circle*/,
@@ -140,6 +140,8 @@ public class IconTheme {
         FILE_MULTIPLE("\uf2ed"), /*css: file-multiple */
         KEY_BINDINGS("\uf3c6"), /*css: keyboard */
         FIND_DUPLICATES("\uf23e"), /*css: code-equal */
+
+        OPEN_IN_NEW_WINDOW("\uf47b"), /*css: open-in-new */
 
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
@@ -223,6 +225,11 @@ public class IconTheme {
         public FontBasedIcon createSmallIcon() {
             return new FontBasedIcon(this.iconCode, this.iconColor, IconTheme.SMALL_SIZE);
         }
+
+        public FontBasedIcon createWithNewColor(Color newColor) {
+            return new FontBasedIcon(this.iconCode, newColor, this.size);
+        }
+
     }
 
 
