@@ -236,7 +236,10 @@ public class FileActions {
 
                 if (write) {
                     bibtexEntryWriter.write(entry, writer);
-                    writer.write(Globals.NEWLINE);
+                    //only append newline if the entry has changed
+                    if(!entry.shouldUseCustomSerialization()){
+                        writer.write(Globals.NEWLINE);
+                    }
                 }
             }
 
@@ -414,7 +417,10 @@ public class FileActions {
                 }
 
                 bibtexEntryWriter.write(be, fw);
-                fw.write(Globals.NEWLINE);
+                //only append newline if the entry has changed
+                if(!be.shouldUseCustomSerialization()){
+                    fw.write(Globals.NEWLINE);
+                }
             }
 
             // Write meta data.
