@@ -1168,15 +1168,14 @@ public class JabRefPreferences {
      * Stores new key bindings into Preferences, provided they actually differ from the old ones.
      */
     public void setNewKeyBindings(HashMap<String, String> newBindings) {
-        if (!newBindings.equals(keyBinds)) {
+        if (!newBindings.equals(keyBinds.getKeyBindings())) {
             // This confirms that the bindings have actually changed.
             String[] bindNames = new String[newBindings.size()];
             String[] bindings = new String[newBindings.size()];
             int index = 0;
-            for (String nm : newBindings.keySet()) {
-                String bnd = newBindings.get(nm);
-                bindNames[index] = nm;
-                bindings[index] = bnd;
+            for (Map.Entry<String, String> keyBinding : newBindings.entrySet()) {
+                bindNames[index] = keyBinding.getKey();
+                bindings[index] = keyBinding.getValue();
                 index++;
             }
             putStringArray("bindNames", bindNames);

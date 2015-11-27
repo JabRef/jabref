@@ -17,8 +17,6 @@ package net.sf.jabref.gui;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
-
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeListener;
@@ -30,16 +28,11 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
 
     private final EventList<BibtexEntry> list;
 
-    String[] idArray;
-    BibtexEntry[] entryArray;
-
-
     public GlazedEntrySorter(Map<String, BibtexEntry> entries) {
         list = new BasicEventList<>();
         list.getReadWriteLock().writeLock().lock();
-        Set<String> keySet = entries.keySet();
-        for (String aKeySet : keySet) {
-            list.add(entries.get(aKeySet));
+        for (Map.Entry<String, BibtexEntry> entry : entries.entrySet()) {
+            list.add(entry.getValue());
         }
 
         // Sort the list so it is ordered according to creation (or read) order

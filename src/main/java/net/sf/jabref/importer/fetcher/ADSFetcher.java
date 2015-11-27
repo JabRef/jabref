@@ -140,7 +140,7 @@ public class ADSFetcher implements EntryFetcher {
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLStreamReader reader = factory.createXMLStreamReader(bis);
             boolean isAbstract = false;
-            String abstractText = "";
+            StringBuilder abstractSB = new StringBuilder();
             while (reader.hasNext()) {
                 reader.next();
                 if (reader.isStartElement() &&
@@ -148,12 +148,13 @@ public class ADSFetcher implements EntryFetcher {
                     isAbstract = true;
                 }
                 if (isAbstract && reader.isCharacters()) {
-                    abstractText = abstractText + reader.getText();
+                    abstractSB.append(reader.getText());
                 }
                 if (isAbstract && reader.isEndElement()) {
                     isAbstract = false;
                 }
             }
+            String abstractText = abstractSB.toString();
             abstractText = abstractText.replace("\n", " ");
             entry.setField("abstract", abstractText);
         } catch (XMLStreamException e) {

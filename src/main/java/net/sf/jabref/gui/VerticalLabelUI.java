@@ -124,9 +124,9 @@ public class VerticalLabelUI extends BasicLabelUI {
         text = super.layoutCL(label, fontMetrics, text, icon,
                 verticalViewR, verticalIconR, verticalTextR);
 
-        viewR = copyRectangle(verticalViewR, viewR);
-        iconR = copyRectangle(verticalIconR, iconR);
-        textR = copyRectangle(verticalTextR, textR);
+        copyRectangle(verticalViewR, viewR);
+        copyRectangle(verticalIconR, iconR);
+        copyRectangle(verticalTextR, textR);
         return text;
     }
 
@@ -190,14 +190,13 @@ public class VerticalLabelUI extends BasicLabelUI {
         return to;
     }
 
-    private static Rectangle copyRectangle(Rectangle from, Rectangle to) {
+    private static void copyRectangle(Rectangle from, Rectangle to) {
         if (to == null) {
-            to = new Rectangle();
+            return;
         }
         to.x = from.x;
         to.y = from.y;
         to.width = from.width;
         to.height = from.height;
-        return to;
     }
 }

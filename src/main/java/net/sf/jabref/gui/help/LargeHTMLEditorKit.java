@@ -56,14 +56,14 @@ class LargeHTMLEditorKit extends HTMLEditorKit {
                         return super.create(elem);
                     }
                     return new HTMLParagraphView(elem);
-                } else if (kind == HTML.Tag.P ||
-                        kind == HTML.Tag.H1 ||
-                        kind == HTML.Tag.H2 ||
-                        kind == HTML.Tag.H3 ||
-                        kind == HTML.Tag.H4 ||
-                        kind == HTML.Tag.H5 ||
-                        kind == HTML.Tag.H6 ||
-                        kind == HTML.Tag.DT) {
+                } else if ((kind == HTML.Tag.P) ||
+                        (kind == HTML.Tag.H1) ||
+                        (kind == HTML.Tag.H2) ||
+                        (kind == HTML.Tag.H3) ||
+                        (kind == HTML.Tag.H4) ||
+                        (kind == HTML.Tag.H5) ||
+                        (kind == HTML.Tag.H6) ||
+                        (kind == HTML.Tag.DT)) {
                     // paragraph
                     return new HTMLParagraphView(elem);
                 }

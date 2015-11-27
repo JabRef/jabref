@@ -27,6 +27,9 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexString;
@@ -61,6 +64,7 @@ public abstract class DBExporter extends DBImporterExporter {
     DBStrings dbStrings;
     private final ArrayList<String> dbNames = new ArrayList<>();
 
+    private static final Log LOGGER = LogFactory.getLog(DBExporter.class);
 
     /**
      * Method for the exportDatabase methods.
@@ -179,13 +183,13 @@ public abstract class DBExporter extends DBImporterExporter {
      */
 
     private void populateEntryTypesTable(Object out) throws SQLException {
-        String query;
+        StringBuilder querySB = new StringBuilder();
         ArrayList<String> fieldRequirement = new ArrayList<>();
 
         ArrayList<String> existentTypes = new ArrayList<>();
         if (out instanceof Connection) {
-            try (ResultSet rs = ((Statement) SQLUtil.processQueryWithResults(out, "SELECT label FROM entry_types"))
-                    .getResultSet()) {
+            try (Statement sm = (Statement) SQLUtil.processQueryWithResults(out, "SELECT label FROM entry_types");
+                    ResultSet rs = sm.getResultSet()) {
                 while (rs.next()) {
                     existentTypes.add(rs.getString(1));
                 }
@@ -202,22 +206,22 @@ public abstract class DBExporter extends DBImporterExporter {
             fieldRequirement = SQLUtil.setFieldRequirement(SQLUtil.getAllFields(), reqFields, optFields, utiFields,
                     fieldRequirement);
             if (!existentTypes.contains(val.getName().toLowerCase())) {
-                String insert = "INSERT INTO entry_types (label, " + fieldStr + ") VALUES (";
-                query = insert + '\'' + val.getName().toLowerCase() + '\'';
+                querySB.append("INSERT INTO entry_types (label, " + fieldStr + ") VALUES (");
+                querySB.append('\'' + val.getName().toLowerCase() + '\'');
                 for (String aFieldRequirement : fieldRequirement) {
-                    query = query + ", '" + aFieldRequirement + '\'';
+                    querySB.append(", '" + aFieldRequirement + '\'');
                 }
-                query = query + ");";
+                querySB.append(");");
             } else {
                 String[] update = fieldStr.split(",");
-                query = "UPDATE entry_types SET \n";
+                querySB.append("UPDATE entry_types SET \n");
                 for (int i = 0; i < fieldRequirement.size(); i++) {
-                    query += update[i] + "='" + fieldRequirement.get(i) + "',";
+                    querySB.append(update[i] + "='" + fieldRequirement.get(i) + "',");
                 }
-                query = query.substring(0, query.lastIndexOf(","));
-                query += " WHERE label='" + val.getName().toLowerCase() + '\'';
+                querySB.delete(querySB.lastIndexOf(","), querySB.length());
+                querySB.append(" WHERE label='" + val.getName().toLowerCase() + '\'');
             }
-            SQLUtil.processQuery(out, query);
+            SQLUtil.processQuery(out, querySB.toString());
         }
     }
 
@@ -295,8 +299,8 @@ public abstract class DBExporter extends DBImporterExporter {
     private static void populateGroupTypesTable(Object out) throws SQLException {
         int quantity = 0;
         if (out instanceof Connection) {
-            try (ResultSet res = ((Statement) SQLUtil.processQueryWithResults(out,
-                    "SELECT COUNT(*) AS amount FROM group_types")).getResultSet()) {
+            try (Statement sm = (Statement) SQLUtil.processQueryWithResults(out,
+                    "SELECT COUNT(*) AS amount FROM group_types"); ResultSet res = sm.getResultSet()) {
                 res.next();
                 quantity = res.getInt("amount");
                 res.getStatement().close();
@@ -367,12 +371,15 @@ public abstract class DBExporter extends DBImporterExporter {
         // open output file
         File outfile = new File(file);
         if (outfile.exists()) {
-            outfile.delete();
-        }
-        try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outfile))) {
-            try (PrintStream fout = new PrintStream(writer)) {
-                performExport(database, metaData, keySet, fout, "file");
+            if (!outfile.delete()) {
+                LOGGER.warn("Cannot delete/overwrite file.");
+                return;
             }
+
+        }
+        try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outfile));
+                PrintStream fout = new PrintStream(writer)) {
+            performExport(database, metaData, keySet, fout, "file");
         }
     }
 

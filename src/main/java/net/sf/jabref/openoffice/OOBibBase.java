@@ -49,6 +49,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
  */
@@ -87,6 +90,8 @@ class OOBibBase {
     private final HashMap<String, String> uniquefiers = new HashMap<>();
 
     private String[] sortedReferenceMarks;
+
+    private static final Log LOGGER = LogFactory.getLog(OOBibBase.class);
 
 
     public OOBibBase(String pathToOO, boolean atEnd) throws Exception {
@@ -159,19 +164,18 @@ class OOBibBase {
 
         ClassLoader loader = ClassLoader.getSystemClassLoader();
         if (loader instanceof URLClassLoader) {
-            URLClassLoader cl = (URLClassLoader) loader;
-            Class<URLClassLoader> sysclass = URLClassLoader.class;
-            try {
+            try (URLClassLoader cl = (URLClassLoader) loader) {
+                Class<URLClassLoader> sysclass = URLClassLoader.class;
 
                 Method method = sysclass.getDeclaredMethod("addURL", URL.class);
                 method.setAccessible(true);
                 method.invoke(cl, new File(pathToExecutable).toURI().toURL());
             } catch (Throwable t) {
-                t.printStackTrace();
-                throw new IOException("Error, could not add URL to system classloader");
+                LOGGER.error("Error, could not add URL to system classloader", t);
+                throw new IOException("Error, could not add URL to system classloader", t);
             }
         } else {
-            System.out.println("Error occured, URLClassLoader expected but " +
+            LOGGER.error("Error occured, URLClassLoader expected but " +
                     loader.getClass() + " received. Could not continue.");
         }
 
