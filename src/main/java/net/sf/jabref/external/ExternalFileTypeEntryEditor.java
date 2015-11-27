@@ -258,7 +258,7 @@ public class ExternalFileTypeEntryEditor {
     }
 
 
-    class BrowseListener implements ActionListener {
+    static class BrowseListener implements ActionListener {
 
         private final JTextField comp;
 

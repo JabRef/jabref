@@ -130,7 +130,7 @@ class DragDropPane extends JTabbedPane {
      * A glass panel which sets the marker for Dragging of Tabs.
      * 
      */
-    class MarkerPane extends JPanel {
+    static class MarkerPane extends JPanel {
 
         private Point locationP;
         private final IconTheme.JabRefIcon moveTabArrow;

@@ -125,7 +125,7 @@ class CitationManager {
     }
 
 
-    class CitEntry implements Comparable<CitEntry> {
+    static class CitEntry implements Comparable<CitEntry> {
 
         final String refMarkName;
         String pageInfo;
@@ -169,7 +169,7 @@ class CitationManager {
         }
     }
 
-    private class CitEntryFormat implements TableFormat<CitEntry> {
+    private static class CitEntryFormat implements TableFormat<CitEntry> {
 
         @Override
         public int getColumnCount() {

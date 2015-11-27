@@ -38,7 +38,7 @@ class LargeHTMLEditorKit extends HTMLEditorKit {
     }
 
 
-    private class MyViewFactory extends HTMLFactory {
+    private static class MyViewFactory extends HTMLFactory {
 
         @Override
         public View create(Element elem) {

@@ -265,7 +265,7 @@ public class ExternalFileTypeEditor extends JDialog {
         }
     }
 
-    class IconRenderer implements TableCellRenderer {
+    static class IconRenderer implements TableCellRenderer {
 
         final JLabel lab = new JLabel();
 

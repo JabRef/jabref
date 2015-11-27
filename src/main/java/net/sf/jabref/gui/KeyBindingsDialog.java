@@ -231,7 +231,7 @@ class KeyBindingsDialog extends JDialog {
 
 
     @SuppressWarnings("serial")
-    private class KeystrokeTable extends JTable {
+    private static class KeystrokeTable extends JTable {
 
         public KeystrokeTable() {
             super();
@@ -248,7 +248,7 @@ class KeyBindingsDialog extends JDialog {
     }
 
     @SuppressWarnings("serial")
-    private class KeystrokeTableModel extends AbstractTableModel {
+    private static class KeystrokeTableModel extends AbstractTableModel {
 
         final String[][] data;
 

@@ -40,7 +40,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class MedlineFetcher implements EntryFetcher {
 
-    class SearchResult {
+    static class SearchResult {
 
         public int count;
 

@@ -600,7 +600,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         }
     }
 
-    class MenuHeaderAction extends BasicAction {
+    static class MenuHeaderAction extends BasicAction {
         public MenuHeaderAction() {
             super(Localization.lang("Edit"));
             this.setEnabled(false);

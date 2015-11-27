@@ -57,7 +57,7 @@ public class VM implements Warn {
     private static final Log LOGGER = LogFactory.getLog(VM.class);
 
 
-    public class Identifier {
+    public static class Identifier {
 
         public final String name;
 
@@ -71,7 +71,7 @@ public class VM implements Warn {
         }
     }
 
-    public class Variable {
+    public static class Variable {
 
         public final String name;
 
@@ -1348,7 +1348,7 @@ public class VM implements Warn {
     }
 
 
-    public class BstEntry {
+    public static class BstEntry {
 
         public BstEntry(BibtexEntry e) {
             this.entry = e;

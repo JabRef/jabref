@@ -219,7 +219,7 @@ class TextAnalyzer {
     }
 
 
-    private class Substring implements Comparable<Substring> {
+    private static class Substring implements Comparable<Substring> {
 
         final int begin;
         final int end;
