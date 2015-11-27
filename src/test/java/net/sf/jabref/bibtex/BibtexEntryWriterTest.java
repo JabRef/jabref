@@ -69,7 +69,7 @@ public class BibtexEntryWriterTest {
                 "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
                 "  Note                     = {some note}," + Globals.NEWLINE +
                 "  Number                   = {1}" + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+                "}";
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
@@ -98,7 +98,7 @@ public class BibtexEntryWriterTest {
                 "  Author                   = {Foo Bar}," + Globals.NEWLINE +
                 "  Month                    = mar," + Globals.NEWLINE +
                 "  Number                   = {1}" + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+                "}";
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
