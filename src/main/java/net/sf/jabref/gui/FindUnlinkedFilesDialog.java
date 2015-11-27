@@ -781,7 +781,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonScan.setToolTipText(Localization.lang("Searches the selected directory for unlinked files."));
         buttonApply = new JButton(Localization.lang("Apply"));
         buttonApply.setMnemonic('I');
-        buttonApply.setToolTipText(Localization.lang("Starts the import of bibtex entries."));
+        buttonApply.setToolTipText(Localization.lang("Starts the import of BibTeX entries."));
         buttonClose = new JButton(Localization.lang("Close"));
         buttonClose.setToolTipText(Localization.lang("Leave this dialog."));
         buttonClose.setMnemonic('C');

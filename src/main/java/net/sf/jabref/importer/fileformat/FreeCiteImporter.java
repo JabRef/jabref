@@ -94,7 +94,7 @@ public class FreeCiteImporter extends ImportFormat {
             writer.write(data);
             writer.flush();
         } catch (IOException e) {
-            status.showMessage(Localization.lang("Unable to connect to freecite online service."));
+            status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
             return null;
         } catch (Exception ex) {
             ex.printStackTrace();

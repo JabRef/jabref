@@ -458,9 +458,9 @@ public class JabRef {
             }
 
             if (usageMsg) {
-                System.out.println(Localization.lang("no base-bibtex-file specified"));
+                System.out.println(Localization.lang("no base-BibTeX-file specified")+"!");
                 System.out.println(Localization.lang("usage") + " :");
-                System.out.println("jabref --aux infile[.aux],outfile[.bib] base-bibtex-file");
+                System.out.println("jabref --aux infile[.aux],outfile[.bib] base-BibTeX-file");
             }
         }
 

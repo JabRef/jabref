@@ -60,7 +60,7 @@ public class ErrorConsoleAction extends AbstractAction {
 
         addTextArea(tabbed, Localization.lang("Output"), streamEavesdropper.getOutput());
         addTextArea(tabbed, Localization.lang("Exceptions"), streamEavesdropper.getErrorMessages(),
-                Localization.lang("No exceptions have ocurred."));
+                Localization.lang("No exceptions have occurred."));
         addTextArea(tabbed, Localization.lang("Log"), logHandler.getLog());
 
         tabbed.setPreferredSize(new Dimension(500, 500));
