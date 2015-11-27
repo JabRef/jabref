@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
@@ -83,6 +84,7 @@ public class BibtexParser {
         entryTypeNames.addAll(BibtexEntryTypes.ENTRY_TYPE_NAMES);
         entryTypeNames.addAll(IEEETranEntryTypes.ENTRY_TYPE_NAMES);
         entryTypeNames.add(CustomEntryType.ENTRYTYPE_FLAG);
+        entryTypeNames = entryTypeNames.parallelStream().map(String::toLowerCase).collect(Collectors.toList());
 
         preProcessReader();
     }
@@ -117,8 +119,9 @@ public class BibtexParser {
     }
 
     private boolean looksLikeEntry(String text) {
-        for(String typeToken: entryTypeNames){
-            if(text.startsWith(typeToken)){
+        String lowerCaseText = text.toLowerCase();
+        for (String typeToken : entryTypeNames) {
+            if (lowerCaseText.startsWith(typeToken)) {
                 return true;
             }
         }
