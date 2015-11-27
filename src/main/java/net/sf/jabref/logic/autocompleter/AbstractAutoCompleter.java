@@ -131,6 +131,6 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
 
     @Override
     public String getAutoCompleteText(String item) {
-        return item.toString();
+        return item;
     }
 }
