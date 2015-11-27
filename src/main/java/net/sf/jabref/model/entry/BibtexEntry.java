@@ -24,7 +24,6 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -495,7 +494,8 @@ public class BibtexEntry {
         return year;
     }
 
-    public void putKeywords(ArrayList<String> keywords) {
+    public void putKeywords(List<String> keywords) {
+        Objects.requireNonNull(keywords);
         // Set Keyword Field
         String oldValue = this.getField("keywords");
         String newValue;
@@ -518,7 +518,7 @@ public class BibtexEntry {
      * @param keyword Keyword to add
      */
     public void addKeyword(String keyword) {
-        ArrayList<String> keywords = this.getSeparatedKeywords();
+        List<String> keywords = this.getSeparatedKeywords();
         Boolean duplicate = false;
 
         if ((keyword == null) || (keyword.length() == 0)) {
@@ -543,7 +543,7 @@ public class BibtexEntry {
      *
      * @param keywords Keywords to add
      */
-    public void addKeywords(ArrayList<String> keywords) {
+    public void addKeywords(List<String> keywords) {
         if (keywords != null) {
             for (String keyword : keywords) {
                 this.addKeyword(keyword);
@@ -551,7 +551,7 @@ public class BibtexEntry {
         }
     }
 
-    public ArrayList<String> getSeparatedKeywords() {
+    public List<String> getSeparatedKeywords() {
         return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField("keywords"));
     }
 }

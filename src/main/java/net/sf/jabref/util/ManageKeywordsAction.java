@@ -20,9 +20,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
@@ -373,7 +373,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         BibtexEntry[] entries = bp.getSelectedEntries();
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibtexEntry entry : entries) {
-            ArrayList<String> separatedKeywords = entry.getSeparatedKeywords();
+            List<String> separatedKeywords = entry.getSeparatedKeywords();
 
             // we "intercept" with a treeset
             // pro: no duplicates
@@ -419,7 +419,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         if (mergeKeywords.isSelected()) {
             for (BibtexEntry entry : entries) {
-                ArrayList<String> separatedKeywords = entry.getSeparatedKeywords();
+                List<String> separatedKeywords = entry.getSeparatedKeywords();
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else {
@@ -427,7 +427,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             // all keywords from first entry have to be added
             BibtexEntry firstEntry = entries[0];
-            ArrayList<String> separatedKeywords = firstEntry.getSeparatedKeywords();
+            List<String> separatedKeywords = firstEntry.getSeparatedKeywords();
             sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
 
             // for the remaining entries, intersection has to be used

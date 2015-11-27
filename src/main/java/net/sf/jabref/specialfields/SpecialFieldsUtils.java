@@ -91,7 +91,7 @@ public class SpecialFieldsUtils {
         if (!SpecialFieldsUtils.keywordSyncEnabled()) {
             return;
         }
-        ArrayList<String> keywordList = be.getSeparatedKeywords();
+        List<String> keywordList = be.getSeparatedKeywords();
         List<String> values = e.getKeyWords();
 
         int foundPos = -1;

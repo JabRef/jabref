@@ -88,6 +88,7 @@ public class BibtexEntryTests {
         Assert.assertFalse(e.hasCiteKey());
     }
 
+    @Test
     public void testGetPublicationDate() {
 
         Assert.assertEquals("2003-02",
@@ -120,6 +121,8 @@ public class BibtexEntryTests {
         String[] expected = {"Foo",  "Bar"};
         Assert.assertArrayEquals(expected, be.getSeparatedKeywords().toArray());
 
+        List<String> kw = be.getSeparatedKeywords();
+
         be.addKeyword("FooBar");
         String[] expected2 = {"Foo", "Bar", "FooBar"};
         Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
@@ -145,6 +148,8 @@ public class BibtexEntryTests {
         Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());
         be2.addKeywords(be.getSeparatedKeywords());
         Assert.assertArrayEquals(expected2, be2.getSeparatedKeywords().toArray());
+        be2.putKeywords(kw);
+        Assert.assertArrayEquals(expected, be2.getSeparatedKeywords().toArray());
     }
 
     @Test
