@@ -17,14 +17,16 @@ package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.SearchTextListener;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.logic.search.SearchTextListener;
 import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 
 import javax.swing.AbstractAction;
@@ -39,7 +41,9 @@ import javax.swing.undo.UndoManager;
 
 public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
 
-    private ArrayList<String> wordsToHighlight;
+    private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
+
+    private List<String> wordsToHighlight;
 
     private UndoManager undo;
 
@@ -68,13 +72,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         Document doc = getDocument();
 
         // Listen for undo and redo events
-        doc.addUndoableEditListener(new UndoableEditListener() {
-
-            @Override
-            public void undoableEditHappened(UndoableEditEvent evt) {
-                undo.addEdit(evt.getEdit());
-            }
-        });
+        doc.addUndoableEditListener(evt -> undo.addEdit(evt.getEdit()));
 
         // Create an undo action and add it to the text component
         getActionMap().put("Undo", new AbstractAction("Undo") {
@@ -138,7 +136,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
      *
      * @param words to highlight
      */
-    private void highLight(ArrayList<String> words) {
+    private void highLight(List<String> words) {
         // highlight all characters that appear in charsToHighlight
         Highlighter highlighter = getHighlighter();
         highlighter.removeAllHighlights();
@@ -158,7 +156,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
                 highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
             } catch (BadLocationException ble) {
                 // should not occur if matcher works right
-                System.out.println(ble);
+                LOGGER.warn("Highlighting not possible, bad location", ble);
             }
         }
 
@@ -167,31 +165,16 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
     @Override
     public void setText(String text) {
         super.setText(text);
-        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
-            highLight(wordsToHighlight);
-        }
+        highLight(wordsToHighlight);
         if (undo != null) {
             undo.discardAllEdits();
         }
     }
 
     @Override
-    public void searchText(ArrayList<String> words) {
-        // words have to be stored in class variable as
-        // setText() makes use of them
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
-            this.wordsToHighlight = words;
-            highLight(words);
-        } else {
-            if (this.wordsToHighlight != null) {
-                // setting of "highLightWords" seems to have changed.
-                // clear all highlights and remember the clearing (by wordsToHighlight = null)
-                this.wordsToHighlight = null;
-                highLight(null);
-            }
-        }
-
+    public void searchText(List<String> words) {
+        this.wordsToHighlight = words;
+        highLight(words);
     }
 
 }

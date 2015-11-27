@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.search;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -42,6 +42,15 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.gui.TransferableBibtexEntry;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.model.entry.BibtexEntry;

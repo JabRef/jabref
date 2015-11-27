@@ -45,10 +45,10 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
-import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -232,7 +232,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AutoCompleter autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
+        AutoCompleter<String> autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);

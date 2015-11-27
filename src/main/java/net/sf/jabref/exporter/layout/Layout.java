@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -36,7 +37,7 @@ public class Layout {
 
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
-    public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception {
+    public Layout(Vector<StringInt> parsedEntries, String classPrefix) {
         StringInt si;
         Vector<LayoutEntry> tmpEntries = new Vector<>(parsedEntries.size());
 
@@ -121,8 +122,7 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, ArrayList<String> wordsToHighlight)
-    {
+    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, List<String> wordsToHighlight) {
         StringBuilder sb = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {

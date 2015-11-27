@@ -33,7 +33,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -113,6 +119,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public SidePaneManager sidePaneManager;
 
     public JTabbedPane tabbedPane; // initialized at constructor
+    final String htmlPadding = "<html><div style='padding:2px 5px;'>";
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
@@ -235,7 +242,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /* References to the toggle buttons in the toolbar */
     // the groups interface
     public JToggleButton groupToggle;
-    public JToggleButton searchToggle;
     public JToggleButton previewToggle;
     public JToggleButton fetcherToggle;
 
@@ -319,14 +325,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Manage content selectors"));
     private final AbstractAction saveSessionAction = new SaveSessionAction();
     public final AbstractAction loadSessionAction = new LoadSessionAction();
-    private final AbstractAction incrementalSearch = new GeneralAction(Actions.INC_SEARCH,
-            Localization.menuTitle("Incremental search"), Localization.lang("Start incremental search"),
-            prefs.getKey(KeyBinds.INCREMENTAL_SEARCH));
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), prefs.getKey(KeyBinds.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
-    private final AbstractAction toggleSearch = new GeneralAction(Actions.TOGGLE_SEARCH,
-            Localization.menuTitle("Search"), Localization.lang("Toggle search panel"),
-            IconTheme.JabRefIcon.SEARCH.getIcon());
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY));
@@ -501,8 +501,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final List<Action> fetcherActions = new LinkedList<>();
 
-    private SearchManager searchManager;
-
     public GroupSelector groupSelector;
 
     // The action for adding a new entry of unspecified type.
@@ -616,7 +614,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 BasePanel bp = getCurrentBasePanel();
                 if (bp != null) {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-                    searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
                     previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
                     fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
                     Globals.focusListener.setFocused(bp.mainTable);
@@ -687,16 +684,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         GUIGlobals.helpDiag = this.helpDiag;
 
         groupSelector = new GroupSelector(this, sidePaneManager);
-        searchManager = new SearchManager(this, sidePaneManager);
+
         generalFetcher = new GeneralFetcher(sidePaneManager, this);
 
         sidePaneManager.register("groups", groupSelector);
-        sidePaneManager.register("search", searchManager);
-
-        // Show the search panel if it was visible at last shutdown:
-        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE)) {
-            sidePaneManager.show("search");
-        }
     }
 
     /**
@@ -768,7 +759,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
         prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
-        prefs.putBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE, sidePaneManager.isComponentVisible("search"));
         // Store divider location for side pane:
         int width = contentPane.getDividerLocation();
         if (width > 0) {
@@ -798,12 +788,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Clear autosave files:
         if (Globals.autoSaveManager != null) {
             Globals.autoSaveManager.clearAutoSaves();
-        }
-
-        // Let the search interface store changes to prefs.
-        // But which one? Let's use the one that is visible.
-        if (getCurrentBasePanel() != null) {
-            searchManager.updatePrefs();
         }
 
         prefs.flush();
@@ -886,7 +870,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         if (close) {
-
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (getBasePanelAt(i).isSaving()) {
                     // There is a database still being saved, so we need to wait.
@@ -959,6 +942,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         con.weighty = 1;
         gbl.setConstraints(contentPane, con);
         getContentPane().add(contentPane);
+
+        UIManager.put("TabbedPane.contentBorderInsets", new Insets(0,0,0,0));
+
         contentPane.setRightComponent(tabbedPane);
         contentPane.setLeftComponent(sidePaneManager.getPanel());
         sidePaneManager.updateView();
@@ -1065,7 +1051,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public void setTabTitle(JComponent comp, String title, String toolTip) {
         int index = getTabIndex(comp);
-        tabbedPane.setTitleAt(index, title);
+        tabbedPane.setTitleAt(index, htmlPadding + title);
         tabbedPane.setToolTipTextAt(index, toolTip);
     }
 
@@ -1244,7 +1230,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(edit);
 
         search.add(normalSearch);
-        search.add(incrementalSearch);
         search.add(replaceAll);
         search.add(massSetField);
         search.addSeparator();
@@ -1280,7 +1265,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(decreseFontSize);
         view.addSeparator();
         view.add(toggleToolbar);
-        view.add(toggleSearch);
         view.add(generalFetcher.getAction());
         view.add(toggleGroups);
         view.add(togglePreview);
@@ -1467,9 +1451,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             tlb.addSeparator();
         }
 
-        searchToggle = new JToggleButton(toggleSearch);
-        tlb.addJToogleButton(searchToggle);
-
         fetcherToggle = new JToggleButton(generalFetcher.getAction());
         tlb.addJToogleButton(fetcherToggle);
 
@@ -1518,7 +1499,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public void stopShowingSearchResults() {
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            getBasePanelAt(i).stopShowingSearchResults();
+            getBasePanelAt(i).getFilterSearchToggle().stop();
         }
     }
 
@@ -1532,8 +1513,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, deleteEntry, copy, paste, mark, unmark,
                 unmarkAll, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
-                toggleGroups, toggleSearch, makeKeyAction, normalSearch, mergeEntries, cleanupEntries,
-                exportToClipboard, incrementalSearch, replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
+                toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
+                replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
                 openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
@@ -2333,10 +2314,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     @Override
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
-    }
-
-    public SearchManager getSearchManager() {
-        return searchManager;
     }
 
 }

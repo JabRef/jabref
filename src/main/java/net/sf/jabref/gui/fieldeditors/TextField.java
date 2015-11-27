@@ -16,10 +16,10 @@
 package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -177,13 +177,7 @@ public class TextField extends JTextField implements FieldEditor {
         Document doc = getDocument();
 
         // Listen for undo and redo events
-        doc.addUndoableEditListener(new UndoableEditListener() {
-
-            @Override
-            public void undoableEditHappened(UndoableEditEvent evt) {
-                undo.addEdit(evt.getEdit());
-            }
-        });
+        doc.addUndoableEditListener(evt -> undo.addEdit(evt.getEdit()));
 
         // Create an undo action and add it to the text component
         getActionMap().put("Undo", new AbstractAction("Undo") {

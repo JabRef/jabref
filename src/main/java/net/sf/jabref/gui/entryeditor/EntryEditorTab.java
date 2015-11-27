@@ -31,6 +31,7 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.fieldeditors.TextField;
@@ -157,14 +158,14 @@ class EntryEditorTab {
                 defaultHeight = 0;
             } else {
                 fieldEditor = new TextArea(fields[i], null);
-                frame.getSearchManager().addSearchListener((TextArea) fieldEditor);
+                bPanel.getSearchBar().getSearchTextObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
-
+            
             JComponent extra = parent.getExtra(fields[i], fieldEditor);
 
             // Add autocompleter listener, if required for this field:
-            AutoCompleter autoCompleter = bPanel.getAutoCompleters().get(fields[i]);
+            AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(fields[i]);
             AutoCompleteListener autoCompleteListener = null;
             if (autoCompleter != null) {
                 autoCompleteListener = new AutoCompleteListener(autoCompleter);

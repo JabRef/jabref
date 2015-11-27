@@ -13,23 +13,22 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.logic.search.matchers;
 
-import java.util.ArrayList;
+import net.sf.jabref.model.entry.BibtexEntry;
+
+import ca.odell.glazedlists.matchers.Matcher;
 
 /**
- * Every Listener that wants to receive events from a search needs to
- * implement this interface
- * 
- * @author Ben
- * 
+ * Matcher that accepts all entries. Used for filtering when so search is
+ * active.
  */
-public interface SearchTextListener {
+public class EverythingMatcher implements Matcher<BibtexEntry> {
 
-    /**
-     * Array of words that were searched for
-     * 
-     * @param words null if nothing is searched for
-     */
-    void searchText(ArrayList<String> words);
+    public static final Matcher<BibtexEntry> INSTANCE = new EverythingMatcher();
+
+    @Override
+    public boolean matches(BibtexEntry object) {
+        return true;
+    }
 }

@@ -28,6 +28,16 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Feature: Merge information from both entries on duplication detection
  - Always use import inspection dialog on import from file
  - All duplicate whitespaces / tabs / newlines are now removed from non-multiline fields
+ - Improvements to search:
+   - Search bar is now at the top
+   - A summary of the search result is shown in textual form in the search bar
+   - The search text field changes its color based on the search result (red if nothing is found, green if at least one entry is found)
+   - Autocompletion suggestions are shown in a popup
+   - Search options are available via a drop-down list, this implements Feature Request #853
+   - "Clear search" button also clears search field, this implements Feature Request #601
+   - Every search is done automatically (live) as soon as the search text is changed
+   - Search is local by default. To do a global search, one has to do a local search and then this search can be done globally as well, opening a new window. 
+   - The local search results can be shown in a new window. 
  - Feature: Merge information from a DOI generated BibTex entry to an entry
  - Added more characters to HTML/Unicode converter
  - Feature: Push citations to Texmaker ([bug 318](https://sourceforge.net/p/jabref/bugs/318/), [bug 582](https://sourceforge.net/p/jabref/bugs/582/))
@@ -101,6 +111,10 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Remove support for key bindings per external application by allowing only the key binding "push to application" for the currently selected external application.
  - Remove "edit preamble" from toolbar
  - Remove support to the move-to-SysTray action
+ - Remove incremental search
+ - Remove option to disable autocompleters for search and make this always one
+ - Remove option to highlight matches and make this always one when not using regex or grammar-based search
+ 
  - Remove option Tools -> Open PDF or PS which is replaced by Tools -> Open File
 
 ## 2.80 - never released

@@ -39,14 +39,6 @@ public class HitOrMissComparator implements Comparator<BibtexEntry> {
             return 0;
         }
 
-        boolean hit1 = hitOrMiss.matches(o1);
-        boolean hit2 = hitOrMiss.matches(o2);
-
-        // TODO use Boolean.compareTo when converting to Java8
-        if (hit1 == hit2) {
-            return 0;
-        } else {
-            return hit1 ? -1 : 1;
-        }
+        return Boolean.compare(hitOrMiss.matches(o2), hitOrMiss.matches(o1));
     }
 }

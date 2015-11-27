@@ -18,6 +18,7 @@ package net.sf.jabref;
 import java.util.Collection;
 import java.util.Vector;
 
+import net.sf.jabref.logic.search.SearchQuery;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,11 +50,10 @@ class SearchManagerNoGUI {
             searchTerm = fieldYear();
         }
 
-        SearchRule searchRule = SearchRules.getSearchRuleByQuery(searchTerm,
-                Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
-                Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
+        SearchQuery searchQuery = new SearchQuery(searchTerm, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
 
-        if (!searchRule.validateSearchStrings(searchTerm)) {
+        if (!searchQuery.isValidQuery()) {
             LOGGER.warn("Search failed: illegal search expression");
             return base;
         }
@@ -61,7 +61,7 @@ class SearchManagerNoGUI {
         Collection<BibtexEntry> entries = database.getEntries();
         Vector<BibtexEntry> matchEntries = new Vector<>();
         for (BibtexEntry entry : entries) {
-            boolean hit = searchRule.applyRule(searchTerm, entry);
+            boolean hit = searchQuery.isMatch(entry);
             entry.setSearchHit(hit);
             if (hit) {
                 matchEntries.add(entry);
