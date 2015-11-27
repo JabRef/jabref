@@ -48,7 +48,7 @@ public class AutoSaveManager {
 
         TimerTask task = new AutoSaveTask();
         t = new Timer();
-        long interval = 60000 * Globals.prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL);
+        long interval = (long) 60000 * Globals.prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL);
         t.scheduleAtFixedRate(task, interval, interval);
     }
 

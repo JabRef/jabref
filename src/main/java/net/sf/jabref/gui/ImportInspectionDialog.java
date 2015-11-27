@@ -203,16 +203,12 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcon.DUPLICATE.getSmallIcon());
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
-    private final JLabel pdfLabel = new JLabel(IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
-    private final JLabel psLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
-    private final int DUPL_COL = 1;
-    private final int FILE_COL = 2;
-    private final int PDF_COL = -1;// 3,
-    private final int PS_COL = -2;// 4,
-    private final int URL_COL = 3;// 5,
-    private final int PAD = 4; // 6;
+    private static final int DUPL_COL = 1;
+    private static final int FILE_COL = 2;
+    private static final int URL_COL = 3;
+    private static final int PAD = 4;
 
 
     /**
@@ -948,7 +944,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     class TableClickListener implements MouseListener {
 
         public boolean isIconColumn(int col) {
-            return (col == FILE_COL) || (col == PDF_COL) || (col == PS_COL) || (col == URL_COL);
+            return (col == FILE_COL) || (col == URL_COL);
         }
 
         @Override
@@ -975,12 +971,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         break;
                     case URL_COL:
                         openExternalLink("url", e);
-                        break;
-                    case PDF_COL:
-                        openExternalLink("pdf", e);
-                        break;
-                    case PS_COL:
-                        openExternalLink("ps", e);
                         break;
                 }
             }
@@ -1266,15 +1256,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return;
             }
             final BibtexEntry entry = selectionModel.getSelected().get(0);
-            String bibtexKey = entry.getCiteKey();
-            if (bibtexKey == null) {
+            if (entry.getCiteKey() == null) {
                 int answer = JOptionPane.showConfirmDialog(frame,
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
                     generateKeySelectedEntry();
-                    bibtexKey = entry.getCiteKey();
                 } else {
                     return; // Can't go on without the bibtex key.
                 }
@@ -1405,10 +1393,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             comparators.clear();
             if (i == FILE_COL) {
                 comparators.add(new IconComparator(new String[]{Globals.FILE_FIELD}));
-            } else if (i == PDF_COL) {
-                comparators.add(new IconComparator(new String[]{"pdf"}));
-            } else if (i == PS_COL) {
-                comparators.add(new IconComparator(new String[]{"ps"}));
             } else if (i == URL_COL) {
                 comparators.add(new IconComparator(new String[]{"url"}));
             }
@@ -1522,23 +1506,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                                 fileLabel.setIcon(model.getEntry(0).getType().getIcon());
                             }
                             return fileLabel;
-                        } else {
-                            return null;
-                        }
-                    case PDF_COL:
-                        o = entry.getField("pdf");
-                        if (o != null) {
-                            pdfLabel.setToolTipText((String) o);
-                            return pdfLabel;
-                        } else {
-                            return null;
-                        }
-
-                    case PS_COL:
-                        o = entry.getField("ps");
-                        if (o != null) {
-                            psLabel.setToolTipText((String) o);
-                            return psLabel;
                         } else {
                             return null;
                         }
