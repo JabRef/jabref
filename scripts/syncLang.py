@@ -1,111 +1,125 @@
-import sys
+# coding=utf-8
 import os
 import re
+import sys
 
 res_dir = "src/main/resources/l10n"
 
 keyFiles = {}
 
-# Builds a list of all translation keys in the list of lines.
-def indexFile(lines):
-    allKeys = []
+
+def get_keys_from_lines(lines):
+    """
+    Builds a list of all translation keys in the list of lines.
+
+    :param lines: a list of strings
+    :return: the sorted keys within the list of strings
+    """
+    keys = []
     for line in lines:
         comment = line.find("#")
-        if (comment != 0):
+        if comment != 0:
             index = line.find("=")
-            while ((index > 0) and (line[index-1]=="\\")):
-                index = line.find("=", index+1)
-            if (index > 0):
-                allKeys.append(line[0:index])
-    allKeys.sort()
-    return allKeys
-        
+            while (index > 0) and (line[index - 1] == "\\"):
+                index = line.find("=", index + 1)
+            if index > 0:
+                keys.append(line[0:index])
+    return keys
 
-# Finds all keys in the first list that are not present in the second list:
-def findMissingKeys(first, second):
+
+def find_missing_keys(first_list, second_list):
+    """
+    Finds all keys in the first list that are not present in the second list
+
+    :param first_list: a list
+    :param second_list: a list
+    :return: a list
+    """
     missing = []
-    for key in first:
-        if not key in second:
+    for key in first_list:
+        if key not in second_list:
             missing.append(key)
     return missing
 
 
-# Appends all the given keys to the file:
-def appendMissingKeys(filename, keys):
-    file = open(filename, "a")
-    file.write("\n")
-    for key in keys:
-        file.write(key+"=\n")
-
-def handleFileSet(mainFile, files, changeFiles):
-    f1 = open(mainFile)
+def read_all_lines(filename):
+    f1 = open(filename)
     lines = f1.readlines()
     f1.close()
-    keys = indexFile(lines)
-    keysPresent = []
-    for i in range(0, len(files)):
-        f2 = open(files[i])
-        lines = f2.readlines()
-        f2.close()
-        keysPresent.append(indexFile(lines))
-        missing = findMissingKeys(keys, keysPresent[i])
-        
-        print "\n\nFile '"+files[i]+"'\n"
-        if len(missing) == 0:
+    return lines
+
+
+def append_keys_to_file(filename, keys):
+    """
+    Appends all the given keys to the file terminating with an equals sign
+    """
+    f = open(filename, "a")
+    f.write("\n")
+    for key in keys:
+        f.write(key + "=\n")
+    f.close()
+
+
+def compare_property_files_to_main_property_file(properties_file, files, change_files):
+    keys_in_properties_file = get_keys_from_lines(read_all_lines(properties_file))
+
+    for other_properties_file in files:
+        keys_in_other_properties_file = get_keys_from_lines(read_all_lines(other_properties_file))
+        keys_missing = find_missing_keys(keys_in_properties_file, keys_in_other_properties_file)
+        keys_obsolete = find_missing_keys(keys_in_other_properties_file, keys_in_properties_file)
+
+        print "\n\nFile '" + other_properties_file + "'\n"
+        if not keys_missing:
             print "----> No missing keys."
         else:
             print "----> Missing keys:"
-            for key in missing:
+            for key in keys_missing:
                 print key
 
-            if changeFiles == 1:
+            if change_files:
                 print "Update file?",
                 if raw_input() in ['y', 'Y']:
-                    appendMissingKeys(files[i], missing)
+                    append_keys_to_file(other_properties_file, keys_missing)
             print ""
-        
-        # See if this file has keys that are not in the main file:
-        redundant = findMissingKeys(keysPresent[i], keys)
-        if len(redundant) > 0:
+
+        if not keys_obsolete:
+            print "----> No possible obsolete keys (not in English language file)."
+        else:
             print "----> Possible obsolete keys (not in English language file):"
-            for key in redundant:
+            for key in keys_obsolete:
                 print key
-                
-            #if changeFiles == 1:
-            #   print "Update file?",
-            #   if raw_input() in ['y', 'Y']:
-            #       removeRedundantKeys(files[i], redundant)
             print ""
-        
-def handleJavaCode(filename, lines, keyList, notTermList):
-    #Extract first string parameter from Localization.lang call. E.g., Localization.lang("Default")
+
+
+def handleJavaCode(filename, lines, keyList):
+    # Extract first string parameter from Localization.lang call. E.g., Localization.lang("Default")
     reOnlyString = r'"((\\"|[^"])*)"[^"]*'
     patt = re.compile(r'Localization\s*\.\s*lang\s*\(\s*' + reOnlyString)
     pattOnlyString = re.compile(reOnlyString)
 
-    #Find multiline Localization lang statements. E.g.:
-    #Localization.lang("This is my string" +
+    # Find multiline Localization lang statements. E.g.:
+    # Localization.lang("This is my string" +
     # "with a long text")
     patt2 = re.compile(r'Localization\s*\.\s*lang\s*\(([^)])*$')
 
     pattPlus = re.compile(r'^\s*\+')
 
-    eList = list(enumerate(lines.split("\n")))
+    lines_with_line_number = list(enumerate(lines))
     i = 0
-    while i < len(eList):
-        linenum, curline = eList[i]
-        
-        #Remove Java single line comments
-        if curline.find("http://") < 0:
-            curline = re.sub("//.*", "", curline)
+    while i < len(lines_with_line_number):
+        line_number, line = lines_with_line_number[i]
 
-        while (curline != ""):
-            result = patt.search(curline)
-            result2 = patt2.search(curline)
+        # Remove Java single line comments
+        if line.find("http://") < 0:
+            line = re.sub("//.*", "", line)
+
+        while line != "":
+            result = patt.search(line)
+            result2 = patt2.search(line)
 
             found = ""
 
-            if result2 and curline.find('",') < 0:
+            if result2 and line.find('",') < 0:
                 # not terminated
                 # but it could be a multiline string
                 if result:
@@ -115,178 +129,185 @@ def handleJavaCode(filename, lines, keyList, notTermList):
                     curText = ""
                     searchForPlus = False
                 origI = i
-                #inspect next line
-                while i+1 < len(eList):
-                    linenum2, curline2 = eList[i+1]
+                # inspect next line
+                while i + 1 < len(lines_with_line_number):
+                    linenum2, curline2 = lines_with_line_number[i + 1]
                     if (not searchForPlus) or pattPlus.search(curline2):
-                        #from now on, we always have to search for a plus
+                        # from now on, we always have to search for a plus
                         searchForPlus = True
 
-                        #The current line has been handled here, therefore indicate to handle the next line
-                        i = i+1
-                        linenum = linenum2
-                        curline = curline2
+                        # The current line has been handled here, therefore indicate to handle the next line
+                        i += 1
+                        line_number = linenum2
+                        line = curline2
 
-                        #Search for the occurence of a string
+                        # Search for the occurence of a string
                         result = pattOnlyString.search(curline2)
                         if result:
                             curText = curText + result.group(1)
-                            #check for several strings in this line
+                            # check for several strings in this line
                             if curline2.count('\"') > 2:
                                 break
-                            #check for several arguments in the line
+                            # check for several arguments in the line
                             if curline2.find('",') > 0:
                                 break
                             if curline2.endswith(")"):
                                 break
                         else:
-                            #plus sign at the beginning found, but no string
+                            # plus sign at the beginning found, but no string
                             break
                     else:
-                        #no continuation found
+                        # no continuation found
                         break
 
                 if origI == i:
-                    print "%s:%d: Not terminated: %s"%(filename, linenum+1, curline)
+                    print "%s:%d: Not terminated: %s" % (filename, line_number + 1, line)
                 else:
                     found = curText
 
             if result or (found != ""):
-                if (found == ""):
-                    #not a multiline string, found via the single line matching
-                    #full string in one line
+                if found == "":
+                    # not a multiline string, found via the single line matching
+                    # full string in one line
                     found = result.group(1)
 
                 found = found.replace(" ", "_")
-                #replace characters that need to be escaped in the language file
-                found = found.replace("=", r"\=").replace(":",r"\:")
-                #replace Java-escaped " to plain "
-                found = found.replace(r'\"','"')
-                #Java-escaped \ to plain \ need not to be converted - they have to be kept
-                #e.g., "\\#" has to be contained as "\\#" in the key
-                #found = found.replace('\\\\','\\')
+                # replace characters that need to be escaped in the language file
+                found = found.replace("=", r"\=").replace(":", r"\:")
+                # replace Java-escaped " to plain "
+                found = found.replace(r'\"', '"')
+                # Java-escaped \ to plain \ need not to be converted - they have to be kept
+                # e.g., "\\#" has to be contained as "\\#" in the key
+                # found = found.replace('\\\\','\\')
                 if (found != "") and (found not in keyList):
                     keyList.append(found)
-                    keyFiles[found] = (filename, linenum)
-                    #print "Adding ", found
-                #else:
-                #   print "Not adding: "+found
-                    
-            #Prepare a possible second run (multiple Localization.lang on this line)
+                    keyFiles[found] = (filename, line_number)
+                    # print "Adding ", found
+                    # else:
+                    #   print "Not adding: "+found
+
+            # Prepare a possible second run (multiple Localization.lang on this line)
             if result:
                 lastPos = result.span()[1]
-                #regular expression is greedy. It will match until Localization.lang("
-                #therefore, we have to adjust lastPos
-                lastPos = lastPos - 14
-                if len(curline) <= lastPos:
-                    curline = ""
+                # regular expression is greedy. It will match until Localization.lang("
+                # therefore, we have to adjust lastPos
+                lastPos -= 14
+                if len(line) <= lastPos:
+                    line = ""
                 else:
-                    curline = curline[lastPos:]
+                    line = line[lastPos:]
             else:
-                #terminate processing of this line, continue to next line
-                curline = ""
-                
-        i = i+1
-            
+                # terminate processing of this line, continue to next line
+                line = ""
+
+        i += 1
+
+
 # Find all Java source files in the given directory, and read the lines of each,
 # calling handleJavaCode on the contents:   
-def handleDir(lists, dirname, fnames):
-    keyList, notTermList = lists    
-    for file in fnames:
-        if len(file) > 6 and file[(len(file)-5):len(file)] == ".java":
-            fl = open(dirname+os.sep+file)
-            lines = fl.read()
-            fl.close()
-            handleJavaCode(dirname + os.sep + file, lines, keyList, notTermList)
-            
-# Go through subdirectories and call handleDir on all diroctories:                      
-def traverseFileTree(dir):
-    keyList = []
-    notTermList = []
-    os.path.walk(dir, handleDir, (keyList, notTermList))
-    print "Keys found: "+str(len(keyList))
-    return keyList
+def handleDir(lists, directory_path, filenames):
+    keyList, notTermList = lists
+    for filename in filenames:
+        if is_java_file(filename):
+            file_path = directory_path + os.sep + filename
+            lines = read_all_lines(file_path)
+            handleJavaCode(file_path, lines, keyList)
 
-    
-# Searches out all translation calls in the Java source files, and reports which
-# are not present in the given resource file.
-#
-# arg: mainFile: a .properties file with the keys to sync with
-def findNewKeysInJavaCode(mainFile, dir, update):
-    keystempo = []
-    keyListtempo = []
-    f1 = open(mainFile)
-    lines = f1.readlines()
-    f1.close()
-    keys = indexFile(lines)
-    keyList = traverseFileTree(dir)
-   
-    # Open the file again, for appending:
-    if update:
-        f1 = open(mainFile, "a")
+
+def is_java_file(filename):
+    """
+    Determines whether a file name is that of a Java file
+
+    :param filename: the filename to be checked
+    :return: boolean
+    """
+    filename_length = len(filename)
+    return filename_length > 6 and filename[(filename_length - 5):filename_length] == ".java"
+
+
+# Go through subdirectories and call handleDir on all directories:
+def traverseFileTree(starting_directory):
+    keys = []
+    notTermList = []
+    os.path.walk(starting_directory, handleDir, (keys, notTermList))
+    print "Keys found: " + str(len(keys))
+    return keys
+
+
+def append_property(properties_file, key, value):
+    f = open(properties_file, "a")
+    f.write(key + "=" + value + "\n")
+    f.close()
+
+def find_missing_and_obsolete_keys(properties_file, source_code_directory, append_missing_keys_to_properties_file):
+    """
+    Searches out all translation calls in the Java source files, and reports which
+    are not present in the given resource file.
+
+    :param properties_file: the properties file with the keys to sync with
+    :param source_code_directory: the directory containing the source code to be checked
+    :param append_missing_keys_to_properties_file: boolean whether the missing keys are appended to the properties_file
+    """
+    keys_in_property_file = get_keys_from_lines(read_all_lines(properties_file))
+    keys_used_in_code = traverseFileTree(source_code_directory)
+
+    keys_obsolete = find_missing_keys(keys_in_property_file, keys_used_in_code)
+    keys_missing = find_missing_keys(keys_used_in_code, keys_in_property_file)
+
+    if append_missing_keys_to_properties_file:
+        f1 = open(properties_file, "a")
         f1.write("\n")
-        
-    # Look for keys that are used in the code, but not present in the language file:
-    for key in keyList:
-        value = key.replace("\\:",":").replace("\\=", "=")
-        if key not in keys:
-            fileName, lineNum = keyFiles[key]
-            print "%s:%i:Missing key: %s"%(fileName, lineNum + 1, value)
-            if update:
-                f1.write(key+"="+value+"\n")
-    
-    # Look for keys in the language file that are not used in the code:
-    for key in keys:
-        if key not in keyList:
-            print "Possible obsolete key: "+key
-        
-    if update:
         f1.close()
-    
-    
-def lookForDuplicates(file, displayKeys):
-    duplicount = 0
-    f1 = open(file)
-    lines = f1.readlines()
-    f1.close()
+
+    for key in keys_missing:
+        value = key.replace("\\:", ":").replace("\\=", "=")
+        file_name, line_number = keyFiles[key]
+        print "%s:%i:Missing key: %s" % (file_name, line_number + 1, value)
+        if append_missing_keys_to_properties_file:
+            append_property(properties_file, key, value)
+
+    for key in keys_obsolete:
+        print "Possible obsolete key: " + key
+
+
+def find_duplicate_keys_and_keys_with_no_value(current_file, display_keys):
+    lines = read_all_lines(current_file)
     mappings = {}
-    emptyVals = 0
+    duplication_count = 0
+    empty_values_count = 0
     for line in lines:
-        comment = line.find("#")
+        is_no_comment = line.find("#") != 0
         index = line.find("=")
-        if (comment != 0) and (index > 0):
+        contains_property = index > 0
+        if is_no_comment and contains_property:
             key = line[0:index]
-            value = line[index+1:].strip()
+            value = line[index + 1:].strip()
             if key in mappings:
                 mappings[key].append(value)
-                duplicount += 1
-                if displayKeys:
-		  print "Duplicate: "+file+": "+key+" =",
-		  print mappings[key]
+                duplication_count += 1
+                if display_keys:
+                    print "Duplicate: " + current_file + ": " + key + " =",
+                    print mappings[key]
             else:
                 mappings[key] = [value]
                 if value == "":
-		    emptyVals = emptyVals + 1
-                    if displayKeys:
-		      print "Empty value: "+file+": "+key
-                #print "New: "+value
-    if duplicount > 0:
-	dupstring = str(duplicount)+" duplicates. "
+                    empty_values_count += 1
+                    if display_keys:
+                        print "Empty value: " + current_file + ": " + key
+    if duplication_count > 0:
+        dupstring = str(duplication_count) + " duplicates. "
     else:
-	dupstring = ""
-    if emptyVals > 0:
-        emptStr = str(emptyVals)+" empty values. "
+        dupstring = ""
+    if empty_values_count > 0:
+        emptStr = str(empty_values_count) + " empty values. "
     else:
-	emptStr = ""
-    if duplicount+emptyVals > 0:
-	okString = ""
+        emptStr = ""
+    if duplication_count + empty_values_count > 0:
+        okString = ""
     else:
-	okString = "ok"
-    print file+": "+dupstring+emptStr+okString
-    #print file+": "+str(emptyVals)+" empty values."
-        
-        
-############# Main part ###################
+        okString = "ok"
+    print current_file + ": " + dupstring + emptStr + okString
+
 
 if len(sys.argv) == 1:
     print """This program must be run from the jabref base directory.
@@ -321,31 +342,31 @@ Option can be one of the following:
         If the -u option is specified, all missing keys will automatically be added to the files.
         There is currently no option to remove obsolete keys automatically.
 """
-    
+
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-s"):
     if (len(sys.argv) >= 3) and (sys.argv[2] == "-u"):
-        update = 1
+        update = True
     else:
-        update = 0
-    findNewKeysInJavaCode(os.path.join(res_dir, "JabRef_en.properties"), ".", update)
-    
+        update = False
+    find_missing_and_obsolete_keys(os.path.join(res_dir, "JabRef_en.properties"), ".", update)
+
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
     if (len(sys.argv) >= 3) and (sys.argv[2] == "-u"):
-        changeFiles = 1
+        change_files = True
     else:
-        changeFiles = 0
+        change_files = False
 
-    filesJabRef = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir(res_dir));
-    filesJabRef = [os.path.join(res_dir, i) for i in filesJabRef];
-    filesMenu = filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir(res_dir));
-    filesMenu = [os.path.join(res_dir, i) for i in filesMenu];
+    filesJabRef = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir(res_dir))
+    filesJabRef = [os.path.join(res_dir, i) for i in filesJabRef]
+    filesMenu = filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir(res_dir))
+    filesMenu = [os.path.join(res_dir, i) for i in filesMenu]
 
-    handleFileSet(os.path.join(res_dir, "JabRef_en.properties"), filesJabRef, changeFiles)
-    handleFileSet(os.path.join(res_dir, "Menu_en.properties"), filesMenu, changeFiles)
+    compare_property_files_to_main_property_file(os.path.join(res_dir, "JabRef_en.properties"), filesJabRef, change_files)
+    compare_property_files_to_main_property_file(os.path.join(res_dir, "Menu_en.properties"), filesMenu, change_files)
 
 elif (len(sys.argv) >= 2) and ((sys.argv[1] == "-d") or (sys.argv[1] == "-c")):
-    files = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir(res_dir));
-    files.extend(filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir(res_dir)));
-    files = [os.path.join(res_dir, i) for i in files];
-    for file in files:
-        lookForDuplicates(file, sys.argv[1] == "-d")
+    files = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir(res_dir))
+    files.extend(filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir(res_dir)))
+    files = [os.path.join(res_dir, i) for i in files]
+    for f in files:
+        find_duplicate_keys_and_keys_with_no_value(f, sys.argv[1] == "-d")
