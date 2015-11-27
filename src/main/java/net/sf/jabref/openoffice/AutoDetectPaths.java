@@ -336,9 +336,7 @@ public class AutoDetectPaths extends AbstractWorker {
                     return file.isDirectory();
                 }
             });
-            for (File dir : dirs) {
-                dirList.add(dir);
-            }
+            Collections.addAll(dirList, dirs);
         }
         return dirList;
     }
