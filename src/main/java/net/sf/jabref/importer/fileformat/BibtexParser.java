@@ -142,23 +142,28 @@ public class BibtexParser {
         return false;
     }
 
-    private String dumpTextReadSoFarToString(){
+    private String dumpTextReadSoFarToString() {
         StringBuilder entry = new StringBuilder();
-        while(!pureTextFromFile.isEmpty()){
+        while (!pureTextFromFile.isEmpty()) {
             entry.append(pureTextFromFile.pollFirst());
         }
         //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
         String result = entry.toString();
         int indexOfAt = entry.indexOf("@");
-        int runningIndex = indexOfAt - 1 ;
-        while(runningIndex > 0){
-            if(!Character.isWhitespace(result.charAt(runningIndex))){
+        int runningIndex = indexOfAt - 1;
+        while (runningIndex > 0) {
+            if (!Character.isWhitespace(result.charAt(runningIndex))) {
                 break;
             }
             runningIndex--;
         }
 
-        result = result.substring(indexOfAt);
+        // only keep newlines if there is an entry before
+        if (runningIndex > 0 && !"}".equals(result.charAt(runningIndex - 1))) {
+            result = result.substring(indexOfAt);
+        } else {
+            result = result.substring(runningIndex + 1);
+        }
         return result;
     }
 
