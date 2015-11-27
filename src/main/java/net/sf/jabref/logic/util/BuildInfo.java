@@ -34,7 +34,9 @@ public class BuildInfo {
         Properties properties = new Properties();
 
         try (InputStream stream = getClass().getResourceAsStream(path)) {
-            properties.load(stream);
+            if(stream != null) {
+                properties.load(stream);
+            }
         } catch (IOException ignored) {
             // nothing to do -> default already set
         }
