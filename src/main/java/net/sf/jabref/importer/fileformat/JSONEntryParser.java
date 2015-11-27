@@ -16,6 +16,9 @@
 
 package net.sf.jabref.importer.fileformat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -55,18 +58,15 @@ public class JSONEntryParser {
         // Authors
         if (bibJsonEntry.has("author")) {
             JSONArray authors = bibJsonEntry.getJSONArray("author");
-            StringBuffer sb = new StringBuffer();
+            List<String> authorList = new ArrayList<>();
             for (int i = 0; i < authors.length(); i++) {
                 if (authors.getJSONObject(i).has("name")) {
-                    sb.append(authors.getJSONObject(i).getString("name"));
-                    if (i < (authors.length() - 1)) {
-                        sb.append(" and ");
-                    }
+                    authorList.add(authors.getJSONObject(i).getString("name"));
                 } else {
                     LOGGER.info("Empty author name.");
                 }
             }
-            entry.setField("author", sb.toString());
+            entry.setField("author", String.join(" and ", authorList));
         } else {
             LOGGER.info("No author found.");
         }
@@ -110,16 +110,13 @@ public class JSONEntryParser {
         // Keywords
         if (bibJsonEntry.has("keywords")) {
             JSONArray keywords = bibJsonEntry.getJSONArray("keywords");
-            StringBuffer sb = new StringBuffer();
+            List<String> keywordList = new ArrayList<>();
             for (int i = 0; i < keywords.length(); i++) {
                 if (!keywords.isNull(i)) {
-                    sb.append(keywords.getString(i));
-                    if (i < (keywords.length() - 1)) {
-                        sb.append(", ");
-                    }
+                    keywordList.add(keywords.getString(i));
                 }
             }
-            entry.setField("keywords", sb.toString());
+            entry.putKeywords(keywordList);
         }
 
         // Identifiers
@@ -171,7 +168,7 @@ public class JSONEntryParser {
 
         // Guess publication type
         String isbn = springerJsonEntry.optString("isbn");
-        if ((isbn == null) || (isbn.length() == 0)) {
+        if (com.google.common.base.Strings.isNullOrEmpty(isbn)) {
             // Probably article
             entry.setType(EntryTypes.getType("article"));
             nametype = "journal";
@@ -185,18 +182,15 @@ public class JSONEntryParser {
         // Authors
         if (springerJsonEntry.has("creators")) {
             JSONArray authors = springerJsonEntry.getJSONArray("creators");
-            StringBuffer sb = new StringBuffer();
+            List<String> authorList = new ArrayList<>();
             for (int i = 0; i < authors.length(); i++) {
                 if (authors.getJSONObject(i).has("creator")) {
-                    sb.append(authors.getJSONObject(i).getString("creator"));
-                    if (i < (authors.length() - 1)) {
-                        sb.append(" and ");
-                    }
+                    authorList.add(authors.getJSONObject(i).getString("creator"));
                 } else {
                     LOGGER.info("Empty author name.");
                 }
             }
-            entry.setField("author", sb.toString());
+            entry.setField("author", String.join(" and ", authorList));
         } else {
             LOGGER.info("No author found.");
         }
@@ -205,7 +199,7 @@ public class JSONEntryParser {
         for (String field : singleFieldStrings) {
             if (springerJsonEntry.has(field)) {
                 String text = springerJsonEntry.getString(field);
-                if (text.length() > 0) {
+                if (!text.isEmpty()) {
                     entry.setField(field, text);
                 }
             }
