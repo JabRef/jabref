@@ -142,7 +142,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
      * columns.
      */
     public String[] getIconTypeForColumn(int col) {
-        Object o = iconCols.get(new Integer(col));
+        Object o = iconCols.get(Integer.valueOf(col));
         if (o != null) {
             return (String[]) o;
         } else {

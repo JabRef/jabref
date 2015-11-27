@@ -177,10 +177,10 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         if (f1 instanceof Integer && f2 instanceof Integer) {
             result = ((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
-            Integer f1AsInteger = new Integer(f1.toString());
+            Integer f1AsInteger = Integer.valueOf(f1.toString());
             result = -f1AsInteger.compareTo((Integer) f2);
         } else if (f1 instanceof Integer) {
-            Integer f2AsInteger = new Integer(f2.toString());
+            Integer f2AsInteger = Integer.valueOf(f2.toString());
             result = -((Integer) f1).compareTo(f2AsInteger);
         } else {
             String ours = ((String) f1).toLowerCase();

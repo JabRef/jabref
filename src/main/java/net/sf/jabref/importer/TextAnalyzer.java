@@ -240,7 +240,7 @@ class TextAnalyzer {
 
         @Override
         public int compareTo(Substring other) {
-            return new Integer(begin).compareTo(other.begin());
+            return Integer.valueOf(begin).compareTo(other.begin());
         }
     }
 }

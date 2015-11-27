@@ -238,7 +238,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         if (store != null) {
             try {
                 String[] dim = store.split(";");
-                dimension = new Dimension(new Integer(dim[0]), new Integer(dim[1]));
+                dimension = new Dimension(Integer.valueOf(dim[0]), Integer.valueOf(dim[1]));
             } catch (Exception ignored) {
                 // Ignored
             }
