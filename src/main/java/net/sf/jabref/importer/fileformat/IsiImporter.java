@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -339,10 +340,10 @@ public class IsiImporter extends ImportFormat {
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();
-            for (String key : hm.keySet()) {
-                String content = hm.get(key);
+            for (Map.Entry<String, String> field : hm.entrySet()) {
+                String content = field.getValue();
                 if ((content == null) || content.trim().isEmpty()) {
-                    toRemove.add(key);
+                    toRemove.add(field.getKey());
                 }
             }
             for (Object aToRemove : toRemove) {

@@ -17,6 +17,7 @@ package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.Action;
@@ -53,9 +54,8 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
             map.put(tabbedPane.getTitleAt(i), panel);
         }
         tabbedPane.removeAll();
-        for (String title : map.keySet()) {
-            BasePanel panel = map.get(title);
-            tabbedPane.addTab(title, panel);
+        for (Map.Entry<String, BasePanel> entry : map.entrySet()) {
+            tabbedPane.addTab(entry.getKey(), entry.getValue());
         }
     }
 
