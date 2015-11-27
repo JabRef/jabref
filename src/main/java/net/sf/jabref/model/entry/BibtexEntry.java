@@ -493,4 +493,65 @@ public class BibtexEntry {
         }
         return year;
     }
+
+    public void putKeywords(List<String> keywords) {
+        Objects.requireNonNull(keywords);
+        // Set Keyword Field
+        String oldValue = this.getField("keywords");
+        String newValue;
+        if (!keywords.isEmpty()) {
+            newValue = String.join(", ", keywords);
+        } else {
+            newValue = null;
+        }
+        if ((oldValue == null) && (newValue == null)) {
+            return;
+        }
+        if ((oldValue == null) || !oldValue.equals(newValue)) {
+            this.setField("keywords", newValue);
+        }
+    }
+
+    /**
+     * Check if a keyword already exists (case insensitive), if not: add it
+     *
+     * @param keyword Keyword to add
+     */
+    public void addKeyword(String keyword) {
+        List<String> keywords = this.getSeparatedKeywords();
+        Boolean duplicate = false;
+
+        if ((keyword == null) || (keyword.length() == 0)) {
+            return;
+        }
+
+        for (String key : keywords) {
+            if (keyword.equalsIgnoreCase(key)) {
+                duplicate = true;
+                break;
+            }
+        }
+
+        if (!duplicate) {
+            keywords.add(keyword);
+            this.putKeywords(keywords);
+        }
+    }
+
+    /**
+     * Add multiple keywords to entry
+     *
+     * @param keywords Keywords to add
+     */
+    public void addKeywords(List<String> keywords) {
+        if (keywords != null) {
+            for (String keyword : keywords) {
+                this.addKeyword(keyword);
+            }
+        }
+    }
+
+    public List<String> getSeparatedKeywords() {
+        return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField("keywords"));
+    }
 }

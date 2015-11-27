@@ -17,8 +17,6 @@ import java.util.*;
 import java.util.List;
 public class UtilTest {
 
-
-
     @Test
     public void testCheckLegalKey() {
         Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA"));
@@ -179,14 +177,6 @@ public class UtilTest {
 
         Assert.assertEquals("Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
                 net.sf.jabref.util.Util.expandBrackets("[author] have published [title] in [journal].", entry, database));
-    }
-
-    @Test
-    public void getSeparatedKeywords() {
-        String keywords = "w1, w2a w2b, w3";
-        ArrayList<String> separatedKeywords = net.sf.jabref.util.Util.getSeparatedKeywords(keywords);
-        String[] expected = new String[]{"w1", "w2a w2b", "w3"};
-        Assert.assertArrayEquals(expected, separatedKeywords.toArray());
     }
 
 
