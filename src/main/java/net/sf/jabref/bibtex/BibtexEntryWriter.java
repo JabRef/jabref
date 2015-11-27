@@ -363,7 +363,7 @@ public class BibtexEntryWriter {
             if (BibtexEntryWriter.tagDisplayNameMap.containsKey(field.toLowerCase())) {
                 result = BibtexEntryWriter.tagDisplayNameMap.get(field.toLowerCase()) + suffix;
             } else {
-                result = (field.charAt(0) + "").toUpperCase() + field.substring(1) + suffix;
+                result = (String.valueOf(field.charAt(0))).toUpperCase() + field.substring(1) + suffix;
             }
         } else {
             result = field + suffix;

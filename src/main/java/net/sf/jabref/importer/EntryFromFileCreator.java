@@ -131,7 +131,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     private static String extractPathesToKeyWordsfield(String absolutePath) {
         final int MIN_PATH_TOKEN_LENGTH = 4;
         StringBuilder sb = new StringBuilder();
-        StringTokenizer st = new StringTokenizer(absolutePath, "" + File.separatorChar);
+        StringTokenizer st = new StringTokenizer(absolutePath, String.valueOf(File.separatorChar));
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if (!st.hasMoreTokens()) {

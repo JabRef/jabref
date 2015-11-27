@@ -82,7 +82,7 @@ public class LatexFieldFormatter {
             throws IllegalArgumentException {
 
         if (content == null) {
-            return valueDelimiterStartOfValue + "" + valueDelimiterEndOfValue;
+            return valueDelimiterStartOfValue + String.valueOf(valueDelimiterEndOfValue);
         }
 
         boolean shouldWrapWithBraces = Globals.prefs.putBracesAroundCapitals(fieldName) && !BIBTEX_STRING.equals(fieldName);
@@ -203,7 +203,7 @@ public class LatexFieldFormatter {
         checkBraces(content);
 
         stringBuilder = new StringBuilder(
-                valueDelimiterStartOfValue + "");
+                String.valueOf(valueDelimiterStartOfValue));
         // these two are also hard coded in net.sf.jabref.importer.fileformat.FieldContentParser.multiLineFields
         // there, JabRefPreferences.NON_WRAPPABLE_FIELDS are also included
         boolean isAbstract = "abstract".equals(fieldName);

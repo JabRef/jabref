@@ -280,7 +280,7 @@ public class LabelPatternUtil {
                 if ((!"".equals(k) // remove empty
                         && !ignore.contains(k.toLowerCase()) // remove ignored words
                         && (k.charAt(k.length() - 1) != '.')
-                        && (k.charAt(0) + "").matches("[A-Z]"))
+                        && (String.valueOf(k.charAt(0))).matches("[A-Z]"))
                         || ((k.length() >= 3) && "uni".equals(k.toLowerCase().substring(0, 2)))) {
                     part.add(k);
                 }

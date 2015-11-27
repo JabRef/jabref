@@ -71,12 +71,12 @@ public class BibtexString {
             if (name.length() <= 1) {
                 return OTHER;
             }
-            if (!(name.charAt(1) + "").toUpperCase().equals(
-                    name.charAt(1) + "")) {
+            if (!(String.valueOf(name.charAt(1))).toUpperCase().equals(
+                    String.valueOf(name.charAt(1)))) {
                 return OTHER;
             }
             for (Type t : Type.values()) {
-                if (t.prefix.equals(name.charAt(0) + "")) {
+                if (t.prefix.equals(String.valueOf(name.charAt(0)))) {
                     return t;
                 }
             }

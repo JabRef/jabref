@@ -308,10 +308,10 @@ public class RepecNepImporter extends ImportFormat {
             }
 
             if (author != null) {
-                authors += !"".equals(authors) ? " and " + author : "" + author;
+                authors += !"".equals(authors) ? " and " + author : author;
             }
             if (institution != null) {
-                institutions += !"".equals(institutions) ? " and " + institution : "" + institution;
+                institutions += !"".equals(institutions) ? " and " + institution : institution;
             }
         }
 
@@ -388,9 +388,9 @@ public class RepecNepImporter extends ImportFormat {
 
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(date != null ? date : new Date());
-                be.setField("year", "" + cal.get(Calendar.YEAR));
+                be.setField("year", String.valueOf(cal.get(Calendar.YEAR)));
                 if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
-                    be.setField("month", "" + cal.get(Calendar.MONTH));
+                    be.setField("month", String.valueOf(cal.get(Calendar.MONTH)));
                 }
 
                 // parse URL field

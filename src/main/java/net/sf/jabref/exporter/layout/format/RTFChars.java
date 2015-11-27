@@ -66,7 +66,7 @@ public class RTFChars implements LayoutFormatter {
             } else if (!incommand && (c == '{' || c == '}')) {
                 // Swallow the brace.
             } else if (Character.isLetter(c)
-                    || Globals.SPECIAL_COMMAND_CHARS.contains("" + c)) {
+                    || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
                 if (!incommand) {
                     sb.append(c);
