@@ -172,7 +172,6 @@ public class SPIRESFetcher implements EntryFetcher {
         // Nothing
     }
 
-    @SuppressWarnings("unused")
     public void done(int entriesImported) {
         // Nothing
     }

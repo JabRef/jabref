@@ -66,7 +66,6 @@ class PdfPreviewPanel extends JPanel {
             e.printStackTrace();
             return;
         }
-        @SuppressWarnings("unchecked")
         List<PDPage> pages = document.getDocumentCatalog().getAllPages();
 
         PDPage page = pages.get(0);

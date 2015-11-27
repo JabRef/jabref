@@ -179,7 +179,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * Used via reflection in {@link net.sf.jabref.importer.DatabaseFileLookup} to construct this
      * class.
      */
-    @SuppressWarnings("unused")
     private FindUnlinkedFilesDialog() {
     }
 

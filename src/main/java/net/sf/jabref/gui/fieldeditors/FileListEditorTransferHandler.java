@@ -86,7 +86,6 @@ class FileListEditorTransferHandler extends TransferHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public boolean importData(JComponent comp, Transferable t) {
         // If the drop target is the main table, we want to record which
         // row the item was dropped on, to identify the entry if needed:

@@ -50,7 +50,6 @@ class BibTeXMLHandler extends DefaultHandler {
 
     // SAX parsing methods
 
-    @SuppressWarnings("unused")
     public void doctypeDecl(String name, String publicId,
             String systemId) {
         // Do nothing

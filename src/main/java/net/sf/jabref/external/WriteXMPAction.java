@@ -275,7 +275,6 @@ public class WriteXMPAction extends AbstractWorker {
             cancelButton.setEnabled(false);
         }
 
-        @SuppressWarnings("unused")
         public void open() {
             progressArea.setText("");
             canceled = false;

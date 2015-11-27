@@ -132,7 +132,6 @@ public class EntryTableTransferHandler extends TransferHandler {
             if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 // JOptionPane.showMessageDialog(null, "Received
                 // javaFileListFlavor");
-                @SuppressWarnings("unchecked")
                 List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
                 return handleDraggedFiles(l, dropRow);
             } else if (t.isDataFlavorSupported(urlFlavor)) {

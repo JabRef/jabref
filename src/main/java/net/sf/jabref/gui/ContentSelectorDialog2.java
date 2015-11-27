@@ -203,7 +203,6 @@ class ContentSelectorDialog2 extends JDialog {
 
         newField.addActionListener(new ActionListener() {
 
-            @SuppressWarnings("unused")
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!fieldListModel.get(0).equals(FIELD_FIRST_LINE)) {

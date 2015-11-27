@@ -102,8 +102,7 @@ class HelpContent extends JTextPane {
     }
 
     // .getResource is called at resourceOwner. This method is available at all Class objects
-    @SuppressWarnings("rawtypes")
-    public void setPage(String filename, Class resourceOwner) {
+    public void setPage(String filename, Class<?> resourceOwner) {
 
         // Check for anchor
         int indexOf = filename.indexOf('#');

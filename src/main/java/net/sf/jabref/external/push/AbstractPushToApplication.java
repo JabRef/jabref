@@ -119,7 +119,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
      * @param keyString String containing the Bibtex keys to be pushed to the application
      * @return String array with the command to call and its arguments
      */
-    @SuppressWarnings("unused")
     protected String[] getCommandLine(String keyString) {
         return null;
     }
