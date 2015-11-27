@@ -96,6 +96,12 @@ public class BibtexEntryWriter {
     }
 
     public void write(BibtexEntry entry, Writer out) throws IOException {
+        // if the entry has not been modified, write it as it was
+        if(entry.shouldUseCustomSerialization()){
+            out.write(entry.getSerialization());
+            return;
+        }
+
         switch (writeFieldSortStyle) {
             case 0:
                 writeRequiredFieldsFirstOptionalFieldsSecondRemainingFieldsThird(entry, out);
