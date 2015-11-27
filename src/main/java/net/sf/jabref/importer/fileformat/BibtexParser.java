@@ -113,6 +113,9 @@ public class BibtexParser {
                 String item = "@" + next;
                 file.append(item);
                 fileContent.add(item);
+            } else {
+                //otherwise give it back to the reader unmodified
+                file.append(next);
             }
         }
         pushbackReader = new PushbackReader(new StringReader(file.toString()), BibtexParser.LOOKAHEAD);
