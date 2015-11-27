@@ -147,7 +147,19 @@ public class BibtexParser {
         while(!pureTextFromFile.isEmpty()){
             entry.append(pureTextFromFile.pollFirst());
         }
-        return entry.toString();
+        //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
+        String result = entry.toString();
+        int indexOfAt = entry.indexOf("@");
+        int runningIndex = indexOfAt - 1 ;
+        while(runningIndex > 0){
+            if(!Character.isWhitespace(result.charAt(runningIndex))){
+                break;
+            }
+            runningIndex--;
+        }
+
+        result = result.substring(indexOfAt);
+        return result;
     }
 
     /**
