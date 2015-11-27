@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,7 +77,7 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     private void init(String query) throws ParseCancellationException {
-        if(this.query != null && this.query.equals(query)) {
+        if(Objects.equals(this.query, query)) {
             return;
         }
 

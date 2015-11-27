@@ -18,6 +18,7 @@ package net.sf.jabref.importer;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Objects;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -131,8 +132,7 @@ class DatabaseFileLookup {
             }
 
             File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
-            if ((expandedFilename != null)
-                    && expandedFilename.equals(aFile)) {
+            if (Objects.equals(expandedFilename, aFile)) {
                 return true;
             }
         }
