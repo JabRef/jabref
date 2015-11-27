@@ -50,7 +50,7 @@ public class ParserResult {
     private int jabrefMinorVersion;
 
     public ParserResult(Collection<BibtexEntry> entries) {
-        this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, EntryType>());
+        this(ImportFormatReader.createDatabase(entries), null, new HashMap<>());
     }
 
     public ParserResult(BibtexDatabase base, MetaData metaData, HashMap<String, EntryType> entryTypes) {
