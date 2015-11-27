@@ -1256,15 +1256,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return;
             }
             final BibtexEntry entry = selectionModel.getSelected().get(0);
-            String bibtexKey = entry.getCiteKey();
-            if (bibtexKey == null) {
+            if (entry.getCiteKey() == null) {
                 int answer = JOptionPane.showConfirmDialog(frame,
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
                     generateKeySelectedEntry();
-                    bibtexKey = entry.getCiteKey();
                 } else {
                     return; // Can't go on without the bibtex key.
                 }

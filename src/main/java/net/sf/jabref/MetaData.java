@@ -57,8 +57,8 @@ public class MetaData implements Iterable<String> {
         int groupsVersionOnDisk = 0;
 
         if (inData != null) {
-            for (String key : inData.keySet()) {
-                StringReader data = new StringReader(inData.get(key));
+            for (Map.Entry<String, String> entry : inData.entrySet()) {
+                StringReader data = new StringReader(entry.getValue());
                 String unit;
                 Vector<String> orderedData = new Vector<>();
                 // We must allow for ; and \ in escape sequences.
@@ -69,19 +69,19 @@ public class MetaData implements Iterable<String> {
                 } catch (IOException ex) {
                     System.err.println("Weird error while parsing meta data.");
                 }
-                if ("groupsversion".equals(key)) {
+                if ("groupsversion".equals(entry.getKey())) {
                     if (orderedData.size() >= 1) {
                         groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
                     }
-                } else if ("groupstree".equals(key)) {
+                } else if ("groupstree".equals(entry.getKey())) {
                     groupsTreePresent = true;
                     treeGroupsData = orderedData; // save for later user
                     // actual import operation is handled later because "groupsversion"
                     // tag might not yet have been read
-                } else if ("groups".equals(key)) {
+                } else if ("groups".equals(entry.getKey())) {
                     flatGroupsData = orderedData;
                 } else {
-                    putData(key, orderedData);
+                    putData(entry.getKey(), orderedData);
                 }
             }
         }

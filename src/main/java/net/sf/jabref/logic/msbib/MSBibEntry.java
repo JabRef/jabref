@@ -424,7 +424,7 @@ class MSBibEntry {
         }
 
         if (("InternetSite".equals(sourceType) || "DocumentFromInternetSite".equals(sourceType))
-                && bibtex.getField("title") != null) {
+                && (bibtex.getField("title") != null)) {
             internetSiteTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "accessed") != null) {
@@ -440,13 +440,13 @@ class MSBibEntry {
         if (("ElectronicSource".equals(sourceType)
                 || "Art".equals(sourceType)
                 || "Misc".equals(sourceType))
-                && bibtex.getField("title") != null) {
+                && (bibtex.getField("title") != null)) {
             publicationTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "medium") != null) {
             medium = bibtex.getField(MSBIB + "medium");
         }
-        if ("SoundRecording".equals(sourceType) && bibtex.getField("title") != null) {
+        if ("SoundRecording".equals(sourceType) && (bibtex.getField("title") != null)) {
             albumTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "recordingnumber") != null) {
@@ -458,7 +458,7 @@ class MSBibEntry {
         if (bibtex.getField(MSBIB + "distributor") != null) {
             distributor = bibtex.getField(MSBIB + "distributor");
         }
-        if ("Interview".equals(sourceType) && bibtex.getField("title") != null) {
+        if ("Interview".equals(sourceType) && (bibtex.getField("title") != null)) {
             broadcastTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "broadcaster") != null) {
@@ -750,7 +750,7 @@ class MSBibEntry {
         // tested using http://www.javaregex.com/test.html
         Pattern pattern = Pattern.compile("\\b(\\w+)\\s*[,]?\\s*(\\w+)\\s*[,]?\\s*(\\w+)\\b");
         Matcher matcher = pattern.matcher(address);
-        if (matcher.matches() && matcher.groupCount() > 3) {
+        if (matcher.matches() && (matcher.groupCount() > 3)) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));
@@ -765,13 +765,13 @@ class MSBibEntry {
             return;
         }
 
-        // Allows 20.3-2007|||20/3-  2007 etc. 
+        // Allows 20.3-2007|||20/3-  2007 etc.
         // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
         // 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
         // tested using http://www.javaregex.com/test.html
         Pattern pattern = Pattern.compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
         Matcher matcher = pattern.matcher(date);
-        if (matcher.matches() && matcher.groupCount() > 3) {
+        if (matcher.matches() && (matcher.groupCount() > 3)) {
             addField(document, parent, "Month" + extra, matcher.group(1));
             addField(document, parent, "Day" + extra, matcher.group(2));
             addField(document, parent, "Year" + extra, matcher.group(3));
@@ -908,15 +908,18 @@ class MSBibEntry {
         if (authors == null) {
             return;
         }
-        String allAuthors = "";
+        StringBuilder allAuthorsSB = new StringBuilder();
         boolean First = true;
+
         for (PersonName name : authors) {
             if (!First) {
-                allAuthors += " and ";
+                allAuthorsSB.append(" and ");
             }
-            allAuthors += name.getFullname();
+            allAuthorsSB.append(name.getFullname());
             First = false;
         }
+        String allAuthors = allAuthorsSB.toString();
+
         map.put(type, allAuthors);
     }
 
@@ -1147,17 +1150,13 @@ class MSBibEntry {
         StringBuilder out = new StringBuilder(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if (in == null || in != null && in.isEmpty()) {
+        if ((in == null) || ((in != null) && in.isEmpty())) {
             return ""; // vacancy test.
         }
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
-            if (current == 0x9 ||
-                    current == 0xA ||
-                    current == 0xD ||
-                    current >= 0x20 && current <= 0xD7FF ||
-                    current >= 0xE000 && current <= 0xFFFD ||
-                    current >= 0x10000 && current <= 0x10FFFF) {
+            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
                 out.append(current);
             }
         }
@@ -1166,7 +1165,7 @@ class MSBibEntry {
 
     /*
      * render as XML
-     * 
+     *
      * TODO This is untested.
      */
     @Override

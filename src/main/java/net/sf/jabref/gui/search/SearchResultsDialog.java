@@ -234,7 +234,7 @@ public class SearchResultsDialog {
         comparators.clear();
 
         // Icon columns:
-        for (int i = 2; i < PAD; i++) {
+        for (int i = 0; i < PAD; i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {

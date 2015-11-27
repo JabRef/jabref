@@ -123,10 +123,11 @@ public class FileActions {
             FileActions.previousStringType = bs.getType();
         }
 
-        String suffix = "";
+        StringBuilder suffixSB = new StringBuilder();
         for (int i = maxKeyLength - bs.getName().length(); i > 0; i--) {
-            suffix += " ";
+            suffixSB.append(" ");
         }
+        String suffix = suffixSB.toString();
 
         fw.write("@String { " + bs.getName() + suffix + " = ");
         if (!bs.getContent().isEmpty()) {
