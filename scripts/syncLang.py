@@ -60,10 +60,10 @@ def append_keys_to_file(filename, keys):
     f.close()
 
 
-def compare_property_files_to_main_property_file(properties_file, files, change_files):
-    keys_in_properties_file = get_keys_from_lines(read_all_lines(properties_file))
+def compare_property_files_to_main_property_file(main_properties_file, other_properties_files, append_missing_keys_to_other_properties_files):
+    keys_in_properties_file = get_keys_from_lines(read_all_lines(main_properties_file))
 
-    for other_properties_file in files:
+    for other_properties_file in other_properties_files:
         keys_in_other_properties_file = get_keys_from_lines(read_all_lines(other_properties_file))
         keys_missing = find_missing_keys(keys_in_properties_file, keys_in_other_properties_file)
         keys_obsolete = find_missing_keys(keys_in_other_properties_file, keys_in_properties_file)
@@ -76,7 +76,7 @@ def compare_property_files_to_main_property_file(properties_file, files, change_
             for key in keys_missing:
                 print key
 
-            if change_files:
+            if append_missing_keys_to_other_properties_files:
                 print "Update file?",
                 if raw_input() in ['y', 'Y']:
                     append_keys_to_file(other_properties_file, keys_missing)
@@ -93,58 +93,58 @@ def compare_property_files_to_main_property_file(properties_file, files, change_
 
 def handleJavaCode(filename, lines, keyList):
     # Extract first string parameter from Localization.lang call. E.g., Localization.lang("Default")
-    reOnlyString = r'"((\\"|[^"])*)"[^"]*'
-    patt = re.compile(r'Localization\s*\.\s*lang\s*\(\s*' + reOnlyString)
-    pattOnlyString = re.compile(reOnlyString)
+    regex_only_key = r'"((\\"|[^"])*)"[^"]*'
+    pattern_single_line = re.compile(r'Localization\s*\.\s*lang\s*\(\s*' + regex_only_key)
+    pattern_only_key = re.compile(regex_only_key)
 
     # Find multiline Localization lang statements. E.g.:
     # Localization.lang("This is my string" +
     # "with a long text")
-    patt2 = re.compile(r'Localization\s*\.\s*lang\s*\(([^)])*$')
+    pattern_multi_line = re.compile(r'Localization\s*\.\s*lang\s*\(([^)])*$')
 
-    pattPlus = re.compile(r'^\s*\+')
+    pattern_plus_symbol = re.compile(r'^\s*\+')
 
     lines_with_line_number = list(enumerate(lines))
-    i = 0
-    while i < len(lines_with_line_number):
-        line_number, line = lines_with_line_number[i]
+    line_index = 0
+    while line_index < len(lines_with_line_number):
+        line_number, line = lines_with_line_number[line_index]
 
         # Remove Java single line comments
         if line.find("http://") < 0:
             line = re.sub("//.*", "", line)
 
         while line != "":
-            result = patt.search(line)
-            result2 = patt2.search(line)
+            result_single_line = pattern_single_line.search(line)
+            result_multi_line = pattern_multi_line.search(line)
 
             found = ""
 
-            if result2 and line.find('",') < 0:
+            if result_multi_line and line.find('",') < 0:
                 # not terminated
                 # but it could be a multiline string
-                if result:
-                    curText = result.group(1)
+                if result_single_line:
+                    curText = result_single_line.group(1)
                     searchForPlus = True
                 else:
                     curText = ""
                     searchForPlus = False
-                origI = i
+                origI = line_index
                 # inspect next line
-                while i + 1 < len(lines_with_line_number):
-                    linenum2, curline2 = lines_with_line_number[i + 1]
-                    if (not searchForPlus) or pattPlus.search(curline2):
+                while line_index + 1 < len(lines_with_line_number):
+                    linenum2, curline2 = lines_with_line_number[line_index + 1]
+                    if (not searchForPlus) or pattern_plus_symbol.search(curline2):
                         # from now on, we always have to search for a plus
                         searchForPlus = True
 
                         # The current line has been handled here, therefore indicate to handle the next line
-                        i += 1
+                        line_index += 1
                         line_number = linenum2
                         line = curline2
 
                         # Search for the occurence of a string
-                        result = pattOnlyString.search(curline2)
-                        if result:
-                            curText = curText + result.group(1)
+                        result_single_line = pattern_only_key.search(curline2)
+                        if result_single_line:
+                            curText = curText + result_single_line.group(1)
                             # check for several strings in this line
                             if curline2.count('\"') > 2:
                                 break
@@ -160,16 +160,16 @@ def handleJavaCode(filename, lines, keyList):
                         # no continuation found
                         break
 
-                if origI == i:
+                if origI == line_index:
                     print "%s:%d: Not terminated: %s" % (filename, line_number + 1, line)
                 else:
                     found = curText
 
-            if result or (found != ""):
+            if result_single_line or (found != ""):
                 if found == "":
                     # not a multiline string, found via the single line matching
                     # full string in one line
-                    found = result.group(1)
+                    found = result_single_line.group(1)
 
                 found = found.replace(" ", "_")
                 # replace characters that need to be escaped in the language file
@@ -187,8 +187,8 @@ def handleJavaCode(filename, lines, keyList):
                     #   print "Not adding: "+found
 
             # Prepare a possible second run (multiple Localization.lang on this line)
-            if result:
-                lastPos = result.span()[1]
+            if result_single_line:
+                lastPos = result_single_line.span()[1]
                 # regular expression is greedy. It will match until Localization.lang("
                 # therefore, we have to adjust lastPos
                 lastPos -= 14
@@ -200,7 +200,7 @@ def handleJavaCode(filename, lines, keyList):
                 # terminate processing of this line, continue to next line
                 line = ""
 
-        i += 1
+        line_index += 1
 
 
 # Find all Java source files in the given directory, and read the lines of each,
@@ -294,19 +294,17 @@ def find_duplicate_keys_and_keys_with_no_value(current_file, display_keys):
                     empty_values_count += 1
                     if display_keys:
                         print "Empty value: " + current_file + ": " + key
-    if duplication_count > 0:
-        dupstring = str(duplication_count) + " duplicates. "
-    else:
-        dupstring = ""
-    if empty_values_count > 0:
-        emptStr = str(empty_values_count) + " empty values. "
-    else:
-        emptStr = ""
-    if duplication_count + empty_values_count > 0:
-        okString = ""
-    else:
-        okString = "ok"
-    print current_file + ": " + dupstring + emptStr + okString
+
+    issues_count = duplication_count + empty_values_count
+
+    message = ""
+    if issues_count == 0:
+        message = "ok"
+    elif duplication_count > 0:
+        message += str(duplication_count) + " duplicates. "
+    elif empty_values_count > 0:
+        message += str(empty_values_count) + " empty values. "
+    print current_file + ": " + message
 
 
 if len(sys.argv) == 1:

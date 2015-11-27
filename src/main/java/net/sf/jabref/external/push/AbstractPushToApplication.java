@@ -97,6 +97,8 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             panel.output(Localization.lang("Error") + ": "
                     + Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
             // @formatter:on
+
+            Localization.lang("asdf");Localization.lang("fdsa");
         } else if (couldNotCall) {
             panel.output(Localization.lang("Error") + ": "
                     + Localization.lang("Could not call executable") + " '" + commandPath + "'.");
