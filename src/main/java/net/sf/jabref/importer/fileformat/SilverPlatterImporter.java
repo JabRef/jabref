@@ -74,7 +74,7 @@ public class SilverPlatterImporter extends ImportFormat {
                 return false; // This is an inspec file, so return false.
             }
 
-            if ((str.length() >= 5) && str.substring(0, 5).equals("TI:  ")) {
+            if ((str.length() >= 5) && "TI:  ".equals(str.substring(0, 5))) {
                 return true;
             }
         }
@@ -116,9 +116,9 @@ public class SilverPlatterImporter extends ImportFormat {
                     //System.out.println(">"+fields[j]+"<");
                     String f3 = field.substring(0, 2);
                     String frest = field.substring(5);
-                    if (f3.equals("TI")) {
+                    if ("TI".equals(f3)) {
                         h.put("title", frest);
-                    } else if (f3.equals("AU")) {
+                    } else if ("AU".equals(f3)) {
                         if (frest.trim().endsWith("(ed)")) {
                             String ed = frest.trim();
                             ed = ed.substring(0, ed.length() - 4);
@@ -128,12 +128,12 @@ public class SilverPlatterImporter extends ImportFormat {
                             h.put("author", AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(
                                     ",-", ", ").replaceAll(";", " and ")));
                         }
-                    } else if (f3.equals("AB")) {
+                    } else if ("AB".equals(f3)) {
                         h.put("abstract", frest);
-                    } else if (f3.equals("DE")) {
+                    } else if ("DE".equals(f3)) {
                         String kw = frest.replaceAll("-;", ",").toLowerCase();
                         h.put("keywords", kw.substring(0, kw.length() - 1));
-                    } else if (f3.equals("SO")) {
+                    } else if ("SO".equals(f3)) {
                         int m = frest.indexOf(".");
                         if (m >= 0) {
                             String jr = frest.substring(0, m);
@@ -152,7 +152,7 @@ public class SilverPlatterImporter extends ImportFormat {
                                 }
                             }
                         }
-                    } else if (f3.equals("PB")) {
+                    } else if ("PB".equals(f3)) {
                         int m = frest.indexOf(":");
                         if (m >= 0) {
                             String jr = frest.substring(0, m);
@@ -172,18 +172,18 @@ public class SilverPlatterImporter extends ImportFormat {
                             }
 
                         }
-                    } else if (f3.equals("AF")) {
+                    } else if ("AF".equals(f3)) {
                         h.put("school", frest.trim());
 
-                    } else if (f3.equals("DT")) {
+                    } else if ("DT".equals(f3)) {
                         frest = frest.trim();
-                        if (frest.equals("Monograph")) {
+                        if ("Monograph".equals(frest)) {
                             Type = "book";
                         } else if (frest.startsWith("Dissertation")) {
                             Type = "phdthesis";
                         } else if (frest.toLowerCase().contains("journal")) {
                             Type = "article";
-                        } else if (frest.equals("Contribution") || frest.equals("Chapter")) {
+                        } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
                             Type = "incollection";
                             // This entry type contains page numbers and booktitle in the
                             // title field.

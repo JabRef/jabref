@@ -20,7 +20,7 @@ public class PreferencesMigrations {
         if (genFields.contains("abstract")) {
 
             String newGen;
-            if (genFields.equals("abstract")) {
+            if ("abstract".equals(genFields)) {
                 newGen = "";
             } else if (genFields.contains(";abstract;")) {
                 newGen = genFields.replaceAll(";abstract;", ";");

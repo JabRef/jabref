@@ -468,7 +468,7 @@ public class Util {
             if (group instanceof KeywordGroup) {
                 KeywordGroup kg = (KeywordGroup) group;
                 String field = kg.getSearchField().toLowerCase();
-                if (field.equals("keywords")) {
+                if ("keywords".equals(field)) {
                     continue; // this is not undesired
                 }
                 for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {

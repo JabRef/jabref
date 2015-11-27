@@ -134,7 +134,7 @@ class PdfPreviewPanel extends JPanel {
         FileListEntry flEntry = null;
         for (int i = 0; i < tm.getRowCount(); i++) {
             flEntry = tm.getEntry(i);
-            if (flEntry.getType().getName().toLowerCase().equals("pdf")) {
+            if ("pdf".equals(flEntry.getType().getName().toLowerCase())) {
                 break;
             }
         }

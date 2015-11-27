@@ -52,7 +52,7 @@ public class MedlineFetcher implements EntryFetcher {
 
 
         public void addID(String id) {
-            if (ids.equals("")) {
+            if ("".equals(ids)) {
                 ids = id;
             } else {
                 ids += "," + id;

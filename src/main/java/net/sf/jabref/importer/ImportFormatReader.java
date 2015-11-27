@@ -328,7 +328,7 @@ public class ImportFormatReader {
     // Set a field, unless the string to set is empty.
     //==================================================
     public static void setIfNecessary(BibtexEntry be, String field, String content) {
-        if (!content.equals("")) {
+        if (!"".equals(content)) {
             be.setField(field, content);
         }
     }

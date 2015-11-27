@@ -140,16 +140,16 @@ public class SixpackImporter extends ImportFormat {
                 EntryType typ = EntryTypes.getType(fields[1].toLowerCase());
                 if (typ == null) {
                     String type = "";
-                    if (fields[1].equals("Masterthesis")) {
+                    if ("Masterthesis".equals(fields[1])) {
                         type = "mastersthesis";
                     }
-                    if (fields[1].equals("PhD-Thesis")) {
+                    if ("PhD-Thesis".equals(fields[1])) {
                         type = "phdthesis";
                     }
-                    if (fields[1].equals("miscellaneous")) {
+                    if ("miscellaneous".equals(fields[1])) {
                         type = "misc";
                     }
-                    if (fields[1].equals("Conference")) {
+                    if ("Conference".equals(fields[1])) {
                         type = "proceedings";
                     }
                     typ = EntryTypes.getType(type.toLowerCase());
@@ -159,14 +159,14 @@ public class SixpackImporter extends ImportFormat {
                 for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++) {
                     fld = fI.get(fieldDef[i]);
                     if (fld != null) {
-                        if (fld.equals("author") || fld.equals("editor")) {
+                        if ("author".equals(fld) || "editor".equals(fld)) {
                             ImportFormatReader.setIfNecessary(entry,
                                     fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ",
                                             " and "));
-                        } else if (fld.equals("pages")) {
+                        } else if ("pages".equals(fld)) {
                             ImportFormatReader.setIfNecessary(entry, fld, fields[i]
                                     .replaceAll("-", "--"));
-                        } else if (fld.equals("file")) {
+                        } else if ("file".equals(fld)) {
                             String fieldName = "pdf"; // We set pdf as default.
                             if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz")) {
                                 fieldName = "ps";

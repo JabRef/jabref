@@ -73,7 +73,7 @@ public class JstorImporter extends ImportFormat {
         }
 
         while ((s = in.readLine()) != null) {
-            if (s.equals("")) {
+            if ("".equals(s)) {
                 continue;
             }
             if (s.startsWith("-----------------------------")) {
@@ -82,7 +82,7 @@ public class JstorImporter extends ImportFormat {
             String[] fields = s.split("\t");
             BibtexEntry be = new BibtexEntry(IdGenerator.next());
             try {
-                if (fields[0].equals("FLA")) {
+                if ("FLA".equals(fields[0])) {
                     be.setType(EntryTypes.getType("article"));
                 }
                 ImportFormatReader.setIfNecessary(be, "title", fields[2]);

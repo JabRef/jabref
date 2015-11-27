@@ -68,7 +68,7 @@ public class ArXiv implements FullTextFinder {
                             String rel = attr.getNamedItem("rel").getNodeValue();
                             String href = attr.getNamedItem("href").getNodeValue();
 
-                            if (rel.equals("related") && attr.getNamedItem("title").getNodeValue().equals("pdf")) {
+                            if ("related".equals(rel) && "pdf".equals(attr.getNamedItem("title").getNodeValue())) {
                                 pdfLink = Optional.of(new URL(href));
                                 LOGGER.info("Fulltext PDF found @ arXiv.");
                             }

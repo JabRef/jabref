@@ -103,12 +103,12 @@ public class CopacImporter extends ImportFormat {
 
             String code = str.substring(0, 4);
 
-            if (code.equals("    ")) {
+            if ("    ".equals(code)) {
                 sb.append(" ").append(str.trim());
             } else {
 
                 // begining of a new item
-                if (str.substring(0, 4).equals("TI- ")) {
+                if ("TI- ".equals(str.substring(0, 4))) {
                     if (sb.length() > 0) {
                         entries.add(sb.toString());
                     }
@@ -139,25 +139,25 @@ public class CopacImporter extends ImportFormat {
                 }
                 String code = line.substring(0, 4);
 
-                if (code.equals("TI- ")) {
+                if ("TI- ".equals(code)) {
                     setOrAppend(b, "title", line.substring(4).trim(), ", ");
-                } else if (code.equals("AU- ")) {
+                } else if ("AU- ".equals(code)) {
                     setOrAppend(b, "author", line.substring(4).trim(), " and ");
-                } else if (code.equals("PY- ")) {
+                } else if ("PY- ".equals(code)) {
                     setOrAppend(b, "year", line.substring(4).trim(), ", ");
-                } else if (code.equals("PU- ")) {
+                } else if ("PU- ".equals(code)) {
                     setOrAppend(b, "publisher", line.substring(4).trim(), ", ");
-                } else if (code.equals("SE- ")) {
+                } else if ("SE- ".equals(code)) {
                     setOrAppend(b, "series", line.substring(4).trim(), ", ");
-                } else if (code.equals("IS- ")) {
+                } else if ("IS- ".equals(code)) {
                     setOrAppend(b, "isbn", line.substring(4).trim(), ", ");
-                } else if (code.equals("KW- ")) {
+                } else if ("KW- ".equals(code)) {
                     setOrAppend(b, "keywords", line.substring(4).trim(), ", ");
-                } else if (code.equals("NT- ")) {
+                } else if ("NT- ".equals(code)) {
                     setOrAppend(b, "note", line.substring(4).trim(), ", ");
-                } else if (code.equals("PD- ")) {
+                } else if ("PD- ".equals(code)) {
                     setOrAppend(b, "physicaldimensions", line.substring(4).trim(), ", ");
-                } else if (code.equals("DT- ")) {
+                } else if ("DT- ".equals(code)) {
                     setOrAppend(b, "documenttype", line.substring(4).trim(), ", ");
                 } else {
                     setOrAppend(b, code.substring(0, 2), line.substring(4).trim(), ", ");

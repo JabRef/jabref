@@ -197,7 +197,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
                 if (col == 0) {
                     rowContent.name = value.toString();
-                    if (getValueAt(row, 1).equals("")) {
+                    if ("".equals(getValueAt(row, 1))) {
                         setValueAt("" + GUIGlobals.DEFAULT_FIELD_LENGTH, row, 1);
                     }
                 }

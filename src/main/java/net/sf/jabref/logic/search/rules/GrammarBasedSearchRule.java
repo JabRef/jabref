@@ -110,9 +110,9 @@ public class GrammarBasedSearchRule implements SearchRule {
         EXACT, CONTAINS, DOES_NOT_CONTAIN;
 
         public static ComparisonOperator build(String value) {
-            if (value.equalsIgnoreCase("CONTAINS") || value.equals("=")) {
+            if ("CONTAINS".equalsIgnoreCase(value) || "=".equals(value)) {
                 return CONTAINS;
-            } else if (value.equalsIgnoreCase("MATCHES") || value.equals("==")) {
+            } else if ("MATCHES".equalsIgnoreCase(value) || "==".equals(value)) {
                 return EXACT;
             } else {
                 return DOES_NOT_CONTAIN;
@@ -224,7 +224,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         @Override
         public Boolean visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
-            if (ctx.operator.getText().equalsIgnoreCase("AND")) {
+            if ("AND".equalsIgnoreCase(ctx.operator.getText())) {
                 return visit(ctx.left) && visit(ctx.right); // and
             } else {
                 return visit(ctx.left) || visit(ctx.right); // or

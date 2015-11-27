@@ -442,7 +442,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                 // text field content, so we skip the searching and keep the entire part up to the caret:
                 res.append(upToCaret);
             }
-            LOGGER.debug("AutoCompListener: " + res.toString());
+            LOGGER.debug("AutoCompListener: " + res);
         } catch (BadLocationException ignore) {
             // Ignored
         }

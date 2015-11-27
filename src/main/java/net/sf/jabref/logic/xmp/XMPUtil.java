@@ -228,7 +228,7 @@ public class XMPUtil {
             if (key.startsWith("bibtex/")) {
                 String value = dict.getString(key);
                 key = key.substring("bibtex/".length());
-                if (key.equals("entrytype")) {
+                if ("entrytype".equals(key)) {
                     EntryType type = EntryTypes.getStandardType(value);
                     if (type != null) {
                         entry.setType(type);
@@ -612,7 +612,7 @@ public class XMPUtil {
                 continue;
             }
 
-            if (field.equals("editor")) {
+            if ("editor".equals(field)) {
                 String authors = entry.getField(field);
 
                 /**
@@ -662,7 +662,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: author
              */
-            if (field.equals("author")) {
+            if ("author".equals(field)) {
                 String authors = entry.getField(field);
                 AuthorList list = AuthorList.getAuthorList(authors);
 
@@ -673,12 +673,12 @@ public class XMPUtil {
                 continue;
             }
 
-            if (field.equals("month")) {
+            if ("month".equals(field)) {
                 // Dealt with in year
                 continue;
             }
 
-            if (field.equals("year")) {
+            if ("year".equals(field)) {
 
                 /**
                  * Year + Month -> Date
@@ -714,7 +714,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: abstract
              */
-            if (field.equals("abstract")) {
+            if ("abstract".equals(field)) {
                 String o = entry.getField(field);
                 dcSchema.setDescription(o);
                 continue;
@@ -733,7 +733,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if (field.equals("doi")) {
+            if ("doi".equals(field)) {
                 String o = entry.getField(field);
                 dcSchema.setIdentifier(o);
                 continue;
@@ -761,7 +761,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if (field.equals("publisher")) {
+            if ("publisher".equals(field)) {
                 String o = entry.getField(field);
                 dcSchema.addPublisher(o);
                 continue;
@@ -799,7 +799,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if (field.equals("keywords")) {
+            if ("keywords".equals(field)) {
                 String o = entry.getField(field);
                 String[] keywords = o.split(",");
                 for (String keyword : keywords) {
@@ -823,7 +823,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: title
              */
-            if (field.equals("title")) {
+            if ("title".equals(field)) {
                 String o = entry.getField(field);
                 dcSchema.setTitle(o);
                 continue;
@@ -1001,13 +1001,13 @@ public class XMPUtil {
 
             if (useXmpPrivacyFilter && filters.contains(field)) {
                 // erase field instead of adding it
-                if (field.equals("author")) {
+                if ("author".equals(field)) {
                     di.setAuthor(null);
-                } else if (field.equals("title")) {
+                } else if ("title".equals(field)) {
                     di.setTitle(null);
-                } else if (field.equals("keywords")) {
+                } else if ("keywords".equals(field)) {
                     di.setKeywords(null);
-                } else if (field.equals("abstract")) {
+                } else if ("abstract".equals(field)) {
                     di.setSubject(null);
                 } else {
                     di.setCustomMetadataValue("bibtex/" + field,
@@ -1016,13 +1016,13 @@ public class XMPUtil {
                 continue;
             }
 
-            if (field.equals("author")) {
+            if ("author".equals(field)) {
                 di.setAuthor(entry.getField("author"));
-            } else if (field.equals("title")) {
+            } else if ("title".equals(field)) {
                 di.setTitle(entry.getField("title"));
-            } else if (field.equals("keywords")) {
+            } else if ("keywords".equals(field)) {
                 di.setKeywords(entry.getField("keywords"));
-            } else if (field.equals("abstract")) {
+            } else if ("abstract".equals(field)) {
                 di.setSubject(entry.getField("abstract"));
             } else {
                 di.setCustomMetadataValue("bibtex/" + field,
@@ -1214,7 +1214,7 @@ public class XMPUtil {
             }
             break;
         case 2:
-            if (args[0].equals("-x") && args[1].endsWith(".pdf")) {
+            if ("-x".equals(args[0]) && args[1].endsWith(".pdf")) {
                 // Read from pdf and write as BibTex
                 XMPMetadata meta = XMPUtil.readRawXMP(new File(args[1]));
 

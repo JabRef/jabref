@@ -128,7 +128,7 @@ public class DuplicateCheck {
             return EMPTY_IN_TWO;
         }
 
-        if (field.equals("author") || field.equals("editor")) {
+        if ("author".equals(field) || "editor".equals(field)) {
             // Specific for name fields.
             // Harmonise case:
             String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase();
@@ -138,7 +138,7 @@ public class DuplicateCheck {
                 return EQUAL;
             }
             return NOT_EQUAL;
-        } else if (field.equals("pages")) {
+        } else if ("pages".equals(field)) {
             // Pages can be given with a variety of delimiters, "-", "--", " - ", " -- ".
             // We do a replace to harmonize these to a simple "-":
             // After this, a simple test for equality should be enough:
@@ -148,7 +148,7 @@ public class DuplicateCheck {
                 return EQUAL;
             }
             return NOT_EQUAL;
-        } else if (field.equals("journal")) {
+        } else if ("journal".equals(field)) {
             // We do not attempt to harmonize abbreviation state of the journal names,
             // but we remove periods from the names in case they are abbreviated with
             // and without dots:

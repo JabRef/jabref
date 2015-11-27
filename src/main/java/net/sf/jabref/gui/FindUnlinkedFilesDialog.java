@@ -396,7 +396,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         }
 
         String path = textfieldDirectoryPath.getText();
-        if ((path == null) || path.equals("")) {
+        if ((path == null) || "".equals(path)) {
             fileChooser.setCurrentDirectory(lastSelectedDirectory);
         } else {
             fileChooser.setCurrentDirectory(new File(path));

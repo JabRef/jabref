@@ -75,7 +75,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
         // If the field is author or editor, we rearrange names so they are
         // sorted according to last name.
-        if (sortField.equals("author") || sortField.equals("editor")) {
+        if ("author".equals(sortField) || "editor".equals(sortField)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
                 //ImportFormatReader.fixAuthor_lastNameFirst((String)f1);

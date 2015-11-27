@@ -310,9 +310,9 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             if (numPattern.matcher(value).matches()) {
                 toSet = Integer.parseInt(value);
             }
-            else if (value.toLowerCase().trim().equals("true")) {
+            else if ("true".equals(value.toLowerCase().trim())) {
                 toSet = Boolean.TRUE;
-            } else if (value.toLowerCase().trim().equals("false")) {
+            } else if ("false".equals(value.toLowerCase().trim())) {
                 toSet = Boolean.FALSE;
             }
             map.put(propertyName, toSet);

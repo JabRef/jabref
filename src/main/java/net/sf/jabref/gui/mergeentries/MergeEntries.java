@@ -226,7 +226,7 @@ public class MergeEntries {
                 maxLabelWidth = tmpLabelWidth;
             }
 
-            if (field.equals("abstract") || field.equals("review")) {
+            if ("abstract".equals(field) || "review".equals(field)) {
                 // Treat the abstract and review fields special
                 JTextArea tf = new JTextArea();
                 tf.setLineWrap(true);
@@ -274,7 +274,7 @@ public class MergeEntries {
             } else {
                 mergedEntry.setField(field, string1);
             }
-            if (field.equals("abstract") || field.equals("review")) {
+            if ("abstract".equals(field) || "review".equals(field)) {
                 // Again, treat abstract and review special
                 JTextArea tf = new JTextArea();
                 tf.setLineWrap(true);
@@ -312,7 +312,7 @@ public class MergeEntries {
             }
         }
         for (int k = 0; k < 3; k++) {
-            mergeLayout.setColumnSpec(5 + (k * 2), ColumnSpec.decode(rbAlign[k] + ":" + maxRBWidth.toString() + "px"));
+            mergeLayout.setColumnSpec(5 + (k * 2), ColumnSpec.decode(rbAlign[k] + ":" + maxRBWidth + "px"));
         }
 
         // Setup a PreviewPanel and a Bibtex source box for the merged entry

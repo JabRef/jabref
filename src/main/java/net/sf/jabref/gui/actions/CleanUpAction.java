@@ -510,7 +510,7 @@ public class CleanUpAction extends AbstractWorker {
             FileListEntry flEntry = flModel.getEntry(i);
             String link = flEntry.getLink();
             String description = flEntry.getDescription();
-            if (link.equals("") && (!description.equals(""))) {
+            if ("".equals(link) && (!"".equals(description))) {
                 // link and description seem to be switched, quickly fix that
                 flEntry.setLink(flEntry.getDescription());
                 flEntry.setDescription("");

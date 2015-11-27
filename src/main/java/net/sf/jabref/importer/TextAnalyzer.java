@@ -140,7 +140,7 @@ class TextAnalyzer {
                 pos = journal.lastIndexOf(' ');
                 if (pos > 0) {
                     String last = journal.substring(pos + 1).toLowerCase();
-                    if (last.equals("volume") || last.equals("vol") || last.equals("v")) {
+                    if ("volume".equals(last) || "vol".equals(last) || "v".equals(last)) {
                         journal = clean(journal.substring(0, pos));
                     }
                 }

@@ -149,7 +149,7 @@ class ContentSelectorDialog2 extends JDialog {
                 int index = wordList.getSelectedIndex();
                 String old = wordList.getSelectedValue();
                 String newVal = wordEditField.getText();
-                if (newVal.equals("") || newVal.equals(old)) {
+                if ("".equals(newVal) || newVal.equals(old)) {
                     return; // Empty string or no change.
                 }
                 if (wordListModel.contains(newVal)) {
@@ -296,7 +296,7 @@ class ContentSelectorDialog2 extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Store if an entry is currently being edited:
-                if (!wordEditField.getText().equals("")) {
+                if (!"".equals(wordEditField.getText())) {
                     wordEditFieldListener.actionPerformed(null);
                 }
                 try {

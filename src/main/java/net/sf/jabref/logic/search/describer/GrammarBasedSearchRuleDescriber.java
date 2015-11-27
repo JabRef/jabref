@@ -61,7 +61,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
 
             @Override
             public String visitBinaryExpression(SearchParser.BinaryExpressionContext context) {
-                if (context.operator.getText().equalsIgnoreCase("AND")) {
+                if ("AND".equalsIgnoreCase(context.operator.getText())) {
                     return String.format("(%s %s %s)", visit(context.left), Localization.lang("and"), visit(context.right));
                 } else {
                     return String.format("(%s %s %s)", visit(context.left), Localization.lang("or"), visit(context.right));

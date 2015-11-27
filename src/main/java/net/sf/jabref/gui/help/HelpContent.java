@@ -165,7 +165,7 @@ class HelpContent extends JTextPane {
         try {
             URL url;
             if(anchorName!=null) {
-                url = new URL(baseUrl.toString()+"#"+anchorName);
+                url = new URL(baseUrl +"#"+anchorName);
             } else {
                 url = baseUrl;
             }

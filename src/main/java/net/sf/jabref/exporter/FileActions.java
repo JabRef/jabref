@@ -526,6 +526,6 @@ public class FileActions {
     private static boolean nonZeroField(BibtexEntry be, String field) {
         String o = be.getField(field);
 
-        return (o != null) && !o.equals("0");
+        return (o != null) && !"0".equals(o);
     }
 }

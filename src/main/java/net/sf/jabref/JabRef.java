@@ -178,7 +178,7 @@ public class JabRef {
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
             String value = cli.getPreferencesReset();
-            if (value.trim().equals("all")) {
+            if ("all".equals(value.trim())) {
                 try {
                     System.out.println(Localization.lang("Setting all preferences to default values."));
                     Globals.prefs.clear();
@@ -531,7 +531,7 @@ public class JabRef {
             }
 
             // At all cost, avoid ending up with the Metal look and feel:
-            if (lookFeel.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
+            if ("javax.swing.plaf.metal.MetalLookAndFeel".equals(lookFeel)) {
                 Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
                 Plastic3DLookAndFeel.setCurrentTheme(new SkyBluer());
                 com.jgoodies.looks.Options.setPopupDropShadowEnabled(true);

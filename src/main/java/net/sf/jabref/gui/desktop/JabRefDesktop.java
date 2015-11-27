@@ -35,7 +35,7 @@ public class JabRefDesktop {
      */
     public static void openExternalViewer(MetaData metaData, String link, String fieldName) throws IOException {
 
-        if (fieldName.equals("ps") || fieldName.equals("pdf")) {
+        if ("ps".equals(fieldName) || "pdf".equals(fieldName)) {
 
             // Find the default directory for this field type:
             String[] dir = metaData.getFileDirectory(fieldName);
@@ -51,23 +51,23 @@ public class JabRefDesktop {
             // Use the correct viewer even if pdf and ps are mixed up:
             String[] split = file.getName().split("\\.");
             if (split.length >= 2) {
-                if (split[split.length - 1].equalsIgnoreCase("pdf")) {
+                if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     fieldName = "pdf";
                     // @formatter:off
-                } else if (split[split.length - 1].equalsIgnoreCase("ps")
-                        || ((split.length >= 3) && split[split.length - 2].equalsIgnoreCase("ps"))) {
+                } else if ("ps".equalsIgnoreCase(split[split.length - 1])
+                        || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
                     // @formatter:on
                     fieldName = "ps";
                 }
             }
 
-        } else if (fieldName.equals("doi")) {
+        } else if ("doi".equals(fieldName)) {
             fieldName = "url";
 
             // sanitizing is done below at the treatment of "URL"
             // in sanitizeUrl a doi-link is correctly treated
 
-        } else if (fieldName.equals("eprint")) {
+        } else if ("eprint".equals(fieldName)) {
             fieldName = "url";
 
             link = URLUtil.sanitizeUrl(link);
@@ -78,7 +78,7 @@ public class JabRefDesktop {
             }
         }
 
-        if (fieldName.equals("url")) { // html
+        if ("url".equals(fieldName)) { // html
             try {
                 openBrowser(link);
             } catch (IOException e) {
@@ -88,7 +88,7 @@ public class JabRefDesktop {
                 // In BasePanel.java, the exception is catched and a text output to the frame
                 // throw e;
             }
-        } else if (fieldName.equals("ps")) {
+        } else if ("ps".equals(fieldName)) {
             try {
                 if (OS.OS_X) {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
@@ -113,7 +113,7 @@ public class JabRefDesktop {
             } catch (IOException e) {
                 System.err.println("An error occured on the command: " + Globals.prefs.get("psviewer") + " " + link);
             }
-        } else if (fieldName.equals("pdf")) {
+        } else if ("pdf".equals(fieldName)) {
             try {
                 if (OS.OS_X) {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");

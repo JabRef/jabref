@@ -44,7 +44,7 @@ public class CanonicalBibtexEntry {
             String line = String.format("  %s = {%s}", fieldName, mapFieldToValue.get(fieldName));
             sj.add(line);
         }
-        sb.append(sj.toString());
+        sb.append(sj);
 
         // append the closing entry bracket
         sb.append("}");

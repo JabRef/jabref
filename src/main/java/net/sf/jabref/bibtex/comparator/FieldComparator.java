@@ -75,10 +75,10 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
         multiplier = reversed ? -1 : 1;
         isTypeHeader = this.field[0].equals(BibtexEntry.TYPE_HEADER);
-        isNameField = this.field[0].equals("author")
-                || this.field[0].equals("editor");
-        isYearField = this.field[0].equals("year");
-        isMonthField = this.field[0].equals("month");
+        isNameField = "author".equals(this.field[0])
+                || "editor".equals(this.field[0]);
+        isYearField = "year".equals(this.field[0]);
+        isMonthField = "month".equals(this.field[0]);
         isNumeric = BibtexFields.isNumeric(this.field[0]);
     }
 

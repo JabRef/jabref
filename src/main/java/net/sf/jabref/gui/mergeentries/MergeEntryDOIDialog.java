@@ -178,10 +178,10 @@ public class MergeEntryDOIDialog extends JDialog {
      */
     private void buttonPressed(String button) {
         BibtexEntry mergedEntry = mergeEntries.getMergeEntry();
-        if (button.equals("cancel")) {
+        if ("cancel".equals(button)) {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));
-        } else if (button.equals("done")) {
+        } else if ("done".equals(button)) {
             // Create a new entry and add it to the undo stack
             // Remove the old entry and add it to the undo stack (which is not working...)
             Set<String> joint = new TreeSet<>(mergedEntry.getFieldNames());

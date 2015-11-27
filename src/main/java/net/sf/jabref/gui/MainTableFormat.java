@@ -93,7 +93,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS)) {
                 return getIconTypeForColumn(col)[0].substring(0, 1).toUpperCase();
             } else {
-                if(getIconTypeForColumn(col)[0].equals("ranking")) {
+                if("ranking".equals(getIconTypeForColumn(col)[0])) {
                     return EntryUtil.capitalizeFirst(getIconTypeForColumn(col)[0]);
                 }
                 return null;
@@ -244,7 +244,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                     o = be.getType().getName();
                 } else {
                     o = be.getFieldOrAlias(fld[i]);
-                    if (getColumnName(col).equals("Author") && (o != null)) {
+                    if ("Author".equals(getColumnName(col)) && (o != null)) {
                         o = panel.database().resolveForStrings((String) o);
                     }
                 }
@@ -435,8 +435,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         Vector<int[]> tmp = new Vector<>(2, 1);
         for (int i = 0; i < columns.length; i++) {
             for (int j = 0; j < columns[i].length; j++) {
-                if (columns[i][j].equals("author")
-                        || columns[i][j].equals("editor")) {
+                if ("author".equals(columns[i][j])
+                        || "editor".equals(columns[i][j])) {
                     tmp.add(new int[]{i, j});
                 }
             }

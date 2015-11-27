@@ -52,46 +52,46 @@ public class GetOpenOfficeType implements LayoutFormatter
     @Override
     public String format(String fieldText)
     {
-        if (fieldText.equalsIgnoreCase("Article")) {
+        if ("Article".equalsIgnoreCase(fieldText)) {
             return "7";
         }
-        if (fieldText.equalsIgnoreCase("Book")) {
+        if ("Book".equalsIgnoreCase(fieldText)) {
             return "1";
         }
-        if (fieldText.equalsIgnoreCase("Booklet")) {
+        if ("Booklet".equalsIgnoreCase(fieldText)) {
             return "2";
         }
-        if (fieldText.equalsIgnoreCase("Inbook")) {
+        if ("Inbook".equalsIgnoreCase(fieldText)) {
             return "5";
         }
-        if (fieldText.equalsIgnoreCase("Incollection")) {
+        if ("Incollection".equalsIgnoreCase(fieldText)) {
             return "5";
         }
-        if (fieldText.equalsIgnoreCase("Inproceedings")) {
+        if ("Inproceedings".equalsIgnoreCase(fieldText)) {
             return "6";
         }
-        if (fieldText.equalsIgnoreCase("Manual")) {
+        if ("Manual".equalsIgnoreCase(fieldText)) {
             return "8";
         }
-        if (fieldText.equalsIgnoreCase("Mastersthesis")) {
+        if ("Mastersthesis".equalsIgnoreCase(fieldText)) {
             return "9";
         }
-        if (fieldText.equalsIgnoreCase("Misc")) {
+        if ("Misc".equalsIgnoreCase(fieldText)) {
             return "10";
         }
-        if (fieldText.equalsIgnoreCase("Other")) {
+        if ("Other".equalsIgnoreCase(fieldText)) {
             return "10";
         }
-        if (fieldText.equalsIgnoreCase("Phdthesis")) {
+        if ("Phdthesis".equalsIgnoreCase(fieldText)) {
             return "9";
         }
-        if (fieldText.equalsIgnoreCase("Proceedings")) {
+        if ("Proceedings".equalsIgnoreCase(fieldText)) {
             return "3";
         }
-        if (fieldText.equalsIgnoreCase("Techreport")) {
+        if ("Techreport".equalsIgnoreCase(fieldText)) {
             return "13";
         }
-        if (fieldText.equalsIgnoreCase("Unpublished")) {
+        if ("Unpublished".equalsIgnoreCase(fieldText)) {
             return "14";
         }
         // Default, Miscelaneous

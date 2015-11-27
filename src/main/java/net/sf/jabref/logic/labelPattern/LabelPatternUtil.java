@@ -73,12 +73,12 @@ public class LabelPatternUtil {
         String token = "";
         for (int p = 0; p < content.length(); p++) {
             if (b == 0) {
-                if ((and.equals("") && (content.charAt(p) == ' '))
-                        || (and.equals(" ") && (content.charAt(p) == 'a'))
-                        || (and.equals(" a") && (content.charAt(p) == 'n'))
-                        || (and.equals(" an") && (content.charAt(p) == 'd'))) {
+                if (("".equals(and) && (content.charAt(p) == ' '))
+                        || (" ".equals(and) && (content.charAt(p) == 'a'))
+                        || (" a".equals(and) && (content.charAt(p) == 'n'))
+                        || (" an".equals(and) && (content.charAt(p) == 'd'))) {
                     and += content.charAt(p);
-                } else if (and.equals(" and") && (content.charAt(p) == ' ')) {
+                } else if (" and".equals(and) && (content.charAt(p) == ' ')) {
                     and = "";
                     tokens.add(token.trim());
                     token = "";
@@ -277,11 +277,11 @@ public class LabelPatternUtil {
 
             // Cleanup: remove unnecessary words.
             for (String k : parts[index].replaceAll("\\{[A-Z]+\\}", "").split("[ \\-_]")) {
-                if ((!k.equals("") // remove empty
+                if ((!"".equals(k) // remove empty
                         && !ignore.contains(k.toLowerCase()) // remove ignored words
                         && (k.charAt(k.length() - 1) != '.')
                         && (k.charAt(0) + "").matches("[A-Z]"))
-                        || ((k.length() >= 3) && k.toLowerCase().substring(0, 2).equals("uni"))) {
+                        || ((k.length() >= 3) && "uni".equals(k.toLowerCase().substring(0, 2)))) {
                     part.add(k);
                 }
             }
@@ -293,17 +293,17 @@ public class LabelPatternUtil {
 
             // Deciding about a part type...
             for (String k : part) {
-                if ((k.length() >= 5) && k.toLowerCase().substring(0, 5).equals("univ")) {
+                if ((k.length() >= 5) && "univ".equals(k.toLowerCase().substring(0, 5))) {
                     isUniversity = true;
                 }
-                if ((k.length() >= 6) && k.toLowerCase().substring(0, 6).equals("techn")) {
+                if ((k.length() >= 6) && "techn".equals(k.toLowerCase().substring(0, 6))) {
                     isTechnology = true;
                 }
-                if (k.toLowerCase().equals("school")) {
+                if ("school".equals(k.toLowerCase())) {
                     isSchool = true;
                 }
                 if (((k.length() >= 7) && k.toLowerCase().substring(0, 7).matches("d[ei]part"))
-                        || ((k.length() >= 4) && k.toLowerCase().substring(0, 4).equals("lab"))) {
+                        || ((k.length() >= 4) && "lab".equals(k.toLowerCase().substring(0, 4)))) {
                     isDepartment = true;
                 }
             }
@@ -319,7 +319,7 @@ public class LabelPatternUtil {
             if (isUniversity) {
                 university = "Uni";
                 for (String k : part) {
-                    if ((k.length() >= 5) && !k.toLowerCase().substring(0, 5).equals("univ")) {
+                    if ((k.length() >= 5) && !"univ".equals(k.toLowerCase().substring(0, 5))) {
                         university += k;
                     }
                 }
@@ -342,9 +342,9 @@ public class LabelPatternUtil {
 
                 for (String k : part) {
                     if ((k.length() >= 7) && !k.toLowerCase().substring(0, 7).matches("d[ei]part")
-                            && !k.toLowerCase().equals("school")
-                            && !k.toLowerCase().equals("faculty")
-                            && !k.replaceAll("[^A-Z]", "").equals("")) {
+                            && !"school".equals(k.toLowerCase())
+                            && !"faculty".equals(k.toLowerCase())
+                            && !"".equals(k.replaceAll("[^A-Z]", ""))) {
                         if (isSchool) {
                             school += k.replaceAll("[^A-Z]", "");
                         }
@@ -366,7 +366,7 @@ public class LabelPatternUtil {
                 } else {
                     for (String k : part) {
                         k = k.replaceAll("[^A-Z]", "");
-                        if (!k.equals("")) {
+                        if (!"".equals(k)) {
                             rest += k;
                         }
                     }
@@ -434,9 +434,9 @@ public class LabelPatternUtil {
             boolean field = false;
             for (int i = 1; i < typeListSize; i++) {
                 String typeListEntry = typeList.get(i);
-                if (typeListEntry.equals("[")) {
+                if ("[".equals(typeListEntry)) {
                     field = true;
-                } else if (typeListEntry.equals("]")) {
+                } else if ("]".equals(typeListEntry)) {
                     field = false;
                 } else if (field) {
                     // check whether there is a modifier on the end such as
@@ -547,11 +547,11 @@ public class LabelPatternUtil {
             for (int j = offset; j < parts.length; j++) {
                 String modifier = parts[j];
 
-                if (modifier.equals("lower")) {
+                if ("lower".equals(modifier)) {
                     label = label.toLowerCase();
-                } else if (modifier.equals("upper")) {
+                } else if ("upper".equals(modifier)) {
                     label = label.toUpperCase();
-                } else if (modifier.equals("abbr")) {
+                } else if ("abbr".equals(modifier)) {
                     // Abbreviate - that is,
                     StringBuilder abbr = new StringBuilder();
                     String[] words = label.replaceAll("[\\{\\}']", "")
@@ -566,7 +566,7 @@ public class LabelPatternUtil {
                 } else if (modifier.startsWith("(") && modifier.endsWith(")")) {
                     // Alternate text modifier in parentheses. Should be inserted if
                     // the label is empty:
-                    if (label.equals("") && (modifier.length() > 2)) {
+                    if ("".equals(label) && (modifier.length() > 2)) {
                         return modifier.substring(1, modifier.length() - 1);
                     }
 
@@ -604,7 +604,7 @@ public class LabelPatternUtil {
                     // code in this section functions correctly
                     val = val.substring(4);
                 } else {
-                    if ((authString == null) || authString.equals("")) {
+                    if ((authString == null) || "".equals(authString)) {
                         authString = entry.getField("editor");
                         if (authString != null) {
                             authString = LabelPatternUtil.normalize(
@@ -615,38 +615,38 @@ public class LabelPatternUtil {
 
                 // Gather all author-related checks, so we don't
                 // have to check all the time.
-                if (val.equals("auth")) {
+                if ("auth".equals(val)) {
                     return LabelPatternUtil.firstAuthor(authString);
-                } else if (val.equals("authForeIni")) {
+                } else if ("authForeIni".equals(val)) {
                     return LabelPatternUtil.firstAuthorForenameInitials(authString);
-                } else if (val.equals("authFirstFull")) {
+                } else if ("authFirstFull".equals(val)) {
                     return LabelPatternUtil.firstAuthorVonAndLast(authString);
-                } else if (val.equals("authors")) {
+                } else if ("authors".equals(val)) {
                     return LabelPatternUtil.allAuthors(authString);
-                } else if (val.equals("authorsAlpha")) {
+                } else if ("authorsAlpha".equals(val)) {
                     return LabelPatternUtil.authorsAlpha(authString);
                 }
                 // Last author's last name
-                else if (val.equals("authorLast")) {
+                else if ("authorLast".equals(val)) {
                     return LabelPatternUtil.lastAuthor(authString);
-                } else if (val.equals("authorLastForeIni")) {
+                } else if ("authorLastForeIni".equals(val)) {
                     return LabelPatternUtil.lastAuthorForenameInitials(authString);
-                } else if (val.equals("authorIni")) {
+                } else if ("authorIni".equals(val)) {
                     return LabelPatternUtil.oneAuthorPlusIni(authString);
                 } else if (val.matches("authIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
                     String s = LabelPatternUtil.authIniN(authString, num);
                     return s == null ? "" : s;
-                } else if (val.equals("auth.auth.ea")) {
+                } else if ("auth.auth.ea".equals(val)) {
                     String s = LabelPatternUtil.authAuthEa(authString);
                     return s == null ? "" : s;
-                } else if (val.equals("auth.etal")) {
+                } else if ("auth.etal".equals(val)) {
                     String s = LabelPatternUtil.authEtal(authString, ".", ".etal");
                     return s == null ? "" : s;
-                } else if (val.equals("authEtAl")) {
+                } else if ("authEtAl".equals(val)) {
                     String s = LabelPatternUtil.authEtal(authString, "", "EtAl");
                     return s == null ? "" : s;
-                } else if (val.equals("authshort")) {
+                } else if ("authshort".equals(val)) {
                     String s = LabelPatternUtil.authshort(authString);
                     return s == null ? "" : s;
                 } else if (val.matches("auth[\\d]+_[\\d]+")) {
@@ -678,18 +678,18 @@ public class LabelPatternUtil {
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
-                if (val.equals("edtr")) {
+                if ("edtr".equals(val)) {
                     return LabelPatternUtil.firstAuthor(entry.getField("editor"));
-                } else if (val.equals("edtrForeIni")) {
+                } else if ("edtrForeIni".equals(val)) {
                     return LabelPatternUtil.firstAuthorForenameInitials(entry.getField("editor"));
-                } else if (val.equals("editors")) {
+                } else if ("editors".equals(val)) {
                     return LabelPatternUtil.allAuthors(entry.getField("editor"));
                     // Last author's last name
-                } else if (val.equals("editorLast")) {
+                } else if ("editorLast".equals(val)) {
                     return LabelPatternUtil.lastAuthor(entry.getField("editor"));
-                } else if (val.equals("editorLastForeIni")) {
+                } else if ("editorLastForeIni".equals(val)) {
                     return LabelPatternUtil.lastAuthorForenameInitials(entry.getField("editor"));
-                } else if (val.equals("editorIni")) {
+                } else if ("editorIni".equals(val)) {
                     return LabelPatternUtil.oneAuthorPlusIni(entry.getField("editor"));
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
@@ -701,10 +701,10 @@ public class LabelPatternUtil {
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                     return s == null ? "" : s;
-                } else if (val.equals("edtr.edtr.ea")) {
+                } else if ("edtr.edtr.ea".equals(val)) {
                     String s = LabelPatternUtil.authAuthEa(entry.getField("editor"));
                     return s == null ? "" : s;
-                } else if (val.equals("edtrshort")) {
+                } else if ("edtrshort".equals(val)) {
                     String s = LabelPatternUtil.authshort(entry.getField("editor"));
                     return s == null ? "" : s;
                 }
@@ -725,15 +725,15 @@ public class LabelPatternUtil {
                     // use it literally:
                     return LabelPatternUtil.getField(entry, val);
                 }
-            } else if (val.equals("firstpage")) {
+            } else if ("firstpage".equals(val)) {
                 return LabelPatternUtil.firstPage(entry.getField("pages"));
-            } else if (val.equals("lastpage")) {
+            } else if ("lastpage".equals(val)) {
                 return LabelPatternUtil.lastPage(entry.getField("pages"));
-            } else if (val.equals("shorttitle")) {
+            } else if ("shorttitle".equals(val)) {
                 return LabelPatternUtil.getTitleWords(3, entry.getField("title"));
-            } else if (val.equals("veryshorttitle")) {
+            } else if ("veryshorttitle".equals(val)) {
                 return LabelPatternUtil.getTitleWords(1, entry.getField("title"));
-            } else if (val.equals("shortyear")) {
+            } else if ("shortyear".equals(val)) {
                 String ss = entry.getFieldOrAlias("year");
                 if (ss.startsWith("in") || ss.startsWith("sub")) {
                     return "IP";

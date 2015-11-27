@@ -161,10 +161,10 @@ public class MergeEntriesDialog extends JDialog {
      */
     private void buttonPressed(String button) {
         BibtexEntry mergedEntry = mergeEntries.getMergeEntry();
-        if (button.equals("cancel")) {
+        if ("cancel".equals(button)) {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));
-        } else if (button.equals("replace")) {
+        } else if ("replace".equals(button)) {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
             panel.insertEntry(mergedEntry);

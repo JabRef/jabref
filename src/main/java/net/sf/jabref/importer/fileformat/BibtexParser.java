@@ -187,16 +187,16 @@ public class BibtexParser {
                 // parse and set accordingly. If not, assume it is an entry
                 // with an unknown type.
                 if (!isEntry) {
-                    if (entryType.toLowerCase().equals("preamble")) {
+                    if ("preamble".equals(entryType.toLowerCase())) {
                         database.setPreamble(parsePreamble());
-                    } else if (entryType.toLowerCase().equals("string")) {
+                    } else if ("string".equals(entryType.toLowerCase())) {
                         BibtexString bs = parseString();
                         try {
                             database.addString(bs);
                         } catch (KeyCollisionException ex) {
                             parserResult.addWarning(Localization.lang("Duplicate string name") + ": " + bs.getName());
                         }
-                    } else if (entryType.toLowerCase().equals("comment")) {
+                    } else if ("comment".equals(entryType.toLowerCase())) {
                         StringBuffer commentBuf = parseBracketedTextExactly();
                         /**
                          *
@@ -277,7 +277,7 @@ public class BibtexParser {
                         boolean duplicateKey = database.insertEntry(be);
                         if (duplicateKey) {
                             parserResult.addDuplicateKey(be.getCiteKey());
-                        } else if ((be.getCiteKey() == null) || be.getCiteKey().equals("")) {
+                        } else if ((be.getCiteKey() == null) || "".equals(be.getCiteKey())) {
                             parserResult
                                     .addWarning(Localization.lang("Empty BibTeX key") + ": "
                                     + be.getAuthorTitleYear(40) + " ("
@@ -409,7 +409,7 @@ public class BibtexParser {
         }
         String key = parseKey();
 
-        if ((key != null) && key.equals("")) {
+        if ("".equals(key)) {
             key = null;
         }
 
@@ -464,7 +464,7 @@ public class BibtexParser {
                 // at least one online database exports bibtex like that, making
                 // it inconvenient
                 // for users if JabRef didn't accept it.
-                if (key.equals("author") || key.equals("editor")) {
+                if ("author".equals(key) || "editor".equals(key)) {
                     entry.setField(key, entry.getField(key) + " and " + content);
                 }
             }
@@ -784,7 +784,7 @@ public class BibtexParser {
             if (Character.isWhitespace((char) j)) {
                 String whs = skipAndRecordWhitespace(j);
 
-                if (!whs.equals("") && !whs.equals("\n\t")) { // &&
+                if (!"".equals(whs) && !"\n\t".equals(whs)) { // &&
                     whs = whs.replaceAll("\t", ""); // Remove tabulators.
                     value.append(whs);
                 } else {

@@ -52,7 +52,7 @@ class LargeHTMLEditorKit extends HTMLEditorKit {
                 }
                 else if (kind == HTML.Tag.IMPLIED) {
                     String ws = (String) elem.getAttributes().getAttribute(CSS.Attribute.WHITE_SPACE);
-                    if (ws != null && ws.equals("pre")) {
+                    if ("pre".equals(ws)) {
                         return super.create(elem);
                     }
                     return new HTMLParagraphView(elem);

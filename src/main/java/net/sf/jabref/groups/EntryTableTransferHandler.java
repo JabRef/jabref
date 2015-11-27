@@ -363,7 +363,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             if ((index >= 0) && (index < fileName.length())) {
                 extension = fileName.substring(index + 1).toLowerCase();
             }
-            if (extension.equals("bib")) {
+            if ("bib".equals(extension)) {
                 // we assume that it is a BibTeX file.
                 // When a user wants to import something with file extension "bib", but which is not a BibTeX file, he should use "file -> import"
                 bibFiles.add(fileName);

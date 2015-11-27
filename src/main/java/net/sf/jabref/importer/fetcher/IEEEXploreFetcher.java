@@ -334,15 +334,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
         // clean up publication field
         EntryType type = entry.getType();
         String sourceField = "";
-        if (type.getName().equals("Article")) {
+        if ("Article".equals(type.getName())) {
             sourceField = "journal";
             entry.clearField("booktitle");
-        } else if (type.getName().equals("Inproceedings")) {
+        } else if ("Inproceedings".equals(type.getName())) {
             sourceField = "booktitle";
         }
         String fullName = entry.getField(sourceField);
         if (fullName != null) {
-            if (type.getName().equals("Article")) {
+            if ("Article".equals(type.getName())) {
                 int ind = fullName.indexOf(": Accepted for future publication");
                 if (ind > 0) {
                     fullName = fullName.substring(0, ind);
@@ -357,7 +357,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     fullName += parts[2];
                 }
                 String note = entry.getField("note");
-                if ((note != null) && note.equals("Early Access")) {
+                if ("Early Access".equals(note)) {
                     entry.setField("year", "to be published");
                     entry.clearField("month");
                     entry.clearField("pages");
@@ -395,7 +395,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     fullName = postfix + " " + prefix;
                 }
             }
-            if (type.getName().equals("Article")) {
+            if ("Article".equals(type.getName())) {
                 fullName = fullName.replace(" - ", "-"); //IEE Proceedings-
 
                 fullName = fullName.trim();
@@ -403,7 +403,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     fullName = Abbreviations.journalAbbrev.getMedlineAbbreviation(fullName).orElse(fullName);
                 }
             }
-            if (type.getName().equals("Inproceedings")) {
+            if ("Inproceedings".equals(type.getName())) {
                 Matcher m2 = proceedingPattern.matcher(fullName);
                 if (m2.find()) {
                     String prefix = m2.group(2);
@@ -498,35 +498,35 @@ public class IEEEXploreFetcher implements EntryFetcher {
             Matcher typeMatcher = typePattern.matcher(text);
             if (typeMatcher.find()) {
                 typeName = typeMatcher.group(1);
-                if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines")
-                        || typeName.equalsIgnoreCase("IEEE Early Access Articles")
-                        || typeName.equalsIgnoreCase("IET Journals &amp; Magazines")
-                        || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines")
-                        || typeName.equalsIgnoreCase("AVS Journals &amp; Magazines")
-                        || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines")
-                        || typeName.equalsIgnoreCase("TUP Journals &amp; Magazines")
-                        || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")
-                        || typeName.equalsIgnoreCase("MIT Press Journals")
-                        || typeName.equalsIgnoreCase("Alcatel-Lucent Journal")) {
+                if ("IEEE Journals &amp; Magazines".equalsIgnoreCase(typeName)
+                        || "IEEE Early Access Articles".equalsIgnoreCase(typeName)
+                        || "IET Journals &amp; Magazines".equalsIgnoreCase(typeName)
+                        || "AIP Journals &amp; Magazines".equalsIgnoreCase(typeName)
+                        || "AVS Journals &amp; Magazines".equalsIgnoreCase(typeName)
+                        || "IBM Journals &amp; Magazines".equalsIgnoreCase(typeName)
+                        || "TUP Journals &amp; Magazines".equalsIgnoreCase(typeName)
+                        || "BIAI Journals &amp; Magazines".equalsIgnoreCase(typeName)
+                        || "MIT Press Journals".equalsIgnoreCase(typeName)
+                        || "Alcatel-Lucent Journal".equalsIgnoreCase(typeName)) {
                     type = EntryTypes.getType("article");
                     sourceField = "journal";
-                } else if (typeName.equalsIgnoreCase("IEEE Conference Publications")
-                        || typeName.equalsIgnoreCase("IET Conference Publications")
-                        || typeName.equalsIgnoreCase("VDE Conference Publications")) {
+                } else if ("IEEE Conference Publications".equalsIgnoreCase(typeName)
+                        || "IET Conference Publications".equalsIgnoreCase(typeName)
+                        || "VDE Conference Publications".equalsIgnoreCase(typeName)) {
                     type = EntryTypes.getType("inproceedings");
                     sourceField = "booktitle";
-                } else if (typeName.equalsIgnoreCase("IEEE Standards") || typeName.equalsIgnoreCase("Standards")) {
+                } else if ("IEEE Standards".equalsIgnoreCase(typeName) || "Standards".equalsIgnoreCase(typeName)) {
                     type = EntryTypes.getType("standard");
                     sourceField = "number";
-                } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
+                } else if ("IEEE eLearning Library Courses".equalsIgnoreCase(typeName)) {
                     type = EntryTypes.getType("electronic");
                     sourceField = "note";
-                } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")
-                        || typeName.equalsIgnoreCase("MIT Press eBook Chapters")
-                        || typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
+                } else if ("Wiley-IEEE Press eBook Chapters".equalsIgnoreCase(typeName)
+                        || "MIT Press eBook Chapters".equalsIgnoreCase(typeName)
+                        || "IEEE USA Books &amp; eBooks".equalsIgnoreCase(typeName)) {
                     type = EntryTypes.getType("incollection");
                     sourceField = "booktitle";
-                } else if (typeName.equalsIgnoreCase("Morgan and Claypool eBooks")) {
+                } else if ("Morgan and Claypool eBooks".equalsIgnoreCase(typeName)) {
                     type = EntryTypes.getType("book");
                     sourceField = "note";
                 }
@@ -541,21 +541,21 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             entry = new BibtexEntry(IdGenerator.next(), type);
 
-            if (typeName.equalsIgnoreCase("IEEE Standards")) {
+            if ("IEEE Standards".equalsIgnoreCase(typeName)) {
                 entry.setField("organization", "IEEE");
             }
 
-            if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")) {
+            if ("Wiley-IEEE Press eBook Chapters".equalsIgnoreCase(typeName)) {
                 entry.setField("publisher", "Wiley-IEEE Press");
-            } else if (typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
+            } else if ("MIT Press eBook Chapters".equalsIgnoreCase(typeName)) {
                 entry.setField("publisher", "MIT Press");
-            } else if (typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
+            } else if ("IEEE USA Books &amp; eBooks".equalsIgnoreCase(typeName)) {
                 entry.setField("publisher", "IEEE USA");
-            } else if (typeName.equalsIgnoreCase("Morgan \\& Claypool eBooks")) {
+            } else if ("Morgan \\& Claypool eBooks".equalsIgnoreCase(typeName)) {
                 entry.setField("publisher", "Morgan and Claypool");
             }
 
-            if (typeName.equalsIgnoreCase("IEEE Early Access Articles")) {
+            if ("IEEE Early Access Articles".equalsIgnoreCase(typeName)) {
                 entry.setField("note", "Early Access");
             }
 
@@ -564,7 +564,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 Matcher fieldMatcher = Pattern.compile(fieldPatterns.get(field)).matcher(text);
                 if (fieldMatcher.find()) {
                     entry.setField(field, htmlConverter.format(fieldMatcher.group(1)));
-                    if (field.equals("title") && fieldMatcher.find()) {
+                    if ("title".equals(field) && fieldMatcher.find()) {
                         String sec_title = htmlConverter.format(fieldMatcher.group(1));
                         if (entry.getType() == EntryTypes.getStandardType("standard")) {
                             sec_title = sec_title.replaceAll("IEEE Std ", "");
@@ -572,7 +572,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         entry.setField(sourceField, sec_title);
 
                     }
-                    if (field.equals("pages") && (fieldMatcher.groupCount() == 2)) {
+                    if ("pages".equals(field) && (fieldMatcher.groupCount() == 2)) {
                         entry.setField(field, fieldMatcher.group(1) + "-" + fieldMatcher.group(2));
                     }
                 }
@@ -599,7 +599,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             if ((entry.getType() == EntryTypes.getStandardType("inproceedings"))
-                    && entry.getField("author").equals("")) {
+                    && "".equals(entry.getField("author"))) {
                 entry.setType(EntryTypes.getStandardType("proceedings"));
             }
 

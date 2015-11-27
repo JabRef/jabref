@@ -494,7 +494,7 @@ public class SearchResultsDialog {
             }
             else {
                 String field = fields[column - PAD];
-                if (field.equals("author") || field.equals("editor")) {
+                if ("author".equals(field) || "editor".equals(field)) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
                     if (frame.getCurrentBasePanel() != null) {

@@ -62,7 +62,7 @@ class ReplaceStringDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 s1 = from.getText();
                 s2 = to.getText();
-                if (s1.equals("")) {
+                if ("".equals(s1)) {
                     return;
                 }
                 ok_pressed = true;

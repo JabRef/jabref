@@ -250,7 +250,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
             // First we remove all rows with empty names.
             for (int i = tableRows.size() - 1; i >= 0; i--) {
-                if (tableRows.elementAt(i).equals("")) {
+                if ("".equals(tableRows.elementAt(i))) {
                     tableRows.removeElementAt(i);
                 }
             }

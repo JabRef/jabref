@@ -1456,7 +1456,7 @@ public class JabRefPreferences {
                 return type;
             }
         }
-        if (mimeType.equals("text/html")) {
+        if ("text/html".equals(mimeType)) {
             return HTML_FALLBACK_TYPE;
         } else {
             return null;

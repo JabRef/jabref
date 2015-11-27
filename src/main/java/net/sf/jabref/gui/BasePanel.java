@@ -978,8 +978,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         tm.setContent(bes[0].getField("file"));
                         for (int i = 0; i < tm.getRowCount(); i++) {
                             FileListEntry flEntry = tm.getEntry(i);
-                            if (flEntry.getType().getName().toLowerCase().equals("url")
-                                    || flEntry.getType().getName().toLowerCase().equals("ps")) {
+                            if ("url".equals(flEntry.getType().getName().toLowerCase())
+                                    || "ps".equals(flEntry.getType().getName().toLowerCase())) {
                                 entry = flEntry;
                                 break;
                             }

@@ -1555,7 +1555,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
             } else {
                 String field = fields[i - PAD];
-                if (field.equals("author") || field.equals("editor")) {
+                if ("author".equals(field) || "editor".equals(field)) {
                     String contents = entry.getField(field);
                     return (contents != null) ? AuthorList.fixAuthor_Natbib(contents) : "";
                 } else {

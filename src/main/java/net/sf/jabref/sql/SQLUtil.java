@@ -106,7 +106,7 @@ public class SQLUtil {
         if (array != null) {
             for (String anArray : array) {
                 if (!list.contains(anArray)) {
-                    if (!anArray.equals("#")) {
+                    if (!"#".equals(anArray)) {
                         list.add(anArray);
                     }
                 }

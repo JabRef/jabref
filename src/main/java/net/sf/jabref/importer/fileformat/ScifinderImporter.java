@@ -64,7 +64,7 @@ public class ScifinderImporter extends ImportFormat {
         int i = 0;
         while (((str = in.readLine()) != null) && (i < 50)) {
 
-            if (str.trim().equals("START_RECORD")) {
+            if ("START_RECORD".equals(str.trim())) {
                 return true;
             }
 
@@ -104,41 +104,41 @@ public class ScifinderImporter extends ImportFormat {
                     tmp[0] = field.substring(0, field.indexOf(":"));
                     tmp[1] = field.substring(field.indexOf(":") + 1).trim();
                     if (tmp.length > 1) {//==2
-                        if (tmp[0].equals("Author")) {
+                        if ("Author".equals(tmp[0])) {
                             hm.put("author", AuthorList.fixAuthor_lastNameFirst(tmp[1].replaceAll(";", " and ")));
-                        } else if (tmp[0].equals("Title")) {
+                        } else if ("Title".equals(tmp[0])) {
                             hm.put("title", tmp[1]);
-                        } else if (tmp[0].equals("Journal Title")) {
+                        } else if ("Journal Title".equals(tmp[0])) {
                             journal = tmp[1];
-                        } else if (tmp[0].equals("Volume")) {
+                        } else if ("Volume".equals(tmp[0])) {
                             hm.put("volume", tmp[1]);
-                        } else if (tmp[0].equals("Page")) {
+                        } else if ("Page".equals(tmp[0])) {
                             hm.put("pages", tmp[1]);
-                        } else if (tmp[0].equals("Publication Year")) {
+                        } else if ("Publication Year".equals(tmp[0])) {
                             hm.put("year", tmp[1]);
-                        } else if (tmp[0].equals("Abstract")) {
+                        } else if ("Abstract".equals(tmp[0])) {
                             hm.put("abstract", tmp[1]);
-                        } else if (tmp[0].equals("Supplementary Terms")) {
+                        } else if ("Supplementary Terms".equals(tmp[0])) {
                             hm.put("keywords",
                                     tmp[1]);
-                        } else if (tmp[0].equals("Inventor Name") && !tmp[1].trim().isEmpty()) {
+                        } else if ("Inventor Name".equals(tmp[0]) && !tmp[1].trim().isEmpty()) {
                             hm.put("author", AuthorList.fixAuthor_lastNameFirst(tmp[1].replaceAll(";", " and ")));
-                        } else if (tmp[0].equals("Patent Assignee")) {
+                        } else if ("Patent Assignee".equals(tmp[0])) {
                             hm.put("institution", tmp[1]);
-                        } else if (tmp[0].equals("Patent Kind Code")) {
+                        } else if ("Patent Kind Code".equals(tmp[0])) {
                             kindcode = " " + tmp[1];
-                        } else if (tmp[0].equals("Patent Country")) {
+                        } else if ("Patent Country".equals(tmp[0])) {
                             country = tmp[1] + " ";
-                        } else if (tmp[0].equals("Patent Number")) {
+                        } else if ("Patent Number".equals(tmp[0])) {
                             number = tmp[1];
-                        } else if (tmp[0].equals("Priority Application Date")) {
+                        } else if ("Priority Application Date".equals(tmp[0])) {
                             hm.put("number", country + number + kindcode);
-                        } else if (tmp[0].equals("Document Type")) {
+                        } else if ("Document Type".equals(tmp[0])) {
                             if (tmp[1].startsWith("Journal") || tmp[1].startsWith("Review")) {
                                 Type = "article";
-                            } else if (tmp[1].equals("Dissertation")) {
+                            } else if ("Dissertation".equals(tmp[1])) {
                                 Type = "phdthesis";
-                            } else if (tmp[1].equals("Patent")) {
+                            } else if ("Patent".equals(tmp[1])) {
                                 Type = "patent";
                             } else if (tmp[1].startsWith("Conference")) {
                                 Type = "conference";
@@ -155,7 +155,7 @@ public class ScifinderImporter extends ImportFormat {
             // create one here
             b.setField(hm);
             if (journal != null) {
-                if (Type.equals("conference")) {
+                if ("conference".equals(Type)) {
                     b.setField("booktitle", journal);
                 } else {
                     b.setField("journal", journal);

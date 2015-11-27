@@ -767,7 +767,7 @@ public class EmacsKeyBindings
                     // get first letter
                     String c = jtc.getText(offs, 1);
                     // we're at the end of the previous word
-                    if (c.equals(" ")) {
+                    if (" ".equals(c)) {
                         /* ugly java workaround to get the beginning of the
                            word.  */
                         offs = Utilities.getWordStart(jtc, ++offs);

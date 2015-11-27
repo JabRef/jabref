@@ -54,11 +54,11 @@ class SPIRESBibtexFilterReader extends FilterReader {
             if (l == null) {
                 return null;
             }
-            if (l.equals("<pre>")) {
+            if ("<pre>".equals(l)) {
                 pre = true;
                 l = inBR.readLine();
             }
-            if (l.equals("</pre>")) {
+            if ("</pre>".equals(l)) {
                 pre = false;
             }
         } while (!pre);

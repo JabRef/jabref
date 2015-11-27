@@ -30,7 +30,7 @@ class SearchWorker extends AbstractWorker {
         this.basePanel = Objects.requireNonNull(basePanel);
         this.searchQuery = Objects.requireNonNull(searchQuery);
         this.mode = Objects.requireNonNull(mode);
-        LOGGER.debug("Search (" + this.mode.getDisplayName() + "): " + this.searchQuery.toString());
+        LOGGER.debug("Search (" + this.mode.getDisplayName() + "): " + this.searchQuery);
     }
 
     /* (non-Javadoc)

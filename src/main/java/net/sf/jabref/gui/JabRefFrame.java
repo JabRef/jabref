@@ -192,7 +192,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
             Object obj = a.getValue(Action.LARGE_ICON_KEY);
-            if ((obj != null) && (obj instanceof IconTheme.FontBasedIcon)) {
+            if ((obj instanceof IconTheme.FontBasedIcon)) {
                 b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
             }
             add(b);
@@ -204,7 +204,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 button.setMargin(marg);
             }
             Object obj = button.getAction().getValue(Action.LARGE_ICON_KEY);
-            if ((obj != null) && (obj instanceof IconTheme.FontBasedIcon)) {
+            if ((obj instanceof IconTheme.FontBasedIcon)) {
                 button.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
             }
             add(button);

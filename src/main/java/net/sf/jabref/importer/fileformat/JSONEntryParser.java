@@ -120,11 +120,11 @@ public class JSONEntryParser {
             JSONArray identifiers = bibJsonEntry.getJSONArray("identifier");
             for (int i = 0; i < identifiers.length(); i++) {
                 String type = identifiers.getJSONObject(i).getString("type");
-                if (type.equals("doi")) {
+                if ("doi".equals(type)) {
                     entry.setField("doi", identifiers.getJSONObject(i).getString("id"));
-                } else if (type.equals("pissn")) {
+                } else if ("pissn".equals(type)) {
                     entry.setField("issn", identifiers.getJSONObject(i).getString("id"));
-                } else if (type.equals("eissn")) {
+                } else if ("eissn".equals(type)) {
                     entry.setField("issn", identifiers.getJSONObject(i).getString("id"));
                 }
             }
@@ -136,7 +136,7 @@ public class JSONEntryParser {
             for (int i = 0; i < links.length(); i++) {
                 if (links.getJSONObject(i).has("type")) {
                     String type = links.getJSONObject(i).getString("type");
-                    if (type.equals("fulltext")) {
+                    if ("fulltext".equals(type)) {
                         if (links.getJSONObject(i).has("url")) {
                             entry.setField("url", links.getJSONObject(i).getString("url"));
                         }

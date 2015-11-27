@@ -137,7 +137,7 @@ public class WriteXMPAction extends AbstractWorker {
                 tm.setContent(field);
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
-                    if ((flEntry.getType() != null) && flEntry.getType().getName().toLowerCase().equals("pdf")) {
+                    if ((flEntry.getType() != null) && "pdf".equals(flEntry.getType().getName().toLowerCase())) {
                         f = FileUtil.expandFilename(flEntry.getLink(), dirs);
                         if (f != null) {
                             files.add(f);

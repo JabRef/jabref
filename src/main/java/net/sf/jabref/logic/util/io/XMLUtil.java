@@ -34,7 +34,7 @@ public class XMLUtil {
             Transformer transformer = tf.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(domSource, result);
-            System.out.println(writer.toString());
+            System.out.println(writer);
         } catch (TransformerException ex) {
             LOGGER.error("", ex);
         }

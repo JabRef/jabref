@@ -187,10 +187,10 @@ public class OvidImporter extends ImportFormat {
                         h.put("pages", h.get("pages").replaceAll("-", "--"));
                     }
 
-                } else if (fieldName.equals("Abstract")) {
+                } else if ("Abstract".equals(fieldName)) {
                     h.put("abstract", content);
 
-                } else if (fieldName.equals("Publication Type")) {
+                } else if ("Publication Type".equals(fieldName)) {
                     if (content.contains("Book")) {
                         h.put("entrytype", "book");
                     } else if (content.contains("Journal")) {
@@ -222,7 +222,7 @@ public class OvidImporter extends ImportFormat {
             // Set the entrytype properly:
             String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "other";
             h.remove("entrytype");
-            if (entryType.equals("book")) {
+            if ("book".equals(entryType)) {
                 if (h.containsKey("chaptertitle")) {
                     // This means we have an "incollection" entry.
                     entryType = "incollection";

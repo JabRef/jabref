@@ -141,7 +141,7 @@ public abstract class DBImporter extends DBImporterExporter {
                             while (rsStrings.next()) {
                                 String label = rsStrings.getString("label");
                                 String content = rsStrings.getString("content");
-                                if (label.equals("@PREAMBLE")) {
+                                if ("@PREAMBLE".equals(label)) {
                                     database.setPreamble(content);
                                 } else {
                                     BibtexString string = new BibtexString(IdGenerator.next(), label, content);

@@ -259,7 +259,7 @@ public class DroppedFileHandler {
     private boolean tryXmpImport(String fileName, ExternalFileType fileType, boolean localFile,
                                  NamedCompound edits) {
 
-        if (!fileType.extension.equals("pdf")) {
+        if (!"pdf".equals(fileType.extension)) {
             return false;
         }
 

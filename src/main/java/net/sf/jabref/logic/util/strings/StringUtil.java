@@ -179,7 +179,7 @@ public class StringUtil {
         addWrappedLine(result, CharMatcher.WHITESPACE.trimTrailingFrom(lines[0]), wrapAmount); // See
         for (int i = 1; i < lines.length; i++) {
 
-            if (!lines[i].trim().equals("")) {
+            if (!"".equals(lines[i].trim())) {
                 result.append(Globals.NEWLINE);
                 result.append('\t');
                 result.append(Globals.NEWLINE);

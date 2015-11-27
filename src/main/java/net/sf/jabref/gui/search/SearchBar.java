@@ -254,7 +254,7 @@ public class SearchBar extends JPanel {
         }
 
         SearchQuery searchQuery = getSearchQuery();
-        LOGGER.debug("Searching " + searchQuery.toString() + " in " + basePanel.getTabTitle());
+        LOGGER.debug("Searching " + searchQuery + " in " + basePanel.getTabTitle());
 
         if (!searchQuery.isValidQuery()) {
             basePanel.output(Localization.lang("Search failed: illegal search expression"));

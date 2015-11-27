@@ -47,7 +47,7 @@ public class GoogleScholar implements FullTextFinder {
             if (link.first() != null) {
                 String s = link.first().attr("href");
                 // link present?
-                if (!s.equals("")) {
+                if (!"".equals(s)) {
                     // TODO: check title inside pdf + length?
                     // TODO: report error function needed?! query -> result
                     LOGGER.info("Fulltext PDF found @ Google: " + s);

@@ -272,10 +272,10 @@ public class LatexFieldFormatter {
             if (inCommand && (c == '}')) {
                 //System.out.println("nestedEnvironments = " + nestedEnvironments);
                 //System.out.println("Done with command: '"+commandName.toString()+"'");
-                if (commandName.toString().equals("begin")) {
+                if ("begin".equals(commandName.toString())) {
                     nestedEnvironments++;
                 }
-                if ((nestedEnvironments > 0) && commandName.toString().equals("end")) {
+                if ((nestedEnvironments > 0) && "end".equals(commandName.toString())) {
                     nestedEnvironments--;
                 }
                 //System.out.println("nestedEnvironments = " + nestedEnvironments);
@@ -287,7 +287,7 @@ public class LatexFieldFormatter {
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
             if ((c == '&') && !escape &&
-                    !(inCommand && commandName.toString().equals("url")) &&
+                    !(inCommand && "url".equals(commandName.toString())) &&
                     (nestedEnvironments == 0)) {
                 stringBuilder.append("\\&");
             } else {
