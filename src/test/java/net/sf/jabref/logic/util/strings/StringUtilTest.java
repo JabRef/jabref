@@ -112,7 +112,12 @@ public class StringUtilTest {
 
     @Test
     public void testGetPart() {
+        // Should be added
+    }
 
+    @Test
+    public void testFindEncodingsForString() {
+        // Unused in JabRef, but should be added in case it finds some use
     }
 
     @Test
@@ -148,14 +153,14 @@ public class StringUtilTest {
     }
 
 
-    String[][] stringArray1 = {{"a", "b"}, {"c", "d"}};
-    String encStringArray1 = "a:b;c:d";
-    String[][] stringArray2null = {{"a", null}, {"c", "d"}};
-    String encStringArray2 = "a:;c:d";
-    String[][] stringArray2 = {{"a", ""}, {"c", "d"}};
-    String encStringArray2null = "a:" + null + ";c:d";
-    String[][] stringArray3 = {{"a", ":b"}, {"c;", "d"}};
-    String encStringArray3 = "a:\\:b;c\\;:d";
+    static final String[][] stringArray1 = {{"a", "b"}, {"c", "d"}};
+    static final String encStringArray1 = "a:b;c:d";
+    static final String[][] stringArray2null = {{"a", null}, {"c", "d"}};
+    static final String encStringArray2 = "a:;c:d";
+    static final String[][] stringArray2 = {{"a", ""}, {"c", "d"}};
+    static final String encStringArray2null = "a:" + null + ";c:d";
+    static final String[][] stringArray3 = {{"a", ":b"}, {"c;", "d"}};
+    static final String encStringArray3 = "a:\\:b;c\\;:d";
 
 
     @Test
