@@ -49,7 +49,7 @@ public class DOI {
     public static Optional<DOI> build(String doi) {
         try {
             return Optional.ofNullable(new DOI(doi));
-        } catch(IllegalArgumentException e) {
+        } catch(IllegalArgumentException | NullPointerException e) {
             return Optional.empty();
         }
     }
