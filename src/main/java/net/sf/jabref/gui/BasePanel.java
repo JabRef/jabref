@@ -367,7 +367,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                 }
                 //entryTable.clearSelection();
-                frame.output(formatOutputMessage(Localization.lang("Cut_pr"), bes.length));
+                frame.output(formatOutputMessage(Localization.lang("Cut"), bes.length));
                 ce.end();
                 undoManager.addEdit(ce);
                 markBaseChanged();
@@ -2147,21 +2147,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void changeType(BibtexEntry[] bes, EntryType type) {
 
         if ((bes == null) || (bes.length == 0)) {
-            output(Localization.lang("First select the entries you wish to change type for."));
+            LOGGER.error("At least one entry must be selected to be able to change the type.");
             return;
         }
         if (bes.length > 1) {
             int choice = JOptionPane.showConfirmDialog(this,
                     // @formatter:off
                     Localization.lang("Multiple entries selected. Do you want to change\nthe type of all these to '%0'?", type.getName()),
-                    Localization.lang("Change type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    Localization.lang("Change entry type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                     // @formatter:on
             if (choice == JOptionPane.NO_OPTION) {
                 return;
             }
         }
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Change type"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Change entry type"));
         for (BibtexEntry be : bes) {
             ce.addEdit(new UndoableChangeType(be, be.getType(), type));
             be.setType(type);

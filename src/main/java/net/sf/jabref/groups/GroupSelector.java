@@ -1007,7 +1007,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private class AddGroupAction extends NodeAction {
 
         public AddGroupAction() {
-            super(Localization.lang("Add Group"));
+            super(Localization.lang("Add group"));
         }
 
         @Override
@@ -1039,7 +1039,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private class AddSubgroupAction extends NodeAction {
 
         public AddSubgroupAction() {
-            super(Localization.lang("Add Subgroup"));
+            super(Localization.lang("Add subgroup"));
         }
 
         @Override
@@ -1093,7 +1093,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private class RemoveSubgroupsAction extends NodeAction {
 
         public RemoveSubgroupsAction() {
-            super(Localization.lang("Remove all subgroups"));
+            super(Localization.lang("Remove subgroups"));
         }
 
         @Override
@@ -1102,10 +1102,10 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             final AbstractGroup group = node.getGroup();
             int conf = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("Remove all subgroups of \"%0\"?", group.getName()),
-                    Localization.lang("Remove all subgroups"), JOptionPane.YES_NO_OPTION);
+                    Localization.lang("Remove subgroups"), JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
                 final UndoableModifySubtree undo = new UndoableModifySubtree(GroupSelector.this, getGroupTreeRoot(),
-                        node, "Remove all subgroups");
+                        node, "Remove subgroups");
                 node.removeAllChildren();
                 revalidateGroups();
                 // Store undo information.

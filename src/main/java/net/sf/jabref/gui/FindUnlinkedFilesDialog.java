@@ -780,7 +780,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonScan.setToolTipText(Localization.lang("Searches the selected directory for unlinked files."));
         buttonApply = new JButton(Localization.lang("Apply"));
         buttonApply.setMnemonic('I');
-        buttonApply.setToolTipText(Localization.lang("Starts the import of bibtex entries."));
+        buttonApply.setToolTipText(Localization.lang("Starts the import of BibTeX entries."));
         buttonClose = new JButton(Localization.lang("Close"));
         buttonClose.setToolTipText(Localization.lang("Leave this dialog."));
         buttonClose.setMnemonic('C');
@@ -850,7 +850,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         panelDirectory.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Select directory")));
         panelFiles.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Select files")));
-        panelEntryTypesSelection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Bibtex entry creation")));
+        panelEntryTypesSelection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("BibTeX entry creation")));
 
         Insets basicInsets = new Insets(6, 6, 6, 6);
         Insets smallInsets = new Insets(3, 2, 3, 1);

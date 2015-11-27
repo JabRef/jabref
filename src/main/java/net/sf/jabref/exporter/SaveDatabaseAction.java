@@ -235,8 +235,8 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
         } catch (UnsupportedCharsetException ex2) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file. "
-                            + "Character encoding '%0' is not supported.", encoding),
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") +
+                            Localization.lang("Character encoding '%0' is not supported.", encoding),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
         } catch (SaveException ex) {
@@ -256,7 +256,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
             JOptionPane.showMessageDialog
-                    (frame, Localization.lang("Could not save file")
+                    (frame, Localization.lang("Could not save file.")
                             + ".\n" + ex.getMessage(),
                             Localization.lang("Save database"),
                             JOptionPane.ERROR_MESSAGE);

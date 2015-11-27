@@ -78,13 +78,13 @@ class GroupDialog extends JDialog {
     private final JCheckBox m_kgCaseSensitive = new JCheckBox(
             Localization.lang("Case sensitive"));
     private final JCheckBox m_kgRegExp = new JCheckBox(
-            Localization.lang("Regular Expression"));
+            Localization.lang("regular expression"));
     // for SearchGroup
     private final JTextField m_sgSearchExpression = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
     private final JCheckBox m_sgCaseSensitive = new JCheckBox(
             Localization.lang("Case sensitive"));
     private final JCheckBox m_sgRegExp = new JCheckBox(
-            Localization.lang("Regular Expression"));
+            Localization.lang("regular expression"));
     // for all types
     private final JButton m_ok = new JButton(Localization.lang("Ok"));
     private final JPanel m_optionsPanel = new JPanel();

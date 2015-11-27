@@ -352,7 +352,7 @@ public class JabRef {
                                 }
                                 session.commit();
                             } catch (SaveException ex) {
-                                System.err.println(Localization.lang("Could not save file") + " '" + data[0] + "': "
+                                System.err.println(Localization.lang("Could not save file.") + "\n"
                                         + ex.getLocalizedMessage());
                             }
                         }
@@ -439,7 +439,7 @@ public class JabRef {
                                 }
                                 session.commit();
                             } catch (SaveException ex) {
-                                System.err.println(Localization.lang("Could not save file") + " '" + subName + "': "
+                                System.err.println(Localization.lang("Could not save file.") + "\n"
                                         + ex.getLocalizedMessage());
                             }
 
@@ -458,9 +458,9 @@ public class JabRef {
             }
 
             if (usageMsg) {
-                System.out.println(Localization.lang("no base-bibtex-file specified"));
+                System.out.println(Localization.lang("no base-BibTeX-file specified")+"!");
                 System.out.println(Localization.lang("usage") + " :");
-                System.out.println("jabref --aux infile[.aux],outfile[.bib] base-bibtex-file");
+                System.out.println("jabref --aux infile[.aux],outfile[.bib] base-BibTeX-file");
             }
         }
 
@@ -690,10 +690,6 @@ public class JabRef {
         if (cli.isLoadSession()) {
             JabRef.jrf.loadSessionAction.actionPerformed(new java.awt.event.ActionEvent(JabRef.jrf, 0, ""));
         }
-
-        /*JOptionPane.showMessageDialog(null, Globals.lang("Please note that this "
-            +"is an early beta version. Do not use it without backing up your files!"),
-                Globals.lang("Beta version"), JOptionPane.WARNING_MESSAGE);*/
 
         // Start auto save timer:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_SAVE)) {

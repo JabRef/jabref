@@ -252,8 +252,7 @@ class StringDialog extends JDialog {
                 if (!value.equals(((BibtexString) strings[row]).getName())) {
                     if (tbase.hasStringLabel((String) value)) {
                         // @formatter:off
-                        JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label "
-                                + "already exists"),
+                        JOptionPane.showMessageDialog(parent, Localization.lang("A string with this label already exists"),
                                 Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
                     } else if (((String) value).contains(" ")) {
                         JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot contain spaces."),
@@ -414,8 +413,8 @@ class StringDialog extends JDialog {
                 panel.markBaseChanged();
             } catch (KeyCollisionException ex) {
                 // @formatter:off
-                JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label "
-                        + "already exists"),
+                JOptionPane.showMessageDialog(parent,
+                        Localization.lang("A string with this label already exists"),
                         Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
                 // @formatter:on
             }

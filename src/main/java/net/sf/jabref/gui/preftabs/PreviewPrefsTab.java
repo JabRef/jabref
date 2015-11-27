@@ -33,8 +33,12 @@ import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 class PreviewPrefsTab extends JPanel implements PrefsTab {
+
+    private static final Log LOGGER = LogFactory.getLog(PrefsTab.class);
 
     private final JabRefPreferences prefs;
 
@@ -184,11 +188,10 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
                     JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"),
                             JOptionPane.PLAIN_MESSAGE);
                 } catch (StringIndexOutOfBoundsException ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Parsing error.", ex);
                     JOptionPane.showMessageDialog(null,
                             Localization.lang("Parsing error") + ": "
-                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage() + '\n'
-                                    + Localization.lang("Look at log for details") + '.',
+                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage(),
                             Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -206,12 +209,11 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
                     JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Localization.lang("Preview"),
                             JOptionPane.PLAIN_MESSAGE);
                 } catch (StringIndexOutOfBoundsException ex) {
-                    ex.printStackTrace();
-                    JOptionPane
-                            .showMessageDialog(null,
-                                    "Parsing error: illegal backslash expression.\n" + ex.getMessage()
-                                            + "\nLook at stderr for details.",
-                                    "Parsing error", JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("Parsing error.", ex);
+                    JOptionPane.showMessageDialog(null,
+                            Localization.lang("Parsing error") + ": "
+                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage(),
+                            Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

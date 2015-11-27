@@ -80,10 +80,10 @@ public class SearchBar extends JPanel {
 
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
 
-        caseSensitive = new JCheckBox(Localization.lang("Match case"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
+        caseSensitive = new JCheckBox(Localization.lang("Case sensitive"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
         caseSensitive.addItemListener(ae -> performSearch());
         caseSensitive.addItemListener(ae -> updatePreferences());
-        regularExp = new JCheckBox(Localization.lang("Regex"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
+        regularExp = new JCheckBox(Localization.lang("regular expression"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
         regularExp.addItemListener(ae -> performSearch());
         regularExp.addItemListener(ae -> updatePreferences());
 
@@ -174,7 +174,7 @@ public class SearchBar extends JPanel {
      */
     private JSearchTextField initSearchField() {
         JSearchTextField searchField = new JSearchTextField();
-        searchField.setTextWhenNotFocused(Localization.lang("Search..."));
+        searchField.setTextWhenNotFocused(Localization.lang("Search")+"...");
         searchField.setColumns(30);
 
         searchField.addKeyListener(new KeyAdapter() {

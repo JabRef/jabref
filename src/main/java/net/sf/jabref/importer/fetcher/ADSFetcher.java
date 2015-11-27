@@ -114,7 +114,7 @@ public class ADSFetcher implements EntryFetcher {
                             .lang("Note: A full text search is currently not supported for %0", getTitle()),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
+            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(
@@ -160,7 +160,7 @@ public class ADSFetcher implements EntryFetcher {
             status.showMessage(Localization.lang("An Error occurred while parsing abstract"), getTitle(),
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
+            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(
