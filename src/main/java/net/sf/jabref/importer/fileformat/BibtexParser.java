@@ -66,6 +66,7 @@ public class BibtexParser {
     private static final Integer LOOKAHEAD = 64;
     private final boolean autoDoubleBraces;
     private List<String> fileContent = new LinkedList<>();
+    private List<String> entryTypeNames;
 
 
     public BibtexParser(Reader in) {
@@ -76,6 +77,13 @@ public class BibtexParser {
         }
         autoDoubleBraces = Globals.prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES);
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
+
+        entryTypeNames = new LinkedList<>();
+        entryTypeNames.addAll(BibLatexEntryTypes.ENTRY_TYPE_NAMES);
+        entryTypeNames.addAll(BibtexEntryTypes.ENTRY_TYPE_NAMES);
+        entryTypeNames.addAll(IEEETranEntryTypes.ENTRY_TYPE_NAMES);
+        entryTypeNames.add(CustomEntryType.ENTRYTYPE_FLAG);
+
         preProcessReader();
     }
 
@@ -94,19 +102,27 @@ public class BibtexParser {
         StringBuilder file = new StringBuilder();
         Scanner scanner = new Scanner(pushbackReader).useDelimiter("@");
 
-        boolean isStart = true;
+
         while (scanner.hasNextLine()) {
             String next = scanner.next();
-            //do not store the encoding line
-            if (!isStart) {
+
+            //only store things that look like an entry type
+            if (looksLikeEntry(next)) {
                 String item = "@" + next;
                 file.append(item);
                 fileContent.add(item);
-            } else {
-                isStart = false;
             }
         }
         pushbackReader = new PushbackReader(new StringReader(file.toString()), BibtexParser.LOOKAHEAD);
+    }
+
+    private boolean looksLikeEntry(String text) {
+        for(String typeToken: entryTypeNames){
+            if(text.startsWith(typeToken)){
+                return true;
+            }
+        }
+        return false;
     }
 
 
