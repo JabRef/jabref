@@ -23,7 +23,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
@@ -66,8 +65,7 @@ public class BibtexParser {
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
     private final boolean autoDoubleBraces;
-    private List<String> fileContent = new LinkedList<>();
-    private List<String> entryTypeNames;
+    private Deque<Character> pureTextFromFile = new LinkedList<>();
 
 
     public BibtexParser(Reader in) {
@@ -78,15 +76,6 @@ public class BibtexParser {
         }
         autoDoubleBraces = Globals.prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES);
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
-
-        entryTypeNames = new LinkedList<>();
-        entryTypeNames.addAll(BibLatexEntryTypes.ENTRY_TYPE_NAMES);
-        entryTypeNames.addAll(BibtexEntryTypes.ENTRY_TYPE_NAMES);
-        entryTypeNames.addAll(IEEETranEntryTypes.ENTRY_TYPE_NAMES);
-        entryTypeNames.add(CustomEntryType.ENTRYTYPE_FLAG);
-        entryTypeNames = entryTypeNames.parallelStream().map(String::toLowerCase).collect(Collectors.toList());
-
-        preProcessReader();
     }
 
     /**
@@ -98,37 +87,6 @@ public class BibtexParser {
     public static ParserResult parse(Reader in) throws IOException {
         BibtexParser parser = new BibtexParser(in);
         return parser.parse();
-    }
-
-    private void preProcessReader() {
-        StringBuilder file = new StringBuilder();
-        Scanner scanner = new Scanner(pushbackReader).useDelimiter("@");
-
-
-        while (scanner.hasNextLine()) {
-            String next = scanner.next();
-
-            //only store things that look like an entry type
-            if (looksLikeEntry(next)) {
-                String item = "@" + next;
-                file.append(item);
-                fileContent.add(item);
-            } else {
-                //otherwise give it back to the reader unmodified
-                file.append(next);
-            }
-        }
-        pushbackReader = new PushbackReader(new StringReader(file.toString()), BibtexParser.LOOKAHEAD);
-    }
-
-    private boolean looksLikeEntry(String text) {
-        String lowerCaseText = text.toLowerCase();
-        for (String typeToken : entryTypeNames) {
-            if (lowerCaseText.startsWith(typeToken)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -182,6 +140,14 @@ public class BibtexParser {
             }
         }
         return false;
+    }
+
+    private String dumpTextReadSoFarToString(){
+        StringBuilder entry = new StringBuilder();
+        while(!pureTextFromFile.isEmpty()){
+            entry.append(pureTextFromFile.pollFirst());
+        }
+        return entry.toString();
     }
 
     /**
@@ -318,6 +284,7 @@ public class BibtexParser {
                         BibtexEntry be = parseEntry(tp);
 
                         boolean duplicateKey = database.insertEntry(be);
+                        be.setSerialization(dumpTextReadSoFarToString());
                         if (duplicateKey) {
                             parserResult.addDuplicateKey(be.getCiteKey());
                         } else if ((be.getCiteKey() == null) || be.getCiteKey().equals("")) {
@@ -405,6 +372,7 @@ public class BibtexParser {
 
     private int read() throws IOException {
         int c = pushbackReader.read();
+        pureTextFromFile.offerLast(Character.valueOf((char) c));
         if (c == '\n') {
             line++;
         }
@@ -416,6 +384,7 @@ public class BibtexParser {
             line--;
         }
         pushbackReader.unread(c);
+        pureTextFromFile.pollLast();
     }
 
     private BibtexString parseString() throws IOException {
@@ -479,22 +448,7 @@ public class BibtexParser {
         }
 
         consume('}', ')');
-        setStringRepresenationFromFile(result);
         return result;
-    }
-
-    private void setStringRepresenationFromFile(BibtexEntry entry) {
-        String key = entry.getCiteKey();
-
-        for (String item : fileContent) {
-
-            if (item.contains(key)) {
-                entry.setSerialization(item);
-                return;
-            }
-
-        }
-
     }
 
     private void parseField(BibtexEntry entry) throws IOException {
