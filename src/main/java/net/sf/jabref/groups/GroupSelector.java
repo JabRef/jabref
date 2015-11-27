@@ -1391,7 +1391,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     public void concludeAssignment(AbstractUndoableEdit undo, GroupTreeNode node, int assignedEntries) {
         if (undo == null) {
             frame.output(Localization.lang("The group \"%0\" already contains the selection.",
-                    new String[] {node.getGroup().getName()}));
+                    node.getGroup().getName()));
             return;
         }
         panel.undoManager.addEdit(undo);

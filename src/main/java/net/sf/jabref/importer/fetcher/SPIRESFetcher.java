@@ -127,7 +127,7 @@ public class SPIRESFetcher implements EntryFetcher {
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             frame.showMessage(
-                    Localization.lang("An Error occurred while fetching from SPIRES source (%0):", new String[] {url})
+                    Localization.lang("An Error occurred while fetching from SPIRES source (%0):", url)
                             + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         }
