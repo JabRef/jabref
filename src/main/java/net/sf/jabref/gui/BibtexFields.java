@@ -30,10 +30,13 @@
 
 package net.sf.jabref.gui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.HashSet;
+import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -395,23 +398,23 @@ public class BibtexFields {
     }
 
     /**
-     * returns an string-array with all fieldnames
+     * returns a List with all fieldnames
      */
-    public static String[] getAllFieldNames() {
-        return BibtexFields.runtime.PUBLIC_FIELDS;
+    public static List<String> getAllFieldNames() {
+        return Arrays.asList(BibtexFields.runtime.PUBLIC_FIELDS);
     }
 
     /**
-     * returns an string-array with only private fieldnames
+     * returns a List with only private fieldnames
      */
-    public static String[] getAllPrivateFieldNames() {
-        Vector<String> pFields = new Vector<>();
+    public static List<String> getAllPrivateFieldNames() {
+        List<String> pFields = new ArrayList<>();
         for (BibtexSingleField sField : BibtexFields.runtime.fieldSet.values()) {
             if (sField.isPrivate()) {
                 pFields.add(sField.getFieldName());
             }
         }
-        return pFields.toArray(new String[pFields.size()]);
+        return pFields;
 
     }
 
