@@ -82,7 +82,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     private final Optional<PdfPreviewPanel> pdfPreviewPanel;
     private final Optional<BasePanel> panel;
 
-    private final JEditorPane previewPane;
+    private JEditorPane previewPane;
 
     private final JScrollPane scrollPane;
 
@@ -174,7 +174,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         this.panel = Optional.ofNullable(panel);
 
-        this.previewPane = createPreviewPane();
+        createPreviewPane();
         if (withPDFPreview) {
             this.pdfPreviewPanel = Optional.of(new PdfPreviewPanel(metaData));
         } else {
@@ -258,8 +258,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         return toolBar;
     }
 
-    private JEditorPane createPreviewPane() {
-        JEditorPane previewPane = new JEditorPane() {
+    private void createPreviewPane() {
+        previewPane = new JEditorPane() {
             @Override
             public Dimension getPreferredScrollableViewportSize() {
                 return getPreferredSize();
@@ -289,7 +289,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
             }
         });
 
-        return previewPane;
     }
 
     public void setMetaData(MetaData metaData) {
@@ -316,7 +315,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     public void setEntry(BibtexEntry newEntry) {
-        if(entry.isPresent() && entry.get() != newEntry) {
+        if(entry.isPresent() && (entry.get() != newEntry)) {
             entry.ifPresent(e -> e.removePropertyChangeListener(this));
             newEntry.addPropertyChangeListener(this);
         }

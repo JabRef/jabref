@@ -227,7 +227,7 @@ public class OAI2Fetcher implements EntryFetcher {
                     be.setField("month", month.bibtexFormat);
                 }
             }
-
+            inputStream.close();
             return be;
         } catch (IOException e) {
             status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url)

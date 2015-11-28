@@ -193,126 +193,116 @@ public class ExportFormat implements IExportFormat {
             ss = getSaveSession(enc, outFile);
         }
 
-        VerifyingWriter ps = ss.getWriter();
+        try (VerifyingWriter ps = ss.getWriter()) {
 
-        Layout beginLayout = null;
-        Reader reader;
+            Layout beginLayout = null;
 
-        // Check if this export filter has bundled name formatters:
-        // Set a global field, so all layouts have access to the custom name formatters:
-        Globals.prefs.customExportNameFormatters = readFormatterFile(lfFileName);
+            // Check if this export filter has bundled name formatters:
+            // Set a global field, so all layouts have access to the custom name formatters:
+            Globals.prefs.customExportNameFormatters = readFormatterFile(lfFileName);
 
-        ArrayList<String> missingFormatters = new ArrayList<>(1);
+            ArrayList<String> missingFormatters = new ArrayList<>(1);
 
-        // Print header
-        try {
-            reader = getReader(lfFileName + ".begin.layout");
-            LayoutHelper layoutHelper = new LayoutHelper(reader);
-            beginLayout = layoutHelper
-                    .getLayoutFromText(Globals.FORMATTER_PACKAGE);
-            reader.close();
-        } catch (IOException ex) {
-            // If an exception was cast, export filter doesn't have a begin
-            // file.
-        }
-        // Write the header
-        if (beginLayout != null) {
-            ps.write(beginLayout.doLayout(database, enc));
-            missingFormatters.addAll(beginLayout.getMissingFormatters());
-        }
+            // Print header
+            try (Reader reader = getReader(lfFileName + ".begin.layout")) {
+                LayoutHelper layoutHelper = new LayoutHelper(reader);
+                beginLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+            } catch (IOException ex) {
+                // If an exception was cast, export filter doesn't have a begin
+                // file.
+            }
+            // Write the header
+            if (beginLayout != null) {
+                ps.write(beginLayout.doLayout(database, enc));
+                missingFormatters.addAll(beginLayout.getMissingFormatters());
+            }
 
-        /*
-         * Write database entries; entries will be sorted as they appear on the
-         * screen, or sorted by author, depending on Preferences. We also supply
-         * the Set entries - if we are to export only certain entries, it will
-         * be non-null, and be used to choose entries. Otherwise, it will be
-         * null, and be ignored.
-         */
-        List<BibtexEntry> sorted = FileActions.getSortedEntries(database, metaData,
-                entryIds, false);
+            /*
+             * Write database entries; entries will be sorted as they appear on the
+             * screen, or sorted by author, depending on Preferences. We also supply
+             * the Set entries - if we are to export only certain entries, it will
+             * be non-null, and be used to choose entries. Otherwise, it will be
+             * null, and be ignored.
+             */
+            List<BibtexEntry> sorted = FileActions.getSortedEntries(database, metaData, entryIds, false);
 
-        // Load default layout
-        reader = getReader(lfFileName + ".layout");
+            // Load default layout
+            Layout defLayout = null;
+            LayoutHelper layoutHelper = null;
+            try (Reader reader = getReader(lfFileName + ".layout")) {
+                layoutHelper = new LayoutHelper(reader);
+                defLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+            }
+            if (defLayout != null) {
+                missingFormatters.addAll(defLayout.getMissingFormatters());
+                LOGGER.warn(defLayout.getMissingFormatters());
+            }
+            HashMap<String, Layout> layouts = new HashMap<>();
+            Layout layout;
 
-        LayoutHelper layoutHelper = new LayoutHelper(reader);
-        Layout defLayout = layoutHelper
-                .getLayoutFromText(Globals.FORMATTER_PACKAGE);
-        reader.close();
-        if (defLayout != null) {
-            missingFormatters.addAll(defLayout.getMissingFormatters());
-            LOGGER.warn(defLayout.getMissingFormatters());
-        }
-        HashMap<String, Layout> layouts = new HashMap<>();
-        Layout layout;
+            ExportFormats.entryNumber = 0;
+            for (BibtexEntry entry : sorted) {
+                ExportFormats.entryNumber++; // Increment entry counter.
+                // Get the layout
+                String type = entry.getType().getName().toLowerCase();
+                if (layouts.containsKey(type)) {
+                    layout = layouts.get(type);
+                } else {
+                    try (Reader reader = getReader(lfFileName + '.' + type + ".layout")) {
+                        // We try to get a type-specific layout for this entry.
+                        layoutHelper = new LayoutHelper(reader);
+                        layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+                        layouts.put(type, layout);
+                        if (layout != null) {
+                            missingFormatters.addAll(layout.getMissingFormatters());
+                        }
 
-        ExportFormats.entryNumber = 0;
-        for (BibtexEntry entry : sorted) {
-            ExportFormats.entryNumber++; // Increment entry counter.
-            // Get the layout
-            String type = entry.getType().getName().toLowerCase();
-            if (layouts.containsKey(type)) {
-                layout = layouts.get(type);
-            } else {
-                try {
-                    // We try to get a type-specific layout for this entry.
-                    reader = getReader(lfFileName + '.' + type + ".layout");
-                    layoutHelper = new LayoutHelper(reader);
-                    layout = layoutHelper
-                            .getLayoutFromText(Globals.FORMATTER_PACKAGE);
-                    layouts.put(type, layout);
-                    reader.close();
-                    if (layout != null) {
-                        missingFormatters.addAll(layout.getMissingFormatters());
+                    } catch (IOException ex) {
+                        // The exception indicates that no type-specific layout
+                        // exists, so we
+                        // go with the default one.
+                        layout = defLayout;
                     }
-
-                } catch (IOException ex) {
-                    // The exception indicates that no type-specific layout
-                    // exists, so we
-                    // go with the default one.
-                    layout = defLayout;
                 }
+
+                // Write the entry
+                ps.write(layout.doLayout(entry, database));
             }
 
-            // Write the entry
-            ps.write(layout.doLayout(entry, database));
-        }
+            // Print footer
 
-        // Print footer
-
-        // changed section - begin (arudert)
-        Layout endLayout = null;
-        try {
-            reader = getReader(lfFileName + ".end.layout");
-            layoutHelper = new LayoutHelper(reader);
-            endLayout = layoutHelper
-                    .getLayoutFromText(Globals.FORMATTER_PACKAGE);
-        } catch (IOException ex) {
-            // If an exception was thrown, export filter doesn't have an end
-            // file.
-        }
-
-        // Write footer
-        if (endLayout != null) {
-            ps.write(endLayout.doLayout(database, encoding));
-            missingFormatters.addAll(endLayout.getMissingFormatters());
-        }
-
-        // Clear custom name formatters:
-        Globals.prefs.customExportNameFormatters = null;
-
-        if (!missingFormatters.isEmpty()) {
-            StringBuilder sb = new StringBuilder("The following formatters could not be found").
-                    append(": ");
-            for (Iterator<String> i = missingFormatters.iterator(); i.hasNext();) {
-                sb.append(i.next());
-                if (i.hasNext()) {
-                    sb.append(", ");
-                }
+            // changed section - begin (arudert)
+            Layout endLayout = null;
+            try (Reader reader = getReader(lfFileName + ".end.layout")) {
+                layoutHelper = new LayoutHelper(reader);
+                endLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+            } catch (IOException ex) {
+                // If an exception was thrown, export filter doesn't have an end
+                // file.
             }
-            LOGGER.warn(sb);
-        }
 
+            // Write footer
+            if (endLayout != null) {
+                ps.write(endLayout.doLayout(database, encoding));
+                missingFormatters.addAll(endLayout.getMissingFormatters());
+            }
+
+            // Clear custom name formatters:
+            Globals.prefs.customExportNameFormatters = null;
+
+            if (!missingFormatters.isEmpty()) {
+                StringBuilder sb = new StringBuilder("The following formatters could not be found").append(": ");
+                for (Iterator<String> i = missingFormatters.iterator(); i.hasNext();) {
+                    sb.append(i.next());
+                    if (i.hasNext()) {
+                        sb.append(", ");
+                    }
+                }
+                LOGGER.warn(sb);
+            }
+        }
         finalizeSaveSession(ss);
+
     }
 
     /**

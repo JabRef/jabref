@@ -18,7 +18,6 @@ package net.sf.jabref.logic.util.io;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

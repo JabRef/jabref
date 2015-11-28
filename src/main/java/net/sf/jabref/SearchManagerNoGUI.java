@@ -23,8 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.importer.*;
-import net.sf.jabref.logic.search.SearchRules;
-import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 

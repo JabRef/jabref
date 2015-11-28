@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.formatter;
 
-import static org.junit.Assert.assertEquals;
-
 import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
 import org.junit.After;
 import org.junit.Assert;
@@ -36,9 +34,11 @@ public class AuthorsFormatterTest {
 
         expectCorrect("Ølver MA", "Ølver, M. A.");
 
-        expectCorrect("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y. and Olsen Y. Y.", "Ølver, M. A. and Øie, G. G. and Øie, G. G. and Alfredsen, J. Å. Å. and Alfredsen, Jo and Olsen, Y. Y. and Olsen, Y. Y.");
+        expectCorrect("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y. and Olsen Y. Y.",
+                "Ølver, M. A. and Øie, G. G. and Øie, G. G. and Alfredsen, J. Å. Å. and Alfredsen, Jo and Olsen, Y. Y. and Olsen, Y. Y.");
 
-        expectCorrect("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y., Olsen Y. Y.", "Ølver, M. A. and Øie, G. G. and Øie, G. G. and Alfredsen, J. Å. Å. and Alfredsen, Jo and Olsen, Y. Y. and Olsen, Y. Y.");
+        expectCorrect("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y., Olsen Y. Y.",
+                "Ølver, M. A. and Øie, G. G. and Øie, G. G. and Alfredsen, J. Å. Å. and Alfredsen, Jo and Olsen, Y. Y. and Olsen, Y. Y.");
 
         expectCorrect("Alver, Morten and Alver, Morten O and Alfredsen, JA and Olsen, Y.Y.", "Alver, Morten and Alver, Morten O. and Alfredsen, J. A. and Olsen, Y. Y.");
 

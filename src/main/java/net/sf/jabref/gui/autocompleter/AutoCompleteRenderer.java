@@ -3,8 +3,6 @@ package net.sf.jabref.gui.autocompleter;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 
-import javax.swing.Action;
-
 /**
  * Renders the list of possible autocomplete items. Also takes care of the currently selected item.
  * @param <E> the type of the items

@@ -5,7 +5,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.ChangeTypeAction;
-import net.sf.jabref.gui.actions.NewEntryAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;

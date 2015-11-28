@@ -1,10 +1,8 @@
 package net.sf.jabref.logic.util.io;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +29,6 @@ public class FileUtilTest {
         List<String> uniqPath = Arrays.asList(uniqArr);
 
         List<String> result = FileUtil.uniquePathSubstrings(paths);
-        Assert.assertEquals(uniqPath, result);
+        assertEquals(uniqPath, result);
     }
 }

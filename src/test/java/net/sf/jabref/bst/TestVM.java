@@ -79,7 +79,7 @@ public class TestVM {
     }
 
     @Test
-    public void testQuote() throws RecognitionException, IOException {
+    public void testQuote() throws RecognitionException {
 
         VM vm = new VM("FUNCTION {a}{ quote$ quote$ * } EXECUTE {a}");
 
@@ -90,7 +90,7 @@ public class TestVM {
     }
 
     @Test
-    public void testVMFunction1() throws RecognitionException, IOException {
+    public void testVMFunction1() throws RecognitionException {
 
         VM vm = new VM("FUNCTION {init.state.consts}{ #0 'before.all := } ");
 
@@ -106,7 +106,7 @@ public class TestVM {
     }
 
     @Test
-    public void testVMExecuteSimple() throws RecognitionException, IOException {
+    public void testVMExecuteSimple() throws RecognitionException {
 
         {
             VM vm = new VM("" + "INTEGERS { variable.a } "
@@ -138,7 +138,7 @@ public class TestVM {
     }
 
     @Test
-    public void testVMIfSkipPop() throws RecognitionException, IOException {
+    public void testVMIfSkipPop() throws RecognitionException {
         VM vm = new VM("FUNCTION {not}	{   { #0 }	    { #1 }  if$	}"
                 + "FUNCTION {and}	{   'skip$	    { pop$ #0 }	  if$	}"
                 + "FUNCTION {or}	{   { pop$ #1 }	    'skip$	  if$	}" + "FUNCTION {test} { "
@@ -161,7 +161,7 @@ public class TestVM {
     }
 
     @Test
-    public void testVMArithmetic() throws RecognitionException, IOException {
+    public void testVMArithmetic() throws RecognitionException {
         {
             VM vm = new VM("FUNCTION {test} { " + "#1 #1 + #5 #2 - }" + "EXECUTE {test}");
 
@@ -184,7 +184,7 @@ public class TestVM {
     }
 
     @Test
-    public void testNumNames() throws RecognitionException, IOException {
+    public void testNumNames() throws RecognitionException {
         {
             VM vm = new VM("FUNCTION {test} { \"Johnny Foo and Mary Bar\" num.names$ }"
                     + "EXECUTE {test}");
@@ -204,7 +204,7 @@ public class TestVM {
     }
 
     @Test
-    public void testVMStringOps1() throws RecognitionException, IOException {
+    public void testVMStringOps1() throws RecognitionException {
         VM vm = new VM(
                 "FUNCTION {test} { \"H\" \"allo\" * \"Johnny\" add.period$ \"Johnny.\" add.period$"
                         + "\"Johnny!\" add.period$ \"Johnny?\" add.period$ \"Johnny} }}}\" add.period$"
@@ -227,7 +227,7 @@ public class TestVM {
     }
 
     @Test
-    public void testSubstring() throws RecognitionException, IOException {
+    public void testSubstring() throws RecognitionException {
         VM vm = new VM("FUNCTION {test} " + "{ \"123456789\" #2  #1  substring$ " + // 2
         "  \"123456789\" #4 global.max$ substring$ " + // 456789
         "  \"123456789\" #1  #9  substring$ " + // 123456789
@@ -276,7 +276,7 @@ public class TestVM {
     }
 
     @Test
-    public void testDuplicateEmptyPopSwapIf() throws RecognitionException, IOException {
+    public void testDuplicateEmptyPopSwapIf() throws RecognitionException {
         VM vm = new VM("FUNCTION {emphasize} " + "{ duplicate$ empty$ " + "  { pop$ \"\" } "
                 + "  { \"{\\em \" swap$ * \"}\" * } " + "  if$ " + "} " + "FUNCTION {test} {"
                 + "  \"\" emphasize " + "  \"Hello\" emphasize " + "}" + "EXECUTE {test} ");
@@ -289,7 +289,7 @@ public class TestVM {
     }
 
     @Test
-    public void testChangeCase() throws RecognitionException, IOException {
+    public void testChangeCase() throws RecognitionException {
         VM vm = new VM(
                 "STRINGS { title } "
                         + "READ "
@@ -319,7 +319,7 @@ public class TestVM {
     }
 
     @Test
-    public void testTextLength() throws RecognitionException, IOException {
+    public void testTextLength() throws RecognitionException {
         VM vm = new VM("FUNCTION {test} {" + "  \"hello world\" text.length$ "
                 + "  \"Hello {W}orld\" text.length$ " + "  \"\" text.length$ "
                 + "  \"{A}{D}/{Cycle}\" text.length$ "
@@ -342,7 +342,7 @@ public class TestVM {
     }
 
     @Test
-    public void testVMIntToStr() throws RecognitionException, IOException {
+    public void testVMIntToStr() throws RecognitionException {
         VM vm = new VM("FUNCTION {test} { #3 int.to.str$ #9999 int.to.str$}" + "EXECUTE {test}");
 
         Vector<BibtexEntry> v = new Vector<>();
@@ -353,7 +353,7 @@ public class TestVM {
     }
 
     @Test
-    public void testVMChrToInt() throws RecognitionException, IOException {
+    public void testVMChrToInt() throws RecognitionException {
         {
             VM vm = new VM("FUNCTION {test} { \"H\" chr.to.int$ }" + "EXECUTE {test}");
 
@@ -391,7 +391,7 @@ public class TestVM {
     }
 
     @Test
-    public void testBuildIn() throws RecognitionException, IOException {
+    public void testBuildIn() throws RecognitionException {
         VM vm = new VM("EXECUTE {global.max$}");
 
         Vector<BibtexEntry> v = new Vector<>();
@@ -402,7 +402,7 @@ public class TestVM {
     }
 
     @Test
-    public void testVariables() throws RecognitionException, IOException {
+    public void testVariables() throws RecognitionException {
 
         VM vm = new VM(" STRINGS { t }                          "
                 + " FUNCTION {not}	{ { #0 } { #1 }  if$ } "
@@ -415,7 +415,7 @@ public class TestVM {
     }
 
     @Test
-    public void testWhile() throws RecognitionException, IOException {
+    public void testWhile() throws RecognitionException {
 
         VM vm = new VM(
                 "STRINGS { t }            "
@@ -628,7 +628,7 @@ public class TestVM {
     }
 
     @Test
-    public void testVMSwap() throws RecognitionException, IOException {
+    public void testVMSwap() throws RecognitionException {
 
         VM vm = new VM("FUNCTION {a}{ #3 \"Hallo\" swap$ } EXECUTE { a }");
 

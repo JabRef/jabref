@@ -54,10 +54,12 @@ public class UnknownEntryType implements EntryType {
         return Collections.unmodifiableList(requiredFields);
     }
 
+    @Override
     public List<String> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
 
+    @Override
     public List<String> getSecondaryOptionalFields() {
         return Collections.unmodifiableList(new ArrayList<>(0));
     }

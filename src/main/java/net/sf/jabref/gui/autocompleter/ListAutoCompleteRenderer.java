@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -56,8 +55,9 @@ public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if(interpretSelectionChangeAsAccept && acceptAction != null)
-				    acceptAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+				if(interpretSelectionChangeAsAccept && (acceptAction != null)) {
+                    acceptAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+                }
 			}
 		});
 		
@@ -81,13 +81,13 @@ public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
     public void selectItem(int index) {
         interpretSelectionChangeAsAccept = false;
      // Set new index if valid otherwise clean selection
-        if(index >= 0 && index < list.getModel().getSize())
+        if((index >= 0) && (index < list.getModel().getSize()))
         {
             list.setSelectedIndex(index);
             list.ensureIndexIsVisible(index);
-        }
-        else
+        } else {
             list.clearSelection();
+        }
         interpretSelectionChangeAsAccept = true;
     }
 

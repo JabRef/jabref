@@ -42,27 +42,26 @@ class MSBibExportFormat extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData,
- final String file,
+    public void performExport(final BibtexDatabase database, final MetaData metaData, final String file,
             final Charset encoding, Set<String> keySet) throws IOException {
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings
         SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
-        VerifyingWriter ps = ss.getWriter();
         MSBibDatabase md = new MSBibDatabase(database, keySet);
+        try (VerifyingWriter ps = ss.getWriter()) {
 
         // PS: DOES NOT SUPPORT EXPORTING ONLY A SET OF ENTRIES
 
-        try {
-            DOMSource source = new DOMSource(md.getDOMrepresentation());
-            StreamResult result = new StreamResult(ps);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
-            trans.setOutputProperty(OutputKeys.INDENT, "yes");
-            trans.transform(source, result);
-        } catch (Exception e) {
-            throw new Error(e);
+            try {
+                DOMSource source = new DOMSource(md.getDOMrepresentation());
+                StreamResult result = new StreamResult(ps);
+                Transformer trans = TransformerFactory.newInstance().newTransformer();
+                trans.setOutputProperty(OutputKeys.INDENT, "yes");
+                trans.transform(source, result);
+            } catch (Exception e) {
+                throw new Error(e);
+            }
         }
-
         try {
             finalizeSaveSession(ss);
         } catch (SaveException ex) {
