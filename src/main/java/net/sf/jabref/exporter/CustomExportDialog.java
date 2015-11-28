@@ -44,13 +44,7 @@ class CustomExportDialog extends JDialog {
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
     private boolean ok_pressed;
-    private int index;
     private final JabRefFrame parent;
-
-    private String oldName;
-    private String oldRegexp;
-    private String oldField;
-
 
     public CustomExportDialog(JabRefFrame parent_, String name_, String layoutFile_, String extension_) {
         this(parent_);
@@ -200,22 +194,6 @@ class CustomExportDialog extends JDialog {
 
     public boolean okPressed() {
         return ok_pressed;
-    }
-
-    public int index() {
-        return index;
-    }
-
-    public String oldField() {
-        return oldField;
-    }
-
-    public String oldName() {
-        return oldName;
-    }
-
-    public String oldRegexp() {
-        return oldRegexp;
     }
 
     public String layoutFile() {

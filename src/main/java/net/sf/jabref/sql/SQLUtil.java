@@ -59,8 +59,8 @@ public class SQLUtil {
         } else {
             SQLUtil.allFields.clear();
         }
-        SQLUtil.uniqueInsert(SQLUtil.allFields, BibtexFields.getAllFieldNames());
-        SQLUtil.uniqueInsert(SQLUtil.allFields, BibtexFields.getAllPrivateFieldNames());
+        SQLUtil.uniqueListInsert(SQLUtil.allFields, BibtexFields.getAllFieldNames());
+        SQLUtil.uniqueListInsert(SQLUtil.allFields, BibtexFields.getAllPrivateFieldNames());
     }
 
     /**
@@ -80,39 +80,36 @@ public class SQLUtil {
      */
     public static String getFieldStr() {
         // create comma separated list of field names
-        String fieldstr = "";
         String field;
+        List<String> fieldNames = new ArrayList<>();
         for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
             field = SQLUtil.allFields.get(i);
-            if (i > 0) {
-                fieldstr = fieldstr + ", ";
-            }
             if (SQLUtil.reservedDBWords.contains(field)) {
                 field += "_";
             }
-            fieldstr = fieldstr + field;
+            fieldNames.add(field);
         }
-        return fieldstr;
+        return String.join(", ", fieldNames);
     }
 
     /**
-     * Inserts the elements of a String array into an ArrayList making sure not to duplicate entries in the ArrayList
+     * Inserts the elements of a List into another List making sure not to duplicate entries in the resulting List
      *
-     * @param list The ArrayList containing unique entries
-     * @param array The String array to be inserted into the ArrayList
-     * @return The updated ArrayList with new unique entries
+     * @param list1 The List containing unique entries
+     * @param list2 The second List to be inserted into the first ArrayList
+     * @return The updated list1 with new unique entries
      */
-    private static ArrayList<String> uniqueInsert(ArrayList<String> list, String[] array) {
-        if (array != null) {
-            for (String anArray : array) {
-                if (!list.contains(anArray)) {
-                    if (!"#".equals(anArray)) {
-                        list.add(anArray);
+    private static List<String> uniqueListInsert(List<String> list1, List<String> list2) {
+        if (list2 != null) {
+            for (String fromList2 : list2) {
+                if (!list1.contains(fromList2)) {
+                    if (!"#".equals(fromList2)) {
+                        list1.add(fromList2);
                     }
                 }
             }
         }
-        return list;
+        return list1;
     }
 
     /**
@@ -124,20 +121,17 @@ public class SQLUtil {
      * @return The SQL code to be included in a CREATE TABLE statement.
      */
     public static String fieldsAsCols(ArrayList<String> fields, String datatype) {
-        String str = "";
         String field;
+        ArrayList<String> newFields = new ArrayList<>();
         ListIterator<String> li = fields.listIterator();
         while (li.hasNext()) {
             field = li.next();
             if (SQLUtil.reservedDBWords.contains(field)) {
                 field = field + '_';
             }
-            str = str + field + datatype;
-            if (li.hasNext()) {
-                str = str + ", ";
-            }
+            newFields.add(field + datatype);
         }
-        return str;
+        return String.join(", ", newFields);
     }
 
     /**
@@ -258,7 +252,7 @@ public class SQLUtil {
      * @throws SQLException
      */
     public static String processQueryWithSingleResult(Connection conn, String query) throws SQLException {
-        try (ResultSet rs = SQLUtil.executeQueryWithResults(conn, query).getResultSet()) {
+        try (Statement sm = SQLUtil.executeQueryWithResults(conn, query); ResultSet rs = sm.getResultSet()) {
             rs.next();
             String result = rs.getString(1);
             rs.getStatement().close();
