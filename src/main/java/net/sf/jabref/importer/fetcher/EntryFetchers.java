@@ -40,7 +40,6 @@ public class EntryFetchers {
         entryFetchers.add(new MedlineFetcher());
         entryFetchers.add(new OAI2Fetcher());
         entryFetchers.add(new ScienceDirectFetcher());
-        entryFetchers.add(new SPIRESFetcher());
         entryFetchers.add(new ACMPortalFetcher());
         entryFetchers.add(new GoogleScholarFetcher());
         entryFetchers.add(new DOAJFetcher());

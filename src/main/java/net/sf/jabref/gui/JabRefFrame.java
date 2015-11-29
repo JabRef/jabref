@@ -413,10 +413,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Open URL or DOI"),
             prefs.getKey(KeyBinds.OPEN_URL_OR_DOI),
             IconTheme.JabRefIcon.WWW.getIcon());
-    private final AbstractAction openSpires = new GeneralAction(Actions.OPEN_SPIRES,
-            Localization.lang("Open SPIRES entry"),
-            Localization.lang("Open SPIRES entry"),
-            prefs.getKey(KeyBinds.OPEN_SPIRES_ENTRY));
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK,
             Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcon.FIND_DUPLICATES.getIcon());
     private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
@@ -1513,7 +1509,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
                 replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
-                openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
+                openUrl, openFolder, openFile, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
                 closeDatabaseAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
                 databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected,

@@ -53,7 +53,6 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
-import net.sf.jabref.importer.fetcher.SPIRESFetcher;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
@@ -1003,34 +1002,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put(Actions.MERGE_DOI, (BaseAction) () -> new MergeEntryDOIDialog(BasePanel.this));
-
-        actions.put(Actions.OPEN_SPIRES, new BaseAction() {
-
-            @Override
-            public void action() {
-                BibtexEntry[] bes = mainTable.getSelectedEntries();
-                if ((bes != null) && (bes.length == 1)) {
-                    Object link = null;
-                    if (bes[0].getField("eprint") != null) {
-                        link = SPIRESFetcher.constructUrlFromEprint(bes[0].getField("eprint"));
-                    } else if (bes[0].getField("slaccitation") != null) {
-                        link = SPIRESFetcher.constructUrlFromSlaccitation(bes[0].getField("slaccitation"));
-                    }
-                    if (link != null) {
-                        try {
-                            JabRefDesktop.openExternalViewer(metaData(), link.toString(), "url");
-                            output(Localization.lang("External viewer called") + '.');
-                        } catch (IOException ex) {
-                            output(Localization.lang("Error") + ": " + ex.getMessage());
-                        }
-                    } else {
-                        output(Localization.lang("No url defined") + '.');
-                    }
-                } else {
-                    output(Localization.lang("No entries or multiple entries selected."));
-                }
-            }
-        });
 
         actions.put(Actions.REPLACE_ALL, new BaseAction() {
 
