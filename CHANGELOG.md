@@ -115,7 +115,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Remove incremental search
  - Remove option to disable autocompleters for search and make this always one
  - Remove option to highlight matches and make this always one when not using regex or grammar-based search
- 
+ - Remove non-working web searches: JSTOR and Sciencedirect (planned to be fixed for the next release)
  - Remove option Tools -> Open PDF or PS which is replaced by Tools -> Open File
 
 ## 2.80 - never released
