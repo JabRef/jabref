@@ -90,16 +90,16 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         if (col == 0) {
             return GUIGlobals.NUMBER_COL;
         } else if (getIconTypeForColumn(col) != null) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS)) {
-                return getIconTypeForColumn(col)[0].substring(0, 1).toUpperCase();
+            String iconTypeForColumnZero = getIconTypeForColumn(col)[0];
+            if ("ranking".equals(iconTypeForColumnZero)) {
+                return EntryUtil.capitalizeFirst(iconTypeForColumnZero);
+            } else if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS)) {
+                return iconTypeForColumnZero.substring(0, 1).toUpperCase();
             } else {
-                if("ranking".equals(getIconTypeForColumn(col)[0])) {
-                    return EntryUtil.capitalizeFirst(getIconTypeForColumn(col)[0]);
-                }
                 return null;
             }
-        } else // try to find an alternative fieldname (for display)
-        {
+        } else {
+            // try to find an alternative fieldname (for display)
             String[] fld = columns[col - padleft];
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < fld.length; i++) {
