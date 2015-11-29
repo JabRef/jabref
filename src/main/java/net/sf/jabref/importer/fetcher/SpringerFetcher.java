@@ -54,7 +54,7 @@ public class SpringerFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         shouldContinue = true;
         try {
-            status.setStatus(Localization.lang("Searching Springer..."));
+            status.setStatus(Localization.lang("Searching..."));
             HttpResponse<JsonNode> jsonResponse;
             query = URLEncoder.encode(query, "UTF-8");
             jsonResponse = Unirest.get(API_URL + query + "&api_key=" + API_KEY + "&p=1")
@@ -73,7 +73,7 @@ public class SpringerFetcher implements EntryFetcher {
                                         Integer.toString(hits));
 
                         if (strCount == null) {
-                            status.setStatus(Localization.lang("Springer search canceled"));
+                            status.setStatus(Localization.lang("Search canceled"));
                             return false;
                         }
 
@@ -113,7 +113,7 @@ public class SpringerFetcher implements EntryFetcher {
                 return true;
             } else {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
-                        Localization.lang("Search Springer"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "Springer"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
         } catch (UnirestException e) {
