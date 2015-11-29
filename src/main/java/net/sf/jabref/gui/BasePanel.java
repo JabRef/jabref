@@ -1640,6 +1640,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 });*/
 
+        // check whether a mainTable already existed and a floatSearch was active
+        boolean floatSearchActive = (mainTable != null) && isShowingFloatSearch();
+
         createMainTable();
 
         for (EntryEditor ee : entryEditors.values()) {
@@ -1691,6 +1694,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
             autoCompleters = new ContentAutoCompleters();
+        }
+
+        // restore floating search result
+        // (needed if preferences have been changed which causes a recreation of the main table)
+        if (floatSearchActive) {
+            startShowingFloatSearch();
         }
 
         splitPane.revalidate();
