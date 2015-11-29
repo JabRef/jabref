@@ -1495,11 +1495,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         database.addDatabaseChangeListener(eventList);
         database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
         groupFilterList = new FilterList<>(eventList.getTheList(), EverythingMatcher.INSTANCE);
-        if(filterGroupToggle!=null) {
+        if (filterGroupToggle != null) {
             filterGroupToggle.updateFilterList(groupFilterList);
         }
         searchFilterList = new FilterList<>(groupFilterList, EverythingMatcher.INSTANCE);
-        if(filterSearchToggle!=null) {
+        if (filterSearchToggle != null) {
             filterSearchToggle.updateFilterList(searchFilterList);
         }
         tableFormat = new MainTableFormat(this);
@@ -2062,14 +2062,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         public void start() {
-            if(!isActive) {
+            if (!isActive) {
                 list.setMatcher(active);
                 isActive = true;
             }
         }
 
         public void stop() {
-            if(isActive) {
+            if (isActive) {
                 list.setMatcher(inactive);
                 isActive = false;
             }
