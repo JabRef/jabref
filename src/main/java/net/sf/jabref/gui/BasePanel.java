@@ -208,10 +208,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         searchBar = new SearchBar(this);
 
-
         setupMainPanel();
-
-        this.add(searchBar, BorderLayout.NORTH);
 
         setupActions();
 
@@ -1498,7 +1495,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         database.addDatabaseChangeListener(eventList);
         database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
         groupFilterList = new FilterList<>(eventList.getTheList(), EverythingMatcher.INSTANCE);
+        if(filterGroupToggle!=null) {
+            filterGroupToggle.updateFilterList(groupFilterList);
+        }
         searchFilterList = new FilterList<>(groupFilterList, EverythingMatcher.INSTANCE);
+        if(filterSearchToggle!=null) {
+            filterSearchToggle.updateFilterList(searchFilterList);
+        }
         tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
         mainTable = new MainTable(tableFormat, searchFilterList, frame, this);
@@ -1672,6 +1675,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         setLayout(new BorderLayout());
         removeAll();
+        add(searchBar, BorderLayout.NORTH);
         add(splitPane, BorderLayout.CENTER);
 
         // Set up name autocompleter for search:
@@ -2045,7 +2049,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public static class StartStopListAction<E> {
-        private final FilterList<E> list;
+        private FilterList<E> list;
         private final Matcher<E> active;
         private final Matcher<E> inactive;
 
@@ -2073,6 +2077,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         public boolean isActive() {
             return isActive;
+        }
+
+        public void updateFilterList(FilterList<E> filterList) {
+            list = filterList;
+            if(isActive) {
+                list.setMatcher(active);
+            } else {
+                list.setMatcher(inactive);
+            }
         }
     }
 
