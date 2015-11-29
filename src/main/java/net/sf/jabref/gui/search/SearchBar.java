@@ -258,7 +258,6 @@ public class SearchBar extends JPanel {
 
         if (!searchQuery.isValidQuery()) {
             basePanel.output(Localization.lang("Search failed: illegal search expression"));
-            clearSearch();
             return;
         }
 
