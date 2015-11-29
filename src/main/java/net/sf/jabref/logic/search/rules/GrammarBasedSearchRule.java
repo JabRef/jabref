@@ -23,6 +23,8 @@ import net.sf.jabref.search.SearchParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -32,6 +34,9 @@ import java.util.regex.Pattern;
  * The search query must be specified in an expression that is acceptable by the Search.g4 grammar.
  */
 public class GrammarBasedSearchRule implements SearchRule {
+
+    private static final Log LOGGER = LogFactory.getLog(GrammarBasedSearchRule.class);
+
 
     public static class ThrowingErrorListener extends BaseErrorListener {
 
@@ -94,7 +99,12 @@ public class GrammarBasedSearchRule implements SearchRule {
 
     @Override
     public boolean applyRule(String query, BibtexEntry bibtexEntry) {
-        return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibtexEntry).visit(tree);
+        try {
+            return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibtexEntry).visit(tree);
+        } catch (Exception e) {
+            LOGGER.debug("Search failed: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
