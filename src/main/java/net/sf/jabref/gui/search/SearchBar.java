@@ -47,6 +47,7 @@ public class SearchBar extends JPanel {
 
     public static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
     public static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
+    public static final Color ADVANCED_SEARCH_COLOR = new Color(102, 255, 255);
 
     private final JButton openCurrentResultsInDialog;
     private final JButton globalSearch;
@@ -257,13 +258,31 @@ public class SearchBar extends JPanel {
         LOGGER.debug("Searching " + searchQuery + " in " + basePanel.getTabTitle());
 
         if (!searchQuery.isValidQuery()) {
-            basePanel.output(Localization.lang("Search failed: illegal search expression"));
+            informUserAboutInvalidSearchQuery();
+
             return;
         }
 
         SearchWorker worker = new SearchWorker(basePanel, searchQuery, searchMode);
         worker.getWorker().run();
         worker.getCallBack().update();
+    }
+
+    private void informUserAboutInvalidSearchQuery() {
+        searchField.setBackground(NO_RESULTS_COLOR);
+
+        searchTextObservable.fireSearchlistenerEvent(null);
+
+        globalSearch.setEnabled(false);
+        openCurrentResultsInDialog.setEnabled(false);
+
+        basePanel.stopShowingFloatSearch();
+        basePanel.getFilterSearchToggle().stop();
+
+        searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(NO_RESULTS_COLOR));
+        searchIcon.setToolTipText(Localization.lang("Search failed: illegal search expression"));
+
+        currentResults.setText(Localization.lang("Search failed: illegal search expression"));
     }
 
     /**
@@ -303,7 +322,7 @@ public class SearchBar extends JPanel {
 
 
         if(grammarBasedSearch) {
-            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(new Color(102,255,255)));
+            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(ADVANCED_SEARCH_COLOR));
             searchIcon.setToolTipText(Localization.lang("Advanced search active."));
         } else {
             searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
