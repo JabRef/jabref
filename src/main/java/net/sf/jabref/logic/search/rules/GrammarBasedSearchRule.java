@@ -102,7 +102,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         try {
             return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibtexEntry).visit(tree);
         } catch (Exception e) {
-            LOGGER.debug("Search failed: " + e.getMessage());
+            LOGGER.debug("Search failed", e);
             return false;
         }
     }
@@ -150,9 +150,9 @@ public class GrammarBasedSearchRule implements SearchRule {
 
             boolean noSuchField = true;
             // this loop iterates over all regular keys, then over pseudo keys like "type"
-            for (int i = 0; i < searchKeys.length + 1; i++) {
+            for (int i = 0; i < (searchKeys.length + 1); i++) {
                 String content;
-                if (i - searchKeys.length == 0) {
+                if ((i - searchKeys.length) == 0) {
                     // PSEUDOFIELD_TYPE
                     if (!fieldPattern.matcher("entrytype").matches()) {
                         continue;
@@ -175,7 +175,7 @@ public class GrammarBasedSearchRule implements SearchRule {
                 }
             }
 
-            return noSuchField && operator == ComparisonOperator.DOES_NOT_CONTAIN;
+            return noSuchField && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
         }
 
         public boolean matchInField(String content) {
