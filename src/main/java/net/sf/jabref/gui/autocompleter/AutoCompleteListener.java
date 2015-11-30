@@ -32,7 +32,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     //TODO: The logging behavior in this class is probably too fine-grained and only understandable to its original author
     private static final Log LOGGER = LogFactory.getLog(AutoCompleteListener.class);
 
-	private final AutoCompleter<String> completer;
+    private final AutoCompleter<String> completer;
 
     // These variables keep track of the situation from time to time.
     private String toSetIn; // null indicates that there are no completions available

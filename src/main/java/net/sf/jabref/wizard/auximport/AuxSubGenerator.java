@@ -176,6 +176,11 @@ public class AuxSubGenerator {
                 back = false;
                 cont = false;
                 loopFileOpen = false;
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    // Ignored
+                }
             }
 
             while (cont) {

@@ -59,7 +59,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
     @Test
     @Ignore(value = "works on windows but not on linux")
-    public void testFindPdf() throws IOException {
+    public void testFindPdf() {
         String pdf = FileFinder.findPdf(entry, "pdf", root.getAbsolutePath());
         AssertUtil.assertEqualPaths("HipKro03 - Hello.pdf", pdf);
 
@@ -81,7 +81,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
     @Test
     @Ignore(value = "works on windows but not on linux")
-    public void testFindAssociatedFiles() throws IOException {
+    public void testFindAssociatedFiles() {
         Collection<BibtexEntry> entries = Collections.singletonList(entry);
         Collection<String> extensions = Arrays.asList("jpg", "pdf");
         Collection<File> dirs = Arrays.asList(new File(root.getAbsoluteFile() + "/pdfs/"),
@@ -99,7 +99,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
     @Test
     @Ignore(value = "works on windows but not on linux")
-    public void testFindPdfInMultiple() throws IOException {
+    public void testFindPdfInMultiple() {
 
         {
             String[] dirsToSearch = new String[]{root.getAbsolutePath(),

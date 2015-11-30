@@ -17,7 +17,6 @@ package net.sf.jabref.groups;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.*;
@@ -190,7 +189,6 @@ class GroupDialog extends JDialog {
                         + "p, 3dlu, p, 3dlu, top:80dlu, 9dlu, p, 9dlu, p");
 
         DefaultFormBuilder builderAll = new DefaultFormBuilder(layoutAll);
-        builderAll.border(Borders.DIALOG);
         builderAll.appendSeparator(Localization.lang("General"));
         builderAll.nextLine();
         builderAll.nextLine();

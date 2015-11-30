@@ -1,6 +1,5 @@
 package net.sf.jabref.export.layout.format;
 
-import junit.framework.Assert;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import org.junit.Before;
@@ -18,9 +17,9 @@ public class RemoveBracketsTest {
 
     @Test
     public void testFormat() throws Exception {
-        Assert.assertEquals("some text", formatter.format("{some text}"));
-        Assert.assertEquals("some text", formatter.format("{some text"));
-        Assert.assertEquals("some text", formatter.format("some text}"));
-        Assert.assertEquals("\\some text\\", formatter.format("\\{some text\\}"));
+        assertEquals("some text", formatter.format("{some text}"));
+        assertEquals("some text", formatter.format("{some text"));
+        assertEquals("some text", formatter.format("some text}"));
+        assertEquals("\\some text\\", formatter.format("\\{some text\\}"));
     }
 }

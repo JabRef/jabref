@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -509,12 +507,12 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        // Do nothing
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        // Do nothing
     }
 
     public void setPreviewActive(boolean enabled) {
@@ -626,15 +624,17 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
     @Override
     public void keyReleased(KeyEvent e) {
+        // Do nothing
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        // Do nothing
     }
 
     @Override
     public void focusGained(FocusEvent e) {
-
+        // Do nothing
     }
 
     @Override

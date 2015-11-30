@@ -269,7 +269,7 @@ public class BibtexParserTest {
 
     @Test
     @Ignore
-    public void testNewlineHandling() throws IOException {
+    public void testNewlineHandling() {
 
         BibtexEntry e = BibtexParser.singleFromString("@article{canh05," +
                 "a = {a\nb}," +

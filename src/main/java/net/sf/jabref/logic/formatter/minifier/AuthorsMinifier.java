@@ -2,9 +2,6 @@ package net.sf.jabref.logic.formatter.minifier;
 
 import net.sf.jabref.logic.formatter.Formatter;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Replaces three or more authors with and others
  */
@@ -17,15 +14,13 @@ public class AuthorsMinifier implements Formatter {
     /**
      * Replaces three or more authors with and others.
      *
-     * <example>
-     *     Stefan Kolb -> Stefan Kolb
-     *     Stefan Kolb and Simon Harrer -> Stefan Kolb and Simon Harrer
-     *     Stefan Kolb and Simon Harrer and Jörg Lenhard -> Stefan Kolb and others
-     * </example>
+     * <example> Stefan Kolb -> Stefan Kolb Stefan Kolb and Simon Harrer -> Stefan Kolb and Simon Harrer Stefan Kolb and
+     * Simon Harrer and Jörg Lenhard -> Stefan Kolb and others </example>
      */
+    @Override
     public String format(String value) {
         // nothing to do
-        if (value == null || value.isEmpty()) {
+        if ((value == null) || value.isEmpty()) {
             return value;
         }
 
@@ -48,7 +43,7 @@ public class AuthorsMinifier implements Formatter {
         }
 
         // already abbreviated
-        if ("others".equals(authors[authors.length - 1]) && authors.length == 2) {
+        if ("others".equals(authors[authors.length - 1]) && (authors.length == 2)) {
             return authorField;
         }
 
