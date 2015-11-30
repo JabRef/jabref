@@ -244,7 +244,7 @@ public class FileActions {
                 if (write) {
                     bibtexEntryWriter.write(entry, writer);
                     //only append newline if the entry has changed
-                    if(!entry.hasChanged()){
+                    if(entry.hasChanged()){
                         writer.write(Globals.NEWLINE);
                     }
                 }
