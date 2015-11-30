@@ -82,8 +82,8 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                defProxyUsername.setEnabled(useProxyAuthentication.isSelected());
-                defProxyPassword.setEnabled(useProxyAuthentication.isSelected());
+                defProxyUsername.setEnabled(useProxy.isSelected() && useProxyAuthentication.isSelected());
+                defProxyPassword.setEnabled(useProxy.isSelected() && useProxyAuthentication.isSelected());
             }
         });
 

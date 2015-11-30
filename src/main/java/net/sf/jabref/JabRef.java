@@ -87,7 +87,7 @@ public class JabRef {
             System.setProperty("http.proxyHost", prefs.get(JabRefPreferences.PROXY_HOSTNAME));
             System.setProperty("http.proxyPort", prefs.get(JabRefPreferences.PROXY_PORT));
 
-            // currently, the following cannot be configured
+            // NetworkTab.java ensures that proxyUsername and proxyPassword are neither null nor empty
             if (prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION)) {
                 System.setProperty("http.proxyUser", prefs.get(JabRefPreferences.PROXY_USERNAME));
                 System.setProperty("http.proxyPassword", prefs.get(JabRefPreferences.PROXY_PASSWORD));
@@ -99,25 +99,28 @@ public class JabRef {
             System.setProperty("proxySet", "true");
         }
 
-        Authenticator.setDefault(new Authenticator() {
+        if (prefs.getBoolean(JabRefPreferences.USE_PROXY)
+                && prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION)) {
+            Authenticator.setDefault(new Authenticator() {
 
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                if (getRequestorType() == RequestorType.PROXY) {
-                    String prot = getRequestingProtocol().toLowerCase();
-                    String host = System.getProperty(prot + ".proxyHost", "");
-                    String port = System.getProperty(prot + ".proxyPort", "80");
-                    String user = System.getProperty(prot + ".proxyUser", "");
-                    String password = System.getProperty(prot + ".proxyPassword", "");
-                    if (getRequestingHost().equalsIgnoreCase(host)) {
-                        if (Integer.parseInt(port) == getRequestingPort()) {
-                            return new PasswordAuthentication(user, password.toCharArray());
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    if (getRequestorType() == RequestorType.PROXY) {
+                        String prot = getRequestingProtocol().toLowerCase();
+                        String host = System.getProperty(prot + ".proxyHost", "");
+                        String port = System.getProperty(prot + ".proxyPort", "80");
+                        String user = System.getProperty(prot + ".proxyUser", "");
+                        String password = System.getProperty(prot + ".proxyPassword", "");
+                        if (getRequestingHost().equalsIgnoreCase(host)) {
+                            if (Integer.parseInt(port) == getRequestingPort()) {
+                                return new PasswordAuthentication(user, password.toCharArray());
+                            }
                         }
                     }
+                    return null;
                 }
-                return null;
-            }
-        });
+            });
+        }
 
         Globals.startBackgroundTasks();
         setupLogHandlerForErrorConsole();
