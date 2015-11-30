@@ -14,6 +14,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Changed
  - Add support for proxy authentication via VM args and GUI settings, this implements Feature Request #388
+- Move Bibtex and Biblatex mode switcher to File menu
+- Display active edit mode (BibTeX or Biblatex) at window title
 
 ### Fixed
 - Fix #420: Reenable preference changes
