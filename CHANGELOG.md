@@ -15,6 +15,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Changed
 
 ### Fixed
+- Fix #414: Rework BibLatex entry types with correct required and optional fields
 - Fix #413: Help links in released jar version are not working
 - Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete. Fixes #412 
 
