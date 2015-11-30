@@ -456,11 +456,11 @@ public class JabRefPreferences {
         }
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
         defaults.put(USE_PROXY, Boolean.FALSE);
-        defaults.put(PROXY_HOSTNAME, "my proxy host");
-        defaults.put(PROXY_PORT, "my proxy port");
+        defaults.put(PROXY_HOSTNAME, "");
+        defaults.put(PROXY_PORT, "80");
         defaults.put(USE_PROXY_AUTHENTICATION, Boolean.FALSE);
-        //defaults.put(PROXY_USERNAME, "my proxy username");
-        //defaults.put(PROXY_PASSWORD, "my proxy password");
+        defaults.put(PROXY_USERNAME, "");
+        defaults.put(PROXY_PASSWORD, "");
         defaults.put(PDF_PREVIEW, Boolean.FALSE);
         defaults.put(USE_DEFAULT_LOOK_AND_FEEL, Boolean.TRUE);
         defaults.put(LYXPIPE, System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
