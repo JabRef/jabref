@@ -102,8 +102,7 @@ class HelpContent extends JTextPane {
     }
 
     // .getResource is called at resourceOwner. This method is available at all Class objects
-    @SuppressWarnings("rawtypes")
-    public void setPage(String filename, Class resourceOwner) {
+    public void setPage(String filename, Class<?> resourceOwner) {
 
         // Check for anchor
         int indexOf = filename.indexOf('#');
@@ -151,7 +150,7 @@ class HelpContent extends JTextPane {
      */
     @Override
     public void setPage(URL url) {
-        if ("file".equals(url.getProtocol())) {
+        if ("file".equals(url.getProtocol()) || "jar".equals(url.getProtocol())) {
             // Creating file by url.toString() and using file.getName() preserves anchors
             File file = new File(url.toString());
             setPage(file.getName(), JabRef.class);
@@ -165,7 +164,7 @@ class HelpContent extends JTextPane {
         try {
             URL url;
             if(anchorName!=null) {
-                url = new URL(baseUrl.toString()+"#"+anchorName);
+                url = new URL(baseUrl +"#"+anchorName);
             } else {
                 url = baseUrl;
             }

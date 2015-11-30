@@ -114,7 +114,7 @@ public class ADSFetcher implements EntryFetcher {
                             .lang("Note: A full text search is currently not supported for %0", getTitle()),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
+            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(
@@ -140,27 +140,28 @@ public class ADSFetcher implements EntryFetcher {
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLStreamReader reader = factory.createXMLStreamReader(bis);
             boolean isAbstract = false;
-            String abstractText = "";
+            StringBuilder abstractSB = new StringBuilder();
             while (reader.hasNext()) {
                 reader.next();
                 if (reader.isStartElement() &&
-                        reader.getLocalName().equals("abstract")) {
+                        "abstract".equals(reader.getLocalName())) {
                     isAbstract = true;
                 }
                 if (isAbstract && reader.isCharacters()) {
-                    abstractText = abstractText + reader.getText();
+                    abstractSB.append(reader.getText());
                 }
                 if (isAbstract && reader.isEndElement()) {
                     isAbstract = false;
                 }
             }
+            String abstractText = abstractSB.toString();
             abstractText = abstractText.replace("\n", " ");
             entry.setField("abstract", abstractText);
         } catch (XMLStreamException e) {
             status.showMessage(Localization.lang("An Error occurred while parsing abstract"), getTitle(),
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url) + "\n\n" + e,
+            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(

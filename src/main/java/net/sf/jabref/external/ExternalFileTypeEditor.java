@@ -113,7 +113,7 @@ public class ExternalFileTypeEditor extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 /*int reply = JOptionPane.showConfirmDialog(ExternalFileTypeEditor.this,
                         Globals.lang("All custom file types will be lost. Proceed?"),
-                        Globals.lang("Reset file type definitons"), JOptionPane.YES_NO_OPTION,
+                        Globals.lang("Reset file type definitions"), JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);*/
                 //if (reply == JOptionPane.YES_OPTION) {
                 java.util.List<ExternalFileType> list = Globals.prefs.getDefaultExternalFileTypes();
@@ -265,7 +265,7 @@ public class ExternalFileTypeEditor extends JDialog {
         }
     }
 
-    class IconRenderer implements TableCellRenderer {
+    static class IconRenderer implements TableCellRenderer {
 
         final JLabel lab = new JLabel();
 

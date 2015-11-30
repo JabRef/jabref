@@ -123,10 +123,11 @@ public class FileActions {
             FileActions.previousStringType = bs.getType();
         }
 
-        String suffix = "";
+        StringBuilder suffixSB = new StringBuilder();
         for (int i = maxKeyLength - bs.getName().length(); i > 0; i--) {
-            suffix += " ";
+            suffixSB.append(" ");
         }
+        String suffix = suffixSB.toString();
 
         fw.write("@String { " + bs.getName() + suffix + " = ");
         if (!bs.getContent().isEmpty()) {
@@ -532,6 +533,6 @@ public class FileActions {
     private static boolean nonZeroField(BibtexEntry be, String field) {
         String o = be.getField(field);
 
-        return (o != null) && !o.equals("0");
+        return (o != null) && !"0".equals(o);
     }
 }

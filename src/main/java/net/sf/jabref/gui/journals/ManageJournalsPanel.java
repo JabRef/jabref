@@ -183,7 +183,7 @@ class ManageJournalsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 File old = null;
-                if (!newNameTf.getText().equals("")) {
+                if (!"".equals(newNameTf.getText())) {
                     old = new File(newNameTf.getText());
                 }
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.SAVE_DIALOG, false);
@@ -198,7 +198,7 @@ class ManageJournalsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 File old = null;
-                if (!personalFile.getText().equals("")) {
+                if (!"".equals(personalFile.getText())) {
                     old = new File(personalFile.getText());
                 }
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.OPEN_DIALOG, false);
@@ -327,7 +327,7 @@ class ManageJournalsPanel extends JPanel {
     private void setupUserTable() {
         JournalAbbreviationRepository userAbbr = new JournalAbbreviationRepository();
         String filename = personalFile.getText();
-        if (!filename.equals("") && new File(filename).exists()) {
+        if (!"".equals(filename) && new File(filename).exists()) {
             try {
                 userAbbr.readJournalListFromFile(new File(filename));
             } catch (FileNotFoundException e) {
@@ -392,7 +392,7 @@ class ManageJournalsPanel extends JPanel {
                 e.printStackTrace();
             }
             String filename = f.getPath();
-            if (filename.equals("")) {
+            if ("".equals(filename)) {
                 filename = null;
             }
             Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, filename);
@@ -401,7 +401,7 @@ class ManageJournalsPanel extends JPanel {
         // Store the list of external files set up:
         ArrayList<String> extFiles = new ArrayList<>();
         for (ExternalFileEntry efe : externals) {
-            if (!efe.getValue().equals("")) {
+            if (!"".equals(efe.getValue())) {
                 extFiles.add(efe.getValue());
             }
         }

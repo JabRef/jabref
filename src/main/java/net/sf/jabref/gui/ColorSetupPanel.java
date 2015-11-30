@@ -101,7 +101,7 @@ public class ColorSetupPanel extends JPanel {
     }
 
 
-    class ColorButtonListener implements ActionListener {
+    static class ColorButtonListener implements ActionListener {
 
         private final ColorButton button;
 
@@ -123,7 +123,7 @@ public class ColorSetupPanel extends JPanel {
      * A button to display the chosen color, and hold key information about a color setting.
      * Includes a method to produce a Default button for this setting.
      */
-    class ColorButton extends JButton implements Icon {
+    static class ColorButton extends JButton implements Icon {
         private Color color = Color.white;
         private final String key;
         private final String name;

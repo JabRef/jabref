@@ -229,11 +229,11 @@ public class OAI2Fetcher implements EntryFetcher {
 
             return be;
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception ocurred while accessing '%0'", url)
+            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url)
  + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
-            status.showMessage(Localization.lang("An SAXException ocurred while parsing '%0':", url)
+            status.showMessage(Localization.lang("An SAXException occurred while parsing '%0':", url)
  + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {

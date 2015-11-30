@@ -19,8 +19,8 @@ import javax.swing.event.ListSelectionListener;
  */
 public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
 	
-    DefaultListModel<E> model = new DefaultListModel<E>();
-	JList<E> list = new JList<E>(model);
+    DefaultListModel<E> model = new DefaultListModel<>();
+	JList<E> list = new JList<>(model);
 	ActionListener acceptAction;
 
 	/**

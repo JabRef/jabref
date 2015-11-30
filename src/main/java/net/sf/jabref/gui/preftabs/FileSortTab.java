@@ -19,9 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -108,7 +106,7 @@ class FileSortTab extends JPanel implements PrefsTab {
             saveInTableOrder.addActionListener(listener);
             saveInSpecifiedOrder.addActionListener(listener);
 
-            ArrayList<String> fieldNames = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
+            ArrayList<String> fieldNames = new ArrayList<>(BibtexFields.getAllFieldNames());
             fieldNames.add(BibtexEntry.KEY_FIELD);
             Collections.sort(fieldNames);
             String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
@@ -228,7 +226,7 @@ class FileSortTab extends JPanel implements PrefsTab {
         exportInTableOrder.addActionListener(listener);
         exportInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> fieldNames = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        ArrayList<String> fieldNames = new ArrayList<>(BibtexFields.getAllFieldNames());
         fieldNames.add(BibtexEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);

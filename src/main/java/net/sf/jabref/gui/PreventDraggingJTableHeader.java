@@ -69,14 +69,14 @@ class PreventDraggingJTableHeader extends JTableHeader {
 
             // prevent dragging of special field columns
             String headerValue = column.getHeaderValue().toString();
-            if (headerValue.equals("P") || headerValue.equals("Q") || headerValue.equals("R")) {
+            if ("P".equals(headerValue) || "Q".equals(headerValue) || "R".equals(headerValue)) {
                 // the letters are guessed. Don't know, where they are set in the code.
                 return;
             }
 
             // other icon columns should also not be dragged
             // note that "P" is used for "PDF" and "Priority"
-            if (headerValue.equals("F") || headerValue.equals("U")) {
+            if ("F".equals(headerValue) || "U".equals(headerValue)) {
                 return;
             }
 

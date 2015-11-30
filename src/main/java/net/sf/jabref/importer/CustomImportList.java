@@ -50,7 +50,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
      * 
      * <p>Is also responsible for instantiating the class loader.</p>
      */
-    public class Importer implements Comparable<Importer> {
+    public static class Importer implements Comparable<Importer> {
 
         private String name;
         private String cliId;

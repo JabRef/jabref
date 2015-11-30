@@ -66,7 +66,6 @@ class PdfPreviewPanel extends JPanel {
             e.printStackTrace();
             return;
         }
-        @SuppressWarnings("unchecked")
         List<PDPage> pages = document.getDocumentCatalog().getAllPages();
 
         PDPage page = pages.get(0);
@@ -134,7 +133,7 @@ class PdfPreviewPanel extends JPanel {
         FileListEntry flEntry = null;
         for (int i = 0; i < tm.getRowCount(); i++) {
             flEntry = tm.getEntry(i);
-            if (flEntry.getType().getName().toLowerCase().equals("pdf")) {
+            if ("pdf".equals(flEntry.getType().getName().toLowerCase())) {
                 break;
             }
         }
@@ -153,7 +152,7 @@ class PdfPreviewPanel extends JPanel {
 
     private void clearPreview() {
         this.picLabel.setIcon(null);
-        this.picLabel.setText(Localization.lang("No preview available"));
+        this.picLabel.setText(Localization.lang("No preview available."));
     }
 
 }

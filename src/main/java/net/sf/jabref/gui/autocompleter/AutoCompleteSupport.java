@@ -71,7 +71,7 @@ public class AutoCompleteSupport<E> {
 	 * @param textComp the textbox component for which autocompletion should be enabled
 	 */
 	public AutoCompleteSupport(JTextComponent textComp) {
-		this(textComp, null, new ListAutoCompleteRenderer<E>());
+		this(textComp, null, new ListAutoCompleteRenderer<>());
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class AutoCompleteSupport<E> {
 	 */
 	public AutoCompleteSupport(JTextComponent textComp,
 			AutoCompleter<E> autoCompleter) {
-		this(textComp, autoCompleter, new ListAutoCompleteRenderer<E>());
+		this(textComp, autoCompleter, new ListAutoCompleteRenderer<>());
 	}
 
 	/**

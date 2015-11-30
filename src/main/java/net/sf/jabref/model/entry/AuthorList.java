@@ -620,7 +620,7 @@ public class AuthorList {
         if ((tokenEnd < original.length()) && (original.charAt(tokenEnd) == '-')) {
             tokenTerm = '-';
         }
-        if (original.substring(tokenStart, tokenEnd).equalsIgnoreCase("and")) {
+        if ("and".equalsIgnoreCase(original.substring(tokenStart, tokenEnd))) {
             return AuthorList.TOKEN_AND;
         } else {
             return AuthorList.TOKEN_WORD;

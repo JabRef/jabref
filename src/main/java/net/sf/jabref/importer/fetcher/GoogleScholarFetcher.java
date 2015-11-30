@@ -87,8 +87,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                 hasRunConfig = true;
             }
             Map<String, JLabel> citations = getCitations(query);
-            for (String link : citations.keySet()) {
-                preview.addEntry(link, citations.get(link));
+            for (Map.Entry<String, JLabel> linkEntry : citations.entrySet()) {
+                preview.addEntry(linkEntry.getKey(), linkEntry.getValue());
             }
 
             return true;
@@ -103,8 +103,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector) {
         int toDownload = 0;
         int downloaded = 0;
-        for (String link : selection.keySet()) {
-            boolean isSelected = selection.get(link);
+        for (Map.Entry<String, Boolean> selEntry : selection.entrySet()) {
+            boolean isSelected = selEntry.getValue();
             if (isSelected) {
                 toDownload++;
             }
@@ -113,19 +113,19 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             return;
         }
 
-        for (String link : selection.keySet()) {
+        for (Map.Entry<String, Boolean> selEntry : selection.entrySet()) {
             if (stopFetching) {
                 break;
             }
             inspector.setProgress(downloaded, toDownload);
-            boolean isSelected = selection.get(link);
+            boolean isSelected = selEntry.getValue();
             if (isSelected) {
                 downloaded++;
                 try {
-                    BibtexEntry entry = downloadEntry(link);
+                    BibtexEntry entry = downloadEntry(selEntry.getKey());
                     inspector.addEntry(entry);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Cannot download entry from Google scholar", e);
                 }
             }
         }

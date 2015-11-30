@@ -103,17 +103,17 @@ public class GVKParser {
             LOGGER.debug("tag: " + tag);
 
             // mak
-            if (tag.equals("002@")) {
+            if ("002@".equals(tag)) {
                 mak = getSubfield("0", datafield);
             }
 
             //ppn
-            if (tag.equals("003@")) {
+            if ("003@".equals(tag)) {
                 ppn = getSubfield("0", datafield);
             }
 
             //author
-            if (tag.equals("028A")) {
+            if ("028A".equals(tag)) {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
@@ -125,7 +125,7 @@ public class GVKParser {
                 author = author.concat(vorname + " " + nachname);
             }
             //author (weiterer)
-            if (tag.equals("028B")) {
+            if ("028B".equals(tag)) {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
@@ -138,7 +138,7 @@ public class GVKParser {
             }
 
             //editor
-            if (tag.equals("028C")) {
+            if ("028C".equals(tag)) {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
@@ -151,24 +151,24 @@ public class GVKParser {
             }
 
             //title and subtitle
-            if (tag.equals("021A")) {
+            if ("021A".equals(tag)) {
                 title = getSubfield("a", datafield);
                 subtitle = getSubfield("d", datafield);
             }
 
             //publisher and address
-            if (tag.equals("033A")) {
+            if ("033A".equals(tag)) {
                 publisher = getSubfield("n", datafield);
                 address = getSubfield("p", datafield);
             }
 
             //date
-            if (tag.equals("011@")) {
+            if ("011@".equals(tag)) {
                 date = getSubfield("a", datafield);
             }
 
             //date, volume, number, pages (year bei Zeitschriften (evtl. redundant mit 011@))
-            if (tag.equals("031A")) {
+            if ("031A".equals(tag)) {
                 date = getSubfield("j", datafield);
                 volume = getSubfield("e", datafield);
                 number = getSubfield("a", datafield);
@@ -179,7 +179,7 @@ public class GVKParser {
             // 036D seems to contain more information than the other fields
             // overwrite information using that field
             // 036D also contains information normally found in 036E
-            if (tag.equals("036D")) {
+            if ("036D".equals(tag)) {
                 // 021 might have been present
                 if (title != null) {
                     // convert old title (contained in "a" of 021A) to volume
@@ -198,7 +198,7 @@ public class GVKParser {
             }
 
             //series and number
-            if (tag.equals("036E")) {
+            if ("036E".equals(tag)) {
                 series = getSubfield("a", datafield);
                 number = getSubfield("l", datafield);
                 String kor = getSubfield("b", datafield);
@@ -209,17 +209,17 @@ public class GVKParser {
             }
 
             //note
-            if (tag.equals("037A")) {
+            if ("037A".equals(tag)) {
                 note = getSubfield("a", datafield);
             }
 
             //edition
-            if (tag.equals("032@")) {
+            if ("032@".equals(tag)) {
                 edition = getSubfield("a", datafield);
             }
 
             //isbn
-            if (tag.equals("004A")) {
+            if ("004A".equals(tag)) {
                 String isbn_10 = getSubfield("0", datafield);
                 String isbn_13 = getSubfield("A", datafield);
 
@@ -235,7 +235,7 @@ public class GVKParser {
 
             // Hochschulschriftenvermerk
             // Bei einer Verlagsdissertation ist der Ort schon eingetragen
-            if (tag.equals("037C")) {
+            if ("037C".equals(tag)) {
                 if (address == null) {
                     address = getSubfield("b", datafield);
                     address = removeSortCharacters(address);
@@ -261,7 +261,7 @@ public class GVKParser {
              * Buchbeiträgen Verlag und Ort wichtig sind
              * (sonst in Kategorie 033A).
              */
-            if (tag.equals("027D")) {
+            if ("027D".equals(tag)) {
                 journal = getSubfield("a", datafield);
                 booktitle = getSubfield("a", datafield);
                 address = getSubfield("p", datafield);
@@ -269,7 +269,7 @@ public class GVKParser {
             }
 
             //pagetotal
-            if (tag.equals("034D")) {
+            if ("034D".equals(tag)) {
                 pagetotal = getSubfield("a", datafield);
 
                 // S, S. etc. entfernen
@@ -277,10 +277,10 @@ public class GVKParser {
             }
 
             // Behandlung von Konferenzen
-            if (tag.equals("030F")) {
+            if ("030F".equals(tag)) {
                 address = getSubfield("k", datafield);
 
-                if (!entryType.equals("proceedings")) {
+                if (!"proceedings".equals(entryType)) {
                     subtitle = getSubfield("a", datafield);
                 }
 
@@ -288,7 +288,7 @@ public class GVKParser {
             }
 
             // Wenn eine Verlagsdiss vorliegt
-            if (entryType.equals("phdthesis")) {
+            if ("phdthesis".equals(entryType)) {
                 if (isbn != null) {
                     entryType = "book";
                 }
@@ -301,19 +301,19 @@ public class GVKParser {
             //SRU-Schnittstelle gelieferten Daten zur
             //Quelle unvollständig sind (z.B. nicht Serie
             //und Nummer angegeben werden)
-            if (tag.equals("039B")) {
+            if ("039B".equals(tag)) {
                 quelle = getSubfield("8", datafield);
             }
-            if (tag.equals("046R")) {
-                if (quelle.equals("") || (quelle == null)) {
+            if ("046R".equals(tag)) {
+                if ("".equals(quelle) || (quelle == null)) {
                     quelle = getSubfield("a", datafield);
                 }
             }
 
             // URLs behandeln
-            if (tag.equals("009P")) {
-                if (datafield.getAttribute("occurrence").equals("03")
-                        || datafield.getAttribute("occurrence").equals("05")) {
+            if ("009P".equals(tag)) {
+                if ("03".equals(datafield.getAttribute("occurrence"))
+                        || "05".equals(datafield.getAttribute("occurrence"))) {
                     if (url == null) {
                         url = getSubfield("a", datafield);
                     }
@@ -351,7 +351,7 @@ public class GVKParser {
             if (quelle.contains("ZDB-ID")) {
                 entryType = "article";
             }
-        } else if (mak.equals("")) {
+        } else if ("".equals(mak)) {
             entryType = "misc";
         } else if (mak.startsWith("O")) {
             entryType = "online";
@@ -432,11 +432,11 @@ public class GVKParser {
             result.setField("note", note);
         }
 
-        if (entryType.equals("article")) {
+        if ("article".equals(entryType)) {
             if (journal != null) {
                 result.setField("journal", journal);
             }
-        } else if (entryType.equals("incollection")) {
+        } else if ("incollection".equals(entryType)) {
             if (booktitle != null) {
                 result.setField("booktitle", booktitle);
             }

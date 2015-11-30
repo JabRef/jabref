@@ -41,7 +41,7 @@ import javax.swing.text.StyledDocument;
 public class TagToMarkedTextStore
 {
 
-    private class TMarkedStoreItem
+    private static class TMarkedStoreItem
     {
 
         int start;

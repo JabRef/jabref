@@ -16,17 +16,13 @@
 package net.sf.jabref.exporter;
 
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.*;
-import java.util.stream.Collectors;
-
 import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.JOptionPane;

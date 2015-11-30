@@ -1168,15 +1168,14 @@ public class JabRefPreferences {
      * Stores new key bindings into Preferences, provided they actually differ from the old ones.
      */
     public void setNewKeyBindings(HashMap<String, String> newBindings) {
-        if (!newBindings.equals(keyBinds)) {
+        if (!newBindings.equals(keyBinds.getKeyBindings())) {
             // This confirms that the bindings have actually changed.
             String[] bindNames = new String[newBindings.size()];
             String[] bindings = new String[newBindings.size()];
             int index = 0;
-            for (String nm : newBindings.keySet()) {
-                String bnd = newBindings.get(nm);
-                bindNames[index] = nm;
-                bindings[index] = bnd;
+            for (Map.Entry<String, String> keyBinding : newBindings.entrySet()) {
+                bindNames[index] = keyBinding.getKey();
+                bindings[index] = keyBinding.getValue();
                 index++;
             }
             putStringArray("bindNames", bindNames);
@@ -1365,14 +1364,14 @@ public class JabRefPreferences {
                 "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice",
                 IconTheme.getImage("openoffice")));
         list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
-        list.add(new ExternalFileType("PNG image", "png", "image/png", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
-        list.add(new ExternalFileType("GIF image", "gif", "image/gif", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
-        list.add(new ExternalFileType("JPG image", "jpg", "image/jpeg", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
+        list.add(new ExternalFileType(Localization.lang("%0 image", "PNG"), "png", "image/png", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
+        list.add(new ExternalFileType(Localization.lang("%0 image", "GIF"), "gif", "image/gif", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
+        list.add(new ExternalFileType(Localization.lang("%0 image", "JPG"), "jpg", "image/jpeg", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall", IconTheme.JabRefIcon.FILE.getSmallIcon()));
         list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
         list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
         list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
-        list.add(new ExternalFileType(Localization.lang("TIFF image"), "tiff", "image/tiff", "gimp", "picture",
+        list.add(new ExternalFileType(Localization.lang("%0 image", "TIFF"), "tiff", "image/tiff", "gimp", "picture",
                 IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
         list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
@@ -1456,7 +1455,7 @@ public class JabRefPreferences {
                 return type;
             }
         }
-        if (mimeType.equals("text/html")) {
+        if ("text/html".equals(mimeType)) {
             return HTML_FALLBACK_TYPE;
         } else {
             return null;

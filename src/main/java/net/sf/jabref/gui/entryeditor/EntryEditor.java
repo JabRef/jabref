@@ -499,7 +499,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
                 FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
                         panel.metaData, storeFieldAction, false,
-                        editor.getFieldName().equals("author") || editor.getFieldName().equals("editor") ? " and " : ", ");
+                        "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");
                 contentSelectors.add(ws);
 
                 return ws;
@@ -1620,11 +1620,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
 
     private void warnDuplicateBibtexkey() {
-        panel.output(Localization.lang("Duplicate BibTeX key. Grouping may not work for this entry."));
+        panel.output(Localization.lang("Duplicate BibTeX key.")+" "+Localization.lang("Grouping may not work for this entry."));
     }
 
     private void warnEmptyBibtexkey() {
-        panel.output(Localization.lang("Empty BibTeX key. Grouping may not work for this entry."));
+        panel.output(Localization.lang("Empty BibTeX key")+". "+Localization.lang("Grouping may not work for this entry."));
     }
 
 

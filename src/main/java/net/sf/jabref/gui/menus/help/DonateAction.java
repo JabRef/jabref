@@ -40,7 +40,7 @@ public class DonateAction extends AbstractAction {
             JabRefDesktop.openBrowser(donationLink);
         } catch (IOException ex) {
             ex.printStackTrace();
-            JabRef.jrf.getCurrentBasePanel().output(Localization.lang("Could not open browser window."));
+            JabRef.jrf.getCurrentBasePanel().output(Localization.lang("Could not open browser."));
         }
     }
 }

@@ -292,7 +292,7 @@ class LayoutEntry {
         case LayoutHelper.IS_OPTION_FIELD:
             String fieldEntry;
 
-            if (text.equals("bibtextype")) {
+            if ("bibtextype".equals(text)) {
                 fieldEntry = bibtex.getType().getName();
             } else {
                 // changed section begin - arudert

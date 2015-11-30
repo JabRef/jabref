@@ -28,6 +28,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -79,8 +80,6 @@ import net.sf.jabref.model.entry.EntryUtil;
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
  * possibility to preview and to locate each entry in the main window.
- *
- * TODO: should be possible to save or export the list.
  */
 public class SearchResultsDialog {
 
@@ -96,23 +95,22 @@ public class SearchResultsDialog {
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
-    private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
-
-    private DefaultEventTableModel<BibtexEntry> model;
-    private final EventList<BibtexEntry> entries = new BasicEventList<>();
-    private SortedList<BibtexEntry> sortedEntries;
-    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<>();
-
-    private JTable entryTable;
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+
+    private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
+    private final EventList<BibtexEntry> entries = new BasicEventList<>();
+
+    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<>();
+    private DefaultEventTableModel<BibtexEntry> model;
+
+    private SortedList<BibtexEntry> sortedEntries;
+    private JTable entryTable;
     private PreviewPanel preview;
 
 
     public SearchResultsDialog(JabRefFrame frame, String title) {
-
-        this.frame = frame;
-
-        init(title);
+        this.frame = Objects.requireNonNull(frame);
+        init(Objects.requireNonNull(title));
     }
 
     private void init(String title) {
@@ -165,8 +163,7 @@ public class SearchResultsDialog {
                 if (!selectionModel.getSelected().isEmpty()) {
                     BibtexEntry[] bes = selectionModel.getSelected().toArray
                             (new BibtexEntry[selectionModel.getSelected().size()]);
-                    TransferableBibtexEntry trbe
-                    = new TransferableBibtexEntry(bes);
+                    TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.getCurrentBasePanel());
@@ -237,7 +234,7 @@ public class SearchResultsDialog {
         comparators.clear();
 
         // Icon columns:
-        for (int i = 2; i < PAD; i++) {
+        for (int i = 0; i < PAD; i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
@@ -285,8 +282,7 @@ public class SearchResultsDialog {
      */
     public synchronized void addEntries(java.util.List<BibtexEntry> newEntries, BasePanel panel) {
         for (BibtexEntry entry : newEntries) {
-            entries.add(entry);
-            entryHome.put(entry, panel);
+            addEntry(entry, panel);
         }
     }
 
@@ -498,7 +494,7 @@ public class SearchResultsDialog {
             }
             else {
                 String field = fields[column - PAD];
-                if (field.equals("author") || field.equals("editor")) {
+                if ("author".equals(field) || "editor".equals(field)) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
                     if (frame.getCurrentBasePanel() != null) {

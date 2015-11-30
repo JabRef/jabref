@@ -102,7 +102,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                     + Localization.lang("Could not call executable") + " '" + commandPath + "'.");
         } else if (couldNotConnect) {
             panel.output(Localization.lang("Error") + ": "
-                    + Localization.lang("Could not connect to ") + getApplicationName() + ".");
+                    + Localization.lang("Could not connect to %0", getApplicationName()) + ".");
         } else {
             panel.output(Localization.lang("Pushed citations to %0", getApplicationName()) + ".");
         }
@@ -119,7 +119,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
      * @param keyString String containing the Bibtex keys to be pushed to the application
      * @return String array with the command to call and its arguments
      */
-    @SuppressWarnings("unused")
     protected String[] getCommandLine(String keyString) {
         return null;
     }

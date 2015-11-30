@@ -47,6 +47,7 @@ public class SearchBar extends JPanel {
 
     public static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
     public static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
+    public static final Color ADVANCED_SEARCH_COLOR = new Color(102, 255, 255);
 
     private final JButton openCurrentResultsInDialog;
     private final JButton globalSearch;
@@ -80,10 +81,10 @@ public class SearchBar extends JPanel {
 
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
 
-        caseSensitive = new JCheckBox(Localization.lang("Match case"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
+        caseSensitive = new JCheckBox(Localization.lang("Case sensitive"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
         caseSensitive.addItemListener(ae -> performSearch());
         caseSensitive.addItemListener(ae -> updatePreferences());
-        regularExp = new JCheckBox(Localization.lang("Regex"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
+        regularExp = new JCheckBox(Localization.lang("regular expression"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
         regularExp.addItemListener(ae -> performSearch());
         regularExp.addItemListener(ae -> updatePreferences());
 
@@ -174,7 +175,7 @@ public class SearchBar extends JPanel {
      */
     private JSearchTextField initSearchField() {
         JSearchTextField searchField = new JSearchTextField();
-        searchField.setTextWhenNotFocused(Localization.lang("Search..."));
+        searchField.setTextWhenNotFocused(Localization.lang("Search")+"...");
         searchField.setColumns(30);
 
         searchField.addKeyListener(new KeyAdapter() {
@@ -254,17 +255,34 @@ public class SearchBar extends JPanel {
         }
 
         SearchQuery searchQuery = getSearchQuery();
-        LOGGER.debug("Searching " + searchQuery.toString() + " in " + basePanel.getTabTitle());
+        LOGGER.debug("Searching " + searchQuery + " in " + basePanel.getTabTitle());
 
         if (!searchQuery.isValidQuery()) {
-            basePanel.output(Localization.lang("Search failed: illegal search expression"));
-            clearSearch();
+            informUserAboutInvalidSearchQuery();
+
             return;
         }
 
         SearchWorker worker = new SearchWorker(basePanel, searchQuery, searchMode);
         worker.getWorker().run();
         worker.getCallBack().update();
+    }
+
+    private void informUserAboutInvalidSearchQuery() {
+        searchField.setBackground(NO_RESULTS_COLOR);
+
+        searchTextObservable.fireSearchlistenerEvent(null);
+
+        globalSearch.setEnabled(false);
+        openCurrentResultsInDialog.setEnabled(false);
+
+        basePanel.stopShowingFloatSearch();
+        basePanel.getFilterSearchToggle().stop();
+
+        searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(NO_RESULTS_COLOR));
+        searchIcon.setToolTipText(Localization.lang("Search failed: illegal search expression"));
+
+        currentResults.setText(Localization.lang("Search failed: illegal search expression"));
     }
 
     /**
@@ -304,7 +322,7 @@ public class SearchBar extends JPanel {
 
 
         if(grammarBasedSearch) {
-            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(new Color(102,255,255)));
+            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(ADVANCED_SEARCH_COLOR));
             searchIcon.setToolTipText(Localization.lang("Advanced search active."));
         } else {
             searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());

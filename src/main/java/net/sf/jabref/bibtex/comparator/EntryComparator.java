@@ -75,7 +75,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
         // If the field is author or editor, we rearrange names so they are
         // sorted according to last name.
-        if (sortField.equals("author") || sortField.equals("editor")) {
+        if ("author".equals(sortField) || "editor".equals(sortField)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
                 //ImportFormatReader.fixAuthor_lastNameFirst((String)f1);
@@ -117,10 +117,10 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
             result = -((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
-            Integer f1AsInteger = new Integer(f1.toString());
+            Integer f1AsInteger = Integer.valueOf(f1.toString());
             result = -f1AsInteger.compareTo((Integer) f2);
         } else if (f1 instanceof Integer) {
-            Integer f2AsInteger = new Integer(f2.toString());
+            Integer f2AsInteger = Integer.valueOf(f2.toString());
             result = -((Integer) f1).compareTo(f2AsInteger);
         } else {
             String ours = ((String) f1).toLowerCase();

@@ -137,7 +137,7 @@ public class CsaImporter extends ImportFormat {
             return fstr; // possible day found in two places
         }
 
-        if ((day != null) && !day.equals("0")) {
+        if ((day != null) && !"0".equals(day)) {
             date.append(day);
             date.append(" ");
         } else {
@@ -172,7 +172,7 @@ public class CsaImporter extends ImportFormat {
         date.append(year);
 
         StringBuilder note = new StringBuilder();
-        if ((day != null) && !day.equals("0")) {
+        if ((day != null) && !"0".equals(day)) {
             note.append("Source Date: ");
             note.append(date);
             note.append(".");
@@ -215,7 +215,7 @@ public class CsaImporter extends ImportFormat {
                 new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         while ((str = in.readLine()) != null) {
-            if (str.equals("DN: Database Name")) {
+            if ("DN: Database Name".equals(str)) {
                 return true;
             }
         }
@@ -251,7 +251,7 @@ public class CsaImporter extends ImportFormat {
                     }
 
                     // post-process Journal article
-                    if (Type.equals("article") &&
+                    if ("article".equals(Type) &&
                             (hm.get("booktitle") != null)) {
                         String booktitle = hm.get("booktitle");
                         hm.remove("booktitle");
@@ -310,8 +310,8 @@ public class CsaImporter extends ImportFormat {
                 }
 
                 // check for start of new record
-                if (fabbr.equals("DN") &&
-                        fname.equalsIgnoreCase("Database Name")) {
+                if ("DN".equals(fabbr) &&
+                        "Database Name".equalsIgnoreCase(fname)) {
                     if (!first) {
                         throw new IOException("format error at line " + fline +
                                 ": DN out of order");
@@ -322,7 +322,7 @@ public class CsaImporter extends ImportFormat {
                             ": missing DN");
                 }
 
-                if (fabbr.equals("PT")) {
+                if ("PT".equals(fabbr)) {
                     Type = null;
                     String flow = fstr.toLowerCase();
                     String[] types = flow.split("; ");
@@ -331,17 +331,17 @@ public class CsaImporter extends ImportFormat {
                                 type.contains("journal article")) {
                             Type = "article";
                             break;
-                        } else if (type.equals("dissertation")) {
+                        } else if ("dissertation".equals(type)) {
                             Type = "phdthesis";
                             break;
-                        } else if (type.equals("conference")) {
+                        } else if ("conference".equals(type)) {
                             Type = "inproceedings";
                             break;
-                        } else if (type.equals("book monograph") &&
+                        } else if ("book monograph".equals(type) &&
                                 (Type == null)) {
                             Type = "book";
                             break;
-                        } else if (type.equals("report") &&
+                        } else if ("report".equals(type) &&
                                 (Type == null)) {
                             Type = "techreport";
                             break;
@@ -354,35 +354,35 @@ public class CsaImporter extends ImportFormat {
                 }
 
                 String ftype = null;
-                if (fabbr.equals("AB")) {
+                if ("AB".equals(fabbr)) {
                     ftype = "abstract";
-                } else if (fabbr.equals("AF")) {
+                } else if ("AF".equals(fabbr)) {
                     ftype = "affiliation";
-                } else if (fabbr.equals("AU")) {
+                } else if ("AU".equals(fabbr)) {
                     ftype = "author";
                     if (fstr.contains(";")) {
                         fstr = fstr.replaceAll("; ", " and ");
                     }
                 }
-                else if (fabbr.equals("CA")) {
+                else if ("CA".equals(fabbr)) {
                     ftype = "organization";
-                } else if (fabbr.equals("DE")) {
+                } else if ("DE".equals(fabbr)) {
                     ftype = "keywords";
-                } else if (fabbr.equals("DO")) {
+                } else if ("DO".equals(fabbr)) {
                     ftype = "doi";
-                } else if (fabbr.equals("ED")) {
+                } else if ("ED".equals(fabbr)) {
                     ftype = "editor";
-                } else if (fabbr.equals("IB")) {
+                } else if ("IB".equals(fabbr)) {
                     ftype = "ISBN";
-                } else if (fabbr.equals("IS")) {
+                } else if ("IS".equals(fabbr)) {
                     ftype = "ISSN";
-                } else if (fabbr.equals("JN")) {
+                } else if ("JN".equals(fabbr)) {
                     ftype = "journal";
-                } else if (fabbr.equals("LA")) {
+                } else if ("LA".equals(fabbr)) {
                     ftype = "language";
-                } else if (fabbr.equals("PB")) {
+                } else if ("PB".equals(fabbr)) {
                     ftype = "publisher";
-                } else if (fabbr.equals("PY")) {
+                } else if ("PY".equals(fabbr)) {
                     ftype = "year";
                     if (hm.get("year") != null) {
                         String oyear = hm.get("year");
@@ -391,7 +391,7 @@ public class CsaImporter extends ImportFormat {
                             //			    System.out.println(fstr + " != " + oyear);
                         }
                     }
-                } else if (fabbr.equals("RL")) {
+                } else if ("RL".equals(fabbr)) {
                     ftype = "url";
                     String[] lines = fstr.split(" ");
                     StringBuilder urls = new StringBuilder();
@@ -409,7 +409,7 @@ public class CsaImporter extends ImportFormat {
                         }
                     }
                     fstr = urls.toString();
-                } else if (fabbr.equals("SO")) {
+                } else if ("SO".equals(fabbr)) {
                     ftype = "booktitle";
 
                     // see if we can extract journal information
@@ -469,14 +469,14 @@ public class CsaImporter extends ImportFormat {
                         fstr = pm.replaceFirst("");
                     }
 
-                    if (fstr.equals(""))
+                    if ("".equals(fstr))
                     {
                         continue;
                         //		    System.out.println("SOURCE: \"" + fstr + "\"");
                     }
-                } else if (fabbr.equals("TI")) {
+                } else if ("TI".equals(fabbr)) {
                     ftype = "title";
-                } else if (fabbr.equals("RE"))
+                } else if ("RE".equals(fabbr))
                 {
                     continue; // throw away References
                 }

@@ -96,7 +96,7 @@ public class JournalAbbreviationRepository {
             Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
             abbreviations.remove(previous);
             LOGGER.info("Duplicate journal abbreviation - old one will be overwritten by new one\nOLD: "
-                    + previous.toString() + "\nNEW: " + abbreviation.toString());
+                    + previous + "\nNEW: " + abbreviation);
         }
 
         abbreviations.add(abbreviation);

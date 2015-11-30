@@ -40,7 +40,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class MedlineFetcher implements EntryFetcher {
 
-    class SearchResult {
+    static class SearchResult {
 
         public int count;
 
@@ -52,7 +52,7 @@ public class MedlineFetcher implements EntryFetcher {
 
 
         public void addID(String id) {
-            if (ids.equals("")) {
+            if ("".equals(ids)) {
                 ids = id;
             } else {
                 ids += "," + id;

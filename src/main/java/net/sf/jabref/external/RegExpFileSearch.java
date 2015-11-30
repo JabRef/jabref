@@ -216,14 +216,14 @@ public class RegExpFileSearch {
                     directory = new File(dirToProcess + '/');
                     continue;
                 }
-                if (dirToProcess.equals(".")) { // Stay in current directory
+                if (".".equals(dirToProcess)) { // Stay in current directory
                     continue;
                 }
-                if (dirToProcess.equals("..")) {
+                if ("..".equals(dirToProcess)) {
                     directory = new File(directory.getParent());
                     continue;
                 }
-                if (dirToProcess.equals("*")) { // Do for all direct subdirs
+                if ("*".equals(dirToProcess)) { // Do for all direct subdirs
 
                     File[] subDirs = directory.listFiles();
                     if (subDirs != null) {
@@ -237,7 +237,7 @@ public class RegExpFileSearch {
                     }
                 }
                 // Do for all direct and indirect subdirs
-                if (dirToProcess.equals("**")) {
+                if ("**".equals(dirToProcess)) {
                     List<File> toDo = new LinkedList<>();
                     toDo.add(directory);
 

@@ -76,7 +76,7 @@ public class EntryMarker {
         Object o = be.getField(BibtexFields.MARKED);
         if (o != null) {
             String s = o.toString();
-            if (s.equals("0")) {
+            if ("0".equals(s)) {
                 if (!onlyMaxLevel) {
                     unmarkOldStyle(be, database, ce);
                 }
@@ -176,7 +176,7 @@ public class EntryMarker {
             return 0;
         }
         String s = (String) fieldVal;
-        if (s.equals("0")) {
+        if ("0".equals(s)) {
             return 1;
         }
         int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);

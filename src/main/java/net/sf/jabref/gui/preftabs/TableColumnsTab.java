@@ -139,7 +139,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             @Override
             public Object getValueAt(int row, int column) {
                 if (row == 0) {
-                    return column == 0 ? GUIGlobals.NUMBER_COL : "" + ncWidth;
+                    return column == 0 ? GUIGlobals.NUMBER_COL : String.valueOf(ncWidth);
                 }
                 row--;
                 if (row >= tableRows.size()) {
@@ -197,7 +197,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
                 if (col == 0) {
                     rowContent.name = value.toString();
-                    if (getValueAt(row, 1).equals("")) {
+                    if ("".equals(getValueAt(row, 1))) {
                         setValueAt("" + GUIGlobals.DEFAULT_FIELD_LENGTH, row, 1);
                     }
                 }
@@ -656,18 +656,18 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 return;
             }
             TableColumnModel colMod = panel.mainTable.getColumnModel();
-            colSetup.setValueAt("" + colMod.getColumn(0).getWidth(), 0, 1);
+            colSetup.setValueAt(String.valueOf(colMod.getColumn(0).getWidth()), 0, 1);
             for (int i = 1; i < colMod.getColumnCount(); i++) {
                 try {
                     String name = panel.mainTable.getColumnName(i).toLowerCase();
                     int width = colMod.getColumn(i).getWidth();
                     if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).toLowerCase().equals(name)) {
-                        colSetup.setValueAt("" + width, i, 1);
+                        colSetup.setValueAt(String.valueOf(width), i, 1);
                     } else { // Doesn't match; search for a matching col in our table
                         for (int j = 0; j < colSetup.getRowCount(); j++) {
                             if ((j < tableRows.size()) &&
                                     ((String) colSetup.getValueAt(j, 0)).toLowerCase().equals(name)) {
-                                colSetup.setValueAt("" + width, j, 1);
+                                colSetup.setValueAt(String.valueOf(width), j, 1);
                                 break;
                             }
                         }
@@ -786,7 +786,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 TableRow tr = tableRows.elementAt(i);
                 names[i] = tr.name.toLowerCase();
                 nWidths[i] = tr.length;
-                widths[i] = "" + tr.length;
+                widths[i] = String.valueOf(tr.length);
             }
 
             // Finally, we store the new preferences.

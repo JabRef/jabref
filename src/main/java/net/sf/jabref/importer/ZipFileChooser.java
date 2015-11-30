@@ -79,7 +79,7 @@ class ZipFileChooser extends JDialog {
      *   size (uncompressed) {@link Long}
      * </li></ol></p>
      */
-    class ZipFileChooserTableModel extends AbstractTableModel {
+    static class ZipFileChooserTableModel extends AbstractTableModel {
 
         private final String[] columnNames = new String[] {
                 Localization.lang("Name"),
@@ -232,7 +232,7 @@ class ZipFileChooser extends JDialog {
                 if (row != -1) {
                     ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
                     ZipEntry tempZipEntry = model.getZipEntry(row);
-                    CustomImportList.Importer importer = prefs.customImports.new Importer();
+                    CustomImportList.Importer importer = new CustomImportList.Importer();
                     importer.setBasePath(model.getZipFile().getName());
                     String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replaceAll("/", ".");
                     importer.setClassName(className);

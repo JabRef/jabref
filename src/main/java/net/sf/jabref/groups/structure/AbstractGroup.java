@@ -224,7 +224,6 @@ public abstract class AbstractGroup {
      *
      * @param db The database to refresh for.
      */
-    @SuppressWarnings("unused")
     public void refreshForNewDatabase(BibtexDatabase db) {
         // Default is to do nothing. Group types that are affected by a change
         // of database must override this method.

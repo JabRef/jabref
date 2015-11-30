@@ -158,8 +158,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 //address = makeUrl(firstEntry);
                 firstEntry += ACMPortalFetcher.perPage;
             }
-            for (String s : previews.keySet()) {
-                preview.addEntry(s, previews.get(s));
+            for (Map.Entry<String, JLabel> entry : previews.entrySet()) {
+                preview.addEntry(entry.getKey(), entry.getValue());
             }
 
             return true;
@@ -180,13 +180,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     @Override
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector) {
-        for (String id : selection.keySet()) {
+        for (Map.Entry<String, Boolean> selentry : selection.entrySet()) {
             if (!shouldContinue) {
                 break;
             }
-            boolean sel = selection.get(id);
+            boolean sel = selentry.getValue();
             if (sel) {
-                BibtexEntry entry = downloadEntryBibTeX(id, fetchAbstract);
+                BibtexEntry entry = downloadEntryBibTeX(selentry.getKey(), fetchAbstract);
                 if (entry != null) {
                     // Convert from HTML and optionally add curly brackets around key words to keep the case
                     String title = entry.getField("title");

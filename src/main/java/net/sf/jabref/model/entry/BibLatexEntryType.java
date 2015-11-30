@@ -78,7 +78,7 @@ public abstract class BibLatexEntryType implements EntryType {
         List<String> myOptionalFields = getOptionalFields();
 
         if (myOptionalFields == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return myOptionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());

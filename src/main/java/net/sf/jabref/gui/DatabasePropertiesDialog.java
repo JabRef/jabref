@@ -18,8 +18,6 @@ package net.sf.jabref.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
 
@@ -228,7 +226,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveInOriginalOrder.addActionListener(listener);
         saveInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> v = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        Vector<String> v = new Vector<>(BibtexFields.getAllFieldNames());
         v.add(BibtexEntry.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);

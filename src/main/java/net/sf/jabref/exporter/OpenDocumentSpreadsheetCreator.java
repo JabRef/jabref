@@ -103,17 +103,12 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
 
         try {
-            Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8");
-            try {
-
-                //            Writer ps = new FileWriter(tmpFile);
+            try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8")) {
                 DOMSource source = new DOMSource(od.getDOMrepresentation());
                 StreamResult result = new StreamResult(ps);
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
-            } finally {
-                ps.close();
             }
         } catch (Exception e) {
             throw new Error(e);

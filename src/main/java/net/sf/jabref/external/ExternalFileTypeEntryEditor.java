@@ -140,7 +140,6 @@ public class ExternalFileTypeEntryEditor {
         if (OS.WINDOWS) {
             application.getDocument().addDocumentListener(new DocumentListener() {
 
-                @SuppressWarnings("unused")
                 private void handle(DocumentEvent e) {
                     if (application.getText().isEmpty()) {
                         useDefault.setSelected(true);
@@ -259,7 +258,7 @@ public class ExternalFileTypeEntryEditor {
     }
 
 
-    class BrowseListener implements ActionListener {
+    static class BrowseListener implements ActionListener {
 
         private final JTextField comp;
 

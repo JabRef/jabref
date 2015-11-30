@@ -289,7 +289,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         for (String field : fields) {
             String value = BibtexDatabase.getResolvedField(field, entry, database);
-            if (field.equals("author") || field.equals("editor")) {
+            if ("author".equals(field) || "editor".equals(field)) {
                 setPersonList(field, value);
             } else {
                 setTextProperty(field, value);

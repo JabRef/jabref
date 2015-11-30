@@ -34,7 +34,7 @@ class DBLPHelper {
      * use capitals. So, we better change the text to lower case.
      */
 
-    class DBLPQueryCleaner {
+    static class DBLPQueryCleaner {
 
         public String cleanQuery(final String query) {
             String cleaned = query;

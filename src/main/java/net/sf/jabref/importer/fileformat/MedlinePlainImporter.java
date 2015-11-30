@@ -112,7 +112,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String[] fields = entry1.split("\n");
 
             for (int j = 0; j < fields.length; j++) {
-                if (fields[j].equals("")) {
+                if ("".equals(fields[j])) {
                     continue;
                 }
 
@@ -138,32 +138,32 @@ public class MedlinePlainImporter extends ImportFormat {
 
                 String lab = entry.substring(0, entry.indexOf('-')).trim();
                 String val = entry.substring(entry.indexOf('-') + 1).trim();
-                if (lab.equals("PT")) {
+                if ("PT".equals(lab)) {
                     val = val.toLowerCase();
-                    if (val.equals("BOOK")) {
+                    if ("BOOK".equals(val)) {
                         type = "book";
-                    } else if (val.equals("journal article")
-                            || val.equals("classical article")
-                            || val.equals("corrected and republished article")
-                            || val.equals("historical article")
-                            || val.equals("introductory journal article")
-                            || val.equals("newspaper article")) {
+                    } else if ("journal article".equals(val)
+                            || "classical article".equals(val)
+                            || "corrected and republished article".equals(val)
+                            || "historical article".equals(val)
+                            || "introductory journal article".equals(val)
+                            || "newspaper article".equals(val)) {
                         type = "article";
-                    } else if (val.equals("clinical conference")
-                            || val.equals("consensus development conference")
-                            || val.equals("consensus development conference, NIH")) {
+                    } else if ("clinical conference".equals(val)
+                            || "consensus development conference".equals(val)
+                            || "consensus development conference, NIH".equals(val)) {
                         type = "conference";
-                    } else if (val.equals("technical report")) {
+                    } else if ("technical report".equals(val)) {
                         type = "techreport";
-                    } else if (val.equals("editorial")) {
+                    } else if ("editorial".equals(val)) {
                         type = "inproceedings";//"incollection";"inbook";
-                    } else if (val.equals("overall")) {
+                    } else if ("overall".equals(val)) {
                         type = "proceedings";
-                    } else if (type.equals("")) {
+                    } else if ("".equals(type)) {
                         type = "other";
                     }
 
-                } else if (lab.equals("TI")) {
+                } else if ("TI".equals(lab)) {
                     String oldVal = hm.get("title");
                     if (oldVal == null) {
                         hm.put("title", val);
@@ -177,60 +177,60 @@ public class MedlinePlainImporter extends ImportFormat {
                 }
                 // =
                 // val;
-                else if (lab.equals("BTI") || lab.equals("CTI")) {
+                else if ("BTI".equals(lab) || "CTI".equals(lab)) {
                     hm.put("booktitle", val);
-                } else if (lab.equals("FAU")) {
-                    if (author.equals("")) {
+                } else if ("FAU".equals(lab)) {
+                    if ("".equals(author)) {
                         author = val;
                     } else {
                         author += " and " + val;
                     }
-                } else if (lab.equals("FED")) {
-                    if (editor.equals("")) {
+                } else if ("FED".equals(lab)) {
+                    if ("".equals(editor)) {
                         editor = val;
                     } else {
                         editor += " and " + val;
                     }
-                } else if (lab.equals("JT")) {
-                    if (type.equals("inproceedings")) {
+                } else if ("JT".equals(lab)) {
+                    if ("inproceedings".equals(type)) {
                         hm.put("booktitle", val);
                     } else {
                         hm.put("journal", val);
                     }
-                } else if (lab.equals("PG")) {
+                } else if ("PG".equals(lab)) {
                     hm.put("pages", val);
-                } else if (lab.equals("PL")) {
+                } else if ("PL".equals(lab)) {
                     hm.put("address", val);
-                } else if (lab.equals("IS")) {
+                } else if ("IS".equals(lab)) {
                     hm.put("issn", val);
-                } else if (lab.equals("VI")) {
+                } else if ("VI".equals(lab)) {
                     hm.put("volume", val);
-                } else if (lab.equals("AB")) {
+                } else if ("AB".equals(lab)) {
                     String oldAb = hm.get("abstract");
                     if (oldAb == null) {
                         hm.put("abstract", val);
                     } else {
                         hm.put("abstract", oldAb + "\n" + val);
                     }
-                } else if (lab.equals("DP")) {
+                } else if ("DP".equals(lab)) {
                     String[] parts = val.split(" ");
                     hm.put("year", parts[0]);
                     if ((parts.length > 1) && !parts[1].isEmpty()) {
                         hm.put("month", parts[1]);
                     }
-                } else if (lab.equals("MH") || lab.equals("OT")) {
+                } else if ("MH".equals(lab) || "OT".equals(lab)) {
                     if (!hm.containsKey("keywords")) {
                         hm.put("keywords", val);
                     } else {
                         String kw = hm.get("keywords");
                         hm.put("keywords", kw + ", " + val);
                     }
-                } else if (lab.equals("CON") || lab.equals("CIN") || lab.equals("EIN")
-                        || lab.equals("EFR") || lab.equals("CRI") || lab.equals("CRF")
-                        || lab.equals("PRIN") || lab.equals("PROF") || lab.equals("RPI")
-                        || lab.equals("RPF") || lab.equals("RIN") || lab.equals("ROF")
-                        || lab.equals("UIN") || lab.equals("UOF") || lab.equals("SPIN")
-                        || lab.equals("ORI")) {
+                } else if ("CON".equals(lab) || "CIN".equals(lab) || "EIN".equals(lab)
+                        || "EFR".equals(lab) || "CRI".equals(lab) || "CRF".equals(lab)
+                        || "PRIN".equals(lab) || "PROF".equals(lab) || "RPI".equals(lab)
+                        || "RPF".equals(lab) || "RIN".equals(lab) || "ROF".equals(lab)
+                        || "UIN".equals(lab) || "UOF".equals(lab) || "SPIN".equals(lab)
+                        || "ORI".equals(lab)) {
                     if (!comment.isEmpty()) {
                         comment = comment + "\n";
                     }
@@ -240,7 +240,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 //                else if (lab.equals("ID"))
                 //                    hm.put("refid", val);
                 //                    // Added doi import (sciencedirect.com) 2011.01.10, Alexander Hug <alexander@alexanderhug.info>
-                else if (lab.equals("AID")) {
+                else if ("AID".equals(lab)) {
                     String doi = val;
                     if (doi.startsWith("doi:")) {
                         doi = doi.replaceAll("(?i)doi:", "").trim();

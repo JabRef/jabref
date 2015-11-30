@@ -1,19 +1,20 @@
-/*  Copyright (C) 2015 Oscar Gustafsson.
+    /*  Copyright (C) 2015 Oscar Gustafsson.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
-
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 package net.sf.jabref.importer.fetcher;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -34,19 +35,15 @@ import net.sf.jabref.importer.fileformat.JSONEntryParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 
-public class DOAJFetcher implements EntryFetcher {
+public class SpringerFetcher implements EntryFetcher {
 
-    private final String searchURL = "https://doaj.org/api/v1/search/articles/";
-    private static final Log LOGGER = LogFactory.getLog(DOAJFetcher.class);
+    private static final String API_URL = "http://api.springer.com/metadata/json?q=";
+    private static final String API_KEY = "b0c7151179b3d9c1119cf325bca8460d";
+    private static final Log LOGGER = LogFactory.getLog(SpringerFetcher.class);
     private final int maxPerPage = 100;
     private boolean shouldContinue;
+    private final JSONEntryParser jep;
 
-
-    private final JSONEntryParser jsonConverter = new JSONEntryParser();
-
-    public DOAJFetcher() {
-        super();
-    }
 
     @Override
     public void stopFetching() {
@@ -59,9 +56,12 @@ public class DOAJFetcher implements EntryFetcher {
         try {
             status.setStatus(Localization.lang("Searching..."));
             HttpResponse<JsonNode> jsonResponse;
-            jsonResponse = Unirest.get(searchURL + query + "?pageSize=1").header("accept", "application/json").asJson();
+            query = URLEncoder.encode(query, "UTF-8");
+            jsonResponse = Unirest.get(API_URL + query + "&api_key=" + API_KEY + "&p=1")
+                    .header("accept", "application/json")
+                    .asJson();
             JSONObject jo = jsonResponse.getBody().getObject();
-            int hits = jo.getInt("total");
+            int hits = jo.getJSONArray("result").getJSONObject(0).getInt("total");
             int numberToFetch = 0;
             if (hits > 0) {
                 if (hits > maxPerPage) {
@@ -89,20 +89,21 @@ public class DOAJFetcher implements EntryFetcher {
                 }
 
                 int fetched = 0; // Keep track of number of items fetched for the progress bar
-                for (int page = 1; ((page - 1) * maxPerPage) <= numberToFetch; page++) {
+                for (int startItem = 1; startItem <= numberToFetch; startItem += maxPerPage) {
                     if (!shouldContinue) {
                         break;
                     }
 
-                    int noToFetch = Math.min(maxPerPage, numberToFetch - ((page - 1) * maxPerPage));
-                    jsonResponse = Unirest.get(searchURL + query + "?page=" + page + "&pageSize=" + noToFetch)
+                    int noToFetch = Math.min(maxPerPage, numberToFetch - startItem);
+                    jsonResponse = Unirest
+                            .get(API_URL + query + "&api_key=" + API_KEY + "&p=" + noToFetch + "&s=" + startItem)
                             .header("accept", "application/json").asJson();
                     jo = jsonResponse.getBody().getObject();
-                    if (jo.has("results")) {
-                        JSONArray results = jo.getJSONArray("results");
+                    if (jo.has("records")) {
+                        JSONArray results = jo.getJSONArray("records");
                         for (int i = 0; i < results.length(); i++) {
-                            JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                            BibtexEntry entry = jsonConverter.BibJSONtoBibtex(bibJsonEntry);
+                            JSONObject springerJsonEntry = results.getJSONObject(i);
+                            BibtexEntry entry = jep.SpringerJSONtoBibtex(springerJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);
@@ -112,31 +113,37 @@ public class DOAJFetcher implements EntryFetcher {
                 return true;
             } else {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
-                        Localization.lang("Search %0", "DOAJ"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "Springer"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
         } catch (UnirestException e) {
-            LOGGER.warn("Problem searching DOAJ", e);
-            status.setStatus(Localization.lang("Search canceled"));
-            return false;
+            LOGGER.warn("Problem searching Springer", e);
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.warn("Cannot encode query", e);
         }
+        return false;
 
     }
 
     @Override
     public String getTitle() {
-        return "DOAJ";
+        return "Springer";
     }
 
     @Override
     public String getHelpPage() {
-        return "DOAJHelp.html";
+        return "SpringerHelp.html";
     }
 
     @Override
     public JPanel getOptionsPanel() {
         // No additional options available
         return null;
+    }
+
+    public SpringerFetcher() {
+        super();
+        jep = new JSONEntryParser();
     }
 
 }

@@ -192,7 +192,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
             Object obj = a.getValue(Action.LARGE_ICON_KEY);
-            if ((obj != null) && (obj instanceof IconTheme.FontBasedIcon)) {
+            if ((obj instanceof IconTheme.FontBasedIcon)) {
                 b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
             }
             add(b);
@@ -204,7 +204,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 button.setMargin(marg);
             }
             Object obj = button.getAction().getValue(Action.LARGE_ICON_KEY);
-            if ((obj != null) && (obj instanceof IconTheme.FontBasedIcon)) {
+            if ((obj instanceof IconTheme.FontBasedIcon)) {
                 button.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
             }
             add(button);
@@ -275,8 +275,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
             Localization.menuTitle("Save selected as ..."), Localization.lang("Save selected as ..."));
     private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
-            Localization.menuTitle("Save selected as plain BibTeX ..."),
-            Localization.lang("Save selected as plain BibTeX ..."));
+            Localization.menuTitle("Save selected as plain BibTeX..."),
+            Localization.lang("Save selected as plain BibTeX..."));
     private final AbstractAction exportAll = ExportFormats.getExportAction(this, false);
     private final AbstractAction exportSelected = ExportFormats.getExportAction(this, true);
     private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
@@ -413,10 +413,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Open URL or DOI"),
             prefs.getKey(KeyBinds.OPEN_URL_OR_DOI),
             IconTheme.JabRefIcon.WWW.getIcon());
-    private final AbstractAction openSpires = new GeneralAction(Actions.OPEN_SPIRES,
-            Localization.lang("Open SPIRES entry"),
-            Localization.lang("Open SPIRES entry"),
-            prefs.getKey(KeyBinds.OPEN_SPIRES_ENTRY));
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK,
             Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcon.FIND_DUPLICATES.getIcon());
     private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
@@ -833,10 +829,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     } else {
                         filename = GUIGlobals.untitledTitle;
                     }
-                    int answer = JOptionPane.showOptionDialog(JabRefFrame.this,
-                            Localization.lang("Database %0 has changed.", filename),
-                            Localization.lang("Unsaved changes"), JOptionPane.YES_NO_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+                    int answer = showSaveDialog(filename);
 
                     if ((answer == JOptionPane.CANCEL_OPTION) ||
                             (answer == JOptionPane.CLOSED_OPTION)) {
@@ -1516,7 +1509,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
                 replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
-                openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
+                openUrl, openFolder, openFile, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
                 closeDatabaseAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
                 databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected,
@@ -1753,9 +1746,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
 
             if (getCurrentBasePanel().isBaseChanged()) {
-                int answer = JOptionPane.showConfirmDialog(JabRefFrame.this,
-                        Localization.lang("Database has changed. Do you want to save before closing?"),
-                        Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
+
+                String filename;
+
+                if (getCurrentBasePanel().getDatabaseFile() != null) {
+                    filename = getCurrentBasePanel().getDatabaseFile().getAbsolutePath();
+                } else {
+                    filename = GUIGlobals.untitledTitle;
+                }
+
+                int answer = showSaveDialog(filename);
                 if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
                     close = false; // The user has cancelled.
                 }
@@ -2316,4 +2316,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JOptionPane.showMessageDialog(this, message);
     }
 
+    private int showSaveDialog(String filename) {
+        Object[] options = {Localization.lang("Save changes"),
+                Localization.lang("Discard changes"),
+                Localization.lang("Return to JabRef")};
+
+        return JOptionPane.showOptionDialog(JabRefFrame.this,
+                Localization.lang("Database '%0' has changed.", filename),
+                Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+    }
 }

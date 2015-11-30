@@ -228,11 +228,11 @@ public class ChangeScanner implements Runnable {
             double comp = -1;
             // (if there are not any entries left in the "disk" database, comp will stay at -1,
             // and this entry will be marked as nonmatched).
-            if (!used.contains("" + piv2) && (piv2 < disk.getEntryCount())) {
+            if (!used.contains(String.valueOf(piv2)) && (piv2 < disk.getEntryCount())) {
                 comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(piv2));
             }
             if (comp > 1) {
-                used.add("" + piv2);
+                used.add(String.valueOf(piv2));
                 piv2++;
                 continue;
             }
@@ -240,14 +240,14 @@ public class ChangeScanner implements Runnable {
             // No? Then check if another entry matches exactly.
             if (piv2 < (disk.getEntryCount() - 1)) {
                 for (int i = piv2 + 1; i < disk.getEntryCount(); i++) {
-                    if (!used.contains("" + i)) {
+                    if (!used.contains(String.valueOf(i))) {
                         comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
                     } else {
                         comp = -1;
                     }
 
                     if (comp > 1) {
-                        used.add("" + i);
+                        used.add(String.valueOf(i));
                         continue mainLoop;
                     }
                 }
@@ -273,7 +273,7 @@ public class ChangeScanner implements Runnable {
 
                 if (piv2 < (disk.getEntryCount() - 1)) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {
-                        if (!used.contains("" + i)) {
+                        if (!used.contains(String.valueOf(i))) {
                             comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1),
                                     disk.getEntryAt(i));
                         } else {
@@ -289,7 +289,7 @@ public class ChangeScanner implements Runnable {
 
                 double MATCH_THRESHOLD = 0.4;
                 if (bestMatch > MATCH_THRESHOLD) {
-                    used.add("" + bestMatchI);
+                    used.add(String.valueOf(bestMatchI));
                     it.remove();
 
                     EntryChange ec = new EntryChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1),
@@ -325,7 +325,7 @@ public class ChangeScanner implements Runnable {
         // may have been added.
         if (used.size() < disk.getEntryCount()) {
             for (int i = 0; i < disk.getEntryCount(); i++) {
-                if (!used.contains("" + i)) {
+                if (!used.contains(String.valueOf(i))) {
 
                     // See if there is an identical dupe in the mem database:
                     boolean hasAlready = false;

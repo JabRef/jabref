@@ -218,7 +218,7 @@ public class JSTORFetcher implements EntryFetcher {
                 // No more headers
                 break;
             }
-            if ((headerName != null) && headerName.equals("Set-Cookie")) {
+            if ("Set-Cookie".equals(headerName)) {
                 if (headerValue.startsWith(name)) {
                     // several key-value-pairs are separated by ';'
                     StringTokenizer st = new StringTokenizer(headerValue, "; ");

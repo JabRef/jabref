@@ -23,7 +23,10 @@ import net.sf.jabref.search.SearchParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +34,9 @@ import java.util.regex.Pattern;
  * The search query must be specified in an expression that is acceptable by the Search.g4 grammar.
  */
 public class GrammarBasedSearchRule implements SearchRule {
+
+    private static final Log LOGGER = LogFactory.getLog(GrammarBasedSearchRule.class);
+
 
     public static class ThrowingErrorListener extends BaseErrorListener {
 
@@ -76,7 +82,7 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     private void init(String query) throws ParseCancellationException {
-        if(this.query != null && this.query.equals(query)) {
+        if(Objects.equals(this.query, query)) {
             return;
         }
 
@@ -93,7 +99,12 @@ public class GrammarBasedSearchRule implements SearchRule {
 
     @Override
     public boolean applyRule(String query, BibtexEntry bibtexEntry) {
-        return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibtexEntry).visit(tree);
+        try {
+            return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibtexEntry).visit(tree);
+        } catch (Exception e) {
+            LOGGER.debug("Search failed", e);
+            return false;
+        }
     }
 
     @Override
@@ -110,9 +121,9 @@ public class GrammarBasedSearchRule implements SearchRule {
         EXACT, CONTAINS, DOES_NOT_CONTAIN;
 
         public static ComparisonOperator build(String value) {
-            if (value.equalsIgnoreCase("CONTAINS") || value.equals("=")) {
+            if ("CONTAINS".equalsIgnoreCase(value) || "=".equals(value)) {
                 return CONTAINS;
-            } else if (value.equalsIgnoreCase("MATCHES") || value.equals("==")) {
+            } else if ("MATCHES".equalsIgnoreCase(value) || "==".equals(value)) {
                 return EXACT;
             } else {
                 return DOES_NOT_CONTAIN;
@@ -139,9 +150,9 @@ public class GrammarBasedSearchRule implements SearchRule {
 
             boolean noSuchField = true;
             // this loop iterates over all regular keys, then over pseudo keys like "type"
-            for (int i = 0; i < searchKeys.length + 1; i++) {
+            for (int i = 0; i < (searchKeys.length + 1); i++) {
                 String content;
-                if (i - searchKeys.length == 0) {
+                if ((i - searchKeys.length) == 0) {
                     // PSEUDOFIELD_TYPE
                     if (!fieldPattern.matcher("entrytype").matches()) {
                         continue;
@@ -164,7 +175,7 @@ public class GrammarBasedSearchRule implements SearchRule {
                 }
             }
 
-            return noSuchField && operator == ComparisonOperator.DOES_NOT_CONTAIN;
+            return noSuchField && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
         }
 
         public boolean matchInField(String content) {
@@ -224,7 +235,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         @Override
         public Boolean visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
-            if (ctx.operator.getText().equalsIgnoreCase("AND")) {
+            if ("AND".equalsIgnoreCase(ctx.operator.getText())) {
                 return visit(ctx.left) && visit(ctx.right); // and
             } else {
                 return visit(ctx.left) || visit(ctx.right); // or

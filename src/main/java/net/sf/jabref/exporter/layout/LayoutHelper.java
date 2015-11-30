@@ -315,18 +315,18 @@ public class LayoutHelper {
                 //System.out.println("NAME:" + name);
 
                 if (firstLetter == 'b') {
-                    if (name.equalsIgnoreCase("begin")) {
+                    if ("begin".equalsIgnoreCase(name)) {
                         // get field name
                         getBracketedField(LayoutHelper.IS_FIELD_START);
 
                         return;
-                    } else if (name.equalsIgnoreCase("begingroup")) {
+                    } else if ("begingroup".equalsIgnoreCase(name)) {
                         // get field name
                         getBracketedField(LayoutHelper.IS_GROUP_START);
                         return;
                     }
                 } else if (firstLetter == 'f') {
-                    if (name.equalsIgnoreCase("format")) {
+                    if ("format".equalsIgnoreCase(name)) {
                         if (c == '[') {
                             // get format parameter
                             // get field name
@@ -339,13 +339,13 @@ public class LayoutHelper {
 
                             return;
                         }
-                    } else if (name.equalsIgnoreCase("filename")) {
+                    } else if ("filename".equalsIgnoreCase(name)) {
                         // Print the name of the database bib file.
                         // This is only supported in begin/end layouts, not in
                         // entry layouts.
                         parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
                         return;
-                    } else if (name.equalsIgnoreCase("filepath")) {
+                    } else if ("filepath".equalsIgnoreCase(name)) {
                         // Print the full path of the database bib file.
                         // This is only supported in begin/end layouts, not in
                         // entry layouts.
@@ -353,15 +353,15 @@ public class LayoutHelper {
                         return;
                     }
                 } else if (firstLetter == 'e') {
-                    if (name.equalsIgnoreCase("end")) {
+                    if ("end".equalsIgnoreCase(name)) {
                         // get field name
                         getBracketedField(LayoutHelper.IS_FIELD_END);
                         return;
-                    } else if (name.equalsIgnoreCase("endgroup")) {
+                    } else if ("endgroup".equalsIgnoreCase(name)) {
                         // get field name
                         getBracketedField(LayoutHelper.IS_GROUP_END);
                         return;
-                    } else if (name.equalsIgnoreCase("encoding")) {
+                    } else if ("encoding".equalsIgnoreCase(name)) {
                         // Print the name of the current encoding used for export.
                         // This is only supported in begin/end layouts, not in
                         // entry layouts.

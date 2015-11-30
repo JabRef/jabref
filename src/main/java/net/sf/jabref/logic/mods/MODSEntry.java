@@ -58,6 +58,7 @@ class MODSEntry {
     private String number;
     private String volume;
     private String genre;
+    private String place;
     private final Set<String> handledExtensions;
 
     private MODSEntry host;
@@ -68,6 +69,9 @@ class MODSEntry {
     private final boolean CHARFORMAT = false;
 
     private static final Log LOGGER = LogFactory.getLog(MODSEntry.class);
+
+    private final LayoutFormatter chars = new XMLChars();
+
 
     private MODSEntry() {
         extensionFields = new HashMap<>();
@@ -85,7 +89,6 @@ class MODSEntry {
     }
 
     private void populateFromBibtex(BibtexEntry bibtex) {
-        LayoutFormatter chars = new XMLChars();
         if (bibtex.getField("title") != null) {
             if (CHARFORMAT) {
                 title = chars.format(bibtex.getField("title"));
@@ -106,7 +109,6 @@ class MODSEntry {
             id = bibtex.getField("bibtexkey");
         }
         if (bibtex.getField("place") != null) {
-            String place = null;
             if (CHARFORMAT) {
                 place = chars.format(bibtex.getField("place"));
             } else {
@@ -149,7 +151,6 @@ class MODSEntry {
 
     private List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new LinkedList<>();
-        LayoutFormatter chars = new XMLChars();
 
         if (!authors.contains(" and ")) {
             if (CHARFORMAT) {
@@ -329,18 +330,13 @@ class MODSEntry {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if ((in == null) || ((in != null) && in.isEmpty()))
-         {
+        if (com.google.common.base.Strings.isNullOrEmpty(in)) {
             return ""; // vacancy test.
         }
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
-            if ((current == 0x9) ||
-                    (current == 0xA) ||
-                    (current == 0xD) ||
-                    ((current >= 0x20) && (current <= 0xD7FF)) ||
-                    ((current >= 0xE000) && (current <= 0xFFFD)) ||
-                    ((current >= 0x10000) && (current <= 0x10FFFF))) {
+            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
                 out.append(current);
             }
         }

@@ -90,16 +90,16 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         if (col == 0) {
             return GUIGlobals.NUMBER_COL;
         } else if (getIconTypeForColumn(col) != null) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS)) {
-                return getIconTypeForColumn(col)[0].substring(0, 1).toUpperCase();
+            String iconTypeForColumnZero = getIconTypeForColumn(col)[0];
+            if ("ranking".equals(iconTypeForColumnZero)) {
+                return EntryUtil.capitalizeFirst(iconTypeForColumnZero);
+            } else if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS)) {
+                return iconTypeForColumnZero.substring(0, 1).toUpperCase();
             } else {
-                if(getIconTypeForColumn(col)[0].equals("ranking")) {
-                    return EntryUtil.capitalizeFirst(getIconTypeForColumn(col)[0]);
-                }
                 return null;
             }
-        } else // try to find an alternative fieldname (for display)
-        {
+        } else {
+            // try to find an alternative fieldname (for display)
             String[] fld = columns[col - padleft];
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < fld.length; i++) {
@@ -142,7 +142,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
      * columns.
      */
     public String[] getIconTypeForColumn(int col) {
-        Object o = iconCols.get(new Integer(col));
+        Object o = iconCols.get(Integer.valueOf(col));
         if (o != null) {
             return (String[]) o;
         } else {
@@ -244,7 +244,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                     o = be.getType().getName();
                 } else {
                     o = be.getFieldOrAlias(fld[i]);
-                    if (getColumnName(col).equals("Author") && (o != null)) {
+                    if ("Author".equals(getColumnName(col)) && (o != null)) {
                         o = panel.database().resolveForStrings((String) o);
                     }
                 }
@@ -435,8 +435,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         Vector<int[]> tmp = new Vector<>(2, 1);
         for (int i = 0; i < columns.length; i++) {
             for (int j = 0; j < columns[i].length; j++) {
-                if (columns[i][j].equals("author")
-                        || columns[i][j].equals("editor")) {
+                if ("author".equals(columns[i][j])
+                        || "editor".equals(columns[i][j])) {
                     tmp.add(new int[]{i, j});
                 }
             }

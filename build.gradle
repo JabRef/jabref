@@ -14,7 +14,6 @@ buildscript {
 plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.2'
     id "com.github.kt3k.coveralls" version "2.4.0x"
-    id "edu.sc.seis.macAppBundle" version "2.1.1"
     id "com.github.youribonnaffe.gradle.format" version "1.2"
     id "com.coverity.ondemand" version "1.4.742"
 }
@@ -40,8 +39,8 @@ gradle.taskGraph.whenReady { taskGraph ->
 }
 
 group = "net.sf.jabref"
-version = "3.0dev"
-project.ext.threeDotVersion = "3.0.0.0"
+version = "3.1dev"
+project.ext.threeDotVersion = "3.0.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -90,7 +89,7 @@ dependencies {
     compile 'org.antlr:antlr4-runtime:4.5.1-1'
 
     compile 'mysql:mysql-connector-java:5.1.37'
-    compile 'org.postgresql:postgresql:9.4-1205-jdbc42'
+    compile 'org.postgresql:postgresql:9.4-1206-jdbc42'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])

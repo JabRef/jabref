@@ -121,7 +121,7 @@ public class ImportCustomizationDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String chosenFileStr = null;
-                CustomImportList.Importer importer = prefs.customImports.new Importer();
+                CustomImportList.Importer importer = new CustomImportList.Importer();
                 importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), "",
                         Localization.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
                 if (importer.getBasePath() != null) {

@@ -50,7 +50,7 @@ public class FindFullText {
                     // javax.net.ssl.SSLProtocolException: handshake alert:  unrecognized_name
                     // http://stackoverflow.com/questions/7615645/ssl-handshake-alert-unrecognized-name-error-since-upgrade-to-java-1-7-0
                     String mimeType = new URLDownload(result.get()).determineMimeType();
-                    if ((mimeType != null) && mimeType.toLowerCase().equals("application/pdf")) {
+                    if ((mimeType != null) && "application/pdf".equals(mimeType.toLowerCase())) {
                         return Optional.of(result.get());
                     } else {
                         // TODO log

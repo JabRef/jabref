@@ -230,7 +230,7 @@ public class Authors extends AbstractParamLayoutFormatter {
                 lastSeparator = value;
             }
         }
-        else if (key.trim().toLowerCase().equals("etal") && !value.isEmpty()) {
+        else if ("etal".equals(key.trim().toLowerCase()) && !value.isEmpty()) {
             etAlString = value;
         }
         else if (Authors.numberPattern.matcher(key.trim()).matches()) {

@@ -53,7 +53,6 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
-import net.sf.jabref.importer.fetcher.SPIRESFetcher;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
@@ -209,10 +208,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         searchBar = new SearchBar(this);
 
-
         setupMainPanel();
-
-        this.add(searchBar, BorderLayout.NORTH);
 
         setupActions();
 
@@ -367,7 +363,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                 }
                 //entryTable.clearSelection();
-                frame.output(formatOutputMessage(Localization.lang("Cut_pr"), bes.length));
+                frame.output(formatOutputMessage(Localization.lang("Cut"), bes.length));
                 ce.end();
                 undoManager.addEdit(ce);
                 markBaseChanged();
@@ -978,8 +974,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         tm.setContent(bes[0].getField("file"));
                         for (int i = 0; i < tm.getRowCount(); i++) {
                             FileListEntry flEntry = tm.getEntry(i);
-                            if (flEntry.getType().getName().toLowerCase().equals("url")
-                                    || flEntry.getType().getName().toLowerCase().equals("ps")) {
+                            if ("url".equals(flEntry.getType().getName().toLowerCase())
+                                    || "ps".equals(flEntry.getType().getName().toLowerCase())) {
                                 entry = flEntry;
                                 break;
                             }
@@ -1003,34 +999,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put(Actions.MERGE_DOI, (BaseAction) () -> new MergeEntryDOIDialog(BasePanel.this));
-
-        actions.put(Actions.OPEN_SPIRES, new BaseAction() {
-
-            @Override
-            public void action() {
-                BibtexEntry[] bes = mainTable.getSelectedEntries();
-                if ((bes != null) && (bes.length == 1)) {
-                    Object link = null;
-                    if (bes[0].getField("eprint") != null) {
-                        link = SPIRESFetcher.constructUrlFromEprint(bes[0].getField("eprint"));
-                    } else if (bes[0].getField("slaccitation") != null) {
-                        link = SPIRESFetcher.constructUrlFromSlaccitation(bes[0].getField("slaccitation"));
-                    }
-                    if (link != null) {
-                        try {
-                            JabRefDesktop.openExternalViewer(metaData(), link.toString(), "url");
-                            output(Localization.lang("External viewer called") + '.');
-                        } catch (IOException ex) {
-                            output(Localization.lang("Error") + ": " + ex.getMessage());
-                        }
-                    } else {
-                        output(Localization.lang("No url defined") + '.');
-                    }
-                } else {
-                    output(Localization.lang("No entries or multiple entries selected."));
-                }
-            }
-        });
 
         actions.put(Actions.REPLACE_ALL, new BaseAction() {
 
@@ -1527,7 +1495,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         database.addDatabaseChangeListener(eventList);
         database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
         groupFilterList = new FilterList<>(eventList.getTheList(), EverythingMatcher.INSTANCE);
+        if (filterGroupToggle != null) {
+            filterGroupToggle.updateFilterList(groupFilterList);
+        }
         searchFilterList = new FilterList<>(groupFilterList, EverythingMatcher.INSTANCE);
+        if (filterSearchToggle != null) {
+            filterSearchToggle.updateFilterList(searchFilterList);
+        }
         tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
         mainTable = new MainTable(tableFormat, searchFilterList, frame, this);
@@ -1666,6 +1640,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 });*/
 
+        // check whether a mainTable already existed and a floatSearch was active
+        boolean floatSearchActive = (mainTable != null) && isShowingFloatSearch();
+
         createMainTable();
 
         for (EntryEditor ee : entryEditors.values()) {
@@ -1701,6 +1678,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         setLayout(new BorderLayout());
         removeAll();
+        add(searchBar, BorderLayout.NORTH);
         add(splitPane, BorderLayout.CENTER);
 
         // Set up name autocompleter for search:
@@ -1716,6 +1694,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
             autoCompleters = new ContentAutoCompleters();
+        }
+
+        // restore floating search result
+        // (needed if preferences have been changed which causes a recreation of the main table)
+        if (floatSearchActive) {
+            startShowingFloatSearch();
         }
 
         splitPane.revalidate();
@@ -2074,7 +2058,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public static class StartStopListAction<E> {
-        private final FilterList<E> list;
+        private FilterList<E> list;
         private final Matcher<E> active;
         private final Matcher<E> inactive;
 
@@ -2087,14 +2071,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         public void start() {
-            if(!isActive) {
+            if (!isActive) {
                 list.setMatcher(active);
                 isActive = true;
             }
         }
 
         public void stop() {
-            if(isActive) {
+            if (isActive) {
                 list.setMatcher(inactive);
                 isActive = false;
             }
@@ -2102,6 +2086,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         public boolean isActive() {
             return isActive;
+        }
+
+        public void updateFilterList(FilterList<E> filterList) {
+            list = filterList;
+            if(isActive) {
+                list.setMatcher(active);
+            } else {
+                list.setMatcher(inactive);
+            }
         }
     }
 
@@ -2147,21 +2140,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void changeType(BibtexEntry[] bes, EntryType type) {
 
         if ((bes == null) || (bes.length == 0)) {
-            output(Localization.lang("First select the entries you wish to change type for."));
+            LOGGER.error("At least one entry must be selected to be able to change the type.");
             return;
         }
         if (bes.length > 1) {
             int choice = JOptionPane.showConfirmDialog(this,
                     // @formatter:off
                     Localization.lang("Multiple entries selected. Do you want to change\nthe type of all these to '%0'?", type.getName()),
-                    Localization.lang("Change type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    Localization.lang("Change entry type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                     // @formatter:on
             if (choice == JOptionPane.NO_OPTION) {
                 return;
             }
         }
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Change type"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Change entry type"));
         for (BibtexEntry be : bes) {
             ce.addEdit(new UndoableChangeType(be, be.getType(), type));
             be.setType(type);

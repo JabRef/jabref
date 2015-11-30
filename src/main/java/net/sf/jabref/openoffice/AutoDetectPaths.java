@@ -179,7 +179,7 @@ public class AutoDetectPaths extends AbstractWorker {
             File rootDir = new File("/Applications");
             File[] files = rootDir.listFiles();
             for (File file : files) {
-                if (file.isDirectory() && file.getName().equals("OpenOffice.org.app")) {
+                if (file.isDirectory() && "OpenOffice.org.app".equals(file.getName())) {
                     rootDir = file;
                     //System.out.println("Setting starting dir to: "+file.getPath());
                     break;
@@ -336,9 +336,7 @@ public class AutoDetectPaths extends AbstractWorker {
                     return file.isDirectory();
                 }
             });
-            for (File dir : dirs) {
-                dirList.add(dir);
-            }
+            Collections.addAll(dirList, dirs);
         }
         return dirList;
     }

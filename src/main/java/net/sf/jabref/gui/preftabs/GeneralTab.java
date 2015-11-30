@@ -76,7 +76,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         allowEditing = new JCheckBox(Localization.lang("Allow editing in table cells"));
 
         memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
-        defSort = new JCheckBox(Localization.lang("Sort Automatically"));
+        defSort = new JCheckBox(Localization.lang("Sort automatically"));
         ctrlClick = new JCheckBox(Localization.lang("Open right-click menu with Ctrl+left button"));
         useOwner = new JCheckBox(Localization.lang("Mark new entries with owner name") + ':');
         useTimeStamp = new JCheckBox(Localization.lang("Mark new entries with addition date") + ". "

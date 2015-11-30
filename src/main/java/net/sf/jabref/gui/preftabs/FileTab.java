@@ -18,6 +18,7 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.swing.AbstractButton;
@@ -182,9 +183,7 @@ class FileTab extends JPanel implements PrefsTab {
                 Localization.lang("Save fields in unsorted order (as until version 2.9.2)"),
                 Localization.lang("Save fields in user-defined order")};
         ArrayList<String> _rbs = new ArrayList<>();
-        for (String _rb : _rbs0) {
-            _rbs.add(_rb);
-        }
+        Collections.addAll(_rbs, _rbs0);
         bgFieldOrderStyle = createRadioBg(_rbs);
         userDefinedFieldOrder = new JTextField(this.prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
         createAdFieldOrderBg(builder, bgFieldOrderStyle, userDefinedFieldOrder);

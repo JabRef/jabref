@@ -113,18 +113,18 @@ public class InspecImporter extends ImportFormat {
                 //System.out.println(fields[j]);
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
-                if (f3.equals("TI")) {
+                if ("TI".equals(f3)) {
                     h.put("title", frest);
-                } else if (f3.equals("PY")) {
+                } else if ("PY".equals(f3)) {
                     h.put("year", frest);
-                } else if (f3.equals("AU")) {
+                } else if ("AU".equals(f3)) {
                     h.put("author",
                             AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(";", " and ")));
-                } else if (f3.equals("AB")) {
+                } else if ("AB".equals(f3)) {
                     h.put("abstract", frest);
-                } else if (f3.equals("ID")) {
+                } else if ("ID".equals(f3)) {
                     h.put("keywords", frest);
-                } else if (f3.equals("SO")) {
+                } else if ("SO".equals(f3)) {
                     int m = frest.indexOf(".");
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
@@ -144,11 +144,11 @@ public class InspecImporter extends ImportFormat {
                         }
                     }
 
-                } else if (f3.equals("RT")) {
+                } else if ("RT".equals(f3)) {
                     frest = frest.trim();
-                    if (frest.equals("Journal-Paper")) {
+                    if ("Journal-Paper".equals(frest)) {
                         Type = "article";
-                    } else if (frest.equals("Conference-Paper") || frest.equals("Conference-Paper; Journal-Paper")) {
+                    } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
                         Type = "inproceedings";
                     } else {
                         Type = frest.replaceAll(" ", "");

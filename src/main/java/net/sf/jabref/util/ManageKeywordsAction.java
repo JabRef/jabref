@@ -404,7 +404,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         bp.markBaseChanged();
     }
 
-    @SuppressWarnings("unchecked")
     private static HashSet<String> createClone(HashSet<String> keywordsToAdd) {
         return (HashSet<String>) keywordsToAdd.clone();
     }

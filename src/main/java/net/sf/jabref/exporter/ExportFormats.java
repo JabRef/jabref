@@ -250,11 +250,11 @@ public class ExportFormats {
                             }
                             // ... or show an error dialog:
                             else {
-                                frame.output(Localization.lang("Could not save file")
+                                frame.output(Localization.lang("Could not save file.")
                                         + " - " + errorMessage);
                                 // Need to warn the user that saving failed!
-                                JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file")
-                                        + ".\n" + errorMessage, Localization.lang("Save database"),
+                                JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.")
+                                        + "\n" + errorMessage, Localization.lang("Save database"),
                                         JOptionPane.ERROR_MESSAGE);
                             }
                         }

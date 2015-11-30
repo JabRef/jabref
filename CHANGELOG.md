@@ -13,6 +13,20 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+
+### Fixed
+- Fix #413: Help links in released jar version are not working
+- Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete. Fixes #412 
+
+### Removed
+
+
+
+
+
+## [3.0] - 2015-11-29
+
+### Changed
  - Updated to support OpenOffice 4 and LibreOffice 5
  - Add toolbar icon for deleting an entry, and move menu item for this action to BibTeX
  - Better support for IEEEtranBSTCTL entries
@@ -22,6 +36,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Tab shows the minimal unique folder name substring if multiple database files share the same name
  - Added a page numbers integrity checker
  - Position and size of certain dialogs are stored and restored.
+ - Feature: Search Springer
  - Feature: Search DOAJ, Directory of Open Access Journals
  - Changes the old integrity check by improving the code base (+tests) and converting it to a simple issues table
  - Added combo box in MassSetFieldAction to simplify selecting the correct field name
@@ -114,7 +129,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Remove incremental search
  - Remove option to disable autocompleters for search and make this always one
  - Remove option to highlight matches and make this always one when not using regex or grammar-based search
- 
+ - Remove non-working web searches: JSTOR and Sciencedirect (planned to be fixed for the next release)
  - Remove option Tools -> Open PDF or PS which is replaced by Tools -> Open File
 
 ## 2.80 - never released
@@ -137,6 +152,7 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as text file in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/dev_2.11...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v3.0...HEAD
+[3.0]: https://github.com/JabRef/jabref/compare/v2.11.1...v3.0
 [dev_2.11]: https://github.com/JabRef/jabref/compare/v2.11.1...dev_2.11
 [2.11.1]: https://github.com/JabRef/jabref/compare/v2.11...v2.11.1

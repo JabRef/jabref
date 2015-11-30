@@ -57,8 +57,8 @@ public class MetaData implements Iterable<String> {
         int groupsVersionOnDisk = 0;
 
         if (inData != null) {
-            for (String key : inData.keySet()) {
-                StringReader data = new StringReader(inData.get(key));
+            for (Map.Entry<String, String> entry : inData.entrySet()) {
+                StringReader data = new StringReader(entry.getValue());
                 String unit;
                 Vector<String> orderedData = new Vector<>();
                 // We must allow for ; and \ in escape sequences.
@@ -69,19 +69,19 @@ public class MetaData implements Iterable<String> {
                 } catch (IOException ex) {
                     System.err.println("Weird error while parsing meta data.");
                 }
-                if (key.equals("groupsversion")) {
+                if ("groupsversion".equals(entry.getKey())) {
                     if (orderedData.size() >= 1) {
                         groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
                     }
-                } else if (key.equals("groupstree")) {
+                } else if ("groupstree".equals(entry.getKey())) {
                     groupsTreePresent = true;
                     treeGroupsData = orderedData; // save for later user
                     // actual import operation is handled later because "groupsversion"
                     // tag might not yet have been read
-                } else if (key.equals("groups")) {
+                } else if ("groups".equals(entry.getKey())) {
                     flatGroupsData = orderedData;
                 } else {
-                    putData(key, orderedData);
+                    putData(entry.getKey(), orderedData);
                 }
             }
         }
@@ -110,11 +110,11 @@ public class MetaData implements Iterable<String> {
      * Add default metadata for new database:
      */
     public void initializeNewDatabase() {
-        metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector<String>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector<String>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector<String>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector<String>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "review", new Vector<String>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector<>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector<>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector<>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector<>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "review", new Vector<>());
     }
 
     /**
@@ -182,7 +182,7 @@ public class MetaData implements Iterable<String> {
             // the file path of this bib file:
             if (!new File(dir).isAbsolute() && (file != null)) {
                 String relDir;
-                if (dir.equals(".")) {
+                if (".".equals(dir)) {
                     // if dir is only "current" directory, just use its parent (== real current directory) as path
                     relDir = file.getParent();
                 } else {

@@ -19,7 +19,7 @@ public class JSearchTextField extends JTextField implements FocusListener {
         super();
         this.setEditable(true);
         this.setText("");
-        this.textWhenNotFocused = Localization.lang("Search...");
+        this.textWhenNotFocused = Localization.lang("Search")+"...";
         this.addFocusListener(this);
     }
 

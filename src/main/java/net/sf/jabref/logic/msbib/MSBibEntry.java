@@ -225,7 +225,7 @@ class MSBibEntry {
             address += country;
         }
         address = address.trim();
-        if (address.isEmpty() || address.equals(",")) {
+        if (address.isEmpty() || ",".equals(address)) {
             address = null;
         }
 
@@ -259,7 +259,7 @@ class MSBibEntry {
             dateAccessed += year;
         }
         dateAccessed = dateAccessed.trim();
-        if (dateAccessed.isEmpty() || dateAccessed.equals(",")) {
+        if (dateAccessed.isEmpty() || ",".equals(dateAccessed)) {
             dateAccessed = null;
         }
 
@@ -412,19 +412,19 @@ class MSBibEntry {
         if (bibtex.getField("type") != null) {
             thesisType = bibtex.getField("type");
         } else {
-            if (bibtex.getType().getName().equalsIgnoreCase("techreport")) {
+            if ("techreport".equalsIgnoreCase(bibtex.getType().getName())) {
                 thesisType = "Tech. rep.";
-            } else if (bibtex.getType().getName().equalsIgnoreCase("mastersthesis")) {
+            } else if ("mastersthesis".equalsIgnoreCase(bibtex.getType().getName())) {
                 thesisType = "Master's thesis";
-            } else if (bibtex.getType().getName().equalsIgnoreCase("phdthesis")) {
+            } else if ("phdthesis".equalsIgnoreCase(bibtex.getType().getName())) {
                 thesisType = "Ph.D. dissertation";
-            } else if (bibtex.getType().getName().equalsIgnoreCase("unpublished")) {
+            } else if ("unpublished".equalsIgnoreCase(bibtex.getType().getName())) {
                 thesisType = "unpublished";
             }
         }
 
-        if ((sourceType.equals("InternetSite") || sourceType.equals("DocumentFromInternetSite"))
-                && bibtex.getField("title") != null) {
+        if (("InternetSite".equals(sourceType) || "DocumentFromInternetSite".equals(sourceType))
+                && (bibtex.getField("title") != null)) {
             internetSiteTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "accessed") != null) {
@@ -437,16 +437,16 @@ class MSBibEntry {
             productionCompany = bibtex.getField(MSBIB + "productioncompany");
         }
 
-        if ((sourceType.equals("ElectronicSource")
-                || sourceType.equals("Art")
-                || sourceType.equals("Misc"))
-                && bibtex.getField("title") != null) {
+        if (("ElectronicSource".equals(sourceType)
+                || "Art".equals(sourceType)
+                || "Misc".equals(sourceType))
+                && (bibtex.getField("title") != null)) {
             publicationTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "medium") != null) {
             medium = bibtex.getField(MSBIB + "medium");
         }
-        if (sourceType.equals("SoundRecording") && bibtex.getField("title") != null) {
+        if ("SoundRecording".equals(sourceType) && (bibtex.getField("title") != null)) {
             albumTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "recordingnumber") != null) {
@@ -458,7 +458,7 @@ class MSBibEntry {
         if (bibtex.getField(MSBIB + "distributor") != null) {
             distributor = bibtex.getField(MSBIB + "distributor");
         }
-        if (sourceType.equals("Interview") && bibtex.getField("title") != null) {
+        if ("Interview".equals(sourceType) && (bibtex.getField("title") != null)) {
             broadcastTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "broadcaster") != null) {
@@ -648,51 +648,51 @@ class MSBibEntry {
         String bibtexType = bibtex.getType().getName();
 
         String result = "Misc";
-        if (bibtexType.equalsIgnoreCase("book")) {
+        if ("book".equalsIgnoreCase(bibtexType)) {
             result = "Book";
-        } else if (bibtexType.equalsIgnoreCase("inbook")) {
+        } else if ("inbook".equalsIgnoreCase(bibtexType)) {
             result = "BookSection";
             bibTexEntry = "inbook";
-        } /* SM 2010.10: generalized */ else if (bibtexType.equalsIgnoreCase("booklet")) {
+        } /* SM 2010.10: generalized */ else if ("booklet".equalsIgnoreCase(bibtexType)) {
             result = "BookSection";
             bibTexEntry = "booklet";
-        } else if (bibtexType.equalsIgnoreCase("incollection")) {
+        } else if ("incollection".equalsIgnoreCase(bibtexType)) {
             result = "BookSection";
             bibTexEntry = "incollection";
-        } else if (bibtexType.equalsIgnoreCase("article")) {
+        } else if ("article".equalsIgnoreCase(bibtexType)) {
             result = "JournalArticle";
-        } else if (bibtexType.equalsIgnoreCase("inproceedings")) {
+        } else if ("inproceedings".equalsIgnoreCase(bibtexType)) {
             result = "ConferenceProceedings";
             bibTexEntry = "inproceedings";
-        } /* SM 2010.10: generalized */ else if (bibtexType.equalsIgnoreCase("conference")) {
+        } /* SM 2010.10: generalized */ else if ("conference".equalsIgnoreCase(bibtexType)) {
             result = "ConferenceProceedings";
             bibTexEntry = "conference";
-        } else if (bibtexType.equalsIgnoreCase("proceedings")) {
+        } else if ("proceedings".equalsIgnoreCase(bibtexType)) {
             result = "ConferenceProceedings";
             bibTexEntry = "proceedings";
-        } else if (bibtexType.equalsIgnoreCase("collection")) {
+        } else if ("collection".equalsIgnoreCase(bibtexType)) {
             result = "ConferenceProceedings";
             bibTexEntry = "collection";
-        } else if (bibtexType.equalsIgnoreCase("techreport")) {
+        } else if ("techreport".equalsIgnoreCase(bibtexType)) {
             result = "Report";
             bibTexEntry = "techreport";
-        } /* SM 2010.10: generalized */ else if (bibtexType.equalsIgnoreCase("manual")) {
+        } /* SM 2010.10: generalized */ else if ("manual".equalsIgnoreCase(bibtexType)) {
             result = "Report";
             bibTexEntry = "manual";
-        } else if (bibtexType.equalsIgnoreCase("mastersthesis")) {
+        } else if ("mastersthesis".equalsIgnoreCase(bibtexType)) {
             result = "Report";
             bibTexEntry = "mastersthesis";
-        } else if (bibtexType.equalsIgnoreCase("phdthesis")) {
+        } else if ("phdthesis".equalsIgnoreCase(bibtexType)) {
             result = "Report";
             bibTexEntry = "phdthesis";
-        } else if (bibtexType.equalsIgnoreCase("unpublished")) {
+        } else if ("unpublished".equalsIgnoreCase(bibtexType)) {
             result = "Report";
             bibTexEntry = "unpublished";
-        } else if (bibtexType.equalsIgnoreCase("patent")) {
+        } else if ("patent".equalsIgnoreCase(bibtexType)) {
             result = "Patent";
-        } else if (bibtexType.equalsIgnoreCase("misc")) {
+        } else if ("misc".equalsIgnoreCase(bibtexType)) {
             result = "Misc";
-        } else if (bibtexType.equalsIgnoreCase("electronic")) {
+        } else if ("electronic".equalsIgnoreCase(bibtexType)) {
             result = "Misc";
             bibTexEntry = "electronic";
         }
@@ -750,7 +750,7 @@ class MSBibEntry {
         // tested using http://www.javaregex.com/test.html
         Pattern pattern = Pattern.compile("\\b(\\w+)\\s*[,]?\\s*(\\w+)\\s*[,]?\\s*(\\w+)\\b");
         Matcher matcher = pattern.matcher(address);
-        if (matcher.matches() && matcher.groupCount() > 3) {
+        if (matcher.matches() && (matcher.groupCount() > 3)) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));
@@ -765,13 +765,13 @@ class MSBibEntry {
             return;
         }
 
-        // Allows 20.3-2007|||20/3-  2007 etc. 
+        // Allows 20.3-2007|||20/3-  2007 etc.
         // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
         // 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
         // tested using http://www.javaregex.com/test.html
         Pattern pattern = Pattern.compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
         Matcher matcher = pattern.matcher(date);
-        if (matcher.matches() && matcher.groupCount() > 3) {
+        if (matcher.matches() && (matcher.groupCount() > 3)) {
             addField(document, parent, "Month" + extra, matcher.group(1));
             addField(document, parent, "Day" + extra, matcher.group(2));
             addField(document, parent, "Year" + extra, matcher.group(3));
@@ -908,31 +908,34 @@ class MSBibEntry {
         if (authors == null) {
             return;
         }
-        String allAuthors = "";
+        StringBuilder allAuthorsSB = new StringBuilder();
         boolean First = true;
+
         for (PersonName name : authors) {
             if (!First) {
-                allAuthors += " and ";
+                allAuthorsSB.append(" and ");
             }
-            allAuthors += name.getFullname();
+            allAuthorsSB.append(name.getFullname());
             First = false;
         }
+        String allAuthors = allAuthorsSB.toString();
+
         map.put(type, allAuthors);
     }
 
     private EntryType mapMSBibToBibtexType(String msbib) {
         EntryType bibtex;
-        if (msbib.equals("Book")) {
+        if ("Book".equals(msbib)) {
             bibtex = BibtexEntryTypes.BOOK;
-        } else if (msbib.equals("BookSection")) {
+        } else if ("BookSection".equals(msbib)) {
             bibtex = BibtexEntryTypes.INBOOK;
-        } else if (msbib.equals("JournalArticle") || msbib.equals("ArticleInAPeriodical")) {
+        } else if ("JournalArticle".equals(msbib) || "ArticleInAPeriodical".equals(msbib)) {
             bibtex = BibtexEntryTypes.ARTICLE;
-        } else if (msbib.equals("ConferenceProceedings")) {
+        } else if ("ConferenceProceedings".equals(msbib)) {
             bibtex = BibtexEntryTypes.CONFERENCE;
-        } else if (msbib.equals("Report")) {
+        } else if ("Report".equals(msbib)) {
             bibtex = BibtexEntryTypes.TECHREPORT;
-        } else if (msbib.equals("InternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("ElectronicSource") || msbib.equals("Art") || msbib.equals("SoundRecording") || msbib.equals("Performance") || msbib.equals("Film") || msbib.equals("Interview") || msbib.equals("Patent") || msbib.equals("Case")) {
+        } else if ("InternetSite".equals(msbib) || "DocumentFromInternetSite".equals(msbib) || "ElectronicSource".equals(msbib) || "Art".equals(msbib) || "SoundRecording".equals(msbib) || "Performance".equals(msbib) || "Film".equals(msbib) || "Interview".equals(msbib) || "Patent".equals(msbib) || "Case".equals(msbib)) {
             bibtex = BibtexEntryTypes.MISC;
         } else {
             bibtex = BibtexEntryTypes.MISC;
@@ -1147,17 +1150,13 @@ class MSBibEntry {
         StringBuilder out = new StringBuilder(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if (in == null || in != null && in.isEmpty()) {
+        if ((in == null) || ((in != null) && in.isEmpty())) {
             return ""; // vacancy test.
         }
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
-            if (current == 0x9 ||
-                    current == 0xA ||
-                    current == 0xD ||
-                    current >= 0x20 && current <= 0xD7FF ||
-                    current >= 0xE000 && current <= 0xFFFD ||
-                    current >= 0x10000 && current <= 0x10FFFF) {
+            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
                 out.append(current);
             }
         }
@@ -1166,7 +1165,7 @@ class MSBibEntry {
 
     /*
      * render as XML
-     * 
+     *
      * TODO This is untested.
      */
     @Override

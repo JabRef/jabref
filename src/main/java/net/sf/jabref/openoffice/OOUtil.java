@@ -126,29 +126,29 @@ class OOUtil {
             }
             String tag = m.group();
             // Handle tags:
-            if (tag.equals("<b>")) {
+            if ("<b>".equals(tag)) {
                 bold++;
-            } else if (tag.equals("</b>")) {
+            } else if ("</b>".equals(tag)) {
                 bold--;
-            } else if (tag.equals("<i>") || tag.equals("<em>")) {
+            } else if ("<i>".equals(tag) || "<em>".equals(tag)) {
                 italic++;
-            } else if (tag.equals("</i>") || tag.equals("</em>")) {
+            } else if ("</i>".equals(tag) || "</em>".equals(tag)) {
                 italic--;
-            } else if (tag.equals("</monospace>")) {
+            } else if ("</monospace>".equals(tag)) {
                 mono = 0;
-            } else if (tag.equals("<monospace>")) {
+            } else if ("<monospace>".equals(tag)) {
                 mono = 1;
-            } else if (tag.equals("</smallcaps>")) {
+            } else if ("</smallcaps>".equals(tag)) {
                 smallCaps = 0;
-            } else if (tag.equals("<smallcaps>")) {
+            } else if ("<smallcaps>".equals(tag)) {
                 smallCaps = 1;
-            } else if (tag.equals("</sup>")) {
+            } else if ("</sup>".equals(tag)) {
                 sup = 0;
-            } else if (tag.equals("<sup>")) {
+            } else if ("<sup>".equals(tag)) {
                 sup = 1;
-            } else if (tag.equals("</sub>")) {
+            } else if ("</sub>".equals(tag)) {
                 sub = 0;
-            } else if (tag.equals("<sub>")) {
+            } else if ("<sub>".equals(tag)) {
                 sub = 1;
             }
 

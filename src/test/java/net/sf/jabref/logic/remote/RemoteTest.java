@@ -60,10 +60,14 @@ public class RemoteTest {
         try (ServerSocket socket = new ServerSocket(port)) {
             Assert.assertTrue(socket.isBound());
 
-            RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle();
-            Assert.assertFalse(server.isOpen());
-            server.openAndStart(msg -> Assert.fail("should not happen"), port);
-            Assert.assertFalse(server.isOpen());
+            try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+                Assert.assertFalse(server.isOpen());
+                server.openAndStart(msg -> Assert.fail("should not happen"), port);
+                Assert.assertFalse(server.isOpen());
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                Assert.fail("Exception: " + e.getMessage());
+            }
         }
     }
 

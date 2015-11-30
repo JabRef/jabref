@@ -35,15 +35,15 @@ public class EntryFetchers {
         entryFetchers.add(new IEEEXploreFetcher());
         entryFetchers.add(new INSPIREFetcher());
         entryFetchers.add(new ISBNtoBibTeXFetcher());
-        entryFetchers.add(new JSTORFetcher());
-        entryFetchers.add(new JSTORFetcher2());
+        //entryFetchers.add(new JSTORFetcher()); // currently not working - why are there 2 different versions?
+        //entryFetchers.add(new JSTORFetcher2()); // see also https://github.com/koppor/jabref/issues/66
         entryFetchers.add(new MedlineFetcher());
         entryFetchers.add(new OAI2Fetcher());
-        entryFetchers.add(new ScienceDirectFetcher());
-        entryFetchers.add(new SPIRESFetcher());
+        // entryFetchers.add(new ScienceDirectFetcher()); currently not working - removed see #409
         entryFetchers.add(new ACMPortalFetcher());
         entryFetchers.add(new GoogleScholarFetcher());
         entryFetchers.add(new DOAJFetcher());
+        entryFetchers.add(new SpringerFetcher());
     }
 
     public List<EntryFetcher> getEntryFetchers() {

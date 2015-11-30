@@ -164,7 +164,7 @@ class KeyBindingsDialog extends JDialog {
             String mod = KeyEvent.getKeyModifiersText(evt.getModifiers());
             // all key bindings must have a modifier: ctrl alt etc
 
-            if (mod.equals("")) {
+            if ("".equals(mod)) {
                 int kc = evt.getKeyCode();
                 if (!(((kc >= KeyEvent.VK_F1) && (kc <= KeyEvent.VK_F12)) ||
                         (kc == KeyEvent.VK_ESCAPE) || (kc == KeyEvent.VK_DELETE))) {
@@ -173,18 +173,18 @@ class KeyBindingsDialog extends JDialog {
             }
             // second key cannot be a modifiers
             if ( //code.equals("Escape")
-            code.equals("Tab")
-                    || code.equals("Backspace")
-                    || code.equals("Enter")
+                    "Tab".equals(code)
+                    || "Backspace".equals(code)
+                    || "Enter".equals(code)
                     //|| code.equals("Delete")
-                    || code.equals("Space")
-                    || code.equals("Ctrl")
-                    || code.equals("Shift")
-                    || code.equals("Alt")) {
+                    || "Space".equals(code)
+                    || "Ctrl".equals(code)
+                    || "Shift".equals(code)
+                    || "Alt".equals(code)) {
                 return;
             }
             String newKey;
-            if (!mod.equals("")) {
+            if (!"".equals(mod)) {
                 newKey = mod.toLowerCase().replaceAll("\\+", " ") + " " + code;
             }
             else {
@@ -231,7 +231,7 @@ class KeyBindingsDialog extends JDialog {
 
 
     @SuppressWarnings("serial")
-    private class KeystrokeTable extends JTable {
+    private static class KeystrokeTable extends JTable {
 
         public KeystrokeTable() {
             super();
@@ -248,7 +248,7 @@ class KeyBindingsDialog extends JDialog {
     }
 
     @SuppressWarnings("serial")
-    private class KeystrokeTableModel extends AbstractTableModel {
+    private static class KeystrokeTableModel extends AbstractTableModel {
 
         final String[][] data;
 

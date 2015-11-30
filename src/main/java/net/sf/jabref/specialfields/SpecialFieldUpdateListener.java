@@ -47,7 +47,7 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
 
             @Override
             public void run() {
-                if (fieldName.equals("keywords")) {
+                if ("keywords".equals(fieldName)) {
                     // we do NOT pass a named component indicating that we do not want to have undo capabilities
                     // if the user undoes the change in the keyword field, this method is also called and 
                     // the special fields are updated accordingly 

@@ -357,19 +357,20 @@ public class BibtexEntryWriter {
             field = "UNKNOWN";
         }
 
-        String suffix = "";
+        StringBuilder suffixSB = new StringBuilder();
         if (writeFieldAddSpaces) {
             for (int i = BibtexEntryWriter.maxFieldLength - field.length(); i > 0; i--) {
-                suffix += " ";
+                suffixSB.append(" ");
             }
         }
+        String suffix = suffixSB.toString();
 
         String result;
         if (writeFieldCameCaseName) {
             if (BibtexEntryWriter.tagDisplayNameMap.containsKey(field.toLowerCase())) {
                 result = BibtexEntryWriter.tagDisplayNameMap.get(field.toLowerCase()) + suffix;
             } else {
-                result = (field.charAt(0) + "").toUpperCase() + field.substring(1) + suffix;
+                result = (String.valueOf(field.charAt(0))).toUpperCase() + field.substring(1) + suffix;
             }
         } else {
             result = field + suffix;

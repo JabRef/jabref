@@ -38,7 +38,6 @@ public class Actions {
     public static final String MOVE_TO_GROUP = "moveToGroup";
     public static final String OPEN_EXTERNAL_FILE = "openExternalFile";
     public static final String OPEN_FOLDER = "openFolder";
-    public static final String OPEN_SPIRES = "openSpires";
     public static final String OPEN_URL = "openUrl";
     public static final String PASTE = "paste";
     public static final String PLAIN_TEXT_IMPORT = "plainTextImport";
