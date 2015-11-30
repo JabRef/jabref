@@ -21,6 +21,7 @@ import com.jgoodies.looks.plastic.theme.SkyBluer;
 import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
+import java.net.Authenticator;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +44,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
@@ -85,16 +87,21 @@ public class JabRef {
             System.setProperty("http.proxyHost", prefs.get(JabRefPreferences.PROXY_HOSTNAME));
             System.setProperty("http.proxyPort", prefs.get(JabRefPreferences.PROXY_PORT));
 
-            // currently, the following cannot be configured
-            if (prefs.get("proxyUsername") != null) {
-                System.setProperty("http.proxyUser", prefs.get("proxyUsername"));
-                System.setProperty("http.proxyPassword", prefs.get("proxyPassword"));
+            // NetworkTab.java ensures that proxyUsername and proxyPassword are neither null nor empty
+            if (prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION)) {
+                System.setProperty("http.proxyUser", prefs.get(JabRefPreferences.PROXY_USERNAME));
+                System.setProperty("http.proxyPassword", prefs.get(JabRefPreferences.PROXY_PASSWORD));
             }
         } else {
             // The following two lines signal that the system proxy settings
             // should be used:
             System.setProperty("java.net.useSystemProxies", "true");
             System.setProperty("proxySet", "true");
+        }
+
+        if (prefs.getBoolean(JabRefPreferences.USE_PROXY)
+                && prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION)) {
+            Authenticator.setDefault(new ProxyAuthenticator());
         }
 
         Globals.startBackgroundTasks();

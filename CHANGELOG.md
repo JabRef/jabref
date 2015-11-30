@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+ - Add support for proxy authentication via VM args and GUI settings, this implements Feature Request #388
 
 ### Fixed
 - Fix #420: Reenable preference changes
