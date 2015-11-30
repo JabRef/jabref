@@ -16,6 +16,8 @@
 package net.sf.jabref.importer;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import net.sf.jabref.importer.fileformat.*;
@@ -334,16 +336,16 @@ public class ImportFormatReader {
     }
 
     public static InputStreamReader getUTF8Reader(File f) throws IOException {
-        return getReader(f, "UTF-8");
+        return getReader(f, StandardCharsets.UTF_8);
     }
 
     public static InputStreamReader getUTF16Reader(File f) throws IOException {
-        return getReader(f, "UTF-16");
+        return getReader(f, StandardCharsets.UTF_16);
     }
 
-    public static InputStreamReader getReader(File f, String encoding)
+    public static InputStreamReader getReader(File f, Charset charset)
             throws IOException {
-        return new InputStreamReader(new FileInputStream(f), encoding);
+        return new InputStreamReader(new FileInputStream(f), charset);
     }
 
     public static Reader getReaderDefaultEncoding(InputStream in)
@@ -438,7 +440,7 @@ public class ImportFormatReader {
         // Finally, if all else fails, see if it is a BibTeX file:
         try {
             ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
-                    Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+                    Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)));
             if ((pr.getDatabase().getEntryCount() > 0)
                     || (pr.getDatabase().getStringCount() > 0)) {
                 pr.setFile(new File(filename));

@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -104,7 +105,7 @@ public class AppendDatabaseAction implements BaseAction {
             try {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
+                Charset encoding = Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
                 ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);

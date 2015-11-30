@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.exporter;
 
+import java.nio.charset.Charset;
 import java.util.Set;
 
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -34,7 +35,7 @@ public class PostgreSQLExport extends ExportFormat {
 
     /**
      * First method called when user starts the export.
-     * 
+     *
      * @param database
      *            The bibtex database from which to export.
      * @param file
@@ -49,7 +50,8 @@ public class PostgreSQLExport extends ExportFormat {
      */
     @Override
     public void performExport(final BibtexDatabase database,
-            final MetaData metaData, final String file, final String encoding,
+ final MetaData metaData, final String file,
+            final Charset encoding,
             Set<String> keySet) throws Exception {
 
         new DBExporterAndImporterFactory().getExporter("POSTGRESQL").exportDatabaseAsFile(database, metaData, keySet, file);

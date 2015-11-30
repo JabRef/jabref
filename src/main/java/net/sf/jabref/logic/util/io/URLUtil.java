@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -68,7 +69,7 @@ public class URLUtil {
                 if (pair.startsWith("url=")) {
                     String value = pair.substring(pair.indexOf("=") + 1, pair.length());
 
-                    String decode = URLDecoder.decode(value, "UTF-8");
+                    String decode = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
                     // url?
                     if(decode.matches(URL_EXP)) {
                         return decode;
@@ -93,12 +94,12 @@ public class URLUtil {
      */
     public static String sanitizeUrl(String link) {
         link = link.trim();
-    
+
         // First check if it is enclosed in \\url{}. If so, remove the wrapper.
         if (link.startsWith("\\url{") && link.endsWith("}")) {
             link = link.substring(5, link.length() - 1);
         }
-    
+
         // DOI cleanup
         // converts doi-only link to full http address
         // Morten Alver 6 Nov 2012: this extracts a nonfunctional Doi from some complete
@@ -112,21 +113,21 @@ public class URLUtil {
             link = link.replaceFirst("^doi:/*", "");
             link = new DOI(link).getURLAsASCIIString();
         }
-    
+
         Optional<DOI> doi = DOI.build(link);
         if (doi.isPresent() && !link.matches("^https?://.*")) {
             link = doi.get().getURLAsASCIIString();
         }
-    
+
         // FIXME: everything below is really flawed atm
         link = link.replaceAll("\\+", "%2B");
-    
+
         try {
-            link = URLDecoder.decode(link, "UTF-8");
+            link = URLDecoder.decode(link, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException ignored) {
             // Ignored
         }
-    
+
         /**
          * Fix for: [ 1574773 ] sanitizeUrl() breaks ftp:// and file:///
          *

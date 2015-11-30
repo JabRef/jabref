@@ -33,6 +33,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -197,7 +198,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         String urlQuery;
         LinkedHashMap<String, JLabel> res = new LinkedHashMap<>();
         try {
-            urlQuery = GoogleScholarFetcher.SEARCH_URL.replace(GoogleScholarFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
+            urlQuery = GoogleScholarFetcher.SEARCH_URL.replace(GoogleScholarFetcher.QUERY_MARKER,
+                    URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
             int count = 1;
             String nextPage;
             while (((nextPage = getCitationsFromUrl(urlQuery, res)) != null)

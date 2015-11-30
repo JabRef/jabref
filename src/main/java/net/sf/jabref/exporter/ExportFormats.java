@@ -17,6 +17,7 @@ package net.sf.jabref.exporter;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import javax.swing.AbstractAction;
@@ -72,7 +73,7 @@ public class ExportFormats {
         ExportFormats.putFormat(new ExportFormat(Localization.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
                 "openoffice", ".csv"));
         ExportFormat ef = new ExportFormat(Localization.lang("RIS"), "ris", "ris", "ris", ".ris");
-        ef.encoding = "UTF-8";
+        ef.encoding = StandardCharsets.UTF_8;
         ExportFormats.putFormat(ef);
         ExportFormats.putFormat(new ExportFormat(Localization.lang("MIS Quarterly"), "misq", "misq", "misq",".rtf"));
 
