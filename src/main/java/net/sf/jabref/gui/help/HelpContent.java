@@ -150,7 +150,7 @@ class HelpContent extends JTextPane {
      */
     @Override
     public void setPage(URL url) {
-        if ("file".equals(url.getProtocol())) {
+        if ("file".equals(url.getProtocol()) || "jar".equals(url.getProtocol())) {
             // Creating file by url.toString() and using file.getName() preserves anchors
             File file = new File(url.toString());
             setPage(file.getName(), JabRef.class);
