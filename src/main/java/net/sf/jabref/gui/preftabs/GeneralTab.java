@@ -242,7 +242,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.WRAPPED_USERNAME = '[' + owner + ']';
         prefs.put(JabRefPreferences.TIME_STAMP_FORMAT, timeStampFormat.getText().trim());
         prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
-        prefs.put(JabRefPreferences.DEFAULT_ENCODING, (String) encodings.getSelectedItem());
+        prefs.put(JabRefPreferences.DEFAULT_ENCODING, encodings.getSelectedItem().toString());
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
 
