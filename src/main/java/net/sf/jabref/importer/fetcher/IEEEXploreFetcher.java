@@ -42,6 +42,8 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.logic.cleanup.CaseKeeper;
+import net.sf.jabref.logic.cleanup.UnitFormatter;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -51,7 +53,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(IEEEXploreFetcher.class);
 
-    final CaseKeeperList caseKeeperList = new CaseKeeperList();
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
 

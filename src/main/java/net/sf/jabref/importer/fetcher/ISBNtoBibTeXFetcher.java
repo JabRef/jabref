@@ -31,6 +31,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.logic.cleanup.CaseKeeper;
+import net.sf.jabref.logic.cleanup.UnitFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
