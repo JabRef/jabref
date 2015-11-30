@@ -633,13 +633,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     public void updateSource() {
         if (updateSource) {
-            StringWriter stringWriter = new StringWriter(200);
 
             try {
-                LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
-                new BibtexEntryWriter(formatter, false).write(entry, stringWriter);
-
-                String srcString = stringWriter.getBuffer().toString();
+                String srcString = getSourceString(entry);
                 source.setText(srcString);
                 lastSourceStringAccepted = srcString;
 
@@ -673,6 +669,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
         }
+    }
+
+    public static String getSourceString(BibtexEntry entry) throws IOException {
+        StringWriter stringWriter = new StringWriter(200);
+        LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
+        new BibtexEntryWriter(formatter, false).write(entry, stringWriter);
+
+        return stringWriter.getBuffer().toString();
     }
 
     /**
