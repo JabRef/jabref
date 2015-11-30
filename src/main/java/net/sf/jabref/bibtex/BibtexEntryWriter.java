@@ -97,7 +97,7 @@ public class BibtexEntryWriter {
 
     public void write(BibtexEntry entry, Writer out) throws IOException {
         // if the entry has not been modified, write it as it was
-        if(entry.shouldUseCustomSerialization()){
+        if(!entry.hasChanged()){
             out.write(entry.getParsedSerialization());
             return;
         }

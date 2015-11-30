@@ -238,7 +238,7 @@ public class FileActions {
                 if (write) {
                     bibtexEntryWriter.write(entry, writer);
                     //only append newline if the entry has changed
-                    if(!entry.shouldUseCustomSerialization()){
+                    if(!entry.hasChanged()){
                         writer.write(Globals.NEWLINE);
                     }
                 }
@@ -419,7 +419,7 @@ public class FileActions {
 
                 bibtexEntryWriter.write(be, fw);
                 //only append newline if the entry has changed
-                if(!be.shouldUseCustomSerialization()){
+                if(!be.hasChanged()){
                     fw.write(Globals.NEWLINE);
                 }
             }

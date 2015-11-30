@@ -67,7 +67,7 @@ public class BibtexEntry {
     * marks if the complete serialization, which was read from file, should be used.
     * Is set to false, if parts of the entry change
      */
-    private boolean useCustomSerialization;
+    private boolean changed;
 
 
     public BibtexEntry() {
@@ -82,7 +82,7 @@ public class BibtexEntry {
         Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
 
         this.id = id;
-        useCustomSerialization = false;
+        changed = true;
         setType(type);
     }
 
@@ -141,7 +141,7 @@ public class BibtexEntry {
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
             this.type = type;
-            useCustomSerialization = false;
+            changed = true;
             firePropertyChangedEvent(TYPE_HEADER, oldType != null ? oldType.getName() : null, type.getName());
         } catch (PropertyVetoException pve) {
             pve.printStackTrace();
@@ -163,7 +163,7 @@ public class BibtexEntry {
         }
 
         this.id = id;
-        useCustomSerialization = false;
+        changed = true;
     }
 
     /**
@@ -306,7 +306,7 @@ public class BibtexEntry {
      * does not check values for content, so e.g. empty strings will be set as such.
      */
     public void setField(Map<String, String> fields) {
-        useCustomSerialization = false;
+        changed = true;
         this.fields.putAll(fields);
     }
 
@@ -322,7 +322,7 @@ public class BibtexEntry {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
 
-        useCustomSerialization = false;
+        changed = true;
 
         String oldValue = fields.get(name);
         try {
@@ -348,7 +348,7 @@ public class BibtexEntry {
      */
     public void clearField(String name) {
 
-        useCustomSerialization = false;
+        changed = true;
 
         if (BibtexEntry.ID_FIELD.equals(name)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
@@ -513,7 +513,7 @@ public class BibtexEntry {
 
 
     public void setParsedSerialization(String parsedSerialization) {
-        useCustomSerialization = true;
+        changed = false;
         this.parsedSerialization = parsedSerialization;
     }
 
@@ -521,8 +521,8 @@ public class BibtexEntry {
         return parsedSerialization;
     }
 
-    public boolean shouldUseCustomSerialization() {
-        return useCustomSerialization;
+    public boolean hasChanged() {
+        return changed;
     }
 
     public void putKeywords(List<String> keywords) {
