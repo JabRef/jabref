@@ -21,7 +21,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete. Fixes #412 
 
 ### Removed
-
+- Removed file history size preference (never available from the UI)
 
 
 
