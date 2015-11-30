@@ -88,9 +88,9 @@ public class JabRef {
             System.setProperty("http.proxyPort", prefs.get(JabRefPreferences.PROXY_PORT));
 
             // currently, the following cannot be configured
-            if (prefs.get("proxyUsername") != null) {
-                System.setProperty("http.proxyUser", prefs.get("proxyUsername"));
-                System.setProperty("http.proxyPassword", prefs.get("proxyPassword"));
+            if (prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION)) {
+                System.setProperty("http.proxyUser", prefs.get(JabRefPreferences.PROXY_USERNAME));
+                System.setProperty("http.proxyPassword", prefs.get(JabRefPreferences.PROXY_PASSWORD));
             }
         } else {
             // The following two lines signal that the system proxy settings

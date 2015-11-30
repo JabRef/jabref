@@ -20,12 +20,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -34,6 +36,9 @@ public class NetworkTab extends JPanel implements PrefsTab {
     private final JCheckBox useProxy;
     private final JTextField defProxyHostname;
     private final JTextField defProxyPort;
+    private final JCheckBox useProxyAuthentication;
+    private final JTextField defProxyUsername;
+    private final JPasswordField defProxyPassword;
     private final JabRefPreferences prefs;
 
     public NetworkTab(JabRefPreferences prefs) {
@@ -48,31 +53,55 @@ public class NetworkTab extends JPanel implements PrefsTab {
         defProxyPort = new JTextField();
         defProxyPort.setEnabled(false);
 
+        useProxyAuthentication = new JCheckBox(Localization.lang("Proxy requires authentication"));
+        useProxyAuthentication.setEnabled(false);
+
+        defProxyUsername = new JTextField();
+        defProxyUsername.setEnabled(false);
+        defProxyPassword = new JPasswordField();
+        defProxyPassword.setEnabled(false);
+
         Insets marg = new Insets(0, 12, 3, 0);
         useProxy.setMargin(marg);
         defProxyPort.setMargin(marg);
+        useProxyAuthentication.setMargin(marg);
 
-        // We need a listener on useImportInspector to enable and disable the
-        // import inspector related choices;
+        // We need a listener on useProxy to enable and disable the
+        // proxy related settings;
         useProxy.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent event) {
                 defProxyHostname.setEnabled(useProxy.isSelected());
                 defProxyPort.setEnabled(useProxy.isSelected());
+                useProxyAuthentication.setEnabled(useProxy.isSelected());
             }
         });
 
-        FormLayout layout = new FormLayout
-                ("8dlu, left:pref, 4dlu, fill:150dlu", "p, 2dlu, p, 2dlu, p, 2dlu, p");
+        useProxyAuthentication.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                defProxyUsername.setEnabled(useProxyAuthentication.isSelected());
+                defProxyPassword.setEnabled(useProxyAuthentication.isSelected());
+            }
+        });
+
+        FormLayout layout = new FormLayout("8dlu, left:pref, 4dlu, left:pref, 4dlu, fill:150dlu",
+                "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p");
         FormBuilder builder = FormBuilder.create().layout(layout);
 
-        builder.addSeparator(Localization.lang("Network")).xyw(1, 1, 4);
-        builder.add(useProxy).xyw(2, 3, 3);
+        builder.addSeparator(Localization.lang("Network")).xyw(1, 1, 6);
+        builder.add(useProxy).xyw(2, 3, 5);
         builder.add(Localization.lang("Host") + ':').xy(2, 5);
-        builder.add(defProxyHostname).xy(4, 5);
+        builder.add(defProxyHostname).xyw(4, 5, 3);
         builder.add(Localization.lang("Port") + ':').xy(2, 7);
-        builder.add(defProxyPort).xy(4, 7);
+        builder.add(defProxyPort).xyw(4, 7, 3);
+        builder.add(useProxyAuthentication).xyw(4, 9, 3);
+        builder.add(Localization.lang("Username:")).xy(4, 11);
+        builder.add(defProxyUsername).xy(6, 11);
+        builder.add(Localization.lang("Password:")).xy(4, 13);
+        builder.add(defProxyPassword).xy(6, 13);
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -87,6 +116,9 @@ public class NetworkTab extends JPanel implements PrefsTab {
         defProxyHostname.setText(prefs.get(JabRefPreferences.PROXY_HOSTNAME));
         defProxyPort.setText(prefs.get(JabRefPreferences.PROXY_PORT));
 
+        useProxyAuthentication.setSelected(prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION));
+        defProxyUsername.setText(prefs.get(JabRefPreferences.PROXY_USERNAME));
+        defProxyPassword.setText(prefs.get(JabRefPreferences.PROXY_PASSWORD));
     }
 
     @Override
@@ -94,16 +126,19 @@ public class NetworkTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.USE_PROXY, useProxy.isSelected());
         prefs.put(JabRefPreferences.PROXY_HOSTNAME, defProxyHostname.getText().trim());
         prefs.put(JabRefPreferences.PROXY_PORT, defProxyPort.getText().trim());
+        prefs.putBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION, useProxyAuthentication.isSelected());
+        prefs.put(JabRefPreferences.PROXY_USERNAME, defProxyUsername.getText().trim());
+        prefs.put(JabRefPreferences.PROXY_PASSWORD, new String(defProxyPassword.getPassword()));
     }
 
     @Override
     public boolean validateSettings() {
-        boolean validSetting;
+        boolean validSetting, validAuthenticationSetting = false;
         if (useProxy.isSelected()) {
             String host = defProxyHostname.getText();
             String port = defProxyPort.getText();
-            if (host == null || host.trim().isEmpty() ||
-                    port == null || port.trim().isEmpty()) {
+            if ((host == null) || host.trim().isEmpty() ||
+                    (port == null) || port.trim().isEmpty()) {
                 validSetting = false;
             } else {
                 Integer p;
@@ -114,14 +149,28 @@ public class NetworkTab extends JPanel implements PrefsTab {
                     validSetting = false;
                 }
             }
+            if (useProxyAuthentication.isSelected()) {
+                String userName = defProxyUsername.getText();
+                char[] password = defProxyPassword.getPassword();
+                // no empty proxy passwords currently supported (they make no sense in this case anyway)
+                if ((userName == null) || userName.trim().isEmpty() || (password == null) || (password.length == 0)) {
+                    validAuthenticationSetting = false;
+                    validSetting = false;
+                } else {
+                    validAuthenticationSetting = true;
+                }
+            }
         } else {
             validSetting = true;
         }
         if (!validSetting) {
-            JOptionPane.showMessageDialog
-                    (null, Localization.lang("Please specify both hostname and port"),
-                            Localization.lang("Invalid setting"),
-                            JOptionPane.ERROR_MESSAGE);
+            if (!validAuthenticationSetting) {
+                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both username and password"),
+                        Localization.lang("Invalid setting"), JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both hostname and port"),
+                        Localization.lang("Invalid setting"), JOptionPane.ERROR_MESSAGE);
+            }
         }
         return validSetting;
     }
