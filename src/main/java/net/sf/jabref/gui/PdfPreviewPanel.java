@@ -78,7 +78,7 @@ class PdfPreviewPanel extends JPanel {
             }
 
         } catch (IOException e) {
-            LOGGER.warn("Cannor open file/PDF document", e);
+            LOGGER.warn("Cannot open file/PDF document", e);
         }
     }
 
