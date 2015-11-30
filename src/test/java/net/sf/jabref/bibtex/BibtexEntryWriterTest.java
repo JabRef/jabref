@@ -93,6 +93,45 @@ public class BibtexEntryWriterTest {
     }
 
     @Test
+    public void multipleWritesWithoutModification() throws IOException {
+        String bibtexEntry = "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}";
+
+        String result = testSingleWrite(bibtexEntry);
+        result = testSingleWrite(result);
+        result = testSingleWrite(result);
+
+        assertEquals(bibtexEntry, result);
+    }
+
+    private String testSingleWrite(String bibtexEntry) throws IOException {
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+
+        Collection<BibtexEntry> entries = result.getDatabase().getEntries();
+        Assert.assertEquals(1, entries.size());
+
+        BibtexEntry entry = entries.iterator().next();
+        Assert.assertEquals("test", entry.getCiteKey());
+        Assert.assertEquals(5, entry.getFieldNames().size());
+        Set<String> fields = entry.getFieldNames();
+        Assert.assertTrue(fields.contains("author"));
+        Assert.assertEquals("Foo Bar", entry.getField("author"));
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter);
+        String actual = stringWriter.toString();
+
+        assertEquals(bibtexEntry, actual);
+        return actual;
+    }
+
+    @Test
     public void monthFieldSpecialSyntax() throws IOException {
         String bibtexEntry = "@Article{test," + Globals.NEWLINE +
                 "  Author                   = {Foo Bar}," + Globals.NEWLINE +
