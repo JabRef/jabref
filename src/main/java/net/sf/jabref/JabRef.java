@@ -21,6 +21,8 @@ import com.jgoodies.looks.plastic.theme.SkyBluer;
 import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -42,6 +44,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
@@ -95,6 +98,26 @@ public class JabRef {
             System.setProperty("java.net.useSystemProxies", "true");
             System.setProperty("proxySet", "true");
         }
+
+        Authenticator.setDefault(new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                if (getRequestorType() == RequestorType.PROXY) {
+                    String prot = getRequestingProtocol().toLowerCase();
+                    String host = System.getProperty(prot + ".proxyHost", "");
+                    String port = System.getProperty(prot + ".proxyPort", "80");
+                    String user = System.getProperty(prot + ".proxyUser", "");
+                    String password = System.getProperty(prot + ".proxyPassword", "");
+                    if (getRequestingHost().equalsIgnoreCase(host)) {
+                        if (Integer.parseInt(port) == getRequestingPort()) {
+                            return new PasswordAuthentication(user, password.toCharArray());
+                        }
+                    }
+                }
+                return null;
+            }
+        });
 
         Globals.startBackgroundTasks();
         setupLogHandlerForErrorConsole();
