@@ -89,12 +89,15 @@ public class BibtexString {
     private String content;
     private String id;
     private Type type;
+    private String parsedSerialization;
+    private boolean hasChanged;
 
 
     public BibtexString(String id, String name, String content) {
         this.id = id;
         this.name = name;
         this.content = content;
+        hasChanged = true;
         type = Type.get(name);
     }
 
@@ -103,6 +106,7 @@ public class BibtexString {
         this.name = name;
         this.content = content;
         this.type = type;
+        hasChanged = true;
     }
 
     public String getId() {
@@ -111,6 +115,7 @@ public class BibtexString {
 
     public void setId(String id) {
         this.id = id;
+        hasChanged = true;
     }
 
     public String getName() {
@@ -119,6 +124,7 @@ public class BibtexString {
 
     public void setName(String name) {
         this.name = name;
+        hasChanged = true;
         type = Type.get(name);
     }
 
@@ -128,6 +134,7 @@ public class BibtexString {
 
     public void setContent(String content) {
         this.content = content;
+        hasChanged = true;
     }
 
     @Override
@@ -137,5 +144,18 @@ public class BibtexString {
 
     public Type getType() {
         return type;
+    }
+
+    public void setParsedSerialization(String parsedSerialization) {
+        this.parsedSerialization = parsedSerialization;
+        hasChanged = false;
+    }
+
+    public String getParsedSerialization() {
+        return parsedSerialization;
+    }
+
+    public boolean hasChanged(){
+        return hasChanged;
     }
 }

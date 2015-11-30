@@ -217,6 +217,7 @@ public class BibtexParser {
                         database.setPreamble(parsePreamble());
                     } else if ("string".equals(entryType.toLowerCase())) {
                         BibtexString bs = parseString();
+                        bs.setParsedSerialization(dumpTextReadSoFarToString());
                         try {
                             database.addString(bs);
                         } catch (KeyCollisionException ex) {

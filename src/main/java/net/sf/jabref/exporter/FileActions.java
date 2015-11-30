@@ -102,6 +102,12 @@ public class FileActions {
         // First remove this from the "remaining" list so it can't cause problem with circular refs:
         remaining.remove(bs.getName());
 
+        //if the string has not been modified, write it back as it was
+        if(!bs.hasChanged()){
+            fw.write(bs.getParsedSerialization());
+            return;
+        }
+
         // Then we go through the string looking for references to other strings. If we find references
         // to strings that we will write, but still haven't, we write those before proceeding. This ensures
         // that the string order will be acceptable for BibTeX.
