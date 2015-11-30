@@ -61,7 +61,7 @@ public class BibtexEntry {
     private boolean searchHit;
     private boolean groupHit;
 
-    private String serialization;
+    private String parsedSerialization;
 
     /*
     * marks if the complete serialization, which was read from file, should be used.
@@ -512,13 +512,13 @@ public class BibtexEntry {
     }
 
 
-    public void setSerialization(String serialization) {
+    public void setParsedSerialization(String parsedSerialization) {
         useCustomSerialization = true;
-        this.serialization = serialization;
+        this.parsedSerialization = parsedSerialization;
     }
 
-    public String getSerialization() {
-        return serialization;
+    public String getParsedSerialization() {
+        return parsedSerialization;
     }
 
     public boolean shouldUseCustomSerialization() {

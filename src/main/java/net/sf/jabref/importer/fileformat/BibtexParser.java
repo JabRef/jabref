@@ -301,7 +301,7 @@ public class BibtexParser {
                         BibtexEntry be = parseEntry(tp);
 
                         boolean duplicateKey = database.insertEntry(be);
-                        be.setSerialization(dumpTextReadSoFarToString());
+                        be.setParsedSerialization(dumpTextReadSoFarToString());
                         if (duplicateKey) {
                             parserResult.addDuplicateKey(be.getCiteKey());
                         } else if ((be.getCiteKey() == null) || "".equals(be.getCiteKey())) {
