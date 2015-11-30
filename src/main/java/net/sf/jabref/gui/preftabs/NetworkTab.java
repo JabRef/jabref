@@ -46,6 +46,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
     private int oldProxyConfigHash;
     private boolean oldUseProxy, oldUseProxyAuth;
 
+
     public NetworkTab(JabRefPreferences prefs) {
         this.prefs = prefs;
 
@@ -119,9 +120,17 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
     }
 
+    private int getProxyConfigHash() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(prefs.get(JabRefPreferences.PROXY_USERNAME)).append(':')
+                .append(prefs.get(JabRefPreferences.PROXY_PASSWORD));
+        sb.append('@').append(prefs.get(JabRefPreferences.PROXY_HOSTNAME)).append(':')
+                .append(prefs.get(JabRefPreferences.PROXY_PORT));
+        return sb.toString().hashCode();
+    }
+
     @Override
     public void setValues() {
-
         useProxy.setSelected(prefs.getBoolean(JabRefPreferences.USE_PROXY));
         defProxyHostname.setText(prefs.get(JabRefPreferences.PROXY_HOSTNAME));
         defProxyPort.setText(prefs.get(JabRefPreferences.PROXY_PORT));
@@ -132,37 +141,20 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
         oldUseProxy = prefs.getBoolean(JabRefPreferences.USE_PROXY);
         oldUseProxyAuth = prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION);
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefs.get(JabRefPreferences.PROXY_USERNAME)).append(':')
-                .append(prefs.get(JabRefPreferences.PROXY_PASSWORD));
-        sb.append('@').append(prefs.get(JabRefPreferences.PROXY_HOSTNAME)).append(':')
-                .append(prefs.get(JabRefPreferences.PROXY_PORT));
-        oldProxyConfigHash = sb.toString().hashCode();
-        sb.setLength(0);
+        oldProxyConfigHash = getProxyConfigHash();
 
     }
 
     @Override
     public void storeSettings() {
-        boolean changedSettings = false;
         prefs.putBoolean(JabRefPreferences.USE_PROXY, useProxy.isSelected());
         prefs.put(JabRefPreferences.PROXY_HOSTNAME, defProxyHostname.getText().trim());
         prefs.put(JabRefPreferences.PROXY_PORT, defProxyPort.getText().trim());
         prefs.putBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION, useProxyAuthentication.isSelected());
         prefs.put(JabRefPreferences.PROXY_USERNAME, defProxyUsername.getText().trim());
         prefs.put(JabRefPreferences.PROXY_PASSWORD, new String(defProxyPassword.getPassword()));
-        changedSettings = ((oldUseProxy != useProxy.isSelected()) || (oldUseProxyAuth != useProxyAuthentication
-                .isSelected()));
-        if (!changedSettings) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(prefs.get(JabRefPreferences.PROXY_USERNAME)).append(':')
-                    .append(prefs.get(JabRefPreferences.PROXY_PASSWORD));
-            sb.append('@').append(prefs.get(JabRefPreferences.PROXY_HOSTNAME)).append(':')
-                    .append(prefs.get(JabRefPreferences.PROXY_PORT));
-            changedSettings = sb.toString().hashCode() != oldProxyConfigHash;
-            sb.setLength(0);
-        }
-        if (changedSettings) {
+        if ((oldUseProxy != useProxy.isSelected()) || (oldUseProxyAuth != useProxyAuthentication.isSelected())
+                || (getProxyConfigHash() != oldProxyConfigHash)) {
             JOptionPane.showMessageDialog(null, Localization.lang("You have changed the proxy settings.").concat(" ")
                     .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
                     Localization.lang("Changed proxy settings"), JOptionPane.WARNING_MESSAGE);
@@ -175,8 +167,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
         if (useProxy.isSelected()) {
             String host = defProxyHostname.getText();
             String port = defProxyPort.getText();
-            if ((host == null) || host.trim().isEmpty() ||
-                    (port == null) || port.trim().isEmpty()) {
+            if ((host == null) || host.trim().isEmpty() || (port == null) || port.trim().isEmpty()) {
                 validSetting = false;
             } else {
                 Integer p;

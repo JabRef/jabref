@@ -22,7 +22,6 @@ import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,25 +101,7 @@ public class JabRef {
 
         if (prefs.getBoolean(JabRefPreferences.USE_PROXY)
                 && prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION)) {
-            Authenticator.setDefault(new Authenticator() {
-
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    if (getRequestorType() == RequestorType.PROXY) {
-                        String prot = getRequestingProtocol().toLowerCase();
-                        String host = System.getProperty(prot + ".proxyHost", "");
-                        String port = System.getProperty(prot + ".proxyPort", "80");
-                        String user = System.getProperty(prot + ".proxyUser", "");
-                        String password = System.getProperty(prot + ".proxyPassword", "");
-                        if (getRequestingHost().equalsIgnoreCase(host)) {
-                            if (Integer.parseInt(port) == getRequestingPort()) {
-                                return new PasswordAuthentication(user, password.toCharArray());
-                            }
-                        }
-                    }
-                    return null;
-                }
-            });
+            Authenticator.setDefault(new ProxyAuthenticator());
         }
 
         Globals.startBackgroundTasks();
