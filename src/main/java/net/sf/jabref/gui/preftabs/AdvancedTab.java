@@ -48,7 +48,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useDefault;
     private final JCheckBox useRemoteServer;
     private final JCheckBox useIEEEAbrv;
-    private final JCheckBox biblatexMode;
     private final JComboBox<String> className;
     private final JTextField remoteServerPort;
     private String oldLnf = "";
@@ -71,7 +70,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         useDefault = new JCheckBox(Localization.lang("Use other look and feel"));
         useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
-        biblatexMode = new JCheckBox(Localization.lang("BibLaTeX mode"));
         remoteServerPort = new JTextField();
         String[] possibleLookAndFeels = {UIManager.getSystemLookAndFeelClassName(),
                 UIManager.getCrossPlatformLookAndFeelClassName(), "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
@@ -154,12 +152,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(useIEEEAbrv);
-
-        builder.nextLine();
-        builder.appendSeparator(Localization.lang("BibLaTeX mode"));
-        builder.append(new JPanel());
-        builder.append(biblatexMode);
-
         builder.nextLine();
         builder.appendSeparator(Localization.lang("Import conversions"));
         builder.nextLine();
@@ -190,8 +182,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         oldPort = remotePreferences.getPort();
         remoteServerPort.setText(String.valueOf(oldPort));
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV));
-        oldBiblMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
-        biblatexMode.setSelected(oldBiblMode);
         useConvertToEquation.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
         useCaseKeeperOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
         useUnitFormatterOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH));
@@ -208,22 +198,12 @@ class AdvancedTab extends JPanel implements PrefsTab {
         }
         storeRemoteSettings();
 
-        preferences.putBoolean(JabRefPreferences.BIBLATEX_MODE, biblatexMode.isSelected());
-
         if ((useDefault.isSelected() == oldUseDef) || !oldLnf.equals(className.getSelectedItem().toString())) {
             JOptionPane.showMessageDialog(null,
                     Localization.lang("You have changed the look and feel setting.").concat(" ")
                             .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
                     Localization.lang("Changed look and feel settings"), JOptionPane.WARNING_MESSAGE);
         }
-
-        if (biblatexMode.isSelected() != oldBiblMode) {
-            JOptionPane.showMessageDialog(null,
-                    Localization.lang("You have toggled the BibLaTeX mode.").concat(" ")
-                            .concat("You must restart JabRef for this change to come into effect."),
-                    Localization.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
-        }
-
         preferences.putBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION, useConvertToEquation.isSelected());
         preferences.putBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH, useCaseKeeperOnSearch.isSelected());
         preferences.putBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH, useUnitFormatterOnSearch.isSelected());
