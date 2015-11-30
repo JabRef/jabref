@@ -151,7 +151,7 @@ public class BibtexParser {
         String result = entry.toString();
         int indexOfAt = entry.indexOf("@");
         int runningIndex = indexOfAt - 1;
-        while (runningIndex > 0) {
+        while (runningIndex >= 0) {
             if (!Character.isWhitespace(result.charAt(runningIndex))) {
                 break;
             }
