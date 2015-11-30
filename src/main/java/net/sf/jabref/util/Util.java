@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -758,7 +759,7 @@ public class Util {
      * @return
      * @throws IOException
      */
-    public static String getResultsWithEncoding(URL source, String encoding) throws IOException {
+    public static String getResultsWithEncoding(URL source, Charset encoding) throws IOException {
         return net.sf.jabref.util.Util.getResultsWithEncoding(source.openConnection(), encoding);
     }
     /**
@@ -768,7 +769,7 @@ public class Util {
      * @return
      * @throws IOException
      */
-    public static String getResultsWithEncoding(URLConnection source, String encoding) throws IOException {
+    public static String getResultsWithEncoding(URLConnection source, Charset encoding) throws IOException {
 
         // set user-agent to avoid being blocked as a crawler
         source.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");

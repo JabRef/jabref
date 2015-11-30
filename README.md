@@ -108,18 +108,11 @@ For IntelliJ IDEA, just import the project via a Gradle Import by pointing at th
 Requires [install4j].
 We've got an [Open Source License](https://www.ej-technologies.com/buy/install4j/openSource).
 
-We switched from [launch4j](http://launch4j.sourceforge.net/) and [NSIS](http://nsis.sourceforge.net), because install4j allows for JRE bundling and the taskbar pinning just works.
-
 To get a list of all targets, use `gradlew tasks`.
 ```
 releaseJar - Creates a Jar release.
 media - Creates executables and installers.
 ```
-
-To set the path to your local NSIS executable pass it via a Gradle property:
-
-`gradlew -PnsisExec=PATH ANY_RELEASE_TASK`
-Typically, this is `"C:\Program Files (x86)\NSIS\makensis.exe"` resulting in the command line `gradlew -PnsisExec="C:\Program Files (x86)\NSIS\makensis.exe" release`.
 
 All binaries are created inside the directory `build/releases`.
 

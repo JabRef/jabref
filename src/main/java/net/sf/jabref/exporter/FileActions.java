@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -158,7 +159,7 @@ public class FileActions {
      *
      * @param encoding String the name of the encoding, which is part of the file header.
      */
-    private static void writeBibFileHeader(Writer out, String encoding) throws IOException {
+    private static void writeBibFileHeader(Writer out, Charset encoding) throws IOException {
         out.write("% ");
         out.write(Globals.encPrefix + encoding + Globals.NEWLINE + Globals.NEWLINE);
     }
@@ -172,7 +173,7 @@ public class FileActions {
      */
     public static SaveSession saveDatabase(BibtexDatabase database,
             MetaData metaData, File file, JabRefPreferences prefs,
-            boolean checkSearch, boolean checkGroup, String encoding, boolean suppressBackup)
+ boolean checkSearch, boolean checkGroup, Charset encoding, boolean suppressBackup)
                     throws SaveException {
 
         TreeMap<String, EntryType> types = new TreeMap<>();
@@ -188,7 +189,7 @@ public class FileActions {
             session = new SaveSession(file, encoding, backup);
         } catch (Throwable e) {
             if (encoding != null) {
-                LOGGER.error("Error from encoding: '" + encoding + "' Len: " + encoding.length(), e);
+                LOGGER.error("Error from encoding: '" + encoding.displayName(), e);
             }
             // we must catch all exceptions to be able notify users that
             // saving failed, no matter what the reason was
@@ -365,7 +366,9 @@ public class FileActions {
      * @return A List containing warnings, if any.
      */
     public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
-            File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding, DatabaseSaveType saveType) throws SaveException {
+ File file,
+            JabRefPreferences prefs, BibtexEntry[] bes, Charset encoding, DatabaseSaveType saveType)
+                    throws SaveException {
 
         TreeMap<String, EntryType> types = new TreeMap<>(); // Map
         // to

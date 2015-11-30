@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -66,7 +67,7 @@ public class FreeCiteImporter extends ImportFormat {
         // URLencode the string for transmission
         String urlencodedCitation = null;
         try {
-            urlencodedCitation = URLEncoder.encode(text, "UTF-8");
+            urlencodedCitation = URLEncoder.encode(text, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             // e.printStackTrace();
         }

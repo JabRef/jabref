@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,7 +46,7 @@ public class TestL10nFiles {
         try {
             Locale.setDefault(locale);
 
-            ResourceBundle.getBundle(prefix, locale, new EncodingControl("UTF-8"));
+            ResourceBundle.getBundle(prefix, locale, new EncodingControl(StandardCharsets.UTF_8));
         } finally {
             Locale.setDefault(oldLocale);
         }

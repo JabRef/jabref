@@ -20,6 +20,7 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,7 +149,7 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibtexDatabase database, String encoding)
+    public String doLayout(BibtexDatabase database, Charset encoding)
     {
         //System.out.println("LAYOUT: " + bibtex.getId());
         StringBuilder sb = new StringBuilder(100);

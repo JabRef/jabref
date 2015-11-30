@@ -32,6 +32,7 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.*;
 
@@ -578,7 +579,7 @@ public class JabRefPreferences {
         defaults.put(HIGHLIGHT_GROUPS_MATCHING_ANY, Boolean.FALSE);
         defaults.put(HIGHLIGHT_GROUPS_MATCHING_ALL, Boolean.FALSE);
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
-        defaults.put(DEFAULT_ENCODING, "UTF-8");
+        defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(GROUPS_VISIBLE_ROWS, 8);
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);

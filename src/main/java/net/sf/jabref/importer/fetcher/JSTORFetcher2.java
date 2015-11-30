@@ -25,6 +25,7 @@ import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -135,7 +136,8 @@ public class JSTORFetcher2 implements EntryFetcher {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<>();
         try {
-            urlQuery = JSTORFetcher2.SEARCH_URL + URLEncoder.encode(query, "UTF-8") + JSTORFetcher2.SEARCH_URL_END;
+            urlQuery = JSTORFetcher2.SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8.name())
+                    + JSTORFetcher2.SEARCH_URL_END;
             int count = 1;
             String[] numberOfRefs = new String[2];
             int refsRequested;

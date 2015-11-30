@@ -16,9 +16,11 @@
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -66,7 +68,8 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JTextField timeStampField;
     private final JabRefPreferences prefs;
     private final JComboBox<String> language = new JComboBox<>(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
-    private final JComboBox<String> encodings = new JComboBox<>(Encodings.ENCODINGS);
+    private final JComboBox<String> encodings;
+    private final DefaultComboBoxModel encodingsModel;
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
@@ -107,6 +110,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         timeStampField = new JTextField();
         inspectionWarnDupli = new JCheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
 
+        encodings = new JComboBox<>();
+        encodingsModel = new DefaultComboBoxModel(Encodings.ENCODINGS);
+        encodings.setModel(encodingsModel);
 
         FormLayout layout = new FormLayout
                 ("8dlu, 1dlu, left:170dlu, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref", "");
@@ -194,13 +200,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
 
-        String enc = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
-        for (int i = 0; i < Encodings.ENCODINGS.length; i++) {
-            if (Encodings.ENCODINGS[i].equalsIgnoreCase(enc)) {
-                encodings.setSelectedIndex(i);
-                break;
-            }
-        }
+        Charset enc = Charset.forName(prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+        encodingsModel.setSelectedItem(enc);
+
         String oldLan = prefs.get(JabRefPreferences.LANGUAGE);
 
         // Language choice
@@ -240,7 +242,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.WRAPPED_USERNAME = '[' + owner + ']';
         prefs.put(JabRefPreferences.TIME_STAMP_FORMAT, timeStampFormat.getText().trim());
         prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
-        prefs.put(JabRefPreferences.DEFAULT_ENCODING, (String) encodings.getSelectedItem());
+        prefs.put(JabRefPreferences.DEFAULT_ENCODING, encodings.getSelectedItem().toString());
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
 

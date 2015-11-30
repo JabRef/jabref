@@ -3,6 +3,7 @@ package net.sf.jabref.logic.l10n;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Localization {
@@ -20,8 +21,9 @@ public class Localization {
         Locale locale = new Locale(language);
 
         try {
-            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
+            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale,
+                    new EncodingControl(StandardCharsets.UTF_8));
 
             // silent fallback to system locale when bundle is not found
             if(!messages.getLocale().equals(locale)) {
@@ -32,8 +34,9 @@ public class Localization {
                     + "> failed, using locale <en> instead", e);
 
             locale = new Locale("en");
-            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
+            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale,
+                    new EncodingControl(StandardCharsets.UTF_8));
         } finally {
             // Set consistent VM locales
             Locale.setDefault(locale);

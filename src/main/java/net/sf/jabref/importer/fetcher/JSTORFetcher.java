@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
@@ -186,7 +187,8 @@ public class JSTORFetcher implements EntryFetcher {
         String urlQuery;
         try {
             urlQuery = "http://www.jstor.org/search/BasicResults?hp=" + JSTORFetcher.MAX_CITATIONS +
-                    "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query=" + URLEncoder.encode(query, "UTF-8") +
+ "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query="
+                    + URLEncoder.encode(query, StandardCharsets.UTF_8.name()) +
                     "&wc=on&citationAction=saveAll";
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);

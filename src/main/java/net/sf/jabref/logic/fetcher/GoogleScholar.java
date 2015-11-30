@@ -10,6 +10,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class GoogleScholar implements FullTextFinder {
             return pdfLink;
         }
 
-        String url = String.format(SEARCH_URL, URLEncoder.encode(entryTitle, "UTF-8"));
+        String url = String.format(SEARCH_URL, URLEncoder.encode(entryTitle, StandardCharsets.UTF_8.name()));
 
         Document doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler

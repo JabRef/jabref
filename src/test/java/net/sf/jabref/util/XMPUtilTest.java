@@ -29,6 +29,7 @@ import org.junit.Test;
 import javax.xml.transform.TransformerException;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -93,7 +94,7 @@ public class XMPUtilTest {
 
             // Convert to UTF8 and make available for metadata.
             ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            try (OutputStreamWriter os = new OutputStreamWriter(bs, "UTF8")) {
+            try (OutputStreamWriter os = new OutputStreamWriter(bs, StandardCharsets.UTF_8)) {
                 os.write(xmpString);
             }
             ByteArrayInputStream in = new ByteArrayInputStream(bs.toByteArray());
@@ -405,7 +406,7 @@ public class XMPUtilTest {
                 // PDMetadata.getInputStreamAsString() does not work
 
                 // Convert to UTF8 and make available for metadata.
-                try (InputStreamReader is = new InputStreamReader(meta.createInputStream(), "UTF8")) {
+                try (InputStreamReader is = new InputStreamReader(meta.createInputStream(), StandardCharsets.UTF_8)) {
                     return XMPUtilTest.slurp(is).trim(); // Trim to kill padding end-newline.
                 }
             }

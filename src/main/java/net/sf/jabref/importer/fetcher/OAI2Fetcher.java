@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.swing.JOptionPane;
@@ -147,7 +148,7 @@ public class OAI2Fetcher implements EntryFetcher {
     public String constructUrl(String key) {
         String identifier;
         try {
-            identifier = URLEncoder.encode(key, "UTF-8");
+            identifier = URLEncoder.encode(key, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             return "";
         }
