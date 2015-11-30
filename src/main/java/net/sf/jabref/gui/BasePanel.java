@@ -91,6 +91,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
 import java.util.List;
@@ -107,7 +108,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     /*
      * The database shown in this panel.
      */
-    private BibtexDatabase database;
+    private final BibtexDatabase database;
 
     private int mode;
     private EntryEditor currentEditor;
@@ -123,7 +124,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private String fileMonitorHandle;
     private boolean saving;
     private boolean updatedExternally;
-    private String encoding;
+    private Charset encoding;
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
@@ -192,7 +193,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private ContentAutoCompleters autoCompleters;
 
-    public BasePanel(JabRefFrame frame, BibtexDatabase db, File file, MetaData metaData, String encoding) {
+
+    public BasePanel(JabRefFrame frame, BibtexDatabase db, File file, MetaData metaData, Charset encoding) {
         Objects.requireNonNull(frame);
         Objects.requireNonNull(db);
         //file may be null
@@ -286,11 +288,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return Globals.prefs;
     }
 
-    public String getEncoding() {
+    public Charset getEncoding() {
         return encoding;
     }
 
-    public void setEncoding(String encoding) {
+    public void setEncoding(Charset encoding) {
         this.encoding = encoding;
     }
 
@@ -1238,7 +1240,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    private boolean saveDatabase(File file, boolean selectedOnly, String enc, FileActions.DatabaseSaveType saveType)
+    private boolean saveDatabase(File file, boolean selectedOnly, Charset enc, FileActions.DatabaseSaveType saveType)
             throws SaveException {
         SaveSession session;
         frame.block();
@@ -1253,7 +1255,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } catch (UnsupportedCharsetException ex2) {
             // @formatter:off
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ' '
-                            + Localization.lang("Character encoding '%0' is not supported.", enc),
+                            + Localization.lang("Character encoding '%0' is not supported.", enc.displayName()),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
             // @formatter:on
             throw new SaveException("rt");
@@ -1285,7 +1287,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
             builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
-                    session.getEncoding())).xy(1, 1);
+                    session.getEncoding().displayName())).xy(1, 1);
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
@@ -1299,10 +1301,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
                 Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"),
-                        Localization.lang("Save database"), JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS,
+                        Localization.lang("Save database"), JOptionPane.QUESTION_MESSAGE, null,
+                        Encodings.ENCODINGS_DISPLAYNAMES,
                         enc);
                 if (choice != null) {
-                    String newEncoding = (String) choice;
+                    Charset newEncoding = Charset.forName((String) choice);
                     return saveDatabase(file, selectedOnly, newEncoding, saveType);
                 } else {
                     commit = false;
@@ -2580,7 +2583,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (!expFile.exists() || (JOptionPane.showConfirmDialog(frame,
                         Localization.lang("'%0' exists. Overwrite file?", expFile.getName()),
                         Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
-                    saveDatabase(expFile, true, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), saveType);
+                    saveDatabase(expFile, true, Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)),
+                            saveType);
                     frame.getFileHistory().newFile(expFile.getPath());
                     frame.output(Localization.lang("Saved selected to '%0'.", expFile.getPath()));
                 }

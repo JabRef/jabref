@@ -16,6 +16,7 @@
 package net.sf.jabref.sql.importer;
 
 import java.awt.event.ActionEvent;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -201,7 +202,7 @@ public class DbImportAction extends AbstractWorker {
             metaData = (MetaData) res[1];
             if (database != null) {
                 BasePanel pan = frame.addTab(database, null, metaData,
-                        Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
+                        Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)), true);
                 pan.metaData().setDBStrings(dbs);
                 frame.setTabTitle(pan, res[2] + "(Imported)", "Imported DB");
                 pan.markBaseChanged();

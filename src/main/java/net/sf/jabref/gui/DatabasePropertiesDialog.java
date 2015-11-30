@@ -18,6 +18,7 @@ package net.sf.jabref.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Vector;
 
@@ -25,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -92,7 +94,8 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Localization.lang("Database properties"), true);
-        encoding = new JComboBox<>(Encodings.ENCODINGS);
+        encoding = new JComboBox<>();
+        encoding.setModel(new DefaultComboBoxModel(Encodings.ENCODINGS));
         ok = new JButton(Localization.lang("Ok"));
         cancel = new JButton(Localization.lang("Cancel"));
         init(parent);
@@ -394,8 +397,8 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.putData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG, serialized);
         }
 
-        String oldEncoding = panel.getEncoding();
-        String newEncoding = (String) encoding.getSelectedItem();
+        Charset oldEncoding = panel.getEncoding();
+        Charset newEncoding = Charset.forName((String) encoding.getSelectedItem());
         panel.setEncoding(newEncoding);
 
         Vector<String> dir = new Vector<>(1);

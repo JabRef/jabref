@@ -26,6 +26,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -726,7 +727,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // Create a new BasePanel for the entries:
                     BibtexDatabase base = new BibtexDatabase();
                     panel = new BasePanel(frame, base, null, new MetaData(),
-                            Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+                            Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)));
                 }
 
                 boolean groupingCanceled = false;

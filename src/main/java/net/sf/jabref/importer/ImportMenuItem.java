@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,7 +37,6 @@ import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
@@ -194,7 +194,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     diag.setVisible(true);
                     diag.toFront();
                 } else {
-                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
+                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(),
+                            Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)), true);
                     frame.output(Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 }
             } else {

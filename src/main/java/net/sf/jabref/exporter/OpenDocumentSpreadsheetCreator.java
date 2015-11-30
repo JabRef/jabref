@@ -26,6 +26,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -45,7 +47,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
 
     @Override
     public void performExport(final BibtexDatabase database, final MetaData metaData, final String file,
-            final String encoding, Set<String> keySet) throws Exception {
+            final Charset encoding, Set<String> keySet) throws Exception {
         OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, keySet);
     }
 
@@ -103,7 +105,8 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
 
         try {
-            try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8")) {
+            try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
+
                 DOMSource source = new DOMSource(od.getDOMrepresentation());
                 StreamResult result = new StreamResult(ps);
                 Transformer trans = TransformerFactory.newInstance().newTransformer();

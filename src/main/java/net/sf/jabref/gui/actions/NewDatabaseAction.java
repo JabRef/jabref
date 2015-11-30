@@ -10,12 +10,13 @@ import net.sf.jabref.model.database.BibtexDatabase;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.nio.charset.Charset;
 
 /**
  * The action concerned with opening a new database.
  */
 public class NewDatabaseAction extends MnemonicAwareAction {
-    private JabRefFrame jabRefFrame;
+    private final JabRefFrame jabRefFrame;
 
     public NewDatabaseAction(JabRefFrame jabRefFrame) {
         super(IconTheme.JabRefIcon.NEW.getIcon());
@@ -29,7 +30,8 @@ public class NewDatabaseAction extends MnemonicAwareAction {
     public void actionPerformed(ActionEvent e) {
         // Create a new, empty, database.
         BibtexDatabase database = new BibtexDatabase();
-        jabRefFrame.addTab(database, null, new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
+        jabRefFrame.addTab(database, null, new MetaData(),
+                Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)), true);
         jabRefFrame.output(Localization.lang("New database created."));
     }
 }

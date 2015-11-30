@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -367,13 +368,13 @@ public class JabRef {
                                 System.out.println(Localization.lang("Saving") + ": " + data[0]);
                                 SaveSession session = FileActions.saveDatabase(pr.getDatabase(), pr.getMetaData(),
                                         new File(data[0]), Globals.prefs, false, false,
-                                        Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), false);
+                                        Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
                                             + Localization.lang(
                                                     "The chosen encoding '%0' could not encode the following characters: ",
-                                                    session.getEncoding())
+                                                    session.getEncoding().displayName())
                                             + session.getWriter().getProblemCharacters());
                                 }
                                 session.commit();
@@ -454,13 +455,13 @@ public class JabRef {
                                 System.out.println(Localization.lang("Saving") + ": " + subName);
                                 SaveSession session = FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
                                         new File(subName), Globals.prefs, false, false,
-                                        Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), false);
+                                        Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
                                             + Localization.lang(
                                                     "The chosen encoding '%0' could not encode the following characters: ",
-                                                    session.getEncoding())
+                                                    session.getEncoding().displayName())
                                             + session.getWriter().getProblemCharacters());
                                 }
                                 session.commit();
@@ -825,7 +826,7 @@ public class JabRef {
                 return ParserResult.FILE_LOCKED;
             }
 
-            String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
+            Charset encoding = Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
             ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
             if (pr == null) {
                 pr = new ParserResult(null, null, null);

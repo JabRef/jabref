@@ -26,7 +26,7 @@ public class PreferencesMigrations {
                 newGen = genFields.replaceAll(";abstract;", ";");
             } else if (genFields.indexOf("abstract;") == 0) {
                 newGen = genFields.replaceAll("abstract;", "");
-            } else if (genFields.indexOf(";abstract") == genFields.length() - 9) {
+            } else if (genFields.indexOf(";abstract") == (genFields.length() - 9)) {
                 newGen = genFields.replaceAll(";abstract", "");
             } else {
                 newGen = genFields;

@@ -26,6 +26,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Fetch or search from GVK http://gso.gbv.de/sru/DB=2.1/
@@ -90,7 +91,7 @@ public class GVKFetcher implements EntryFetcher {
         // Jeden einzelnen Suchbegriff URL-Encodieren
         for (int x = 0; x < qterms.length; x++) {
             try {
-                qterms[x] = URLEncoder.encode(qterms[x], "UTF-8");
+                qterms[x] = URLEncoder.encode(qterms[x], StandardCharsets.UTF_8.name());
             } catch (UnsupportedEncodingException e) {
                 LOGGER.error("Unsupported encoding", e);
             }
