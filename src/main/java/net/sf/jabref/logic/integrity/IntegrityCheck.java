@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.integrity;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -51,7 +53,9 @@ public class IntegrityCheck {
 
         data = entry.getField("title");
         if (data != null) {
-            TITLE_CHECKER.check(data.toString(), "title", entry, result);
+            if(!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+                TITLE_CHECKER.check(data.toString(), "title", entry, result);
+            }
             BRACKET_CHECKER.check(data.toString(), "title", entry, result);
         }
 
