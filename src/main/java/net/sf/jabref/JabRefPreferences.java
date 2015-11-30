@@ -221,7 +221,6 @@ public class JabRefPreferences {
     public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
-    public static final String HISTORY_SIZE = "historySize";
     public static final String RECENT_FILES = "recentFiles";
     public static final String GENERAL_FIELDS = "generalFields";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
@@ -589,7 +588,6 @@ public class JabRefPreferences {
         defaults.put(GENERAL_FIELDS, "crossref;keywords;file;doi;url;urldate;"
                 + "pdf;comment;owner");
 
-        defaults.put(HISTORY_SIZE, 8);
         defaults.put(FONT_STYLE, java.awt.Font.PLAIN);
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
