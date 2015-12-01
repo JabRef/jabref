@@ -144,51 +144,6 @@ public class BibtexParser {
         return false;
     }
 
-    private String dumpTextReadSoFarToString() {
-        StringBuilder entry = new StringBuilder();
-        while (!pureTextFromFile.isEmpty()) {
-            entry.append(pureTextFromFile.pollFirst());
-        }
-
-        String result = entry.toString();
-        int indexOfAt = entry.indexOf("@");
-
-        // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry
-        if (indexOfAt == -1) {
-            return purgeEOFCharacters(entry);
-        } else {
-
-            //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
-            int runningIndex = indexOfAt - 1;
-            while (runningIndex >= 0) {
-                if (!Character.isWhitespace(result.charAt(runningIndex))) {
-                    break;
-                }
-                runningIndex--;
-            }
-
-            // only keep newlines if there is an entry before
-            if (runningIndex > 0 && !"}".equals(result.charAt(runningIndex - 1))) {
-                result = result.substring(indexOfAt);
-            } else {
-                result = result.substring(runningIndex + 1);
-            }
-            return result;
-        }
-    }
-
-    private String purgeEOFCharacters(StringBuilder input) {
-
-        StringBuilder remainingText = new StringBuilder();
-            for(Character character: input.toString().toCharArray()){
-                if (!(isEOFCharacter(character))){
-                    remainingText.append(character);
-                }
-            }
-
-        return remainingText.toString();
-    }
-
     /**
      * Will parse the BibTex-Data found when reading from reader.
      * <p>
@@ -348,7 +303,7 @@ public class BibtexParser {
             // Instantiate meta data:
             parserResult.setMetaData(new MetaData(meta, database));
 
-            if(lastParsedEntry != null) {
+            if (lastParsedEntry != null) {
                 // read remaining content of file and add it to the parsed serialization of the last entry
                 lastParsedEntry.setParsedSerialization(lastParsedEntry.getParsedSerialization() + dumpTextReadSoFarToString());
             }
@@ -364,6 +319,62 @@ public class BibtexParser {
         database = new BibtexDatabase();
         entryTypes = new HashMap<>(); // To store custem entry types parsed.
         parserResult = new ParserResult(database, null, entryTypes);
+    }
+
+    /**
+     * Puts all text that has been read from the reader, including newlines, etc., since the last call of this method into a string.
+     * Removes the JabRef file header, if it is found
+     *
+     * @return the text read so far
+     */
+    private String dumpTextReadSoFarToString() {
+        StringBuilder entry = new StringBuilder();
+        while (!pureTextFromFile.isEmpty()) {
+            entry.append(pureTextFromFile.pollFirst());
+        }
+
+        String result = entry.toString();
+        int indexOfAt = entry.indexOf("@");
+
+        // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
+        if (indexOfAt == -1) {
+            return purgeEOFCharacters(entry);
+        } else {
+
+            //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
+            int runningIndex = indexOfAt - 1;
+            while (runningIndex >= 0) {
+                if (!Character.isWhitespace(result.charAt(runningIndex))) {
+                    break;
+                }
+                runningIndex--;
+            }
+
+            // only keep newlines if there is an entry before
+            if (runningIndex > 0 && !"}".equals(result.charAt(runningIndex - 1))) {
+                result = result.substring(indexOfAt);
+            } else {
+                result = result.substring(runningIndex + 1);
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Removes all eof characters from a StringBuilder and returns a new String with the resulting content
+     *
+     * @return a String without eof characters
+     */
+    private String purgeEOFCharacters(StringBuilder input) {
+
+        StringBuilder remainingText = new StringBuilder();
+        for (Character character : input.toString().toCharArray()) {
+            if (!(isEOFCharacter(character))) {
+                remainingText.append(character);
+            }
+        }
+
+        return remainingText.toString();
     }
 
     private void skipWhitespace() throws IOException {
