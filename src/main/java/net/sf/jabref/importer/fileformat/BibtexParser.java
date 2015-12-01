@@ -181,7 +181,7 @@ public class BibtexParser {
 
         StringBuilder remainingText = new StringBuilder();
             for(Character character: input.toString().toCharArray()){
-                if (!((character == -1) || (character == 65535))){
+                if (!(isEOFCharacter(character))){
                     remainingText.append(character);
                 }
             }
@@ -367,7 +367,7 @@ public class BibtexParser {
 
         while (true) {
             c = read();
-            if ((c == -1) || (c == 65535)) {
+            if (isEOFCharacter(c)) {
                 eof = true;
                 return;
             }
@@ -382,6 +382,10 @@ public class BibtexParser {
         }
     }
 
+    private boolean isEOFCharacter(int c) {
+        return (c == -1) || (c == 65535);
+    }
+
     private String skipAndRecordWhitespace(int j) throws IOException {
         int c;
         StringBuilder sb = new StringBuilder();
@@ -390,7 +394,7 @@ public class BibtexParser {
         }
         while (true) {
             c = read();
-            if ((c == -1) || (c == 65535)) {
+            if (isEOFCharacter(c)) {
                 eof = true;
                 return sb.toString();
             }
@@ -826,7 +830,7 @@ public class BibtexParser {
         while (!((peek() == '}') && (brackets == 0))) {
 
             int j = read();
-            if ((j == -1) || (j == 65535)) {
+            if (isEOFCharacter(j)) {
                 throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
             } else if (j == '{') {
                 brackets++;
@@ -869,7 +873,7 @@ public class BibtexParser {
         while (!((peek() == '}') && (brackets == 0))) {
 
             int j = read();
-            if ((j == -1) || (j == 65535)) {
+            if (isEOFCharacter(j)) {
                 throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
             } else if (j == '{') {
                 brackets++;
@@ -893,7 +897,7 @@ public class BibtexParser {
 
         while (!((peek() == '"') && (brackets == 0))) {
             int j = read();
-            if ((j == -1) || (j == 65535)) {
+            if (isEOFCharacter(j)) {
                 throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
             } else if (j == '{') {
                 brackets++;
@@ -923,7 +927,7 @@ public class BibtexParser {
             // do nothing
         }
 
-        if ((c == -1) || (c == 65535)) {
+        if (isEOFCharacter(c)) {
             eof = true;
         }
 
