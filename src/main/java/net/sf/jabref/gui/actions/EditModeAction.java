@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 
 public class EditModeAction extends AbstractAction {
     public EditModeAction() {
-        putValue(Action.NAME, Localization.lang("Switch to %0 mode", getOppositeMode()));
+        putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", getOppositeMode()));
     }
 
     @Override
@@ -22,7 +22,7 @@ public class EditModeAction extends AbstractAction {
             Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, true);
         }
         // update menu label
-        putValue(Action.NAME, Localization.lang("Switch to %0 mode", getOppositeMode()));
+        putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", getOppositeMode()));
         // TODO: enable this change per file and without GUI restart
         JOptionPane.showMessageDialog(null,
                     Localization.lang("You have toggled the %0 mode.", getMode()).concat(" ")
@@ -35,12 +35,12 @@ public class EditModeAction extends AbstractAction {
     }
 
     private String getOppositeMode() {
-        String mode = isBiblatexMode() ? "BibTeX" : "Biblatex";
+        String mode = isBiblatexMode() ? "BibTeX" : "BibLaTeX";
         return mode;
     }
 
     private String getMode() {
-        String mode = isBiblatexMode() ? "Biblatex" : "BibTeX";
+        String mode = isBiblatexMode() ? "BibLaTeX" : "BibTeX";
         return mode;
     }
 }

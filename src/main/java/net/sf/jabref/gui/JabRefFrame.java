@@ -665,7 +665,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     public void setWindowTitle() {
         BasePanel panel = getCurrentBasePanel();
-        String mode = biblatexMode ? " (" + Localization.lang("%0 mode", "Biblatex") + ")" : " (" + Localization.lang("%0 mode", "BibTeX") + ")";
+        String mode = biblatexMode ? " (" + Localization.lang("%0 mode", "BibLaTeX") + ")" : " (" + Localization.lang("%0 mode", "BibTeX") + ")";
 
         // no database open
         if (panel == null) {
