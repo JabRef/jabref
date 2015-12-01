@@ -14,7 +14,10 @@ public class CaseKeeperTest {
 
     @Test
     public void test() {
-        fail("Not yet implemented");
+        CaseKeeper ck = new CaseKeeper();
+
+        assertEquals("{VLSI}", ck.format("VLSI"));
+        assertEquals("{VLSI}", ck.format("{VLSI}"));
     }
 
 }

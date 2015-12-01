@@ -14,7 +14,10 @@ public class UnitFormatterTest {
 
     @Test
     public void test() {
-        fail("Not yet implemented");
+        UnitFormatter uf = new UnitFormatter();
+
+        assertEquals("1~{A}", uf.format("1 A"));
+        assertEquals("1\\mbox{-}{mA}", uf.format("1-mA"));
     }
 
 }

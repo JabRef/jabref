@@ -26,10 +26,24 @@ public class LatexCleanup {
         this.entry = entry;
     }
 
+    public LatexCleanup() {
+        this.entry = null;
+    }
+
     public void cleanup() {
+        if (this.entry == null) {
+            return;
+        }
+
         final String field = "title";
 
-        String newValue = entry.getField(field);
+        String newValue = format(entry.getField(field));
+
+        entry.setField(field, newValue);
+    }
+
+    public String format(String oldString) {
+        String newValue = oldString;
 
         // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted
         newValue = newValue.replace("$$", "").replaceAll("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{",
@@ -44,8 +58,7 @@ public class LatexCleanup {
         newValue = newValue.replace("  ", " "); // Clean up
         newValue = newValue.replace("$$", "");
         newValue = newValue.replace(" )$", ")$");
-
-        entry.setField(field, newValue);
+        return newValue;
     }
 
 }
