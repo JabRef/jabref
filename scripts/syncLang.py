@@ -318,7 +318,7 @@ Option can be one of the following:
 
     -d: Search the language files for empty and duplicate translations. 
         For each duplicate set found, a list will be printed showing the various 
-        translations for the same key. There is currently to option to remove duplicates
+        translations for the same key. There is currently no option to remove duplicates
         automatically.
         
     -s [-u]: Search the Java source files for language keys. All keys that are found in the source files
