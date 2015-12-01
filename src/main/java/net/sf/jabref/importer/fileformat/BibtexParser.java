@@ -161,15 +161,10 @@ public class BibtexParser {
         }
         // Bibtex related contents.
         initializeParserResult();
+
         HashMap<String, String> meta = new HashMap<>();
 
-        // First see if we can find the version number of the JabRef version that
-        // wrote the file:
-        String versionNumber = readJabRefVersionNumber();
-        if (versionNumber != null) {
-            parserResult.setJabrefVersion(versionNumber);
-            setMajorMinorVersions();
-        }
+        setVersionNumber();
 
         skipWhitespace();
 
@@ -320,6 +315,17 @@ public class BibtexParser {
         entryTypes = new HashMap<>(); // To store custem entry types parsed.
         parserResult = new ParserResult(database, null, entryTypes);
     }
+
+    private void setVersionNumber() throws IOException {
+        // First see if we can find the version number of the JabRef version that
+        // wrote the file:
+        String versionNumber = readJabRefVersionNumber();
+        if (versionNumber != null) {
+            parserResult.setJabrefVersion(versionNumber);
+            setMajorMinorVersions();
+        }
+    }
+
 
     /**
      * Puts all text that has been read from the reader, including newlines, etc., since the last call of this method into a string.
