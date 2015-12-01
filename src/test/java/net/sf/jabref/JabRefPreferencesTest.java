@@ -3,6 +3,7 @@ package net.sf.jabref;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,6 +33,12 @@ public class JabRefPreferencesTest {
         String actual = prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void getDefaultEncodingReturnsPreviouslyStoredEncoding() {
+        prefs.setDefaultEncoding(StandardCharsets.UTF_16BE);
+        assertEquals(StandardCharsets.UTF_16BE, prefs.getDefaultEncoding());
     }
 
     @After
