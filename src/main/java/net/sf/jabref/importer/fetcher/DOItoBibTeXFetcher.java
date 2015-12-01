@@ -31,6 +31,8 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
+import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.util.Util;

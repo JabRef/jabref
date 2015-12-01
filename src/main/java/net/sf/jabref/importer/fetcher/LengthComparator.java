@@ -2,7 +2,7 @@ package net.sf.jabref.importer.fetcher;
 
 import java.util.Comparator;
 
-class LengthComparator implements Comparator<String> {
+public class LengthComparator implements Comparator<String> {
 
     @Override
     public int compare(String o1, String o2) {

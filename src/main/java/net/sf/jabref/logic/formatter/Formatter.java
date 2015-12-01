@@ -1,7 +1,13 @@
 package net.sf.jabref.logic.formatter;
 
 /**
- * Formatter Interface
+ * The Formatter is used for a Filter design-pattern. Implementing classes have to accept a String and returned a
+ * formatted version of it.
+ *
+ * Example:
+ *
+ * "John von Neumann" => "von Neumann, John"
+ *
  */
 public interface Formatter {
     /**
