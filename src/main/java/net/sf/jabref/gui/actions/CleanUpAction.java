@@ -34,14 +34,16 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.HTMLConverter;
-import net.sf.jabref.importer.fetcher.CaseKeeper;
-import net.sf.jabref.importer.fetcher.UnitFormatter;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
+import net.sf.jabref.logic.cleanup.CaseKeeper;
+import net.sf.jabref.logic.cleanup.LatexCleanup;
 import net.sf.jabref.logic.cleanup.PageNumbersCleanup;
+import net.sf.jabref.logic.cleanup.UnitFormatter;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -704,21 +706,8 @@ public class CleanUpAction extends AbstractWorker {
         if (oldValue == null) {
             return;
         }
-        String newValue = oldValue;
-
-        // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted
-        newValue = newValue.replace("$$", "").replaceAll("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{", "$1");
-        // Move numbers, +, -, /, and brackets into equations
-        newValue = newValue.replaceAll("(([^$]|\\\\\\$)*)\\$", "$1@@"); // Replace $, but not \$ with @@
-        newValue = newValue.replaceAll("([^@]*)@@([^@]*)@@", "$1\\$$2@@"); // Replace every other @@ with $
-        //newValue = newValue.replaceAll("([0-9\\(\\.]+) \\$","\\$$1\\\\ "); // Move numbers followed by a space left of $ inside the equation, e.g., 0.35 $\mu$m
-        newValue = newValue.replaceAll("([0-9\\(\\.]+[ ]?[-+/]?[ ]?)\\$", "\\$$1"); // Move numbers, possibly with operators +, -, or /,  left of $ into the equation
-        newValue = newValue.replaceAll("@@([ ]?[-+/]?[ ]?[0-9\\)\\.]+)", " $1@@"); // Move numbers right of @@ into the equation
-        newValue = newValue.replace("@@", "$"); // Replace all @@ with $
-        newValue = newValue.replace("  ", " "); // Clean up
-        newValue = newValue.replace("$$", "");
-        newValue = newValue.replace(" )$", ")$");
-
+        new LatexCleanup(entry).cleanup();
+        String newValue = entry.getField(field);
         if (!oldValue.equals(newValue)) {
             entry.setField(field, newValue);
             ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));

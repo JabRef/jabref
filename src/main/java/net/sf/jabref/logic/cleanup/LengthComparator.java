@@ -1,4 +1,4 @@
-package net.sf.jabref.importer.fetcher;
+package net.sf.jabref.logic.cleanup;
 
 import java.util.Comparator;
 
