@@ -93,13 +93,43 @@ public class BibtexEntryWriterTest {
     }
 
     @Test
-    public void roundTripWithPrependingNewlines() throws IOException {
+         public void roundTripWithPrependingNewlines() throws IOException {
         String bibtexEntry = "\r\n@Article{test," + Globals.NEWLINE +
                 "  Author                   = {Foo Bar}," + Globals.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
                 "  Note                     = {some note}," + Globals.NEWLINE +
                 "  Number                   = {1}" + Globals.NEWLINE +
                 "}";
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+
+        Collection<BibtexEntry> entries = result.getDatabase().getEntries();
+        Assert.assertEquals(1, entries.size());
+
+        BibtexEntry entry = entries.iterator().next();
+        Assert.assertEquals("test", entry.getCiteKey());
+        Assert.assertEquals(5, entry.getFieldNames().size());
+        Set<String> fields = entry.getFieldNames();
+        Assert.assertTrue(fields.contains("author"));
+        Assert.assertEquals("Foo Bar", entry.getField("author"));
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter);
+        String actual = stringWriter.toString();
+
+        assertEquals(bibtexEntry, actual);
+    }
+
+    @Test
+    public void roundTripWithAppendedNewlines() throws IOException {
+        String bibtexEntry = "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}\n\n";
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
