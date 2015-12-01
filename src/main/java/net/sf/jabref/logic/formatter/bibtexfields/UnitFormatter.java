@@ -17,9 +17,9 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 
 import java.util.Arrays;
 
-import net.sf.jabref.importer.fetcher.LengthComparator;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
 public class UnitFormatter implements Formatter {
 
@@ -111,7 +111,7 @@ public class UnitFormatter implements Formatter {
             return null;
         }
 
-        Arrays.sort(listOfWords, new LengthComparator()); // LengthComparator from CaseKeeper.java
+        Arrays.sort(listOfWords, new StringLengthComparator()); // LengthComparator from CaseKeeper.java
 
         // Replace the hyphen in 12-bit etc with a non-breaking hyphen, will also avoid bad casing of 12-Bit
         text = text.replaceAll("([0-9,\\.]+)-([Bb][Ii][Tt])", "$1\\\\mbox\\{-\\}$2");
