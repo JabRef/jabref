@@ -32,6 +32,7 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import javax.swing.*;
@@ -1667,5 +1668,13 @@ public class JabRefPreferences {
      */
     void overwritePreferences(JabRefPreferences owPrefs) {
         singleton = owPrefs;
+    }
+
+    public Charset getDefaultEncoding() {
+        return Charset.forName(get(JabRefPreferences.DEFAULT_ENCODING));
+    }
+
+    public void setDefaultEncoding(Charset encoding) {
+        put(JabRefPreferences.DEFAULT_ENCODING, encoding.name());
     }
 }

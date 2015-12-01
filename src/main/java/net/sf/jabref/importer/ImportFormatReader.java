@@ -351,7 +351,7 @@ public class ImportFormatReader {
     public static Reader getReaderDefaultEncoding(InputStream in)
             throws IOException {
         InputStreamReader reader;
-        reader = new InputStreamReader(in, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+        reader = new InputStreamReader(in, Globals.prefs.getDefaultEncoding());
 
         return reader;
     }
@@ -440,7 +440,7 @@ public class ImportFormatReader {
         // Finally, if all else fails, see if it is a BibTeX file:
         try {
             ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
-                    Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)));
+ Globals.prefs.getDefaultEncoding());
             if ((pr.getDatabase().getEntryCount() > 0)
                     || (pr.getDatabase().getStringCount() > 0)) {
                 pr.setFile(new File(filename));

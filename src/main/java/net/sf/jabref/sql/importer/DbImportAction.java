@@ -16,7 +16,6 @@
 package net.sf.jabref.sql.importer;
 
 import java.awt.event.ActionEvent;
-import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
@@ -202,7 +200,7 @@ public class DbImportAction extends AbstractWorker {
             metaData = (MetaData) res[1];
             if (database != null) {
                 BasePanel pan = frame.addTab(database, null, metaData,
-                        Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)), true);
+ Globals.prefs.getDefaultEncoding(), true);
                 pan.metaData().setDBStrings(dbs);
                 frame.setTabTitle(pan, res[2] + "(Imported)", "Imported DB");
                 pan.markBaseChanged();

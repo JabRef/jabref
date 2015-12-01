@@ -1612,7 +1612,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             metaData = new MetaData();
         }
         if (encoding == null) {
-            encoding = Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+            encoding = Globals.prefs.getDefaultEncoding();
         }
 
         BasePanel bp = new BasePanel(JabRefFrame.this, db, file, metaData, encoding);

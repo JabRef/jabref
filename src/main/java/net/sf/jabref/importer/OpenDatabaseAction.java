@@ -235,7 +235,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 String fileName = file.getPath();
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                Charset encoding = Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+                Charset encoding = Globals.prefs.getDefaultEncoding();
 
                 if (FileBasedLock.hasLockFile(file)) {
                     long modificationTIme = FileBasedLock.getLockFileTimeStamp(file);

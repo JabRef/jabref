@@ -198,7 +198,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
 
-        Charset enc = Charset.forName(prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+        Charset enc = Globals.prefs.getDefaultEncoding();
         encodings.setSelectedItem(enc);
 
         String oldLan = prefs.get(JabRefPreferences.LANGUAGE);
@@ -240,7 +240,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.WRAPPED_USERNAME = '[' + owner + ']';
         prefs.put(JabRefPreferences.TIME_STAMP_FORMAT, timeStampFormat.getText().trim());
         prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
-        prefs.put(JabRefPreferences.DEFAULT_ENCODING, encodings.getSelectedItem().toString());
+        prefs.setDefaultEncoding((Charset) encodings.getSelectedItem());
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
 
