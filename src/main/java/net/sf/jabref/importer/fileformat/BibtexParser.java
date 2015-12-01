@@ -21,6 +21,7 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,6 +67,7 @@ public class BibtexParser {
     private static final Integer LOOKAHEAD = 64;
     private final boolean autoDoubleBraces;
     private Deque<Character> pureTextFromFile = new LinkedList<>();
+    private BibtexEntry lastParsedEntry;
 
 
     public BibtexParser(Reader in) {
@@ -147,24 +149,44 @@ public class BibtexParser {
         while (!pureTextFromFile.isEmpty()) {
             entry.append(pureTextFromFile.pollFirst());
         }
-        //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
+
         String result = entry.toString();
         int indexOfAt = entry.indexOf("@");
-        int runningIndex = indexOfAt - 1;
-        while (runningIndex >= 0) {
-            if (!Character.isWhitespace(result.charAt(runningIndex))) {
-                break;
-            }
-            runningIndex--;
-        }
 
-        // only keep newlines if there is an entry before
-        if (runningIndex > 0 && !"}".equals(result.charAt(runningIndex - 1))) {
-            result = result.substring(indexOfAt);
+        // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry
+        if (indexOfAt == -1) {
+            return purgeEOFCharacters(entry);
         } else {
-            result = result.substring(runningIndex + 1);
+
+            //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
+            int runningIndex = indexOfAt - 1;
+            while (runningIndex >= 0) {
+                if (!Character.isWhitespace(result.charAt(runningIndex))) {
+                    break;
+                }
+                runningIndex--;
+            }
+
+            // only keep newlines if there is an entry before
+            if (runningIndex > 0 && !"}".equals(result.charAt(runningIndex - 1))) {
+                result = result.substring(indexOfAt);
+            } else {
+                result = result.substring(runningIndex + 1);
+            }
+            return result;
         }
-        return result;
+    }
+
+    private String purgeEOFCharacters(StringBuilder input) {
+
+        StringBuilder remainingText = new StringBuilder();
+            for(Character character: input.toString().toCharArray()){
+                if (!((character == -1) || (character == 65535))){
+                    remainingText.append(character);
+                }
+            }
+
+        return remainingText.toString();
     }
 
     /**
@@ -303,6 +325,7 @@ public class BibtexParser {
 
                         boolean duplicateKey = database.insertEntry(be);
                         be.setParsedSerialization(dumpTextReadSoFarToString());
+                        lastParsedEntry = be;
                         if (duplicateKey) {
                             parserResult.addDuplicateKey(be.getCiteKey());
                         } else if ((be.getCiteKey() == null) || "".equals(be.getCiteKey())) {
@@ -326,6 +349,11 @@ public class BibtexParser {
 
             // Instantiate meta data:
             parserResult.setMetaData(new MetaData(meta, database));
+
+            if(lastParsedEntry != null) {
+                // read remaining content of file and add it to the parsed serialization of the last entry
+                lastParsedEntry.setParsedSerialization(lastParsedEntry.getParsedSerialization() + dumpTextReadSoFarToString());
+            }
 
             return parserResult;
         } catch (KeyCollisionException kce) {
