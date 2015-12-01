@@ -112,7 +112,7 @@ public class URLDownload {
             return output.toString();
         } catch (IOException e) {
             LOGGER.warn("Could not copy input", e);
-            return "";
+            throw e;
         }
     }
 
@@ -136,6 +136,7 @@ public class URLDownload {
             copy(input, output);
         } catch (IOException e) {
             LOGGER.warn("Could not copy input", e);
+            throw e;
         }
     }
 

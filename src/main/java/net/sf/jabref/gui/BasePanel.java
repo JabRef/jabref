@@ -184,7 +184,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private final StartStopListAction<BibtexEntry> filterSearchToggle;
 
-    private final StartStopListAction<BibtexEntry> filterGroupToggle;;
+    private final StartStopListAction<BibtexEntry> filterGroupToggle;
 
     // Returns a collection of AutoCompleters, which are populated from the current database
     public ContentAutoCompleters getAutoCompleters() {

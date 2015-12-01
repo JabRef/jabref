@@ -32,8 +32,6 @@ import java.util.regex.Matcher;
 import javax.swing.AbstractAction;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
 import javax.swing.text.*;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;

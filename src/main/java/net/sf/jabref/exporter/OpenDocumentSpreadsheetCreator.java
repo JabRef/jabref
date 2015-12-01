@@ -128,8 +128,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
 
     private static void addFromResource(String resource, OutputStream out) {
         URL url = OpenDocumentSpreadsheetCreator.class.getResource(resource);
-        try {
-            InputStream in = url.openStream();
+        try (InputStream in = url.openStream()) {
             byte[] buffer = new byte[256];
             synchronized (out) {
                 while (true) {

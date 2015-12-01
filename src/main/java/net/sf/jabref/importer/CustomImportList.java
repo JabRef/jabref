@@ -23,11 +23,12 @@
  Further information about the GNU GPL is available at:
  http://www.gnu.org/copyleft/gpl.ja.html
   Copyright (C) 2005-2014 JabRef contributors.
- 
+
 */
 package net.sf.jabref.importer;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -38,8 +39,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 
 /**
- * Collection of user defined custom import formats. 
- * 
+ * Collection of user defined custom import formats.
+ *
  * <p>The collection can be stored and retrieved from Preferences. It is sorted by the default
  * order of {@link ImportFormat}.</p>
  */
@@ -47,7 +48,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
     /**
      * Object with data for a custom importer.
-     * 
+     *
      * <p>Is also responsible for instantiating the class loader.</p>
      */
     public static class Importer implements Comparable<Importer> {
@@ -116,7 +117,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
         @Override
         public boolean equals(Object o) {
-            return o != null && o instanceof Importer && this.getName().equals(((Importer) o).getName());
+            return (o != null) && (o instanceof Importer) && this.getName().equals(((Importer) o).getName());
         }
 
         @Override
@@ -134,12 +135,14 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
             return this.name;
         }
 
-        public ImportFormat getInstance() throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-            URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()});
-            Class<?> clazz = Class.forName(className, true, cl);
-            ImportFormat importFormat = (ImportFormat) clazz.newInstance();
-            importFormat.setIsCustomImporter(true);
-            return importFormat;
+        public ImportFormat getInstance() throws IOException, MalformedURLException, ClassNotFoundException,
+                InstantiationException, IllegalAccessException {
+            try (URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()})) {
+                Class<?> clazz = Class.forName(className, true, cl);
+                ImportFormat importFormat = (ImportFormat) clazz.newInstance();
+                importFormat.setIsCustomImporter(true);
+                return importFormat;
+            }
         }
     }
 
@@ -173,10 +176,10 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
     /**
      * Adds an importer.
-     * 
+     *
      * <p>If an old one equal to the new one was contained, the old
      * one is replaced.</p>
-     * 
+     *
      * @param customImporter new (version of an) importer
      * @return  if the importer was contained
      */

@@ -34,13 +34,14 @@ public class PageNumbersFormatter implements Formatter {
      *     Invalid -> Invalid
      * </example>
      */
+    @Override
     public String format(String value) {
         final String rejectLiterals = "[^0-9,\\-\\+]";
         final Pattern pagesPattern = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
         final String replace = "$1--$2";
 
         // nothing to do
-        if (value == null || value.isEmpty()) {
+        if ((value == null) || value.isEmpty()) {
             return value;
         }
 

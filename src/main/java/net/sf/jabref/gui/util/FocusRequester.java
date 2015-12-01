@@ -18,7 +18,6 @@ package net.sf.jabref.gui.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.swing.SwingUtilities;
 import java.awt.Component;
 
 public class FocusRequester implements Runnable {

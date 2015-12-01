@@ -19,7 +19,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -33,6 +32,9 @@ import net.sf.jabref.MetaData;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 
@@ -41,6 +43,7 @@ class PdfPreviewPanel extends JPanel {
     private final JLabel picLabel;
     private final MetaData metaData;
 
+    private static final Log LOGGER = LogFactory.getLog(PdfPreviewPanel.class);
 
     public PdfPreviewPanel(MetaData metaData) {
         this.metaData = metaData;
@@ -49,50 +52,33 @@ class PdfPreviewPanel extends JPanel {
     }
 
     private void renderPDFFile(File file) {
-        InputStream input;
-        try {
-            input = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return;
-        }
 
-        PDDocument document;
-        try {
-            document = PDDocument.load(input);
+        try (InputStream input = new FileInputStream(file);
+                PDDocument document = PDDocument.load(input)) {
+            List<PDPage> pages = document.getDocumentCatalog().getAllPages();
+
+            PDPage page = pages.get(0);
+            BufferedImage image;
+            try {
+                image = page.convertToImage();
+            } catch (Exception e1) {
+                // silently ignores all rendering exceptions
+                image = null;
+            }
+
+            if (image != null) {
+                int width = this.getParent().getWidth();
+                int height = this.getParent().getHeight();
+                BufferedImage resImage = resizeImage(image, width, height, BufferedImage.TYPE_INT_RGB);
+                ImageIcon icon = new ImageIcon(resImage);
+                picLabel.setText(null);
+                picLabel.setIcon(icon);
+            } else {
+                clearPreview();
+            }
+
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return;
-        }
-        List<PDPage> pages = document.getDocumentCatalog().getAllPages();
-
-        PDPage page = pages.get(0);
-        BufferedImage image;
-        try {
-            image = page.convertToImage();
-        } catch (Exception e1) {
-            // silently ignores all rendering exceptions
-            image = null;
-        }
-
-        if (image != null) {
-            int width = this.getParent().getWidth();
-            int height = this.getParent().getHeight();
-            BufferedImage resImage = resizeImage(image, width, height, BufferedImage.TYPE_INT_RGB);
-            ImageIcon icon = new ImageIcon(resImage);
-            picLabel.setText(null);
-            picLabel.setIcon(icon);
-        } else {
-            clearPreview();
-        }
-
-        try {
-            document.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.warn("Cannot open file/PDF document", e);
         }
     }
 

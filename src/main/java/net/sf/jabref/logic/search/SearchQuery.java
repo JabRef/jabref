@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescriber;

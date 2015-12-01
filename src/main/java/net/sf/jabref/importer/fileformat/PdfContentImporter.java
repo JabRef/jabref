@@ -205,28 +205,11 @@ public class PdfContentImporter extends ImportFormat {
         return removeNonLettersAtEnd(title);
     }
 
-    private static boolean isYear(String yearStr) {
-        try {
-            Integer.parseInt(yearStr);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     @Override
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
         final ArrayList<BibtexEntry> res = new ArrayList<>(1);
 
-        PDDocument document;
-        try {
-            document = PDDocument.load(in);
-        } catch (IOException e) {
-            LOGGER.error("Could not load document", e);
-            return res;
-        }
-
-        try {
+        try (PDDocument document = PDDocument.load(in)) {
             if (document.isEncrypted()) {
                 LOGGER.error("Encrypted documents are not supported");
                 //return res;
@@ -552,10 +535,9 @@ public class PdfContentImporter extends ImportFormat {
             } else {
                 LOGGER.error("Could not find class", e);
             }
-        } finally {
-            document.close();
+        } catch (IOException e) {
+            LOGGER.error("Could not load document", e);
         }
-
         return res;
     }
 

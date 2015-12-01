@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.logic.search;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

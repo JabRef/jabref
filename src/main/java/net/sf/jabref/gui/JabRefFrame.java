@@ -247,6 +247,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JToggleButton fetcherToggle;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
+    private final AbstractAction editModeAction = new EditModeAction();
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
     private final AbstractAction newDatabaseAction = new NewDatabaseAction(this);
@@ -659,18 +660,26 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
+    /**
+     * Sets the title of the main window.
+     */
     public void setWindowTitle() {
-        // Set window title:
-        BasePanel bp = getCurrentBasePanel();
-        if (bp == null) {
-            setTitle(GUIGlobals.frameTitle);
+        BasePanel panel = getCurrentBasePanel();
+        String mode = biblatexMode ? " (" + Localization.lang("%0 mode", "BibLaTeX") + ")" : " (" + Localization.lang("%0 mode", "BibTeX") + ")";
+
+        // no database open
+        if (panel == null) {
+            setTitle(GUIGlobals.frameTitle + mode);
             return;
         }
-        String star = bp.isBaseChanged() ? "*" : "";
-        if (bp.getDatabaseFile() != null) {
-            setTitle(GUIGlobals.frameTitle + " - " + bp.getDatabaseFile().getPath() + star);
+
+        String changeFlag = panel.isBaseChanged() ? "*" : "";
+
+        if (panel.getDatabaseFile() != null) {
+            String databaseFile = panel.getDatabaseFile().getPath();
+            setTitle(GUIGlobals.frameTitle + " - " + databaseFile + changeFlag + mode);
         } else {
-            setTitle(GUIGlobals.frameTitle + " - " + GUIGlobals.untitledTitle + star);
+            setTitle(GUIGlobals.frameTitle + " - " + GUIGlobals.untitledTitle + changeFlag + mode);
         }
     }
 
@@ -1157,11 +1166,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sessions.add(saveSessionAction);
         file.add(sessions);
         file.add(fileHistory);
-
+        file.addSeparator();
+        file.add(editModeAction);
         file.addSeparator();
         file.add(closeDatabaseAction);
         file.add(quit);
         mb.add(file);
+
         edit.add(undo);
         edit.add(redo);
 

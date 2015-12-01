@@ -26,6 +26,8 @@ public class FileHistory {
     private final JabRefPreferences prefs;
     private final LinkedList<String> history = new LinkedList<>();
 
+    private final int HISTORY_SIZE = 8;
+
 
     public FileHistory(JabRefPreferences prefs) {
         this.prefs = prefs;
@@ -48,7 +50,7 @@ public class FileHistory {
     public void newFile(String filename) {
         history.remove(filename);
         history.addFirst(filename);
-        while (history.size() > prefs.getInt(JabRefPreferences.HISTORY_SIZE)) {
+        while (history.size() > HISTORY_SIZE) {
             history.removeLast();
         }
     }
