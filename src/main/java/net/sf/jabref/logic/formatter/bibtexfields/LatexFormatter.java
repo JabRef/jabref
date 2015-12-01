@@ -4,10 +4,6 @@ import net.sf.jabref.logic.formatter.Formatter;
 
 public class LatexFormatter implements Formatter {
 
-    public LatexFormatter() {
-        // TODO Auto-generated constructor stub
-    }
-
     @Override
     public String getName() {
         return "Latex";

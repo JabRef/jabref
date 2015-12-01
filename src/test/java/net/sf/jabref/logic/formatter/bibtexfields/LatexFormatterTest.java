@@ -2,20 +2,9 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.jabref.model.entry.BibtexEntry;
-
 public class LatexFormatterTest {
-
-    private BibtexEntry entry;
-
-
-    @Before
-    public void setUp() throws Exception {
-        entry = new BibtexEntry();
-    }
 
     @Test
     public void test() {

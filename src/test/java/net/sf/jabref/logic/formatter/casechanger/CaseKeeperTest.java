@@ -2,15 +2,10 @@ package net.sf.jabref.logic.formatter.casechanger;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
 import org.junit.Test;
 
 
 public class CaseKeeperTest {
-
-    @Before
-    public void setUp() throws Exception {
-    }
 
     @Test
     public void test() {
@@ -18,6 +13,8 @@ public class CaseKeeperTest {
 
         assertEquals("{VLSI}", ck.format("VLSI"));
         assertEquals("{VLSI}", ck.format("{VLSI}"));
+        assertEquals("VLsI", ck.format("VLsI"));
+        assertEquals("{VLSI} {VLSI}", ck.format("VLSI {VLSI}"));
     }
 
 }
