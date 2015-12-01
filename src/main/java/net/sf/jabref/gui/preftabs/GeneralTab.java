@@ -69,7 +69,6 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JabRefPreferences prefs;
     private final JComboBox<String> language = new JComboBox<>(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
     private final JComboBox<String> encodings;
-    private final DefaultComboBoxModel encodingsModel;
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
@@ -111,8 +110,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         inspectionWarnDupli = new JCheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
 
         encodings = new JComboBox<>();
-        encodingsModel = new DefaultComboBoxModel(Encodings.ENCODINGS);
-        encodings.setModel(encodingsModel);
+        encodings.setModel(new DefaultComboBoxModel(Encodings.ENCODINGS));
 
         FormLayout layout = new FormLayout
                 ("8dlu, 1dlu, left:170dlu, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref", "");
@@ -201,7 +199,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
 
         Charset enc = Charset.forName(prefs.get(JabRefPreferences.DEFAULT_ENCODING));
-        encodingsModel.setSelectedItem(enc);
+        encodings.setSelectedItem(enc);
 
         String oldLan = prefs.get(JabRefPreferences.LANGUAGE);
 

@@ -398,7 +398,7 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         Charset oldEncoding = panel.getEncoding();
-        Charset newEncoding = Charset.forName((String) encoding.getSelectedItem());
+        Charset newEncoding = (Charset) encoding.getSelectedItem();
         panel.setEncoding(newEncoding);
 
         Vector<String> dir = new Vector<>(1);
