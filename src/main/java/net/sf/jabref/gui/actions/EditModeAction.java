@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 
 public class EditModeAction extends AbstractAction {
     public EditModeAction() {
-        putValue(Action.NAME, Localization.lang("Switch_to_%0_mode", getOppositeMode()));
+        putValue(Action.NAME, Localization.lang("Switch to %0 mode", getOppositeMode()));
     }
 
     @Override
@@ -22,12 +22,12 @@ public class EditModeAction extends AbstractAction {
             Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, true);
         }
         // update menu label
-        putValue(Action.NAME, Localization.lang("Switch_to_%0_mode", getOppositeMode()));
+        putValue(Action.NAME, Localization.lang("Switch to %0 mode", getOppositeMode()));
         // TODO: enable this change per file and without GUI restart
         JOptionPane.showMessageDialog(null,
-                    Localization.lang("You have toggled an edit mode switch.").concat(" ")
+                    Localization.lang("You have toggled the %0 mode.", getMode()).concat(" ")
                             .concat("You must restart JabRef for this change to come into effect."),
-                    Localization.lang("Switch edit mode"), JOptionPane.WARNING_MESSAGE);
+                    Localization.lang("%0 mode", getMode()), JOptionPane.WARNING_MESSAGE);
     }
 
     private boolean isBiblatexMode() {
@@ -36,6 +36,11 @@ public class EditModeAction extends AbstractAction {
 
     private String getOppositeMode() {
         String mode = isBiblatexMode() ? "BibTeX" : "Biblatex";
+        return mode;
+    }
+
+    private String getMode() {
+        String mode = isBiblatexMode() ? "Biblatex" : "BibTeX";
         return mode;
     }
 }
