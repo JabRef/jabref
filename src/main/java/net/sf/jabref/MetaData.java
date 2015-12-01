@@ -19,7 +19,6 @@ import java.io.*;
 import java.util.*;
 
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
@@ -29,6 +28,8 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class MetaData implements Iterable<String> {
 
+    public static final String META_FLAG = "jabref-meta: ";
+    public static final String META_FLAG_OLD = "bibkeeper-meta: ";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
 
@@ -258,7 +259,7 @@ public class MetaData implements Iterable<String> {
         for (String key : sortedKeys) {
             StringBuffer sb = new StringBuffer();
             Vector<String> orderedData = metaData.get(key);
-            sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
+            sb.append("@comment{").append(META_FLAG).append(key).append(":");
             for (int j = 0; j < orderedData.size(); j++) {
                 sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
             }
@@ -273,7 +274,7 @@ public class MetaData implements Iterable<String> {
         if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
             StringBuffer sb = new StringBuffer();
             // write version first
-            sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupsversion:");
+            sb.append("@comment{").append(META_FLAG).append("groupsversion:");
             sb.append("" + VersionHandling.CURRENT_VERSION + ";");
             sb.append("}");
             sb.append(Globals.NEWLINE);
@@ -282,7 +283,7 @@ public class MetaData implements Iterable<String> {
 
             // now write actual groups
             sb = new StringBuffer();
-            sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupstree:");
+            sb.append("@comment{").append(META_FLAG).append("groupstree:");
             sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
             StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);

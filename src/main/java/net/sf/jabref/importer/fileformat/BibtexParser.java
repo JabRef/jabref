@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -302,18 +301,18 @@ public class BibtexParser {
          */
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
         if (comment.substring(0,
-                Math.min(comment.length(), GUIGlobals.META_FLAG.length())).equals(
-                GUIGlobals.META_FLAG)
+                Math.min(comment.length(), MetaData.META_FLAG.length())).equals(
+                MetaData.META_FLAG)
                 || comment.substring(0,
-                Math.min(comment.length(), GUIGlobals.META_FLAG_OLD.length()))
-                .equals(GUIGlobals.META_FLAG_OLD)) {
+                Math.min(comment.length(), MetaData.META_FLAG_OLD.length()))
+                .equals(MetaData.META_FLAG_OLD)) {
 
             String rest;
-            if (comment.substring(0, GUIGlobals.META_FLAG.length()).equals(
-                    GUIGlobals.META_FLAG)) {
-                rest = comment.substring(GUIGlobals.META_FLAG.length());
+            if (comment.substring(0, MetaData.META_FLAG.length()).equals(
+                    MetaData.META_FLAG)) {
+                rest = comment.substring(MetaData.META_FLAG.length());
             } else {
-                rest = comment.substring(GUIGlobals.META_FLAG_OLD.length());
+                rest = comment.substring(MetaData.META_FLAG_OLD.length());
             }
 
             int pos = rest.indexOf(':');
