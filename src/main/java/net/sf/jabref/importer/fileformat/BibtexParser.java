@@ -205,10 +205,8 @@ public class BibtexParser {
             return parserResult;
         }
         // Bibtex related contents.
-        database = new BibtexDatabase();
+        initializeParserResult();
         HashMap<String, String> meta = new HashMap<>();
-        entryTypes = new HashMap<>(); // To store custem entry types parsed.
-        parserResult = new ParserResult(database, null, entryTypes);
 
         // First see if we can find the version number of the JabRef version that
         // wrote the file:
@@ -360,6 +358,12 @@ public class BibtexParser {
             // kce.printStackTrace();
             throw new IOException("Duplicate ID in bibtex file: " + kce);
         }
+    }
+
+    private void initializeParserResult() {
+        database = new BibtexDatabase();
+        entryTypes = new HashMap<>(); // To store custem entry types parsed.
+        parserResult = new ParserResult(database, null, entryTypes);
     }
 
     private void skipWhitespace() throws IOException {
