@@ -296,12 +296,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Back"), prefs.getKey(KeyBinds.BACK), IconTheme.JabRefIcon.LEFT.getIcon());
     final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
             Localization.lang("Delete entry"), prefs.getKey(KeyBinds.DELETE_ENTRY), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
-    private final AbstractAction copy = new EditAction(Actions.COPY, Localization.lang("Copy"),
-            IconTheme.JabRefIcon.COPY.getIcon());
-    private final AbstractAction paste = new EditAction(Actions.PASTE, Localization.lang("Paste"),
-            IconTheme.JabRefIcon.PASTE.getIcon());
-    private final AbstractAction cut = new EditAction(Actions.CUT, Localization.lang("Cut"),
-            IconTheme.JabRefIcon.CUT.getIcon());
+    private final AbstractAction copy = new EditAction(Actions.COPY, Localization.menuTitle("Copy"),
+            Localization.lang("Copy"), prefs.getKey(KeyBinds.COPY), IconTheme.JabRefIcon.COPY.getIcon());
+    private final AbstractAction paste = new EditAction(Actions.PASTE, Localization.menuTitle("Paste"),
+            Localization.lang("Paste"), prefs.getKey(KeyBinds.PASTE), IconTheme.JabRefIcon.PASTE.getIcon());
+    private final AbstractAction cut = new EditAction(Actions.CUT, Localization.menuTitle("Cut"),
+            Localization.lang("Cut"), prefs.getKey(KeyBinds.CUT), IconTheme.JabRefIcon.CUT.getIcon());
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
             Localization.lang("Mark entries"), prefs.getKey(KeyBinds.MARK_ENTRIES), IconTheme.JabRefIcon.MARK_ENTRIES.getIcon());
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES,
@@ -2118,22 +2118,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * relevant name in its action map.
      */
     class EditAction extends MnemonicAwareAction {
+
         private final String command;
 
-
-        public EditAction(String command, String name, Icon icon) {
+        public EditAction(String command, String menuTitle, String description, KeyStroke key, Icon icon) {
             super(icon);
             this.command = command;
-            String nName = EntryUtil.capitalizeFirst(command);
-            putValue(Action.NAME, nName);
-            putValue(Action.ACCELERATOR_KEY, prefs.getKey(nName));
-            putValue(Action.SHORT_DESCRIPTION, name);
-            //putValue(ACCELERATOR_KEY,
-            //         (next?prefs.getKey(KeyBinds.NEXT_TAB):prefs.getKey(KeyBinds.PREVIOUS_TAB)));
+            putValue(Action.NAME, menuTitle);
+            putValue(Action.ACCELERATOR_KEY, key);
+            putValue(Action.SHORT_DESCRIPTION, description);
         }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
+        @Override public void actionPerformed(ActionEvent e) {
 
             LOGGER.debug(Globals.focusListener.getFocused().toString());
             JComponent source = Globals.focusListener.getFocused();

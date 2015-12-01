@@ -18,11 +18,12 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Display active edit mode (BibTeX or Biblatex) at window title
 
 ### Fixed
-- Fix #420: Reenable preference changes
-- Fix #414: Rework BibLatex entry types with correct required and optional fields
-- Fix #413: Help links in released jar version are not working
-- Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete. Fixes #412 
-- Fixes #437: The toolbar after the search field is now correctly wrapped when using a small resolution for JabRef
+- Fixed #420: Reenable preference changes
+- Fixed #414: Rework BibLatex entry types with correct required and optional fields
+- Fixed #413: Help links in released jar version are not working
+- Fixes #412: Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete.
+- Fixed #437: The toolbar after the search field is now correctly wrapped when using a small window size for JabRef
+- Fixed #438: Cut, Copy and Paste are now translated correctly in the menu
 
 ### Removed
 - Removed file history size preference (never available from the UI)
