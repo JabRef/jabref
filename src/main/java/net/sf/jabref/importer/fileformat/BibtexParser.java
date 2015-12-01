@@ -162,153 +162,17 @@ public class BibtexParser {
         // Bibtex related contents.
         initializeParserResult();
 
-        HashMap<String, String> meta = new HashMap<>();
-
         setVersionNumber();
 
         skipWhitespace();
 
         try {
-            while (!eof) {
-                boolean found = consumeUncritically('@');
-                if (!found) {
-                    break;
-                }
-                skipWhitespace();
-                String entryType = parseTextToken();
-                EntryType type = EntryTypes.getType(entryType);
-                boolean isEntry = type != null;
-                // The entry type name was not recognized. This can mean
-                // that it is a string, preamble, or comment. If so,
-                // parse and set accordingly. If not, assume it is an entry
-                // with an unknown type.
-                if (!isEntry) {
-                    if ("preamble".equals(entryType.toLowerCase())) {
-                        database.setPreamble(parsePreamble());
-                    } else if ("string".equals(entryType.toLowerCase())) {
-                        BibtexString bibtexString = parseString();
-                        bibtexString.setParsedSerialization(dumpTextReadSoFarToString());
-                        try {
-                            database.addString(bibtexString);
-                        } catch (KeyCollisionException ex) {
-                            parserResult.addWarning(Localization.lang("Duplicate string name") + ": " + bibtexString.getName());
-                        }
-                    } else if ("comment".equals(entryType.toLowerCase())) {
-                        StringBuffer buffer = parseBracketedTextExactly();
-                        /**
-                         *
-                         * Metadata are used to store Bibkeeper-specific
-                         * information in .bib files.
-                         *
-                         * Metadata are stored in bibtex files in the format
-                         *
-                         * @comment{jabref-meta: type:data0;data1;data2;...}
-                         *
-                         * Each comment that starts with the META_FLAG is stored
-                         * in the meta HashMap, with type as key. Unluckily, the
-                         * old META_FLAG bibkeeper-meta: was used in JabRef 1.0
-                         * and 1.1, so we need to support it as well. At least
-                         * for a while. We'll always save with the new one.
-                         */
-                        String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
-                        if (comment.substring(0,
-                                Math.min(comment.length(), GUIGlobals.META_FLAG.length())).equals(
-                                GUIGlobals.META_FLAG)
-                                || comment.substring(0,
-                                Math.min(comment.length(), GUIGlobals.META_FLAG_OLD.length()))
-                                .equals(GUIGlobals.META_FLAG_OLD)) {
-
-                            String rest;
-                            if (comment.substring(0, GUIGlobals.META_FLAG.length()).equals(
-                                    GUIGlobals.META_FLAG)) {
-                                rest = comment.substring(GUIGlobals.META_FLAG.length());
-                            } else {
-                                rest = comment.substring(GUIGlobals.META_FLAG_OLD.length());
-                            }
-
-                            int pos = rest.indexOf(':');
-
-                            if (pos > 0) {
-                                meta.put(rest.substring(0, pos), rest.substring(pos + 1));
-                                // We remove all line breaks in the metadata - these
-                                // will have been inserted
-                                // to prevent too long lines when the file was
-                                // saved, and are not part of the data.
-                            }
-
-                        } else if (comment.substring(0,
-                                Math.min(comment.length(), CustomEntryType.ENTRYTYPE_FLAG.length())).equals(
-                                CustomEntryType.ENTRYTYPE_FLAG)) {
-                            // A custom entry type can also be stored in a
-                            // "@comment"
-                            CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
-                            entryTypes.put(typ.getName(), typ);
-                        } else {
-                            // FIXME: user comments are simply dropped
-                            // at least, we log that we ignored the comment
-                            LOGGER.info("Dropped comment from database: " + comment);
-                        }
-                    } else {
-                        // The entry type was not recognized. This may mean that
-                        // it is a custom entry type whose definition will
-                        // appear
-                        // at the bottom of the file. So we use an
-                        // UnknownEntryType
-                        // to remember the type name by.
-                        type = new UnknownEntryType(EntryUtil.capitalizeFirst(entryType));
-                        isEntry = true;
-                    }
-                }
-
-                // True if not comment, preamble or string.
-                if (isEntry) {
-                    /**
-                     * Morten Alver 13 Aug 2006: Trying to make the parser more
-                     * robust. If an exception is thrown when parsing an entry,
-                     * drop the entry and try to resume parsing. Add a warning
-                     * for the user.
-                     */
-                    try {
-                        BibtexEntry entry = parseEntry(type);
-
-                        boolean duplicateKey = database.insertEntry(entry);
-                        entry.setParsedSerialization(dumpTextReadSoFarToString());
-                        lastParsedEntry = entry;
-                        if (duplicateKey) {
-                            parserResult.addDuplicateKey(entry.getCiteKey());
-                        } else if ((entry.getCiteKey() == null) || "".equals(entry.getCiteKey())) {
-                            parserResult
-                                    .addWarning(Localization.lang("Empty BibTeX key") + ": "
-                                            + entry.getAuthorTitleYear(40) + " ("
-                                            + Localization.lang("grouping may not work for this entry") + ")");
-                        }
-                    } catch (IOException ex) {
-                        LOGGER.warn("Could not parse entry", ex);
-                        parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '"
-                                + ex.getMessage() + "'. " + Localization.lang("Skipped entry."));
-
-                    }
-                }
-                skipWhitespace();
-            }
-            // Before returning the database, update entries with unknown type
-            // based on parsed type definitions, if possible.
-            checkEntryTypes(parserResult);
-
-            // Instantiate meta data:
-            parserResult.setMetaData(new MetaData(meta, database));
-
-            if (lastParsedEntry != null) {
-                // read remaining content of file and add it to the parsed serialization of the last entry
-                lastParsedEntry.setParsedSerialization(lastParsedEntry.getParsedSerialization() + dumpTextReadSoFarToString());
-            }
-
-            return parserResult;
+            return parseFileContent();
         } catch (KeyCollisionException kce) {
-            // kce.printStackTrace();
             throw new IOException("Duplicate ID in bibtex file: " + kce);
         }
     }
+
 
     private void initializeParserResult() {
         database = new BibtexDatabase();
@@ -323,6 +187,168 @@ public class BibtexParser {
         if (versionNumber != null) {
             parserResult.setJabrefVersion(versionNumber);
             setMajorMinorVersions();
+        }
+    }
+
+    private ParserResult parseFileContent() throws IOException {
+        HashMap<String, String> meta = new HashMap<>();
+
+        while (!eof) {
+            boolean found = consumeUncritically('@');
+            if (!found) {
+                break;
+            }
+
+            skipWhitespace();
+
+            // try to read the entry type
+            String entryType = parseTextToken();
+            EntryType type = EntryTypes.getType(entryType);
+            boolean isEntry = type != null;
+
+            // The entry type name was not recognized. This can mean
+            // that it is a string, preamble, or comment. If so,
+            // parse and set accordingly. If not, assume it is an entry
+            // with an unknown type.
+            if (!isEntry) {
+                if ("preamble".equals(entryType.toLowerCase())) {
+                    database.setPreamble(parsePreamble());
+                } else if ("string".equals(entryType.toLowerCase())) {
+                    parseBibtexString();
+                } else if ("comment".equals(entryType.toLowerCase())) {
+                    parseJabRefComment(meta);
+                } else {
+                    // The entry type was not recognized. This may mean that
+                    // it is a custom entry type whose definition will
+                    // appear
+                    // at the bottom of the file. So we use an
+                    // UnknownEntryType
+                    // to remember the type name by.
+                    type = new UnknownEntryType(EntryUtil.capitalizeFirst(entryType));
+                    isEntry = true;
+                }
+            }
+
+            // True if not comment, preamble or string.
+            if (isEntry) {
+                parseAndAddEntry(type);
+            }
+
+            skipWhitespace();
+        }
+        // Before returning the database, update entries with unknown type
+        // based on parsed type definitions, if possible.
+        checkEntryTypes(parserResult);
+
+        // Instantiate meta data:
+        parserResult.setMetaData(new MetaData(meta, database));
+
+        parseRemainingContent();
+
+        return parserResult;
+    }
+
+    private void parseRemainingContent() {
+        if (lastParsedEntry != null) {
+            // read remaining content of file and add it to the parsed serialization of the last entry
+            lastParsedEntry.setParsedSerialization(lastParsedEntry.getParsedSerialization() + dumpTextReadSoFarToString());
+        }
+    }
+
+    private void parseAndAddEntry(EntryType type) {
+        /**
+         * Morten Alver 13 Aug 2006: Trying to make the parser more
+         * robust. If an exception is thrown when parsing an entry,
+         * drop the entry and try to resume parsing. Add a warning
+         * for the user.
+         */
+        try {
+            BibtexEntry entry = parseEntry(type);
+
+            boolean duplicateKey = database.insertEntry(entry);
+            entry.setParsedSerialization(dumpTextReadSoFarToString());
+            lastParsedEntry = entry;
+            if (duplicateKey) {
+                parserResult.addDuplicateKey(entry.getCiteKey());
+            } else if ((entry.getCiteKey() == null) || "".equals(entry.getCiteKey())) {
+                parserResult
+                        .addWarning(Localization.lang("Empty BibTeX key") + ": "
+                                + entry.getAuthorTitleYear(40) + " ("
+                                + Localization.lang("grouping may not work for this entry") + ")");
+            }
+        } catch (IOException ex) {
+            LOGGER.warn("Could not parse entry", ex);
+            parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '"
+                    + ex.getMessage() + "'. " + Localization.lang("Skipped entry."));
+
+        }
+    }
+
+    private void parseJabRefComment(HashMap<String, String> meta) throws IOException {
+        StringBuffer buffer = parseBracketedTextExactly();
+        /**
+         *
+         * Metadata are used to store Bibkeeper-specific
+         * information in .bib files.
+         *
+         * Metadata are stored in bibtex files in the format
+         *
+         * @comment{jabref-meta: type:data0;data1;data2;...}
+         *
+         * Each comment that starts with the META_FLAG is stored
+         * in the meta HashMap, with type as key. Unluckily, the
+         * old META_FLAG bibkeeper-meta: was used in JabRef 1.0
+         * and 1.1, so we need to support it as well. At least
+         * for a while. We'll always save with the new one.
+         */
+        String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
+        if (comment.substring(0,
+                Math.min(comment.length(), GUIGlobals.META_FLAG.length())).equals(
+                GUIGlobals.META_FLAG)
+                || comment.substring(0,
+                Math.min(comment.length(), GUIGlobals.META_FLAG_OLD.length()))
+                .equals(GUIGlobals.META_FLAG_OLD)) {
+
+            String rest;
+            if (comment.substring(0, GUIGlobals.META_FLAG.length()).equals(
+                    GUIGlobals.META_FLAG)) {
+                rest = comment.substring(GUIGlobals.META_FLAG.length());
+            } else {
+                rest = comment.substring(GUIGlobals.META_FLAG_OLD.length());
+            }
+
+            int pos = rest.indexOf(':');
+
+            if (pos > 0) {
+                meta.put(rest.substring(0, pos), rest.substring(pos + 1));
+                // We remove all line breaks in the metadata - these
+                // will have been inserted
+                // to prevent too long lines when the file was
+                // saved, and are not part of the data.
+            }
+
+        } else if (comment.substring(0,
+                Math.min(comment.length(), CustomEntryType.ENTRYTYPE_FLAG.length())).equals(
+                CustomEntryType.ENTRYTYPE_FLAG)) {
+            // A custom entry type can also be stored in a
+            // "@comment"
+            CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
+            entryTypes.put(typ.getName(), typ);
+        } else {
+            // FIXME: user comments are simply dropped
+            // at least, we log that we ignored the comment
+            LOGGER.info("Dropped comment from database: " + comment);
+        }
+    }
+
+
+    private void parseBibtexString() throws IOException {
+        BibtexString bibtexString = parseString();
+        bibtexString.setParsedSerialization(dumpTextReadSoFarToString());
+        try {
+            database.addString(bibtexString);
+        } catch (KeyCollisionException ex) {
+            parserResult.addWarning(Localization.lang("Duplicate string name") + ": " + bibtexString.getName());
         }
     }
 
