@@ -13,13 +13,15 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.importer.fetcher;
+package net.sf.jabref.logic.formatter.bibtexfields;
 
 import java.util.Arrays;
 
-import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.importer.fetcher.LengthComparator;
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
-public class UnitFormatter implements LayoutFormatter {
+public class UnitFormatter implements Formatter {
 
     private static final String[] unitList = new String[] {
             "A", // Ampere
@@ -135,6 +137,11 @@ public class UnitFormatter implements LayoutFormatter {
             return null;
         }
         return format(text, UnitFormatter.unitCombinations);
+    }
+
+    @Override
+    public String getName() {
+        return Localization.lang("UnitFormatter");
     }
 
 }
