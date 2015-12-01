@@ -349,7 +349,7 @@ public class JabRef {
                                 System.out.println(Localization.lang("Saving") + ": " + data[0]);
                                 SaveSession session = FileActions.saveDatabase(pr.getDatabase(), pr.getMetaData(),
                                         new File(data[0]), Globals.prefs, false, false,
-                                        Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)), false);
+                                        Globals.prefs.getDefaultEncoding(), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
@@ -436,7 +436,7 @@ public class JabRef {
                                 System.out.println(Localization.lang("Saving") + ": " + subName);
                                 SaveSession session = FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
                                         new File(subName), Globals.prefs, false, false,
-                                        Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)), false);
+                                        Globals.prefs.getDefaultEncoding(), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
@@ -807,7 +807,7 @@ public class JabRef {
                 return ParserResult.FILE_LOCKED;
             }
 
-            Charset encoding = Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+            Charset encoding = Globals.prefs.getDefaultEncoding();
             ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
             if (pr == null) {
                 pr = new ParserResult(null, null, null);

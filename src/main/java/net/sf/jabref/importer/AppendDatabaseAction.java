@@ -105,7 +105,7 @@ public class AppendDatabaseAction implements BaseAction {
             try {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                Charset encoding = Charset.forName(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+                Charset encoding = Globals.prefs.getDefaultEncoding();
                 ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);
