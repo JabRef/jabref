@@ -63,6 +63,7 @@ import java.awt.GridLayout;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 
 import javax.swing.Box;
@@ -373,7 +374,8 @@ public class FontSelectorDialog extends JDialog {
             String[] _array = new String[nameVector.size()];
             nameVector.copyInto(_array);
             return _array;
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InvocationTargetException |
+                IllegalAccessException | IllegalArgumentException ex) {
             return null;//return Toolkit.getDefaultToolkit().getFontList();
         }
     }
