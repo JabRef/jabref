@@ -29,7 +29,6 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 public class MetaData implements Iterable<String> {
 
     public static final String META_FLAG = "jabref-meta: ";
-    public static final String META_FLAG_OLD = "bibkeeper-meta: ";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
 

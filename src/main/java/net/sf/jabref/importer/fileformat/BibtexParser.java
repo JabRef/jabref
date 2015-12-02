@@ -302,29 +302,24 @@ public class BibtexParser {
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
         if (comment.substring(0,
                 Math.min(comment.length(), MetaData.META_FLAG.length())).equals(
-                MetaData.META_FLAG)
-                || comment.substring(0,
-                Math.min(comment.length(), MetaData.META_FLAG_OLD.length()))
-                .equals(MetaData.META_FLAG_OLD)) {
+                MetaData.META_FLAG)) {
 
-            String rest;
+
             if (comment.substring(0, MetaData.META_FLAG.length()).equals(
                     MetaData.META_FLAG)) {
-                rest = comment.substring(MetaData.META_FLAG.length());
-            } else {
-                rest = comment.substring(MetaData.META_FLAG_OLD.length());
+                String rest = comment.substring(MetaData.META_FLAG.length());
+
+
+                int pos = rest.indexOf(':');
+
+                if (pos > 0) {
+                    meta.put(rest.substring(0, pos), rest.substring(pos + 1));
+                    // We remove all line breaks in the metadata - these
+                    // will have been inserted
+                    // to prevent too long lines when the file was
+                    // saved, and are not part of the data.
+                }
             }
-
-            int pos = rest.indexOf(':');
-
-            if (pos > 0) {
-                meta.put(rest.substring(0, pos), rest.substring(pos + 1));
-                // We remove all line breaks in the metadata - these
-                // will have been inserted
-                // to prevent too long lines when the file was
-                // saved, and are not part of the data.
-            }
-
         } else if (comment.substring(0,
                 Math.min(comment.length(), CustomEntryType.ENTRYTYPE_FLAG.length())).equals(
                 CustomEntryType.ENTRYTYPE_FLAG)) {
