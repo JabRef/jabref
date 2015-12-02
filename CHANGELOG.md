@@ -158,7 +158,7 @@ Since much functionality has changed during development, a release of this versi
 
 ## 2.11 - 2015-11-11
 
-The changelog of 2.11 and versions before is maintained as text file in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
+The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v3.0...HEAD
 [3.0]: https://github.com/JabRef/jabref/compare/v2.11.1...v3.0
