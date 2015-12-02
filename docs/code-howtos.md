@@ -1,11 +1,5 @@
 This page provides some development support in the form of howtos. 
 
-## Tooltips
-
-### Browser plugins
-* [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
-* [ZenHub Browser Extension](https://www.zenhub.io/) - `+1` for GitHub and much more
-
 ## Error Handling in JabRef
 ### Throwing and Catching Exceptions
 Principles: 
