@@ -29,9 +29,7 @@ import org.xml.sax.SAXException;
 import com.google.common.base.Strings;
 
 public class GVKParser {
-
     private static final Log LOGGER = LogFactory.getLog(GVKParser.class);
-
 
     public List<BibtexEntry> parseEntries(InputStream is)
             throws ParserConfigurationException, SAXException, IOException {
@@ -354,7 +352,9 @@ public class GVKParser {
         } else if ("".equals(mak)) {
             entryType = "misc";
         } else if (mak.startsWith("O")) {
-            entryType = "online";
+            entryType = "misc";
+            // FIXME: online only available in Biblatex
+            //entryType = "online";
         }
 
         /*
