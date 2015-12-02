@@ -9,7 +9,7 @@ This page lists some software we consider useful.
 * Use [git for windows](https://git-for-windows.github.io/), no additional git tooling required
 * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) - Aim: Store password for GitHub permanently for https repository locations
   * <s>Execute `"c:\Program Files\Git\bin\git.exe" push origin` once using **cmd** not `git bash` - reason: https://github.com/Microsoft/Git-Credential-Manager-for-Windows/issues/50.</s>
-* [ConEmu](http://conemu.github.io/) -> Preview Version - Aim: Colorful console with tabs
+* [ConEmu](http://conemu.github.io/) -> Preview Version or [Cmder](http://cmder.net/) - Aim: Colorful console with tabs
   * At first start:
     * "Choose your startup task ...": `{Bash::Git bash}}
     * `OK`
