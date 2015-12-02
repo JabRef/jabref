@@ -160,8 +160,6 @@ public class BibtexParser {
         // Bibtex related contents.
         initializeParserResult();
 
-        setVersionNumber();
-
         skipWhitespace();
 
         try {
@@ -176,16 +174,6 @@ public class BibtexParser {
         database = new BibtexDatabase();
         entryTypes = new HashMap<>(); // To store custem entry types parsed.
         parserResult = new ParserResult(database, null, entryTypes);
-    }
-
-    private void setVersionNumber() throws IOException {
-        // First see if we can find the version number of the JabRef version that
-        // wrote the file:
-        String versionNumber = readJabRefVersionNumber();
-        if (versionNumber != null) {
-            parserResult.setJabrefVersion(versionNumber);
-            setMajorMinorVersions();
-        }
     }
 
     private ParserResult parseFileContent() throws IOException {
@@ -1002,75 +990,4 @@ public class BibtexParser {
         }
     }
 
-    /**
-     * Read the JabRef signature, if any, and find what version number is given.
-     * This method advances the file reader only as far as the end of the first line of
-     * the JabRef signature, or up until the point where the read characters don't match
-     * the signature. This should ensure that the parser can continue from that spot without
-     * resetting the reader, without the risk of losing important contents.
-     *
-     * @return The version number, or null if not found.
-     * @throws IOException
-     */
-    private String readJabRefVersionNumber() throws IOException {
-        StringBuilder headerText = new StringBuilder();
-
-        boolean keepOn = true;
-        int piv = 0;
-        int character;
-
-        // We start by reading the standard part of the signature, which precedes
-        // the version number: This file was created with JabRef X.y.
-        while (keepOn) {
-            character = peek();
-            headerText.append((char) character);
-            if ((piv == 0) && (Character.isWhitespace((char) character) || (character == '%'))) {
-                read();
-            } else if (character == Globals.SIGNATURE.charAt(piv)) {
-                piv++;
-                read();
-            } else {
-                return null;
-            }
-
-            // Check if we've reached the end of the signature's standard part:
-            if (piv == Globals.SIGNATURE.length()) {
-                keepOn = false;
-
-                // Found the standard part. Now read the version number:
-                StringBuilder stringBuilder = new StringBuilder();
-                while (((character = read()) != '\n') && (character != -1)) {
-                    stringBuilder.append((char) character);
-                }
-                String versionNumber = stringBuilder.toString().trim();
-                // See if it fits the X.y. pattern:
-                if (Pattern.compile("[1-9]+\\.[1-9A-Za-z ]+\\.").matcher(versionNumber).matches()) {
-                    // It matched. Remove the last period and return:
-                    return versionNumber.substring(0, versionNumber.length() - 1);
-                } else if (Pattern.compile("[1-9]+\\.[1-9]\\.[1-9A-Za-z ]+\\.").matcher(versionNumber).matches()) {
-                    // It matched. Remove the last period and return:
-                    return versionNumber.substring(0, versionNumber.length() - 1);
-                }
-
-            }
-        }
-        return null;
-    }
-
-    /**
-     * After a JabRef version number has been parsed and put into _pr,
-     * parse the version number to determine the JabRef major and minor version
-     * number
-     */
-    private void setMajorMinorVersions() {
-        String version = parserResult.getJabrefVersion();
-        Pattern versionPattern = Pattern.compile("([0-9]+)\\.([0-9]+).*");
-        Matcher matcher = versionPattern.matcher(version);
-        if (matcher.matches()) {
-            if (matcher.groupCount() >= 2) {
-                parserResult.setJabrefMajorVersion(Integer.parseInt(matcher.group(1)));
-                parserResult.setJabrefMinorVersion(Integer.parseInt(matcher.group(2)));
-            }
-        }
-    }
 }

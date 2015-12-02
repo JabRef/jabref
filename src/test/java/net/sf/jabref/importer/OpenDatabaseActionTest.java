@@ -82,40 +82,4 @@ public class OpenDatabaseActionTest {
         Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
     }
 
-    @Test
-    public void noVersionForNoHeader() throws IOException {
-        ParserResult result = OpenDatabaseAction.loadDatabase(bibNoHeader, defaultEncoding);
-
-        // Version
-        Assert.assertEquals(0, result.getJabrefMajorVersion());
-        Assert.assertEquals(0, result.getJabrefMinorVersion());
-    }
-
-    @Test
-    public void noVersionForWrongHeader() throws IOException {
-        ParserResult result = OpenDatabaseAction.loadDatabase(bibWrongHeader, defaultEncoding);
-
-        // Version
-        Assert.assertEquals(0, result.getJabrefMajorVersion());
-        Assert.assertEquals(0, result.getJabrefMinorVersion());
-    }
-
-    @Test
-    public void noVersionForHeaderWithoutSignature() throws IOException {
-        // newer JabRef versions do not put a header
-        ParserResult result = OpenDatabaseAction.loadDatabase(bibHeader, defaultEncoding);
-
-        // Version
-        Assert.assertEquals(0, result.getJabrefMajorVersion());
-        Assert.assertEquals(0, result.getJabrefMinorVersion());
-    }
-
-    @Test
-    public void versionFromSignature() throws IOException {
-        ParserResult result = OpenDatabaseAction.loadDatabase(bibHeaderAndSignature, defaultEncoding);
-
-        // Version
-        Assert.assertEquals(2, result.getJabrefMajorVersion());
-        Assert.assertEquals(9, result.getJabrefMinorVersion());
-    }
 }
