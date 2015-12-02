@@ -54,7 +54,8 @@ public class PostgreSQLExport extends ExportFormat {
             final Charset encoding,
             Set<String> keySet) throws Exception {
 
-        new DBExporterAndImporterFactory().getExporter("POSTGRESQL").exportDatabaseAsFile(database, metaData, keySet, file);
+        new DBExporterAndImporterFactory().getExporter("POSTGRESQL").exportDatabaseAsFile(database, metaData, keySet,
+                file, encoding);
 
     }
 

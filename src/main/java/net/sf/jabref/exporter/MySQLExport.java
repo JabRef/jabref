@@ -46,7 +46,8 @@ public class MySQLExport extends ExportFormat {
     public void performExport(final BibtexDatabase database, final MetaData metaData, final String file,
             final Charset encodingToUse, Set<String> keySet) throws Exception {
 
-        new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(database, metaData, keySet, file);
+        new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(database, metaData, keySet, file,
+                encodingToUse);
 
     }
 

@@ -86,7 +86,6 @@ public class DatabaseFileLookupTest {
         /**
          * Select all nodes manually.
          */
-        @SuppressWarnings("unchecked")
         Enumeration<CheckableTreeNode> enumeration = treeNode.breadthFirstEnumeration();
         while (enumeration.hasMoreElements()) {
             CheckableTreeNode nextElement = enumeration.nextElement();
@@ -173,7 +172,6 @@ public class DatabaseFileLookupTest {
         return instance;
     }
 
-    @SuppressWarnings("unchecked")
     private static <T> Constructor<? extends T>[] orderByParamCount(Constructor<? extends T>[] constructors) {
         List<Constructor<? extends T>> list = Arrays.asList(constructors);
         Collections.sort(list, new Comparator<Constructor<? extends T>>() {
