@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.maintable;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -27,6 +27,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;

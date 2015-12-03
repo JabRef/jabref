@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.maintable;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -37,6 +37,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.groups.GroupMatcher;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.EntryMarker;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;

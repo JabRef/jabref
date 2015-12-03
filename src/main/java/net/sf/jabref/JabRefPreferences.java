@@ -41,6 +41,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.CleanUpAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;

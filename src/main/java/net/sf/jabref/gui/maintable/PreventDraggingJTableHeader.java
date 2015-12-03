@@ -13,16 +13,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.maintable;
 
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 /**
  * Related to <code>MainTable</code> class. <br/>
