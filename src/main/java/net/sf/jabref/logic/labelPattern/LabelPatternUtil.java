@@ -317,12 +317,14 @@ public class LabelPatternUtil {
             // If university is detected than the previous part is suggested
             // as department
             if (isUniversity) {
-                university = "Uni";
+                StringBuilder uniSB = new StringBuilder();
+                uniSB.append("Uni");
                 for (String k : part) {
                     if ((k.length() >= 5) && !"univ".equals(k.toLowerCase().substring(0, 5))) {
-                        university += k;
+                        uniSB.append(k);
                     }
                 }
+                university = uniSB.toString();
                 if ((index > 0) && (department == null)) {
                     department = parts[index - 1];
                 }
@@ -603,13 +605,13 @@ public class LabelPatternUtil {
                     // remove the "pure" prefix so the remaining
                     // code in this section functions correctly
                     val = val.substring(4);
-                } else {
-                    if ((authString == null) || "".equals(authString)) {
-                        authString = entry.getField("editor");
-                        if (authString != null) {
-                            authString = LabelPatternUtil.normalize(
-                                    LabelPatternUtil.database.resolveForStrings(authString));
-                        }
+                }
+
+                if ((authString == null) || "".equals(authString)) {
+                    authString = entry.getField("editor");
+                    if (authString != null) {
+                        authString = LabelPatternUtil
+                                .normalize(LabelPatternUtil.database.resolveForStrings(authString));
                     }
                 }
 
@@ -735,7 +737,9 @@ public class LabelPatternUtil {
                 return LabelPatternUtil.getTitleWords(1, entry.getField("title"));
             } else if ("shortyear".equals(val)) {
                 String ss = entry.getFieldOrAlias("year");
-                if (ss.startsWith("in") || ss.startsWith("sub")) {
+                if (ss == null) {
+                    return "";
+                } else if (ss.startsWith("in") || ss.startsWith("sub")) {
                     return "IP";
                 } else if (ss.length() > 2) {
                     return ss.substring(ss.length() - 2);
@@ -1028,18 +1032,18 @@ public class LabelPatternUtil {
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
     static String NAuthors(String authorField, int n) {
-        String author = "";
         String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\s+\\band\\b\\s+");
         int i = 0;
+        StringBuilder authorSB = new StringBuilder();
         while ((tokens.length > i) && (i < n)) {
             String lastName = tokens[i].replaceAll(",\\s+.*", "");
-            author += lastName;
+            authorSB.append(lastName);
             i++;
         }
-        if (tokens.length <= n) {
-            return author;
+        if (tokens.length > n) {
+            authorSB.append("EtAl");
         }
-        return author + "EtAl";
+        return authorSB.toString();
     }
 
     /**
@@ -1053,22 +1057,20 @@ public class LabelPatternUtil {
     static String oneAuthorPlusIni(String authorField) {
         final int CHARS_OF_FIRST = 5;
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
-        String author = "";
         String[] tokens = authorField.split("\\s+\\band\\b\\s+");
         int i = 1;
         if (tokens.length == 0) {
-            return author;
+            return "";
         }
         String firstAuthor = tokens[0].split(",")[0];
-        author = firstAuthor.substring(0,
-                Math.min(CHARS_OF_FIRST,
-                        firstAuthor.length()));
+        StringBuilder authorSB = new StringBuilder();
+        authorSB.append(firstAuthor.substring(0, Math.min(CHARS_OF_FIRST, firstAuthor.length())));
         while (tokens.length > i) {
             // convert lastname, firstname to firstname lastname
-            author += tokens[i].charAt(0);
+            authorSB.append(tokens[i].charAt(0));
             i++;
         }
-        return author;
+        return authorSB.toString();
     }
 
     /**
