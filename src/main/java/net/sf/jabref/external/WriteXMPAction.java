@@ -176,7 +176,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             if (optDiag.canceled) {
                 optDiag.progressArea.append("\n"
-                        + Localization.lang("Operation canceled.\n"));
+                        + Localization.lang("Operation canceled.") +"\n");
                 break;
             }
         }
