@@ -210,7 +210,6 @@ public class MainTable extends JTable {
 
     /**
      * Adds a sorting rule that floats hits to the top, and causes non-hits to be grayed out:
-     * @param m The Matcher that determines if an entry is a hit or not.
      */
     public void showFloatSearch() {
         if(!isFloatSearchActive) {
@@ -243,7 +242,6 @@ public class MainTable extends JTable {
 
     /**
      * Adds a sorting rule that floats group hits to the top, and causes non-hits to be grayed out:
-     * @param m The Matcher that determines if an entry is a in the current group selection or not.
      */
     public void showFloatGrouping() {
         if(!isFloatGroupingActive) {
@@ -364,33 +362,34 @@ public class MainTable extends JTable {
         String[] widths = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
         TableColumnModel cm = getColumnModel();
         cm.getColumn(0).setPreferredWidth(ncWidth);
-        for (int i = 1; i < tableFormat.padleft; i++) {
-
-            // Check if the Column is an extended RankingColumn (and not a compact-ranking column)
-            // If this is the case, set a certain Column-width,
-            // because the RankingIconColumn needs some more width
-            if (tableFormat.isRankingColumn(i)) {
-                // Lock the width of ranking icon column.
-                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-            } else {
-                // Lock the width of icon columns.
-                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
-                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
-            }
-
-        }
-        for (int i = tableFormat.padleft; i < getModel().getColumnCount(); i++) {
-            try {
-                cm.getColumn(i).setPreferredWidth(Integer.parseInt(widths[i - tableFormat.padleft]));
-            } catch (Throwable ex) {
-                LOGGER.info("Exception while setting column widths. Choosing default.", ex);
-                cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);
-            }
-
-        }
+        // FIXME set correct width for each field
+//        for (int i = 1; i < tableFormat.padleft; i++) {
+//
+//            // Check if the Column is an extended RankingColumn (and not a compact-ranking column)
+//            // If this is the case, set a certain Column-width,
+//            // because the RankingIconColumn needs some more width
+//            if (tableFormat.isRankingColumn(i)) {
+//                // Lock the width of ranking icon column.
+//                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+//                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+//                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+//            } else {
+//                // Lock the width of icon columns.
+//                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+//                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+//                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+//            }
+//
+//        }
+//        for (int i = tableFormat.padleft; i < getModel().getColumnCount(); i++) {
+//            try {
+//                cm.getColumn(i).setPreferredWidth(Integer.parseInt(widths[i - tableFormat.padleft]));
+//            } catch (Throwable ex) {
+//                LOGGER.info("Exception while setting column widths. Choosing default.", ex);
+//                cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);
+//            }
+//
+//        }
     }
 
     public BibtexEntry getEntryAt(int row) {
@@ -438,24 +437,25 @@ public class MainTable extends JTable {
         comparators.clear();
         comparators.add(new FirstColumnComparator(panel.database()));
 
-        // Icon columns:
-        for (int i = 1; i < tableFormat.padleft; i++) {
-            comparators = comparatorChooser.getComparatorsForColumn(i);
-            comparators.clear();
-            String[] iconField = tableFormat.getIconTypeForColumn(i);
-
-            if (iconField[0].equals(SpecialFieldsUtils.FIELDNAME_RANKING)) {
-                comparators.add(new RankingFieldComparator());
-            } else {
-                comparators.add(new IconComparator(iconField));
-            }
-        }
-        // Remaining columns:
-        for (int i = tableFormat.padleft; i < tableFormat.getColumnCount(); i++) {
-            comparators = comparatorChooser.getComparatorsForColumn(i);
-            comparators.clear();
-            comparators.add(new FieldComparator(tableFormat.getColumnName(i).toLowerCase()));
-        }
+        // FIXME set correct comparator for the columns
+//        // Icon columns:
+//        for (int i = 1; i < tableFormat.padleft; i++) {
+//            comparators = comparatorChooser.getComparatorsForColumn(i);
+//            comparators.clear();
+//            String[] iconField = tableFormat.getIconTypeForColumn(i);
+//
+//            if (iconField[0].equals(SpecialFieldsUtils.FIELDNAME_RANKING)) {
+//                comparators.add(new RankingFieldComparator());
+//            } else {
+//                comparators.add(new IconComparator(iconField));
+//            }
+//        }
+//        // Remaining columns:
+//        for (int i = tableFormat.padleft; i < tableFormat.getColumnCount(); i++) {
+//            comparators = comparatorChooser.getComparatorsForColumn(i);
+//            comparators.clear();
+//            comparators.add(new FieldComparator(tableFormat.getColumnName(i).toLowerCase()));
+//        }
 
         // Set initial sort columns:
 
