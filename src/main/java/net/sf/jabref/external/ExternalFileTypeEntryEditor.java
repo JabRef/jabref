@@ -48,7 +48,6 @@ public class ExternalFileTypeEntryEditor {
     private final JTextField name = new JTextField();
     private final JTextField mimeType = new JTextField();
     private final JTextField application = new JTextField();
-    private String selectedIcon;
     private final JLabel icon = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
@@ -222,7 +221,6 @@ public class ExternalFileTypeEntryEditor {
         } else {
             other.setSelected(true);
         }
-        selectedIcon = null;
     }
 
     private void storeSettings(ExternalFileType fileTypeEntry) {
@@ -236,10 +234,6 @@ public class ExternalFileTypeEntryEditor {
             fileTypeEntry.setExtension(ext);
         }
 
-        if (selectedIcon != null) {
-            fileTypeEntry.setIconName(selectedIcon);
-            fileTypeEntry.setIcon(IconTheme.getImage(fileTypeEntry.getIconName()));
-        }
         if (!OS.WINDOWS) {
             fileTypeEntry.setOpenWith(application.getText().trim());
         } else {
