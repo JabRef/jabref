@@ -365,7 +365,12 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     private void addEntry() {
-        addEntry("");
+        String[] defaultDirectory = metaData.getFileDirectory(Globals.FILE_FIELD);
+        if(defaultDirectory.length > 0 && defaultDirectory[0] != null) {
+            addEntry(defaultDirectory[0]);
+        } else {
+            addEntry("");
+        }
     }
 
     private void removeEntries() {
