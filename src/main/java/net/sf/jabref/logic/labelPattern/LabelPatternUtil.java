@@ -317,14 +317,14 @@ public class LabelPatternUtil {
             // If university is detected than the previous part is suggested
             // as department
             if (isUniversity) {
-                StringBuilder uniSB = new StringBuilder();
-                uniSB.append("Uni");
+                StringBuilder universitySB = new StringBuilder();
+                universitySB.append("Uni");
                 for (String k : part) {
                     if ((k.length() >= 5) && !"univ".equals(k.toLowerCase().substring(0, 5))) {
-                        uniSB.append(k);
+                        universitySB.append(k);
                     }
                 }
-                university = uniSB.toString();
+                university = universitySB.toString();
                 if ((index > 0) && (department == null)) {
                     department = parts[index - 1];
                 }
@@ -555,15 +555,15 @@ public class LabelPatternUtil {
                     label = label.toUpperCase();
                 } else if ("abbr".equals(modifier)) {
                     // Abbreviate - that is,
-                    StringBuilder abbr = new StringBuilder();
+                    StringBuilder abbreviateSB = new StringBuilder();
                     String[] words = label.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
                     for (String word1 : words) {
                         if (!word1.isEmpty()) {
-                            abbr.append(word1.charAt(0));
+                            abbreviateSB.append(word1.charAt(0));
                         }
                     }
-                    label = abbr.toString();
+                    label = abbreviateSB.toString();
 
                 } else if (modifier.startsWith("(") && modifier.endsWith(")")) {
                     // Alternate text modifier in parentheses. Should be inserted if
