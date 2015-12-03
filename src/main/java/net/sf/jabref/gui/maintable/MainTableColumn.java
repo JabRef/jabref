@@ -8,11 +8,11 @@ import java.util.Optional;
 
 public class MainTableColumn {
 
-    private String columnName;
+    private final String columnName;
 
-    private Optional<String[]> bibtexFields;
+    private final Optional<String[]> bibtexFields;
 
-    private boolean isIconColumn;
+    private final boolean isIconColumn;
 
     public MainTableColumn(String columnName, boolean isIconColumn) {
         this.columnName = columnName;
