@@ -28,6 +28,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -901,9 +902,9 @@ public class Util {
 
                 boolean foundAny = false;
                 // Iterate over the entries:
-                for (BibtexEntry anEntry : result.keySet()) {
+                for (Entry<BibtexEntry, List<File>> entryFilePair : result.entrySet()) {
                     FileListTableModel tableModel;
-                    String oldVal = anEntry.getField(Globals.FILE_FIELD);
+                    String oldVal = entryFilePair.getKey().getField(Globals.FILE_FIELD);
                     if (singleTableModel == null) {
                         tableModel = new FileListTableModel();
                         if (oldVal != null) {
@@ -913,7 +914,7 @@ public class Util {
                         assert entries.size() == 1;
                         tableModel = singleTableModel;
                     }
-                    List<File> files = result.get(anEntry);
+                    List<File> files = entryFilePair.getValue();
                     for (File f : files) {
                         f = FileUtil.shortenFileName(f, dirsS);
                         boolean alreadyHas = false;
@@ -944,15 +945,16 @@ public class Util {
                             }
                             if (ce != null) {
                                 // store undo information
-                                UndoableFieldChange change = new UndoableFieldChange(anEntry, Globals.FILE_FIELD, oldVal, newVal);
+                                UndoableFieldChange change = new UndoableFieldChange(entryFilePair.getKey(),
+                                        Globals.FILE_FIELD, oldVal, newVal);
                                 ce.addEdit(change);
                             }
                             // hack: if table model is given, do NOT modify entry
                             if (singleTableModel == null) {
-                                anEntry.setField(Globals.FILE_FIELD, newVal);
+                                entryFilePair.getKey().setField(Globals.FILE_FIELD, newVal);
                             }
                             if (changedEntries != null) {
-                                changedEntries.add(anEntry);
+                                changedEntries.add(entryFilePair.getKey());
                             }
                         }
                     }

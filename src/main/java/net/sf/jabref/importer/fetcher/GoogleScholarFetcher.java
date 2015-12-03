@@ -173,9 +173,9 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             formItems.put("scisf", "4");
             formItems.put("num", String.valueOf(GoogleScholarFetcher.MAX_ENTRIES_TO_LOAD));
             StringBuilder ub = new StringBuilder(GoogleScholarFetcher.URL_SETPREFS + "?");
-            for (Iterator<String> i = formItems.keySet().iterator(); i.hasNext();) {
-                String name = i.next();
-                ub.append(name).append("=").append(formItems.get(name));
+            for (Iterator<Map.Entry<String, String>> i = formItems.entrySet().iterator(); i.hasNext();) {
+                Map.Entry<String, String> name = i.next();
+                ub.append(name.getKey()).append("=").append(name.getValue());
                 if (i.hasNext()) {
                     ub.append("&");
                 }
