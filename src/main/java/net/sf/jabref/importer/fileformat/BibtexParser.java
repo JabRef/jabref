@@ -21,7 +21,6 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
@@ -55,7 +54,7 @@ import org.apache.commons.logging.LogFactory;
 public class BibtexParser {
     private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
 
-    private PushbackReader pushbackReader;
+    private final PushbackReader pushbackReader;
     private BibtexDatabase database;
     private HashMap<String, EntryType> entryTypes;
     private boolean eof;
@@ -64,7 +63,7 @@ public class BibtexParser {
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
     private final boolean autoDoubleBraces;
-    private Deque<Character> pureTextFromFile = new LinkedList<>();
+    private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private BibtexEntry lastParsedEntry;
 
 
@@ -311,13 +310,15 @@ public class BibtexParser {
                     dumpTextReadSoFarToString();
                 }
             }
-        } else if (comment.substring(0,
-                Math.min(comment.length(), CustomEntryType.ENTRYTYPE_FLAG.length())).equals(
-                CustomEntryType.ENTRYTYPE_FLAG)) {
+        } else if (comment.substring(0, Math.min(comment.length(), CustomEntryType.ENTRYTYPE_FLAG.length()))
+                .equals(CustomEntryType.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
             CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
             entryTypes.put(typ.getName(), typ);
+
+            // custom entry types are always re-written by JabRef and not stored in the file
+            dumpTextReadSoFarToString();
         } else {
             // FIXME: user comments are simply dropped
             // at least, we log that we ignored the comment
@@ -367,7 +368,7 @@ public class BibtexParser {
             }
 
             // only keep newlines if there is an entry before
-            if (runningIndex > 0 && !"}".equals(result.charAt(runningIndex - 1))) {
+            if ((runningIndex > 0) && !"}".equals(result.charAt(runningIndex - 1))) {
                 result = result.substring(indexOfAt);
             } else {
                 result = result.substring(runningIndex + 1);
