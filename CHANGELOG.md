@@ -17,6 +17,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Add support for proxy authentication via VM args and GUI settings, this implements Feature Request #388
 - Move Bibtex and Biblatex mode switcher to File menu
 - Display active edit mode (BibTeX or Biblatex) at window title
+- Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
 
 ### Fixed
 - Fixed #420: Reenable preference changes

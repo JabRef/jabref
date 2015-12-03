@@ -108,12 +108,18 @@ public class SearchBar extends JPanel {
         this.searchField = initSearchField();
         this.add(searchField);
 
+        JButton clearSearchButton = new JButton(Localization.lang("Clear"));
+        clearSearchButton.addActionListener((l) -> endSearch());
+        this.add(clearSearchButton);
+
         searchModeButton = new JButton();
         updateSearchModeButtonText();
         searchModeButton.addActionListener((l) -> toggleSearchModeAndSearch());
 
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(false);
+        toolBar.add(clearSearchButton);
+        toolBar.addSeparator();
         toolBar.add(regularExp);
         toolBar.add(caseSensitive);
         toolBar.addSeparator();
@@ -184,7 +190,7 @@ public class SearchBar extends JPanel {
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE) {
-                    basePanel.mainTable.requestFocus();
+                    endSearch();
                 }
             }
         });
@@ -203,6 +209,13 @@ public class SearchBar extends JPanel {
         JTextFieldChangeListenerUtil.addChangeListener(searchField, e -> performSearch());
 
         return searchField;
+    }
+
+    private void endSearch() {
+        // first focus request is necessary so that the UI stays nice
+        basePanel.mainTable.requestFocus();
+        clearSearch();
+        basePanel.mainTable.requestFocus();
     }
 
     /**
