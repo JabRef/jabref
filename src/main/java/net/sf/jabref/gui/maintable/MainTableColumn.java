@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.maintable;
 
 import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 
 import java.util.Optional;
@@ -75,6 +76,32 @@ public class MainTableColumn {
         return bibtexFields;
     }
 
+    public Object getColumnValue(BibtexEntry entry) {
+        if (bibtexFields.isPresent()) {
+            String content = null;
+            String[] possibleFields =bibtexFields.get();
+            for (int i = 0; i < possibleFields.length; i++) {
+                if (possibleFields[i].equals(BibtexEntry.TYPE_HEADER)) {
+                    content = entry.getType().getName();
+                } else {
+                    content = entry.getFieldOrAlias(possibleFields[i]);
+                    if ("Author".equalsIgnoreCase(columnName) && (content != null)) {
+                        //TODO
+                        // content = panel.database().resolveForStrings((String) content);
+                    }
+                }
+                if (content != null) {
+                    break;
+                }
+            }
 
+            if (isNameColumn()) {
+                //TODO
+                // return formatName(content);
+            }
+            return content;
 
+        }
+        return null;
+    }
 }

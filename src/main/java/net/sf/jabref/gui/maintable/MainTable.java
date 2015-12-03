@@ -417,7 +417,10 @@ public class MainTable extends JTable {
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
         List<String> fields = new ArrayList<>();
         for (Integer i : sortCols) {
-            String name = tableFormat.getColumnType(i);
+            // TODO check whether this really works
+            String name = tableFormat.getColumnName(i);
+            //TODO OLD
+            // String name = tableFormat.getColumnType(i);
             if (name != null) {
                 fields.add(name.toLowerCase());
             }
@@ -460,72 +463,72 @@ public class MainTable extends JTable {
         // Set initial sort columns:
 
         // Default sort order:
-        String[] sortFields = new String[] {
-                Globals.prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD),
-                Globals.prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD),
-                Globals.prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD)
-        };
-        boolean[] sortDirections = new boolean[] {
-                Globals.prefs.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING),
-                Globals.prefs.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING),
-                Globals.prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING)
-        }; // descending
-
-        sortedForTable.getReadWriteLock().writeLock().lock();
-        try {
-            for (int i = 0; i < sortFields.length; i++) {
-                int index = -1;
-                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX)) {
-                    index = tableFormat.getColumnIndex(sortFields[i]);
-                } else {
-                    for (int j = 0; j < tableFormat.getColumnCount(); j++) {
-                        if (sortFields[i].equals(tableFormat.getColumnType(j))) {
-                            index = j;
-                            break;
-                        }
-                    }
-                }
-                if (index >= 0) {
-                    comparatorChooser.appendComparator(index, 0, sortDirections[i]);
-                }
-            }
-        } finally {
-            sortedForTable.getReadWriteLock().writeLock().unlock();
-        }
-
-        // Add action listener so we can remember the sort order:
-        comparatorChooser.addSortActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                // Get the information about the current sort order:
-                List<String> fields = getCurrentSortFields();
-                List<Boolean> order = getCurrentSortOrder();
-                // Update preferences:
-                int count = Math.min(fields.size(), order.size());
-                if (count >= 1) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
-                }
-                if (count >= 2) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
-                }
-                else {
-                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
-                }
-                if (count >= 3) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
-                }
-                else {
-                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
-                }
-            }
-
-        });
+//        String[] sortFields = new String[] {
+//                Globals.prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD),
+//                Globals.prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD),
+//                Globals.prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD)
+//        };
+//        boolean[] sortDirections = new boolean[] {
+//                Globals.prefs.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING),
+//                Globals.prefs.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING),
+//                Globals.prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING)
+//        }; // descending
+//
+//        sortedForTable.getReadWriteLock().writeLock().lock();
+//        try {
+//            for (int i = 0; i < sortFields.length; i++) {
+//                int index = -1;
+//                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX)) {
+//                    index = tableFormat.getColumnIndex(sortFields[i]);
+//                } else {
+//                    for (int j = 0; j < tableFormat.getColumnCount(); j++) {
+//                        if (sortFields[i].equals(tableFormat.getColumnType(j))) {
+//                            index = j;
+//                            break;
+//                        }
+//                    }
+//                }
+//                if (index >= 0) {
+//                    comparatorChooser.appendComparator(index, 0, sortDirections[i]);
+//                }
+//            }
+//        } finally {
+//            sortedForTable.getReadWriteLock().writeLock().unlock();
+//        }
+//
+//        // Add action listener so we can remember the sort order:
+//        comparatorChooser.addSortActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                // Get the information about the current sort order:
+//                List<String> fields = getCurrentSortFields();
+//                List<Boolean> order = getCurrentSortOrder();
+//                // Update preferences:
+//                int count = Math.min(fields.size(), order.size());
+//                if (count >= 1) {
+//                    Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
+//                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
+//                }
+//                if (count >= 2) {
+//                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
+//                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
+//                }
+//                else {
+//                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
+//                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
+//                }
+//                if (count >= 3) {
+//                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
+//                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
+//                }
+//                else {
+//                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
+//                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
+//                }
+//            }
+//
+//        });
 
     }
 
