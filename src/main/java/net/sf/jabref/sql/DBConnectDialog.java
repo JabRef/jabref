@@ -224,11 +224,8 @@ public class DBConnectDialog extends JDialog {
         case 2:
             errMsg = errMsg + errors[0] + " and " + errors[1] + '.';
             break;
-        case 3:
+        default: // Will be 3 at most
             errMsg = errMsg + errors[0] + ", " + errors[1] + ", and " + errors[2] + '.';
-            break;
-        default:
-
         }
 
         return errMsg;
@@ -247,10 +244,7 @@ public class DBConnectDialog extends JDialog {
         dbStrings.storeToPreferences();
 
         char[] pwd = pwdPassword.getPassword();
-        String tmp = "";
-        for (char aPwd : pwd) {
-            tmp = tmp + aPwd;
-        }
+        String tmp = new String(pwd);
         dbStrings.setPassword(tmp);
         Arrays.fill(pwd, '0');
 

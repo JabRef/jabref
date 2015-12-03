@@ -25,9 +25,11 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 import javax.swing.*;
+import javax.xml.transform.TransformerException;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -133,7 +135,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
                                 message = Localization.lang("Wrote XMP-metadata");
                             }
                             written++;
-                        } catch (Exception e) {
+                        } catch (IOException | TransformerException e) {
                             if (files.size() == 1) {
                                 message = Localization.lang("Error while writing") + " '" + file.getPath() + "'";
                             }

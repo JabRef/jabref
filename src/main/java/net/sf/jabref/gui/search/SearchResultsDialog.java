@@ -89,9 +89,9 @@ public class SearchResultsDialog {
     private final String[] fields = new String[] {
             "author", "title", "year", "journal"
     };
-    private final int FILE_COL = 0;
-    private final int URL_COL = 1;
-    private final int PAD = 2;
+    private final static int FILE_COL = 0;
+    private final static int URL_COL = 1;
+    private final static int PAD = 2;
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
