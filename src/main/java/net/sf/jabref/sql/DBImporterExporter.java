@@ -36,9 +36,9 @@ public class DBImporterExporter {
     protected int getDatabaseIDByName(MetaData metaData, Object out, String dbName) throws SQLException {
 
         if (out instanceof Connection) {
-            Object response = SQLUtil.processQueryWithResults(out,
+            try (Statement response = (Statement) SQLUtil.processQueryWithResults(out,
                     "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';");
-            try (ResultSet rs = ((Statement) response).getResultSet()) {
+                    ResultSet rs = response.getResultSet()) {
                 if (rs.next()) {
                     return rs.getInt("database_id");
                 } else {
