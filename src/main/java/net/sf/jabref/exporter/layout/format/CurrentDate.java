@@ -32,16 +32,18 @@ import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 /**
  * Inserts the current date (the time a database is being exported).
- * 
+ *
  * <p>If a fieldText is given, it must be a valid {@link SimpleDateFormat} pattern.
- * If none is given, the format pattern will be <code>yyyy.MM.dd hh:mm:ss z</code></p>
+ * If none is given, the format pattern will be <code>yyyy-MM-dd hh:mm:ss z</code>.
+ * This follows ISO-8601. Reason: <a href="https://xkcd.com/1179/">https://xkcd.com/1179/</a>.</p>
  *
  * @author andreas_sf at rudert-home dot de
  */
 public class CurrentDate implements LayoutFormatter
 {
 
-    private static final String defaultFormat = "yyyy.MM.dd hh:mm:ss z";
+    // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
+    private static final String defaultFormat = "yyyy-MM-dd hh:mm:ss z";
 
 
     /*
@@ -52,7 +54,7 @@ public class CurrentDate implements LayoutFormatter
     public String format(String fieldText)
     {
         String format = CurrentDate.defaultFormat;
-        if (fieldText != null && fieldText.trim() != null && !fieldText.trim().isEmpty()) {
+        if ((fieldText != null) && (fieldText.trim() != null) && !fieldText.trim().isEmpty()) {
             format = fieldText;
         }
         return new SimpleDateFormat(format).format(new Date());
