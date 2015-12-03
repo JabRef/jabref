@@ -319,11 +319,11 @@ public class DownloadExternalFile {
         }
         // First see if the stripped link gives a reasonable suffix:
         String suffix;
-        int sLIndex = strippedLink.lastIndexOf('.');
-        if ((sLIndex <= 0) || (sLIndex == (strippedLink.length() - 1))) {
+        int strippedLinkIndex = strippedLink.lastIndexOf('.');
+        if ((strippedLinkIndex <= 0) || (strippedLinkIndex == (strippedLink.length() - 1))) {
             suffix = null;
         } else {
-            suffix = strippedLink.substring(sLIndex + 1);
+            suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
         if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
             return suffix;
@@ -335,7 +335,7 @@ public class DownloadExternalFile {
                 // No occurrence, or at the end
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (strippedLink.substring(sLIndex + 1).indexOf('/') > 0) {
+                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') > 0) {
                     return "";
                 } else {
                     return suffix; // return the first one we found, anyway.
