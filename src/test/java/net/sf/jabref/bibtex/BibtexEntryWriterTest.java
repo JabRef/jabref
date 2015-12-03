@@ -52,12 +52,12 @@ public class BibtexEntryWriterTest {
 
         String actual = stringWriter.toString();
 
-        String expected = "@Article{," + Globals.NEWLINE +
+        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
                 "  Author                   = {Foo Bar}," + Globals.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
                 "  Note                     = {some note}," + Globals.NEWLINE +
                 "  Number                   = {1}" + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+                "}";
 
         assertEquals(expected, actual);
     }
@@ -120,6 +120,43 @@ public class BibtexEntryWriterTest {
         String actual = stringWriter.toString();
 
         assertEquals(bibtexEntry, actual);
+    }
+
+    @Test
+    public void roundTripWithModification() throws IOException {
+        String bibtexEntry = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}";
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+
+        Collection<BibtexEntry> entries = result.getDatabase().getEntries();
+        Assert.assertEquals(1, entries.size());
+
+        BibtexEntry entry = entries.iterator().next();
+        Assert.assertEquals("test", entry.getCiteKey());
+        Assert.assertEquals(5, entry.getFieldNames().size());
+        entry.setField("author", "BlaBla");
+        Set<String> fields = entry.getFieldNames();
+        Assert.assertTrue(fields.contains("author"));
+        Assert.assertEquals("BlaBla", entry.getField("author"));
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter);
+        String actual = stringWriter.toString();
+
+        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {BlaBla}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}";
+        assertEquals(expected, actual);
     }
 
     @Test
