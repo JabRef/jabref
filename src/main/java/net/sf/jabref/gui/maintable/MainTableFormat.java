@@ -77,6 +77,10 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     }
 
+    public List<MainTableColumn> getTableColumns() {
+        return tableColumns;
+    }
+
 
     /**
      * This method returns a string array indicating the types of icons to be displayed in the given column.

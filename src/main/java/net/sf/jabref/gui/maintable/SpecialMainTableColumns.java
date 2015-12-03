@@ -12,7 +12,7 @@ import javax.swing.*;
 
 public class SpecialMainTableColumns {
 
-    public static final MainTableColumn NUMBER_COL = new MainTableColumn(GUIGlobals.NUMBER_COL) {
+    public static final MainTableColumn NUMBER_COL = new MainTableColumn(GUIGlobals.NUMBER_COL, false) {
 
         @Override
         public Object getColumnValue(BibtexEntry entry) {
@@ -21,7 +21,7 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_RANKING,
-            new String[] {SpecialFieldsUtils.FIELDNAME_RANKING}) {
+            new String[] {SpecialFieldsUtils.FIELDNAME_RANKING}, true) {
 
         @Override
         public Object getColumnValue(BibtexEntry entry) {
@@ -35,7 +35,7 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_PRIORITY,
-            new String[] {SpecialFieldsUtils.FIELDNAME_PRIORITY}) {
+            new String[] {SpecialFieldsUtils.FIELDNAME_PRIORITY}, true) {
 
         @Override
         public Object getColumnValue(BibtexEntry entry) {
@@ -51,7 +51,7 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_READ,
-            new String[] {SpecialFieldsUtils.FIELDNAME_READ}) {
+            new String[] {SpecialFieldsUtils.FIELDNAME_READ}, true) {
 
         @Override
         public Object getColumnValue(BibtexEntry entry) {
@@ -77,7 +77,7 @@ public class SpecialMainTableColumns {
 
 
     public static final MainTableColumn FILE_COLUMN = new MainTableColumn(Globals.FILE_FIELD,
-            new String[] {Globals.FILE_FIELD}) {
+            new String[] {Globals.FILE_FIELD}, true) {
 
         @Override
         public Object getColumnValue(BibtexEntry entry) {
@@ -105,7 +105,7 @@ public class SpecialMainTableColumns {
      * @return the crated MainTableColumn
      */
     public static MainTableColumn createIconColumn(String columnName, String[] fields) {
-        return new MainTableColumn(columnName, fields) {
+        return new MainTableColumn(columnName, fields, true) {
 
             @Override public Object getColumnValue(BibtexEntry entry) {
                 JLabel iconLabel = null;
@@ -138,7 +138,7 @@ public class SpecialMainTableColumns {
      * @return the created MainTableColumn
      */
     public static MainTableColumn createFileIconColumn(String externalFileTypeName) {
-        return new MainTableColumn(externalFileTypeName) {
+        return new MainTableColumn(externalFileTypeName, true) {
 
             @Override public Object getColumnValue(BibtexEntry entry) {
 

@@ -12,14 +12,24 @@ public class MainTableColumn {
 
     private Optional<String[]> bibtexFields;
 
-    public MainTableColumn(String columnName) {
+    private boolean isIconColumn;
+
+    public MainTableColumn(String columnName, boolean isIconColumn) {
         this.columnName = columnName;
         this.bibtexFields = Optional.empty();
+        this.isIconColumn = isIconColumn;
     }
 
     public MainTableColumn(String columnName, String[] bibtexFields) {
         this.columnName = columnName;
         this.bibtexFields = Optional.of(bibtexFields);
+        this.isIconColumn = false;
+    }
+
+    public MainTableColumn(String columnName, String[] bibtexFields, boolean isIconColumn) {
+        this.columnName = columnName;
+        this.bibtexFields = Optional.of(bibtexFields);
+        this.isIconColumn = isIconColumn;
     }
 
     /**
@@ -74,6 +84,10 @@ public class MainTableColumn {
 
     public Optional<String[]> getBibtexFields() {
         return bibtexFields;
+    }
+
+    public boolean isIconColumn() {
+        return isIconColumn;
     }
 
     public Object getColumnValue(BibtexEntry entry) {
