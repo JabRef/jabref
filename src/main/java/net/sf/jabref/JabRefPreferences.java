@@ -32,6 +32,7 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import javax.swing.*;
@@ -353,7 +354,7 @@ public class JabRefPreferences {
 
     private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<>(4);
     private final HashSet<String> nonWrappableFields = new HashSet<>(5);
-    private static GlobalLabelPattern keyPattern;
+    private GlobalLabelPattern keyPattern;
 
     // Object containing custom export formats:
     public final CustomExportList customExports;
@@ -1196,19 +1197,19 @@ public class JabRefPreferences {
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
     public GlobalLabelPattern getKeyPattern() {
-        JabRefPreferences.keyPattern = new GlobalLabelPattern();
+        keyPattern = new GlobalLabelPattern();
         Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
                 for (String key : keys) {
-                    JabRefPreferences.keyPattern.addLabelPattern(key, pre.get(key, null));
+                    keyPattern.addLabelPattern(key, pre.get(key, null));
                 }
             }
         } catch (BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
-        return JabRefPreferences.keyPattern;
+        return keyPattern;
     }
 
     /**
@@ -1217,7 +1218,7 @@ public class JabRefPreferences {
      * @param pattern the pattern to store
      */
     public void putKeyPattern(GlobalLabelPattern pattern) {
-        JabRefPreferences.keyPattern = pattern;
+        keyPattern = pattern;
 
         // Store overridden definitions to Preferences.
         Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
@@ -1667,5 +1668,13 @@ public class JabRefPreferences {
      */
     void overwritePreferences(JabRefPreferences owPrefs) {
         singleton = owPrefs;
+    }
+
+    public Charset getDefaultEncoding() {
+        return Charset.forName(get(JabRefPreferences.DEFAULT_ENCODING));
+    }
+
+    public void setDefaultEncoding(Charset encoding) {
+        put(JabRefPreferences.DEFAULT_ENCODING, encoding.name());
     }
 }

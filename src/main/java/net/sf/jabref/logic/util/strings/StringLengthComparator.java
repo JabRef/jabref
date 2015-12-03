@@ -1,8 +1,8 @@
-package net.sf.jabref.importer.fetcher;
+package net.sf.jabref.logic.util.strings;
 
 import java.util.Comparator;
 
-class LengthComparator implements Comparator<String> {
+public class StringLengthComparator implements Comparator<String> {
 
     @Override
     public int compare(String o1, String o2) {

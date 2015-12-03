@@ -13,15 +13,19 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Add ability to format/cleanup the date field
 - Add support for proxy authentication via VM args and GUI settings, this implements Feature Request #388
 - Move Bibtex and Biblatex mode switcher to File menu
 - Display active edit mode (BibTeX or Biblatex) at window title
+- Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
 
 ### Fixed
-- Fix #420: Reenable preference changes
-- Fix #414: Rework BibLatex entry types with correct required and optional fields
-- Fix #413: Help links in released jar version are not working
-- Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete. Fixes #412 
+- Fixed #420: Reenable preference changes
+- Fixed #414: Rework BibLatex entry types with correct required and optional fields
+- Fixed #413: Help links in released jar version are not working
+- Fixes #412: Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete.
+- Fixed #437: The toolbar after the search field is now correctly wrapped when using a small window size for JabRef
+- Fixed #438: Cut, Copy and Paste are now translated correctly in the menu
 
 ### Removed
 - Removed file history size preference (never available from the UI)
@@ -155,7 +159,7 @@ Since much functionality has changed during development, a release of this versi
 
 ## 2.11 - 2015-11-11
 
-The changelog of 2.11 and versions before is maintained as text file in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
+The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v3.0...HEAD
 [3.0]: https://github.com/JabRef/jabref/compare/v2.11.1...v3.0

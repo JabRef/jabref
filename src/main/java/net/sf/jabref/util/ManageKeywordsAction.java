@@ -405,7 +405,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     private static HashSet<String> createClone(HashSet<String> keywordsToAdd) {
-        return (HashSet<String>) keywordsToAdd.clone();
+        return new HashSet<>(keywordsToAdd);
     }
 
     private void fillKeyWordList() {

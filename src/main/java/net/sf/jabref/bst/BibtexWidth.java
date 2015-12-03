@@ -46,29 +46,7 @@ public class BibtexWidth {
     private static int[] widths;
 
 
-    private static int getSpecialCharWidth(char[] c, int pos) {
-        if ((pos + 1) < c.length) {
-            if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
-                return 778;
-            }
-            if ((c[pos] == 'O') && (c[pos + 1] == 'E')) {
-                return 1014;
-            }
-            if ((c[pos] == 'a') && (c[pos + 1] == 'e')) {
-                return 722;
-            }
-            if ((c[pos] == 'A') && (c[pos + 1] == 'E')) {
-                return 903;
-            }
-            if ((c[pos] == 's') && (c[pos + 1] == 's')) {
-                return 500;
-            }
-        }
-        return BibtexWidth.getCharWidth(c[pos]);
-    }
-
-    public static int getCharWidth(char c) {
-
+    static {
         if (BibtexWidth.widths == null) {
             BibtexWidth.widths = new int[128];
 
@@ -171,6 +149,31 @@ public class BibtexWidth {
             BibtexWidth.widths[125] = 500;
             BibtexWidth.widths[126] = 500;
         }
+    }
+
+    private static int getSpecialCharWidth(char[] c, int pos) {
+        if ((pos + 1) < c.length) {
+            if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
+                return 778;
+            }
+            if ((c[pos] == 'O') && (c[pos + 1] == 'E')) {
+                return 1014;
+            }
+            if ((c[pos] == 'a') && (c[pos + 1] == 'e')) {
+                return 722;
+            }
+            if ((c[pos] == 'A') && (c[pos + 1] == 'E')) {
+                return 903;
+            }
+            if ((c[pos] == 's') && (c[pos + 1] == 's')) {
+                return 500;
+            }
+        }
+        return BibtexWidth.getCharWidth(c[pos]);
+    }
+
+    public static int getCharWidth(char c) {
+
 
         if ((c >= 0) && (c < 128)) {
             return BibtexWidth.widths[c];

@@ -62,7 +62,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private MetaData metaData;
     private BasePanel panel;
-    private final JComboBox<String> encoding;
+    private final JComboBox<Charset> encoding;
     private final JButton ok;
     private final JButton cancel;
     private final JTextField fileDir = new JTextField(40);
@@ -95,7 +95,7 @@ public class DatabasePropertiesDialog extends JDialog {
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Localization.lang("Database properties"), true);
         encoding = new JComboBox<>();
-        encoding.setModel(new DefaultComboBoxModel(Encodings.ENCODINGS));
+        encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
         ok = new JButton(Localization.lang("Ok"));
         cancel = new JButton(Localization.lang("Cancel"));
         init(parent);
@@ -398,7 +398,7 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         Charset oldEncoding = panel.getEncoding();
-        Charset newEncoding = Charset.forName((String) encoding.getSelectedItem());
+        Charset newEncoding = (Charset) encoding.getSelectedItem();
         panel.setEncoding(newEncoding);
 
         Vector<String> dir = new Vector<>(1);

@@ -34,14 +34,13 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.HTMLConverter;
-import net.sf.jabref.importer.fetcher.CaseKeeper;
-import net.sf.jabref.importer.fetcher.UnitFormatter;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.logic.cleanup.PageNumbersCleanup;
+
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -57,6 +56,7 @@ public class CleanUpAction extends AbstractWorker {
     private static final String CLEANUP_DOI = "CleanUpDOI";
     private static final String CLEANUP_MONTH = "CleanUpMonth";
     private static final String CLEANUP_PAGENUMBERS = "CleanUpPageNumbers";
+    private static final String CLEANUP_DATE = "CleanUpDate";
     private static final String CLEANUP_MAKEPATHSRELATIVE = "CleanUpMakePathsRelative";
     private static final String CLEANUP_RENAMEPDF = "CleanUpRenamePDF";
     private static final String CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
@@ -75,6 +75,7 @@ public class CleanUpAction extends AbstractWorker {
         defaults.put(CLEANUP_DOI, Boolean.TRUE);
         defaults.put(CLEANUP_MONTH, Boolean.TRUE);
         defaults.put(CLEANUP_PAGENUMBERS, Boolean.TRUE);
+        defaults.put(CLEANUP_DATE, Boolean.TRUE);
         defaults.put(CLEANUP_MAKEPATHSRELATIVE, Boolean.TRUE);
         defaults.put(CLEANUP_RENAMEPDF, Boolean.TRUE);
         defaults.put(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, Boolean.FALSE);
@@ -92,6 +93,7 @@ public class CleanUpAction extends AbstractWorker {
     private JCheckBox cleanUpDOI;
     private JCheckBox cleanUpMonth;
     private JCheckBox cleanUpPageNumbers;
+    private JCheckBox cleanUpDate;
     private JCheckBox cleanUpMakePathsRelative;
     private JCheckBox cleanUpRenamePDF;
     private JCheckBox cleanUpRenamePDFonlyRelativePaths;
@@ -162,6 +164,7 @@ public class CleanUpAction extends AbstractWorker {
         cleanUpDOI = new JCheckBox(Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
         cleanUpMonth = new JCheckBox(Localization.lang("Format content of month field to #mon#"));
         cleanUpPageNumbers = new JCheckBox(Localization.lang("Ensure that page ranges are of the form num1--num2"));
+        cleanUpDate = new JCheckBox(Localization.lang("Format date field in the form yyyy-mm or yyyy-mm-dd"));
         cleanUpMakePathsRelative = new JCheckBox(Localization.lang("Make paths of linked files relative (if possible)"));
         cleanUpRenamePDF = new JCheckBox(Localization.lang("Rename PDFs to given filename format pattern"));
         cleanUpRenamePDF.addChangeListener(new ChangeListener() {
@@ -181,7 +184,8 @@ public class CleanUpAction extends AbstractWorker {
         cleanUpBibLatex = new JCheckBox(Localization.lang("Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
         retrieveSettings();
 
-        FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
+        FormLayout layout = new FormLayout("left:15dlu,pref:grow",
+                "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
         FormBuilder builder = FormBuilder.create().layout(layout);
         builder.add(cleanUpHTML).xyw(1, 1, 2);
         builder.add(cleanUpUnicode).xyw(1, 2, 2);
@@ -192,13 +196,14 @@ public class CleanUpAction extends AbstractWorker {
         builder.add(cleanUpDOI).xyw(1, 7, 2);
         builder.add(cleanUpMonth).xyw(1, 8, 2);
         builder.add(cleanUpPageNumbers).xyw(1, 9, 2);
-        builder.add(cleanUpUpgradeExternalLinks).xyw(1, 10, 2);
-        builder.add(cleanUpMakePathsRelative).xyw(1, 11, 2);
-        builder.add(cleanUpRenamePDF).xyw(1, 12, 2);
+        builder.add(cleanUpDate).xyw(1, 10, 2);
+        builder.add(cleanUpUpgradeExternalLinks).xyw(1, 11, 2);
+        builder.add(cleanUpMakePathsRelative).xyw(1, 12, 2);
+        builder.add(cleanUpRenamePDF).xyw(1, 13, 2);
         String currentPattern = Localization.lang("Filename format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
-        builder.add(new JLabel(currentPattern)).xy(2, 13);
-        builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 14);
-        builder.add(cleanUpBibLatex).xyw(1, 15, 2);
+        builder.add(new JLabel(currentPattern)).xy(2, 14);
+        builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 15);
+        builder.add(cleanUpBibLatex).xyw(1, 16, 2);
         optionsPanel = builder.build();
 
     }
@@ -208,6 +213,7 @@ public class CleanUpAction extends AbstractWorker {
         cleanUpDOI.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_DOI));
         cleanUpMonth.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_MONTH));
         cleanUpPageNumbers.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_PAGENUMBERS));
+        cleanUpDate.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_DATE));
         cleanUpMakePathsRelative.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_MAKEPATHSRELATIVE));
         cleanUpRenamePDF.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_RENAMEPDF));
         cleanUpRenamePDFonlyRelativePaths.setSelected(Globals.prefs.getBoolean(CleanUpAction.CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS));
@@ -226,6 +232,7 @@ public class CleanUpAction extends AbstractWorker {
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_DOI, cleanUpDOI.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_MONTH, cleanUpMonth.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_PAGENUMBERS, cleanUpPageNumbers.isSelected());
+        Globals.prefs.putBoolean(CleanUpAction.CLEANUP_DATE, cleanUpDate.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_MAKEPATHSRELATIVE, cleanUpMakePathsRelative.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_RENAMEPDF, cleanUpRenamePDF.isSelected());
         Globals.prefs.putBoolean(CleanUpAction.CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, cleanUpRenamePDFonlyRelativePaths.isSelected());
@@ -281,6 +288,7 @@ public class CleanUpAction extends AbstractWorker {
         boolean choiceCleanUpDOI = cleanUpDOI.isSelected();
         boolean choiceCleanUpMonth = cleanUpMonth.isSelected();
         boolean choiceCleanUpPageNumbers = cleanUpPageNumbers.isSelected();
+        boolean choiceCleanUpDate = cleanUpDate.isSelected();
         boolean choiceCleanUpUpgradeExternalLinks = cleanUpUpgradeExternalLinks.isSelected();
         boolean choiceMakePathsRelative = cleanUpMakePathsRelative.isSelected();
         boolean choiceRenamePDF = cleanUpRenamePDF.isSelected();
@@ -333,6 +341,10 @@ public class CleanUpAction extends AbstractWorker {
             if (choiceCleanUpPageNumbers) {
                 doCleanUpPageNumbers(entry, ce);
             }
+            if (choiceCleanUpDate) {
+                doCleanUpDate(entry, ce);
+            }
+
             fixWrongFileEntries(entry, ce);
             if (choiceMakePathsRelative) {
                 doMakePathsRelative(entry, ce);
@@ -480,19 +492,7 @@ public class CleanUpAction extends AbstractWorker {
     }
 
     private static void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
-        String oldValue = entry.getField("pages");
-        // not set
-        if (oldValue == null) {
-            return;
-        }
-        // run formatter
-        new PageNumbersCleanup(entry).cleanup();
-        // new value
-        String newValue = entry.getField("pages");
-        // undo action
-        if (!oldValue.equals(newValue)) {
-            ce.addEdit(new UndoableFieldChange(entry, "pages", oldValue, newValue));
-        }
+        doFieldFormatterCleanup(entry, FieldFormatterCleanup.PAGE_NUMBERS, ce);
     }
 
     private static void fixWrongFileEntries(BibtexEntry entry, NamedCompound ce) {
@@ -671,58 +671,41 @@ public class CleanUpAction extends AbstractWorker {
      * Adds curly brackets {} around keywords
      */
     private static void doConvertCase(BibtexEntry entry, NamedCompound ce) {
-        final String field = "title";
-        String oldValue = entry.getField(field);
-        if (oldValue == null) {
-            return;
-        }
-        final CaseKeeper caseKeeper = new CaseKeeper();
-        String newValue = caseKeeper.format(oldValue);
-        if (!oldValue.equals(newValue)) {
-            entry.setField(field, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
-        }
+        doFieldFormatterCleanup(entry, FieldFormatterCleanup.TITLE_CASE, ce);
     }
 
     private static void doConvertUnits(BibtexEntry entry, NamedCompound ce) {
-        final String field = "title";
-        String oldValue = entry.getField(field);
-        if (oldValue == null) {
-            return;
-        }
-        final UnitFormatter unitFormatter = new UnitFormatter();
-        String newValue = unitFormatter.format(oldValue);
-        if (!oldValue.equals(newValue)) {
-            entry.setField(field, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
-        }
+        doFieldFormatterCleanup(entry, FieldFormatterCleanup.TITLE_UNITS, ce);
     }
 
     private static void doConvertLaTeX(BibtexEntry entry, NamedCompound ce) {
-        final String field = "title";
-        String oldValue = entry.getField(field);
+        doFieldFormatterCleanup(entry, FieldFormatterCleanup.TITLE_LATEX, ce);
+    }
+
+    /**
+     * Format dates correctly (yyyy-mm-dd or yyyy-mm)
+     */
+    private static void doCleanUpDate(BibtexEntry entry, NamedCompound ce) {
+        doFieldFormatterCleanup(entry, FieldFormatterCleanup.DATES, ce);
+    }
+
+    /**
+     * Runs the field formatter on the entry and records the change.
+     */
+    private static void doFieldFormatterCleanup(BibtexEntry entry, FieldFormatterCleanup cleaner, NamedCompound ce) {
+        String oldValue = entry.getField(cleaner.getField());
         if (oldValue == null) {
             return;
         }
-        String newValue = oldValue;
 
-        // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted
-        newValue = newValue.replace("$$", "").replaceAll("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{", "$1");
-        // Move numbers, +, -, /, and brackets into equations
-        newValue = newValue.replaceAll("(([^$]|\\\\\\$)*)\\$", "$1@@"); // Replace $, but not \$ with @@
-        newValue = newValue.replaceAll("([^@]*)@@([^@]*)@@", "$1\\$$2@@"); // Replace every other @@ with $
-        //newValue = newValue.replaceAll("([0-9\\(\\.]+) \\$","\\$$1\\\\ "); // Move numbers followed by a space left of $ inside the equation, e.g., 0.35 $\mu$m
-        newValue = newValue.replaceAll("([0-9\\(\\.]+[ ]?[-+/]?[ ]?)\\$", "\\$$1"); // Move numbers, possibly with operators +, -, or /,  left of $ into the equation
-        newValue = newValue.replaceAll("@@([ ]?[-+/]?[ ]?[0-9\\)\\.]+)", " $1@@"); // Move numbers right of @@ into the equation
-        newValue = newValue.replace("@@", "$"); // Replace all @@ with $
-        newValue = newValue.replace("  ", " "); // Clean up
-        newValue = newValue.replace("$$", "");
-        newValue = newValue.replace(" )$", ")$");
+        // run formatter
+        cleaner.cleanup(entry);
 
+        String newValue = entry.getField(cleaner.getField());
+
+        // undo action
         if (!oldValue.equals(newValue)) {
-            entry.setField(field, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+            ce.addEdit(new UndoableFieldChange(entry, cleaner.getField(), oldValue, newValue));
         }
     }
-
 }

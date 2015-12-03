@@ -20,8 +20,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Vector;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -221,26 +219,6 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     @Override
     public Enumeration<GroupTreeNode> children() {
         return super.children();
-    }
-
-    /**
-     * Scans the subtree rooted at this node.
-     *
-     * @return All groups that contain the specified entry.
-     */
-    public AbstractGroup[] getMatchingGroups(BibtexEntry entry) {
-        Vector<AbstractGroup> matchingGroups = new Vector<>();
-        Enumeration<GroupTreeNode> e = preorderEnumeration();
-        AbstractGroup group;
-        while (e.hasMoreElements()) {
-            group = e.nextElement().getGroup();
-            if (group.contains(null, entry)) {
-                matchingGroups.add(group);
-            }
-        }
-        AbstractGroup[] matchingGroupsArray = new AbstractGroup[matchingGroups
-                .size()];
-        return matchingGroups.toArray(matchingGroupsArray);
     }
 
     public boolean canMoveUp() {

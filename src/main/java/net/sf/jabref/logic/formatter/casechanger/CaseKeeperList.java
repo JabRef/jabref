@@ -14,13 +14,13 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-package net.sf.jabref.importer.fetcher;
+package net.sf.jabref.logic.formatter.casechanger;
 
 /**
  * Container class for lists with keywords where the case should be kept independent of bibstyle
- * 
+ *
  */
-class CaseKeeperList {
+public class CaseKeeperList {
 
     // @formatter:off
     // Common words in IEEE Xplore that should always be in the given case

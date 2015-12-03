@@ -32,6 +32,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -46,6 +49,8 @@ import net.sf.jabref.model.entry.EntryType;
  * Open Source Citation Parser http://freecite.library.brown.edu/
  */
 public class FreeCiteImporter extends ImportFormat {
+
+    private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
 
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
@@ -94,11 +99,11 @@ public class FreeCiteImporter extends ImportFormat {
             // write parameters
             writer.write(data);
             writer.flush();
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Already connected.", e);
         } catch (IOException e) {
             status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
-            return null;
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Unable to connect to FreeCite online service.", e);
             return null;
         }
         // output is in conn.getInputStream();

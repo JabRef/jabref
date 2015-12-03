@@ -13,19 +13,21 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.importer.fetcher;
+package net.sf.jabref.logic.formatter.casechanger;
 
 import java.util.Arrays;
 
-import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
-public class CaseKeeper implements LayoutFormatter {
+public class CaseKeeper implements Formatter {
 
     private String format(String text, String[] listOfWords) {
         if (text == null) {
             return null;
         }
-        Arrays.sort(listOfWords, new LengthComparator());
+        Arrays.sort(listOfWords, new StringLengthComparator());
         // For each word in the list
         for (String listOfWord : listOfWords) {
             // Add {} if the character before is a space, -, /, (, [, ", or } or if it is at the start of the string but not if it is followed by a }
@@ -41,6 +43,11 @@ public class CaseKeeper implements LayoutFormatter {
         }
         final CaseKeeperList list = new CaseKeeperList();
         return this.format(text, list.getAll());
+    }
+
+    @Override
+    public String getName() {
+        return Localization.lang("CaseKepper");
     }
 
 }

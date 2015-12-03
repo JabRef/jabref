@@ -101,14 +101,6 @@ public class BibtexString {
         type = Type.get(name);
     }
 
-    public BibtexString(String id, String name, String content, Type type) {
-        this.id = id;
-        this.name = name;
-        this.content = content;
-        this.type = type;
-        hasChanged = true;
-    }
-
     public String getId() {
         return id;
     }
