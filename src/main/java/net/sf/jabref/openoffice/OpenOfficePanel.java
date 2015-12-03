@@ -838,7 +838,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                         + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
                 + Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")
                 + "</html>",
-                Localization.lang(""), JOptionPane.ERROR_MESSAGE);
+                "", JOptionPane.ERROR_MESSAGE);
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
@@ -846,7 +846,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                         + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
                 + Localization.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
                 + "</html>",
-                Localization.lang(""), JOptionPane.ERROR_MESSAGE);
+                "", JOptionPane.ERROR_MESSAGE);
     }
 
     public void insertUsingBST() {
