@@ -115,16 +115,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         return -1;
     }
 
-    /**
-     * Checks, if the Column (int col) is a Ranking-Column
-     *
-     * @param col Column Number
-     * @return Is Ranking-Column or not?
-     */
-    public boolean isRankingColumn(int col) {
-        return tableColumns.get(col).getColumnName().equals(SpecialFieldsUtils.FIELDNAME_RANKING);
-    }
-
     @Override
     public Object getColumnValue(BibtexEntry be, int col) {
 
