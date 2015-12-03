@@ -37,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
@@ -172,17 +173,10 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             formItems.put("scis", "yes");
             formItems.put("scisf", "4");
             formItems.put("num", String.valueOf(GoogleScholarFetcher.MAX_ENTRIES_TO_LOAD));
-            StringBuilder ub = new StringBuilder(GoogleScholarFetcher.URL_SETPREFS + "?");
-            for (Iterator<Map.Entry<String, String>> i = formItems.entrySet().iterator(); i.hasNext();) {
-                Map.Entry<String, String> name = i.next();
-                ub.append(name.getKey()).append("=").append(name.getValue());
-                if (i.hasNext()) {
-                    ub.append("&");
-                }
-            }
-            ub.append("&submit=");
+            String request = formItems.entrySet().stream().map(Object::toString)
+                    .collect(Collectors.joining("&", GoogleScholarFetcher.URL_SETPREFS + "?", "&submit="));
             // Download the URL to set preferences:
-            new URLDownload(new URL(ub.toString())).downloadToString();
+            new URLDownload(new URL(request)).downloadToString();
 
         } catch (UnsupportedEncodingException ex) {
             LOGGER.error("Unsupported encoding.", ex);
