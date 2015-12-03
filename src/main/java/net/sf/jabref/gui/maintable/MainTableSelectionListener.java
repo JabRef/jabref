@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -231,15 +231,18 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         final int col = table.columnAtPoint(e.getPoint());
         final int row = table.rowAtPoint(e.getPoint());
 
-        // Check if the user has clicked on an icon cell to open url or pdf.
-        final String[] iconType = table.getIconTypeForColumn(col);
+        // get the MainTableColumn which is currently visible at col
+        int modelIndex = table.getColumnModel().getColumn(col).getModelIndex();
+        MainTableColumn modelColumn = table.getMainTableColumn(modelIndex);
 
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
-            if (iconType == null) {
+            if (modelColumn == null || !modelColumn.isIconColumn()) {
+                // show normal right click menu
                 processPopupTrigger(e, row);
             } else {
-                showIconRightClickMenu(e, row, iconType);
+                // show right click menu for icon columns
+                showIconRightClickMenu(e, row, modelColumn);
             }
         }
     }
@@ -421,77 +424,74 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     }
 
     /**
-     * Process popup trigger events occurring on an icon cell in the table. Show
-     * a menu where the user can choose which external resource to open for the
-     * entry. If no relevant external resources exist, let the normal popup trigger
+     * Process popup trigger events occurring on an icon cell in the table. Show a menu where the user can choose which
+     * external resource to open for the entry. If no relevant external resources exist, let the normal popup trigger
      * handler do its thing instead.
+     *
      * @param e The mouse event defining this popup trigger.
      * @param row The row where the event occurred.
-     * @param iconType A string array containing the resource fields associated with
-     *  this table cell.
+     * @param column the MainTableColumn associated with this table cell.
      */
-    private void showIconRightClickMenu(MouseEvent e, int row, String[] iconType) {
+    private void showIconRightClickMenu(MouseEvent e, int row, MainTableColumn column) {
         BibtexEntry entry = tableRows.get(row);
         JPopupMenu menu = new JPopupMenu();
         boolean showDefaultPopup = true;
 
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
-        if (iconType[0].equals(Globals.FILE_FIELD)) {
-            // We use a FileListTableModel to parse the field content:
-            Object o = entry.getField(iconType[0]);
-            FileListTableModel fileList = new FileListTableModel();
-            fileList.setContent((String) o);
-            // If there are one or more links, open the first one:
-            for (int i = 0; i < fileList.getRowCount(); i++) {
-                FileListEntry flEntry = fileList.getEntry(i);
+        if(column.getBibtexFields().isPresent()) {
+            for(String field : column.getBibtexFields().get()) {
+                if (Globals.FILE_FIELD.equals(field)) {
+                    // We use a FileListTableModel to parse the field content:
+                    String fileFieldContent = entry.getField(field);
+                    FileListTableModel fileList = new FileListTableModel();
+                    fileList.setContent(fileFieldContent);
+                    // If there are one or more links, open the first one:
+                    for (int i = 0; i < fileList.getRowCount(); i++) {
+                        FileListEntry flEntry = fileList.getEntry(i);
+                        // TODO Enable Filtering for special file type columns
+                        //                        //If file types are specified, ignore files of other types.
+                        //                        if (column.length > 1) {
+                        //                            boolean correctType = false;
+                        //                            for (int j = 1; j < column.length; j++) {
+                        //                                if (flEntry.getType().toString().equals(column[j])) {
+                        //                                    correctType = true;
+                        //                                }
+                        //                            }
+                        //                            if (!correctType) {
+                        //                                continue;
+                        //                            }
+                        //                        }
 
-                //If file types are specified, ignore files of other types.
-                if (iconType.length > 1) {
-                    boolean correctType = false;
-                    for (int j = 1; j < iconType.length; j++) {
-                        if (flEntry.getType().toString().equals(iconType[j])) {
-                            correctType = true;
+                        String description = flEntry.getDescription();
+                        if ((description == null) || (description.trim().isEmpty())) {
+                            description = flEntry.getLink();
                         }
-                    }
-                    if (!correctType) {
-                        continue;
-                    }
-                }
-
-                String description = flEntry.getDescription();
-                if ((description == null) || (description.trim().isEmpty())) {
-                    description = flEntry.getLink();
-                }
-                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
-                        flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
-                        flEntry.getType()));
-                showDefaultPopup = false;
-            }
-        } else {
-            SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(iconType[0]);
-            if (field != null) {
-                //                for (SpecialFieldValue val: field.getValues()) {
-                //                	menu.add(val.getMenuAction(panel.frame()));
-                //                }
-                // full pop should be shown as left click already shows short popup
-                showDefaultPopup = true;
-            } else {
-                for (String anIconType : iconType) {
-                    Object o = entry.getField(anIconType);
-                    if (o != null) {
-                        menu.add(new ExternalFileMenuItem(panel.frame(), entry, (String) o, (String) o,
-                                GUIGlobals.getTableIcon(anIconType).getIcon(),
-                                panel.metaData(), anIconType));
+                        menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
+                                flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
+                                flEntry.getType()));
                         showDefaultPopup = false;
                     }
+                } else {
+                    SpecialField specialField = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(column.getColumnName());
+                    if (specialField != null) {
+                        // full pop should be shown as left click already shows short popup
+                        showDefaultPopup = true;
+                    } else {
+                        String content = entry.getField(field);
+                        if (content != null) {
+                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content,
+                                    GUIGlobals.getTableIcon(field).getIcon(), panel.metaData(), field));
+                            showDefaultPopup = false;
+                        }
+                    }
                 }
             }
-        }
-        if (showDefaultPopup) {
-            processPopupTrigger(e, row);
-        } else {
-            menu.show(table, e.getX(), e.getY());
+            if (showDefaultPopup) {
+                processPopupTrigger(e, row);
+            } else {
+                menu.show(table, e.getX(), e.getY());
+            }
         }
     }
 

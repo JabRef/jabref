@@ -153,8 +153,7 @@ public class MainTable extends JTable {
         setGridColor(Globals.prefs.getColor(JabRefPreferences.GRID_COLOR));
         if (Globals.prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID)) {
             setShowGrid(true);
-        } else
-        {
+        } else {
             setShowGrid(false);
             setIntercellSpacing(new Dimension(0, 0));
         }
@@ -788,5 +787,9 @@ public class MainTable extends JTable {
      */
     public SortedList<BibtexEntry> getSortedForTable() {
         return sortedForTable;
+    }
+
+    public MainTableColumn getMainTableColumn(int modelIndex) {
+        return tableFormat.getTableColumns().get(modelIndex);
     }
 }
