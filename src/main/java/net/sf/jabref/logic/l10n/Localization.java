@@ -64,6 +64,9 @@ public class Localization {
                     + Locale.getDefault());
         }
         if (translation == null) {
+            LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
+                    + Locale.getDefault());
+
             translation = key;
         }
 

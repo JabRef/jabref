@@ -26,7 +26,7 @@ public class FileHistory {
     private final JabRefPreferences prefs;
     private final LinkedList<String> history = new LinkedList<>();
 
-    private final int HISTORY_SIZE = 8;
+    private final static int HISTORY_SIZE = 8;
 
 
     public FileHistory(JabRefPreferences prefs) {

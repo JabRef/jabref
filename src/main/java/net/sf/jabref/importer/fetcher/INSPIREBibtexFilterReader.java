@@ -21,18 +21,18 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
- * 
+ *
  * Warning -- it is not a generic filter, only read is implemented!
  *
  * Note: this is just a quick port of the original SPIRESBibtexFilterReader.
- * 
+ *
  * @author Fedor Bezrukov
  * @author Sheer El-Showk
- * 
+ *
  * @version $Id$
- * 
+ *
  * TODO: Fix grammar in bibtex entries -- it ma return invalid bibkeys (with space)
- * 
+ *
  */
 class INSPIREBibtexFilterReader extends FilterReader {
 
@@ -60,6 +60,9 @@ class INSPIREBibtexFilterReader extends FilterReader {
             if (l.contains("<pre>")) {
                 pre = true;
                 l = in.readLine();
+            }
+            if (l == null) {
+                return null;
             }
             if (l.contains("</pre>")) {
                 pre = false;

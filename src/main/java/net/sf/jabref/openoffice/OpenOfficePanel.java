@@ -773,8 +773,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         }
 
         BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
-        final BibtexDatabase database = panel.database();
         if (panel != null) {
+            final BibtexDatabase database = panel.database();
             BibtexEntry[] entries = panel.getSelectedEntries();
             if (entries.length > 0) {
                 try {
@@ -815,9 +815,9 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 ooBase.clearBibTextSectionContent();
               */
             BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
-            final BibtexDatabase database = panel.database();
             Map<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<>();
             if (panel != null) {
+                final BibtexDatabase database = panel.database();
                 BibtexEntry[] e = panel.getSelectedEntries();
                 for (BibtexEntry anE : e) {
                     entries.put(anE, database);
@@ -838,7 +838,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                         + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
                 + Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")
                 + "</html>",
-                Localization.lang(""), JOptionPane.ERROR_MESSAGE);
+                "", JOptionPane.ERROR_MESSAGE);
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
@@ -846,14 +846,14 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                         + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
                 + Localization.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
                 + "</html>",
-                Localization.lang(""), JOptionPane.ERROR_MESSAGE);
+                "", JOptionPane.ERROR_MESSAGE);
     }
 
     public void insertUsingBST() {
         try {
             BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
-            final BibtexDatabase database = panel.database();
             if (panel != null) {
+                final BibtexDatabase database = panel.database();
                 BibtexEntry[] entries = panel.getSelectedEntries();
                 ArrayList<BibtexEntry> el = new ArrayList<>();
                 Collections.addAll(el, entries);

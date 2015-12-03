@@ -25,9 +25,11 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 import javax.swing.*;
+import javax.xml.transform.TransformerException;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -44,7 +46,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
     public WriteXMPEntryEditorAction(BasePanel panel, EntryEditor editor) {
         this.panel = panel;
         this.editor = editor;
-        // normally, the next call should be without "Localization.lang". However, the string "Write XMP" is also used in non-menu places and therefore, the translation must be also available at Localization.lang()
+        // normally, the next call should be without "Localization.lang". However, the string "Write XMP" is also used in non-menu places and therefore, the translation must be also available at Localization.lang
         putValue(Action.NAME, Localization.lang("Write XMP"));
         putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.WRITE_XMP.getIcon());
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Write BibtexEntry as XMP-metadata to PDF."));
@@ -133,7 +135,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
                                 message = Localization.lang("Wrote XMP-metadata");
                             }
                             written++;
-                        } catch (Exception e) {
+                        } catch (IOException | TransformerException e) {
                             if (files.size() == 1) {
                                 message = Localization.lang("Error while writing") + " '" + file.getPath() + "'";
                             }

@@ -135,17 +135,6 @@ class KeyBindingsDialog extends JDialog {
         // TODO: setup so that clicking on list will display the current binding
     }
 
-
-    /*    private void setTop() {
-        Box topBox = new Box(BoxLayout.X_AXIS);
-
-        topBox.add(new JLabel(Localization.lang("Binding") + ":", JLabel.RIGHT));
-        topBox.add(keyTF);
-        getContentPane().add(topBox, BorderLayout.NORTH);
-
-    }
-    */
-
     /**
      * respond to grabKey and display the key binding
      */
