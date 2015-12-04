@@ -409,49 +409,51 @@ public class Util {
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
-        return net.sf.jabref.util.Util.upgradePdfPsToFile(database.getEntryMap().values(), fields);
+        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
+
+        for (BibtexEntry entry : database.getEntryMap().values()) {
+            upgradePdfPsToFile(entry, fields, ce);
+        }
+
+        ce.end();
+        return ce;
     }
 
     /**
-     * Collect file links from the given set of fields, and add them to the list contained in the field
-     * GUIGlobals.FILE_FIELD.
+     * TODO: Move this to cleanup class. Collect file links from the given set of fields, and add them to the list
+     * contained in the field GUIGlobals.FILE_FIELD.
      *
      * @param entries The entries to modify.
      * @param fields The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
-    public static NamedCompound upgradePdfPsToFile(Collection<BibtexEntry> entries, String[] fields) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
+    public static void upgradePdfPsToFile(BibtexEntry entry, String[] fields, NamedCompound ce) {
+        FileListTableModel tableModel = new FileListTableModel();
+        // If there are already links in the file field, keep those on top:
+        String oldFileContent = entry.getField(Globals.FILE_FIELD);
+        if (oldFileContent != null) {
+            tableModel.setContent(oldFileContent);
+        }
+        int oldRowCount = tableModel.getRowCount();
+        for (String field : fields) {
+            String o = entry.getField(field);
+            if (o != null) {
+                if (!o.trim().isEmpty()) {
+                    File f = new File(o);
+                    FileListEntry flEntry = new FileListEntry(f.getName(), o,
+                            Globals.prefs.getExternalFileTypeByExt(field));
+                    tableModel.addEntry(tableModel.getRowCount(), flEntry);
 
-        for (BibtexEntry entry : entries) {
-            FileListTableModel tableModel = new FileListTableModel();
-            // If there are already links in the file field, keep those on top:
-            String oldFileContent = entry.getField(Globals.FILE_FIELD);
-            if (oldFileContent != null) {
-                tableModel.setContent(oldFileContent);
-            }
-            int oldRowCount = tableModel.getRowCount();
-            for (String field : fields) {
-                String o = entry.getField(field);
-                if (o != null) {
-                    if (!o.trim().isEmpty()) {
-                        File f = new File(o);
-                        FileListEntry flEntry = new FileListEntry(f.getName(), o, Globals.prefs.getExternalFileTypeByExt(field));
-                        tableModel.addEntry(tableModel.getRowCount(), flEntry);
-
-                        entry.clearField(field);
-                        ce.addEdit(new UndoableFieldChange(entry, field, o, null));
-                    }
+                    entry.clearField(field);
+                    ce.addEdit(new UndoableFieldChange(entry, field, o, null));
                 }
             }
-            if (tableModel.getRowCount() != oldRowCount) {
-                String newValue = tableModel.getStringRepresentation();
-                entry.setField(Globals.FILE_FIELD, newValue);
-                ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
-            }
         }
-        ce.end();
-        return ce;
+        if (tableModel.getRowCount() != oldRowCount) {
+            String newValue = tableModel.getStringRepresentation();
+            entry.setField(Globals.FILE_FIELD, newValue);
+            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
+        }
     }
 
     /**
