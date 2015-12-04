@@ -160,7 +160,7 @@ public class FileActions {
      */
     private static void writeBibFileHeader(Writer out, Charset encoding) throws IOException {
         out.write("% ");
-        out.write(Globals.encPrefix + encoding + Globals.NEWLINE + Globals.NEWLINE);
+        out.write(Globals.encPrefix + encoding + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE);
     }
 
     /**
