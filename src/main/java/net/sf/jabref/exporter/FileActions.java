@@ -70,7 +70,7 @@ public class FileActions {
      * Write all strings in alphabetical order, modified to produce a safe (for
      * BibTeX) order of the strings if they reference each other.
      *
-     * @param fw The Writer to send the output to.
+     * @param fw       The Writer to send the output to.
      * @param database The database whose strings we should write.
      * @throws IOException If anthing goes wrong in writing.
      */
@@ -104,7 +104,7 @@ public class FileActions {
         remaining.remove(bs.getName());
 
         //if the string has not been modified, write it back as it was
-        if(!bs.hasChanged()){
+        if (!bs.hasChanged()) {
             fw.write(bs.getParsedSerialization());
             return;
         }
@@ -172,9 +172,9 @@ public class FileActions {
      * entries are saved.
      */
     public static SaveSession saveDatabase(BibtexDatabase database,
-            MetaData metaData, File file, JabRefPreferences prefs,
- boolean checkSearch, boolean checkGroup, Charset encoding, boolean suppressBackup)
-                    throws SaveException {
+                                           MetaData metaData, File file, JabRefPreferences prefs,
+                                           boolean checkSearch, boolean checkGroup, Charset encoding, boolean suppressBackup)
+            throws SaveException {
 
         TreeMap<String, EntryType> types = new TreeMap<>();
 
@@ -219,8 +219,10 @@ public class FileActions {
 
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
+            BibtexEntry lastEntry = null;
             for (BibtexEntry entry : sorter) {
                 exceptionCause = entry;
+                lastEntry = entry;
 
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
@@ -263,6 +265,13 @@ public class FileActions {
                     }
                 }
 
+            }
+
+            //finally write whatever remains of the file, but at least a concluding newline
+            if (database.getEpilog() != null && database.getEpilog() != "") {
+               writer.write(database.getEpilog());
+            } else {
+               writer.write(Globals.NEWLINE);
             }
         } catch (Throwable ex) {
             ex.printStackTrace();
@@ -362,9 +371,9 @@ public class FileActions {
      * @return A List containing warnings, if any.
      */
     public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
- File file,
-            JabRefPreferences prefs, BibtexEntry[] bes, Charset encoding, DatabaseSaveType saveType)
-                    throws SaveException {
+                                                 File file,
+                                                 JabRefPreferences prefs, BibtexEntry[] bes, Charset encoding, DatabaseSaveType saveType)
+            throws SaveException {
 
         TreeMap<String, EntryType> types = new TreeMap<>(); // Map
         // to
@@ -424,7 +433,7 @@ public class FileActions {
 
                 bibtexEntryWriter.write(be, fw);
                 //only append newline if the entry has changed
-                if(!be.hasChanged()){
+                if (!be.hasChanged()) {
                     fw.write(Globals.NEWLINE);
                 }
             }
@@ -522,7 +531,7 @@ public class FileActions {
         if (keySet != null) {
             Iterator<String> i = keySet.iterator();
 
-            for (; i.hasNext();) {
+            for (; i.hasNext(); ) {
                 sorter.add(database.getEntryById(i.next()));
             }
         }

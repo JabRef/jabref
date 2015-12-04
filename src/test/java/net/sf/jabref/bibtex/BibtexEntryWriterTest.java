@@ -186,7 +186,8 @@ public class BibtexEntryWriterTest {
         writer.write(entry, stringWriter);
         String actual = stringWriter.toString();
 
-        assertEquals(bibtexEntry, actual);
+        //appending newlines are not written by the writer, but by FileActions. So, these should be removed here.
+        assertEquals(bibtexEntry.substring(0, bibtexEntry.length()-2), actual);
     }
 
     @Test

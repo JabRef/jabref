@@ -104,7 +104,8 @@ public class MetaData implements Iterable<String> {
     /**
      * The MetaData object can be constructed with no data in it.
      */
-    public MetaData() {}
+    public MetaData() {
+    }
 
     /**
      * Add default metadata for new database:
@@ -158,6 +159,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Look up the directory set up for the given field type for this database.
      * If no directory is set up, return that defined in global preferences.
+     *
      * @param fieldName The field type
      * @return The default directory for this field type.
      */
@@ -195,8 +197,7 @@ public class MetaData implements Iterable<String> {
                 }
             }
             dirs.add(dir);
-        }
-        else {
+        } else {
             String dir = Globals.prefs.get(fieldName + "Directory");
             if (dir != null) {
                 dirs.add(dir);
@@ -218,9 +219,10 @@ public class MetaData implements Iterable<String> {
 
     /**
      * Parse the groups metadata string
+     *
      * @param orderedData The vector of metadata strings
-     * @param db The BibtexDatabase this metadata belongs to
-     * @param version The group tree version
+     * @param db          The BibtexDatabase this metadata belongs to
+     * @param version     The group tree version
      * @return true if parsing was successful, false otherwise
      */
     private void putGroups(Vector<String> orderedData, BibtexDatabase db, int version) {
@@ -255,6 +257,14 @@ public class MetaData implements Iterable<String> {
     public void writeMetaData(Writer out) throws IOException {
         // write all meta data except groups
         SortedSet<String> sortedKeys = new TreeSet<>(metaData.keySet());
+
+        // if there is something to write, initially append two newlines
+        boolean somethingToWrite = sortedKeys.size() > 0 && groupsRoot != null && groupsRoot.getChildCount() > 0;
+        if (somethingToWrite) {
+            out.write(Globals.NEWLINE);
+            out.write(Globals.NEWLINE);
+        }
+
         for (String key : sortedKeys) {
             StringBuffer sb = new StringBuffer();
             Vector<String> orderedData = metaData.get(key);
@@ -374,7 +384,7 @@ public class MetaData implements Iterable<String> {
      * Updates the stored key patterns to the given key patterns.
      *
      * @param labelPattern the key patterns to update to. <br />
-     * A reference to this object is stored internally and is returned at getLabelPattern();
+     *                     A reference to this object is stored internally and is returned at getLabelPattern();
      */
     public void setLabelPattern(DatabaseLabelPattern labelPattern) {
         // remove all keypatterns from metadata

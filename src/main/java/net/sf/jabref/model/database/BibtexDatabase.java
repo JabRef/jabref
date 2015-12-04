@@ -63,6 +63,11 @@ public class BibtexDatabase {
     private boolean followCrossrefs = true;
 
     /**
+     * All file contents below the last entry in the file
+     */
+    private String epilog = "";
+
+    /**
      * use a map instead of a set since i need to know how many of each key is
      * inthere
      */
@@ -655,5 +660,14 @@ public class BibtexDatabase {
                     DatabaseChangeEvent.ChangeType.CHANGED_ENTRY, (BibtexEntry) propertyChangeEvent.getSource()));
         }
     };
+
+
+    public void setEpilog(String epilog) {
+        this.epilog = epilog;
+    }
+
+    public String getEpilog() {
+        return epilog;
+    }
 
 }

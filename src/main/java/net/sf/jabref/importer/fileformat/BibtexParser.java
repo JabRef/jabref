@@ -64,7 +64,6 @@ public class BibtexParser {
     private static final Integer LOOKAHEAD = 64;
     private final boolean autoDoubleBraces;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
-    private BibtexEntry lastParsedEntry;
 
 
     public BibtexParser(Reader in) {
@@ -236,10 +235,7 @@ public class BibtexParser {
     }
 
     private void parseRemainingContent() {
-        if (lastParsedEntry != null) {
-            // read remaining content of file and add it to the parsed serialization of the last entry
-            lastParsedEntry.setParsedSerialization(lastParsedEntry.getParsedSerialization() + dumpTextReadSoFarToString());
-        }
+        database.setEpilog(dumpTextReadSoFarToString());
     }
 
     private void parseAndAddEntry(EntryType type) {
@@ -254,7 +250,6 @@ public class BibtexParser {
 
             boolean duplicateKey = database.insertEntry(entry);
             entry.setParsedSerialization(dumpTextReadSoFarToString());
-            lastParsedEntry = entry;
             if (duplicateKey) {
                 parserResult.addDuplicateKey(entry.getCiteKey());
             } else if ((entry.getCiteKey() == null) || "".equals(entry.getCiteKey())) {
