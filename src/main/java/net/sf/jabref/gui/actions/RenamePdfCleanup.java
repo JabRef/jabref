@@ -60,7 +60,7 @@ public class RenamePdfCleanup implements Cleaner {
             //get new Filename with path
             //Create new Path based on old Path and new filename
             File expandedOldFile = FileUtil.expandFilename(realOldFilename, paths);
-            if (expandedOldFile.getParent() == null) {
+            if ((expandedOldFile == null) || (expandedOldFile.getParent() == null)) {
                 // something went wrong. Just skip this entry
                 continue;
             }
