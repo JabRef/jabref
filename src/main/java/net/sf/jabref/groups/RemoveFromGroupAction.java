@@ -22,8 +22,8 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.logic.groups.GroupsUtil;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.Util;
 
 public class RemoveFromGroupAction extends AbstractAction {
 
@@ -52,7 +52,7 @@ public class RemoveFromGroupAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent evt) {
         // warn if assignment has undesired side effects (modifies a field != keywords)
-        if (!GroupsUtil.warnAssignmentSideEffects(new AbstractGroup[] {m_node.getGroup()},
+        if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {m_node.getGroup()},
                 m_panel.getSelectedEntries(),
                 m_panel.getDatabase(),
                 m_panel.frame()))
