@@ -273,8 +273,8 @@ public class FileActions {
             } else {
                writer.write(Globals.NEWLINE);
             }
-        } catch (Throwable ex) {
-            ex.printStackTrace();
+        } catch (IOException ex) {
+            LOGGER.error("Could not write file", ex);
             session.cancel();
             // repairAfterError(file, backup, INIT_OK);
             throw new SaveException(ex.getMessage(), ex.getLocalizedMessage(), exceptionCause);
