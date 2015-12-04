@@ -43,6 +43,7 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -261,66 +262,47 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
         // A double click on an entry should open the entry's editor.
         if (e.getClickCount() == 2) {
-
             BibtexEntry toShow = tableRows.get(row);
             editSignalled(toShow);
+            return;
         }
 
-        // Check if the user has clicked on an icon cell to open url or pdf.
-        final String[] iconType = table.getIconTypeForColumn(col);
+        // get the MainTableColumn which is currently visible at col
+        int modelIndex = table.getColumnModel().getColumn(col).getModelIndex();
+        MainTableColumn modelColumn = table.getMainTableColumn(modelIndex);
 
         // Workaround for Windows. Right-click is not popup trigger on mousePressed, but
         // on mouseReleased. Therefore we need to avoid taking action at this point, because
         // action will be taken when the button is released:
-        if (OS.WINDOWS && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1)) {
+        if (OS.WINDOWS && (modelColumn.isIconColumn()) && (e.getButton() != MouseEvent.BUTTON1)) {
             return;
         }
 
-        if (iconType != null) {
-            // left click on icon field
-            SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(iconType[0]);
-            if ((e.getClickCount() == 1) && (field != null)) {
-                // special field found
-                if (field.isSingleValueField()) {
-                    // directly execute toggle action instead of showing a menu with one action
-                    field.getValues().get(0).getAction(panel.frame()).action();
-                } else {
-                    JPopupMenu menu = new JPopupMenu();
-                    for (SpecialFieldValue val : field.getValues()) {
-                        menu.add(val.getMenuAction(panel.frame()));
-                    }
-                    menu.show(table, e.getX(), e.getY());
-                }
-                return;
-            }
+        // Check if the clicked colum is a specialfield column
+        if(modelColumn.isIconColumn() && SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(modelColumn.getColumnName())!=null) {
+            // handle specialfield
+            handleSpecialFieldLeftClick(e, modelColumn.getColumnName());
+        } else if (modelColumn.isIconColumn()) { // left click on icon field
 
             Object value = table.getValueAt(row, col);
-            if (value == null)
-             {
+            if (value == null) {
                 return; // No icon here, so we do nothing.
             }
 
             final BibtexEntry entry = tableRows.get(row);
 
-            // Get the icon type. Corresponds to the field name.
-            int hasField = -1;
-            for (int i = iconType.length - 1; i >= 0; i--) {
-                if (entry.getField(iconType[i]) != null) {
-                    hasField = i;
-                }
-            }
-            if (hasField == -1) {
-                return;
-            }
-            final String fieldName = iconType[hasField];
+            final List<String> fieldNames = modelColumn.getBibtexFields();
 
             //If this is a file link field with specified file types,
             //we should also pass the types.
-            String[] fileTypes = {};
-            if ((hasField == 0) && iconType[hasField].equals(Globals.FILE_FIELD) && (iconType.length > 1)) {
-                fileTypes = iconType;
-            }
-            final List<String> listOfFileTypes = Collections.unmodifiableList(Arrays.asList(fileTypes));
+            // TODO enable File Filter IconColumns!
+            // String[] fileTypes = {};
+            // if ((hasField == 0) && iconType[hasField].equals(Globals.FILE_FIELD) && (iconType.length > 1)) {
+            //     fileTypes = iconType;
+            // }
+            //final List<String> listOfFileTypes = Collections.unmodifiableList(Arrays.asList(fileTypes));
+            // TODO enable File Filter IconColumns!
+            final List<String> listOfFileTypes = new ArrayList<>();
 
             // Open it now. We do this in a thread, so the program won't freeze during the wait.
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
@@ -328,81 +310,88 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 @Override
                 public void run() {
                     panel.output(Localization.lang("External viewer called") + '.');
+                    // check for all field names whether a link is present
+                    // (is relevant for combinations such as "url/doi")
+                    for(String fieldName : fieldNames) {
+                        String link = entry.getField(fieldName);
+                        if (link == null) {
+                            continue; // There is no content for this field continue with the next one
+                        }
 
-                    Object link = entry.getField(fieldName);
-                    if (link == null) {
-                        LOGGER.info("Error: no link to " + fieldName + '.');
-                        return; // There is an icon, but the field is not set.
-                    }
+                        // See if this is a simple file link field, or if it is a file-list
+                        // field that can specify a list of links:
+                        if (fieldName.equals(Globals.FILE_FIELD)) {
 
-                    // See if this is a simple file link field, or if it is a file-list
-                    // field that can specify a list of links:
-                    if (fieldName.equals(Globals.FILE_FIELD)) {
+                            // We use a FileListTableModel to parse the field content:
+                            FileListTableModel fileList = new FileListTableModel();
+                            fileList.setContent(link);
 
-                        // We use a FileListTableModel to parse the field content:
-                        FileListTableModel fileList = new FileListTableModel();
-                        fileList.setContent((String) link);
-
-                        FileListEntry flEntry = null;
-                        // If there are one or more links of the correct type,
-                        // open the first one:
-                        if (!listOfFileTypes.isEmpty()) {
-                            for (int i = 0; i < fileList.getRowCount(); i++) {
-                                flEntry = fileList.getEntry(i);
-                                boolean correctType = false;
-                                for (String listOfFileType : listOfFileTypes) {
-                                    if (flEntry.getType().toString().equals(listOfFileType)) {
-                                        correctType = true;
+                            FileListEntry flEntry = null;
+                            // If there are one or more links of the correct type,
+                            // open the first one:
+                            //TODO check when file filter is implemented
+                            if (!listOfFileTypes.isEmpty()) {
+                                for (int i = 0; i < fileList.getRowCount(); i++) {
+                                    flEntry = fileList.getEntry(i);
+                                    boolean correctType = false;
+                                    for (String listOfFileType : listOfFileTypes) {
+                                        if (flEntry.getType().toString().equals(listOfFileType)) {
+                                            correctType = true;
+                                        }
                                     }
+                                    if (correctType) {
+                                        break;
+                                    }
+                                    flEntry = null;
                                 }
-                                if (correctType) {
-                                    break;
-                                }
-                                flEntry = null;
+                            } else if (fileList.getRowCount() > 0) {
+                                //If there are no file types specified open the first file
+                                flEntry = fileList.getEntry(0);
                             }
-                        }
-                        //If there are no file types specified, consider all files.
-                        else if (fileList.getRowCount() > 0) {
-                            flEntry = fileList.getEntry(0);
-                        }
-                        if (flEntry != null) {
-                            //                            if (fileList.getRowCount() > 0) {
-                            //                                FileListEntry flEntry = fileList.getEntry(0);
-
-                            ExternalFileMenuItem item = new ExternalFileMenuItem
-                                    (panel.frame(), entry, "",
-                                            flEntry.getLink(), flEntry.getType().getIcon(),
-                                            panel.metaData(), flEntry.getType());
-                            boolean success = item.openLink();
-                            if (!success) {
+                            if (flEntry != null) {
+                                ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
+                                        flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
+                                        flEntry.getType());
+                                boolean success = item.openLink();
+                                if (!success) {
+                                    panel.output(Localization.lang("Unable to open link."));
+                                }
+                            }
+                        } else {
+                            try {
+                                JabRefDesktop.openExternalViewer(panel.metaData(), link, fieldName);
+                            } catch (IOException ex) {
                                 panel.output(Localization.lang("Unable to open link."));
                             }
                         }
-                    } else {
-                        try {
-                            JabRefDesktop.openExternalViewer(panel.metaData(), (String) link, fieldName);
-                        } catch (IOException ex) {
-                            panel.output(Localization.lang("Unable to open link."));
-                        }
-
-                        /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");
-                        ExternalFileMenuItem item = new ExternalFileMenuItem
-                                (panel.frame(), entry, "",
-                                (String)link, type.getIcon(),
-                                panel.metaData(), type);
-                        boolean success = item.openLink();
-                        if (!success) {
-                            panel.output(Localization.lang("Unable to open link."));
-                        } */
-                        //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
+                        break; // only open the first link
                     }
-
-                    //catch (IOException ex) {
-                    //    panel.output(Globals.lang("Error") + ": " + ex.getMessage());
-                    //}
                 }
-
             });
+        }
+    }
+
+    /**
+     * Method to handle a single left click on one the special fields (e.g., ranking, quality, ...)
+     * Shows either a popup to select/clear a value or simply toggles the functionality to set/unset the special field
+     *
+     * @param e MouseEvent used to determine the position of the popups
+     * @param columnName the name of the specialfield column
+     */
+    private void handleSpecialFieldLeftClick(MouseEvent e, String columnName) {
+        SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(columnName);
+        if ((e.getClickCount() == 1) && (field != null)) {
+            // special field found
+            if (field.isSingleValueField()) {
+                // directly execute toggle action instead of showing a menu with one action
+                field.getValues().get(0).getAction(panel.frame()).action();
+            } else {
+                JPopupMenu menu = new JPopupMenu();
+                for (SpecialFieldValue val : field.getValues()) {
+                    menu.add(val.getMenuAction(panel.frame()));
+                }
+                menu.show(table, e.getX(), e.getY());
+            }
         }
     }
 
