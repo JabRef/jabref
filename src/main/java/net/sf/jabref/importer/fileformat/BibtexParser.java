@@ -198,6 +198,8 @@ public class BibtexParser {
             if (!isEntry) {
                 if ("preamble".equals(entryType.toLowerCase())) {
                     database.setPreamble(parsePreamble());
+                    // the preamble is saved verbatim anyways, so the text read so far can be dropped
+                    dumpTextReadSoFarToString();
                 } else if ("string".equals(entryType.toLowerCase())) {
                     parseBibtexString();
                 } else if ("comment".equals(entryType.toLowerCase())) {
