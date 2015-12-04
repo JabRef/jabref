@@ -258,9 +258,6 @@ public class MetaData implements Iterable<String> {
         // write all meta data except groups
         SortedSet<String> sortedKeys = new TreeSet<>(metaData.keySet());
 
-        // if there is something to write, initially append two newlines
-        boolean somethingToWrite = sortedKeys.size() > 0 && groupsRoot != null && groupsRoot.getChildCount() > 0;
-
         for (String key : sortedKeys) {
 
             StringBuffer sb = new StringBuffer();
