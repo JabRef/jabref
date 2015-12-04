@@ -96,7 +96,6 @@ public class FileActions {
                 }
             }
         }
-        fw.write(Globals.NEWLINE);
     }
 
     private static void writeString(Writer fw, BibtexString bs, HashMap<String, BibtexString> remaining, int maxKeyLength) throws IOException {
