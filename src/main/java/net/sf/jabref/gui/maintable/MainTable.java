@@ -447,7 +447,7 @@ public class MainTable extends JTable {
             if (SpecialFieldsUtils.FIELDNAME_RANKING.equals(tableColumn.getColumnName())) {
                 comparators.add(new RankingFieldComparator());
             } else if (tableColumn.isIconColumn()) {
-                comparators.add(new IconComparator(tableColumn.getBibtexFields().orElse(new String[]{})));
+                comparators.add(new IconComparator(tableColumn.getBibtexFields()));
             } else {
                 comparators = comparatorChooser.getComparatorsForColumn(i);
                 comparators.clear();

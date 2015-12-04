@@ -439,8 +439,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
-        if(column.getBibtexFields().isPresent()) {
-            for(String field : column.getBibtexFields().get()) {
+        if(!column.getBibtexFields().isEmpty()) {
+            for(String field : column.getBibtexFields()) {
                 if (Globals.FILE_FIELD.equals(field)) {
                     // We use a FileListTableModel to parse the field content:
                     String fileFieldContent = entry.getField(field);

@@ -26,14 +26,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -1391,9 +1384,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
-                comparators.add(new IconComparator(new String[]{Globals.FILE_FIELD}));
+                comparators.add(new IconComparator(Arrays.asList(Globals.FILE_FIELD)));
             } else if (i == URL_COL) {
-                comparators.add(new IconComparator(new String[]{"url"}));
+                comparators.add(new IconComparator(Arrays.asList("url")));
             }
 
         }

@@ -4,31 +4,31 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 
-import java.util.Optional;
+import java.util.*;
 
 public class MainTableColumn {
 
     private final String columnName;
 
-    private final Optional<String[]> bibtexFields;
+    private final List<String> bibtexFields;
 
     private final boolean isIconColumn;
 
     public MainTableColumn(String columnName, boolean isIconColumn) {
         this.columnName = columnName;
-        this.bibtexFields = Optional.empty();
+        this.bibtexFields = new ArrayList<>();
         this.isIconColumn = isIconColumn;
     }
 
     public MainTableColumn(String columnName, String[] bibtexFields) {
         this.columnName = columnName;
-        this.bibtexFields = Optional.of(bibtexFields);
+        this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
         this.isIconColumn = false;
     }
 
     public MainTableColumn(String columnName, String[] bibtexFields, boolean isIconColumn) {
         this.columnName = columnName;
-        this.bibtexFields = Optional.of(bibtexFields);
+        this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
         this.isIconColumn = isIconColumn;
     }
 
@@ -40,19 +40,20 @@ public class MainTableColumn {
      * @return
      */
     public String getDisplayName() {
-        if(bibtexFields.isPresent()) {
-            String[] fields = bibtexFields.get();
+        if(!bibtexFields.isEmpty()) {
             StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < fields.length; i++) {
+            int i=0;
+            for (String field : bibtexFields) {
                 if (i > 0) {
                     builder.append(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
                 }
-                String fieldDisplayName = BibtexFields.getFieldDisplayName(fields[i]);
+                String fieldDisplayName = BibtexFields.getFieldDisplayName(field);
                 if (fieldDisplayName != null) {
                     builder.append(fieldDisplayName);
                 } else {
-                    builder.append(EntryUtil.capitalizeFirst(fields[i]));
+                    builder.append(EntryUtil.capitalizeFirst(field));
                 }
+                i++;
             }
             return builder.toString();
         } else {
@@ -67,14 +68,9 @@ public class MainTableColumn {
      * @return true if the bibtex fields contains author or editor
      */
     public boolean isNameColumn() {
-        if(bibtexFields.isPresent()) {
-            for(String field : bibtexFields.get()) {
-                if("author".equals(field) || "editor".equals(field)) {
-                    return true;
-                }
-            }
+        if (bibtexFields.contains("author") || bibtexFields.contains("editor")) {
+            return true;
         }
-
         return false;
     }
 
@@ -82,7 +78,7 @@ public class MainTableColumn {
         return columnName;
     }
 
-    public Optional<String[]> getBibtexFields() {
+    public List<String> getBibtexFields() {
         return bibtexFields;
     }
 
@@ -91,14 +87,13 @@ public class MainTableColumn {
     }
 
     public Object getColumnValue(BibtexEntry entry) {
-        if (bibtexFields.isPresent()) {
+        if (!bibtexFields.isEmpty()) {
             String content = null;
-            String[] possibleFields =bibtexFields.get();
-            for (int i = 0; i < possibleFields.length; i++) {
-                if (possibleFields[i].equals(BibtexEntry.TYPE_HEADER)) {
+            for (String field : bibtexFields) {
+                if (field.equals(BibtexEntry.TYPE_HEADER)) {
                     content = entry.getType().getName();
                 } else {
-                    content = entry.getFieldOrAlias(possibleFields[i]);
+                    content = entry.getFieldOrAlias(field);
                     if ("Author".equalsIgnoreCase(columnName) && (content != null)) {
                         //TODO
                         // content = panel.database().resolveForStrings((String) content);

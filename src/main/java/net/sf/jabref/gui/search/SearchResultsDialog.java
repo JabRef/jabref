@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Objects;
@@ -238,9 +239,9 @@ public class SearchResultsDialog {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
-                comparators.add(new IconComparator(new String[] {Globals.FILE_FIELD}));
+                comparators.add(new IconComparator(Arrays.asList(Globals.FILE_FIELD)));
             } else if (i == URL_COL) {
-                comparators.add(new IconComparator(new String[] {"url"}));
+                comparators.add(new IconComparator(Arrays.asList("url")));
             }
 
         }
