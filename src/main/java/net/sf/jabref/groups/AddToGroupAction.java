@@ -25,8 +25,8 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.logic.groups.GroupsUtil;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 public class AddToGroupAction extends AbstractAction {
@@ -88,14 +88,14 @@ public class AddToGroupAction extends AbstractAction {
                 groups[i] = removeGroupsNodes.elementAt(i).getGroup();
             }
             groups[groups.length - 1] = m_node.getGroup();
-            if (!Util.warnAssignmentSideEffects(groups,
+            if (!GroupsUtil.warnAssignmentSideEffects(groups,
                     entries, m_panel.getDatabase(), m_panel.frame()))
             {
                 return; // user aborted operation
             }
         } else {
             // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {m_node.getGroup()},
+            if (!GroupsUtil.warnAssignmentSideEffects(new AbstractGroup[] {m_node.getGroup()},
                     entries, m_panel.getDatabase(), m_panel.frame()))
             {
                 return; // user aborted operation

@@ -34,8 +34,8 @@ import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.logic.groups.GroupsUtil;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.PositionWindow;
 
@@ -93,22 +93,22 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 String fieldText = field.getText();
                 if (keywords.isSelected()) {
                     if (nd.isSelected()) {
-                        hs = Util.findDeliminatedWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
+                        hs = GroupsUtil.findDeliminatedWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
                                 deliminator.getText());
                     } else {
-                        hs = Util.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
+                        hs = GroupsUtil.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
                                 remove.getText());
 
                     }
                 } else if (authors.isSelected()) {
                     List<String> fields = new ArrayList<>(2);
                     fields.add("author");
-                    hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
+                    hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
                     fieldText = "author";
                 } else if (editors.isSelected()) {
                     List<String> fields = new ArrayList<>(2);
                     fields.add("editor");
-                    hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
+                    hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
                     fieldText = "editor";
                 }
 

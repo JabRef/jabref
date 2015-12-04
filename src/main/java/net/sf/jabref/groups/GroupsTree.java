@@ -39,7 +39,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.groups.GroupsUtil;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
@@ -287,7 +287,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
                 // warn if assignment has undesired side effects (modifies a
                 // field != keywords)
-                if (!Util.warnAssignmentSideEffects(
+                if (!GroupsUtil.warnAssignmentSideEffects(
                         new AbstractGroup[] {group},
                         selection.getSelection(), groupSelector
                                 .getActiveBasePanel().getDatabase(),
