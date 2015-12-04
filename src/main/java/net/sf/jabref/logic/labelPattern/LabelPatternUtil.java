@@ -335,25 +335,26 @@ public class LabelPatternUtil {
                 // Explicitly defined department part is build the same way as
                 // school
             } else if (isSchool || isDepartment) {
-                if (isSchool) {
-                    school = "";
-                }
-                if (isDepartment) {
-                    department = "";
-                }
-
+                StringBuilder schoolSB = new StringBuilder();
+                StringBuilder departmentSB = new StringBuilder();
                 for (String k : part) {
                     if ((k.length() >= 7) && !k.toLowerCase().substring(0, 7).matches("d[ei]part")
                             && !"school".equals(k.toLowerCase())
                             && !"faculty".equals(k.toLowerCase())
                             && !"".equals(k.replaceAll("[^A-Z]", ""))) {
                         if (isSchool) {
-                            school += k.replaceAll("[^A-Z]", "");
+                            schoolSB.append(k.replaceAll("[^A-Z]", ""));
                         }
                         if (isDepartment) {
-                            department += k.replaceAll("[^A-Z]", "");
+                            departmentSB.append(k.replaceAll("[^A-Z]", ""));
                         }
                     }
+                }
+                if (isSchool) {
+                    school = schoolSB.toString();
+                }
+                if (isDepartment) {
+                    department = departmentSB.toString();
                 }
                 // A part not matching university, department nor school.
             } else if (rest == null) {
@@ -612,6 +613,8 @@ public class LabelPatternUtil {
                     if (authString != null) {
                         authString = LabelPatternUtil
                                 .normalize(LabelPatternUtil.database.resolveForStrings(authString));
+                    } else {
+                        authString = "";
                     }
                 }
 

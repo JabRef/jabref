@@ -68,4 +68,19 @@ public class UnknownEntryType implements EntryType {
     public int compareTo(EntryType o) {
         return getName().compareTo(o.getName());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof UnknownEntryType) {
+            return (this.compareTo(((UnknownEntryType) o)) == 0);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
 }

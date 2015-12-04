@@ -178,11 +178,13 @@ public class AutoDetectPaths extends AbstractWorker {
         else if (OS.OS_X) {
             File rootDir = new File("/Applications");
             File[] files = rootDir.listFiles();
-            for (File file : files) {
-                if (file.isDirectory() && "OpenOffice.org.app".equals(file.getName())) {
-                    rootDir = file;
-                    //System.out.println("Setting starting dir to: "+file.getPath());
-                    break;
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory() && "OpenOffice.org.app".equals(file.getName())) {
+                        rootDir = file;
+                        //System.out.println("Setting starting dir to: "+file.getPath());
+                        break;
+                    }
                 }
             }
             //System.out.println("Searching for soffice.bin");
@@ -336,7 +338,9 @@ public class AutoDetectPaths extends AbstractWorker {
                     return file.isDirectory();
                 }
             });
-            Collections.addAll(dirList, dirs);
+            if (dirs != null) {
+                Collections.addAll(dirList, dirs);
+            }
         }
         return dirList;
     }
