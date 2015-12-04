@@ -261,7 +261,6 @@ public class FileActions {
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
                         CustomEntryTypesManager.save(tp, writer);
-                        writer.write(Globals.NEWLINE);
                     }
                 }
 

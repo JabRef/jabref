@@ -260,21 +260,18 @@ public class MetaData implements Iterable<String> {
 
         // if there is something to write, initially append two newlines
         boolean somethingToWrite = sortedKeys.size() > 0 && groupsRoot != null && groupsRoot.getChildCount() > 0;
-        if (somethingToWrite) {
-            out.write(Globals.NEWLINE);
-            out.write(Globals.NEWLINE);
-        }
 
         for (String key : sortedKeys) {
+
             StringBuffer sb = new StringBuffer();
+            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE);
             Vector<String> orderedData = metaData.get(key);
             sb.append("@comment{").append(META_FLAG).append(key).append(":");
             for (int j = 0; j < orderedData.size(); j++) {
                 sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
             }
             sb.append("}");
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
 
             out.write(sb.toString());
         }
@@ -283,15 +280,18 @@ public class MetaData implements Iterable<String> {
         if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
             StringBuffer sb = new StringBuffer();
             // write version first
+            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE);
             sb.append("@comment{").append(META_FLAG).append("groupsversion:");
             sb.append("" + VersionHandling.CURRENT_VERSION + ";");
             sb.append("}");
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
+
             out.write(sb.toString());
 
             // now write actual groups
             sb = new StringBuffer();
+            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE);
             sb.append("@comment{").append(META_FLAG).append("groupstree:");
             sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
@@ -303,8 +303,6 @@ public class MetaData implements Iterable<String> {
                 sb.append(Globals.NEWLINE);
             }
             sb.append("}");
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
             out.write(sb.toString());
         }
     }

@@ -56,6 +56,7 @@ public class CustomEntryTypesManager {
     }
 
     public static void save(CustomEntryType entry, Writer out) throws IOException {
+        out.write(Globals.NEWLINE + Globals.NEWLINE);
         out.write("@comment{");
         out.write(CustomEntryType.ENTRYTYPE_FLAG);
         out.write(entry.getName());
@@ -63,7 +64,7 @@ public class CustomEntryTypesManager {
         out.write(entry.getRequiredFieldsString());
         out.write("] opt[");
         out.write(String.join(";", entry.getOptionalFields()));
-        out.write("]}" + Globals.NEWLINE);
+        out.write("]}");
     }
 
     public static CustomEntryType parseEntryType(String comment) {
