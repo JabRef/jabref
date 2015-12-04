@@ -86,6 +86,10 @@ public class MainTableColumn {
         return isIconColumn;
     }
 
+    public boolean isFileFilter() {
+        return false; // Overridden in SpecialMainTableColumns for file filter columns
+    }
+
     public Object getColumnValue(BibtexEntry entry) {
         if (!bibtexFields.isEmpty()) {
             String content = null;
@@ -113,4 +117,5 @@ public class MainTableColumn {
         }
         return null;
     }
+
 }

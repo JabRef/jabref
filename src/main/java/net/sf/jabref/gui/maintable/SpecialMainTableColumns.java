@@ -107,7 +107,8 @@ public class SpecialMainTableColumns {
     public static MainTableColumn createIconColumn(String columnName, String[] fields) {
         return new MainTableColumn(columnName, fields, true) {
 
-            @Override public Object getColumnValue(BibtexEntry entry) {
+            @Override
+            public Object getColumnValue(BibtexEntry entry) {
                 JLabel iconLabel = null;
                 boolean iconFound = false;
 
@@ -138,9 +139,15 @@ public class SpecialMainTableColumns {
      * @return the created MainTableColumn
      */
     public static MainTableColumn createFileIconColumn(String externalFileTypeName) {
-        return new MainTableColumn(externalFileTypeName, true) {
+        return new MainTableColumn(externalFileTypeName, new String[] {Globals.FILE_FIELD}, true) {
 
-            @Override public Object getColumnValue(BibtexEntry entry) {
+            @Override
+            public boolean isFileFilter() {
+                return true;
+            }
+
+            @Override
+            public Object getColumnValue(BibtexEntry entry) {
 
                 boolean iconFound = false;
                 JLabel iconLabel = null;

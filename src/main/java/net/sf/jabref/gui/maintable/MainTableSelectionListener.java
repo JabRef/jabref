@@ -293,17 +293,6 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
             final List<String> fieldNames = modelColumn.getBibtexFields();
 
-            //If this is a file link field with specified file types,
-            //we should also pass the types.
-            // TODO enable File Filter IconColumns!
-            // String[] fileTypes = {};
-            // if ((hasField == 0) && iconType[hasField].equals(Globals.FILE_FIELD) && (iconType.length > 1)) {
-            //     fileTypes = iconType;
-            // }
-            //final List<String> listOfFileTypes = Collections.unmodifiableList(Arrays.asList(fileTypes));
-            // TODO enable File Filter IconColumns!
-            final List<String> listOfFileTypes = new ArrayList<>();
-
             // Open it now. We do this in a thread, so the program won't freeze during the wait.
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
@@ -327,22 +316,13 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                             fileList.setContent(link);
 
                             FileListEntry flEntry = null;
-                            // If there are one or more links of the correct type,
-                            // open the first one:
-                            //TODO check when file filter is implemented
-                            if (!listOfFileTypes.isEmpty()) {
+                            // If there are one or more links of the correct type, open the first one:
+                            if (modelColumn.isFileFilter()) {
                                 for (int i = 0; i < fileList.getRowCount(); i++) {
-                                    flEntry = fileList.getEntry(i);
-                                    boolean correctType = false;
-                                    for (String listOfFileType : listOfFileTypes) {
-                                        if (flEntry.getType().toString().equals(listOfFileType)) {
-                                            correctType = true;
-                                        }
-                                    }
-                                    if (correctType) {
+                                    if (fileList.getEntry(i).getType().toString().equals(modelColumn.getColumnName())) {
+                                        flEntry = fileList.getEntry(i);
                                         break;
                                     }
-                                    flEntry = null;
                                 }
                             } else if (fileList.getRowCount() > 0) {
                                 //If there are no file types specified open the first file
@@ -435,23 +415,11 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                     String fileFieldContent = entry.getField(field);
                     FileListTableModel fileList = new FileListTableModel();
                     fileList.setContent(fileFieldContent);
-                    // If there are one or more links, open the first one:
                     for (int i = 0; i < fileList.getRowCount(); i++) {
                         FileListEntry flEntry = fileList.getEntry(i);
-                        // TODO Enable Filtering for special file type columns
-                        //                        //If file types are specified, ignore files of other types.
-                        //                        if (column.length > 1) {
-                        //                            boolean correctType = false;
-                        //                            for (int j = 1; j < column.length; j++) {
-                        //                                if (flEntry.getType().toString().equals(column[j])) {
-                        //                                    correctType = true;
-                        //                                }
-                        //                            }
-                        //                            if (!correctType) {
-                        //                                continue;
-                        //                            }
-                        //                        }
-
+                        if(column.isFileFilter() && !flEntry.getType().toString().equals(column.getColumnName())) {
+                            continue;
+                        }
                         String description = flEntry.getDescription();
                         if ((description == null) || (description.trim().isEmpty())) {
                             description = flEntry.getLink();
