@@ -193,7 +193,6 @@ public class JabRefPreferences {
     public static final String FILE_COLUMN = "fileColumn";
     public static final String PREFER_URL_DOI = "preferUrlDoi";
     public static final String URL_COLUMN = "urlColumn";
-    public static final String PDF_COLUMN = "pdfColumn";
     public static final String DISABLE_ON_MULTIPLE_SELECTION = "disableOnMultipleSelection";
     public static final String CTRL_CLICK = "ctrlClick";
     public static final String INCOMPLETE_ENTRY_BACKGROUND = "incompleteEntryBackground";
@@ -618,7 +617,6 @@ public class JabRefPreferences {
 
         defaults.put(CTRL_CLICK, Boolean.FALSE);
         defaults.put(DISABLE_ON_MULTIPLE_SELECTION, Boolean.FALSE);
-        defaults.put(PDF_COLUMN, Boolean.FALSE);
         defaults.put(URL_COLUMN, Boolean.TRUE);
         defaults.put(PREFER_URL_DOI, Boolean.FALSE);
         defaults.put(FILE_COLUMN, Boolean.TRUE);

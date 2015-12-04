@@ -192,9 +192,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         if (Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN)) {
             tableColumns.add(SpecialMainTableColumns.FILE_COLUMN);
         }
-        if (Globals.prefs.getBoolean(JabRefPreferences.PDF_COLUMN)) {
-            tableColumns.add(SpecialMainTableColumns.createIconColumn(JabRefPreferences.PDF_COLUMN, MainTableFormat.PDF));
-        }
+
         if (Globals.prefs.getBoolean(JabRefPreferences.URL_COLUMN)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI)) {
                 tableColumns.add(SpecialMainTableColumns.createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.DOI_FIRST));
