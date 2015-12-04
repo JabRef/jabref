@@ -104,7 +104,36 @@ public class Util {
         if (key == null) {
             return null;
         }
-        if (!JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY)) {
+        return checkLegalKey(key,
+                JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+    }
+
+    /**
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
+     */
+    public static String replaceSpecialCharacters(String s) {
+        for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
+            s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
+        }
+        return s;
+    }
+
+
+    /**
+     * This method returns a String similar to the one passed in, except that it is molded into a form that is
+     * acceptable for bibtex.
+     *
+     * Watch-out that the returned string might be of length 0 afterwards.
+     *
+     * @param key mayBeNull
+     * @param enforceLegalKey make sure that the key is legal in all respects
+     */
+    public static String checkLegalKey(String key, boolean enforceLegalKey) {
+        if (key == null) {
+            return null;
+        }
+        if (!enforceLegalKey) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
             // interfere with parsing:
@@ -121,7 +150,8 @@ public class Util {
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"') && (c != '}') && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
+            if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"') && (c != '}')
+                    && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
                 newKey.append(c);
             }
         }
@@ -130,17 +160,6 @@ public class Util {
         // letter or letter combination that bibtex can accept.
 
         return net.sf.jabref.util.Util.replaceSpecialCharacters(newKey.toString());
-    }
-
-    /**
-     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
-     * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
-     */
-    public static String replaceSpecialCharacters(String s) {
-        for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
-            s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
-        }
-        return s;
     }
 
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
