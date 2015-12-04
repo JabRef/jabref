@@ -219,10 +219,8 @@ public class FileActions {
 
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
-            BibtexEntry lastEntry = null;
             for (BibtexEntry entry : sorter) {
                 exceptionCause = entry;
-                lastEntry = entry;
 
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
