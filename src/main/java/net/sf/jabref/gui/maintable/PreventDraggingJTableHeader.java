@@ -19,6 +19,7 @@ import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import java.awt.event.MouseEvent;
 
 /**
  * Related to <code>MainTable</code> class. <br/>
@@ -34,8 +35,19 @@ import javax.swing.table.TableColumnModel;
  */
 class PreventDraggingJTableHeader extends JTableHeader {
 
-    public PreventDraggingJTableHeader(TableColumnModel cm) {
+    private final MainTableFormat tableFormat;
+
+    public PreventDraggingJTableHeader(TableColumnModel cm, MainTableFormat tableFormat) {
         super(cm);
+        this.tableFormat = tableFormat;
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        int index = columnModel.getColumnIndexAtX(event.getX());
+        int realIndex = columnModel.getColumn(index).getModelIndex();
+        MainTableColumn column = tableFormat.getTableColumns().get(realIndex);
+        return column.getDisplayName();
     }
 
     /**

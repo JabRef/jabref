@@ -147,6 +147,11 @@ public class SpecialMainTableColumns {
             }
 
             @Override
+            public String getDisplayName() {
+                return externalFileTypeName;
+            }
+
+            @Override
             public Object getColumnValue(BibtexEntry entry) {
 
                 boolean iconFound = false;

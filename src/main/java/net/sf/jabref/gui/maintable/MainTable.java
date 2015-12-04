@@ -158,7 +158,7 @@ public class MainTable extends JTable {
             setIntercellSpacing(new Dimension(0, 0));
         }
 
-        this.setTableHeader(new PreventDraggingJTableHeader(this.getColumnModel()));
+        this.setTableHeader(new PreventDraggingJTableHeader(this.getColumnModel(), tableFormat));
 
         comparatorChooser = this.createTableComparatorChooser(this, sortedForTable,
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
