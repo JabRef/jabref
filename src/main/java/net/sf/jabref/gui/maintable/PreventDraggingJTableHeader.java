@@ -15,15 +15,18 @@
 */
 package net.sf.jabref.gui.maintable;
 
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.Enumeration;
 
 /**
  * Related to <code>MainTable</code> class. <br/>
- * Prevents dragging of the first header column ("#").
+ * Prevents dragging of the first header column ("#") and shows icons in the table header if an icon has to be set.
  *
  * This might not be the best way to solve this problem. Overriding
  * <code>getDraggedColumn</code> produces some ugly gui dragging artifacts if a
@@ -33,13 +36,30 @@ import java.awt.event.MouseEvent;
  * @author Fabian Bieker
  * @since 12/2008
  */
-class PreventDraggingJTableHeader extends JTableHeader {
+class PreventDraggingJTableHeader extends JTableHeader implements TableCellRenderer {
 
     private final MainTableFormat tableFormat;
 
-    public PreventDraggingJTableHeader(TableColumnModel cm, MainTableFormat tableFormat) {
-        super(cm);
+    private final TableCellRenderer delegate;
+
+    public PreventDraggingJTableHeader(JTable table, MainTableFormat tableFormat) {
+        super(table.getColumnModel());
+        this.setTable(table);
         this.tableFormat = tableFormat;
+        this.delegate = table.getTableHeader().getDefaultRenderer();
+        setupTableHeaderIcons();
+    }
+
+    private void setupTableHeaderIcons() {
+
+        Enumeration<TableColumn> columns = columnModel.getColumns();
+        while(columns.hasMoreElements()) {
+            TableColumn column = columns.nextElement();
+            column.setHeaderRenderer(this);
+            MainTableColumn mainTableColumn = tableFormat.getTableColumns().get(column.getModelIndex());
+            column.setHeaderValue(mainTableColumn.getHeaderLabel());
+        }
+
     }
 
     @Override
@@ -76,6 +96,28 @@ class PreventDraggingJTableHeader extends JTableHeader {
         }
 
         return column;
+    }
+
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value,
+            boolean isSelected, boolean hasFocus, int row, int column) {
+
+        // delegate to previously used TableCellRenderer which styles the component
+        Component resultFromDelegate = delegate.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+        // Changing style is only possible if both value and resultFromDelegate are JLabels
+        if (value instanceof JLabel && resultFromDelegate instanceof JLabel) {
+            String text = ((JLabel) value).getText();
+            Icon icon = ((JLabel) value).getIcon();
+            if (icon != null) {
+                ((JLabel) resultFromDelegate).setIcon(icon);
+                ((JLabel) resultFromDelegate).setText(null);
+            } else {
+                ((JLabel) resultFromDelegate).setText(text);
+            }
+        }
+
+        return resultFromDelegate;
     }
 
     /**

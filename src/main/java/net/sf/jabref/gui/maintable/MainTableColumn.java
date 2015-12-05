@@ -4,6 +4,7 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 
+import javax.swing.*;
 import java.util.*;
 
 public class MainTableColumn {
@@ -14,28 +15,31 @@ public class MainTableColumn {
 
     private final boolean isIconColumn;
 
-    public MainTableColumn(String columnName, boolean isIconColumn) {
+    private final JLabel iconLabel;
+
+    public MainTableColumn(String columnName) {
         this.columnName = columnName;
         this.bibtexFields = new ArrayList<>();
-        this.isIconColumn = isIconColumn;
+        this.isIconColumn = false;
+        this.iconLabel = null;
     }
 
     public MainTableColumn(String columnName, String[] bibtexFields) {
         this.columnName = columnName;
         this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
         this.isIconColumn = false;
+        this.iconLabel = null;
     }
 
-    public MainTableColumn(String columnName, String[] bibtexFields, boolean isIconColumn) {
+    public MainTableColumn(String columnName, String[] bibtexFields, JLabel iconLabel) {
         this.columnName = columnName;
         this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
-        this.isIconColumn = isIconColumn;
+        this.isIconColumn = true;
+        this.iconLabel = iconLabel;
     }
 
     /**
      * Get the table column name to be displayed in the UI
-     *
-     * TODO: use JLabel to be able to display Iconcols?
      *
      * @return
      */
@@ -118,4 +122,11 @@ public class MainTableColumn {
         return null;
     }
 
+    public JLabel getHeaderLabel() {
+        if(isIconColumn) {
+            return iconLabel;
+        } else {
+            return new JLabel(getDisplayName());
+        }
+    }
 }

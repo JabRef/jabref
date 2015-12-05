@@ -15,9 +15,7 @@
 */
 package net.sf.jabref.gui.maintable;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Comparator;
@@ -158,7 +156,7 @@ public class MainTable extends JTable {
             setIntercellSpacing(new Dimension(0, 0));
         }
 
-        this.setTableHeader(new PreventDraggingJTableHeader(this.getColumnModel(), tableFormat));
+        this.setTableHeader(new PreventDraggingJTableHeader(this, tableFormat));
 
         comparatorChooser = this.createTableComparatorChooser(this, sortedForTable,
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);

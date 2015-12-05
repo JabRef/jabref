@@ -195,15 +195,21 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
         if (Globals.prefs.getBoolean(JabRefPreferences.URL_COLUMN)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI)) {
-                tableColumns.add(SpecialMainTableColumns.createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.DOI_FIRST));
+                tableColumns.add(SpecialMainTableColumns
+                        .createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.DOI_FIRST,
+                                new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon())));
             } else {
-                tableColumns.add(SpecialMainTableColumns.createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.URL_FIRST));
+                tableColumns.add(SpecialMainTableColumns
+                        .createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.URL_FIRST,
+                                new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon())));
             }
 
         }
 
         if (Globals.prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN)) {
-            tableColumns.add(SpecialMainTableColumns.createIconColumn(JabRefPreferences.ARXIV_COLUMN, MainTableFormat.ARXIV));
+            tableColumns.add(SpecialMainTableColumns
+                    .createIconColumn(JabRefPreferences.ARXIV_COLUMN, MainTableFormat.ARXIV,
+                            new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon())));
         }
 
         if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
