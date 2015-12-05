@@ -47,4 +47,9 @@ public class EntryTypesTestBibLatex {
         assertEquals(BibLatexEntryTypes.ARTICLE, biblatexentrytypes.getType("article"));
     }
 
+    @Test
+    public void testIsThisBibLatex() {
+        assertTrue(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE));
+    }
+
 }
