@@ -65,8 +65,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private final JRadioButton preferUrl;
     private final JRadioButton preferDoi;
 
-    private final JCheckBox showOneLetterHeadingForIconColumns;
-
     /*** begin: special fields ***/
     private final JCheckBox specialFieldsEnabled;
     private JCheckBox rankingColumn;
@@ -242,8 +240,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         toolBar.add(moveDown);
         tabPanel.add(toolBar, BorderLayout.EAST);
 
-        showOneLetterHeadingForIconColumns = new JCheckBox(Localization.lang("Show one letter heading for icon columns"));
-
         fileColumn = new JCheckBox(Localization.lang("Show file column"));
         urlColumn = new JCheckBox(Localization.lang("Show URL/DOI column"));
         preferUrl = new JRadioButton(Localization.lang("Show URL first"));
@@ -332,8 +328,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         specialTableColumnsBuilder.add(readStatusColumn, cc.xyw(2, 7, 2));
         specialTableColumnsBuilder.add(syncKeywords, cc.xyw(2, 10, 2));
         specialTableColumnsBuilder.add(writeSpecialFields, cc.xyw(2, 11, 2));
-        specialTableColumnsBuilder.add(showOneLetterHeadingForIconColumns, cc.xyw(1, 12, 4));
-        specialTableColumnsBuilder.add(helpButton, cc.xyw(1, 13, 2));
+        specialTableColumnsBuilder.add(helpButton, cc.xyw(1, 12, 2));
 
         specialTableColumnsBuilder.add(fileColumn, cc.xyw(5, 1, 2));
         specialTableColumnsBuilder.add(urlColumn, cc.xyw(5, 2, 2));
@@ -430,9 +425,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         specialFieldsEnabled.setSelected(oldSpecialFieldsEnabled); // Call twice to make sure the ChangeListener is triggered
 
         /*** end: special fields ***/
-
-        boolean oldShowOneLetterHeadingForIconColumns = prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS);
-        showOneLetterHeadingForIconColumns.setSelected(oldShowOneLetterHeadingForIconColumns);
 
         tableRows.clear();
         String[] names = prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
@@ -703,8 +695,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         else {
             prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, new String[]{});
         }
-
-        prefs.putBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, showOneLetterHeadingForIconColumns.isSelected());
 
         /*** begin: special fields ***/
 
