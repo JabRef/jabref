@@ -1666,7 +1666,7 @@ public class JabRefPreferences {
      *
      * @param owPrefs
      */
-    void overwritePreferences(JabRefPreferences owPrefs) {
+    public void overwritePreferences(JabRefPreferences owPrefs) {
         singleton = owPrefs;
     }
 

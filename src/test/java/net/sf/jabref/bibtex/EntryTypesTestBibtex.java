@@ -13,24 +13,26 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 public class EntryTypesTestBibtex {
 
-    Boolean biblatex;
+    private JabRefPreferences backup;
+
 
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
-        biblatex = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
+        backup = Globals.prefs;
         Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, false);
     }
 
     @After
     public void tearDown() throws Exception {
-        Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, biblatex);
+        Globals.prefs.overwritePreferences(backup);
     }
 
     @Test
     public void testBibtexMode() {
         // Bibtex mode
         EntryTypes bibtexentrytypes = new EntryTypes();
+
         assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article"));
         assertNull(bibtexentrytypes.getType("aaaaarticle"));
         assertNull(bibtexentrytypes.getStandardType("aaaaarticle"));
@@ -42,7 +44,6 @@ public class EntryTypesTestBibtex {
         bibtexentrytypes.removeType("article");
         // Should not be possible to remove a standard type
         assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article"));
-
     }
 
 }
