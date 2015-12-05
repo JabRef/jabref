@@ -26,36 +26,9 @@ public class EntryTypes {
     }
 
     private static void initBibLatexEntryTypes() {
-        ALL_TYPES.put("article", BibLatexEntryTypes.ARTICLE);
-        ALL_TYPES.put("book", BibLatexEntryTypes.BOOK);
-        ALL_TYPES.put("inbook", BibLatexEntryTypes.INBOOK);
-        ALL_TYPES.put("bookinbook", BibLatexEntryTypes.BOOKINBOOK);
-        ALL_TYPES.put("suppbook", BibLatexEntryTypes.SUPPBOOK);
-        ALL_TYPES.put("booklet", BibLatexEntryTypes.BOOKLET);
-        ALL_TYPES.put("collection", BibLatexEntryTypes.COLLECTION);
-        ALL_TYPES.put("incollection", BibLatexEntryTypes.INCOLLECTION);
-        ALL_TYPES.put("suppcollection", BibLatexEntryTypes.SUPPCOLLECTION);
-        ALL_TYPES.put("manual", BibLatexEntryTypes.MANUAL);
-        ALL_TYPES.put("misc", BibLatexEntryTypes.MISC);
-        ALL_TYPES.put("online", BibLatexEntryTypes.ONLINE);
-        ALL_TYPES.put("patent", BibLatexEntryTypes.PATENT);
-        ALL_TYPES.put("periodical", BibLatexEntryTypes.PERIODICAL);
-        ALL_TYPES.put("suppperiodical", BibLatexEntryTypes.SUPPPERIODICAL);
-        ALL_TYPES.put("proceedings", BibLatexEntryTypes.PROCEEDINGS);
-        ALL_TYPES.put("inproceedings", BibLatexEntryTypes.INPROCEEDINGS);
-        ALL_TYPES.put("reference", BibLatexEntryTypes.REFERENCE);
-        ALL_TYPES.put("inreference", BibLatexEntryTypes.INREFERENCE);
-        ALL_TYPES.put("report", BibLatexEntryTypes.REPORT);
-        ALL_TYPES.put("set", BibLatexEntryTypes.SET);
-        ALL_TYPES.put("thesis", BibLatexEntryTypes.THESIS);
-        ALL_TYPES.put("unpublished", BibLatexEntryTypes.UNPUBLISHED);
-        ALL_TYPES.put("conference", BibLatexEntryTypes.CONFERENCE);
-        ALL_TYPES.put("electronic", BibLatexEntryTypes.ELECTRONIC);
-        ALL_TYPES.put("mastersthesis", BibLatexEntryTypes.MASTERSTHESIS);
-        ALL_TYPES.put("phdthesis", BibLatexEntryTypes.PHDTHESIS);
-        ALL_TYPES.put("techreport", BibLatexEntryTypes.TECHREPORT);
-        ALL_TYPES.put("www", BibLatexEntryTypes.WWW);
-        ALL_TYPES.put("ieeetranbstctl", BibLatexEntryTypes.IEEETRANBSTCTL);
+        for (EntryType type : BibLatexEntryTypes.ALL) {
+            ALL_TYPES.put(type.getName().toLowerCase(), type);
+        }
     }
 
     private static void initBibtexEntryTypes() {
@@ -106,12 +79,14 @@ public class EntryTypes {
     public static void removeType(String name) {
         String toLowerCase = name.toLowerCase();
 
-        ALL_TYPES.remove(toLowerCase);
+        if (!ALL_TYPES.get(toLowerCase).equals(STANDARD_TYPES.get(toLowerCase))) {
+            ALL_TYPES.remove(toLowerCase);
 
-        if (STANDARD_TYPES.get(toLowerCase) != null) {
-            // In this case the user has removed a customized version
-            // of a standard type. We reinstate the standard type.
-            addOrModifyCustomEntryType((CustomEntryType) STANDARD_TYPES.get(toLowerCase));
+            if (STANDARD_TYPES.get(toLowerCase) != null) {
+                // In this case the user has removed a customized version
+                // of a standard type. We reinstate the standard type.
+                addOrModifyCustomEntryType((CustomEntryType) STANDARD_TYPES.get(toLowerCase));
+            }
         }
     }
 
@@ -122,6 +97,10 @@ public class EntryTypes {
         if (o != null) {
             return o;
         }
-        return BibtexEntryTypes.MISC;
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+            return BibLatexEntryTypes.MISC;
+        } else {
+            return BibtexEntryTypes.MISC;
+        }
     }
 }
