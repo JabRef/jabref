@@ -18,6 +18,7 @@ package net.sf.jabref.gui.maintable;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
@@ -278,6 +279,25 @@ public class MainTable extends JTable {
 
     public JScrollPane getPane() {
         return pane;
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent e) {
+
+        // Set tooltip text for all columns which are not fully displayed
+
+        String toolTipText = null;
+        Point p = e.getPoint();
+        int col = columnAtPoint(p);
+        int row = rowAtPoint(p);
+        Component comp = prepareRenderer(getCellRenderer(row, col), row, col);
+
+        Rectangle bounds = getCellRect(row, col, false);
+
+        if (comp.getPreferredSize().width > bounds.width && getValueAt(row, col) != null) {
+            toolTipText = getValueAt(row, col).toString();
+        }
+        return toolTipText;
     }
 
     @Override
