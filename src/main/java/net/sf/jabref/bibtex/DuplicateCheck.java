@@ -30,6 +30,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DuplicateCheck {
 
+    private static final Log LOGGER = LogFactory.getLog(DuplicateCheck.class);
+
     /*
      * Integer values for indicating result of duplicate check (for entries):
      *
@@ -49,8 +51,6 @@ public class DuplicateCheck {
 
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
     private static final HashMap<String, Double> fieldWeights = new HashMap<>();
-
-    private static final Log LOGGER = LogFactory.getLog(DuplicateCheck.class);
 
 
     static {
