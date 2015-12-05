@@ -2,6 +2,7 @@ package net.sf.jabref.bibtex;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.CustomEntryType;
 
 
 public class EntryTypesTestBibtex {
@@ -41,6 +43,18 @@ public class EntryTypesTestBibtex {
 
         assertEquals(BibtexEntryTypes.MISC, bibtexentrytypes.getBibtexEntryType("aaaaarticle"));
 
+        // Edit the "article" entry type
+        ArrayList<String> requiredFields = new ArrayList<>(BibtexEntryTypes.ARTICLE.getRequiredFields());
+        requiredFields.add("specialfield");
+
+        CustomEntryType newArticle = new CustomEntryType("article", requiredFields,
+                BibtexEntryTypes.ARTICLE.getOptionalFields());
+
+        bibtexentrytypes.addOrModifyCustomEntryType(newArticle);
+        // Should not be the same any more
+        assertNotEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article"));
+
+        // Remove the custom "article" entry type, which should restore the original
         bibtexentrytypes.removeType("article");
         // Should not be possible to remove a standard type
         assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article"));

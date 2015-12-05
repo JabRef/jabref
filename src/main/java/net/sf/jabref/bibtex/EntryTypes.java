@@ -59,6 +59,10 @@ public class EntryTypes {
     }
 
     public static void addOrModifyCustomEntryType(CustomEntryType type) {
+        addOrModifyEntryType(type);
+    }
+
+    private static void addOrModifyEntryType(EntryType type) {
         ALL_TYPES.put(type.getName().toLowerCase(), type);
     }
 
@@ -85,7 +89,7 @@ public class EntryTypes {
             if (STANDARD_TYPES.get(toLowerCase) != null) {
                 // In this case the user has removed a customized version
                 // of a standard type. We reinstate the standard type.
-                addOrModifyCustomEntryType((CustomEntryType) STANDARD_TYPES.get(toLowerCase));
+                addOrModifyEntryType(STANDARD_TYPES.get(toLowerCase));
             }
         }
     }
