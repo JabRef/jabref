@@ -670,6 +670,13 @@ public class JabRef {
         if (!loaded.isEmpty()) {
             for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
                 ParserResult pr = i.next();
+
+                String lastFocusedDatabase = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
+                boolean hadLastFocus = pr.getFile().getAbsolutePath().equals(lastFocusedDatabase);
+                if (hadLastFocus) {
+                    first = true;
+                }
+
                 if (pr.isInvalid()) {
                     failed.add(pr);
                     i.remove();
@@ -770,8 +777,7 @@ public class JabRef {
         }
 
         if (!loaded.isEmpty()) {
-            JabRef.jrf.tabbedPane.setSelectedIndex(0);
-            new FocusRequester(((BasePanel) JabRef.jrf.tabbedPane.getComponentAt(0)).mainTable);
+            new FocusRequester(JabRef.jrf.getCurrentBasePanel().mainTable);
         }
     }
 

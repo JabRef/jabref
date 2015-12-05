@@ -782,6 +782,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     names[i] = filenames.elementAt(i);
                 }
                 prefs.putStringArray(JabRefPreferences.LAST_EDITED, names);
+                String focusedDatabase = getCurrentBasePanel().getDatabaseFile().getAbsolutePath();
+                prefs.put(JabRefPreferences.LAST_FOCUSED, focusedDatabase);
             }
 
         }
