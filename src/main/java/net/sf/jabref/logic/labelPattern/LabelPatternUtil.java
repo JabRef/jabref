@@ -358,22 +358,23 @@ public class LabelPatternUtil {
                 }
                 // A part not matching university, department nor school.
             } else if (rest == null) {
-                rest = "";
+                StringBuilder restSB = new StringBuilder();
                 // Less than 3 parts -> concatenate those
                 if (part.size() < 3) {
                     for (String k : part)
                      {
-                        rest += k;
+                        restSB.append(k);
                     // More than 3 parts -> use 1st letter abbreviation
                     }
                 } else {
                     for (String k : part) {
                         k = k.replaceAll("[^A-Z]", "");
                         if (!"".equals(k)) {
-                            rest += k;
+                            restSB.append(k);
                         }
                     }
                 }
+                rest = restSB.toString();
             }
         }
 
@@ -957,7 +958,7 @@ public class LabelPatternUtil {
     }
 
     /**
-     * Gets the forename initals of the last author/editor
+     * Gets the forename initials of the last author/editor
      *
      * @param authorField
      *            a <code>String</code>

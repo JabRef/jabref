@@ -56,7 +56,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.BibtexFields;
@@ -98,15 +97,6 @@ public class Util {
 
     private static final UnicodeCharMap UNICODE_CHAR_MAP = new UnicodeCharMap();
 
-
-    /**
-     * This method sets the location of a Dialog such that it is centered with regard to another window, but not outside
-     * the screen on the left and the top.
-     */
-    public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
-        diag.setLocationRelativeTo(win);
-    }
-
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is
      * acceptable for bibtex.
@@ -119,7 +109,36 @@ public class Util {
         if (key == null) {
             return null;
         }
-        if (!JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY)) {
+        return checkLegalKey(key,
+                JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+    }
+
+    /**
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
+     */
+    public static String replaceSpecialCharacters(String s) {
+        for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
+            s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
+        }
+        return s;
+    }
+
+
+    /**
+     * This method returns a String similar to the one passed in, except that it is molded into a form that is
+     * acceptable for bibtex.
+     *
+     * Watch-out that the returned string might be of length 0 afterwards.
+     *
+     * @param key mayBeNull
+     * @param enforceLegalKey make sure that the key is legal in all respects
+     */
+    public static String checkLegalKey(String key, boolean enforceLegalKey) {
+        if (key == null) {
+            return null;
+        }
+        if (!enforceLegalKey) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
             // interfere with parsing:
@@ -136,7 +155,8 @@ public class Util {
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"') && (c != '}') && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
+            if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"') && (c != '}')
+                    && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
                 newKey.append(c);
             }
         }
@@ -145,89 +165,6 @@ public class Util {
         // letter or letter combination that bibtex can accept.
 
         return net.sf.jabref.util.Util.replaceSpecialCharacters(newKey.toString());
-    }
-
-    /**
-     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
-     * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
-     */
-    public static String replaceSpecialCharacters(String s) {
-        for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
-            s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
-        }
-        return s;
-    }
-
-    public static TreeSet<String> findDeliminatedWordsInField(BibtexDatabase db, String field, String deliminator) {
-        TreeSet<String> res = new TreeSet<>();
-
-        for (String s : db.getKeySet()) {
-            BibtexEntry be = db.getEntryById(s);
-            Object o = be.getField(field);
-            if (o != null) {
-                String fieldValue = o.toString().trim();
-                StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
-                while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Returns a HashMap containing all words used in the database in the given field type. Characters in
-     * <code>remove</code> are not included.
-     *
-     * @param db a <code>BibtexDatabase</code> value
-     * @param field a <code>String</code> value
-     * @param remove a <code>String</code> value
-     * @return a <code>HashSet</code> value
-     */
-    public static TreeSet<String> findAllWordsInField(BibtexDatabase db, String field, String remove) {
-        TreeSet<String> res = new TreeSet<>();
-        StringTokenizer tok;
-        for (String s : db.getKeySet()) {
-            BibtexEntry be = db.getEntryById(s);
-            Object o = be.getField(field);
-            if (o != null) {
-                tok = new StringTokenizer(o.toString(), remove, false);
-                while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Finds all authors' last names in all the given fields for the given database.
-     *
-     * @param db The database.
-     * @param fields The fields to look in.
-     * @return a set containing the names.
-     */
-    public static Set<String> findAuthorLastNames(BibtexDatabase db, List<String> fields) {
-        Set<String> res = new TreeSet<>();
-        for (String s : db.getKeySet()) {
-            BibtexEntry be = db.getEntryById(s);
-            for (String field : fields) {
-                String val = be.getField(field);
-                if ((val != null) && !val.isEmpty()) {
-                    AuthorList al = AuthorList.getAuthorList(val);
-                    for (int i = 0; i < al.size(); i++) {
-                        AuthorList.Author a = al.getAuthor(i);
-                        String lastName = a.getLast();
-                        if ((lastName != null) && !lastName.isEmpty()) {
-                            res.add(lastName);
-                        }
-                    }
-                }
-
-            }
-        }
-
-        return res;
     }
 
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
@@ -452,74 +389,6 @@ public class Util {
         }
         ce.end();
         return ce;
-    }
-
-    /**
-     * Warns the user of undesired side effects of an explicit assignment/removal of entries to/from this group.
-     * Currently there are four types of groups: AllEntriesGroup, SearchGroup - do not support explicit assignment.
-     * ExplicitGroup - never modifies entries. KeywordGroup - only this modifies entries upon assignment/removal.
-     * Modifications are acceptable unless they affect a standard field (such as "author") besides the "keywords" field.
-     *
-     * @param parent The Component used as a parent when displaying a confirmation dialog.
-     * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
-     *         otherwise (this indicates that the user has aborted the assignment).
-     */
-    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibtexEntry[] entries, BibtexDatabase db, Component parent) {
-        Vector<String> affectedFields = new Vector<>();
-        for (AbstractGroup group : groups) {
-            if (group instanceof KeywordGroup) {
-                KeywordGroup kg = (KeywordGroup) group;
-                String field = kg.getSearchField().toLowerCase();
-                if ("keywords".equals(field)) {
-                    continue; // this is not undesired
-                }
-                for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {
-                    if (field.equals(BibtexFields.getFieldName(i))) {
-                        affectedFields.add(field);
-                        break;
-                    }
-                }
-            }
-        }
-        if (affectedFields.isEmpty()) {
-            return true; // no side effects
-        }
-
-        // show a warning, then return
-        StringBuffer message = // JZTODO lyrics...
-                new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
-        for (int i = 0; i < affectedFields.size(); ++i) {
-            message.append(affectedFields.elementAt(i)).append("\n");
-        }
-        message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
-        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        return choice != JOptionPane.NO_OPTION;
-
-        // if (groups instanceof KeywordGroup) {
-        // KeywordGroup kg = (KeywordGroup) groups;
-        // String field = kg.getSearchField().toLowerCase();
-        // if (field.equals("keywords"))
-        // return true; // this is not undesired
-        // for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
-        // if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
-        // // show a warning, then return
-        // String message = Globals // JZTODO lyrics...
-        // .lang(
-        // "This action will modify the \"%0\" field "
-        // + "of your entries.\nThis could cause undesired changes to "
-        // + "your entries, so it is\nrecommended that you change the grouping
-        // field "
-        // + "in your group\ndefinition to \"keywords\" or a non-standard name."
-        // + "\n\nDo you still want to continue?",
-        // field);
-        // int choice = JOptionPane.showConfirmDialog(parent, message,
-        // Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
-        // JOptionPane.WARNING_MESSAGE);
-        // return choice != JOptionPane.NO_OPTION;
-        // }
-        // }
-        // }
-        // return true; // found no side effects
     }
 
     /**
@@ -815,6 +684,74 @@ public class Util {
             }
             return sb.toString();
         }
+    }
+
+    /**
+     * Warns the user of undesired side effects of an explicit assignment/removal of entries to/from this group.
+     * Currently there are four types of groups: AllEntriesGroup, SearchGroup - do not support explicit assignment.
+     * ExplicitGroup - never modifies entries. KeywordGroup - only this modifies entries upon assignment/removal.
+     * Modifications are acceptable unless they affect a standard field (such as "author") besides the "keywords" field.
+     *
+     * @param parent The Component used as a parent when displaying a confirmation dialog.
+     * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
+     *         otherwise (this indicates that the user has aborted the assignment).
+     */
+    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibtexEntry[] entries, BibtexDatabase db, Component parent) {
+        Vector<String> affectedFields = new Vector<>();
+        for (AbstractGroup group : groups) {
+            if (group instanceof KeywordGroup) {
+                KeywordGroup kg = (KeywordGroup) group;
+                String field = kg.getSearchField().toLowerCase();
+                if ("keywords".equals(field)) {
+                    continue; // this is not undesired
+                }
+                for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {
+                    if (field.equals(BibtexFields.getFieldName(i))) {
+                        affectedFields.add(field);
+                        break;
+                    }
+                }
+            }
+        }
+        if (affectedFields.isEmpty()) {
+            return true; // no side effects
+        }
+    
+        // show a warning, then return
+        StringBuffer message = // JZTODO lyrics...
+                new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
+        for (int i = 0; i < affectedFields.size(); ++i) {
+            message.append(affectedFields.elementAt(i)).append("\n");
+        }
+        message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
+        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        return choice != JOptionPane.NO_OPTION;
+    
+        // if (groups instanceof KeywordGroup) {
+        // KeywordGroup kg = (KeywordGroup) groups;
+        // String field = kg.getSearchField().toLowerCase();
+        // if (field.equals("keywords"))
+        // return true; // this is not undesired
+        // for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
+        // if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
+        // // show a warning, then return
+        // String message = Globals // JZTODO lyrics...
+        // .lang(
+        // "This action will modify the \"%0\" field "
+        // + "of your entries.\nThis could cause undesired changes to "
+        // + "your entries, so it is\nrecommended that you change the grouping
+        // field "
+        // + "in your group\ndefinition to \"keywords\" or a non-standard name."
+        // + "\n\nDo you still want to continue?",
+        // field);
+        // int choice = JOptionPane.showConfirmDialog(parent, message,
+        // Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
+        // JOptionPane.WARNING_MESSAGE);
+        // return choice != JOptionPane.NO_OPTION;
+        // }
+        // }
+        // }
+        // return true; // found no side effects
     }
 
     public static boolean updateTimeStampIsSet() {
