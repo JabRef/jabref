@@ -63,6 +63,7 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.logging.CacheableHandler;
+import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 /**
@@ -671,9 +672,7 @@ public class JabRef {
             for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
                 ParserResult pr = i.next();
 
-                String lastFocusedDatabase = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
-                boolean hadLastFocus = pr.getFile().getAbsolutePath().equals(lastFocusedDatabase);
-                if (hadLastFocus) {
+                if (new LastFocusedTabPreferences(Globals.prefs).hadLastFocus(pr.getFile())) {
                     first = true;
                 }
 
