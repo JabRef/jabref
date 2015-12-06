@@ -223,7 +223,7 @@ public abstract class DBExporter extends DBImporterExporter {
                     querySB.append(update[i] + "='" + fieldRequirement.get(i) + "',");
                 }
                 querySB.delete(querySB.lastIndexOf(","), querySB.length());
-                querySB.append(" WHERE label='" + val.getName().toLowerCase() + '\'');
+                querySB.append(" WHERE label='" + val.getName().toLowerCase() + "';");
             }
             SQLUtil.processQuery(out, querySB.toString());
         }
