@@ -21,6 +21,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
 
 ### Fixed
+- Fixed: Cleanup process aborts if linked file does not exists
 - Fixed #420: Reenable preference changes
 - Fixed #414: Rework BibLatex entry types with correct required and optional fields
 - Fixed #413: Help links in released jar version are not working

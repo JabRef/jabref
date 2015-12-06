@@ -39,7 +39,6 @@ import net.sf.jabref.logic.cleanup.Cleaner;
 import net.sf.jabref.logic.cleanup.DoiCleanup;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.cleanup.FormatterCleanup;
-import net.sf.jabref.logic.cleanup.RemoveFieldCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -461,13 +460,5 @@ public class CleanUpAction extends AbstractWorker {
         for (FieldChange change : changes) {
             ce.addEdit(new UndoableFieldChange(change));
         }
-    }
-
-    /**
-     * Clears the given field of the entry and records the change.
-     */
-    private static void removeFieldValue(BibtexEntry entry, String fieldName, NamedCompound ce) {
-        RemoveFieldCleanup cleaner = new RemoveFieldCleanup(fieldName);
-        doCleanup(cleaner, entry, ce);
     }
 }
