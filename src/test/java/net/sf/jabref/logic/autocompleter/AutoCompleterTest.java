@@ -25,17 +25,20 @@ public class AutoCompleterTest {
 
     @Test
     public void testAutoCompleterFactory() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(JabRefPreferences.getInstance());
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
         Assert.assertTrue(autoCompleter instanceof NameFieldAutoCompleter);
 
-        autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
+        autoCompleter = autoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
         Assert.assertTrue(autoCompleter instanceof DefaultAutoCompleter);
     }
 
     @Test
     public void testDefaultAutoCompleter() {
-        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(JabRefPreferences.getInstance());
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -52,7 +55,9 @@ public class AutoCompleterTest {
 
     @Test
     public void testCrossRefCompleter() {
-        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.CROSSREF_FIELD);
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(JabRefPreferences.getInstance());
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(AutoCompleterTest.CROSSREF_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -66,7 +71,9 @@ public class AutoCompleterTest {
 
     @Test
     public void testEntireFieldCompleter() {
-        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.ENTIRE_FIELD);
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(JabRefPreferences.getInstance());
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(AutoCompleterTest.ENTIRE_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -80,8 +87,9 @@ public class AutoCompleterTest {
 
     @Test
     public void testNameFieldCompleter() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(JabRefPreferences.getInstance());
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -93,8 +101,8 @@ public class AutoCompleterTest {
         Globals.prefs.putBoolean("autoCompFF", Boolean.FALSE);
         boolean oldAutoCompLF = Globals.prefs.getBoolean("autoCompLF");
         Globals.prefs.putBoolean("autoCompLF", Boolean.FALSE);
-        String oldACFM = Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE);
-        Globals.prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+        AutoCompleteFirstNameMode oldACFM = autoCompletePreferences.getFirstnameMode();
+        autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.BOTH);
 
         Assert.assertEquals("Kostakos, V.", autoCompleter.complete("Kostakos")[0]);
         Assert.assertEquals(2, autoCompleter.complete("Kostakos").length);
@@ -133,7 +141,7 @@ public class AutoCompleterTest {
         Globals.prefs.putBoolean("autoComplete", oldAutocomplete);
         Globals.prefs.putBoolean("autoCompFF", oldAutoCompFF);
         Globals.prefs.putBoolean("autoCompLF", oldAutoCompLF);
-        Globals.prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, oldACFM);
+        autoCompletePreferences.setFirstnameMode(oldACFM);
     }
 
     private BibtexDatabase getDatabase() {

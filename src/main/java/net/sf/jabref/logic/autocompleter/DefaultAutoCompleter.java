@@ -20,21 +20,23 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import java.util.StringTokenizer;
 
 /**
- * Stores all words which are separated by Globals.SEPARATING_CHARS. This
- * autocompleter only processes the field which is given by the fieldname.
+ * Delivers possible completions for a given string.
+ * Stores all words in the given field which are separated by SEPARATING_CHARS.
  *
  * @author kahlert, cordes
  */
 class DefaultAutoCompleter extends AbstractAutoCompleter {
 
     private final String fieldName;
-    
+
     private final String SEPARATING_CHARS = ";,\n ";
 
     /**
      * @see AutoCompleterFactory
      */
-    DefaultAutoCompleter(String fieldName) {
+    DefaultAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
+        super(preferences);
+
         this.fieldName = fieldName;
     }
 
@@ -43,6 +45,10 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * Stores all words in the given field which are separated by SEPARATING_CHARS.
+     */
     @Override
     public void addBibtexEntry(BibtexEntry entry) {
         if (entry == null) {
@@ -54,7 +60,7 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
             StringTokenizer tok = new StringTokenizer(fieldValue, SEPARATING_CHARS);
             while (tok.hasMoreTokens()) {
                 String word = tok.nextToken();
-                addWordToIndex(word);
+                addItemToIndex(word);
             }
         }
     }

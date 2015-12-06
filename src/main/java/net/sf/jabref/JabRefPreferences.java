@@ -43,6 +43,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
@@ -162,12 +163,6 @@ public class JabRefPreferences {
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String WORKING_DIRECTORY = "workingDirectory";
     public static final String NUMBER_COL_WIDTH = "numberColWidth";
-    public static final String SHORTEST_TO_COMPLETE = "shortestToComplete";
-    public static final String AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode";
-    public static final String AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both"; // here are the possible values for _MODE:
-    public static final String AUTO_COMP_LAST_FIRST = "autoCompLF";
-    public static final String AUTO_COMP_FIRST_LAST = "autoCompFF";
-    public static final String AUTO_COMPLETE_FIELDS = "autoCompleteFields";
     public static final String AUTO_COMPLETE = "autoComplete";
     public static final String SEARCH_PANE_POS_Y = "searchPanePosY";
     public static final String SEARCH_PANE_POS_X = "searchPanePosX";
@@ -333,8 +328,6 @@ public class JabRefPreferences {
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
     private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
     public static final String PDF_PREVIEW = "pdfPreview";
-    public static final String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly";
-    public static final String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly";
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
@@ -562,11 +555,7 @@ public class JabRefPreferences {
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
         defaults.put(AUTO_COMPLETE, Boolean.TRUE);
-        defaults.put(AUTO_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref");
-        defaults.put(AUTO_COMP_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
-        defaults.put(AUTO_COMP_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(SHORTEST_TO_COMPLETE, 1);
-        defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+        AutoCompletePreferences.putDefaults(defaults);
         defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
