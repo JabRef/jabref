@@ -47,6 +47,12 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
     private static final String[] FIELDS_TO_LOOK_FOR = new String[] {"pdf", "ps"};
 
+    private boolean offerChangeSettings;
+
+    private boolean offerChangeDatabase;
+
+    private boolean offerSetFileDir;
+
 
     /**
      * This method should be performed if the major/minor versions recorded in the ParserResult
@@ -56,20 +62,17 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      */
     @Override
     public boolean isActionNecessary(ParserResult pr) {
+        // Find out which actions should be offered:
+        // Only offer to change Preferences if file column is not already visible:
+        offerChangeSettings = !Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN) || !showsFileInGenFields();
+        // Only offer to upgrade links if the pdf/ps fields are used:
+        offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
+        // If the "file" directory is not set, offer to migrate pdf/ps dir:
+        offerSetFileDir = !Globals.prefs.hasKey(Globals.FILE_FIELD + "Directory")
+                && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
+
         // First check if this warning is disabled:
-        if (!Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING)) {
-            return false;
-        }
-        if (pr.getJabrefMajorVersion() <= 0) {
-            return false; // non-JabRef file
-        } else if (pr.getJabrefMajorVersion() < 2) {
-            return true; // old
-        } else if (pr.getJabrefMajorVersion() == 2) {
-            return pr.getJabrefMinorVersion() <= 2;
-        } else {
-            // JabRef version 3 does not contain a header, but who knows
-            return true;
-        }
+        return Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING) && isThereSomethingToBeDone();
     }
 
     /**
@@ -80,17 +83,9 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      */
     @Override
     public void performAction(BasePanel panel, ParserResult pr) {
-        // Find out which actions should be offered:
-        // Only offer to change Preferences if file column is not already visible:
-        boolean offerChangeSettings = !Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN) || !showsFileInGenFields();
-        // Only offer to upgrade links if the pdf/ps fields are used:
-        boolean offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
-        // If the "file" directory is not set, offer to migrate pdf/ps dir:
-        boolean offerSetFileDir = !Globals.prefs.hasKey(Globals.FILE_FIELD + "Directory")
-                && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
-        if (!offerChangeDatabase && !offerChangeSettings && !offerSetFileDir)
-         {
+
+        if (!isThereSomethingToBeDone())         {
             return; // Nothing to do, just return.
         }
 
@@ -153,6 +148,10 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             makeChanges(panel, pr, changeSettings.isSelected(), changeDatabase.isSelected(),
                     setFileDir.isSelected() ? fileDir.getText() : null);
         }
+    }
+
+    private boolean isThereSomethingToBeDone() {
+        return  offerChangeSettings || offerChangeDatabase || offerSetFileDir;
     }
 
     /**

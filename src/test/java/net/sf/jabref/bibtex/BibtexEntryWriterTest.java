@@ -52,12 +52,12 @@ public class BibtexEntryWriterTest {
 
         String actual = stringWriter.toString();
 
-        String expected = "@Article{," + Globals.NEWLINE +
+        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
                 "  Author                   = {Foo Bar}," + Globals.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
                 "  Note                     = {some note}," + Globals.NEWLINE +
                 "  Number                   = {1}" + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+                "}";
 
         assertEquals(expected, actual);
     }
@@ -69,7 +69,7 @@ public class BibtexEntryWriterTest {
                 "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
                 "  Note                     = {some note}," + Globals.NEWLINE +
                 "  Number                   = {1}" + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+                "}";
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
@@ -93,12 +93,149 @@ public class BibtexEntryWriterTest {
     }
 
     @Test
+         public void roundTripWithPrependingNewlines() throws IOException {
+        String bibtexEntry = "\r\n@Article{test," + Globals.NEWLINE +
+                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}";
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+
+        Collection<BibtexEntry> entries = result.getDatabase().getEntries();
+        Assert.assertEquals(1, entries.size());
+
+        BibtexEntry entry = entries.iterator().next();
+        Assert.assertEquals("test", entry.getCiteKey());
+        Assert.assertEquals(5, entry.getFieldNames().size());
+        Set<String> fields = entry.getFieldNames();
+        Assert.assertTrue(fields.contains("author"));
+        Assert.assertEquals("Foo Bar", entry.getField("author"));
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter);
+        String actual = stringWriter.toString();
+
+        assertEquals(bibtexEntry, actual);
+    }
+
+    @Test
+    public void roundTripWithModification() throws IOException {
+        String bibtexEntry = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}";
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+
+        Collection<BibtexEntry> entries = result.getDatabase().getEntries();
+        Assert.assertEquals(1, entries.size());
+
+        BibtexEntry entry = entries.iterator().next();
+        Assert.assertEquals("test", entry.getCiteKey());
+        Assert.assertEquals(5, entry.getFieldNames().size());
+        entry.setField("author", "BlaBla");
+        Set<String> fields = entry.getFieldNames();
+        Assert.assertTrue(fields.contains("author"));
+        Assert.assertEquals("BlaBla", entry.getField("author"));
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter);
+        String actual = stringWriter.toString();
+
+        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {BlaBla}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}";
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void roundTripWithAppendedNewlines() throws IOException {
+        String bibtexEntry = "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}\n\n";
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+
+        Collection<BibtexEntry> entries = result.getDatabase().getEntries();
+        Assert.assertEquals(1, entries.size());
+
+        BibtexEntry entry = entries.iterator().next();
+        Assert.assertEquals("test", entry.getCiteKey());
+        Assert.assertEquals(5, entry.getFieldNames().size());
+        Set<String> fields = entry.getFieldNames();
+        Assert.assertTrue(fields.contains("author"));
+        Assert.assertEquals("Foo Bar", entry.getField("author"));
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter);
+        String actual = stringWriter.toString();
+
+        //appending newlines are not written by the writer, but by FileActions. So, these should be removed here.
+        assertEquals(bibtexEntry.substring(0, bibtexEntry.length()-2), actual);
+    }
+
+    @Test
+    public void multipleWritesWithoutModification() throws IOException {
+        String bibtexEntry = "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}";
+
+        String result = testSingleWrite(bibtexEntry);
+        result = testSingleWrite(result);
+        result = testSingleWrite(result);
+
+        assertEquals(bibtexEntry, result);
+    }
+
+    private String testSingleWrite(String bibtexEntry) throws IOException {
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+
+        Collection<BibtexEntry> entries = result.getDatabase().getEntries();
+        Assert.assertEquals(1, entries.size());
+
+        BibtexEntry entry = entries.iterator().next();
+        Assert.assertEquals("test", entry.getCiteKey());
+        Assert.assertEquals(5, entry.getFieldNames().size());
+        Set<String> fields = entry.getFieldNames();
+        Assert.assertTrue(fields.contains("author"));
+        Assert.assertEquals("Foo Bar", entry.getField("author"));
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter);
+        String actual = stringWriter.toString();
+
+        assertEquals(bibtexEntry, actual);
+        return actual;
+    }
+
+    @Test
     public void monthFieldSpecialSyntax() throws IOException {
         String bibtexEntry = "@Article{test," + Globals.NEWLINE +
                 "  Author                   = {Foo Bar}," + Globals.NEWLINE +
                 "  Month                    = mar," + Globals.NEWLINE +
                 "  Number                   = {1}" + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+                "}";
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));

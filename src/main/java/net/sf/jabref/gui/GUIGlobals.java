@@ -121,9 +121,6 @@ public class GUIGlobals {
     public static Color activeBackground;
     public static Color invalidFieldBackgroundColor;
 
-    public static final String META_FLAG = "jabref-meta: ";
-    public static final String META_FLAG_OLD = "bibkeeper-meta: ";
-
     // some fieldname constants
     public static final double DEFAULT_FIELD_WEIGHT = 1;
     public static final double MAX_FIELD_WEIGHT = 2;

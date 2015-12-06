@@ -96,6 +96,13 @@ public class BibtexEntryWriter {
     }
 
     public void write(BibtexEntry entry, Writer out) throws IOException {
+        // if the entry has not been modified, write it as it was
+        if(!entry.hasChanged()){
+            out.write(entry.getParsedSerialization());
+            return;
+        }
+        out.write(Globals.NEWLINE + Globals.NEWLINE);
+
         switch (writeFieldSortStyle) {
             case 0:
                 writeRequiredFieldsFirstOptionalFieldsSecondRemainingFieldsThird(entry, out);
@@ -166,7 +173,7 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}');
     }
 
     private List<String> getRequiredFieldsSorted(BibtexEntry entry) {
@@ -245,7 +252,7 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}');
     }
 
     private void writeUserDefinedOrder(BibtexEntry entry, Writer out) throws IOException {
@@ -290,7 +297,7 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}');
 
     }
 

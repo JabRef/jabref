@@ -70,7 +70,7 @@ public class FileActions {
      * Write all strings in alphabetical order, modified to produce a safe (for
      * BibTeX) order of the strings if they reference each other.
      *
-     * @param fw The Writer to send the output to.
+     * @param fw       The Writer to send the output to.
      * @param database The database whose strings we should write.
      * @throws IOException If anthing goes wrong in writing.
      */
@@ -96,12 +96,17 @@ public class FileActions {
                 }
             }
         }
-        fw.write(Globals.NEWLINE);
     }
 
     private static void writeString(Writer fw, BibtexString bs, HashMap<String, BibtexString> remaining, int maxKeyLength) throws IOException {
         // First remove this from the "remaining" list so it can't cause problem with circular refs:
         remaining.remove(bs.getName());
+
+        //if the string has not been modified, write it back as it was
+        if (!bs.hasChanged()) {
+            fw.write(bs.getParsedSerialization());
+            return;
+        }
 
         // Then we go through the string looking for references to other strings. If we find references
         // to strings that we will write, but still haven't, we write those before proceeding. This ensures
@@ -155,7 +160,7 @@ public class FileActions {
      */
     private static void writeBibFileHeader(Writer out, Charset encoding) throws IOException {
         out.write("% ");
-        out.write(Globals.encPrefix + encoding + Globals.NEWLINE + Globals.NEWLINE);
+        out.write(Globals.encPrefix + encoding + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE);
     }
 
     /**
@@ -166,9 +171,9 @@ public class FileActions {
      * entries are saved.
      */
     public static SaveSession saveDatabase(BibtexDatabase database,
-            MetaData metaData, File file, JabRefPreferences prefs,
- boolean checkSearch, boolean checkGroup, Charset encoding, boolean suppressBackup)
-                    throws SaveException {
+                                           MetaData metaData, File file, JabRefPreferences prefs,
+                                           boolean checkSearch, boolean checkGroup, Charset encoding, boolean suppressBackup)
+            throws SaveException {
 
         TreeMap<String, EntryType> types = new TreeMap<>();
 
@@ -238,7 +243,6 @@ public class FileActions {
 
                 if (write) {
                     bibtexEntryWriter.write(entry, writer);
-                    writer.write(Globals.NEWLINE);
                 }
             }
 
@@ -254,13 +258,19 @@ public class FileActions {
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
                         CustomEntryTypesManager.save(tp, writer);
-                        writer.write(Globals.NEWLINE);
                     }
                 }
 
             }
-        } catch (Throwable ex) {
-            ex.printStackTrace();
+
+            //finally write whatever remains of the file, but at least a concluding newline
+            if (database.getEpilog() != null && database.getEpilog() != "") {
+               writer.write(database.getEpilog());
+            } else {
+               writer.write(Globals.NEWLINE);
+            }
+        } catch (IOException ex) {
+            LOGGER.error("Could not write file", ex);
             session.cancel();
             // repairAfterError(file, backup, INIT_OK);
             throw new SaveException(ex.getMessage(), ex.getLocalizedMessage(), exceptionCause);
@@ -357,9 +367,9 @@ public class FileActions {
      * @return A List containing warnings, if any.
      */
     public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
- File file,
-            JabRefPreferences prefs, BibtexEntry[] bes, Charset encoding, DatabaseSaveType saveType)
-                    throws SaveException {
+                                                 File file,
+                                                 JabRefPreferences prefs, BibtexEntry[] bes, Charset encoding, DatabaseSaveType saveType)
+            throws SaveException {
 
         TreeMap<String, EntryType> types = new TreeMap<>(); // Map
         // to
@@ -418,7 +428,10 @@ public class FileActions {
                 }
 
                 bibtexEntryWriter.write(be, fw);
-                fw.write(Globals.NEWLINE);
+                //only append newline if the entry has changed
+                if (!be.hasChanged()) {
+                    fw.write(Globals.NEWLINE);
+                }
             }
 
             // Write meta data.
@@ -514,7 +527,7 @@ public class FileActions {
         if (keySet != null) {
             Iterator<String> i = keySet.iterator();
 
-            for (; i.hasNext();) {
+            for (; i.hasNext(); ) {
                 sorter.add(database.getEntryById(i.next()));
             }
         }

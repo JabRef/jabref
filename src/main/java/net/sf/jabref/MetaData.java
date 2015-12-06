@@ -19,7 +19,6 @@ import java.io.*;
 import java.util.*;
 
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
@@ -29,6 +28,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class MetaData implements Iterable<String> {
 
+    public static final String META_FLAG = "jabref-meta: ";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
 
@@ -104,7 +104,8 @@ public class MetaData implements Iterable<String> {
     /**
      * The MetaData object can be constructed with no data in it.
      */
-    public MetaData() {}
+    public MetaData() {
+    }
 
     /**
      * Add default metadata for new database:
@@ -158,6 +159,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Look up the directory set up for the given field type for this database.
      * If no directory is set up, return that defined in global preferences.
+     *
      * @param fieldName The field type
      * @return The default directory for this field type.
      */
@@ -195,8 +197,7 @@ public class MetaData implements Iterable<String> {
                 }
             }
             dirs.add(dir);
-        }
-        else {
+        } else {
             String dir = Globals.prefs.get(fieldName + "Directory");
             if (dir != null) {
                 dirs.add(dir);
@@ -218,9 +219,10 @@ public class MetaData implements Iterable<String> {
 
     /**
      * Parse the groups metadata string
+     *
      * @param orderedData The vector of metadata strings
-     * @param db The BibtexDatabase this metadata belongs to
-     * @param version The group tree version
+     * @param db          The BibtexDatabase this metadata belongs to
+     * @param version     The group tree version
      * @return true if parsing was successful, false otherwise
      */
     private void putGroups(Vector<String> orderedData, BibtexDatabase db, int version) {
@@ -255,16 +257,18 @@ public class MetaData implements Iterable<String> {
     public void writeMetaData(Writer out) throws IOException {
         // write all meta data except groups
         SortedSet<String> sortedKeys = new TreeSet<>(metaData.keySet());
+
         for (String key : sortedKeys) {
+
             StringBuffer sb = new StringBuffer();
+            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE);
             Vector<String> orderedData = metaData.get(key);
-            sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
+            sb.append("@comment{").append(META_FLAG).append(key).append(":");
             for (int j = 0; j < orderedData.size(); j++) {
                 sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
             }
             sb.append("}");
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
 
             out.write(sb.toString());
         }
@@ -273,16 +277,19 @@ public class MetaData implements Iterable<String> {
         if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
             StringBuffer sb = new StringBuffer();
             // write version first
-            sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupsversion:");
+            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE);
+            sb.append("@comment{").append(META_FLAG).append("groupsversion:");
             sb.append("" + VersionHandling.CURRENT_VERSION + ";");
             sb.append("}");
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
+
             out.write(sb.toString());
 
             // now write actual groups
             sb = new StringBuffer();
-            sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupstree:");
+            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE);
+            sb.append("@comment{").append(META_FLAG).append("groupstree:");
             sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
             StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
@@ -293,8 +300,6 @@ public class MetaData implements Iterable<String> {
                 sb.append(Globals.NEWLINE);
             }
             sb.append("}");
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
             out.write(sb.toString());
         }
     }
@@ -374,7 +379,7 @@ public class MetaData implements Iterable<String> {
      * Updates the stored key patterns to the given key patterns.
      *
      * @param labelPattern the key patterns to update to. <br />
-     * A reference to this object is stored internally and is returned at getLabelPattern();
+     *                     A reference to this object is stored internally and is returned at getLabelPattern();
      */
     public void setLabelPattern(DatabaseLabelPattern labelPattern) {
         // remove all keypatterns from metadata

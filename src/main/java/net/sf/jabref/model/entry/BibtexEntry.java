@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,6 +61,14 @@ public class BibtexEntry {
     private boolean searchHit;
     private boolean groupHit;
 
+    private String parsedSerialization;
+
+    /*
+    * marks if the complete serialization, which was read from file, should be used.
+    * Is set to false, if parts of the entry change
+     */
+    private boolean changed;
+
 
     public BibtexEntry() {
         this(IdGenerator.next());
@@ -73,6 +82,7 @@ public class BibtexEntry {
         Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
 
         this.id = id;
+        changed = true;
         setType(type);
     }
 
@@ -131,6 +141,7 @@ public class BibtexEntry {
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
             this.type = type;
+            changed = true;
             firePropertyChangedEvent(TYPE_HEADER, oldType != null ? oldType.getName() : null, type.getName());
         } catch (PropertyVetoException pve) {
             pve.printStackTrace();
@@ -152,6 +163,7 @@ public class BibtexEntry {
         }
 
         this.id = id;
+        changed = true;
     }
 
     /**
@@ -294,6 +306,7 @@ public class BibtexEntry {
      * does not check values for content, so e.g. empty strings will be set as such.
      */
     public void setField(Map<String, String> fields) {
+        changed = true;
         this.fields.putAll(fields);
     }
 
@@ -308,6 +321,8 @@ public class BibtexEntry {
         if (BibtexEntry.ID_FIELD.equals(name)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
+
+        changed = true;
 
         String oldValue = fields.get(name);
         try {
@@ -333,6 +348,8 @@ public class BibtexEntry {
      */
     public void clearField(String name) {
 
+        changed = true;
+
         if (BibtexEntry.ID_FIELD.equals(name)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
@@ -351,9 +368,9 @@ public class BibtexEntry {
      * database argument is given, this method will try to look up missing fields in
      * entries linked by the "crossref" field, if any.
      *
-     * @param allFields   An array of field names to be checked.
-     * @param database The database in which to look up crossref'd entries, if any. This
-     *                 argument can be null, meaning that no attempt will be made to follow crossrefs.
+     * @param allFields An array of field names to be checked.
+     * @param database  The database in which to look up crossref'd entries, if any. This
+     *                  argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     boolean allFieldsPresent(String[] allFields, BibtexDatabase database) {
@@ -424,7 +441,7 @@ public class BibtexEntry {
     /**
      * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
      * as is
-     *
+     * <p>
      * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
      */
     @Override
@@ -455,7 +472,7 @@ public class BibtexEntry {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {getField("author"), getField("title"), getField("year")};
+        String[] s = new String[]{getField("author"), getField("title"), getField("year")};
 
         for (int i = 0; i < s.length; ++i) {
             if (s[i] == null) {
@@ -492,6 +509,20 @@ public class BibtexEntry {
             }
         }
         return year;
+    }
+
+
+    public void setParsedSerialization(String parsedSerialization) {
+        changed = false;
+        this.parsedSerialization = parsedSerialization;
+    }
+
+    public String getParsedSerialization() {
+        return parsedSerialization;
+    }
+
+    public boolean hasChanged() {
+        return changed;
     }
 
     public void putKeywords(List<String> keywords) {
