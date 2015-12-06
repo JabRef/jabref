@@ -26,8 +26,9 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.logic.formatter.Formatter;
 
-public class HTMLConverter implements LayoutFormatter {
+public class HTMLConverter implements LayoutFormatter, Formatter {
 
     private static final Log LOGGER = LogFactory.getLog(HTMLConverter.class);
 
@@ -926,5 +927,10 @@ public class HTMLConverter implements LayoutFormatter {
         } else {
             return position; // Don't do anything.
         }
+    }
+
+    @Override
+    public String getName() {
+        return "HTMLConverter";
     }
 }
