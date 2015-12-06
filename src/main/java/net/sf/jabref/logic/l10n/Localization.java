@@ -74,44 +74,35 @@ public class Localization {
         if ((translation != null) && !translation.isEmpty()) {
             // also done if no params are given
             //  Then, %c is translated to ":", %e is translated to "=", ...
-            translation = translation.replaceAll("_", " ");
-            StringBuffer sb = new StringBuffer();
-            boolean b = false;
-            char c;
-            for (int i = 0; i < translation.length(); ++i) {
-                c = translation.charAt(i);
-                if (c == '%') {
-                    b = true;
-                } else {
-                    if (!b) {
-                        sb.append(c);
-                    } else {
-                        b = false;
-                        try {
-                            int index = Integer.parseInt(String.valueOf(c));
-                            if ((params != null) && (index >= 0) && (index <= params.length)) {
-                                sb.append(params[index]);
-                            }
-                        } catch (NumberFormatException e) {
-                            // append literally (for quoting) or insert special
-                            // symbol
-                            switch (c) {
-                                case 'c': // colon
-                                    sb.append(':');
-                                    break;
-                                case 'e': // equal
-                                    sb.append('=');
-                                    break;
-                                default: // anything else, e.g. %
-                                    sb.append(c);
-                            }
-                        }
-                    }
-                }
-            }
-            return sb.toString();
+            new Translation(translation, params).translate();
         }
         return key;
+    }
+
+    private static class Translation {
+
+        private final String key;
+        private final List<String> params;
+
+        public Translation(String key, String... params) {
+            this.key = Objects.requireNonNull(key);
+            this.params = Arrays.asList(params);
+            if(this.params.size() > 10) {
+                throw new IllegalStateException("Translations can only have at most 10 parameters");
+            }
+        }
+
+        public String translate() {
+            String translation = key.replaceAll("_", " ").replaceAll("%e", "=").replaceAll("%c", ":");
+
+            for (int i = 0; i < params.size(); i++) {
+                String param = params.get(i);
+                translation = translation.replaceAll("%" + i, param);
+            }
+
+            return translation;
+        }
+
     }
 
     public static String lang(String key, String... params) {
