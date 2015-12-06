@@ -35,6 +35,8 @@ public class LocalizationTest {
     public void testParsingCode() {
         String code = ""
                 + "Localization.lang(\"one per line\")"
+                + "Localization.lang(\n" +
+                "            \"Copy \\\\cite{BibTeX key}\")"
                 + "Localization.lang(\"two per line\") Localization.lang(\"two per line\")"
                 + "Localization.lang(\"multi \" + \n"
                 + "\"line\")"
@@ -42,14 +44,14 @@ public class LocalizationTest {
                 + "Localization.lang(\"Search %0\", \"Springer\")"
                 + "Localization.lang(\"Reset preferences (key1,key2,... or 'all')\")";
 
-        List<String> expectedLanguageKeys = Arrays.asList("one_per_line", "two_per_line", "two_per_line", "multi_line",
+        List<String> expectedLanguageKeys = Arrays.asList("one_per_line", "Copy_\\cite{BibTeX_key}", "two_per_line", "two_per_line", "multi_line",
                 "one_per_line_with_var", "Search_%0", "Reset_preferences_(key1,key2,..._or_'all')");
 
         assertEquals(expectedLanguageKeys, LocalizationParser.getLanguageKeysInString(code, LocalizationParser.Type.LANG));
     }
 
-    private static class LocalizationParser {
-        private static enum Type {
+    public static class LocalizationParser {
+        private enum Type {
             LANG, MENU
 
         }
@@ -130,7 +132,7 @@ public class LocalizationTest {
                     index++;
                 }
 
-                String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(buffer.toString()).replaceAll("QUOTATIONPLACEHOLDER");
+                String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(buffer.toString()).replaceAll("QUOTATIONPLACEHOLDER").replaceAll("\\\\\\\\","\\\\");
 
                 // only retain what is within quotation
                 StringBuilder b = new StringBuilder();

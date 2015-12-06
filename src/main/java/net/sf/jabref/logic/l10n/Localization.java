@@ -126,5 +126,8 @@ public class Localization {
         return translate(menuTitles, "menu item", key, params);
     }
 
+    public static List<String> getMenuTitleKeys() {
+        return new LinkedList<>(menuTitles.keySet());
+    }
 }
 
