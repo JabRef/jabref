@@ -154,6 +154,7 @@ public class JabRefPreferences {
     public static final String MERGEENTRIES_POS_X = "mergeEntriesPosX";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
+    public static final String LAST_FOCUSED = "lastFocused";
     public static final String BACKUP = "backup";
     public static final String ENTRY_TYPE_FORM_WIDTH = "entryTypeFormWidth";
     public static final String ENTRY_TYPE_FORM_HEIGHT_FACTOR = "entryTypeFormHeightFactor";
@@ -531,6 +532,7 @@ public class JabRefPreferences {
         defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, null);
+        defaults.put(LAST_FOCUSED, null);
         defaults.put(STRINGS_POS_X, 0);
         defaults.put(STRINGS_POS_Y, 0);
         defaults.put(STRINGS_SIZE_X, 600);

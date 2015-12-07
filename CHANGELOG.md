@@ -14,6 +14,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Changed
 - Implements #470: Show editor (as an alternative to author) and booktitle (as an alternative to journal) in the main table by default
+- Restore focus to last focused tab on start
 - Add ability to format/cleanup the date field
 - Add support for proxy authentication via VM args and GUI settings, this implements Feature Request #388
 - Move Bibtex and Biblatex mode switcher to File menu

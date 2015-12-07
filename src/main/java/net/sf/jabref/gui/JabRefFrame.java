@@ -65,6 +65,7 @@ import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -782,6 +783,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     names[i] = filenames.elementAt(i);
                 }
                 prefs.putStringArray(JabRefPreferences.LAST_EDITED, names);
+                File focusedDatabase = getCurrentBasePanel().getDatabaseFile();
+                new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
 
         }

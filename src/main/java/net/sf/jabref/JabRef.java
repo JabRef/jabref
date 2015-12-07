@@ -63,6 +63,7 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.logging.CacheableHandler;
+import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 /**
@@ -670,6 +671,11 @@ public class JabRef {
         if (!loaded.isEmpty()) {
             for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
                 ParserResult pr = i.next();
+
+                if (new LastFocusedTabPreferences(Globals.prefs).hadLastFocus(pr.getFile())) {
+                    first = true;
+                }
+
                 if (pr.isInvalid()) {
                     failed.add(pr);
                     i.remove();
@@ -770,8 +776,7 @@ public class JabRef {
         }
 
         if (!loaded.isEmpty()) {
-            JabRef.jrf.tabbedPane.setSelectedIndex(0);
-            new FocusRequester(((BasePanel) JabRef.jrf.tabbedPane.getComponentAt(0)).mainTable);
+            new FocusRequester(JabRef.jrf.getCurrentBasePanel().mainTable);
         }
     }
 
