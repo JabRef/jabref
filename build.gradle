@@ -98,7 +98,7 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
 
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.mashape.unirest:unirest-java:1.4.7'
