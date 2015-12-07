@@ -17,10 +17,9 @@ package net.sf.jabref.logic.autocompleter;
 
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 
 /**
+ * Delivers possible completions for a given string.
  * Interprets the given values as names and stores them in different
  * permutations so we can complete by beginning with last name or first name.
  *
@@ -29,11 +28,13 @@ import net.sf.jabref.JabRefPreferences;
 class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
     private final String[] fieldNames;
-    private final boolean lastNameOnlyAndSeparationBySpace; // true if only last names should be completed and there is NO separation by " and ", but by " "
+    /**
+     * true if only last names should be completed and there is NO separation by " and ", but by " "
+     */
+    private final boolean lastNameOnlyAndSeparationBySpace;
     private final boolean autoCompFF;
     private final boolean autoCompLF;
-    private final boolean autoCompFullFirstOnly;
-    private final boolean autoCompShortFirstOnly;
+    private final AutoCompleteFirstNameMode autoCompFirstnameMode;
 
     private String prefix = "";
 
@@ -41,25 +42,27 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
     /**
      * @see AutoCompleterFactory
      */
-    NameFieldAutoCompleter(String fieldName) {
-        this(new String[]{fieldName}, false);
+    NameFieldAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
+        this(new String[] {fieldName}, false, preferences);
     }
 
-    public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnlyAndSeparationBySpace) {
+    public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnlyAndSeparationBySpace,
+            AutoCompletePreferences preferences) {
+        super(preferences);
+
         this.fieldNames = fieldNames;
         this.lastNameOnlyAndSeparationBySpace = lastNameOnlyAndSeparationBySpace;
-        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST)) {
+        if (preferences.getCompleteFirstLast()) {
             autoCompFF = true;
             autoCompLF = false;
-        } else if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST)) {
+        } else if (preferences.getCompleteLastFirst()) {
             autoCompFF = false;
             autoCompLF = true;
         } else {
             autoCompFF = true;
             autoCompLF = true;
         }
-        autoCompShortFirstOnly = Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR);
-        autoCompFullFirstOnly = Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL);
+        autoCompFirstnameMode = preferences.getFirstnameMode();
     }
 
     @Override
@@ -67,7 +70,7 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
         // quick hack
         // when used at entry fields (!this.lastNameOnlyAndSeparationBySpace), this is a single unit field
         // when used at the search form (this.lastNameOnlyAndSeparationBySpace), this is NOT a single unit field
-        // reason: search keywords are separated by space. 
+        // reason: search keywords are separated by space.
         //    This is OK for last names without prefix. "Lastname" works perfectly.
         //    querying for "van der Lastname" can be interpreted as
         //      a) "van" "der" "Lastname"
@@ -87,28 +90,34 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
                 for (int j = 0; j < authorList.size(); j++) {
                     AuthorList.Author author = authorList.getAuthor(j);
                     if (lastNameOnlyAndSeparationBySpace) {
-                        addWordToIndex(author.getLastOnly());
+                        addItemToIndex(author.getLastOnly());
                     } else {
                         if (autoCompLF) {
-                            if (autoCompShortFirstOnly) {
-                                addWordToIndex(author.getLastFirst(true));
-                            } else if (autoCompFullFirstOnly) {
-                                addWordToIndex(author.getLastFirst(false));
-                            } else {
-                                // JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
-                                addWordToIndex(author.getLastFirst(true));
-                                addWordToIndex(author.getLastFirst(false));
+                            switch (autoCompFirstnameMode) {
+                            case ONLY_ABBREVIATED:
+                                    addItemToIndex(author.getLastFirst(true));
+                                    break;
+                            case ONLY_FULL:
+                                    addItemToIndex(author.getLastFirst(false));
+                                    break;
+                            case BOTH:
+                            default:
+                                addItemToIndex(author.getLastFirst(true));
+                                addItemToIndex(author.getLastFirst(false));
                             }
                         }
                         if (autoCompFF) {
-                            if (autoCompShortFirstOnly) {
-                                addWordToIndex(author.getFirstLast(true));
-                            } else if (autoCompFullFirstOnly) {
-                                addWordToIndex(author.getFirstLast(false));
-                            } else {
-                                // JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
-                                addWordToIndex(author.getFirstLast(true));
-                                addWordToIndex(author.getFirstLast(false));
+                            switch (autoCompFirstnameMode) {
+                            case ONLY_ABBREVIATED:
+                                addItemToIndex(author.getFirstLast(true));
+                                break;
+                            case ONLY_FULL:
+                                addItemToIndex(author.getFirstLast(false));
+                                break;
+                            case BOTH:
+                            default:
+                                    addItemToIndex(author.getFirstLast(true));
+                                    addItemToIndex(author.getFirstLast(false));
                             }
                         }
                     }
@@ -136,7 +145,7 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
     @Override
     public String[] complete(String toComplete) {
-        // Normally, one would implement that using 
+        // Normally, one would implement that using
         // class inheritance. But this seemed overengineered
         if (this.lastNameOnlyAndSeparationBySpace) {
             toComplete = determinePrefixAndReturnRemainder(toComplete, " ");

@@ -31,7 +31,8 @@ import javax.swing.SpinnerNumberModel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
+import net.sf.jabref.logic.autocompleter.AutoCompleteFirstNameMode;
+import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
@@ -62,6 +63,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     private final JTextField autoCompFields;
     private final JabRefPreferences prefs;
+    private final AutoCompletePreferences autoCompletePreferences;
     private final JabRefFrame frame;
 
 
@@ -78,6 +80,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     public EntryEditorPrefsTab(JabRefFrame frame, JabRefPreferences prefs) {
         this.prefs = prefs;
+        autoCompletePreferences = new AutoCompletePreferences(prefs);
         this.frame = frame;
         setLayout(new BorderLayout());
 
@@ -89,7 +92,8 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         disableOnMultiple = new JCheckBox(Localization.lang("Disable entry editor when multiple entries are selected"));
         autoComplete = new JCheckBox(Localization.lang("Enable word/name autocompletion"));
 
-        shortestToComplete = new JSpinner(new SpinnerNumberModel(prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE), 1, 5, 1));
+        shortestToComplete = new JSpinner(
+                new SpinnerNumberModel(autoCompletePreferences.getShortestLengthToComplete(), 1, 5, 1));
 
         // allowed name formats
         autoCompFF = new JRadioButton(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"));
@@ -181,12 +185,12 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         emacsRebindCtrlF.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
         disableOnMultiple.setSelected(prefs.getBoolean(JabRefPreferences.DISABLE_ON_MULTIPLE_SELECTION));
         autoComplete.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE));
-        autoCompFields.setText(prefs.get(JabRefPreferences.AUTO_COMPLETE_FIELDS));
-        shortestToComplete.setValue(prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE));
+        autoCompFields.setText(autoCompletePreferences.getCompleteNamesAsString());
+        shortestToComplete.setValue(autoCompletePreferences.getShortestLengthToComplete());
 
-        if (prefs.getBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST)) {
+        if (autoCompletePreferences.getCompleteFirstLast()) {
             autoCompFF.setSelected(true);
-        } else if (prefs.getBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST)) {
+        } else if (autoCompletePreferences.getCompleteLastFirst()) {
             autoCompLF.setSelected(true);
         } else {
             autoCompBoth.setSelected(true);
@@ -194,11 +198,14 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         oldAutoCompFF = autoCompFF.isSelected();
         oldAutoCompLF = autoCompLF.isSelected();
 
-        if (prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR)) {
+        switch (autoCompletePreferences.getFirstnameMode()) {
+        case ONLY_ABBREVIATED:
             firstNameModeAbbr.setSelected(true);
-        } else if (prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL)) {
+            break;
+        case ONLY_FULL:
             firstNameModeFull.setSelected(true);
-        } else {
+            break;
+        default:
             firstNameModeBoth.setSelected(true);
         }
         // one field less than the option is enough. If one filed changes, another one also changes.
@@ -240,28 +247,28 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.DISABLE_ON_MULTIPLE_SELECTION, disableOnMultiple.isSelected());
         // We want to know if the following settings have been modified:
         boolean oldAutoComplete = prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE);
-        String oldAutoCompFields = prefs.get(JabRefPreferences.AUTO_COMPLETE_FIELDS);
-        prefs.putInt(JabRefPreferences.SHORTEST_TO_COMPLETE, (Integer) shortestToComplete.getValue());
+        String oldAutoCompFields = autoCompletePreferences.getCompleteNamesAsString();
+        autoCompletePreferences.setShortestLengthToComplete((Integer) shortestToComplete.getValue());
         prefs.putBoolean(JabRefPreferences.AUTO_COMPLETE, autoComplete.isSelected());
-        prefs.put(JabRefPreferences.AUTO_COMPLETE_FIELDS, autoCompFields.getText());
+        autoCompletePreferences.setCompleteNames(autoCompFields.getText());
         if (autoCompBoth.isSelected()) {
-            prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, false);
-            prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, false);
+            autoCompletePreferences.setCompleteFirstLast(false);
+            autoCompletePreferences.setCompleteLastFirst(false);
         }
         else if (autoCompFF.isSelected()) {
-            prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, true);
-            prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, false);
+            autoCompletePreferences.setCompleteFirstLast(true);
+            autoCompletePreferences.setCompleteLastFirst(false);
         }
         else {
-            prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, false);
-            prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, true);
+            autoCompletePreferences.setCompleteFirstLast(false);
+            autoCompletePreferences.setCompleteLastFirst(true);
         }
         if (firstNameModeAbbr.isSelected()) {
-            prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR);
+            autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
         } else if (firstNameModeFull.isSelected()) {
-            prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL);
+            autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.ONLY_FULL);
         } else {
-            prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+            autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.BOTH);
         }
 
         // We need to remove all entry editors from cache if the source panel setting
@@ -276,8 +283,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 bp.entryEditors.clear();
             }
         }
-        // the autocompleter has to be updated to the new min length to complete
-        AutoCompleterFactory.SHORTEST_TO_COMPLETE = (Integer) shortestToComplete.getValue();
     }
 
     @Override

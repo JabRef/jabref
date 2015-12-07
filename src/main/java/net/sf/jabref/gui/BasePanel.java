@@ -54,6 +54,7 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
@@ -1689,14 +1690,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         instantiateSearchAutoCompleter();
         this.getDatabase().addDatabaseChangeListener(new SearchAutoCompleterUpdater());
 
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
-            autoCompleters = new ContentAutoCompleters(getDatabase(), metaData);
+            autoCompleters = new ContentAutoCompleters(getDatabase(), metaData, autoCompletePreferences);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
-            autoCompleters = new ContentAutoCompleters();
+            autoCompleters = new ContentAutoCompleters(autoCompletePreferences);
         }
 
         // restore floating search result
@@ -1715,7 +1717,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void instantiateSearchAutoCompleter() {
-        searchAutoCompleter = AutoCompleterFactory.getFor("author", "editor");
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
+        searchAutoCompleter = autoCompleterFactory.getFor("author", "editor");
         for (BibtexEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);
         }
