@@ -273,7 +273,6 @@ public class SQLUtil {
             if (warn != null) {
                 LOGGER.warn(warn);
             }
-            stmnt.close();
         }
     }
 
