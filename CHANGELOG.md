@@ -32,6 +32,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Removed
 - Removed file history size preference (never available from the UI)
+- Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
 
 
 

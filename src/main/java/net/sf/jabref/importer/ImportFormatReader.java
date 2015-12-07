@@ -54,7 +54,6 @@ public class ImportFormatReader {
         formats.add(new FreeCiteImporter());
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
-        formats.add(new JstorImporter());
         formats.add(new MedlineImporter());
         formats.add(new MedlinePlainImporter());
         formats.add(new MsBibImporter());
