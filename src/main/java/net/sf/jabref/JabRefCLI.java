@@ -101,6 +101,10 @@ public class JabRefCLI {
         return cl.getOptionValue("importToOpen");
     }
 
+    public boolean isDebugLogging() {
+        return cl.hasOption("debug");
+    }
+
     public boolean isFetcherEngine() {
         return cl.hasOption("fetch");
     }
@@ -126,6 +130,7 @@ public class JabRefCLI {
         options.addOption("h", "help", false, Localization.lang("Display help on command line options"));
         options.addOption("l", "loads", false, Localization.lang("Load session"));
         options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
+        options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 
         // @formatter:off
         options.addOption(Option.builder("i").

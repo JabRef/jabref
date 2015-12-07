@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.*;
@@ -174,6 +175,12 @@ public class JabRef {
     public Vector<ParserResult> processArguments(String[] args, boolean initialStartup) {
 
         cli = new JabRefCLI(args);
+
+        if (!cli.isBlank() && cli.isDebugLogging()) {
+            Globals.handler.setLevel(Level.FINE);
+            ((Jdk14Logger) LOGGER).getLogger().setLevel(Level.FINE);
+            LOGGER.debug("Showing debug messages");
+        }
 
         if (initialStartup && cli.isShowVersion()) {
             cli.displayVersion();

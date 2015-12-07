@@ -20,6 +20,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Move Bibtex and Biblatex mode switcher to File menu
 - Display active edit mode (BibTeX or Biblatex) at window title
 - Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
+- Added command line switch --debug to show more detailed logging messages
 
 ### Fixed
 - Fixed: Cleanup process aborts if linked file does not exists
