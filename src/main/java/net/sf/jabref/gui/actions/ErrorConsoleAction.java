@@ -58,10 +58,10 @@ public class ErrorConsoleAction extends AbstractAction {
     private void displayErrorConsole(JFrame parent) {
         JTabbedPane tabbed = new JTabbedPane();
 
-        addTextArea(tabbed, Localization.lang("Output"), streamEavesdropper.getOutput());
+        addTextArea(tabbed, Localization.lang("Log"), logHandler.getLog());
         addTextArea(tabbed, Localization.lang("Exceptions"), streamEavesdropper.getErrorMessages(),
                 Localization.lang("No exceptions have occurred."));
-        addTextArea(tabbed, Localization.lang("Log"), logHandler.getLog());
+        addTextArea(tabbed, Localization.lang("Output"), streamEavesdropper.getOutput());
 
         tabbed.setPreferredSize(new Dimension(500, 500));
 
