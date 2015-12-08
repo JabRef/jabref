@@ -674,7 +674,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             return;
         }
 
-        String changeFlag = panel.isBaseChanged() ? "*" : "";
+        String changeFlag = panel.isModified() ? "*" : "";
 
         if (panel.getDatabaseFile() != null) {
             String databaseFile = panel.getDatabaseFile().getPath();
@@ -830,7 +830,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         Vector<String> filenames = new Vector<>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (getBasePanelAt(i).isBaseChanged()) {
+                if (getBasePanelAt(i).isModified()) {
                     tabbedPane.setSelectedIndex(i);
                     Object[] options = {Localization.lang("Save changes"),
                             Localization.lang("Discard changes"),
@@ -1753,57 +1753,54 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            // Ask here if the user really wants to close, if the base
-            // has not been saved since last save.
-            boolean close = true;
-            if (getCurrentBasePanel() == null) { // when it is initially empty
-                return; // nbatada nov 7
+            // empty tab without database
+            // TODO: this menu should be tab based not on the DragDropPopupPane
+            if (getCurrentBasePanel() == null) {
+                return;
             }
 
-            if (getCurrentBasePanel().isBaseChanged()) {
-
-                String filename;
-
-                if (getCurrentBasePanel().getDatabaseFile() != null) {
-                    filename = getCurrentBasePanel().getDatabaseFile().getAbsolutePath();
-                } else {
-                    filename = GUIGlobals.untitledTitle;
+            if (getCurrentBasePanel().isModified()) {
+                if(confirmClose()) {
+                    close();
                 }
-
-                int answer = showSaveDialog(filename);
-                if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
-                    close = false; // The user has cancelled.
-                }
-                if (answer == JOptionPane.YES_OPTION) {
-                    // The user wants to save.
-                    try {
-                        SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
-                        saveAction.runCommand();
-                        if (saveAction.isCancelled() || !saveAction.isSuccess()) {
-                            // The action either not cancelled or unsuccessful.
-                            // Break!
-                            close = false;
-                        }
-
-                    } catch (Throwable ex) {
-                        // Something prevented the file
-                        // from being saved. Break!!!
-                        close = false;
-                    }
-
-                }
-            }
-
-            if (close) {
+            } else {
                 close();
             }
         }
 
-        public void close() {
-            BasePanel pan = getCurrentBasePanel();
-            pan.cleanUp();
-            AutoSaveManager.deleteAutoSaveFile(pan); // Delete autosave
-            tabbedPane.remove(pan);
+        // Ask if the user really wants to close, if the base has not been saved
+        private boolean confirmClose() {
+            boolean close = false;
+            String filename;
+
+            if (getCurrentBasePanel().getDatabaseFile() != null) {
+                filename = getCurrentBasePanel().getDatabaseFile().getAbsolutePath();
+            } else {
+                filename = GUIGlobals.untitledTitle;
+            }
+
+            int answer = showSaveDialog(filename);
+            if (answer == JOptionPane.YES_OPTION) {
+                // The user wants to save.
+                try {
+                    SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
+                    saveAction.runCommand();
+                    if (saveAction.isSuccess()) {
+                        close = true;
+                    }
+                } catch (Throwable ex) {
+                    // do not close
+                }
+
+            }
+            return close;
+        }
+
+        private void close() {
+            BasePanel panel = getCurrentBasePanel();
+            panel.cleanUp();
+            AutoSaveManager.deleteAutoSaveFile(panel);
+            tabbedPane.remove(panel);
             if (tabbedPane.getTabCount() > 0) {
                 markActiveBasePanel();
             }

@@ -70,7 +70,7 @@ public class AutoSaveManager {
             }
 
             for (BasePanel panel : panels) {
-                if (panel.isBaseChanged()) {
+                if (panel.isModified()) {
                     if (panel.getDatabaseFile() != null) {
                         AutoSaveManager.autoSave(panel);
                     }
