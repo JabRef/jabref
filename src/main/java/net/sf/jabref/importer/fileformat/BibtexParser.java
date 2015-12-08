@@ -101,6 +101,7 @@ public class BibtexParser {
         try {
             return parser.parse().getDatabase().getEntries();
         } catch (Exception e) {
+            LOGGER.warn("BibtexParser.fromString(String): " + e.getMessage(), e);
             return null;
         }
     }

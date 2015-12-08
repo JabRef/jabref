@@ -620,7 +620,6 @@ public class Util {
      * @throws IOException
      */
     public static String getResults(URLConnection source) throws IOException {
-
         return net.sf.jabref.util.Util.getResultsWithEncoding(source, null);
     }
 
@@ -662,6 +661,66 @@ public class Util {
             sb.append((char) byteRead);
         }
         return sb.toString();
+    }
+
+    /**
+     * Get the results of HTTP post on a URL and return contents as a String.
+     *
+     * @param source postData encoding
+     * @return
+     * @throws IOException
+     */
+    public static String getPostResultsWithEncoding(URL source, String postData, Charset encoding) throws IOException {
+        HttpURLConnection con = (HttpURLConnection) source.openConnection();
+
+        //add a default request header
+        con.setRequestMethod("POST");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        return net.sf.jabref.util.Util.getPostResultsWithEncoding(con, postData, encoding);
+    }
+
+    /**
+     * Get the results of HTTP post on a URL and return contents as a String.
+     *
+     * @param source postData encoding
+     * @return
+     * @throws IOException
+     */
+    public static String getPostResultsWithEncoding(HttpURLConnection source, String postData, Charset encoding)
+            throws IOException {
+
+        // Send post request
+        source.setDoOutput(true);
+        try (DataOutputStream wr = new DataOutputStream(source.getOutputStream());) {
+            wr.writeBytes(postData);
+            wr.flush();
+            wr.close();
+        }
+
+        int responseCode = source.getResponseCode();
+
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        if (encoding != null) {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(source.getInputStream(), encoding));) {
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+            }
+        } else {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(source.getInputStream()));) {
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+            }
+        }
+
+        return response.toString();
     }
 
     /**
@@ -718,7 +777,7 @@ public class Util {
         if (affectedFields.isEmpty()) {
             return true; // no side effects
         }
-    
+
         // show a warning, then return
         StringBuffer message = // JZTODO lyrics...
                 new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
@@ -728,7 +787,7 @@ public class Util {
         message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
         int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
-    
+
         // if (groups instanceof KeywordGroup) {
         // KeywordGroup kg = (KeywordGroup) groups;
         // String field = kg.getSearchField().toLowerCase();
