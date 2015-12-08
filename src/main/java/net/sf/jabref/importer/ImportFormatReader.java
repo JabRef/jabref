@@ -49,7 +49,6 @@ public class ImportFormatReader {
         formats.add(new BibteXMLImporter());
         formats.add(new BiomailImporter());
         formats.add(new CopacImporter());
-        formats.add(new CsaImporter());
         formats.add(new EndnoteImporter());
         formats.add(new FreeCiteImporter());
         formats.add(new InspecImporter());
