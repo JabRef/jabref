@@ -34,13 +34,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -73,7 +67,6 @@ import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.ExportCustomizationDialog;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.exporter.SaveAllAction;
@@ -1022,7 +1015,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * handle the color of active and inactive JTabbedPane tabs
      */
-    private void markActiveBasePanel() {
+    public void markActiveBasePanel() {
         int now = tabbedPane.getSelectedIndex();
         int len = tabbedPane.getTabCount();
         if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
@@ -1573,7 +1566,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * <p>
      * The action that are affected are set in initActions.
      */
-    private void updateEnabledState() {
+    public void updateEnabledState() {
         int tabCount = tabbedPane.getTabCount();
         if (tabCount != previousTabCount) {
             previousTabCount = tabCount;
@@ -1741,82 +1734,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     // The action for closing the current database and leaving the window open.
-    private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
-
-    class CloseDatabaseAction extends MnemonicAwareAction {
-        public CloseDatabaseAction() {
-            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-            putValue(Action.NAME, Localization.menuTitle("Close database"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
-            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.CLOSE_DATABASE));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // empty tab without database
-            // TODO: this menu should be tab based not on the DragDropPopupPane
-            if (getCurrentBasePanel() == null) {
-                return;
-            }
-
-            if (getCurrentBasePanel().isModified()) {
-                if(confirmClose()) {
-                    close();
-                }
-            } else {
-                close();
-            }
-        }
-
-        // Ask if the user really wants to close, if the base has not been saved
-        private boolean confirmClose() {
-            boolean close = false;
-            String filename;
-
-            if (getCurrentBasePanel().getDatabaseFile() != null) {
-                filename = getCurrentBasePanel().getDatabaseFile().getAbsolutePath();
-            } else {
-                filename = GUIGlobals.untitledTitle;
-            }
-
-            int answer = showSaveDialog(filename);
-            if (answer == JOptionPane.YES_OPTION) {
-                // The user wants to save.
-                try {
-                    SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
-                    saveAction.runCommand();
-                    if (saveAction.isSuccess()) {
-                        close = true;
-                    }
-                } catch (Throwable ex) {
-                    // do not close
-                }
-
-            }
-            return close;
-        }
-
-        private void close() {
-            BasePanel panel = getCurrentBasePanel();
-            panel.cleanUp();
-            AutoSaveManager.deleteAutoSaveFile(panel);
-            tabbedPane.remove(panel);
-            if (tabbedPane.getTabCount() > 0) {
-                markActiveBasePanel();
-            }
-            setWindowTitle();
-            updateEnabledState(); // FIXME: Man, this is what I call a bug that this is not called.
-            output(Localization.lang("Closed database") + '.');
-            // update tab titles
-            updateAllTabTitles();
-        }
-    }
+    private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction(this);
 
     // The action for opening the preferences dialog.
     private final AbstractAction showPrefs = new ShowPrefsAction();
 
-    class ShowPrefsAction
-            extends MnemonicAwareAction {
+    class ShowPrefsAction extends MnemonicAwareAction {
 
         public ShowPrefsAction() {
             super(IconTheme.JabRefIcon.PREFERENCES.getIcon());
@@ -2324,7 +2247,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JOptionPane.showMessageDialog(this, message);
     }
 
-    private int showSaveDialog(String filename) {
+    public int showSaveDialog(String filename) {
         Object[] options = {Localization.lang("Save changes"),
                 Localization.lang("Discard changes"),
                 Localization.lang("Return to JabRef")};

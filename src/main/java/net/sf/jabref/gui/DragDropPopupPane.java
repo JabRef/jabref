@@ -20,6 +20,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
+import net.sf.jabref.gui.actions.CloseDatabaseAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -28,9 +30,7 @@ import net.sf.jabref.logic.l10n.Localization;
  * Code inspired by http://forums.devx.com/showthread.php?t=151270
  */
 public class DragDropPopupPane extends DragDropPane {
-
     private JPopupMenu popupMenu;
-
 
     public DragDropPopupPane(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction,
             AbstractAction bibtexKeyPatternAction, AbstractAction closeDatabaseAction) {
@@ -51,6 +51,19 @@ public class DragDropPopupPane extends DragDropPane {
             AbstractAction bibtexKeyPatternAction, AbstractAction closeDatabaseAction) {
         popupMenu = new JPopupMenu();
 
+        // Close actions
+        JMenuItem close = new JMenuItem(Localization.lang("Close"));
+        JMenuItem closeOthers = new JMenuItem(Localization.lang("Close Others"));
+        JMenuItem closeAll = new JMenuItem(Localization.lang("Close All"));
+        close.addActionListener(new CloseDatabaseAction(this));
+        closeOthers.addActionListener(new CloseDatabaseAction(this, CloseDatabaseAction.CloseMode.OTHER));
+        closeAll.addActionListener(new CloseDatabaseAction(this, CloseDatabaseAction.CloseMode.ALL));
+        popupMenu.add(close);
+        popupMenu.add(closeOthers);
+        popupMenu.add(closeAll);
+
+        popupMenu.addSeparator();
+
         JMenuItem databasePropertiesBtn = new JMenuItem(Localization.lang("Database properties"));
         databasePropertiesBtn.addActionListener(databasePropertiesAction);
         popupMenu.add(databasePropertiesBtn);
@@ -62,10 +75,6 @@ public class DragDropPopupPane extends DragDropPane {
         JMenuItem manageSelectorsBtn = new JMenuItem(Localization.lang("Manage content selectors"));
         manageSelectorsBtn.addActionListener(manageSelectorsAction);
         popupMenu.add(manageSelectorsBtn);
-
-        JMenuItem closeBtn = new JMenuItem(Localization.lang("Close"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-        closeBtn.addActionListener(closeDatabaseAction);
-        popupMenu.add(closeBtn);
     }
 
     private void tabClicked(MouseEvent e) {
