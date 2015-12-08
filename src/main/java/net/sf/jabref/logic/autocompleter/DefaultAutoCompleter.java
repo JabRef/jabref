@@ -17,6 +17,7 @@ package net.sf.jabref.logic.autocompleter;
 
 import net.sf.jabref.model.entry.BibtexEntry;
 
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 /**
@@ -37,7 +38,7 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
     DefaultAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
         super(preferences);
 
-        this.fieldName = fieldName;
+        this.fieldName = Objects.requireNonNull(fieldName);
     }
 
     @Override

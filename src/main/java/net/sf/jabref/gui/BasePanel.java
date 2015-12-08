@@ -1719,7 +1719,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void instantiateSearchAutoCompleter() {
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
-        searchAutoCompleter = autoCompleterFactory.getFor("author", "editor");
+        searchAutoCompleter = autoCompleterFactory.getPersonAutoCompleter();
         for (BibtexEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);
         }

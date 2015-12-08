@@ -48,4 +48,9 @@ class BibtexKeyAutoCompleter extends AbstractAutoCompleter {
             addItemToIndex(key.trim());
         }
     }
+
+    @Override
+    protected int getLengthOfShortestWordToAdd() {
+        return 1;
+    }
 }

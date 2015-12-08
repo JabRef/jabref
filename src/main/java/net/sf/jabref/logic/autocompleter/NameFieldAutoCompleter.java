@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
+import java.util.Objects;
+
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibtexEntry;
 
@@ -43,26 +45,27 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
      * @see AutoCompleterFactory
      */
     NameFieldAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
-        this(new String[] {fieldName}, false, preferences);
+        this(new String[] {Objects.requireNonNull(fieldName)}, false, preferences);
     }
 
     public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnlyAndSeparationBySpace,
             AutoCompletePreferences preferences) {
         super(preferences);
 
-        this.fieldNames = fieldNames;
+        this.fieldNames = Objects.requireNonNull(fieldNames);
         this.lastNameOnlyAndSeparationBySpace = lastNameOnlyAndSeparationBySpace;
-        if (preferences.getCompleteFirstLast()) {
+        if (preferences.getOnlyCompleteFirstLast()) {
             autoCompFF = true;
             autoCompLF = false;
-        } else if (preferences.getCompleteLastFirst()) {
+        } else if (preferences.getOnlyCompleteLastFirst()) {
             autoCompFF = false;
             autoCompLF = true;
         } else {
             autoCompFF = true;
             autoCompLF = true;
         }
-        autoCompFirstnameMode = preferences.getFirstnameMode();
+        autoCompFirstnameMode = preferences.getFirstnameMode() != null ? preferences
+                .getFirstnameMode() : AutoCompleteFirstNameMode.BOTH;
     }
 
     @Override
@@ -145,6 +148,10 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
     @Override
     public String[] complete(String toComplete) {
+        if (toComplete == null) {
+            return new String[] {};
+        }
+
         // Normally, one would implement that using
         // class inheritance. But this seemed overengineered
         if (this.lastNameOnlyAndSeparationBySpace) {
@@ -164,4 +171,8 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
         return prefix;
     }
 
+    @Override
+    protected int getLengthOfShortestWordToAdd() {
+        return 1;
+    }
 }

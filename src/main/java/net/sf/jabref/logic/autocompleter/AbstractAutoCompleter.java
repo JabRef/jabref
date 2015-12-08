@@ -59,8 +59,11 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
      */
     @Override
     public String[] complete(String toComplete) {
+        if(toComplete == null) {
+            return new String[] {};
+        }
         if (isTooShortToComplete(toComplete)) {
-            return null;
+            return new String[] {};
         }
         String lowerCase = toComplete.toLowerCase();
 
@@ -108,7 +111,7 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
 
     @Override
     public void addItemToIndex(String word) {
-        if (word.length() < AbstractAutoCompleter.SHORTEST_WORD_TO_ADD) {
+        if (word.length() < getLengthOfShortestWordToAdd()) {
             return;
         }
 
@@ -135,5 +138,9 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
     @Override
     public String getAutoCompleteText(String item) {
         return item;
+    }
+
+    protected int getLengthOfShortestWordToAdd() {
+        return AbstractAutoCompleter.SHORTEST_WORD_TO_ADD;
     }
 }
