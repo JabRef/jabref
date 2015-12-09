@@ -18,7 +18,7 @@ package net.sf.jabref.importer.fetcher;
 import java.awt.BorderLayout;
 
 import java.io.IOException;
-
+import java.lang.reflect.Array;
 import java.net.ConnectException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -68,16 +68,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final HTMLConverter htmlConverter = new HTMLConverter();
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
-    private int hits;
-    private int parsed;
     private boolean shouldContinue;
-    private boolean includeAbstract;
-
-    private String terms;
-    private String postData;
-
-    private final Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
-    private final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
 
     public IEEEXploreFetcher() {
         super();
@@ -96,26 +87,26 @@ public class IEEEXploreFetcher implements EntryFetcher {
     @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         //IEEE API seems to use .QT. as a marker for the quotes for exact phrase searching
-        terms = query.replaceAll("\"", "\\.QT\\.");
+        String terms = query.replaceAll("\"", "\\.QT\\.");
 
         shouldContinue = true;
-        parsed = 0;
+        int parsed = 0;
         int pageNumber = 1;
 
-        postData = makeSearchPostRequestPayload(pageNumber);
+        String postData = makeSearchPostRequestPayload(pageNumber, terms);
 
         try {
+            //open the search URL
             URL url = new URL(IEEEXploreFetcher.URL_SEARCH);
-
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
             //add request header
-            con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Content-type", "application/json");
 
-            String page = Util.getPostResultsWithEncoding(con, postData, null);
+            //retrieve the search results
+            String page = Util.getPostResults(con, postData, null);
+
             //the page can be blank if the search did not work (not sure the exact conditions that lead to this, but declaring it an invalid search for now)
             if (page.isEmpty()) {
                 status.showMessage(Localization.lang("You have entered an invalid search '%0'.", query),
@@ -124,9 +115,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             //parses the JSON data returned by the query
-            //todo: a faster way would be to parse the JSON tokens one at a time just to extract the article number, but this seems to be fast enough...
-            JSONObject jsonObj = new JSONObject(page);
-            hits = jsonObj.getInt("totalRecords");
+            //TODO: a faster way would be to parse the JSON tokens one at a time just to extract the article number, but this seems to be fast enough...
+            JSONObject searchResultsJson = new JSONObject(page);
+            int hits = searchResultsJson.getInt("totalRecords");
 
             //if no search results were found
             if (hits == 0) {
@@ -137,67 +128,28 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //if max hits were exceeded, display the warning
             if (hits > IEEEXploreFetcher.MAX_FETCH) {
-                // @formatter:off
-                status.showMessage(Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
-                        new String[] {String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)}),
+                status.showMessage(
+                        Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
+                                String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
-                // @formatter:on
             }
 
-            //buffer to use for building the URL for fetching the bibtex data from IEEEXplore
-            StringBuffer bibtexQueryURLStringBuf = new StringBuffer();
-            bibtexQueryURLStringBuf.append(URL_BIBTEX_START);
-
-            //loop over each record and create a comma-separate list of article numbers which will be used to download the raw Bibtex
-            JSONArray recordsJsonArray = jsonObj.getJSONArray("records");
-            for (int n = 0; n < recordsJsonArray.length(); n++) {
-                if (!recordsJsonArray.getJSONObject(n).isNull("articleNumber")) {
-                    bibtexQueryURLStringBuf.append(recordsJsonArray.getJSONObject(n).getString("articleNumber") + ",");
-                }
-            }
-            //delete the last comma
-            bibtexQueryURLStringBuf.deleteCharAt(bibtexQueryURLStringBuf.length() - 1);
-
-
-            //add the abstract setting
-            includeAbstract = absCheckBox.isSelected();
-            if (includeAbstract) {
-                bibtexQueryURLStringBuf.append("&citations-format=citation-abstract");
-            } else {
-                bibtexQueryURLStringBuf.append("&citations-format=citation-only");
-            }
-
-            //append the remaining URL
-            bibtexQueryURLStringBuf.append(URL_BIBTEX_END);
-
-            //fetch the raw Bibtex results from IEEEXplore and parse
-            URL bibtexURL = new URL(bibtexQueryURLStringBuf.toString());
+            //fetch the raw Bibtex results from IEEEXplore
+            URL bibtexURL = new URL(createBibtexQueryURL(searchResultsJson));
             String bibtexPage = Util.getResults(bibtexURL);
 
-            //for some reason, the escaped HTML characters in the titles are in the format "#xNNNN" (they are missing the ampersand)
-            //add the ampersands back in before passing to the HTML formatter so they can be properly converted
-            //TODO: Maybe edit the HTMLconverter to also recognize escaped characters even when the & is missing?
-            //Pattern escapedPattern = Pattern.compile("(?<!&)#([x]*)([0]*)(\\p{XDigit}+);");
-            bibtexPage = bibtexPage.replaceAll("(?<!&)(#[x]*[0]*\\p{XDigit}+;)", "&$1");
+            //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
+            bibtexPage = preprocessBibtexResultsPage(bibtexPage);
 
-            //Also, percent signs are not escaped by the IEEEXplore Bibtex output nor, it would appear, the subsequent processing in JabRef
-            //TODO: Maybe find a better spot for this if it applies more universally
-            bibtexPage = bibtexPage.replaceAll("(?<!\\\\)%", "\\\\%");
-
-            //Format the bibtexResults using the HTML formatter (clears up numerical and text escaped characters and remaining HTML tags)
-            bibtexPage = htmlConverter.format(bibtexPage);
-
+            //parse the page into Bibtex entries
             Collection<BibtexEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage);
-
             if (parsedBibtexCollection == null) {
                 status.showMessage(Localization.lang("Error occured parsing Bibtex returned from IEEEXplore"),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
-
             int nEntries = parsedBibtexCollection.size();
             Iterator<BibtexEntry> parsedBibtexCollectionIterator = parsedBibtexCollection.iterator();
-
             while (parsedBibtexCollectionIterator.hasNext() && shouldContinue) {
                 dialog.addEntry(cleanup(parsedBibtexCollectionIterator.next()));
                 dialog.setProgress(parsed, nEntries);
@@ -244,11 +196,57 @@ public class IEEEXploreFetcher implements EntryFetcher {
         shouldContinue = false;
     }
 
-    private String makeSearchPostRequestPayload(int startIndex) {
+    private String makeSearchPostRequestPayload(int startIndex, String terms) {
         return "{\"queryText\":" + JSONObject.quote(terms) + ",\"refinements\":[],\"pageNumber\":\"" + startIndex
                 + "\",\"searchWithin\":[],\"newsearch\":\"true\",\"searchField\":\"Search_All\",\"rowsPerPage\":\"100\"}";
     }
 
+    private String createBibtexQueryURL(JSONObject searchResultsJson) {
+
+        //buffer to use for building the URL for fetching the bibtex data from IEEEXplore
+        StringBuffer bibtexQueryURLStringBuf = new StringBuffer();
+        bibtexQueryURLStringBuf.append(URL_BIBTEX_START);
+
+        //loop over each record and create a comma-separate list of article numbers which will be used to download the raw Bibtex
+        JSONArray recordsJsonArray = searchResultsJson.getJSONArray("records");
+        for (int n = 0; n < recordsJsonArray.length(); n++) {
+            if (!recordsJsonArray.getJSONObject(n).isNull("articleNumber")) {
+                bibtexQueryURLStringBuf.append(recordsJsonArray.getJSONObject(n).getString("articleNumber") + ",");
+            }
+        }
+        //delete the last comma
+        bibtexQueryURLStringBuf.deleteCharAt(bibtexQueryURLStringBuf.length() - 1);
+
+        //add the abstract setting
+        boolean includeAbstract = absCheckBox.isSelected();
+        if (includeAbstract) {
+            bibtexQueryURLStringBuf.append("&citations-format=citation-abstract");
+        } else {
+            bibtexQueryURLStringBuf.append("&citations-format=citation-only");
+        }
+
+        //append the remaining URL
+        bibtexQueryURLStringBuf.append(URL_BIBTEX_END);
+
+        return bibtexQueryURLStringBuf.toString();
+    }
+
+    private String preprocessBibtexResultsPage(String bibtexPage) {
+        //for some reason, the escaped HTML characters in the titles are in the format "#xNNNN" (they are missing the ampersand)
+        //add the ampersands back in before passing to the HTML formatter so they can be properly converted
+        //TODO: Maybe edit the HTMLconverter to also recognize escaped characters even when the & is missing?
+        //Pattern escapedPattern = Pattern.compile("(?<!&)#([x]*)([0]*)(\\p{XDigit}+);");
+        bibtexPage = bibtexPage.replaceAll("(?<!&)(#[x]*[0]*\\p{XDigit}+;)", "&$1");
+
+        //Also, percent signs are not escaped by the IEEEXplore Bibtex output nor, it would appear, the subsequent processing in JabRef
+        //TODO: Maybe find a better spot for this if it applies more universally
+        bibtexPage = bibtexPage.replaceAll("(?<!\\\\)%", "\\\\%");
+
+        //Format the bibtexResults using the HTML formatter (clears up numerical and text escaped characters and remaining HTML tags)
+        bibtexPage = htmlConverter.format(bibtexPage);
+
+        return bibtexPage;
+    }
 
     private BibtexEntry cleanup(BibtexEntry entry) {
         if (entry == null) {
@@ -299,8 +297,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
         String author = entry.getField("author");
         if (author != null) {
             author = author.replaceAll("\\s+", " ");
+
+            //reorder the "Jr." "Sr." etc to the correct ordering
+            String[] authorSplit = author.split("(^\\s*|\\s*$|\\s+and\\s+)");
+            for (int n = 0; n < (Array.getLength(authorSplit)); n++) {
+                authorSplit[n] = authorSplit[n].replaceAll("(.+?),(.+?),(.+)", "$1,$3,$2");
+            }
+            author = String.join(" and ", authorSplit);
+
             author = author.replaceAll("\\.", ". ");
-            //author = author.replaceAll("([^;]+),([^;]+),([^;]+)", "$1,$3,$2"); // Change order in case of Jr. etc
             author = author.replaceAll("  ", " ");
             author = author.replaceAll("\\. -", ".-");
             author = author.replaceAll("; ", " and ");
@@ -402,6 +407,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.replaceAll(" on", " ").replace("  ", " ");
             }
 
+            Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
+
             Matcher m1 = publicationPattern.matcher(fullName);
             String abrvPattern = ".*[^,] '?\\d+\\)?";
             if (m1.find()) {
@@ -434,6 +441,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 }
             }
             if ("Inproceedings".equals(type.getName())) {
+                Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
                 Matcher m2 = proceedingPattern.matcher(fullName);
                 if (m2.find()) {
                     String prefix = m2.group(2);

@@ -670,15 +670,9 @@ public class Util {
      * @return
      * @throws IOException
      */
-    public static String getPostResultsWithEncoding(URL source, String postData, Charset encoding) throws IOException {
+    public static String getPostResults(URL source, String postData, Charset encoding) throws IOException {
         HttpURLConnection con = (HttpURLConnection) source.openConnection();
-
-        //add a default request header
-        con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
-        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-
-        return net.sf.jabref.util.Util.getPostResultsWithEncoding(con, postData, encoding);
+        return getPostResults(con, postData, encoding);
     }
 
     /**
@@ -688,8 +682,13 @@ public class Util {
      * @return
      * @throws IOException
      */
-    public static String getPostResultsWithEncoding(HttpURLConnection source, String postData, Charset encoding)
+    public static String getPostResults(HttpURLConnection source, String postData, Charset encoding)
             throws IOException {
+
+        //add a default request header
+        source.setRequestMethod("POST");
+        source.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
+        source.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
         // Send post request
         source.setDoOutput(true);
@@ -709,14 +708,12 @@ public class Util {
                 while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine);
                 }
-                in.close();
             }
         } else {
             try (BufferedReader in = new BufferedReader(new InputStreamReader(source.getInputStream()));) {
                 while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine);
                 }
-                in.close();
             }
         }
 
