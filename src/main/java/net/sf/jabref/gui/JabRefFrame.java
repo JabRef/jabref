@@ -2359,13 +2359,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     public class CloseAllDatabasesAction extends MnemonicAwareAction {
-        public CloseAllDatabasesAction() {
-            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-            putValue(Action.NAME, Localization.menuTitle("Close database"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
-            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.CLOSE_DATABASE));
-        }
-
         @Override
         public void actionPerformed(ActionEvent e) {
             while((BasePanel) getCurrentBasePanel() != null) {
@@ -2375,13 +2368,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     public class CloseOtherDatabasesAction extends MnemonicAwareAction {
-        public CloseOtherDatabasesAction() {
-            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-            putValue(Action.NAME, Localization.menuTitle("Close database"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
-            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.CLOSE_DATABASE));
-        }
-
         @Override
         public void actionPerformed(ActionEvent e) {
             final BasePanel active = (BasePanel) getCurrentBasePanel();
