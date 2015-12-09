@@ -2284,7 +2284,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void closeTab(BasePanel panel) {
-        // TODO: this menu should be tab based not on the DragDropPopupPane
         // empty tab without database
         if (panel == null) {
             return;
