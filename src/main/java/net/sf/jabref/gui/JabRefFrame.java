@@ -2338,7 +2338,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             markActiveBasePanel();
         }
         setWindowTitle();
-        updateEnabledState(); // FIXME: Man, this is what I call a bug that this is not called.
+        updateEnabledState();
         output(Localization.lang("Closed database") + '.');
         // update tab titles
         updateAllTabTitles();
