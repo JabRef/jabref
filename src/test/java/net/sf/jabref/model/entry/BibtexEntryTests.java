@@ -78,12 +78,20 @@ public class BibtexEntryTests {
     public void isNullOrEmptyCiteKey() {
         BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
         Assert.assertFalse(e.hasCiteKey());
+
         e.setField(BibtexEntry.KEY_FIELD, "");
         Assert.assertFalse(e.hasCiteKey());
-        e.setField(BibtexEntry.KEY_FIELD, null);
-        Assert.assertFalse(e.hasCiteKey());
+
+        try {
+            e.setField(BibtexEntry.KEY_FIELD, null);
+            Assert.fail();
+        } catch(NullPointerException asExpected) {
+
+        }
+
         e.setField(BibtexEntry.KEY_FIELD, "key");
         Assert.assertTrue(e.hasCiteKey());
+
         e.clearField(BibtexEntry.KEY_FIELD);
         Assert.assertFalse(e.hasCiteKey());
     }
@@ -136,11 +144,12 @@ public class BibtexEntryTests {
         be.addKeyword("");
         Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
 
-        be.addKeyword(null);
-        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+        try {
+            be.addKeyword(null);
+            Assert.fail();
+        } catch(NullPointerException asExpected){
 
-        be.addKeywords(null);
-        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+        }
 
         BibtexEntry be2 = new BibtexEntry();
         Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());

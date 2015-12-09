@@ -499,10 +499,6 @@ public class BibtexParser {
         }
         String key = parseKey();
 
-        if ("".equals(key)) {
-            key = null;
-        }
-
         result.setField(BibtexEntry.KEY_FIELD, key);
         skipWhitespace();
 
