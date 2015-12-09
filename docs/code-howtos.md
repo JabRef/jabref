@@ -134,6 +134,15 @@ When accessing a preference value, the method Globals.prefs.getTYPE(key) has to 
 
 ## Test Cases
 
+* Use `Assert.assertEquals(Collections.emptyList(), actualList);` instead of `Assert.assertEquals(0, actualList.size());` to test whether a list is empty.
+* Similarly, use `Assert.assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of 
+```` java
+         Assert.assertEquals(2, actualList.size());
+         Assert.assertEquals("a", actualList.get(0));
+         Assert.assertEquals("b", actualList.get(1));
+````
+
+### Preferences in tests
 If `Globals.prefs` are not initialized in a test case, try to add
 
 ```java
