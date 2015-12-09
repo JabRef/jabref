@@ -21,7 +21,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import net.sf.jabref.gui.actions.CloseDatabaseAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -33,7 +32,7 @@ public class DragDropPopupPane extends DragDropPane {
     private JPopupMenu popupMenu;
 
     public DragDropPopupPane(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction,
-            AbstractAction bibtexKeyPatternAction, AbstractAction closeDatabaseAction) {
+            AbstractAction bibtexKeyPatternAction, AbstractAction closeDatabaseAction, AbstractAction closeAllDatabaseAction, AbstractAction closeOtherDatabaseAction) {
         super();
 
         addMouseListener(new java.awt.event.MouseAdapter() {
@@ -44,20 +43,20 @@ public class DragDropPopupPane extends DragDropPane {
             }
         });
 
-        initPopupMenu(manageSelectorsAction, databasePropertiesAction, bibtexKeyPatternAction, closeDatabaseAction);
+        initPopupMenu(manageSelectorsAction, databasePropertiesAction, bibtexKeyPatternAction, closeDatabaseAction, closeAllDatabaseAction, closeOtherDatabaseAction);
     }
 
     private void initPopupMenu(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction,
-            AbstractAction bibtexKeyPatternAction, AbstractAction closeDatabaseAction) {
+            AbstractAction bibtexKeyPatternAction, AbstractAction closeDatabaseAction, AbstractAction closeAllDatabaseAction, AbstractAction closeOtherDatabaseAction) {
         popupMenu = new JPopupMenu();
 
         // Close actions
         JMenuItem close = new JMenuItem(Localization.lang("Close"));
         JMenuItem closeOthers = new JMenuItem(Localization.lang("Close Others"));
         JMenuItem closeAll = new JMenuItem(Localization.lang("Close All"));
-        close.addActionListener(new CloseDatabaseAction(this));
-        closeOthers.addActionListener(new CloseDatabaseAction(this, CloseDatabaseAction.CloseMode.OTHER));
-        closeAll.addActionListener(new CloseDatabaseAction(this, CloseDatabaseAction.CloseMode.ALL));
+        close.addActionListener(closeDatabaseAction);
+        closeOthers.addActionListener(closeOtherDatabaseAction);
+        closeAll.addActionListener(closeAllDatabaseAction);
         popupMenu.add(close);
         popupMenu.add(closeOthers);
         popupMenu.add(closeAll);

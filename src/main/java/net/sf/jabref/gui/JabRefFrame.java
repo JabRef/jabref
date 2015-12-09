@@ -43,6 +43,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.exporter.*;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinds;
@@ -67,10 +68,6 @@ import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.exporter.ExportCustomizationDialog;
-import net.sf.jabref.exporter.ExportFormats;
-import net.sf.jabref.exporter.SaveAllAction;
-import net.sf.jabref.exporter.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;
 import net.sf.jabref.external.push.PushToApplications;
@@ -537,7 +534,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void init() {
-        tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern, closeDatabaseAction);
+        tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern, closeDatabaseAction, closeAllDatabasesAction, closeOtherDatabasesAction);
 
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
@@ -1519,7 +1516,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
                 openUrl, openFolder, openFile, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
-                closeDatabaseAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
+                closeDatabaseAction, closeAllDatabasesAction, closeOtherDatabasesAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
                 databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected,
                 importCurrent, saveAll, dbConnect, dbExport, focusTable));
 
@@ -1734,7 +1731,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     // The action for closing the current database and leaving the window open.
-    private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction(this);
+    private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
+    private final CloseAllDatabasesAction closeAllDatabasesAction = new CloseAllDatabasesAction();
+    private final CloseOtherDatabasesAction closeOtherDatabasesAction = new CloseOtherDatabasesAction();
 
     // The action for opening the preferences dialog.
     private final AbstractAction showPrefs = new ShowPrefsAction();
@@ -2256,5 +2255,117 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 Localization.lang("Database '%0' has changed.", filename),
                 Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+    }
+
+    private void closeTab(BasePanel panel) {
+        // TODO: this menu should be tab based not on the DragDropPopupPane
+        // empty tab without database
+        if (panel == null) {
+            return;
+        }
+
+        if (panel.isModified()) {
+            if(confirmClose(panel)) {
+                removeTab(panel);
+            }
+        } else {
+            removeTab(panel);
+        }
+    }
+
+    // Ask if the user really wants to close, if the base has not been saved
+    private boolean confirmClose(BasePanel panel) {
+        boolean close = false;
+        String filename;
+
+        if (panel.getDatabaseFile() != null) {
+            filename = panel.getDatabaseFile().getAbsolutePath();
+        } else {
+            filename = GUIGlobals.untitledTitle;
+        }
+
+        int answer = showSaveDialog(filename);
+        if (answer == JOptionPane.YES_OPTION) {
+            // The user wants to save.
+            try {
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
+                saveAction.runCommand();
+                if (saveAction.isSuccess()) {
+                    close = true;
+                }
+            } catch (Throwable ex) {
+                // do not close
+            }
+
+        } else if(answer == JOptionPane.NO_OPTION) {
+            // discard changes
+            close = true;
+        }
+        return close;
+    }
+
+    private void removeTab(BasePanel panel) {
+        panel.cleanUp();
+        AutoSaveManager.deleteAutoSaveFile(panel);
+        tabbedPane.remove(panel);
+        if (tabbedPane.getTabCount() > 0) {
+            markActiveBasePanel();
+        }
+        setWindowTitle();
+        updateEnabledState(); // FIXME: Man, this is what I call a bug that this is not called.
+        output(Localization.lang("Closed database") + '.');
+        // update tab titles
+        updateAllTabTitles();
+    }
+
+    public class CloseDatabaseAction extends MnemonicAwareAction {
+        public CloseDatabaseAction() {
+            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
+            putValue(Action.NAME, Localization.menuTitle("Close database"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
+            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.CLOSE_DATABASE));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            closeTab(getCurrentBasePanel());
+        }
+    }
+
+    public class CloseAllDatabasesAction extends MnemonicAwareAction {
+        public CloseAllDatabasesAction() {
+            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
+            putValue(Action.NAME, Localization.menuTitle("Close database"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
+            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.CLOSE_DATABASE));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            while((BasePanel) getCurrentBasePanel() != null) {
+                closeTab((BasePanel) getCurrentBasePanel());
+            }
+        }
+    }
+
+    public class CloseOtherDatabasesAction extends MnemonicAwareAction {
+        public CloseOtherDatabasesAction() {
+            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
+            putValue(Action.NAME, Localization.menuTitle("Close database"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
+            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.CLOSE_DATABASE));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            final BasePanel active = (BasePanel) getCurrentBasePanel();
+            final Component[] panels = tabbedPane.getComponents();
+
+            for(Component p : panels) {
+                if(p != active) {
+                    closeTab((BasePanel) p);
+                }
+            }
+        }
     }
 }
