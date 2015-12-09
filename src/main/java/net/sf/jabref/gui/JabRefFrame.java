@@ -1516,7 +1516,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
                 openUrl, openFolder, openFile, togglePreview, dupliCheck, autoSetFile,
                 newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
-                closeDatabaseAction, closeAllDatabasesAction, closeOtherDatabasesAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
+                closeDatabaseAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
                 databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected,
                 importCurrent, saveAll, dbConnect, dbExport, focusTable));
 

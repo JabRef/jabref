@@ -33,10 +33,8 @@ public class DragDropPopupPane extends DragDropPane {
 
     public DragDropPopupPane(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction,
             AbstractAction bibtexKeyPatternAction, AbstractAction closeDatabaseAction, AbstractAction closeAllDatabaseAction, AbstractAction closeOtherDatabaseAction) {
-        super();
 
         addMouseListener(new java.awt.event.MouseAdapter() {
-
             @Override
             public void mouseClicked(MouseEvent e) {
                 tabClicked(e);
@@ -82,10 +80,5 @@ public class DragDropPopupPane extends DragDropPane {
             // display popup near location of mouse click
             popupMenu.show(e.getComponent(), e.getX(), e.getY() - 10);
         }
-    }
-
-    private void closeSelectedTab() {
-        // remove selected tab
-        remove(getSelectedIndex());
     }
 }
