@@ -1480,28 +1480,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         tlb.addSeparator();
 
-        // Removing the separate push-to buttons, replacing them by the
-        // multipurpose button:
-        //tlb.addAction(emacsPushAction);
-        //tlb.addAction(lyxPushAction);
-        //tlb.addAction(winEdtPushAction);
         tlb.add(pushExternalButton.getComponent());
         tlb.addSeparator();
         tlb.add(donationAction);
-//        tlb.addAction(openFolder);
-//        tlb.addAction(openFile);
-        //tlb.addAction(openPdf);
-        //tlb.addAction(openUrl);
-
-        //tlb.addSeparator();
-        //tlb.addAction(showPrefs);
-        tlb.add(Box.createHorizontalGlue());
-        //tlb.add(new JabRefLabel(GUIGlobals.frameTitle+" "+GUIGlobals.version));
-
-        tlb.addAction(closeDatabaseAction);
-        //Insets margin = new Insets(0, 0, 0, 0);
-        //for (int i=0; i<tlb.getComponentCount(); i++)
-        //  ((JButton)tlb.getComponentAtIndex(i)).setMargin(margin);
     }
 
     public void output(final String s) {
