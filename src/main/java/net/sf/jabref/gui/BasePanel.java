@@ -220,7 +220,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         db.addDatabaseChangeListener(new GroupTreeUpdater());
 
-
         if (file == null) {
             if (!database.getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
@@ -255,9 +254,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 title = title + '*';
             }
         } else {
-            title = getDatabaseFile().getName();
+            // check if file is modified
+            String changeFlag = isModified() ? "*" : "";
+            title = getDatabaseFile().getName() + changeFlag;
         }
-
         return title;
     }
 
@@ -2008,13 +2008,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void markBaseChanged() {
         baseChanged = true;
 
-        // Put an asterix behind the filename to indicate the
-        // database has changed.
-        String oldTitle = frame.getTabTitle(this);
-        if (!oldTitle.endsWith("*")) {
-            frame.setTabTitle(this, oldTitle + '*', frame.getTabTooltip(this));
-            frame.setWindowTitle();
-        }
+        // Put an asterix behind the filename to indicate the database has changed.
+        frame.setTabTitle(this, getTabTitle(), getDatabaseFile().getAbsolutePath());
+        frame.setWindowTitle();
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
@@ -2037,9 +2033,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
             if (getDatabaseFile() != null) {
-                frame.setTabTitle(BasePanel.this, getDatabaseFile().getName(), getDatabaseFile().getAbsolutePath());
+                frame.setTabTitle(this, getTabTitle(), getDatabaseFile().getAbsolutePath());
             } else {
-                frame.setTabTitle(BasePanel.this, GUIGlobals.untitledTitle, null);
+                frame.setTabTitle(this, GUIGlobals.untitledTitle, null);
             }
         }
         frame.setWindowTitle();

@@ -62,7 +62,7 @@ public class NewEntryAction extends MnemonicAwareAction {
             ((BasePanel) jabRefFrame.tabbedPane.getSelectedComponent())
                     .newEntry(EntryTypes.getType(thisType));
         } else {
-            LOGGER.info("Action 'New entry' must be disabled when no " + "database is open.");
+            LOGGER.info("Action 'New entry' must be disabled when no database is open.");
         }
     }
 }

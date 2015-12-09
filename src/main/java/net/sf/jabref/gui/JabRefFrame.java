@@ -1067,16 +1067,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return tabbedPane.getTitleAt(getTabIndex(comp));
     }
 
-    public String getTabTooltip(JComponent comp) {
-        return tabbedPane.getToolTipTextAt(getTabIndex(comp));
-    }
-
     public void setTabTitle(JComponent comp, String title, String toolTip) {
         int index = getTabIndex(comp);
         tabbedPane.setTitleAt(index, htmlPadding + title);
         tabbedPane.setToolTipTextAt(index, toolTip);
     }
-
 
     class GeneralAction extends MnemonicAwareAction {
 
