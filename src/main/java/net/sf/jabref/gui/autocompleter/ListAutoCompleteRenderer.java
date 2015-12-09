@@ -3,6 +3,8 @@ package net.sf.jabref.gui.autocompleter;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -31,9 +33,9 @@ public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
 
 
     @Override
-    public void update(E[] autoCompletions) {
+    public void update(List<E> autoCompletions) {
         if (autoCompletions != null) {
-            list.setListData(autoCompletions);
+            list.setListData(new Vector<>(autoCompletions));
             list.clearSelection();
         } else {
             model.removeAllElements();

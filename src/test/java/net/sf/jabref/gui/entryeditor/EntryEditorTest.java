@@ -13,6 +13,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.List;
 
 public class EntryEditorTest {
 
@@ -31,9 +33,8 @@ public class EntryEditorTest {
         // test content of stored words in autocompleter ...
         AutoCompleter<String> autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("author");
 
-        String[] result = autoCompleter.complete("Hans");
-        Assert.assertEquals(1, result.length);
-        Assert.assertEquals("Hans Meiser", result[0]);
+        List<String> result = autoCompleter.complete("Hans");
+        Assert.assertEquals(Arrays.asList("Hans Meiser"), result);
 
         TestUtils.closeJabRef();
     }
@@ -53,9 +54,8 @@ public class EntryEditorTest {
         // test content of stored words in autocompleter ...
         AutoCompleter<String> autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("journal");
 
-        String[] result = autoCompleter.complete("Ne");
-        Assert.assertEquals(1, result.length);
-        Assert.assertEquals("New Testtext", result[0]);
+        List<String> result = autoCompleter.complete("Ne");
+        Assert.assertEquals(Arrays.asList("New Testtext"), result);
 
         TestUtils.closeJabRef();
     }

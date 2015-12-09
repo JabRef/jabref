@@ -15,6 +15,9 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.model.entry.AuthorList;
@@ -29,7 +32,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
-    private final String[] fieldNames;
+    private final List<String> fieldNames;
     /**
      * true if only last names should be completed and there is NO separation by " and ", but by " "
      */
@@ -45,10 +48,10 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
      * @see AutoCompleterFactory
      */
     NameFieldAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
-        this(new String[] {Objects.requireNonNull(fieldName)}, false, preferences);
+        this(Collections.singletonList(Objects.requireNonNull(fieldName)), false, preferences);
     }
 
-    public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnlyAndSeparationBySpace,
+    public NameFieldAutoCompleter(List<String> fieldNames, boolean lastNameOnlyAndSeparationBySpace,
             AutoCompletePreferences preferences) {
         super(preferences);
 
@@ -147,9 +150,9 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
     }
 
     @Override
-    public String[] complete(String toComplete) {
+    public List<String> complete(String toComplete) {
         if (toComplete == null) {
-            return new String[] {};
+            return new ArrayList<>();
         }
 
         // Normally, one would implement that using
@@ -160,10 +163,6 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
             toComplete = determinePrefixAndReturnRemainder(toComplete, " and ");
         }
         return super.complete(toComplete);
-    }
-
-    public String getFieldName() {
-        return fieldNames[0];
     }
 
     @Override

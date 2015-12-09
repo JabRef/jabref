@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -46,7 +47,7 @@ public class AutoCompleterFactory {
     }
 
     public AutoCompleter<String> getPersonAutoCompleter() {
-        return new NameFieldAutoCompleter(new String[] {"author", "editor"}, true, preferences);
+        return new NameFieldAutoCompleter(Arrays.asList("author", "editor"), true, preferences);
     }
 
 }

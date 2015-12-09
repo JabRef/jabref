@@ -2,6 +2,10 @@ package net.sf.jabref.logic.autocompleter;
 
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,6 +13,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 
 public class BibtexKeyAutoCompleterTest {
 
+    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void initAutoCompleterWithNullPreferenceThrowsException() {
         new BibtexKeyAutoCompleter(null);
@@ -19,8 +24,8 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        String[] result = autoCompleter.complete("test");
-        Assert.assertEquals(0, result.length);
+        List<String> result = autoCompleter.complete("test");
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -29,8 +34,9 @@ public class BibtexKeyAutoCompleterTest {
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
         autoCompleter.addBibtexEntry(null);
-        String[] result = autoCompleter.complete("test");
-        Assert.assertEquals(0, result.length);
+
+        List<String> result = autoCompleter.complete("test");
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -40,8 +46,9 @@ public class BibtexKeyAutoCompleterTest {
 
         BibtexEntry entry = new BibtexEntry();
         autoCompleter.addBibtexEntry(entry);
-        String[] result = autoCompleter.complete("test");
-        Assert.assertEquals(0, result.length);
+
+        List<String> result = autoCompleter.complete("test");
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -52,9 +59,9 @@ public class BibtexKeyAutoCompleterTest {
         BibtexEntry entry = new BibtexEntry();
         entry.setField(BibtexEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
-        String[] result = autoCompleter.complete("testKey");
-        Assert.assertEquals(1, result.length);
-        Assert.assertEquals("testKey", result[0]);
+
+        List<String> result = autoCompleter.complete("testKey");
+        Assert.assertEquals(Arrays.asList("testKey"), result);
     }
 
     @Test
@@ -65,9 +72,9 @@ public class BibtexKeyAutoCompleterTest {
         BibtexEntry entry = new BibtexEntry();
         entry.setField(BibtexEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
-        String[] result = autoCompleter.complete("test");
-        Assert.assertEquals(1, result.length);
-        Assert.assertEquals("testKey", result[0]);
+
+        List<String> result = autoCompleter.complete("test");
+        Assert.assertEquals(Arrays.asList("testKey"), result);
     }
 
     @Test
@@ -78,9 +85,9 @@ public class BibtexKeyAutoCompleterTest {
         BibtexEntry entry = new BibtexEntry();
         entry.setField(BibtexEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
-        String[] result = autoCompleter.complete("testkey");
-        Assert.assertEquals(1, result.length);
-        Assert.assertEquals("testKey", result[0]);
+
+        List<String> result = autoCompleter.complete("testkey");
+        Assert.assertEquals(Arrays.asList("testKey"), result);
     }
 
     @Test
@@ -91,8 +98,9 @@ public class BibtexKeyAutoCompleterTest {
         BibtexEntry entry = new BibtexEntry();
         entry.setField(BibtexEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
-        String[] result = autoCompleter.complete(null);
-        Assert.assertEquals(0, result.length);
+
+        List<String> result = autoCompleter.complete(null);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -103,8 +111,9 @@ public class BibtexKeyAutoCompleterTest {
         BibtexEntry entry = new BibtexEntry();
         entry.setField(BibtexEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
-        String[] result = autoCompleter.complete("");
-        Assert.assertEquals(0, result.length);
+
+        List<String> result = autoCompleter.complete("");
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -119,10 +128,8 @@ public class BibtexKeyAutoCompleterTest {
         entryTwo.setField(BibtexEntry.KEY_FIELD, "testKeyTwo");
         autoCompleter.addBibtexEntry(entryTwo);
 
-        String[] result = autoCompleter.complete("testKey");
-        Assert.assertEquals(2, result.length);
-        Assert.assertEquals("testKeyOne", result[0]);
-        Assert.assertEquals("testKeyTwo", result[1]);
+        List<String> result = autoCompleter.complete("testKey");
+        Assert.assertEquals(Arrays.asList("testKeyOne", "testKeyTwo"), result);
     }
 
     @Test
@@ -133,9 +140,9 @@ public class BibtexKeyAutoCompleterTest {
         BibtexEntry entry = new BibtexEntry();
         entry.setField(BibtexEntry.KEY_FIELD, "key");
         autoCompleter.addBibtexEntry(entry);
-        String[] result = autoCompleter.complete("k");
-        Assert.assertEquals(1, result.length);
-        Assert.assertEquals("key", result[0]);
+
+        List<String> result = autoCompleter.complete("k");
+        Assert.assertEquals(Arrays.asList("key"), result);
     }
 
     @Test
@@ -147,7 +154,8 @@ public class BibtexKeyAutoCompleterTest {
         BibtexEntry entry = new BibtexEntry();
         entry.setField(BibtexEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
-        String[] result = autoCompleter.complete("test");
-        Assert.assertEquals(0, result.length);
+
+        List<String> result = autoCompleter.complete("test");
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 }

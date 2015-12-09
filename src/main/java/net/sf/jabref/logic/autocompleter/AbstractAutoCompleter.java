@@ -14,8 +14,8 @@
 package net.sf.jabref.logic.autocompleter;
 
 import java.util.ArrayList;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -58,12 +58,12 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
      * Otherwise the completion is case insensitive.
      */
     @Override
-    public String[] complete(String toComplete) {
+    public List<String> complete(String toComplete) {
         if(toComplete == null) {
-            return new String[] {};
+            return new ArrayList<>();
         }
         if (isTooShortToComplete(toComplete)) {
-            return new String[] {};
+            return new ArrayList<>();
         }
         String lowerCase = toComplete.toLowerCase();
 
@@ -78,13 +78,13 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
             for (String s : subset) {
                 result.addAll(possibleStringsForSearchString.get(s));
             }
-            return result.toArray(new String[result.size()]);
+            return result;
         } else {
             // user typed in a mix of upper case and lower case,
             // we assume user wants to have exact search
             String ender = AbstractAutoCompleter.incrementLastCharacter(toComplete);
             SortedSet<String> subset = indexCaseSensitive.subSet(toComplete, ender);
-            return subset.toArray(new String[subset.size()]);
+            return new ArrayList<>(subset);
         }
     }
 

@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.autocompleter;
 
+import java.util.List;
+
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
@@ -39,11 +41,11 @@ public interface AutoCompleter<E> {
     /**
      * Returns one or more possible completions for a given string. The returned
      * completion depends on which informations were stored while adding
-     * BibtexEntries.
+     * BibtexEntries. If no suggestions for completions are found, then an empty list is returned.
      *
      * @see AutoCompleter#addBibtexEntry(BibtexEntry)
      */
-    E[] complete(String toComplete);
+    List<E> complete(String toComplete);
 
     /**
      * Directly adds an item to the AutoCompleter.
