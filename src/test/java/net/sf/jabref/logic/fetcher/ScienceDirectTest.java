@@ -31,10 +31,10 @@ public class ScienceDirectTest {
 
     @Test
     public void findByDOI() throws IOException {
-        entry.setField("doi", "10.1016/j.aasri.2014.09.002");
+        entry.setField("doi", "10.1016/j.jrmge.2015.08.004");
 
         Assert.assertEquals(
-                Optional.of(new URL("http://api.elsevier.com/content/article/doi/10.1016/j.aasri.2014.09.002?httpAccept=application/pdf")),
+                Optional.of(new URL("http://www.sciencedirect.com/science/article/pii/S1674775515001079/pdfft?md5=2b19b19a387cffbae237ca6a987279df&pid=1-s2.0-S1674775515001079-main.pdf")),
                 finder.findFullText(entry)
         );
     }
