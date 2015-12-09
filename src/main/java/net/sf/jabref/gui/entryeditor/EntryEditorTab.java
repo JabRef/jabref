@@ -236,7 +236,7 @@ class EntryEditorTab {
     public void markIfModified(FieldEditor fieldEditor) {
         // Only mark as changed if not already is and the field was indeed
         // modified
-        if (!updating && !parent.panel.isBaseChanged() && isFieldModified(fieldEditor)) {
+        if (!updating && !parent.panel.isModified() && isFieldModified(fieldEditor)) {
             markBaseChanged();
         }
     }

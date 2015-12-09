@@ -261,7 +261,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return title;
     }
 
-    public boolean isBaseChanged() {
+    public boolean isModified() {
         return baseChanged;
     }
 
