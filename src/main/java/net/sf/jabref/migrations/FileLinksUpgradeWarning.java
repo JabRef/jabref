@@ -45,7 +45,7 @@ import net.sf.jabref.util.Util;
  */
 public class FileLinksUpgradeWarning implements PostOpenAction {
 
-    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {"pdf", "ps"};
+    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {"pdf", "ps", "evastar_pdf"};
 
     private boolean offerChangeSettings;
 
