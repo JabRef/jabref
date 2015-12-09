@@ -533,18 +533,47 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     }
 
+    private JPopupMenu tabPopupMenu() {
+        JPopupMenu popupMenu = new JPopupMenu();
+
+        // Close actions
+        JMenuItem close = new JMenuItem(Localization.lang("Close"));
+        JMenuItem closeOthers = new JMenuItem(Localization.lang("Close Others"));
+        JMenuItem closeAll = new JMenuItem(Localization.lang("Close All"));
+        close.addActionListener(closeDatabaseAction);
+        closeOthers.addActionListener(closeOtherDatabasesAction);
+        closeAll.addActionListener(closeAllDatabasesAction);
+        popupMenu.add(close);
+        popupMenu.add(closeOthers);
+        popupMenu.add(closeAll);
+
+        popupMenu.addSeparator();
+
+        JMenuItem databasePropertiesBtn = new JMenuItem(Localization.lang("Database properties"));
+        databasePropertiesBtn.addActionListener(databaseProperties);
+        popupMenu.add(databasePropertiesBtn);
+
+        JMenuItem bibtexKeyPatternBtn = new JMenuItem(Localization.lang("Bibtex key patterns"));
+        bibtexKeyPatternBtn.addActionListener(bibtexKeyPattern);
+        popupMenu.add(bibtexKeyPatternBtn);
+
+        JMenuItem manageSelectorsBtn = new JMenuItem(Localization.lang("Manage content selectors"));
+        manageSelectorsBtn.addActionListener(manageSelectors);
+        popupMenu.add(manageSelectorsBtn);
+
+        return popupMenu;
+    }
+
     private void init() {
-        tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern, closeDatabaseAction, closeAllDatabasesAction, closeOtherDatabasesAction);
+        tabbedPane = new DragDropPopupPane(tabPopupMenu());
 
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
-        // glassPane.setVisible(true);
 
         setTitle(GUIGlobals.frameTitle);
         setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowClosing(WindowEvent e) {
                 if (OS.OS_X) {
@@ -571,7 +600,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // Set up a ComponentListener that saves the last size and position of the dialog
         this.addComponentListener(new ComponentAdapter() {
-
             @Override
             public void componentResized(ComponentEvent e) {
                 // Save dialog position
@@ -585,7 +613,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         });
 
-
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
 
@@ -595,7 +622,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          * cut/paste/copy operations would some times occur in the wrong tab.
          */
         tabbedPane.addChangeListener(new ChangeListener() {
-
             @Override
             public void stateChanged(ChangeEvent e) {
                 markActiveBasePanel();
