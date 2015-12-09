@@ -18,13 +18,14 @@ package net.sf.jabref.importer.fetcher;
 import java.awt.BorderLayout;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
+//import java.lang.reflect.Array;
 import java.net.ConnectException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.net.HttpURLConnection;
 import java.util.Collection;
 import java.util.Iterator;
@@ -47,7 +48,6 @@ import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeperList;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -62,7 +62,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final String DIALOG_TITLE = Localization.lang("Search %0", "IEEEXplore");
     private static final int MAX_FETCH = 100;
 
-    final CaseKeeperList caseKeeperList = new CaseKeeperList();
+    private static final Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
+    private static final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
+
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
     private final HTMLConverter htmlConverter = new HTMLConverter();
@@ -105,7 +107,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             con.setRequestProperty("Content-type", "application/json");
 
             //retrieve the search results
-            String page = Util.getPostResults(con, postData, null);
+            String page = Util.getPostResults(con, postData, StandardCharsets.UTF_8);
 
             //the page can be blank if the search did not work (not sure the exact conditions that lead to this, but declaring it an invalid search for now)
             if (page.isEmpty()) {
@@ -300,7 +302,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //reorder the "Jr." "Sr." etc to the correct ordering
             String[] authorSplit = author.split("(^\\s*|\\s*$|\\s+and\\s+)");
-            for (int n = 0; n < (Array.getLength(authorSplit)); n++) {
+            for (int n = 0; n < authorSplit.length; n++) {
                 authorSplit[n] = authorSplit[n].replaceAll("(.+?),(.+?),(.+)", "$1,$3,$2");
             }
             author = String.join(" and ", authorSplit);
@@ -407,8 +409,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.replaceAll(" on", " ").replace("  ", " ");
             }
 
-            Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
-
             Matcher m1 = publicationPattern.matcher(fullName);
             String abrvPattern = ".*[^,] '?\\d+\\)?";
             if (m1.find()) {
@@ -441,7 +441,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 }
             }
             if ("Inproceedings".equals(type.getName())) {
-                Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
                 Matcher m2 = proceedingPattern.matcher(fullName);
                 if (m2.find()) {
                     String prefix = m2.group(2);

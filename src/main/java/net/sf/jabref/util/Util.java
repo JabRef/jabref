@@ -694,8 +694,6 @@ public class Util {
         source.setDoOutput(true);
         try (DataOutputStream wr = new DataOutputStream(source.getOutputStream());) {
             wr.writeBytes(postData);
-            wr.flush();
-            wr.close();
         }
 
         int responseCode = source.getResponseCode();
@@ -703,19 +701,12 @@ public class Util {
         String inputLine;
         StringBuffer response = new StringBuffer();
 
-        if (encoding != null) {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(source.getInputStream(), encoding));) {
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-            }
-        } else {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(source.getInputStream()));) {
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(source.getInputStream(), encoding));) {
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
             }
         }
+
 
         return response.toString();
     }
