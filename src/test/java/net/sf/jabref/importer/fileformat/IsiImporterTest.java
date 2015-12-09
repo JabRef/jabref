@@ -290,7 +290,7 @@ public class IsiImporterTest {
         Assert.assertEquals("4", a.getField("volume"));
         Assert.assertEquals("3", a.getField("number"));
 
-        Assert.assertEquals("1545-598X", a.getField("SN"));
+        Assert.assertEquals("1545-598X", a.getField("sn"));
 
         Assert.assertEquals("387--391", a.getField("pages"));
 
