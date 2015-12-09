@@ -79,10 +79,10 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * This method presents a dialog box explaining and offering to make the
      * changes. If the user confirms, the changes are performed.
      * @param panel
-     * @param pr
+     * @param parserResult
      */
     @Override
-    public void performAction(BasePanel panel, ParserResult pr) {
+    public void performAction(BasePanel panel, ParserResult parserResult) {
 
 
         if (!isThereSomethingToBeDone())         {
@@ -99,23 +99,23 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 false);
 
         JPanel message = new JPanel();
-        FormBuilder b = FormBuilder.create().layout(new FormLayout("left:pref", "p"));
+        FormBuilder formBuilder = FormBuilder.create().layout(new FormLayout("left:pref", "p"));
         // Keep the formatting of these lines. Otherwise, strings have to be translated again.
         // See updated JabRef_en.properties modifications by python syncLang.py -s -u
         int row = 1;
-        b.add(new JLabel("<html>" + Localization.lang("This database was written using an older version of JabRef.") + "<br>"
-                + Localization.lang("The current version features a new way of handling links to external files.<br>To take advantage of this, your links must be changed into the new format, and<br>JabRef must be configured to show the new links.") + "<p>"
+        formBuilder.add(new JLabel("<html>" + Localization.lang("This database uses outdated file links.") + "<br><br>"
+                + Localization.lang("JabRef no longer supports 'ps' or 'pdf' fields.<br>File links are now stored in the 'file' field and files are stored in an external file directory.<br>To make use of this feature, JabRef needs to upgrade file links.<br><br>") + "<p>"
                 + Localization.lang("Do you want JabRef to do the following operations?") + "</html>")).xy(1, row);
 
         if (offerChangeSettings) {
-            b.appendRows("2dlu, p");
+            formBuilder.appendRows("2dlu, p");
             row += 2;
-            b.add(changeSettings).xy(1, row);
+            formBuilder.add(changeSettings).xy(1, row);
         }
         if (offerChangeDatabase) {
-            b.appendRows("2dlu, p");
+            formBuilder.appendRows("2dlu, p");
             row += 2;
-            b.add(changeDatabase).xy(1, row);
+            formBuilder.add(changeDatabase).xy(1, row);
         }
         if (offerSetFileDir) {
             if (Globals.prefs.hasKey("pdfDirectory")) {
@@ -123,20 +123,20 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             } else {
                 fileDir.setText(Globals.prefs.get("psDirectory"));
             }
-            JPanel pan = new JPanel();
-            pan.add(setFileDir);
-            pan.add(fileDir);
+            JPanel builderPanel = new JPanel();
+            builderPanel.add(setFileDir);
+            builderPanel.add(fileDir);
             JButton browse = new JButton(Localization.lang("Browse"));
             browse.addActionListener(BrowseAction.buildForDir(fileDir));
-            pan.add(browse);
-            b.appendRows("2dlu, p");
+            builderPanel.add(browse);
+            formBuilder.appendRows("2dlu, p");
             row += 2;
-            b.add(pan).xy(1, row);
+            formBuilder.add(builderPanel).xy(1, row);
         }
-        b.appendRows("6dlu, p");
-        b.add(doNotShowDialog).xy(1, row+2);
+        formBuilder.appendRows("6dlu, p");
+        formBuilder.add(doNotShowDialog).xy(1, row+2);
 
-        message.add(b.build());
+        message.add(formBuilder.build());
 
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 message, Localization.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
@@ -145,7 +145,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         }
 
         if (answer == JOptionPane.YES_OPTION) {
-            makeChanges(panel, pr, changeSettings.isSelected(), changeDatabase.isSelected(),
+            makeChanges(panel, parserResult, changeSettings.isSelected(), changeDatabase.isSelected(),
                     setFileDir.isSelected() ? fileDir.getText() : null);
         }
     }
