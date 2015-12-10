@@ -39,6 +39,15 @@ public class BibDatabaseTypeDetectionTest {
     }
 
     @Test
+    public void detectUnknownBasedOnFields() {
+        BibEntry entry = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
+        entry.setField("someunknownfield", "value");
+        Collection<BibEntry> entries = Arrays.asList(entry);
+
+        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(entries));
+    }
+
+    @Test
     public void detectUndistinguishableAsBibtex() {
         BibEntry entry = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
         entry.setField("title", "My cool paper");
@@ -59,6 +68,7 @@ public class BibDatabaseTypeDetectionTest {
     public void ignoreUnknownTypesForDecision() {
         // BibTex
         BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
+        custom.setField("someunknownfield", "value");
         BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
         Collection<BibEntry> entries = Arrays.asList(custom, bibtex);
 
