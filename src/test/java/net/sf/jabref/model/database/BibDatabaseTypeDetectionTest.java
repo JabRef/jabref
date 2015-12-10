@@ -39,15 +39,6 @@ public class BibDatabaseTypeDetectionTest {
     }
 
     @Test
-    public void detectUnknownBasedOnFields() {
-        BibEntry entry = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
-        entry.setField("someunknownfield", "value");
-        Collection<BibEntry> entries = Arrays.asList(entry);
-
-        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(entries));
-    }
-
-    @Test
     public void detectUndistinguishableAsBibtex() {
         BibEntry entry = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
         entry.setField("title", "My cool paper");
@@ -57,7 +48,18 @@ public class BibDatabaseTypeDetectionTest {
     }
 
     @Test
-    public void detectSingleUnknownTypeAsBibtex() {
+    public void detectMixedModeAsBiblatex() {
+        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
+        bibtex.setField("journal", "IEEE Trans. Services Computing");
+        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.ARTICLE);
+        biblatex.setField("translator", "Stefan Kolb");
+        Collection<BibEntry> entries = Arrays.asList(bibtex, biblatex);
+
+        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(entries));
+    }
+
+    @Test
+    public void detectUnknownTypeAsBibtex() {
         BibEntry entry = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
         Collection<BibEntry> entries = Arrays.asList(entry);
 
@@ -65,33 +67,57 @@ public class BibDatabaseTypeDetectionTest {
     }
 
     @Test
-    public void ignoreUnknownTypesForDecision() {
-        // BibTex
+    public void detectUnknownTypeAsBibtexBasedOnFields() {
+        BibEntry entry = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
+        entry.setField("someunknownfield", "value");
+        Collection<BibEntry> entries = Arrays.asList(entry);
+
+        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(entries));
+    }
+
+    @Test
+    public void ignoreUnknownTypesForBibtexDecision() {
+        BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
+        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
+        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.ARTICLE);
+        Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
+
+        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(entries));
+    }
+
+    @Test
+    public void ignoreUnknownTypesForBibtexDecisionBasedOnFields() {
         BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
         custom.setField("someunknownfield", "value");
         BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
-        Collection<BibEntry> entries = Arrays.asList(custom, bibtex);
-
-        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(entries));
-
-        // Biblatex
-        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.MVBOOK);
-        entries = Arrays.asList(custom, biblatex);
-
-        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(entries));
-
-        // Field-based Biblatex
-        biblatex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
-        biblatex.setField("translator", "Stefan Kolb");
-        entries = Arrays.asList(custom, biblatex, bibtex);
-
-        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(entries));
-
-        // Field-based BibTex
-        biblatex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
         bibtex.setField("journal", "IEEE Trans. Services Computing");
-        entries = Arrays.asList(custom, biblatex, bibtex);
+        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.ARTICLE);
+        biblatex.setField("title", "someothertitle");
+        Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
 
         assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(entries));
+    }
+
+    @Test
+    public void ignoreUnknownTypesForBiblatexDecision() {
+        BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
+        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
+        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.MVBOOK);
+        Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
+
+        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(entries));
+    }
+
+    @Test
+    public void ignoreUnknownTypesForBiblatexDecisionBasedOnFields() {
+        BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
+        custom.setField("someunknownfield", "value");
+        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
+        bibtex.setField("title", "IEEE Trans. Services Computing");
+        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.ARTICLE);
+        biblatex.setField("translator", "Stefan Kolb");
+        Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
+
+        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(entries));
     }
 }
