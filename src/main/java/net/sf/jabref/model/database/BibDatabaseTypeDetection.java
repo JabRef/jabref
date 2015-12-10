@@ -25,9 +25,8 @@ public class BibDatabaseTypeDetection {
      * 3. Otherwise return BibTex
      *
      * @param entries a BibEntry collection
-     * @return the infered database type
+     * @return the inferred database type
      */
-    // TODO: what about custom entry types?, Define type detection on type field in jabref bib file?
     public static BibDatabaseType inferType(Collection<BibEntry> entries) {
         final List<EntryType> bibtex = BibtexEntryTypes.ALL;
         final List<EntryType> biblatex = BibLatexEntryTypes.ALL;
