@@ -6,8 +6,10 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -33,12 +35,29 @@ public class BibDatabaseTypeDetection {
         final List<EntryType> entryTypes = getEntryTypes(entries);
 
         // type-based check
-        if(entryTypes.stream().anyMatch(isIncludedIn(exclusiveBiblatex))) {
+        if (entryTypes.stream().anyMatch(isIncludedIn(exclusiveBiblatex))) {
             return BibDatabaseType.BIBLATEX;
-        } else if(entryTypes.stream().allMatch(isIncludedIn(bibtex))) {
+        } else if (entryTypes.stream().allMatch(isIncludedIn(bibtex))) {
             // field-based check
+            if(entries.stream().anyMatch(hasBiblatexFields())) {
+                return BibDatabaseType.BIBLATEX;
+            }
         }
         return BibDatabaseType.BIBTEX;
+    }
+
+    private static List<String> exclusiveBiblatexFields(EntryType type) {
+        final Optional<EntryType> biblatexType = BibLatexEntryTypes.getType(type.getName());
+        final Optional<EntryType> bibtexType = BibtexEntryTypes.getType(type.getName());
+
+        if (!biblatexType.isPresent() || !bibtexType.isPresent()) {
+            return new ArrayList<>(0);
+        }
+
+        final List<String> bibtexFields = bibtexType.get().getAllFields();
+        final List<String> biblatexFields = biblatexType.get().getAllFields();
+
+        return biblatexFields.stream().filter(f -> !bibtexFields.contains(f)).collect(Collectors.toList());
     }
 
     private static List<EntryType> getEntryTypes(Collection<BibEntry> collection) {
@@ -46,7 +65,7 @@ public class BibDatabaseTypeDetection {
     }
 
     private static List<EntryType> filterEntryTypes(List<EntryType> types, Predicate<EntryType> predicate) {
-        return types.stream().filter(predicate).collect(Collectors.<EntryType>toList());
+        return types.stream().filter(predicate).collect(Collectors.toList());
     }
 
     private static Predicate<EntryType> isNotIncludedIn(List<EntryType> collection) {
@@ -55,5 +74,10 @@ public class BibDatabaseTypeDetection {
 
     private static Predicate<EntryType> isIncludedIn(List<EntryType> collection) {
         return entry -> collection.stream().anyMatch(c -> c.getName().equalsIgnoreCase(entry.getName()));
+    }
+
+    private static Predicate<BibEntry> hasBiblatexFields() {
+        return e -> e.getFieldNames().stream()
+                .anyMatch(name -> exclusiveBiblatexFields(e.getType()).stream().anyMatch(c -> c.equalsIgnoreCase(name)));
     }
 }

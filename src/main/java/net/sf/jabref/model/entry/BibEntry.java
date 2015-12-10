@@ -42,7 +42,6 @@ import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class BibEntry {
-
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
