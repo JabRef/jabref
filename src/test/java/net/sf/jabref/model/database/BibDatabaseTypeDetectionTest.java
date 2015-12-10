@@ -18,14 +18,6 @@ public class BibDatabaseTypeDetectionTest {
         assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(entries));
     }
 
-    /*
-    @Test
-    public void detectBibtexOnly() {
-        Collection<BibEntry> entries = Arrays.asList(new BibEntry("someid", BibtexEntryTypes.MASTERSTHESIS));
-
-        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(entries));
-    }
-
     @Test
     public void detectBiblatexFieldBased() {
         BibEntry entry = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
@@ -52,7 +44,4 @@ public class BibDatabaseTypeDetectionTest {
 
         assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(entries));
     }
-
-    // TODO: what about custom entry types?, Define type detection on type field in jabref bib file?
-    */
 }
