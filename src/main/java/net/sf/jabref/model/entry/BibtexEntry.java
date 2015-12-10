@@ -585,4 +585,8 @@ public class BibtexEntry {
     public List<String> getSeparatedKeywords() {
         return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField("keywords"));
     }
+
+    public MyEntryClass getMyEntryClass() {
+        return MyStandardEntryClass.ARTICLE;
+    }
 }
