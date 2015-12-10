@@ -15,6 +15,11 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibtexEntry;
 
@@ -27,7 +32,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
-    private final String[] fieldNames;
+    private final List<String> fieldNames;
     /**
      * true if only last names should be completed and there is NO separation by " and ", but by " "
      */
@@ -43,26 +48,27 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
      * @see AutoCompleterFactory
      */
     NameFieldAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
-        this(new String[] {fieldName}, false, preferences);
+        this(Collections.singletonList(Objects.requireNonNull(fieldName)), false, preferences);
     }
 
-    public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnlyAndSeparationBySpace,
+    public NameFieldAutoCompleter(List<String> fieldNames, boolean lastNameOnlyAndSeparationBySpace,
             AutoCompletePreferences preferences) {
         super(preferences);
 
-        this.fieldNames = fieldNames;
+        this.fieldNames = Objects.requireNonNull(fieldNames);
         this.lastNameOnlyAndSeparationBySpace = lastNameOnlyAndSeparationBySpace;
-        if (preferences.getCompleteFirstLast()) {
+        if (preferences.getOnlyCompleteFirstLast()) {
             autoCompFF = true;
             autoCompLF = false;
-        } else if (preferences.getCompleteLastFirst()) {
+        } else if (preferences.getOnlyCompleteLastFirst()) {
             autoCompFF = false;
             autoCompLF = true;
         } else {
             autoCompFF = true;
             autoCompLF = true;
         }
-        autoCompFirstnameMode = preferences.getFirstnameMode();
+        autoCompFirstnameMode = preferences.getFirstnameMode() != null ? preferences
+                .getFirstnameMode() : AutoCompleteFirstNameMode.BOTH;
     }
 
     @Override
@@ -144,7 +150,11 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
     }
 
     @Override
-    public String[] complete(String toComplete) {
+    public List<String> complete(String toComplete) {
+        if (toComplete == null) {
+            return new ArrayList<>();
+        }
+
         // Normally, one would implement that using
         // class inheritance. But this seemed overengineered
         if (this.lastNameOnlyAndSeparationBySpace) {
@@ -155,13 +165,13 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
         return super.complete(toComplete);
     }
 
-    public String getFieldName() {
-        return fieldNames[0];
-    }
-
     @Override
     public String getPrefix() {
         return prefix;
     }
 
+    @Override
+    protected int getLengthOfShortestWordToAdd() {
+        return 1;
+    }
 }

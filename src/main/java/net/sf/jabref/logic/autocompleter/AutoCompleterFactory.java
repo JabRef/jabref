@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -32,6 +33,8 @@ public class AutoCompleterFactory {
     }
 
     public AutoCompleter<String> getFor(String fieldName) {
+        Objects.requireNonNull(fieldName);
+
         if ("author".equals(fieldName) || "editor".equals(fieldName)) {
             return new NameFieldAutoCompleter(fieldName, preferences);
         } else if ("crossref".equals(fieldName)) {
@@ -43,8 +46,8 @@ public class AutoCompleterFactory {
         }
     }
 
-    public AutoCompleter<String> getFor(String fieldName, String secondFieldName) {
-        return new NameFieldAutoCompleter(new String[] {fieldName, secondFieldName}, true, preferences);
+    public AutoCompleter<String> getPersonAutoCompleter() {
+        return new NameFieldAutoCompleter(Arrays.asList("author", "editor"), true, preferences);
     }
 
 }

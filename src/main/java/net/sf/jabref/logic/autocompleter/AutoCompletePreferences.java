@@ -51,6 +51,12 @@ public class AutoCompletePreferences {
         preferences.putInt(PREF_SHORTEST_TO_COMPLETE, value);
     }
 
+    /**
+     * Returns how the first names are handled.
+     * For "ONLY_FULL", the auto completer returns the full name, e.g. "Smith, Bob"
+     * For "ONLY_ABBREVIATED", the auto completer returns the first name abbreviated, e.g. "Smith, B."
+     * For "BOTH", the auto completer returns both versions.
+     */
     public AutoCompleteFirstNameMode getFirstnameMode() {
         try {
             return AutoCompleteFirstNameMode.valueOf(preferences.get(PREF_FIRSTNAME_MODE));
@@ -64,19 +70,19 @@ public class AutoCompletePreferences {
         preferences.put(PREF_FIRSTNAME_MODE, mode.name());
     }
 
-    public boolean getCompleteLastFirst() {
+    public boolean getOnlyCompleteLastFirst() {
         return preferences.getBoolean(PREF_LAST_FIRST);
     }
 
-    public void setCompleteLastFirst(boolean value) {
+    public void setOnlyCompleteLastFirst(boolean value) {
         preferences.putBoolean(PREF_LAST_FIRST, value);
     }
 
-    public boolean getCompleteFirstLast() {
+    public boolean getOnlyCompleteFirstLast() {
         return preferences.getBoolean(PREF_FIRST_LAST);
     }
 
-    public void setCompleteFirstLast(boolean value) {
+    public void setOnlyCompleteFirstLast(boolean value) {
         preferences.putBoolean(PREF_FIRST_LAST, value);
     }
 

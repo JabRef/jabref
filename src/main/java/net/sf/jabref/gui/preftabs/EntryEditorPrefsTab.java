@@ -188,9 +188,9 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         autoCompFields.setText(autoCompletePreferences.getCompleteNamesAsString());
         shortestToComplete.setValue(autoCompletePreferences.getShortestLengthToComplete());
 
-        if (autoCompletePreferences.getCompleteFirstLast()) {
+        if (autoCompletePreferences.getOnlyCompleteFirstLast()) {
             autoCompFF.setSelected(true);
-        } else if (autoCompletePreferences.getCompleteLastFirst()) {
+        } else if (autoCompletePreferences.getOnlyCompleteLastFirst()) {
             autoCompLF.setSelected(true);
         } else {
             autoCompBoth.setSelected(true);
@@ -252,16 +252,16 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.AUTO_COMPLETE, autoComplete.isSelected());
         autoCompletePreferences.setCompleteNames(autoCompFields.getText());
         if (autoCompBoth.isSelected()) {
-            autoCompletePreferences.setCompleteFirstLast(false);
-            autoCompletePreferences.setCompleteLastFirst(false);
+            autoCompletePreferences.setOnlyCompleteFirstLast(false);
+            autoCompletePreferences.setOnlyCompleteLastFirst(false);
         }
         else if (autoCompFF.isSelected()) {
-            autoCompletePreferences.setCompleteFirstLast(true);
-            autoCompletePreferences.setCompleteLastFirst(false);
+            autoCompletePreferences.setOnlyCompleteFirstLast(true);
+            autoCompletePreferences.setOnlyCompleteLastFirst(false);
         }
         else {
-            autoCompletePreferences.setCompleteFirstLast(false);
-            autoCompletePreferences.setCompleteLastFirst(true);
+            autoCompletePreferences.setOnlyCompleteFirstLast(false);
+            autoCompletePreferences.setOnlyCompleteLastFirst(true);
         }
         if (firstNameModeAbbr.isSelected()) {
             autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
