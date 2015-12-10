@@ -94,7 +94,7 @@ dependencies {
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.guava:guava:19.0'
 
     compile 'commons-logging:commons-logging:1.2'
 
