@@ -18,7 +18,7 @@ package net.sf.jabref.gui.undo;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -28,13 +28,13 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class UndoablePreambleChange extends AbstractUndoableEdit {
 
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private final String oldValue;
     private final String newValue;
     private final BasePanel panel;
 
 
-    public UndoablePreambleChange(BibtexDatabase base, BasePanel panel,
+    public UndoablePreambleChange(BibDatabase base, BasePanel panel,
             String oldValue, String newValue) {
         this.base = base;
         this.oldValue = oldValue;

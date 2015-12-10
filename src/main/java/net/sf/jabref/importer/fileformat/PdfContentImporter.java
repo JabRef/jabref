@@ -32,7 +32,7 @@ import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.EntryType;
@@ -206,8 +206,8 @@ public class PdfContentImporter extends ImportFormat {
     }
 
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        final ArrayList<BibtexEntry> res = new ArrayList<>(1);
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
+        final ArrayList<BibEntry> res = new ArrayList<>(1);
 
         try (PDDocument document = PDDocument.load(in)) {
             if (document.isEncrypted()) {
@@ -242,7 +242,7 @@ public class PdfContentImporter extends ImportFormat {
                     }
 
                     @Override
-                    public void addEntry(BibtexEntry entry) {
+                    public void addEntry(BibEntry entry) {
                         // add the entry to the result object
                         res.add(entry);
                     }
@@ -479,7 +479,7 @@ public class PdfContentImporter extends ImportFormat {
                 }
             }
 
-            BibtexEntry entry = new BibtexEntry();
+            BibEntry entry = new BibEntry();
             entry.setType(type);
 
             if (author != null) {

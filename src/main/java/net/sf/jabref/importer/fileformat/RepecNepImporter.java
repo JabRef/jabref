@@ -28,7 +28,7 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -269,7 +269,7 @@ public class RepecNepImporter extends ImportFormat {
      * @param be
      * @throws IOException
      */
-    private void parseTitleString(BibtexEntry be) throws IOException {
+    private void parseTitleString(BibEntry be) throws IOException {
         // skip article number
         this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1, this.lastLine.length());
         be.setField("title", readMultipleLines());
@@ -281,7 +281,7 @@ public class RepecNepImporter extends ImportFormat {
      * @param be
      * @throws IOException
      */
-    private void parseAuthors(BibtexEntry be) throws IOException {
+    private void parseAuthors(BibEntry be) throws IOException {
         // read authors and institutions
         String authors = "";
         String institutions = "";
@@ -329,7 +329,7 @@ public class RepecNepImporter extends ImportFormat {
      * @param be
      * @throws IOException
      */
-    private void parseAbstract(BibtexEntry be) throws IOException {
+    private void parseAbstract(BibEntry be) throws IOException {
         String theabstract = readMultipleLines();
 
         if (!"".equals(theabstract)) {
@@ -343,7 +343,7 @@ public class RepecNepImporter extends ImportFormat {
      * @param be
      * @throws IOException
      */
-    private void parseAdditionalFields(BibtexEntry be, boolean multilineUrlFieldAllowed) throws IOException {
+    private void parseAdditionalFields(BibEntry be, boolean multilineUrlFieldAllowed) throws IOException {
 
         // one empty line is possible before fields start
         if ((this.lastLine != null) && "".equals(this.lastLine.trim())) {
@@ -427,8 +427,8 @@ public class RepecNepImporter extends ImportFormat {
      * @see net.sf.jabref.imports.ImportFormat#importEntries(java.io.InputStream)
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         String paperNoStr = null;
         this.line = 0;
 
@@ -442,7 +442,7 @@ public class RepecNepImporter extends ImportFormat {
                     this.inOverviewSection = this.preLine.startsWith("In this issue we have");
                 }
                 if (isStartOfWorkingPaper()) {
-                    BibtexEntry be = new BibtexEntry(IdGenerator.next());
+                    BibEntry be = new BibEntry(IdGenerator.next());
                     be.setType(EntryTypes.getType("techreport"));
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be);

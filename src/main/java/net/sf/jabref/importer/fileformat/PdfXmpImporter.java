@@ -20,8 +20,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
@@ -39,7 +38,7 @@ public class PdfXmpImporter extends ImportFormat {
      * Returns a list of all BibtexEntries found in the inputstream.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
         return XMPUtil.readXMP(in);
     }
 

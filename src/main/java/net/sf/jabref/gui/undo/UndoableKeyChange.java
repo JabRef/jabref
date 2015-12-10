@@ -17,7 +17,7 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -28,12 +28,12 @@ import net.sf.jabref.logic.l10n.Localization;
 public class UndoableKeyChange extends AbstractUndoableEdit {
 
     private final String entryId;
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private final String oldValue;
     private final String newValue;
 
 
-    public UndoableKeyChange(BibtexDatabase base, String entryId,
+    public UndoableKeyChange(BibDatabase base, String entryId,
             String oldValue, String newValue) {
         this.base = base;
         this.entryId = entryId;

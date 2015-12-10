@@ -21,11 +21,11 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 class TextAnalyzer {
 
-    private final BibtexEntry be = null;
+    private final BibEntry be = null;
 
     private static final Log LOGGER = LogFactory.getLog(TextAnalyzer.class);
 
@@ -38,7 +38,7 @@ class TextAnalyzer {
         guessBibtexFields(text);
     }
 
-    public BibtexEntry getEntry() {
+    public BibEntry getEntry() {
         return be;
     }
 

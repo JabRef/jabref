@@ -22,7 +22,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -32,13 +32,13 @@ import net.sf.jabref.model.entry.BibtexEntry;
 public class UndoableFieldChange extends AbstractUndoableEdit {
     private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
     private final String field;
     private final String oldValue;
     private final String newValue;
 
 
-    public UndoableFieldChange(BibtexEntry entry, String field,
+    public UndoableFieldChange(BibEntry entry, String field,
             String oldValue, String newValue) {
         this.entry = entry;
         this.field = field;

@@ -63,7 +63,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1395,7 +1395,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // There is no open tab to add to, so we create a new tab:
                 addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
             } else {
-                List<BibtexEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
+                List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
                 addImportedEntries(panel, entries, false);
             }
         } else {
@@ -1596,7 +1596,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public BasePanel addTab(BibtexDatabase db, File file, MetaData metaData, Charset encoding, boolean raisePanel) {
+    public BasePanel addTab(BibDatabase db, File file, MetaData metaData, Charset encoding, boolean raisePanel) {
         // ensure that non-null parameters are really non-null
         if (metaData == null) {
             metaData = new MetaData();
@@ -1759,7 +1759,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param entries   The entries to add.
      * @param openInNew Should the entries be imported into a new database?
      */
-    private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries, final boolean openInNew) {
+    private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries, final boolean openInNew) {
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override

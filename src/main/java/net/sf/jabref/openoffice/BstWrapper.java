@@ -15,8 +15,8 @@
  */
 package net.sf.jabref.openoffice;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.FormatChars;
 import net.sf.jabref.bst.VM;
@@ -65,7 +65,7 @@ class BstWrapper {
      * @param database The database the entries belong to.
      * @return A Map of the entries' bibtex keys linking to their processed strings.
      */
-    public Map<String, String> processEntries(Collection<BibtexEntry> entries, BibtexDatabase database) {
+    public Map<String, String> processEntries(Collection<BibEntry> entries, BibDatabase database) {
         // TODO: how to handle uniquefiers?
 
         // TODO: need handling of crossrefs?

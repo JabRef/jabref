@@ -33,7 +33,7 @@ import javax.swing.JPanel;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -113,7 +113,7 @@ public class JSTORFetcher implements EntryFetcher {
             String citations = getCitations(ticket, query);
 
             // Last retrieve the Bibtex-entries of the citations found
-            Collection<BibtexEntry> entries = getBibtexEntries(ticket, citations);
+            Collection<BibEntry> entries = getBibtexEntries(ticket, citations);
 
             if (entries.isEmpty()) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
@@ -122,7 +122,7 @@ public class JSTORFetcher implements EntryFetcher {
                 return false;
             }
 
-            for (BibtexEntry entry : entries) {
+            for (BibEntry entry : entries) {
                 dialog.addEntry(entry);
             }
             return true;
@@ -144,7 +144,7 @@ public class JSTORFetcher implements EntryFetcher {
      * @throws IOException
      *             Most probably related to a problem connecting to JStor.
      */
-    private static Collection<BibtexEntry> getBibtexEntries(String ticket, String citations)
+    private static Collection<BibEntry> getBibtexEntries(String ticket, String citations)
             throws IOException {
         try {
             URL url = new URL(JSTORFetcher.URL_BIBTEX);

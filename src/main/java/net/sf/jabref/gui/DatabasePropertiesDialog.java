@@ -49,7 +49,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Created by IntelliJ IDEA.
@@ -230,7 +230,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveInSpecifiedOrder.addActionListener(listener);
 
         Vector<String> v = new Vector<>(BibtexFields.getAllFieldNames());
-        v.add(BibtexEntry.KEY_FIELD);
+        v.add(BibEntry.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
         savePriSort = new JComboBox<>(allPlusKey);

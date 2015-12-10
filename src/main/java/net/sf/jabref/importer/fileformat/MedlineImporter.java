@@ -25,9 +25,8 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.fileformat.MedlineHandler;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,7 +84,7 @@ public class MedlineImporter extends ImportFormat {
      *
      * @return Will return an empty list on error.
      */
-    public static List<BibtexEntry> fetchMedline(String id, OutputPrinter status) {
+    public static List<BibEntry> fetchMedline(String id, OutputPrinter status) {
         String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" +
                 id;
         try {
@@ -102,7 +101,7 @@ public class MedlineImporter extends ImportFormat {
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
         // Obtain a factory object for creating SAX parsers
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -113,7 +112,7 @@ public class MedlineImporter extends ImportFormat {
         parserFactory.setNamespaceAware(true);
 
         // Now create a SAXParser object
-        ArrayList<BibtexEntry> bibItems = null;
+        ArrayList<BibEntry> bibItems = null;
         try {
             SAXParser parser = parserFactory.newSAXParser(); // May throw
             // exceptions

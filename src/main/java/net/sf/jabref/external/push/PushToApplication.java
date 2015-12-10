@@ -16,8 +16,8 @@
 package net.sf.jabref.external.push;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.MetaData;
 
 import javax.swing.*;
@@ -60,7 +60,7 @@ public interface PushToApplication {
      * @param entries
      * @param metaData
      */
-    void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData);
+    void pushEntries(BibDatabase database, BibEntry[] entries, String keyString, MetaData metaData);
 
     /**
      * Reporting etc., this method is called on the event dispatch thread after pushEntries() returns.

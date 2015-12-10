@@ -36,7 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
@@ -60,7 +60,7 @@ public class FreeCiteImporter extends ImportFormat {
     }
 
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status)
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
         try(Scanner scan = new Scanner(in)) {
             String text = scan.useDelimiter("\\A").next();
@@ -68,7 +68,7 @@ public class FreeCiteImporter extends ImportFormat {
         }
     }
 
-    public List<BibtexEntry> importEntries(String text, OutputPrinter status) {
+    public List<BibEntry> importEntries(String text, OutputPrinter status) {
         // URLencode the string for transmission
         String urlencodedCitation = null;
         try {
@@ -109,7 +109,7 @@ public class FreeCiteImporter extends ImportFormat {
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
 
-        List<BibtexEntry> res = new ArrayList<>();
+        List<BibEntry> res = new ArrayList<>();
 
         XMLInputFactory factory = XMLInputFactory.newInstance();
         try {
@@ -121,7 +121,7 @@ public class FreeCiteImporter extends ImportFormat {
 
                     StringBuilder noteSB = new StringBuilder();
 
-                    BibtexEntry e = new BibtexEntry();
+                    BibEntry e = new BibEntry();
                     // fallback type
                     EntryType type = BibtexEntryTypes.INPROCEEDINGS;
 

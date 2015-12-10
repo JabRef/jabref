@@ -31,7 +31,7 @@ import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -162,12 +162,12 @@ public class IsiImporter extends ImportFormat {
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         if (stream == null) {
             throw new IOException("No stream given.");
         }
 
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -334,8 +334,8 @@ public class IsiImporter extends ImportFormat {
                 continue;
             }
 
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getBibtexEntryType(Type));
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getTypeOrDefault(Type));
             // id assumes an existing database so don't
 
             // Remove empty fields:

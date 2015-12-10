@@ -41,8 +41,6 @@ public class EntryTypesTestBibtex {
         assertEquals(19, bibtexentrytypes.getAllValues().size());
         assertEquals(19, bibtexentrytypes.getAllTypes().size());
 
-        assertEquals(BibtexEntryTypes.MISC, bibtexentrytypes.getBibtexEntryType("aaaaarticle"));
-
         // Edit the "article" entry type
         ArrayList<String> requiredFields = new ArrayList<>(BibtexEntryTypes.ARTICLE.getRequiredFields());
         requiredFields.add("specialfield");
@@ -58,6 +56,12 @@ public class EntryTypesTestBibtex {
         bibtexentrytypes.removeType("article");
         // Should not be possible to remove a standard type
         assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article"));
+    }
+
+    @Test
+    public void defaultType() {
+        EntryTypes types = new EntryTypes();
+        assertEquals(BibtexEntryTypes.MISC, types.getTypeOrDefault("unknowntype"));
     }
 
     @Test

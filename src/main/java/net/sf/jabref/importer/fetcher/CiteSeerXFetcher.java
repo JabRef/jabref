@@ -20,7 +20,7 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibtexEntry entry = getSingleCitation(citation);
+                BibEntry entry = getSingleCitation(citation);
                 //BibtexEntry entry = BibsonomyScraper.getEntry(citation);
 
                 //dialog.setProgress(++i, citations.size());
@@ -139,7 +139,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     private static final Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
 
-    private static BibtexEntry getSingleCitation(String urlString) throws IOException {
+    private static BibEntry getSingleCitation(String urlString) throws IOException {
 
         URL url = new URL(urlString);
         String cont = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
@@ -147,7 +147,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
         Matcher m = CiteSeerXFetcher.titlePattern.matcher(cont);
         if (m.find()) {
-            BibtexEntry entry = new BibtexEntry(IdGenerator.next());
+            BibEntry entry = new BibEntry(IdGenerator.next());
             entry.setField("title", m.group(1));
 
             // Find authors:

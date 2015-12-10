@@ -1,11 +1,10 @@
 package net.sf.jabref.gui.entryeditor;
 
 import net.sf.jabref.JabRef;
-import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.testutils.TestUtils;
 
 import org.junit.Assert;
@@ -22,10 +21,10 @@ public class EntryEditorTest {
     @Ignore
     public void changingAuthorUpdatesAutoCompleter() {
         TestUtils.initJabRef();
-        BibtexEntry bibtexEntry = new BibtexEntry();
-        bibtexEntry.setField("author", "Brigitte Laurant");
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField("author", "Brigitte Laurant");
         FieldEditor authorTextField = new TextArea("author", "Hans Meiser");
-        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibtexEntry);
+        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibEntry);
 
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
@@ -43,10 +42,10 @@ public class EntryEditorTest {
     @Ignore
     public void changingSomeFieldUpdatesAutoCompleter() {
         TestUtils.initJabRef();
-        BibtexEntry bibtexEntry = new BibtexEntry();
-        bibtexEntry.setField("journal", "Testtext");
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField("journal", "Testtext");
         FieldEditor authorTextField = new TextArea("journal", "New Testtext");
-        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibtexEntry);
+        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibEntry);
 
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));

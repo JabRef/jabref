@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.groups.structure;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -61,7 +61,7 @@ public class SearchGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          SearchGroup.toString(), or null if incompatible
      */
-    public static AbstractGroup fromString(String s, BibtexDatabase db,
+    public static AbstractGroup fromString(String s, BibDatabase db,
             int version) throws Exception {
         if (!s.startsWith(SearchGroup.ID)) {
             throw new Exception(
@@ -143,13 +143,13 @@ public class SearchGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibtexEntry[] entries) {
+    public AbstractUndoableEdit add(BibEntry[] entries) {
         // nothing to do, add is not supported
         return null;
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
+    public AbstractUndoableEdit remove(BibEntry[] entries) {
         // nothing to do, remove is not supported
         return null;
     }
@@ -174,12 +174,12 @@ public class SearchGroup extends AbstractGroup {
      *      net.sf.jabref.BibtexEntry)
      */
     @Override
-    public boolean contains(String searchOptions, BibtexEntry entry) {
+    public boolean contains(String searchOptions, BibEntry entry) {
         return getSearchRule().applyRule(searchOptions, entry);
     }
 
     @Override
-    public boolean contains(BibtexEntry entry) {
+    public boolean contains(BibEntry entry) {
         return contains(SearchRule.DUMMY_QUERY, entry);
     }
 

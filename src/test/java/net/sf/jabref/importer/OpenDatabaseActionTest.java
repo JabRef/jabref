@@ -2,7 +2,7 @@ package net.sf.jabref.importer;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class OpenDatabaseActionTest {
     @Test
     public void entriesAreParsedNoHeader() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibNoHeader, defaultEncoding);
-        BibtexDatabase db = result.getDatabase();
+        BibDatabase db = result.getDatabase();
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
@@ -65,7 +65,7 @@ public class OpenDatabaseActionTest {
     @Test
     public void entriesAreParsedHeader() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibHeader, defaultEncoding);
-        BibtexDatabase db = result.getDatabase();
+        BibDatabase db = result.getDatabase();
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
@@ -75,7 +75,7 @@ public class OpenDatabaseActionTest {
     @Test
     public void entriesAreParsedHeaderAndSignature() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibHeaderAndSignature, defaultEncoding);
-        BibtexDatabase db = result.getDatabase();
+        BibDatabase db = result.getDatabase();
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());

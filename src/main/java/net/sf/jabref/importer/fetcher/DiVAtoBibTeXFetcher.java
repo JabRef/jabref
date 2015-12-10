@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
@@ -84,7 +84,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+        BibEntry entry = BibtexParser.singleFromString(bibtexString);
         if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
             String title = entry.getField("title");

@@ -38,7 +38,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * An Action for launching mass field.
@@ -209,7 +209,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (bp == null) {
             return;
         }
-        BibtexEntry[] entries = bp.getSelectedEntries();
+        BibEntry[] entries = bp.getSelectedEntries();
         // Lazy creation of the dialog:
         if (diag == null) {
             createDialog();
@@ -222,7 +222,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             return;
         }
 
-        Collection<BibtexEntry> entryList;
+        Collection<BibEntry> entryList;
         // If all entries should be treated, change the entries array:
         if (all.isSelected()) {
             entryList = bp.database().getEntries();

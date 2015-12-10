@@ -17,7 +17,7 @@ package net.sf.jabref.gui;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -32,11 +32,11 @@ import java.io.StringWriter;
  */
 public class TransferableBibtexEntry implements Transferable {
 
-    private final BibtexEntry[] data;
-    public static final DataFlavor entryFlavor = new DataFlavor(BibtexEntry.class, "JabRef entry");
+    private final BibEntry[] data;
+    public static final DataFlavor entryFlavor = new DataFlavor(BibEntry.class, "JabRef entry");
 
 
-    public TransferableBibtexEntry(BibtexEntry[] data) {
+    public TransferableBibtexEntry(BibEntry[] data) {
         this.data = data;
     }
 
@@ -60,7 +60,7 @@ public class TransferableBibtexEntry implements Transferable {
             try {
                 StringWriter sw = new StringWriter();
                 BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), false);
-                for (BibtexEntry entry : data) {
+                for (BibEntry entry : data) {
                     bibtexEntryWriter.write(entry, sw);
                 }
                 return sw.toString();

@@ -26,7 +26,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
@@ -35,7 +35,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
     private final PushToApplication operation;
     private final JabRefFrame frame;
     private BasePanel panel;
-    private BibtexEntry[] entries;
+    private BibEntry[] entries;
 
 
     public PushToApplicationAction(JabRefFrame frame, PushToApplication operation) {
@@ -64,7 +64,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
 
         // If required, check that all entries have BibTeX keys defined:
         if (operation.requiresBibtexKeys()) {
-            for (BibtexEntry entry : entries) {
+            for (BibEntry entry : entries) {
                 if ((entry.getCiteKey() == null) || entry.getCiteKey().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires all selected entries to have BibTex keys defined."), (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
                     return;
@@ -91,11 +91,11 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         });
     }
 
-    private static String getKeyString(BibtexEntry[] bibentries) {
+    private static String getKeyString(BibEntry[] bibentries) {
         StringBuilder result = new StringBuilder();
         String citeKey;
         boolean first = true;
-        for (BibtexEntry bes : bibentries) {
+        for (BibEntry bes : bibentries) {
             citeKey = bes.getCiteKey();
             // if the key is empty we give a warning and ignore this entry
             if ((citeKey == null) || "".equals(citeKey)) {

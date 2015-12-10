@@ -51,6 +51,24 @@ public class EntryTypes {
     }
 
     /**
+     * This method returns the EntryType for the name of a type,
+     * or the default type (*.MISC) if it does not exist.
+     */
+    // Get an entry type defined in BibtexEntryType
+    public static EntryType getTypeOrDefault(String type) {
+        EntryType entryType = getType(type);
+
+        if (entryType == null) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+                return BibLatexEntryTypes.MISC;
+            } else {
+                return BibtexEntryTypes.MISC;
+            }
+        }
+        return entryType;
+    }
+
+    /**
      * This method returns the standard BibtexEntryType for the
      * name of a type, or null if it does not exist.
      */
@@ -91,20 +109,6 @@ public class EntryTypes {
                 // of a standard type. We reinstate the standard type.
                 addOrModifyEntryType(STANDARD_TYPES.get(toLowerCase));
             }
-        }
-    }
-
-    // Get an entry type defined in BibtexEntryType
-    public static EntryType getBibtexEntryType(String type) {
-        // decide which entryType object to return
-        EntryType o = getType(type);
-        if (o != null) {
-            return o;
-        }
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-            return BibLatexEntryTypes.MISC;
-        } else {
-            return BibtexEntryTypes.MISC;
         }
     }
 }

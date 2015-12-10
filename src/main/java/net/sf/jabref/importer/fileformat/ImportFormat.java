@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Role of an importer for JabRef.
@@ -71,7 +71,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      *
      * TODO the return type should be changed to "ParseResult" as the parser could use a different encoding than the default encoding
      */
-    public abstract List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException;
+    public abstract List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException;
 
     /**
      * Name of this import format.

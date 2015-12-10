@@ -19,7 +19,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableModifySubtree;
@@ -42,7 +42,7 @@ class GroupChange extends Change {
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         final GroupTreeNode root = panel.metaData().getGroups();
         final UndoableModifySubtree undo = new UndoableModifySubtree(
                 panel.getGroupSelector(), panel.metaData().getGroups(),

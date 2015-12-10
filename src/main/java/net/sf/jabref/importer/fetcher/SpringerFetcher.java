@@ -33,7 +33,7 @@ import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.JSONEntryParser;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class SpringerFetcher implements EntryFetcher {
 
@@ -103,7 +103,7 @@ public class SpringerFetcher implements EntryFetcher {
                         JSONArray results = jo.getJSONArray("records");
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject springerJsonEntry = results.getJSONObject(i);
-                            BibtexEntry entry = jep.SpringerJSONtoBibtex(springerJsonEntry);
+                            BibEntry entry = jep.SpringerJSONtoBibtex(springerJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);

@@ -20,7 +20,7 @@ import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.YearUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 import java.text.Collator;
@@ -40,7 +40,7 @@ import java.util.Comparator;
  * TODO: Testcases
  * 
  */
-public class FieldComparator implements Comparator<BibtexEntry> {
+public class FieldComparator implements Comparator<BibEntry> {
 
     private static Collator collator;
 
@@ -74,7 +74,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         this.fieldName = field;
         this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
         multiplier = reversed ? -1 : 1;
-        isTypeHeader = this.field[0].equals(BibtexEntry.TYPE_HEADER);
+        isTypeHeader = this.field[0].equals(BibEntry.TYPE_HEADER);
         isNameField = "author".equals(this.field[0])
                 || "editor".equals(this.field[0]);
         isYearField = "year".equals(this.field[0]);
@@ -83,7 +83,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
     }
 
     @Override
-    public int compare(BibtexEntry e1, BibtexEntry e2) {
+    public int compare(BibEntry e1, BibEntry e2) {
         Object f1;
         Object f2;
 
@@ -191,7 +191,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         return result * localMultiplier;
     }
 
-    private Object getField(BibtexEntry entry) {
+    private Object getField(BibEntry entry) {
         for (String aField : field) {
             Object o = entry.getFieldOrAlias(aField);
             if (o != null) {

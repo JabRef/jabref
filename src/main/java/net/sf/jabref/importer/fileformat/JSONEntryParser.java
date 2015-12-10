@@ -25,7 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
 
 public class JSONEntryParser {
@@ -43,7 +43,7 @@ public class JSONEntryParser {
      * @param bibJsonEntry The JSONObject to convert
      * @return the converted BibtexEntry
      */
-    public BibtexEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
+    public BibEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
         // Fields that are directly accessible at the top level BibJson object
         String[] singleFieldStrings = {"year", "title", "abstract", "month"};
 
@@ -52,7 +52,7 @@ public class JSONEntryParser {
 
 
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setType(EntryTypes.getType("article"));
 
         // Authors
@@ -158,12 +158,12 @@ public class JSONEntryParser {
      * @param springerJsonEntry the JSONObject from search results
      * @return the converted BibtexEntry
      */
-    public static BibtexEntry SpringerJSONtoBibtex(JSONObject springerJsonEntry) {
+    public static BibEntry SpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
         String[] singleFieldStrings = {"issn", "volume", "abstract", "doi", "title", "number",
                 "publisher"};
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         String nametype;
 
         // Guess publication type

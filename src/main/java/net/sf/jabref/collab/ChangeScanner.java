@@ -43,8 +43,8 @@ import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.model.database.EntrySorter;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 
 public class ChangeScanner implements Runnable {
@@ -53,12 +53,12 @@ public class ChangeScanner implements Runnable {
 
     private final File f;
 
-    private final BibtexDatabase inMem;
+    private final BibDatabase inMem;
     private final MetaData mdInMem;
     private final BasePanel panel;
     private final JabRefFrame frame;
 
-    private BibtexDatabase inTemp;
+    private BibDatabase inTemp;
     private MetaData mdInTemp;
 
     private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
@@ -95,7 +95,7 @@ public class ChangeScanner implements Runnable {
             mdInTemp = pr.getMetaData();
             // Parse the modified file.
             pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.getDefaultEncoding());
-            BibtexDatabase onDisk = pr.getDatabase();
+            BibDatabase onDisk = pr.getDatabase();
             MetaData mdOnDisk = pr.getMetaData();
 
             // Sort both databases according to a common sort key.
@@ -357,7 +357,7 @@ public class ChangeScanner implements Runnable {
      * @param index int
      * @return BibtexEntry
      */
-    private static BibtexEntry bestFit(EntrySorter old, EntrySorter neu, int index) {
+    private static BibEntry bestFit(EntrySorter old, EntrySorter neu, int index) {
         double comp = -1;
         int found = 0;
         for (int i = 0; i < neu.getEntryCount(); i++) {
@@ -374,7 +374,7 @@ public class ChangeScanner implements Runnable {
         return neu.getEntryAt(found);
     }
 
-    private void scanPreamble(BibtexDatabase inMem1, BibtexDatabase onTmp, BibtexDatabase onDisk) {
+    private void scanPreamble(BibDatabase inMem1, BibDatabase onTmp, BibDatabase onDisk) {
         String mem = inMem1.getPreamble();
         String tmp = onTmp.getPreamble();
         String disk = onDisk.getPreamble();
@@ -388,7 +388,7 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    private void scanStrings(BibtexDatabase inMem1, BibtexDatabase onTmp, BibtexDatabase onDisk) {
+    private void scanStrings(BibDatabase inMem1, BibDatabase onTmp, BibDatabase onDisk) {
         int nTmp = onTmp.getStringCount();
         int nDisk = onDisk.getStringCount();
         if ((nTmp == 0) && (nDisk == 0)) {
@@ -496,7 +496,7 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    private static BibtexString findString(BibtexDatabase base, String name, HashSet<Object> used) {
+    private static BibtexString findString(BibDatabase base, String name, HashSet<Object> used) {
         if (!base.hasStringLabel(name)) {
             return null;
         }

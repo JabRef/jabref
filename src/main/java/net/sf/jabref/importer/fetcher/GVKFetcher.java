@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -109,9 +109,9 @@ public class GVKFetcher implements EntryFetcher {
             }
         }
 
-        List<BibtexEntry> bibs = fetchGVK(gvkQuery);
+        List<BibEntry> bibs = fetchGVK(gvkQuery);
 
-        for (BibtexEntry entry : bibs) {
+        for (BibEntry entry : bibs) {
             dialog.addEntry(entry);
         }
 
@@ -149,8 +149,8 @@ public class GVKFetcher implements EntryFetcher {
         return (result);
     }
 
-    private List<BibtexEntry> fetchGVK(String query) {
-        List<BibtexEntry> result;
+    private List<BibEntry> fetchGVK(String query) {
+        List<BibEntry> result;
 
         String urlPrefix = "http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=";
         String urlQuery = query;

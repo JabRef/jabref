@@ -2,7 +2,7 @@ package net.sf.jabref.logic.autocompleter;
 
 import java.util.List;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Delivers possible completions for a given string.
@@ -22,7 +22,7 @@ public interface AutoCompleter<E> {
      * Add a BibtexEntry to this AutoCompleter.
      * @note The AutoCompleter itself decides which information should be stored for later completion.
      */
-    void addBibtexEntry(BibtexEntry entry);
+    void addBibtexEntry(BibEntry entry);
 
     /**
      * States whether the field consists of multiple values (false) or of a single value (true)
@@ -43,14 +43,14 @@ public interface AutoCompleter<E> {
      * completion depends on which informations were stored while adding
      * BibtexEntries. If no suggestions for completions are found, then an empty list is returned.
      *
-     * @see AutoCompleter#addBibtexEntry(BibtexEntry)
+     * @see AutoCompleter#addBibtexEntry(BibEntry)
      */
     List<E> complete(String toComplete);
 
     /**
      * Directly adds an item to the AutoCompleter.
      * This method should be called only if the information does not comes directly from a BibtexEntry.
-     * Otherwise the {@link #addBibtexEntry(BibtexEntry)} is preferred.
+     * Otherwise the {@link #addBibtexEntry(BibEntry)} is preferred.
      * @param item item to add
      */
     void addItemToIndex(E item);

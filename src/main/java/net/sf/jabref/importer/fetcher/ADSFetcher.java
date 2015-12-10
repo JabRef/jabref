@@ -36,8 +36,8 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -76,10 +76,10 @@ public class ADSFetcher implements EntryFetcher {
             String key = query;
             /* Query ADS and load the results into the BibtexDatabase */
             status.setStatus(Localization.lang("Processing ") + key);
-            BibtexDatabase bd = importADSEntries(key, status);
+            BibDatabase bd = importADSEntries(key, status);
             if ((bd != null) && (bd.getEntryCount() > 0)) {
                 /* Add the entry to the inspection dialog */
-                for (BibtexEntry entry : bd.getEntries()) {
+                for (BibEntry entry : bd.getEntries()) {
                     importADSAbstract(key, entry, status);
                     dialog.addEntry(entry);
                 }
@@ -98,7 +98,7 @@ public class ADSFetcher implements EntryFetcher {
         // Do nothing
     }
 
-    private BibtexDatabase importADSEntries(String key, OutputPrinter status) {
+    private BibDatabase importADSEntries(String key, OutputPrinter status) {
         String url = constructUrl(key);
         try {
             URL ADSUrl = new URL(url + "&data_type=BIBTEX");
@@ -128,7 +128,7 @@ public class ADSFetcher implements EntryFetcher {
         return "http://adsabs.harvard.edu/doi/" + key;
     }
 
-    private void importADSAbstract(String key, BibtexEntry entry, OutputPrinter status) {
+    private void importADSAbstract(String key, BibEntry entry, OutputPrinter status) {
         /* TODO: construct ADSUrl from BibtexEntry */
         String url = constructUrl(key);
         try {

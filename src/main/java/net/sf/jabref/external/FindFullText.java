@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.fetcher.*;
 import net.sf.jabref.logic.net.URLDownload;
 
@@ -33,7 +33,7 @@ public class FindFullText {
         finders.add(new GoogleScholar());
     }
 
-    public Optional<URL> findFullText(BibtexEntry entry) {
+    public Optional<URL> findFullText(BibEntry entry) {
         for (FullTextFinder finder : finders) {
             try {
                 Optional<URL> result = finder.findFullText(entry);

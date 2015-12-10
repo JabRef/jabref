@@ -19,8 +19,8 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 
@@ -73,7 +73,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys, MetaData metaData) {
+    public void pushEntries(BibDatabase database, BibEntry[] entries, String keys, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;

@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
@@ -90,14 +90,14 @@ public class FileFinder {
      * extension parameter.
      *
      */
-    public static String findPdf(BibtexEntry entry, String extension, String directory) {
+    public static String findPdf(BibEntry entry, String extension, String directory) {
         return FileFinder.findPdf(entry, extension, new String[]{directory});
     }
 
     /**
      * Convenience method for findPDF. Can search multiple PDF directories.
      */
-    public static String findPdf(BibtexEntry entry, String extension, String[] directories) {
+    public static String findPdf(BibEntry entry, String extension, String[] directories) {
 
         String regularExpression;
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
@@ -117,7 +117,7 @@ public class FileFinder {
      * @param fileType The file type to search for.
      * @return The link to the file found, or null if not found.
      */
-    public static String findFile(BibtexEntry entry, ExternalFileType fileType, List<String> extraDirs) {
+    public static String findFile(BibEntry entry, ExternalFileType fileType, List<String> extraDirs) {
 
         List<String> dirs = new ArrayList<>();
         dirs.addAll(extraDirs);
@@ -168,7 +168,7 @@ public class FileFinder {
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    private static String findFile(BibtexEntry entry, BibtexDatabase database, String[] directory,
+    private static String findFile(BibEntry entry, BibDatabase database, String[] directory,
                                    String file, boolean relative) {
 
         for (String aDirectory : directory) {
@@ -185,7 +185,7 @@ public class FileFinder {
      *
      * Uses findFile(BibtexEntry, BibtexDatabase, (String)null, String, false).
      */
-    public static String findFile(BibtexEntry entry, BibtexDatabase database, String file) {
+    public static String findFile(BibEntry entry, BibDatabase database, String file) {
         return FileFinder.findFile(entry, database, (String) null, file, false);
     }
 
@@ -194,7 +194,7 @@ public class FileFinder {
      * base the search on.
      *
      */
-    public static String findFile(BibtexEntry entry, BibtexDatabase database, String directory,
+    public static String findFile(BibEntry entry, BibDatabase database, String directory,
             String file, boolean relative) {
 
         File root;
@@ -239,7 +239,7 @@ public class FileFinder {
      * The actual work-horse. Will find absolute filepaths starting from the
      * given directory using the given regular expression string for search.
      */
-    private static String findFile(BibtexEntry entry, BibtexDatabase database, File directory,
+    private static String findFile(BibEntry entry, BibDatabase database, File directory,
                                    String file) {
 
         if (file.startsWith("/")) {

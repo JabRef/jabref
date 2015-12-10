@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 
@@ -53,7 +53,7 @@ class StringRemoveChange extends Change {
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
 
         try {
             panel.database().removeString(inMem.getId());

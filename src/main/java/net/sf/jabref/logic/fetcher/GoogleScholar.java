@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -24,7 +24,7 @@ public class GoogleScholar implements FullTextFinder {
     private static final int NUM_RESULTS = 10;
 
     @Override
-    public Optional<URL> findFullText(BibtexEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 

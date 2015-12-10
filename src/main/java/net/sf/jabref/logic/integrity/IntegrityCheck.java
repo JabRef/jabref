@@ -3,8 +3,8 @@ package net.sf.jabref.logic.integrity;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,21 +20,21 @@ public class IntegrityCheck {
     public static final Checker BRACKET_CHECKER = new BracketChecker();
     public static final Checker PAGES_CHECKER = new PagesChecker();
 
-    public List<IntegrityMessage> checkBibtexDatabase(BibtexDatabase base) {
+    public List<IntegrityMessage> checkBibtexDatabase(BibDatabase base) {
         List<IntegrityMessage> result = new ArrayList<>();
 
         if (base == null) {
             return result;
         }
 
-        for (BibtexEntry entry : base.getEntries()) {
+        for (BibEntry entry : base.getEntries()) {
             result.addAll(checkBibtexEntry(entry));
         }
 
         return result;
     }
 
-    public List<IntegrityMessage> checkBibtexEntry(BibtexEntry entry) {
+    public List<IntegrityMessage> checkBibtexEntry(BibEntry entry) {
         List<IntegrityMessage> result = new ArrayList<>();
 
         if (entry == null) {
@@ -74,13 +74,13 @@ public class IntegrityCheck {
 
     public static interface Checker {
 
-        void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector);
+        void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector);
     }
 
     private static class AuthorNameChecker implements Checker {
 
         @Override
-        public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
             String valueTrimmedAndLowerCase = value.trim().toLowerCase();
             if(valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
                 collector.add(new IntegrityMessage(Localization.lang("should start with a name"), entry, fieldName));
@@ -94,7 +94,7 @@ public class IntegrityCheck {
     private static class BracketChecker implements Checker {
 
         @Override
-        public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
             // metaphor: integer-based stack (push + / pop -)
             int counter = 0;
             for (char a : value.trim().toCharArray()) {
@@ -122,7 +122,7 @@ public class IntegrityCheck {
         private static final Predicate<String> HAS_CAPITAL_LETTERS = Pattern.compile("[\\p{Lu}\\p{Lt}]").asPredicate();
 
         @Override
-        public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
             /*
              * Algorithm:
              * - remove trailing whitespaces
@@ -157,7 +157,7 @@ public class IntegrityCheck {
          * Checks, if the number String contains a four digit year
          */
         @Override
-        public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
             if (!CONTAINS_FOUR_DIGIT.test(value.trim())) {
                 collector.add(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, fieldName));
             }
@@ -190,7 +190,7 @@ public class IntegrityCheck {
          * Checks, if the page numbers String conforms to the BibTex manual
          */
         @Override
-        public void check(String value, String fieldName, BibtexEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
             if (!VALID_PAGE_NUMBER.test(value.trim())) {
                 collector.add(new IntegrityMessage(Localization.lang("should contain a valid page number range"), entry, fieldName));
             }

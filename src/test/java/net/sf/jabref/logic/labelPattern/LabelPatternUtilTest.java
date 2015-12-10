@@ -10,8 +10,8 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 public class LabelPatternUtilTest {
@@ -45,25 +45,25 @@ public class LabelPatternUtilTest {
 
     @Before
     public void setUp() {
-        LabelPatternUtil.setDataBase(new BibtexDatabase());
+        LabelPatternUtil.setDataBase(new BibDatabase());
     }
 
     @Test
     public void testAndInAuthorName() {
-        BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}");
+        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}");
         Assert.assertEquals("Holland", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth")));
     }
 
     @Test
     public void testAndAuthorNames() {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
-        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+        BibEntry entry = BibtexParser.singleFromString(bibtexString);
         Assert.assertEquals("HerlandHaugeHelgeland", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry, "authors3")));
     }
 
     @Test
     public void testSpecialLatexCharacterInAuthorName() {
-        BibtexEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}");
+        BibEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}");
         Assert.assertEquals("Popovicova", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
     }
 
@@ -73,7 +73,7 @@ public class LabelPatternUtilTest {
      */
     @Test
     public void testMakeLabelAndCheckLegalKeys() {
-        BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Köning}, year={2000}}");
+        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Köning}, year={2000}}");
         Assert.assertEquals("Koen", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}");
@@ -115,7 +115,7 @@ public class LabelPatternUtilTest {
      */
     @Test
     public void testMakeLabelAndCheckLegalKeysAccentGrave() {
-        BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}");
+        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}");
         Assert.assertEquals("Aoen", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}");
@@ -643,7 +643,7 @@ public class LabelPatternUtilTest {
 
     @Test
     public void keywordN_keywordsSeparatedBySpace() {
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("keywords", "w1, w2a w2b, w3");
 
         String result = LabelPatternUtil.makeLabel(entry, "keyword1");
@@ -660,7 +660,7 @@ public class LabelPatternUtilTest {
 
     @Test
     public void keywordsN_keywordsSeparatedBySpace() {
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("keywords", "w1, w2a w2b, w3");
 
         // all keywords

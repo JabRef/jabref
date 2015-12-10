@@ -61,7 +61,7 @@ import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -597,7 +597,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             moveNodeLeftPopupAction.setNode(node);
             moveNodeRightPopupAction.setNode(node);
             // add/remove entries to/from group
-            BibtexEntry[] selection = frame.getCurrentBasePanel().getSelectedEntries();
+            BibEntry[] selection = frame.getCurrentBasePanel().getSelectedEntries();
             if (selection.length > 0) {
                 if (node.getGroup().supportsAdd() && !node.getGroup().containsAll(selection)) {
                     addToGroup.setNode(node);
@@ -648,7 +648,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * @param node deletion != addition
      */
     private void updateGroupContent(GroupTreeNode node) {
-        BibtexEntry[] entries = panel.getSelectedEntries();
+        BibEntry[] entries = panel.getSelectedEntries();
         AbstractGroup group = node.getGroup();
         AbstractUndoableEdit undoRemove = null;
         AbstractUndoableEdit undoAdd = null;
@@ -656,10 +656,10 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // Sort entries into current members and non-members of the group
         // Current members will be removed
         // Current non-members will be added
-        ArrayList<BibtexEntry> toRemove = new ArrayList<>(entries.length);
-        ArrayList<BibtexEntry> toAdd = new ArrayList<>(entries.length);
+        ArrayList<BibEntry> toRemove = new ArrayList<>(entries.length);
+        ArrayList<BibEntry> toAdd = new ArrayList<>(entries.length);
 
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             // Sort according to current state of the entries
             if (group.contains(entry)) {
                 LOGGER.info("Removing entry " + entry);
@@ -672,11 +672,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         // If there are entries to remove
         if (!toRemove.isEmpty()) {
-            undoRemove = node.removeFromGroup(toRemove.toArray(new BibtexEntry[toRemove.size()]));
+            undoRemove = node.removeFromGroup(toRemove.toArray(new BibEntry[toRemove.size()]));
         }
         // If there are entries to add
         if (!toAdd.isEmpty()) {
-            undoAdd = node.addToGroup(toAdd.toArray(new BibtexEntry[toAdd.size()]));
+            undoAdd = node.addToGroup(toAdd.toArray(new BibEntry[toAdd.size()]));
         }
 
         // Remember undo information
@@ -754,7 +754,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         private final SearchRule rules;
         private final String searchTerm;
-        private final ArrayList<BibtexEntry> matches = new ArrayList<>();
+        private final ArrayList<BibEntry> matches = new ArrayList<>();
         private final boolean showOverlappingGroupsP;
         int hits;
 
@@ -767,7 +767,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         @Override
         public void run() {
-            for (BibtexEntry entry : panel.getDatabase().getEntries()) {
+            for (BibEntry entry : panel.getDatabase().getEntries()) {
                 boolean hit = rules.applyRule(searchTerm, entry);
                 entry.setGroupHit(hit);
                 if (hit) {
@@ -1457,7 +1457,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * Highlight all groups that contain any/all of the specified entries. If entries is null or has zero length,
      * highlight is cleared.
      */
-    public void showMatchingGroups(BibtexEntry[] entries, boolean requireAll) {
+    public void showMatchingGroups(BibEntry[] entries, boolean requireAll) {
         if ((entries == null) || (entries.length == 0)) { // nothing selected
             groupsTree.setHighlight3Cells(null);
             groupsTree.revalidate();
@@ -1498,12 +1498,12 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     /**
      * Show groups that, if selected, would show at least one of the entries found in the specified search.
      */
-    private void showOverlappingGroups(List<BibtexEntry> matches) { //DatabaseSearch search) {
+    private void showOverlappingGroups(List<BibEntry> matches) { //DatabaseSearch search) {
         List<GroupTreeNode> nodes = new ArrayList<>();
         for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements();) {
             GroupTreeNode node = e.nextElement();
             SearchRule rule = node.getSearchRule();
-            for (BibtexEntry match : matches) {
+            for (BibEntry match : matches) {
                 if (!rule.applyRule(SearchRule.DUMMY_QUERY, match)) {
                     continue;
                 }

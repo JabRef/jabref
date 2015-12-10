@@ -31,7 +31,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * User: alver
@@ -199,9 +199,9 @@ public class ExportFormats {
                     final IExportFormat format = eff.getExportFormat();
                     Set<String> entryIds = null;
                     if (selectedOnly) {
-                        BibtexEntry[] selected = frame.getCurrentBasePanel().getSelectedEntries();
+                        BibEntry[] selected = frame.getCurrentBasePanel().getSelectedEntries();
                         entryIds = new HashSet<>();
-                        for (BibtexEntry bibtexEntry : selected) {
+                        for (BibEntry bibtexEntry : selected) {
                             entryIds.add(bibtexEntry.getId());
                         }
                     }

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 class DBLPHelper {
 
@@ -68,8 +68,8 @@ class DBLPHelper {
      *            page as String
      * @return list of BibtexEntry
      */
-    public List<BibtexEntry> getBibTexFromPage(final String page) {
-        final List<BibtexEntry> bibtexList = new ArrayList<>();
+    public List<BibEntry> getBibTexFromPage(final String page) {
+        final List<BibEntry> bibtexList = new ArrayList<>();
         final String startPattern = "<pre class=\"verbatim select-on-click\">";
         final String endPattern = "</pre>";
 

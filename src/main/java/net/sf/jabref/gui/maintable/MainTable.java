@@ -49,7 +49,7 @@ import net.sf.jabref.gui.util.IsMarkedComparator;
 import net.sf.jabref.gui.util.RankingFieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -80,21 +80,21 @@ public class MainTable extends JTable {
 
     private final MainTableFormat tableFormat;
     private final BasePanel panel;
-    private final SortedList<BibtexEntry> sortedForMarking;
-    private final SortedList<BibtexEntry> sortedForTable;
-    private final SortedList<BibtexEntry> sortedForSearch;
-    private final SortedList<BibtexEntry> sortedForGrouping;
+    private final SortedList<BibEntry> sortedForMarking;
+    private final SortedList<BibEntry> sortedForTable;
+    private final SortedList<BibEntry> sortedForSearch;
+    private final SortedList<BibEntry> sortedForGrouping;
     private final boolean tableColorCodes;
     private boolean isFloatSearchActive;
     private boolean isFloatGroupingActive;
-    private final DefaultEventSelectionModel<BibtexEntry> localSelectionModel;
-    private final TableComparatorChooser<BibtexEntry> comparatorChooser;
+    private final DefaultEventSelectionModel<BibEntry> localSelectionModel;
+    private final TableComparatorChooser<BibEntry> comparatorChooser;
     private final JScrollPane pane;
-    private Comparator<BibtexEntry> searchComparator;
-    private Comparator<BibtexEntry> groupComparator;
-    private final Comparator<BibtexEntry> markingComparator = new IsMarkedComparator();
-    private Matcher<BibtexEntry> searchMatcher;
-    private Matcher<BibtexEntry> groupMatcher;
+    private Comparator<BibEntry> searchComparator;
+    private Comparator<BibEntry> groupComparator;
+    private final Comparator<BibEntry> markingComparator = new IsMarkedComparator();
+    private Matcher<BibEntry> searchMatcher;
+    private Matcher<BibEntry> groupMatcher;
 
     // needed to activate/deactivate the listener
     private final PersistenceTableColumnListener tableColumnListener;
@@ -113,7 +113,7 @@ public class MainTable extends JTable {
     }
 
 
-    public MainTable(MainTableFormat tableFormat, EventList<BibtexEntry> list, JabRefFrame frame,
+    public MainTable(MainTableFormat tableFormat, EventList<BibEntry> list, JabRefFrame frame,
             BasePanel panel) {
         super();
 
@@ -137,12 +137,12 @@ public class MainTable extends JTable {
         searchComparator = null;
         groupComparator = null;
 
-        DefaultEventTableModel<BibtexEntry> tableModel = (DefaultEventTableModel<BibtexEntry>) GlazedListsSwing
+        DefaultEventTableModel<BibEntry> tableModel = (DefaultEventTableModel<BibEntry>) GlazedListsSwing
                 .eventTableModelWithThreadProxyList(sortedForGrouping, tableFormat);
         setModel(tableModel);
 
         tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
-        localSelectionModel = (DefaultEventSelectionModel<BibtexEntry>) GlazedListsSwing
+        localSelectionModel = (DefaultEventSelectionModel<BibEntry>) GlazedListsSwing
                 .eventSelectionModelWithThreadProxyList(sortedForGrouping);
         setSelectionModel(localSelectionModel);
         pane = new JScrollPane(this);
@@ -268,11 +268,11 @@ public class MainTable extends JTable {
     }
 
 
-    public EventList<BibtexEntry> getTableRows() {
+    public EventList<BibEntry> getTableRows() {
         return sortedForGrouping;
     }
 
-    public void addSelectionListener(ListEventListener<BibtexEntry> listener) {
+    public void addSelectionListener(ListEventListener<BibEntry> listener) {
         getSelected().addListEventListener(listener);
     }
 
@@ -407,15 +407,15 @@ public class MainTable extends JTable {
         }
     }
 
-    public BibtexEntry getEntryAt(int row) {
+    public BibEntry getEntryAt(int row) {
         return sortedForGrouping.get(row);
     }
 
     /**
      * @return the return value is never null
      */
-    public BibtexEntry[] getSelectedEntries() {
-        final BibtexEntry[] BE_ARRAY = new BibtexEntry[0];
+    public BibEntry[] getSelectedEntries() {
+        final BibEntry[] BE_ARRAY = new BibEntry[0];
         return getSelected().toArray(BE_ARRAY);
     }
 
@@ -549,10 +549,10 @@ public class MainTable extends JTable {
 
     private int getCellStatus(int row, int col) {
         try {
-            BibtexEntry be = sortedForGrouping.get(row);
+            BibEntry be = sortedForGrouping.get(row);
             EntryType type = be.getType();
             String columnName = getColumnName(col).toLowerCase();
-            if (columnName.equals(BibtexEntry.KEY_FIELD) || type.getRequiredFieldsFlat().contains(columnName)) {
+            if (columnName.equals(BibEntry.KEY_FIELD) || type.getRequiredFieldsFlat().contains(columnName)) {
                 return MainTable.REQUIRED;
             }
             if (type.getOptionalFields().contains(columnName)) {
@@ -571,7 +571,7 @@ public class MainTable extends JTable {
      *   <code>.getSelected().getReadWriteLock().writeLock().lock()</code>
      *   and then <code>.unlock()</code>
      */
-    public EventList<BibtexEntry> getSelected() {
+    public EventList<BibEntry> getSelected() {
         return localSelectionModel.getSelected();
     }
 
@@ -592,7 +592,7 @@ public class MainTable extends JTable {
         this.localSelectionModel.addSelectionInterval(row, row);
     }
 
-    public int findEntry(BibtexEntry entry) {
+    public int findEntry(BibEntry entry) {
         return sortedForGrouping.indexOf(entry);
     }
 
@@ -608,13 +608,13 @@ public class MainTable extends JTable {
                 .getBibtexFields().contains(Globals.FILE_FIELD);
     }
 
-    private boolean matches(int row, Matcher<BibtexEntry> m) {
+    private boolean matches(int row, Matcher<BibEntry> m) {
         return m.matches(sortedForGrouping.get(row));
     }
 
     private boolean isComplete(int row) {
         try {
-            BibtexEntry be = sortedForGrouping.get(row);
+            BibEntry be = sortedForGrouping.get(row);
             return be.hasAllRequiredFields(panel.database());
         } catch (NullPointerException ex) {
             return true;
@@ -623,7 +623,7 @@ public class MainTable extends JTable {
 
     private int isMarked(int row) {
         try {
-            BibtexEntry be = sortedForGrouping.get(row);
+            BibEntry be = sortedForGrouping.get(row);
             return EntryMarker.isMarked(be);
         } catch (NullPointerException ex) {
             return 0;
@@ -745,9 +745,9 @@ public class MainTable extends JTable {
                 (one.getBlue() + two.getBlue()) / 2);
     }
 
-    private TableComparatorChooser<BibtexEntry> createTableComparatorChooser(JTable table, SortedList<BibtexEntry> list,
+    private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list,
                                                                              Object sortingStrategy) {
-        final TableComparatorChooser<BibtexEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
+        final TableComparatorChooser<BibEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
         result.addSortActionListener(e -> {
             // We need to reset the stack of sorted list each time sorting order
             // changes, or the sorting breaks down:
@@ -776,7 +776,7 @@ public class MainTable extends JTable {
      * @param index The column number.
      * @return The Comparator, or null if none is set.
      */
-    public Comparator<BibtexEntry> getComparatorForColumn(int index) {
+    public Comparator<BibEntry> getComparatorForColumn(int index) {
         List<Comparator> l = comparatorChooser.getComparatorsForColumn(index);
         return l.isEmpty() ? null : l.get(0);
     }
@@ -806,7 +806,7 @@ public class MainTable extends JTable {
      * Note: The returned List must not be modified from the outside
      * @return The sorted list of entries.
      */
-    public SortedList<BibtexEntry> getSortedForTable() {
+    public SortedList<BibEntry> getSortedForTable() {
         return sortedForTable;
     }
 

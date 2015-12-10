@@ -29,8 +29,8 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -111,7 +111,7 @@ public class INSPIREFetcher implements EntryFetcher {
      * @param key The OAI2 key to fetch from ArXiv.
      * @return The imported BibtexEntry or null if none.
      */
-    private BibtexDatabase importInspireEntries(String key, OutputPrinter frame) {
+    private BibDatabase importInspireEntries(String key, OutputPrinter frame) {
         String url = constructUrl(key);
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
@@ -175,14 +175,14 @@ public class INSPIREFetcher implements EntryFetcher {
         try {
             frame.setStatus("Fetching entries from Inspire");
             /* query the archive and load the results into the BibtexEntry */
-            BibtexDatabase bd = importInspireEntries(query, frame);
+            BibDatabase bd = importInspireEntries(query, frame);
 
             /* addSpiresURLtoDatabase(bd); */
 
             frame.setStatus("Adding fetched entries");
             /* add the entry to the inspection dialog */
             if (bd.getEntryCount() > 0) {
-                for (BibtexEntry entry : bd.getEntries()) {
+                for (BibEntry entry : bd.getEntries()) {
                     dialog.addEntry(entry);
                 }
             }

@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class NameFieldAutoCompleterTest {
 
@@ -50,7 +50,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete("test");
@@ -62,7 +62,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("title", "testTitle");
         autoCompleter.addBibtexEntry(entry);
 
@@ -75,7 +75,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
         autoCompleter.addBibtexEntry(entry);
 
@@ -88,7 +88,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
         autoCompleter.addBibtexEntry(entry);
 
@@ -101,7 +101,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
         autoCompleter.addBibtexEntry(entry);
 
@@ -114,7 +114,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
         autoCompleter.addBibtexEntry(entry);
 
@@ -127,7 +127,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
         autoCompleter.addBibtexEntry(entry);
 
@@ -140,10 +140,10 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entryOne = new BibtexEntry();
+        BibEntry entryOne = new BibEntry();
         entryOne.setField("field", "testNameOne");
         autoCompleter.addBibtexEntry(entryOne);
-        BibtexEntry entryTwo = new BibtexEntry();
+        BibEntry entryTwo = new BibEntry();
         entryTwo.setField("field", "testNameTwo");
         autoCompleter.addBibtexEntry(entryTwo);
 
@@ -157,7 +157,7 @@ public class NameFieldAutoCompleterTest {
         when(preferences.getShortestLengthToComplete()).thenReturn(100);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
         autoCompleter.addBibtexEntry(entry);
 
@@ -170,7 +170,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
         autoCompleter.addBibtexEntry(entry);
 
@@ -183,7 +183,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
         autoCompleter.addBibtexEntry(entry);
 
@@ -196,7 +196,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Reagle, Jr., Joseph M.");
         autoCompleter.addBibtexEntry(entry);
 
@@ -209,7 +209,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Eric von Hippel");
         autoCompleter.addBibtexEntry(entry);
 
@@ -223,7 +223,7 @@ public class NameFieldAutoCompleterTest {
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_FULL);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Honig Bär");
         autoCompleter.addBibtexEntry(entry);
 
@@ -236,7 +236,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
         autoCompleter.addBibtexEntry(entry);
 
@@ -250,7 +250,7 @@ public class NameFieldAutoCompleterTest {
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_FULL);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
         autoCompleter.addBibtexEntry(entry);
 
@@ -264,7 +264,7 @@ public class NameFieldAutoCompleterTest {
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Reagle, Jr., Joseph M.");
         autoCompleter.addBibtexEntry(entry);
 
@@ -278,7 +278,7 @@ public class NameFieldAutoCompleterTest {
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
         autoCompleter.addBibtexEntry(entry);
 
@@ -292,7 +292,7 @@ public class NameFieldAutoCompleterTest {
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Eric von Hippel");
         autoCompleter.addBibtexEntry(entry);
 
@@ -305,7 +305,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
         autoCompleter.addBibtexEntry(entry);
 
@@ -319,7 +319,7 @@ public class NameFieldAutoCompleterTest {
         when(preferences.getOnlyCompleteFirstLast()).thenReturn(true);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
         autoCompleter.addBibtexEntry(entry);
 
@@ -333,7 +333,7 @@ public class NameFieldAutoCompleterTest {
         when(preferences.getOnlyCompleteLastFirst()).thenReturn(true);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
         autoCompleter.addBibtexEntry(entry);
 
@@ -346,7 +346,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "nam");
         autoCompleter.addBibtexEntry(entry);
 

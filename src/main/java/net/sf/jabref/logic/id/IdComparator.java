@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.id;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Comparator;
 
@@ -24,10 +24,10 @@ import java.util.Comparator;
  * can be used to sort entries back into the order they were created,
  * provided the IDs given to entries are lexically monotonically increasing.
  */
-public class IdComparator implements Comparator<BibtexEntry> {
+public class IdComparator implements Comparator<BibEntry> {
 
     @Override
-    public int compare(BibtexEntry one, BibtexEntry two) {
+    public int compare(BibEntry one, BibEntry two) {
         return one.getId().compareTo(two.getId());
     }
 }

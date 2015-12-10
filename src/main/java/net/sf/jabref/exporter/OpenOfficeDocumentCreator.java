@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -45,7 +45,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData,
+    public void performExport(final BibDatabase database, final MetaData metaData,
  final String file,
             final Charset encoding, Set<String> keySet) throws Exception {
         OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), database, keySet);
@@ -71,7 +71,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         }
     }
 
-    private static void exportOpenOfficeCalc(File file, BibtexDatabase database, Set<String> keySet) throws Exception {
+    private static void exportOpenOfficeCalc(File file, BibDatabase database, Set<String> keySet) throws Exception {
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("oocalc", null);
         OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, keySet);
@@ -85,7 +85,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         tmpFile.delete();
     }
 
-    private static void exportOpenOfficeCalcXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
+    private static void exportOpenOfficeCalcXML(File tmpFile, BibDatabase database, Set<String> keySet) {
         OOCalcDatabase od = new OOCalcDatabase(database, keySet);
 
         try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {

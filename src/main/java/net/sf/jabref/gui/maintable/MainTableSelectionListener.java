@@ -32,7 +32,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,13 +56,13 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
  * List event, mouse, key and focus listener for the main table that makes up the
  * most part of the BasePanel for a single bib database.
  */
-public class MainTableSelectionListener implements ListEventListener<BibtexEntry>, MouseListener,
+public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener,
         KeyListener, FocusListener {
 
     private final PreviewPanel[] previewPanel;
     private final MainTable table;
     private final BasePanel panel;
-    private final EventList<BibtexEntry> tableRows;
+    private final EventList<BibEntry> tableRows;
 
     private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
     private PreviewPanel preview;
@@ -112,11 +112,11 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     }
 
     @Override
-    public void listChanged(ListEvent<BibtexEntry> e) {
+    public void listChanged(ListEvent<BibEntry> e) {
         if (!enabled) {
             return;
         }
-        EventList<BibtexEntry> selected = e.getSourceList();
+        EventList<BibEntry> selected = e.getSourceList();
         Object newSelected = null;
         while (e.next()) {
             if (e.getType() == ListEvent.INSERT) {
@@ -134,7 +134,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         if (newSelected != null) {
 
             // Ok, we have a single new entry that has been selected. Now decide what to do with it:
-            final BibtexEntry toShow = (BibtexEntry) newSelected;
+            final BibEntry toShow = (BibEntry) newSelected;
             final int mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanel.WILL_SHOW_EDITOR) || (mode == BasePanel.SHOWING_EDITOR)) {
                 // An entry is currently being edited.
@@ -177,11 +177,11 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
     }
 
-    private void updatePreview(final BibtexEntry toShow, final boolean changedPreview) {
+    private void updatePreview(final BibEntry toShow, final boolean changedPreview) {
         updatePreview(toShow, changedPreview, 0);
     }
 
-    private void updatePreview(final BibtexEntry toShow, final boolean changedPreview, int repeats) {
+    private void updatePreview(final BibEntry toShow, final boolean changedPreview, int repeats) {
         if (workingOnPreview) {
             if (repeats > 0) {
                 return; // We've already waited once. Give up on this selection.
@@ -191,7 +191,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             t.start();
             return;
         }
-        EventList<BibtexEntry> list = table.getSelected();
+        EventList<BibEntry> list = table.getSelected();
         // Check if the entry to preview is still selected:
         if ((list.size() != 1) || (list.get(0) != toShow)) {
             return;
@@ -216,7 +216,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         }
     }
 
-    public void editSignalled(BibtexEntry entry) {
+    public void editSignalled(BibEntry entry) {
         final int mode = panel.getMode();
         EntryEditor editor = panel.getEntryEditor(entry);
         if (mode != BasePanel.SHOWING_EDITOR) {
@@ -262,7 +262,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
         // A double click on an entry should open the entry's editor.
         if (e.getClickCount() == 2) {
-            BibtexEntry toShow = tableRows.get(row);
+            BibEntry toShow = tableRows.get(row);
             editSignalled(toShow);
             return;
         }
@@ -289,7 +289,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 return; // No icon here, so we do nothing.
             }
 
-            final BibtexEntry entry = tableRows.get(row);
+            final BibEntry entry = tableRows.get(row);
 
             final List<String> fieldNames = modelColumn.getBibtexFields();
 
@@ -402,7 +402,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
      * @param column the MainTableColumn associated with this table cell.
      */
     private void showIconRightClickMenu(MouseEvent e, int row, MainTableColumn column) {
-        BibtexEntry entry = tableRows.get(row);
+        BibEntry entry = tableRows.get(row);
         JPopupMenu menu = new JPopupMenu();
         boolean showDefaultPopup = true;
 

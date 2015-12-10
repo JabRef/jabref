@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.regex.Pattern;
@@ -86,8 +86,8 @@ public class SilverPlatterImporter extends ImportFormat {
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
             boolean isChapter = false;
             String str;
@@ -212,8 +212,8 @@ public class SilverPlatterImporter extends ImportFormat {
 
                 }
 
-                BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                        .getBibtexEntryType(Type)); // id assumes an existing database so don't
+                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                        .getTypeOrDefault(Type)); // id assumes an existing database so don't
                 // create one here
                 b.setField(h);
 

@@ -26,8 +26,8 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
@@ -69,7 +69,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void pushEntries(BibtexDatabase database, final BibtexEntry[] entries, final String keyString, MetaData metaData) {
+    public void pushEntries(BibDatabase database, final BibEntry[] entries, final String keyString, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;

@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
@@ -82,7 +82,7 @@ public class CopacImporter extends ImportFormat {
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         if (stream == null) {
             throw new IOException("No stream given.");
         }
@@ -121,13 +121,13 @@ public class CopacImporter extends ImportFormat {
             entries.add(sb.toString());
         }
 
-        List<BibtexEntry> results = new LinkedList<>();
+        List<BibEntry> results = new LinkedList<>();
 
         for (String entry : entries) {
 
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID,
                     BibtexEntryTypes.BOOK);
 
             String[] lines = entry.split("\n");
@@ -169,7 +169,7 @@ public class CopacImporter extends ImportFormat {
         return results;
     }
 
-    private static void setOrAppend(BibtexEntry b, String field, String value, String separator) {
+    private static void setOrAppend(BibEntry b, String field, String value, String separator) {
         String o = b.getField(field);
         if (o != null) {
             b.setField(field, o + separator + value);

@@ -24,8 +24,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
@@ -115,7 +115,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      *
      * @param db The database to refresh for.
      */
-    public void refreshGroupsForNewDatabase(BibtexDatabase db) {
+    public void refreshGroupsForNewDatabase(BibDatabase db) {
         for (int i = 0; i < getChildCount(); ++i) {
             GroupTreeNode node = (GroupTreeNode) getChildAt(i);
             node.getGroup().refreshForNewDatabase(db);
@@ -311,7 +311,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Adds the selected entries to this node's group.
      */
-    public AbstractUndoableEdit addToGroup(BibtexEntry[] entries) {
+    public AbstractUndoableEdit addToGroup(BibEntry[] entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }
@@ -325,7 +325,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Removes the selected entries from this node's group.
      */
-    public AbstractUndoableEdit removeFromGroup(BibtexEntry[] entries) {
+    public AbstractUndoableEdit removeFromGroup(BibEntry[] entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }

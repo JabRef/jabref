@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.importer.*;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * @author Silberer, Zirn
@@ -32,17 +32,17 @@ import net.sf.jabref.model.entry.BibtexEntry;
 class SearchManagerNoGUI {
 
     private String searchTerm;
-    private final BibtexDatabase database;
-    private BibtexDatabase base;
+    private final BibDatabase database;
+    private BibDatabase base;
 
     private static final Log LOGGER = LogFactory.getLog(SearchManagerNoGUI.class);
 
-    public SearchManagerNoGUI(String term, BibtexDatabase dataBase) {
+    public SearchManagerNoGUI(String term, BibDatabase dataBase) {
         searchTerm = term;
         database = dataBase;
     }
 
-    public BibtexDatabase getDBfromMatches() {
+    public BibDatabase getDBfromMatches() {
         LOGGER.debug("Search term: " + searchTerm);
         if (specifiedYears()) {
             searchTerm = fieldYear();
@@ -56,9 +56,9 @@ class SearchManagerNoGUI {
             return base;
         }
 
-        Collection<BibtexEntry> entries = database.getEntries();
-        Vector<BibtexEntry> matchEntries = new Vector<>();
-        for (BibtexEntry entry : entries) {
+        Collection<BibEntry> entries = database.getEntries();
+        Vector<BibEntry> matchEntries = new Vector<>();
+        for (BibEntry entry : entries) {
             boolean hit = searchQuery.isMatch(entry);
             entry.setSearchHit(hit);
             if (hit) {

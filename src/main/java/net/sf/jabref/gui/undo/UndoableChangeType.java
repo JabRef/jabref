@@ -17,7 +17,7 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 
 /**
@@ -27,10 +27,10 @@ public class UndoableChangeType extends AbstractUndoableEdit {
 
     private final EntryType oldType;
     private final EntryType newType;
-    private final BibtexEntry be;
+    private final BibEntry be;
 
 
-    public UndoableChangeType(BibtexEntry be, EntryType oldType,
+    public UndoableChangeType(BibEntry be, EntryType oldType,
             EntryType newType) {
         this.oldType = oldType;
         this.newType = newType;

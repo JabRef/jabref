@@ -3,7 +3,7 @@ package net.sf.jabref.bibtex;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,9 +27,9 @@ public class DuplicateCheckTest {
 
     @Test
     public void testDuplicateDetection() {
-        BibtexEntry one = new BibtexEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
+        BibEntry one = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
 
-        BibtexEntry two = new BibtexEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
+        BibEntry two = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
 
         one.setField("author", "Billy Bob");
         two.setField("author", "Billy Bob");

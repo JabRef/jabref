@@ -25,8 +25,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.Layout;
 
 import com.sun.star.beans.Property;
@@ -62,7 +62,7 @@ class OOUtil {
      * @throws Exception
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
-            Layout layout, String parStyle, BibtexEntry entry, BibtexDatabase database, String uniquefier)
+            Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
             throws Exception {
 
         final String UNIQUEFIER_FIELD = "uniq";
@@ -295,13 +295,13 @@ class OOUtil {
      * @param entry the original entry
      * @return the cloned and processed entry
      */
-    public static BibtexEntry createAdaptedEntry(BibtexEntry entry) {
+    public static BibEntry createAdaptedEntry(BibEntry entry) {
         if (entry == null) {
             return null;
         }
-        BibtexEntry e = (BibtexEntry) entry.clone();
+        BibEntry e = (BibEntry) entry.clone();
         for (String field : e.getFieldNames()) {
-            if (field.equals(BibtexEntry.KEY_FIELD)) {
+            if (field.equals(BibEntry.KEY_FIELD)) {
                 continue;
             }
             String value = e.getField(field);

@@ -9,13 +9,13 @@ import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.Cleaner;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 
 public class FileEntryCleaner implements Cleaner {
 
     @Override
-    public List<FieldChange> cleanup(BibtexEntry entry) {
+    public List<FieldChange> cleanup(BibEntry entry) {
         String oldValue = entry.getField(Globals.FILE_FIELD);
         if (oldValue == null) {
             return new ArrayList<>();

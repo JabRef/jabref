@@ -36,7 +36,7 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -192,7 +192,7 @@ public class OAI2Fetcher implements EntryFetcher {
      *            The OAI2 key to fetch from ArXiv.
      * @return The imported BibtexEntry or null if none.
      */
-    public BibtexEntry importOai2Entry(String key) {
+    public BibEntry importOai2Entry(String key) {
         /**
          * Fix for problem reported in mailing-list:
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
@@ -207,7 +207,7 @@ public class OAI2Fetcher implements EntryFetcher {
             InputStream inputStream = oai2Connection.getInputStream();
 
             /* create an empty BibtexEntry and set the oai2identifier field */
-            BibtexEntry be = new BibtexEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
+            BibEntry be = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
             be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, key);
             DefaultHandler handlerBase = new OAI2Handler(be);
             /* parse the result */
@@ -301,7 +301,7 @@ public class OAI2Fetcher implements EntryFetcher {
                 }
 
                 /* query the archive and load the results into the BibtexEntry */
-                BibtexEntry be = importOai2Entry(key);
+                BibEntry be = importOai2Entry(key);
 
                 if (shouldWait()) {
                     lastCall = new Date();

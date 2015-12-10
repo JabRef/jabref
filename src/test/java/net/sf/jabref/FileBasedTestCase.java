@@ -1,7 +1,7 @@
 package net.sf.jabref;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,8 +14,8 @@ import java.io.File;
  */
 public class FileBasedTestCase {
 
-    protected BibtexDatabase database;
-    protected BibtexEntry entry;
+    protected BibDatabase database;
+    protected BibEntry entry;
     protected File root;
 
     private String oldPdfDirectory;

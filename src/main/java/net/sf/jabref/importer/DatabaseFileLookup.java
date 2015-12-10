@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.FileListEntry;
@@ -31,7 +31,7 @@ import net.sf.jabref.gui.FileListTableModel;
 /**
  * Search class for files. <br>
  * <br>
- * This class provides some functionality to search in a {@link BibtexDatabase} for
+ * This class provides some functionality to search in a {@link BibDatabase} for
  * files. <br>
  * <br>
  *
@@ -46,19 +46,19 @@ class DatabaseFileLookup {
 
     private final HashMap<File, Boolean> fileToFound = new HashMap<>();
 
-    private final Collection<BibtexEntry> entries;
+    private final Collection<BibEntry> entries;
 
     private final String[] possibleFilePaths;
 
 
     /**
-     * Creates an instance by passing a {@link BibtexDatabase} which will be
+     * Creates an instance by passing a {@link BibDatabase} which will be
      * used for the searches.
      *
      * @param aDatabase
-     *            A {@link BibtexDatabase}.
+     *            A {@link BibDatabase}.
      */
-    public DatabaseFileLookup(BibtexDatabase aDatabase) {
+    public DatabaseFileLookup(BibDatabase aDatabase) {
         if (aDatabase == null) {
             throw new IllegalArgumentException("Passing a 'null' BibtexDatabase.");
         }
@@ -68,10 +68,10 @@ class DatabaseFileLookup {
 
     /**
      * Returns whether the File <code>aFile</code> is present in the database
-     * as an attached File to an {@link BibtexEntry}. <br>
+     * as an attached File to an {@link BibEntry}. <br>
      * <br>
      * To do this, the field specified by the key <b>file</b> will be searched
-     * for the provided file for every {@link BibtexEntry} in the database. <br>
+     * for the provided file for every {@link BibEntry} in the database. <br>
      * <br>
      * For the matching, the absolute file paths will be used.
      *
@@ -85,7 +85,7 @@ class DatabaseFileLookup {
             return fileToFound.get(aFile);
         } else {
             Boolean res = false;
-            for (BibtexEntry entry : entries) {
+            for (BibEntry entry : entries) {
                 if (lookupEntry(aFile, entry)) {
                     res = true;
                     break;
@@ -98,7 +98,7 @@ class DatabaseFileLookup {
     }
 
     /**
-     * Searches the specified {@link BibtexEntry} <code>anEntry</code> for the
+     * Searches the specified {@link BibEntry} <code>anEntry</code> for the
      * appearance of the specified {@link File} <code>aFile</code>. <br>
      * <br>
      * Therefore the <i>file</i>-field of the bibtex-entry will be searched for
@@ -112,7 +112,7 @@ class DatabaseFileLookup {
      * @return <code>true</code>, if the bibtex entry stores the file in its
      *         <i>file</i>-field, otherwise <code>false</code>.
      */
-    private boolean lookupEntry(File aFile, BibtexEntry anEntry) {
+    private boolean lookupEntry(File aFile, BibEntry anEntry) {
 
         if ((aFile == null) || (anEntry == null)) {
             return false;

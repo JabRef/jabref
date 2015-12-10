@@ -10,7 +10,7 @@ import net.sf.jabref.gui.IconTheme;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 import net.sf.jabref.JabRef;
@@ -54,7 +54,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
     }
 
     @Override
-    protected BibtexEntry createBibtexEntry(File pdfFile) {
+    protected BibEntry createBibtexEntry(File pdfFile) {
 
         if (!accept(pdfFile)) {
             return null;
@@ -80,7 +80,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      * @param pdfFile
      * @param entry
      */
-    private void addEntryDataFromPDDocumentInformation(File pdfFile, BibtexEntry entry) {
+    private void addEntryDataFromPDDocumentInformation(File pdfFile, BibEntry entry) {
         PDDocument document = null;
         try {
             document = PDDocument.load(pdfFile.getAbsoluteFile());
@@ -88,7 +88,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
                     .getDocumentInformation();
 
             if (pdfDocInfo != null) {
-                BibtexEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
+                BibEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
                         .getDocumentInformation());
                 if (entryDI != null) {
                     addEntryDataToEntry(entry, entryDI);
@@ -127,9 +127,9 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      * @param aFile
      * @param entry
      */
-    private void addEntyDataFromXMP(File aFile, BibtexEntry entry) {
+    private void addEntyDataFromXMP(File aFile, BibEntry entry) {
         try {
-            List<BibtexEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
+            List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
             addEntrysToEntry(entry, entrys);
         } catch (EncryptionNotSupportedException e) {
             // no canceling here, just no data added.

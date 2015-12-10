@@ -1,12 +1,12 @@
 package net.sf.jabref.model.database;
 
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Collection;
 
 public class BibTypeDetection {
-    public static BibType inferType(Collection<BibtexEntry> entries) {
+    public static BibType inferType(Collection<BibEntry> entries) {
         // standard mode
         BibType type = BibType.BIBTEX;
 

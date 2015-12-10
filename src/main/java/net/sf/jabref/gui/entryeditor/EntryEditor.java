@@ -63,7 +63,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchTextListener;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -90,7 +90,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
-    private BibtexEntry entry;
+    private BibEntry entry;
 
     private final EntryType type;
 
@@ -178,7 +178,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     // @formatter:on
 
 
-    public EntryEditor(JabRefFrame frame, BasePanel panel, BibtexEntry entry) {
+    public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
 
         this.frame = frame;
         this.panel = panel;
@@ -316,11 +316,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * @return reference to the currently edited entry
      */
     @Override
-    public BibtexEntry getEntry() {
+    public BibEntry getEntry() {
         return entry;
     }
 
-    public BibtexDatabase getDatabase() {
+    public BibDatabase getDatabase() {
         return panel.getDatabase();
     }
 
@@ -671,7 +671,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
-    public static String getSourceString(BibtexEntry entry) throws IOException {
+    public static String getSourceString(BibEntry entry) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
         new BibtexEntryWriter(formatter, false).write(entry, stringWriter);
@@ -843,7 +843,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      *
      * @param swtichEntry a <code>BibtexEntry</code> value
      */
-    public synchronized void switchTo(BibtexEntry swtichEntry) {
+    public synchronized void switchTo(BibEntry swtichEntry) {
         if (this.entry == swtichEntry) {
             /**
              * Even if the editor is already showing the same entry, update
@@ -894,7 +894,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         try {
             ParserResult parserResult = bibtexParser.parse();
-            BibtexDatabase database = parserResult.getDatabase();
+            BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {
                 throw new IllegalStateException("More than one entry found.");
@@ -910,7 +910,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
-            BibtexEntry newEntry = database.getEntryById(database.getKeySet().iterator().next());
+            BibEntry newEntry = database.getEntryById(database.getKeySet().iterator().next());
             String id = entry.getId();
             String newKey = newEntry.getCiteKey();
             boolean anyChanged = false;
@@ -1523,7 +1523,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             String bibtexKeyData = entry.getCiteKey();
 
             // set the field named for "bibtexkey"
-            setField(BibtexEntry.KEY_FIELD, bibtexKeyData);
+            setField(BibEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();
 

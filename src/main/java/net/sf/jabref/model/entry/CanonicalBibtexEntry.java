@@ -17,7 +17,7 @@ public class CanonicalBibtexEntry {
      *
      * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
      */
-    public static String getCanonicalRepresentation(BibtexEntry e) {
+    public static String getCanonicalRepresentation(BibEntry e) {
         StringBuilder sb = new StringBuilder();
 
         // generate first line: type and bibtex key
@@ -32,7 +32,7 @@ public class CanonicalBibtexEntry {
         SortedSet<String> sortedFields = new TreeSet<>();
         for (String fieldName : e.getFieldNames()) {
             // JabRef stores the key in the field KEY_FIELD, which must not be serialized
-            if (!fieldName.equals(BibtexEntry.KEY_FIELD)) {
+            if (!fieldName.equals(BibEntry.KEY_FIELD)) {
                 String lowerCaseFieldName = fieldName.toLowerCase(Locale.US);
                 sortedFields.add(lowerCaseFieldName);
                 mapFieldToValue.put(lowerCaseFieldName, e.getField(fieldName));

@@ -30,8 +30,8 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 /**
@@ -162,8 +162,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @return true if at least one of the given fields is set in at least one entry,
      *  false otherwise.
      */
-    private boolean linksFound(BibtexDatabase database, String[] fields) {
-        for (BibtexEntry entry : database.getEntries()) {
+    private boolean linksFound(BibDatabase database, String[] fields) {
+        for (BibEntry entry : database.getEntries()) {
             for (String field : fields) {
                 if (entry.getField(field) != null) {
                     return true;

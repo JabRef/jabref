@@ -2,20 +2,20 @@ package net.sf.jabref;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;
 
 import java.io.StringReader;
 
 public class BibtexTestData {
 
-    public static BibtexEntry getBibtexEntry() {
-        BibtexDatabase database = getBibtexDatabase();
+    public static BibEntry getBibtexEntry() {
+        BibDatabase database = getBibtexDatabase();
         return database.getEntriesByKey("HipKro03")[0];
     }
 
-    public static BibtexDatabase getBibtexDatabase() {
+    public static BibDatabase getBibtexDatabase() {
         // @formatter:off
         StringReader reader = new StringReader(
                 "@ARTICLE{HipKro03,\n"

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -19,54 +19,53 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
+import java.io.IOException;
 import java.net.URL;
-import java.io.*;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
- * FullTextFinder implementation that attempts to find a PDF URL at SpringerLink.
- *
- * Uses Springer API, see @link{https://dev.springer.com}
+ * FullTextFinder implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
  */
-public class SpringerLink implements FullTextFinder {
-    private static final Log LOGGER = LogFactory.getLog(SpringerLink.class);
-
-    private static final String API_URL = "http://api.springer.com/meta/v1/json";
-    private static final String API_KEY = "b0c7151179b3d9c1119cf325bca8460d";
-    private static final String CONTENT_HOST = "link.springer.com";
+public class DoiResolution implements FullTextFinder {
+    private static final Log LOGGER = LogFactory.getLog(DoiResolution.class);
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibtexEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
-        // Try unique DOI first
+        // Follow all redirects and scan for a single pdf link
         Optional<DOI> doi = DOI.build(entry.getField("doi"));
 
         if(doi.isPresent()) {
             // Available in catalog?
             try {
-                HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
-                        .queryString("api_key", API_KEY)
-                        .queryString("q", String.format("doi:%s", doi.get().getDOI()))
-                        .asJson();
+                String sciLink = getUrlByDoi(doi.get().getDOI());
 
-                JSONObject json = jsonResponse.getBody().getObject();
-                int results = json.getJSONArray("result").getJSONObject(0).getInt("total");
+                if (!sciLink.isEmpty()) {
+                    // Retrieve PDF link
+                    Document html = Jsoup.connect(sciLink).ignoreHttpErrors(true).get();
+                    Element link = html.getElementById("pdfLink");
 
-                if (results > 0) {
-                    LOGGER.info("Fulltext PDF found @ Springer.");
-                    pdfLink = Optional.of(new URL("http", CONTENT_HOST, String.format("/content/pdf/%s.pdf", doi.get().getDOI())));
+                    if (link != null) {
+                        LOGGER.info("Fulltext PDF found @ ScienceDirect.");
+                        pdfLink = Optional.of(new URL(link.attr("pdfurl")));
+                    }
                 }
             } catch(UnirestException e) {
-                LOGGER.warn("SpringerLink API request failed: " + e.getMessage(), e);
+                LOGGER.warn("ScienceDirect API request failed: " + e.getMessage(), e);
             }
         }
 

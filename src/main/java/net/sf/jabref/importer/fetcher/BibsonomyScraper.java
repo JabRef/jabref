@@ -17,7 +17,7 @@ package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.net.URLDownload;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ class BibsonomyScraper {
      * @param entryUrl
      * @return
      */
-    public static BibtexEntry getEntry(String entryUrl) {
+    public static BibEntry getEntry(String entryUrl) {
         try {
             // Replace special characters by corresponding sequences:
             entryUrl = entryUrl.replaceAll("%", "%25").replaceAll(":", "%3A").replaceAll("/", "%2F").replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");

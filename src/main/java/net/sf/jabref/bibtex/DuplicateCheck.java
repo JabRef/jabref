@@ -16,8 +16,8 @@
 package net.sf.jabref.bibtex;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,7 +68,7 @@ public class DuplicateCheck {
      * @param two BibtexEntry
      * @return boolean
      */
-    public static boolean isDuplicate(BibtexEntry one, BibtexEntry two) {
+    public static boolean isDuplicate(BibEntry one, BibEntry two) {
 
         // First check if they are of the same type - a necessary condition:
         if (one.getType() != two.getType()) {
@@ -98,7 +98,7 @@ public class DuplicateCheck {
         return req[0] >= DuplicateCheck.duplicateThreshold;
     }
 
-    private static double[] compareFieldSet(String[] fields, BibtexEntry one, BibtexEntry two) {
+    private static double[] compareFieldSet(String[] fields, BibEntry one, BibEntry two) {
         double res = 0;
         double totWeights = 0.;
         for (String field : fields) {
@@ -122,7 +122,7 @@ public class DuplicateCheck {
         return new double[] {0.5, 0.0};
     }
 
-    private static int compareSingleField(String field, BibtexEntry one, BibtexEntry two) {
+    private static int compareSingleField(String field, BibEntry one, BibEntry two) {
         String s1 = one.getField(field);
         String s2 = two.getField(field);
         if (s1 == null) {
@@ -176,7 +176,7 @@ public class DuplicateCheck {
         }
     }
 
-    public static double compareEntriesStrictly(BibtexEntry one, BibtexEntry two) {
+    public static double compareEntriesStrictly(BibEntry one, BibEntry two) {
         HashSet<String> allFields = new HashSet<>();
         allFields.addAll(one.getFieldNames());
         allFields.addAll(two.getFieldNames());
@@ -207,8 +207,8 @@ public class DuplicateCheck {
      * @param entry    The entry of which we are looking for duplicates.
      * @return The first duplicate entry found. null if no duplicates are found.
      */
-    public static BibtexEntry containsDuplicate(BibtexDatabase database, BibtexEntry entry) {
-        for (BibtexEntry other : database.getEntries()) {
+    public static BibEntry containsDuplicate(BibDatabase database, BibEntry entry) {
+        for (BibEntry other : database.getEntries()) {
             if (DuplicateCheck.isDuplicate(entry, other)) {
                 return other; // Duplicate found.
             }

@@ -31,8 +31,8 @@ import javax.swing.JOptionPane;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;
@@ -74,11 +74,9 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param keySet   The set of IDs of the entries to export.
      * @param out      The output (PrintStream or Connection) object to which the DML should be written.
      */
-
-    private void performExport(final BibtexDatabase database, final MetaData metaData, Set<String> keySet, Object out,
+    private void performExport(final BibDatabase database, final MetaData metaData, Set<String> keySet, Object out,
                                String dbName) throws Exception {
-
-        List<BibtexEntry> entries = FileActions.getSortedEntries(database, metaData, keySet, false);
+        List<BibEntry> entries = FileActions.getSortedEntries(database, metaData, keySet, false);
         GroupTreeNode gtn = metaData.getGroups();
 
         int database_id = getDatabaseIDByName(metaData, out, dbName);
@@ -100,12 +98,12 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param entries     The BibtexEntries to export
      * @param out         The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private void populateEntriesTable(int database_id, List<BibtexEntry> entries, Object out) throws SQLException {
+    private void populateEntriesTable(int database_id, List<BibEntry> entries, Object out) throws SQLException {
         String query;
         String val;
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, " + fieldStr
                 + ", database_id) VALUES (";
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             query = insert + '\'' + entry.getId() + '\'' + ", (SELECT entry_types_id FROM entry_types WHERE label='"
                     + entry.getType().getName().toLowerCase() + "'), '" + entry.getCiteKey() + '\'';
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
@@ -147,7 +145,7 @@ public abstract class DBExporter extends DBImporterExporter {
         // if this group contains entries...
         if (cursor.getGroup() instanceof ExplicitGroup) {
             ExplicitGroup grp = (ExplicitGroup) cursor.getGroup();
-            for (BibtexEntry be : grp.getEntries()) {
+            for (BibEntry be : grp.getEntries()) {
                 SQLUtil.processQuery(out, "INSERT INTO entry_group (entries_id, groups_id) " + "VALUES ("
                         + "(SELECT entries_id FROM entries WHERE jabref_eid=" + '\'' + be.getId()
                         + "' AND database_id = " + database_id + "), "
@@ -334,7 +332,7 @@ public abstract class DBExporter extends DBImporterExporter {
      *                    using getDatabaseIDByPath(metaData, out)
      * @throws SQLException
      */
-    private static void populateStringTable(BibtexDatabase database, Object out, int database_id) throws SQLException {
+    private static void populateStringTable(BibDatabase database, Object out, int database_id) throws SQLException {
         String insert = "INSERT INTO strings (label, content, database_id) VALUES (";
 
         if (database.getPreamble() != null) {
@@ -376,9 +374,8 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param file     The name of the file to which the DML should be written
      * @param encoding The encoding to be used
      */
-    public void exportDatabaseAsFile(final BibtexDatabase database, final MetaData metaData, Set<String> keySet,
+    public void exportDatabaseAsFile(final BibDatabase database, final MetaData metaData, Set<String> keySet,
                                      String file, Charset encoding) throws Exception {
-
         // open output file
         File outfile = new File(file);
         if (outfile.exists()) {
@@ -403,7 +400,7 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param keySet          The set of IDs of the entries to export.
      * @param databaseStrings The necessary database connection information
      */
-    public void exportDatabaseToDBMS(final BibtexDatabase database, final MetaData metaData, Set<String> keySet,
+    public void exportDatabaseToDBMS(final BibDatabase database, final MetaData metaData, Set<String> keySet,
                                      DBStrings databaseStrings, JabRefFrame frame) throws Exception {
         String dbName;
         Connection conn = null;

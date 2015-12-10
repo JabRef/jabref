@@ -17,8 +17,8 @@ package net.sf.jabref.groups.structure;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.search.SearchRule;
 
 /**
@@ -72,7 +72,7 @@ public abstract class AbstractGroup {
      * @throws Exception If an error occured and a group could not be created, e.g.
      *                   due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
+    public static AbstractGroup fromString(String s, BibDatabase db, int version) throws Exception {
         if (s.startsWith(KeywordGroup.ID)) {
             return KeywordGroup.fromString(s, db, version);
         }
@@ -121,7 +121,7 @@ public abstract class AbstractGroup {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit add(BibtexEntry[] entries);
+    public abstract AbstractUndoableEdit add(BibEntry[] entries);
 
     /**
      * Removes the specified entries from this group.
@@ -130,25 +130,25 @@ public abstract class AbstractGroup {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit remove(BibtexEntry[] entries);
+    public abstract AbstractUndoableEdit remove(BibEntry[] entries);
 
     /**
      * @param query The search option to apply.
      * @return true if this group contains the specified entry, false otherwise.
      */
-    public abstract boolean contains(String query, BibtexEntry entry);
+    public abstract boolean contains(String query, BibEntry entry);
 
     /**
      * @return true if this group contains the specified entry, false otherwise.
      */
-    public abstract boolean contains(BibtexEntry entry);
+    public abstract boolean contains(BibEntry entry);
 
     /**
      * @return true if this group contains any of the specified entries, false
      * otherwise.
      */
-    public boolean containsAny(BibtexEntry[] entries) {
-        for (BibtexEntry entry : entries) {
+    public boolean containsAny(BibEntry[] entries) {
+        for (BibEntry entry : entries) {
             if (contains(entry)) {
                 return true;
             }
@@ -160,8 +160,8 @@ public abstract class AbstractGroup {
      * @return true if this group contains all of the specified entries, false
      * otherwise.
      */
-    public boolean containsAll(BibtexEntry[] entries) {
-        for (BibtexEntry entry : entries) {
+    public boolean containsAll(BibEntry[] entries) {
+        for (BibEntry entry : entries) {
             if (!contains(entry)) {
                 return false;
             }
@@ -224,7 +224,7 @@ public abstract class AbstractGroup {
      *
      * @param db The database to refresh for.
      */
-    public void refreshForNewDatabase(BibtexDatabase db) {
+    public void refreshForNewDatabase(BibDatabase db) {
         // Default is to do nothing. Group types that are affected by a change
         // of database must override this method.
     }

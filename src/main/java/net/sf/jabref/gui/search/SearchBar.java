@@ -29,7 +29,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.SearchQueryLocalizer;
 import net.sf.jabref.logic.search.SearchTextObservable;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -94,7 +94,7 @@ public class SearchBar extends JPanel {
         openCurrentResultsInDialog.addActionListener(ae -> {
             SearchResultsDialog searchDialog = new SearchResultsDialog(basePanel.frame(), Localization.lang("Search results in database %0 for %1",
                     basePanel.getDatabaseFile().getName(), SearchQueryLocalizer.localize(this.getSearchQuery())));
-            basePanel.getDatabase().getEntries().stream().filter(BibtexEntry::isSearchHit).forEach(entry -> searchDialog.addEntry(entry, basePanel));
+            basePanel.getDatabase().getEntries().stream().filter(BibEntry::isSearchHit).forEach(entry -> searchDialog.addEntry(entry, basePanel));
             searchDialog.selectFirstEntry();
             searchDialog.setVisible(true);
         });

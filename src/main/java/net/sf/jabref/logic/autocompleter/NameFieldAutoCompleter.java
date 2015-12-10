@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Delivers possible completions for a given string.
@@ -85,7 +85,7 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
     }
 
     @Override
-    public void addBibtexEntry(BibtexEntry entry) {
+    public void addBibtexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }

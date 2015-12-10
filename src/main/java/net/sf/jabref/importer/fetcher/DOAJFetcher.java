@@ -32,7 +32,7 @@ import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.JSONEntryParser;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class DOAJFetcher implements EntryFetcher {
 
@@ -102,7 +102,7 @@ public class DOAJFetcher implements EntryFetcher {
                         JSONArray results = jo.getJSONArray("results");
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                            BibtexEntry entry = jsonConverter.BibJSONtoBibtex(bibJsonEntry);
+                            BibEntry entry = jsonConverter.BibJSONtoBibtex(bibJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);

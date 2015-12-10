@@ -16,7 +16,7 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
@@ -37,7 +37,7 @@ public class TransferableFileLinkSelection implements Transferable {
     private final List<File> fileList = new ArrayList<>();
 
 
-    public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {
+    public TransferableFileLinkSelection(BasePanel panel, BibEntry[] selection) {
         String s = selection[0].getField(Globals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
         if (s != null) {

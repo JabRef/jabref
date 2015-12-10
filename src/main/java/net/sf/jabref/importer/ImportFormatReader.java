@@ -22,8 +22,8 @@ import java.util.*;
 
 import net.sf.jabref.importer.fileformat.*;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -97,7 +97,7 @@ public class ImportFormatReader {
         return null;
     }
 
-    public List<BibtexEntry> importFromStream(String format, InputStream in, OutputPrinter status)
+    public List<BibEntry> importFromStream(String format, InputStream in, OutputPrinter status)
             throws IOException {
         ImportFormat importer = getByCliId(format);
 
@@ -105,7 +105,7 @@ public class ImportFormatReader {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        List<BibtexEntry> res = importer.importEntries(in, status);
+        List<BibEntry> res = importer.importEntries(in, status);
 
         // Remove all empty entries
         if (res != null) {
@@ -115,7 +115,7 @@ public class ImportFormatReader {
         return res;
     }
 
-    public List<BibtexEntry> importFromFile(String format, String filename, OutputPrinter status)
+    public List<BibEntry> importFromFile(String format, String filename, OutputPrinter status)
             throws IOException {
         ImportFormat importer = getByCliId(format);
 
@@ -126,7 +126,7 @@ public class ImportFormatReader {
         return importFromFile(importer, filename, status);
     }
 
-    public List<BibtexEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
+    public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
         File file = new File(filename);
 
         try (InputStream stream = new FileInputStream(file)) {
@@ -139,12 +139,12 @@ public class ImportFormatReader {
         }
     }
 
-    public static BibtexDatabase createDatabase(Collection<BibtexEntry> bibentries) {
+    public static BibDatabase createDatabase(Collection<BibEntry> bibentries) {
         ImportFormatReader.purgeEmptyEntries(bibentries);
 
-        BibtexDatabase database = new BibtexDatabase();
+        BibDatabase database = new BibDatabase();
 
-        for (BibtexEntry entry : bibentries) {
+        for (BibEntry entry : bibentries) {
 
             entry.setId(IdGenerator.next());
             database.insertEntry(entry);
@@ -327,7 +327,7 @@ public class ImportFormatReader {
     //==================================================
     // Set a field, unless the string to set is empty.
     //==================================================
-    public static void setIfNecessary(BibtexEntry be, String field, String content) {
+    public static void setIfNecessary(BibEntry be, String field, String content) {
         if (!"".equals(content)) {
             be.setField(field, content);
         }
@@ -359,9 +359,9 @@ public class ImportFormatReader {
      * removes all entries that have no fields set. This is useful for rooting out
      * an unsucessful import (wrong format) that returns a number of empty entries.
      */
-    private static void purgeEmptyEntries(Collection<BibtexEntry> entries) {
-        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext(); ) {
-            BibtexEntry entry = i.next();
+    private static void purgeEmptyEntries(Collection<BibEntry> entries) {
+        for (Iterator<BibEntry> i = entries.iterator(); i.hasNext(); ) {
+            BibEntry entry = i.next();
 
             // If there are no fields, remove the entry:
             if (entry.getFieldNames().isEmpty()) {
@@ -400,7 +400,7 @@ public class ImportFormatReader {
         OutputPrinterToNull nullOutput = new OutputPrinterToNull();
 
         // stores ref to best result, gets updated at the next loop
-        List<BibtexEntry> bestResult = null;
+        List<BibEntry> bestResult = null;
         int bestResultCount = 0;
         String bestFormatName = null;
 
@@ -409,7 +409,7 @@ public class ImportFormatReader {
 
             try {
 
-                List<BibtexEntry> entries = importFromFile(imFo, filename, nullOutput);
+                List<BibEntry> entries = importFromFile(imFo, filename, nullOutput);
 
                 int entryCount;
                 if (entries == null) {

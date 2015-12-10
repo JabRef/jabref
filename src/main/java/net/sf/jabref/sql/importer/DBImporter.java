@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
@@ -93,7 +93,7 @@ public abstract class DBImporter extends DBImporterExporter {
             try (ResultSet rsDatabase = SQLUtil.queryAllFromTable(conn,
                     "jabref_database WHERE database_name IN " + jabrefDBs)) {
                 while (rsDatabase.next()) {
-                    BibtexDatabase database = new BibtexDatabase();
+                    BibDatabase database = new BibDatabase();
                     // Find entry type IDs and their mappings to type names:
                     HashMap<String, EntryType> types = new HashMap<>();
                     try (ResultSet rsEntryType = SQLUtil.queryAllFromTable(conn, "entry_types")) {
@@ -114,14 +114,14 @@ public abstract class DBImporter extends DBImporterExporter {
 
                         String database_id = rsDatabase.getString("database_id");
                         // Read the entries and create BibtexEntry instances:
-                        HashMap<String, BibtexEntry> entries = new HashMap<>();
+                        HashMap<String, BibEntry> entries = new HashMap<>();
                         try (ResultSet rsEntries = SQLUtil.queryAllFromTable(conn,
                                 "entries WHERE database_id= '" + database_id + "';")) {
                             while (rsEntries.next()) {
                                 String id = rsEntries.getString("entries_id");
-                                BibtexEntry entry = new BibtexEntry(IdGenerator.next(),
+                                BibEntry entry = new BibEntry(IdGenerator.next(),
                                         types.get(rsEntries.getString("entry_types_id")));
-                                entry.setField(BibtexEntry.KEY_FIELD, rsEntries.getString("cite_key"));
+                                entry.setField(BibEntry.KEY_FIELD, rsEntries.getString("cite_key"));
                                 for (String col : colNames) {
                                     String value = rsEntries.getString(col);
                                     if (value != null) {
@@ -178,7 +178,7 @@ public abstract class DBImporter extends DBImporterExporter {
                 "SELECT label FROM group_types WHERE group_types_id='" + groupId + "';");
     }
 
-    private void importGroupsTree(MetaData metaData, HashMap<String, BibtexEntry> entries, Connection conn,
+    private void importGroupsTree(MetaData metaData, HashMap<String, BibEntry> entries, Connection conn,
             String database_id) throws SQLException {
         HashMap<String, GroupTreeNode> groups = new HashMap<>();
         LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<>();

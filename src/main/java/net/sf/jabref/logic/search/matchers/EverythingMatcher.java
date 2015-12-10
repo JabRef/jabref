@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.search.matchers;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import ca.odell.glazedlists.matchers.Matcher;
 
@@ -23,12 +23,12 @@ import ca.odell.glazedlists.matchers.Matcher;
  * Matcher that accepts all entries. Used for filtering when so search is
  * active.
  */
-public class EverythingMatcher implements Matcher<BibtexEntry> {
+public class EverythingMatcher implements Matcher<BibEntry> {
 
-    public static final Matcher<BibtexEntry> INSTANCE = new EverythingMatcher();
+    public static final Matcher<BibEntry> INSTANCE = new EverythingMatcher();
 
     @Override
-    public boolean matches(BibtexEntry object) {
+    public boolean matches(BibEntry object) {
         return true;
     }
 }

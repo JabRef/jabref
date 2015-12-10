@@ -27,7 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.MetaData;
 
 import net.sf.jabref.logic.l10n.Localization;
@@ -107,7 +107,7 @@ class PdfPreviewPanel extends JPanel {
         return resizedImage;
     }
 
-    public void updatePanel(BibtexEntry entry) {
+    public void updatePanel(BibEntry entry) {
         if (entry == null) {
             clearPreview();
             return;
