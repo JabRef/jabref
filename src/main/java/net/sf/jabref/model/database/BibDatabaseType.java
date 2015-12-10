@@ -1,6 +1,6 @@
 package net.sf.jabref.model.database;
 
-public enum BibType {
+public enum BibDatabaseType {
     BIBTEX,
     BIBLATEX
 }

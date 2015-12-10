@@ -73,8 +73,8 @@ public class BibDatabase {
      */
     private final HashMap<String, Integer> allKeys = new HashMap<>();
 
-    public BibType getBibType() {
-        return BibTypeDetection.inferType(entries.values());
+    public BibDatabaseType getBibType() {
+        return BibDatabaseTypeDetection.inferType(entries.values());
     }
 
     /**
