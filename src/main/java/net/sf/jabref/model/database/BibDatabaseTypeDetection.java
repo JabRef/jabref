@@ -22,8 +22,7 @@ public class BibDatabaseTypeDetection {
      * Only standard BibTex and Biblatex entry types are considered in the decision process.
      *
      * 1. Check if any of the entries is a type exclusive to Biblatex
-     * 2. Check if all entries belong to the standard BibTex set
-     * 2.1 Check if any Biblatex fields are present
+     * 2. Check if any exclusive Biblatex fields are present
      * 3. Otherwise return BibTex
      *
      * @param entries a BibEntry collection
@@ -35,7 +34,7 @@ public class BibDatabaseTypeDetection {
         // type-based check
         if (entryTypes.stream().anyMatch(isIncludedIn(exclusiveBiblatex))) {
             return BibDatabaseType.BIBLATEX;
-        } else if (entryTypes.stream().allMatch(isIncludedIn(bibtex))) {
+        } else {
             // field-based check
             if(entries.stream().anyMatch(hasBiblatexFields())) {
                 return BibDatabaseType.BIBLATEX;
@@ -48,6 +47,7 @@ public class BibDatabaseTypeDetection {
         final Optional<EntryType> biblatexType = BibLatexEntryTypes.getType(type.getName());
         final Optional<EntryType> bibtexType = BibtexEntryTypes.getType(type.getName());
 
+        // return empty array if this is no Biblatex or BibTex type
         if (!biblatexType.isPresent() || !bibtexType.isPresent()) {
             return new ArrayList<>(0);
         }

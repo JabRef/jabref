@@ -69,13 +69,18 @@ public class BibDatabaseTypeDetectionTest {
         entries = Arrays.asList(custom, biblatex);
 
         assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(entries));
-    }
 
-    @Test
-    public void detectMixedTypesAsBiblatex() {
-        BibEntry biblatex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
-        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
-        Collection<BibEntry> entries = Arrays.asList(biblatex, bibtex);
+        // Field-based Biblatex
+        biblatex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
+        biblatex.setField("translator", "Stefan Kolb");
+        entries = Arrays.asList(custom, biblatex, bibtex);
+
+        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(entries));
+
+        // Field-based BibTex
+        biblatex = new BibEntry("someid", BibtexEntryTypes.ARTICLE);
+        bibtex.setField("journal", "IEEE Trans. Services Computing");
+        entries = Arrays.asList(custom, biblatex, bibtex);
 
         assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(entries));
     }
