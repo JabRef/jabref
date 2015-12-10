@@ -73,6 +73,9 @@ public class BibtexDatabase {
      */
     private final HashMap<String, Integer> allKeys = new HashMap<>();
 
+    public BibType getBibType() {
+        return BibTypeDetection.inferType(entries.values());
+    }
 
     /**
      * Returns the number of entries.
