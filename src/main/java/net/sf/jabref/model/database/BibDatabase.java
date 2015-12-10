@@ -49,29 +49,32 @@ import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * A bibliograhpy database.
+ */
 public class BibDatabase {
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
+    /**
+     * State attributes
+     */
     private final Map<String, BibEntry> entries = new ConcurrentHashMap<>();
-
+    // use a map instead of a set since i need to know how many of each key is in there
+    private final HashMap<String, Integer> allKeys = new HashMap<>();
     private String preamble;
-
+    // All file contents below the last entry in the file
+    private String epilog = "";
     private final Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
 
-    private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
-
+    /**
+     * Configuration
+     */
     private boolean followCrossrefs = true;
 
     /**
-     * All file contents below the last entry in the file
+     * Behavior
      */
-    private String epilog = "";
-
-    /**
-     * use a map instead of a set since i need to know how many of each key is
-     * inthere
-     */
-    private final HashMap<String, Integer> allKeys = new HashMap<>();
+    private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
     public BibDatabaseType getBibType() {
         return BibDatabaseTypeDetection.inferType(entries.values());
@@ -102,11 +105,6 @@ public class BibDatabase {
         return sorter;
     }
 
-    /**
-     * Just temporary, for testing purposes....
-     *
-     * @return
-     */
     public Map<String, BibEntry> getEntryMap() {
         return entries;
     }
@@ -164,7 +162,6 @@ public class BibDatabase {
     }
 
     public synchronized BibEntry[] getEntriesByKey(String key) {
-
         ArrayList<BibEntry> result = new ArrayList<>();
 
         for (BibEntry entry : entries.values()) {
@@ -172,7 +169,6 @@ public class BibDatabase {
                 result.add(entry);
             }
         }
-
         return result.toArray(new BibEntry[result.size()]);
     }
 
@@ -180,8 +176,7 @@ public class BibDatabase {
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
      */
-    public synchronized boolean insertEntry(BibEntry entry)
-            throws KeyCollisionException {
+    public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
         String id = entry.getId();
         if (getEntryById(id) != null) {
             throw new KeyCollisionException(
@@ -324,21 +319,20 @@ public class BibDatabase {
      * Take the given collection of BibtexEntry and resolve any string
      * references.
      *
-     * @param ent A collection of BibtexEntries in which all strings of the form
+     * @param entries A collection of BibtexEntries in which all strings of the form
      *                #xxx# will be resolved against the hash map of string
      *                references stored in the databasee.
      * @param inPlace If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
      * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
-    public List<BibEntry> resolveForStrings(Collection<BibEntry> ent, boolean inPlace) {
-
-        if (ent == null) {
+    public List<BibEntry> resolveForStrings(Collection<BibEntry> entries, boolean inPlace) {
+        if (entries == null) {
             throw new IllegalArgumentException("entries must not be null");
         }
 
-        List<BibEntry> results = new ArrayList<>(ent.size());
+        List<BibEntry> results = new ArrayList<>(entries.size());
 
-        for (BibEntry entry : ent) {
+        for (BibEntry entry : entries) {
             results.add(this.resolveForStrings(entry, inPlace));
         }
         return results;
@@ -358,7 +352,6 @@ public class BibDatabase {
      * given BibtexEntries is modified.
      */
     public BibEntry resolveForStrings(BibEntry entry, boolean inPlace) {
-
         if (!inPlace) {
             entry = (BibEntry) entry.clone();
         }
@@ -366,7 +359,6 @@ public class BibDatabase {
         for (Object field : entry.getFieldNames()) {
             entry.setField(field.toString(), this.resolveForStrings(entry.getField(field.toString())));
         }
-
         return entry;
     }
 
@@ -378,10 +370,8 @@ public class BibDatabase {
      */
     private String resolveString(String label, HashSet<String> usedIds) {
         for (BibtexString string : bibtexStrings.values()) {
-
             //Util.pr(label+" : "+string.getName());
             if (string.getName().toLowerCase().equals(label.toLowerCase())) {
-
                 // First check if this string label has been resolved
                 // earlier in this recursion. If so, we have a
                 // circular reference, and have to stop to avoid
@@ -417,7 +407,6 @@ public class BibDatabase {
     }
 
     private String resolveContent(String res, HashSet<String> usedIds) {
-
         if (res.matches(".*#[^#]+#.*")) {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;
@@ -579,7 +568,6 @@ public class BibDatabase {
      * @return The resolved field value or null if not found.
      */
     public static String getResolvedField(String field, BibEntry bibtex, BibDatabase database) {
-
         if (field.equals("bibtextype")) {
             return bibtex.getType().getName();
         }
@@ -607,8 +595,7 @@ public class BibDatabase {
     }
 
     /**
-     * Returns a text with references resolved according to an optionally given
-     * database.
+     * Returns a text with references resolved according to an optionally given database.
      *
      * @param toResolve maybenull The text to resolve.
      * @param database  maybenull The database to use for resolving the text.
@@ -618,14 +605,12 @@ public class BibDatabase {
         if ((toResolve != null) && (database != null)) {
             return database.resolveForStrings(toResolve);
         }
-
         return toResolve;
     }
 
     public void setFollowCrossrefs(boolean followCrossrefs) {
         this.followCrossrefs = followCrossrefs;
     }
-
 
     /*
      * Entries are stored in a HashMap with the ID as key. What happens if
@@ -664,7 +649,6 @@ public class BibDatabase {
         }
     };
 
-
     public void setEpilog(String epilog) {
         this.epilog = epilog;
     }
@@ -672,5 +656,4 @@ public class BibDatabase {
     public String getEpilog() {
         return epilog;
     }
-
 }
