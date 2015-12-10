@@ -128,7 +128,11 @@ public class EntryMarker {
             }
             String newVal = sb.length() > 0 ? sb.toString() : null;*/
             ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be.getField(BibtexFields.MARKED), newValue));
-            be.setField(BibtexFields.MARKED, newValue);
+            if (newValue == null) {
+                be.clearField(BibtexFields.MARKED);
+            } else {
+                be.setField(BibtexFields.MARKED, newValue);
+            }
         }
     }
 
@@ -147,10 +151,9 @@ public class EntryMarker {
         TreeSet<Object> owners = new TreeSet<>();
         for (BibtexEntry entry : database.getEntries()) {
             Object o = entry.getField(BibtexFields.OWNER);
-            if (o != null)
-             {
+            if (o != null) {
                 owners.add(o);
-            // System.out.println("Owner: "+entry.getField(Globals.OWNER));
+                // System.out.println("Owner: "+entry.getField(Globals.OWNER));
             }
         }
         owners.remove(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
