@@ -30,6 +30,7 @@ class CamelCaser {
         put("ctluse_forced_etal", "Ctl_Forced_Etal");
         put("ctluse_paper", "CtlUse_Paper");
         put("ctluse_url", "CtlUse_Url");
+        put("dayfiled", "DayFiled");
         put("doi", "DOI");
         put("editora", "EditorA");
         put("editorb", "EditorB");
@@ -55,6 +56,7 @@ class CamelCaser {
         put("mainsubtitle", "MainSubTitle");
         put("maintitle", "MainTitle");
         put("maintitleaddon", "MainTitleAddon");
+        put("monthfiled", "MonthFiled");
         put("origlanguage", "OrigLanguage");
         put("pagetotal", "PageTotal");
         put("pubstate", "PubState");
@@ -63,6 +65,7 @@ class CamelCaser {
         put("UNKNOWN", "UNKNOWN");
         put("url", "Url");
         put("urldate", "UrlDate");
+        put("yearfiled", "YearFiled");
     }
 
     /**
