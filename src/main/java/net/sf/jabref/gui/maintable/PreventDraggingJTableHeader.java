@@ -56,7 +56,7 @@ class PreventDraggingJTableHeader extends JTableHeader implements TableCellRende
         while(columns.hasMoreElements()) {
             TableColumn column = columns.nextElement();
             column.setHeaderRenderer(this);
-            MainTableColumn mainTableColumn = tableFormat.getTableColumns().get(column.getModelIndex());
+            MainTableColumn mainTableColumn = tableFormat.getTableColumn(column.getModelIndex());
             column.setHeaderValue(mainTableColumn.getHeaderLabel());
         }
 
@@ -66,7 +66,7 @@ class PreventDraggingJTableHeader extends JTableHeader implements TableCellRende
     public String getToolTipText(MouseEvent event) {
         int index = columnModel.getColumnIndexAtX(event.getX());
         int realIndex = columnModel.getColumn(index).getModelIndex();
-        MainTableColumn column = tableFormat.getTableColumns().get(realIndex);
+        MainTableColumn column = tableFormat.getTableColumn(realIndex);
         return column.getDisplayName();
     }
 

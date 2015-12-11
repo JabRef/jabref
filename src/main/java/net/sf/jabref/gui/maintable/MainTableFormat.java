@@ -46,7 +46,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
-    private static final String[] PDF = {"pdf", "ps"};
     private static final String[] URL_FIRST = {"url", "doi"};
     private static final String[] DOI_FIRST = {"doi", "url"};
     private static final String[] ARXIV = {"eprint"};
@@ -77,25 +76,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     }
 
-    public List<MainTableColumn> getTableColumns() {
-        return tableColumns;
-    }
-
-
-    /**
-     * This method returns a string array indicating the types of icons to be displayed in the given column.
-     * It returns null if the column is not an icon column, and thereby also serves to identify icon
-     * columns.
-     */
-    //TODO to be removed?
-    public String[] getIconTypeForColumn(int col) {
-        return null;
-//        Object o = iconCols.get(Integer.valueOf(col));
-//        if (o != null) {
-//            return (String[]) o;
-//        } else {
-//            return null;
-//        }
+    public MainTableColumn getTableColumn(int index) {
+        return tableColumns.get(index);
     }
 
     /**

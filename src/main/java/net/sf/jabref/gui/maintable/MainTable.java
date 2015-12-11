@@ -380,7 +380,7 @@ public class MainTable extends JTable {
         TableColumnModel cm = getColumnModel();
         cm.getColumn(0).setPreferredWidth(ncWidth);
         for(int i=1; i<cm.getColumnCount(); i++) {
-            MainTableColumn mainTableColumn = tableFormat.getTableColumns().get(cm.getColumn(i).getModelIndex());
+            MainTableColumn mainTableColumn = tableFormat.getTableColumn(cm.getColumn(i).getModelIndex());
             if(SpecialFieldsUtils.FIELDNAME_RANKING.equals(mainTableColumn.getColumnName())) {
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
@@ -457,7 +457,7 @@ public class MainTable extends JTable {
         comparators.add(new FirstColumnComparator(panel.database()));
 
         for (int i = 1; i < tableFormat.getColumnCount(); i++) {
-            MainTableColumn tableColumn = tableFormat.getTableColumns().get(i);
+            MainTableColumn tableColumn = tableFormat.getTableColumn(i);
 
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
@@ -597,8 +597,18 @@ public class MainTable extends JTable {
         return sortedForGrouping.indexOf(entry);
     }
 
-    public String[] getIconTypeForColumn(int column) {
-        return tableFormat.getIconTypeForColumn(column);
+    /**
+     * method to check whether a MainTableColumn at the modelIndex refers to the file field
+     *
+     * @param modelIndex
+     * @return
+     */
+    public boolean isFileColumn(int modelIndex) {
+        if (tableFormat.getTableColumn(modelIndex) != null) {
+            return tableFormat.getTableColumn(modelIndex).getBibtexFields().contains(Globals.FILE_FIELD);
+        } else {
+            return false;
+        }
     }
 
     private boolean matches(int row, Matcher<BibtexEntry> m) {
@@ -808,6 +818,6 @@ public class MainTable extends JTable {
     }
 
     public MainTableColumn getMainTableColumn(int modelIndex) {
-        return tableFormat.getTableColumns().get(modelIndex);
+        return tableFormat.getTableColumn(modelIndex);
     }
 }
