@@ -70,7 +70,6 @@ class StringDialog extends JDialog {
     private final BasePanel panel;
     private Object[] strings;
 
-    JLabel lab;
     private final StringTable table;
     private final HelpAction helpAction;
 
