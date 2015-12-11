@@ -1062,10 +1062,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return tabbedPane;
     }
 
-    public String getTabTitle(JComponent comp) {
-        return tabbedPane.getTitleAt(getTabIndex(comp));
-    }
-
     public void setTabTitle(JComponent comp, String title, String toolTip) {
         int index = getTabIndex(comp);
         tabbedPane.setTitleAt(index, title);
