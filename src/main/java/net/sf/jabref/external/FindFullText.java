@@ -63,42 +63,4 @@ public class FindFullText {
         }
         return Optional.empty();
     }
-
-    /**
-     * Follow redirects until the final location is reached. This is necessary to handle Doi links, which
-     * redirect to publishers' web sites. We need to know the publisher's domain name in order to choose
-     * which FullTextFinder to use.
-     *
-     * @param url           The url to start with.
-     * @param redirectCount The number of previous redirects. We will follow a maximum of 5 redirects.
-     * @return the final URL, or the initial one in case there is no redirect.
-     * @throws IOException for connection error
-     */
-    private static URL resolveRedirects(URL url, int redirectCount) throws IOException {
-        URLConnection uc = url.openConnection();
-        if (uc instanceof HttpURLConnection) {
-            HttpURLConnection huc = (HttpURLConnection) uc;
-            huc.setInstanceFollowRedirects(false);
-            huc.connect();
-            int responseCode = huc.getResponseCode();
-            String location = huc.getHeaderField("location");
-            huc.disconnect();
-            if ((responseCode == HttpURLConnection.HTTP_MOVED_TEMP) || ((responseCode == HttpURLConnection.HTTP_MOVED_PERM) && (redirectCount < 5))) {
-                try {
-                    URL newUrl = new URL(location);
-                    return resolveRedirects(newUrl, redirectCount + 1);
-                } catch (MalformedURLException ex) {
-                    return url; // take the previous one, since this one didn't make sense.
-                    // TODO: this could be caused by location being a relative link, but this would just give
-                    // the default page in the case of www.springerlink.com, not the article page. Don't know why.
-                }
-
-            } else {
-                return url;
-            }
-
-        } else {
-            return url;
-        }
-    }
 }
