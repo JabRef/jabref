@@ -1,20 +1,3 @@
-/*  Copyright (C) -2015 JabRef contributors.
-    Copyright (C) 2015 Oliver Kopp
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.bibtex;
 
 import net.sf.jabref.gui.BibtexFields;
@@ -32,25 +15,6 @@ import com.google.common.base.Strings;
 import net.sf.jabref.model.entry.EntryType;
 
 public class BibtexEntryWriter {
-
-    /**
-     * Display name map for entry field names.
-     */
-    private static final Map<String, String> tagDisplayNameMap = new HashMap<>();
-
-
-    static {
-        // The field name display map.
-        BibtexEntryWriter.tagDisplayNameMap.put("bibtexkey", "BibTeXKey");
-        BibtexEntryWriter.tagDisplayNameMap.put("doi", "DOI");
-        BibtexEntryWriter.tagDisplayNameMap.put("ee", "EE");
-        BibtexEntryWriter.tagDisplayNameMap.put("howpublished", "HowPublished");
-        BibtexEntryWriter.tagDisplayNameMap.put("lastchecked", "LastChecked");
-        BibtexEntryWriter.tagDisplayNameMap.put("isbn", "ISBN");
-        BibtexEntryWriter.tagDisplayNameMap.put("issn", "ISSN");
-        BibtexEntryWriter.tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
-        BibtexEntryWriter.tagDisplayNameMap.put("url", "URL");
-    }
 
     private static final Map<String, List<String>> requiredFieldsSorted = new HashMap<>();
 
@@ -368,11 +332,7 @@ public class BibtexEntryWriter {
 
         String result;
         if (writeFieldCameCaseName) {
-            if (BibtexEntryWriter.tagDisplayNameMap.containsKey(field.toLowerCase())) {
-                result = BibtexEntryWriter.tagDisplayNameMap.get(field.toLowerCase()) + suffix;
-            } else {
-                result = (String.valueOf(field.charAt(0))).toUpperCase() + field.substring(1) + suffix;
-            }
+            result = CamelCaser.toCamelCase(field) + suffix;
         } else {
             result = field + suffix;
         }
