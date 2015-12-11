@@ -7,10 +7,7 @@ import javax.swing.SwingUtilities;
 /**
  *  FlowLayout subclass that fully supports wrapping of components.
  */
-public class WrapLayout extends FlowLayout
-{
-    private Dimension preferredLayoutSize;
-
+public class WrapLayout extends FlowLayout {
     /**
      * Constructs a new <code>WrapLayout</code> with a left
      * alignment and a default 5-unit horizontal and vertical gap.

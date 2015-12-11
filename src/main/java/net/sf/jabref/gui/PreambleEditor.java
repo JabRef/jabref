@@ -30,13 +30,11 @@ import net.sf.jabref.gui.undo.UndoablePreambleChange;
 import net.sf.jabref.logic.l10n.Localization;
 
 class PreambleEditor extends JDialog {
-
     // A reference to the entry this object works on.
     private final BibtexDatabase base;
     private final BasePanel panel;
     private final JabRefPreferences prefs;
 
-    JLabel lab;
     private FieldEditor ed;
 
 
