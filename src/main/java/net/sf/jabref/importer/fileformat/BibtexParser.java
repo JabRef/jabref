@@ -15,14 +15,11 @@
 */
 package net.sf.jabref.importer.fileformat;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
-import java.util.regex.Pattern;
-
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -91,7 +88,7 @@ public class BibtexParser {
      * Parses BibtexEntries from the given string and returns the collection of all entries found.
      *
      * @param bibtexString
-     * @return Returns null if an error occurred, returns an empty collection if no entries where found.
+     * @return Returns returns an empty collection if no entries where found or if an error occurred.
      */
     public static Collection<BibEntry> fromString(String bibtexString) {
         StringReader reader = new StringReader(bibtexString);
@@ -100,7 +97,7 @@ public class BibtexParser {
         try {
             return parser.parse().getDatabase().getEntries();
         } catch (Exception e) {
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -121,26 +118,8 @@ public class BibtexParser {
     }
 
     /**
-     * Check whether the source is in the correct format for this importer.
-     */
-    public static boolean isRecognizedFormat(Reader reader) throws IOException {
-        // Our strategy is to look for the "@<type>    {" line.
-        BufferedReader in = new BufferedReader(reader);
-
-        Pattern formatPattern = Pattern.compile("@[a-zA-Z]*\\s*\\{");
-
-        String bibtexString;
-
-        while ((bibtexString = in.readLine()) != null) {
-            if (formatPattern.matcher(bibtexString).find()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Will parse the BibTex-Data found when reading from reader.
+     * Will parse the BibTex-Data found when reading from reader. Ignores any encoding supplied in the file by
+     * "Encoding: myEncoding".
      * <p>
      * The reader will be consumed.
      * <p>
@@ -492,7 +471,6 @@ public class BibtexParser {
             skipWhitespace();
         }
         String key = parseKey();
-
         result.setField(BibEntry.KEY_FIELD, key);
         skipWhitespace();
 
@@ -559,7 +537,7 @@ public class BibtexParser {
         while (((character = peek()) != ',') && (character != '}') && (character != ')')) {
 
             if (eof) {
-                throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
+                throw new IOException("Error in line " + line + ": EOF in mid-string");
             }
             if (character == '"') {
                 StringBuffer text = parseQuotedFieldExactly();
@@ -571,7 +549,7 @@ public class BibtexParser {
                  *
                  * while (!((peek() == '"') && (j != '\\'))) { j = read(); if
                  * (_eof || (j == -1) || (j == 65535)) { throw new
-                 * RuntimeException("Error in line "+line+ ": EOF in
+                 * IOException("Error in line "+line+ ": EOF in
                  * mid-string"); }
                  *
                  * value.append((char) j); }
@@ -848,7 +826,7 @@ public class BibtexParser {
 
             int character = read();
             if (isEOFCharacter(character)) {
-                throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
+                throw new IOException("Error in line " + line + ": EOF in mid-string");
             } else if (character == '{') {
                 brackets++;
             } else if (character == '}') {
@@ -891,7 +869,7 @@ public class BibtexParser {
 
             int character = read();
             if (isEOFCharacter(character)) {
-                throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
+                throw new IOException("Error in line " + line + ": EOF in mid-string");
             } else if (character == '{') {
                 brackets++;
             } else if (character == '}') {
@@ -915,7 +893,7 @@ public class BibtexParser {
         while (!((peek() == '"') && (brackets == 0))) {
             int j = read();
             if (isEOFCharacter(j)) {
-                throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
+                throw new IOException("Error in line " + line + ": EOF in mid-string");
             } else if (j == '{') {
                 brackets++;
             } else if (j == '}') {
@@ -933,7 +911,7 @@ public class BibtexParser {
         int character = read();
 
         if (character != expected) {
-            throw new RuntimeException("Error in line " + line + ": Expected " + expected
+            throw new IOException("Error in line " + line + ": Expected " + expected
                     + " but received " + (char) character);
         }
     }
@@ -958,12 +936,12 @@ public class BibtexParser {
         int character = read();
 
         if ((character != firstOption) && (character != secondOption)) {
-            throw new RuntimeException("Error in line " + line + ": Expected " + firstOption + " or "
+            throw new IOException("Error in line " + line + ": Expected " + firstOption + " or "
                     + secondOption + " but received " + character);
         }
     }
 
-    private void checkEntryTypes(ParserResult parserResult) {
+    private void checkEntryTypes(ParserResult result) {
         for (BibEntry bibEntry : database.getEntries()) {
             if (bibEntry.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
@@ -972,7 +950,7 @@ public class BibtexParser {
                 if (type != null) {
                     bibEntry.setType(type);
                 } else {
-                    parserResult.addWarning(
+                    result.addWarning(
                             Localization.lang("Unknown entry type")
                                     + ": " + name + "; key: " + bibEntry.getCiteKey()
                     );

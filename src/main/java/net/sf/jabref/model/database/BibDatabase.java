@@ -240,7 +240,7 @@ public class BibDatabase {
     }
 
     /**
-     * Inserts a Bibtex String at the given index.
+     * Inserts a Bibtex String.
      */
     public synchronized void addString(BibtexString string)
             throws KeyCollisionException {
@@ -256,7 +256,7 @@ public class BibDatabase {
     }
 
     /**
-     * Removes the string at the given index.
+     * Removes the string with the given id.
      */
     public void removeString(String id) {
         bibtexStrings.remove(id);
@@ -279,10 +279,10 @@ public class BibDatabase {
     }
 
     /**
-     * Returns the string at the given index.
+     * Returns the string with the given id.
      */
-    public BibtexString getString(String o) {
-        return bibtexStrings.get(o);
+    public BibtexString getString(String id) {
+        return bibtexStrings.get(id);
     }
 
     /**

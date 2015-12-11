@@ -31,11 +31,12 @@ import net.sf.jabref.model.entry.BibEntry;
 public class BibtexImporter extends ImportFormat {
 
     /**
-     * @return false as that does not cause any harm in the current implementation of JabRef
+     * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
+     *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
      */
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
-        return BibtexParser.isRecognizedFormat(new InputStreamReader(in));
+        return true;
     }
 
     /**
