@@ -1508,7 +1508,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (filterSearchToggle != null) {
             filterSearchToggle.updateFilterList(searchFilterList);
         }
-        tableFormat = new MainTableFormat();
+        tableFormat = new MainTableFormat(database);
         tableFormat.updateTableFormat();
         mainTable = new MainTable(tableFormat, searchFilterList, frame, this);
 

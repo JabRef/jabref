@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.maintable;
 
 import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 
@@ -17,18 +18,22 @@ public class MainTableColumn {
 
     private final JLabel iconLabel;
 
+    private final BibtexDatabase database;
+
     public MainTableColumn(String columnName) {
         this.columnName = columnName;
         this.bibtexFields = new ArrayList<>();
         this.isIconColumn = false;
         this.iconLabel = null;
+        this.database = null;
     }
 
-    public MainTableColumn(String columnName, String[] bibtexFields) {
+    public MainTableColumn(String columnName, String[] bibtexFields, BibtexDatabase database) {
         this.columnName = columnName;
         this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
         this.isIconColumn = false;
         this.iconLabel = null;
+        this.database = database;
     }
 
     public MainTableColumn(String columnName, String[] bibtexFields, JLabel iconLabel) {
@@ -36,12 +41,13 @@ public class MainTableColumn {
         this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
         this.isIconColumn = true;
         this.iconLabel = iconLabel;
+        this.database = null;
     }
 
     /**
      * Get the table column name to be displayed in the UI
      *
-     * @return
+     * @return name to be displayed
      */
     public String getDisplayName() {
         if(!bibtexFields.isEmpty()) {
@@ -72,10 +78,7 @@ public class MainTableColumn {
      * @return true if the bibtex fields contains author or editor
      */
     public boolean isNameColumn() {
-        if (bibtexFields.contains("author") || bibtexFields.contains("editor")) {
-            return true;
-        }
-        return false;
+        return bibtexFields.contains("author") || bibtexFields.contains("editor");
     }
 
     public String getColumnName() {
@@ -102,9 +105,8 @@ public class MainTableColumn {
                     content = entry.getType().getName();
                 } else {
                     content = entry.getFieldOrAlias(field);
-                    if ("Author".equalsIgnoreCase(columnName) && (content != null)) {
-                        //TODO
-                        // content = panel.database().resolveForStrings((String) content);
+                    if ((database!=null) && "Author".equalsIgnoreCase(columnName) && (content != null)) {
+                        content = database.resolveForStrings(content);
                     }
                 }
                 if (content != null) {
@@ -113,8 +115,7 @@ public class MainTableColumn {
             }
 
             if (isNameColumn()) {
-                //TODO
-                // return formatName(content);
+                return MainTableNameFormatter.formatName(content);
             }
             return content;
 

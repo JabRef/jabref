@@ -107,7 +107,6 @@ public class MainTable extends JTable {
     public static final int OPT_STRING = 3;
     private static final int OTHER = 3;
     private static final int BOOLEAN = 4;
-    public static final int ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
 
     static {
         MainTable.updateRenderers();
@@ -598,17 +597,15 @@ public class MainTable extends JTable {
     }
 
     /**
-     * method to check whether a MainTableColumn at the modelIndex refers to the file field
+     * method to check whether a MainTableColumn at the modelIndex refers to the file field (either as a specific
+     * file extension filter or not)
      *
-     * @param modelIndex
-     * @return
+     * @param modelIndex model index of the column to check
+     * @return true if the column shows the "file" field; false otherwise
      */
     public boolean isFileColumn(int modelIndex) {
-        if (tableFormat.getTableColumn(modelIndex) != null) {
-            return tableFormat.getTableColumn(modelIndex).getBibtexFields().contains(Globals.FILE_FIELD);
-        } else {
-            return false;
-        }
+        return tableFormat.getTableColumn(modelIndex) != null && tableFormat.getTableColumn(modelIndex)
+                .getBibtexFields().contains(Globals.FILE_FIELD);
     }
 
     private boolean matches(int row, Matcher<BibtexEntry> m) {
@@ -751,14 +748,10 @@ public class MainTable extends JTable {
     private TableComparatorChooser<BibtexEntry> createTableComparatorChooser(JTable table, SortedList<BibtexEntry> list,
                                                                              Object sortingStrategy) {
         final TableComparatorChooser<BibtexEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
-        result.addSortActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // We need to reset the stack of sorted list each time sorting order
-                // changes, or the sorting breaks down:
-                refreshSorting();
-            }
+        result.addSortActionListener(e -> {
+            // We need to reset the stack of sorted list each time sorting order
+            // changes, or the sorting breaks down:
+            refreshSorting();
         });
         return result;
     }

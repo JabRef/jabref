@@ -53,6 +53,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.TransferableBibtexEntry;
+import net.sf.jabref.gui.maintable.MainTableNameFormatter;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -499,8 +500,7 @@ public class SearchResultsDialog {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
                     if (frame.getCurrentBasePanel() != null) {
-                        return frame.getCurrentBasePanel().tableFormat.formatName
-                                (entry.getField(field));
+                        return MainTableNameFormatter.formatName(entry.getField(field));
                     }
                 }
                 return entry.getField(field);

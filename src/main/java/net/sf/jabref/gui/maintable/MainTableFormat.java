@@ -16,20 +16,13 @@
 package net.sf.jabref.gui.maintable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
 import net.sf.jabref.gui.*;
-import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.gui.TableFormat;
 
@@ -51,15 +44,13 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     private static final String[] ARXIV = {"eprint"};
     public static final String[] FILE = {Globals.FILE_FIELD};
 
+    private final BibtexDatabase database;
+
     private List<MainTableColumn> tableColumns = new ArrayList<>();
 
-    private boolean namesAsIs;
-    private boolean abbr_names;
-    private boolean namesNatbib;
-    private boolean namesFf;
-    private boolean namesLf;
-    private boolean namesLastOnly;
-
+    public MainTableFormat(BibtexDatabase database) {
+        this.database = database;
+    }
 
     @Override
     public int getColumnCount() {
@@ -104,30 +95,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     }
 
-    /**
-     * Format a name field for the table, according to user preferences.
-     *
-     * @param nameToFormat The contents of the name field.
-     * @return The formatted name field.
-     */
-    // TODO move to some Util class?
-    public String formatName(String nameToFormat) {
-        if (nameToFormat == null) {
-            return null;
-        } else if (namesAsIs) {
-            return nameToFormat;
-        } else if (namesNatbib) {
-            nameToFormat = AuthorList.fixAuthor_Natbib(nameToFormat);
-        } else if (namesLastOnly) {
-            nameToFormat = AuthorList.fixAuthor_lastNameOnlyCommas(nameToFormat, false);
-        } else if (namesFf) {
-            nameToFormat = AuthorList.fixAuthor_firstNameFirstCommas(nameToFormat, abbr_names, false);
-        } else if (namesLf) {
-            nameToFormat = AuthorList.fixAuthor_lastNameFirstCommas(nameToFormat, abbr_names, false);
-        }
-        return nameToFormat;
-    }
-
     public void updateTableFormat() {
         // clear existing column configuration
         tableColumns.clear();
@@ -139,13 +106,12 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         // Read table columns from prefs:
         String[] colSettings = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
 
-        for (int i = 0; i < colSettings.length; i++) {
+        for (String columnName : colSettings) {
             // stored column name will be used as columnName
-            String columnName = colSettings[i];
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             // at MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR
-            String[] fields = colSettings[i].split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
-            tableColumns.add(new MainTableColumn(columnName, fields));
+            String[] fields = columnName.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
+            tableColumns.add(new MainTableColumn(columnName, fields, database));
         }
 
 
@@ -200,15 +166,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 tableColumns.add(SpecialMainTableColumns.createFileIconColumn(desiredColumn));
             }
         }
-
-        // Read name format options:
-        namesNatbib = Globals.prefs.getBoolean(JabRefPreferences.NAMES_NATBIB); //MK:
-        namesLastOnly = Globals.prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
-        namesAsIs = Globals.prefs.getBoolean(JabRefPreferences.NAMES_AS_IS);
-        abbr_names = Globals.prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES); //MK:
-        namesFf = Globals.prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST);
-        namesLf = !(namesAsIs || namesFf || namesNatbib || namesLastOnly); // None of the above.
-
     }
 
 }
