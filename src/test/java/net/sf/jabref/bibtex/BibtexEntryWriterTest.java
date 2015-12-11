@@ -28,7 +28,8 @@ public class BibtexEntryWriterTest {
         Globals.prefs = JabRefPreferences.getInstance();
         // make sure that we use the "new style" serialization
         Globals.prefs.putInt(JabRefPreferences.WRITEFIELD_SORTSTYLE, 0);
-
+        // make sure that we use camel casing
+        Globals.prefs.putBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME, true);
     }
 
     @Before
@@ -93,7 +94,7 @@ public class BibtexEntryWriterTest {
     }
 
     @Test
-         public void roundTripWithPrependingNewlines() throws IOException {
+    public void roundTripWithPrependingNewlines() throws IOException {
         String bibtexEntry = "\r\n@Article{test," + Globals.NEWLINE +
                 "  Author                   = {Foo Bar}," + Globals.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
@@ -160,6 +161,46 @@ public class BibtexEntryWriterTest {
     }
 
     @Test
+    public void roundTripWithCamelCasing() throws IOException {
+        String bibtexEntry = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+                "  author                   = {Foo Bar}," + Globals.NEWLINE +
+                "  journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}," + Globals.NEWLINE +
+                "  howpublished             = {asdf}" + Globals.NEWLINE +
+                "}";
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+
+        Collection<BibtexEntry> entries = result.getDatabase().getEntries();
+        Assert.assertEquals(1, entries.size());
+
+        BibtexEntry entry = entries.iterator().next();
+        Assert.assertEquals("test", entry.getCiteKey());
+        Assert.assertEquals(6, entry.getFieldNames().size());
+        entry.setField("author", "BlaBla");
+        Set<String> fields = entry.getFieldNames();
+        Assert.assertTrue(fields.contains("author"));
+        Assert.assertEquals("BlaBla", entry.getField("author"));
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+
+        writer.write(entry, stringWriter);
+        String actual = stringWriter.toString();
+
+        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {BlaBla}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}," + Globals.NEWLINE +
+                "  HowPublished             = {asdf}" + Globals.NEWLINE +
+                "}";
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void roundTripWithAppendedNewlines() throws IOException {
         String bibtexEntry = "@Article{test," + Globals.NEWLINE +
                 "  Author                   = {Foo Bar}," + Globals.NEWLINE +
@@ -187,7 +228,7 @@ public class BibtexEntryWriterTest {
         String actual = stringWriter.toString();
 
         //appending newlines are not written by the writer, but by FileActions. So, these should be removed here.
-        assertEquals(bibtexEntry.substring(0, bibtexEntry.length()-2), actual);
+        assertEquals(bibtexEntry.substring(0, bibtexEntry.length() - 2), actual);
     }
 
     @Test
