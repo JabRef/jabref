@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
  * Electronic, IEEETranBSTCTL, Periodical, Patent, Standard
  */
 public class IEEETranEntryTypes {
-
     /**
      * Electronic entry type for internet references
      * <p>
@@ -117,6 +116,4 @@ public class IEEETranEntryTypes {
     };
 
     public static final List<EntryType> ALL = Arrays.asList(ELECTRONIC, IEEETRANBSTCTL, PERIODICAL, PATENT, STANDARD);
-
-    public static final List<String> ENTRY_TYPE_NAMES = ALL.stream().map(EntryType::getName).collect(Collectors.toList());
 }
