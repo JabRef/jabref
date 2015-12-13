@@ -17,10 +17,7 @@ import java.util.stream.Collectors;
 public class LocalizationParser {
 
     public static List<LocalizationEntry> find(LocalizationBundle type) throws IOException {
-        List<LocalizationEntry> entries = Files.walk(Paths.get("src/main"))
-                .filter(LocalizationParser::isJavaFile)
-                .flatMap(p -> getLanguageKeysInJavaFile(p, type).stream())
-                .collect(Collectors.toList());
+        List<LocalizationEntry> entries = findLocalizationEntriesInJavaFiles(type);
 
         List<String> keysInJavaFiles = entries.stream()
                 .map(LocalizationEntry::getKey)
@@ -29,7 +26,6 @@ public class LocalizationParser {
                 .collect(Collectors.toList());
 
         List<String> englishKeys;
-
         if (type == LocalizationBundle.LANG) {
             englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
         } else {
@@ -39,6 +35,13 @@ public class LocalizationParser {
         missingKeys.removeAll(englishKeys);
 
         return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(Collectors.toList());
+    }
+
+    private static List<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundle type) throws IOException {
+        return Files.walk(Paths.get("src/main"))
+                    .filter(LocalizationParser::isJavaFile)
+                    .flatMap(p -> getLanguageKeysInJavaFile(p, type).stream())
+                    .collect(Collectors.toList());
     }
 
     public static List<String> getKeysInPropertiesFile(String path) throws IOException {
@@ -59,23 +62,14 @@ public class LocalizationParser {
         return path.toString().endsWith(".java");
     }
 
-    private static final String INFINITE_WHITESPACE = "\\s*";
-    private static final String DOT = "\\.";
-    private static final Pattern LOCALIZATION_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "lang" + INFINITE_WHITESPACE + "\\(");
-
-    private static final Pattern LOCALIZATION_MENU_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "menuTitle" + INFINITE_WHITESPACE + "\\(");
-    private static final Pattern ESCAPED_QUOTATION_SYMBOL = Pattern.compile("\\\\\"");
-
-    private static final Pattern QUOTATION_SYMBOL = Pattern.compile("QUOTATIONPLACEHOLDER");
-
-    private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundle type) {
+    public static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundle type) {
         List<LocalizationEntry> result = new LinkedList<>();
 
         try {
             List<String> lines = Files.readAllLines(path, Charsets.UTF_8);
             String content = String.join("\n", lines);
 
-            List<String> keys = getLanguageKeysInString(content, type);
+            List<String> keys = JavaLocalizationEntryParser.getLanguageKeysInString(content, type);
 
             for (String key : keys) {
                 result.add(new LocalizationEntry(path, key, type));
@@ -88,72 +82,85 @@ public class LocalizationParser {
         return result;
     }
 
-    public static List<String> getLanguageKeysInString(String content, LocalizationBundle type) {
-        List<String> result = new LinkedList<>();
+    public static class JavaLocalizationEntryParser {
 
-        Matcher matcher;
-        if (type == LocalizationBundle.LANG) {
-            matcher = LOCALIZATION_START_PATTERN.matcher(content);
-        } else {
-            matcher = LOCALIZATION_MENU_START_PATTERN.matcher(content);
-        }
-        while (matcher.find()) {
-            // find contents between the brackets, covering multi-line strings as well
-            int index = matcher.end();
-            int brackets = 1;
-            StringBuilder buffer = new StringBuilder();
-            while (brackets != 0) {
-                char c = content.charAt(index);
-                if (c == '(') {
-                    brackets++;
-                } else if (c == ')') {
-                    brackets--;
-                }
-                buffer.append(c);
-                index++;
+        private static final String INFINITE_WHITESPACE = "\\s*";
+        private static final String DOT = "\\.";
+        private static final Pattern LOCALIZATION_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "lang" + INFINITE_WHITESPACE + "\\(");
+
+        private static final Pattern LOCALIZATION_MENU_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "menuTitle" + INFINITE_WHITESPACE + "\\(");
+        private static final Pattern ESCAPED_QUOTATION_SYMBOL = Pattern.compile("\\\\\"");
+
+        private static final Pattern QUOTATION_SYMBOL = Pattern.compile("QUOTATIONPLACEHOLDER");
+
+        public static List<String> getLanguageKeysInString(String content, LocalizationBundle type) {
+            List<String> result = new LinkedList<>();
+
+            Matcher matcher;
+            if (type == LocalizationBundle.LANG) {
+                matcher = LOCALIZATION_START_PATTERN.matcher(content);
+            } else {
+                matcher = LOCALIZATION_MENU_START_PATTERN.matcher(content);
             }
+            while (matcher.find()) {
+                // find contents between the brackets, covering multi-line strings as well
+                int index = matcher.end();
+                int brackets = 1;
+                StringBuilder buffer = new StringBuilder();
+                while (brackets != 0) {
+                    char c = content.charAt(index);
+                    if (c == '(') {
+                        brackets++;
+                    } else if (c == ')') {
+                        brackets--;
+                    }
+                    buffer.append(c);
+                    index++;
+                }
 
-            String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(buffer.toString()).replaceAll("QUOTATIONPLACEHOLDER");
+                String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(buffer.toString()).replaceAll("QUOTATIONPLACEHOLDER");
 
-            // only retain what is within quotation
-            StringBuilder b = new StringBuilder();
-            int quotations = 0;
-            for (char c : parsedContentsOfLangMethod.toCharArray()) {
-                if (c == '"' && quotations > 0) {
-                    quotations--;
-                } else if (c == '"') {
-                    quotations++;
-                } else {
-                    if (quotations != 0) {
-                        b.append(c);
+                // only retain what is within quotation
+                StringBuilder b = new StringBuilder();
+                int quotations = 0;
+                for (char c : parsedContentsOfLangMethod.toCharArray()) {
+                    if (c == '"' && quotations > 0) {
+                        quotations--;
+                    } else if (c == '"') {
+                        quotations++;
                     } else {
-                        if (c == ',') {
-                            break;
+                        if (quotations != 0) {
+                            b.append(c);
+                        } else {
+                            if (c == ',') {
+                                break;
+                            }
                         }
                     }
                 }
+
+                String languageKey = QUOTATION_SYMBOL.matcher(b.toString()).replaceAll("\\\"");
+
+                // escape chars which are not allowed in property file keys
+                String languagePropertyKey = new Localization.LocalizationKey(languageKey).getPropertiesKey();
+
+                if (languagePropertyKey.endsWith("_")) {
+                    throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
+                }
+
+                if (languagePropertyKey.contains("\\n")) {
+                    throw new RuntimeException(languageKey + " contains a new line character. As this is a localization key, this is illegal!");
+                }
+
+                if (!languagePropertyKey.trim().isEmpty()) {
+                    result.add(languagePropertyKey);
+                }
+
             }
 
-            String languageKey = QUOTATION_SYMBOL.matcher(b.toString()).replaceAll("\\\"");
-
-            // escape chars which are not allowed in property file keys
-            String languagePropertyKey = new Localization.LocalizationKey(languageKey).getPropertiesKey();
-
-            if (languagePropertyKey.endsWith("_")) {
-                throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
-            }
-
-            if(languagePropertyKey.contains("\\n")) {
-                throw new RuntimeException(languageKey + " contains a new line character. As this is a localization key, this is illegal!");
-            }
-
-            if (!languagePropertyKey.trim().isEmpty()) {
-                result.add(languagePropertyKey);
-            }
-
+            return result;
         }
 
-        return result;
     }
 
 }

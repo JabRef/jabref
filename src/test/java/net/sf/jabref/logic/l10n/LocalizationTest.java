@@ -93,7 +93,7 @@ public class LocalizationTest {
                 "one_per_line_with_var", "Search_%0", "Reset_preferences_(key1,key2,..._or_'all')", "Multiple_entries_selected._Do_you_want_to_change_" +
                         "the_type_of_all_these_to_'%0'?");
 
-        List<String> languageKeysInString = LocalizationParser.getLanguageKeysInString(code, LocalizationBundle.LANG);
+        List<String> languageKeysInString = LocalizationParser.JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundle.LANG);
         assertEquals(expectedLanguageKeys, languageKeysInString);
     }
 
