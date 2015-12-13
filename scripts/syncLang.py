@@ -77,9 +77,7 @@ def compare_property_files_to_main_property_file(main_properties_file, other_pro
                 print key
 
             if append_missing_keys_to_other_properties_files:
-                print "Update file?",
-                if raw_input() in ['y', 'Y']:
-                    append_keys_to_file(other_properties_file, keys_missing)
+                append_keys_to_file(other_properties_file, keys_missing)
             print ""
 
         if not keys_obsolete:
@@ -91,183 +89,10 @@ def compare_property_files_to_main_property_file(main_properties_file, other_pro
             print ""
 
 
-def handleJavaCode(filename, lines, keyList):
-    # Extract first string parameter from Localization.lang call. E.g., Localization.lang("Default")
-    regex_only_key = r'"((\\"|[^"])*)"[^"]*'
-    pattern_single_line = re.compile(r'Localization\s*\.\s*lang\s*\(\s*' + regex_only_key)
-    pattern_only_key = re.compile(regex_only_key)
-
-    # Find multiline Localization lang statements. E.g.:
-    # Localization.lang("This is my string" +
-    # "with a long text")
-    pattern_multi_line = re.compile(r'Localization\s*\.\s*lang\s*\(([^)])*$')
-
-    pattern_plus_symbol = re.compile(r'^\s*\+')
-
-    lines_with_line_number = list(enumerate(lines))
-    line_index = 0
-    while line_index < len(lines_with_line_number):
-        line_number, line = lines_with_line_number[line_index]
-
-        # Remove Java single line comments
-        if line.find("http://") < 0:
-            line = re.sub("//.*", "", line)
-
-        while line != "":
-            result_single_line = pattern_single_line.search(line)
-            result_multi_line = pattern_multi_line.search(line)
-
-            found = ""
-
-            if result_multi_line and line.find('",') < 0:
-                # not terminated
-                # but it could be a multiline string
-                if result_single_line:
-                    curText = result_single_line.group(1)
-                    searchForPlus = True
-                else:
-                    curText = ""
-                    searchForPlus = False
-                origI = line_index
-                # inspect next line
-                while line_index + 1 < len(lines_with_line_number):
-                    linenum2, curline2 = lines_with_line_number[line_index + 1]
-                    if (not searchForPlus) or pattern_plus_symbol.search(curline2):
-                        # from now on, we always have to search for a plus
-                        searchForPlus = True
-
-                        # The current line has been handled here, therefore indicate to handle the next line
-                        line_index += 1
-                        line_number = linenum2
-                        line = curline2
-
-                        # Search for the occurence of a string
-                        result_single_line = pattern_only_key.search(curline2)
-                        if result_single_line:
-                            curText = curText + result_single_line.group(1)
-                            # check for several strings in this line
-                            if curline2.count('\"') > 2:
-                                break
-                            # check for several arguments in the line
-                            if curline2.find('",') > 0:
-                                break
-                            if curline2.endswith(")"):
-                                break
-                        else:
-                            # plus sign at the beginning found, but no string
-                            break
-                    else:
-                        # no continuation found
-                        break
-
-                if origI == line_index:
-                    print "%s:%d: Not terminated: %s" % (filename, line_number + 1, line)
-                else:
-                    found = curText
-
-            if result_single_line or (found != ""):
-                if found == "":
-                    # not a multiline string, found via the single line matching
-                    # full string in one line
-                    found = result_single_line.group(1)
-
-                found = found.replace(" ", "_")
-                # replace characters that need to be escaped in the language file
-                found = found.replace("=", r"\=").replace(":", r"\:")
-                # replace Java-escaped " to plain "
-                found = found.replace(r'\"', '"')
-                # Java-escaped \ to plain \ need not to be converted - they have to be kept
-                # e.g., "\\#" has to be contained as "\\#" in the key
-                # found = found.replace('\\\\','\\')
-                if (found != "") and (found not in keyList):
-                    keyList.append(found)
-                    keyFiles[found] = (filename, line_number)
-                    # print "Adding ", found
-                    # else:
-                    #   print "Not adding: "+found
-
-            # Prepare a possible second run (multiple Localization.lang on this line)
-            if result_single_line:
-                lastPos = result_single_line.span()[1]
-                # regular expression is greedy. It will match until Localization.lang("
-                # therefore, we have to adjust lastPos
-                lastPos -= 14
-                if len(line) <= lastPos:
-                    line = ""
-                else:
-                    line = line[lastPos:]
-            else:
-                # terminate processing of this line, continue to next line
-                line = ""
-
-        line_index += 1
-
-
-# Find all Java source files in the given directory, and read the lines of each,
-# calling handleJavaCode on the contents:   
-def handleDir(lists, directory_path, filenames):
-    keyList, notTermList = lists
-    for filename in filenames:
-        if is_java_file(filename):
-            file_path = directory_path + os.sep + filename
-            lines = read_all_lines(file_path)
-            handleJavaCode(file_path, lines, keyList)
-
-
-def is_java_file(filename):
-    """
-    Determines whether a file name is that of a Java file
-
-    :param filename: the filename to be checked
-    :return: boolean
-    """
-    filename_length = len(filename)
-    return filename_length > 6 and filename[(filename_length - 5):filename_length] == ".java"
-
-
-# Go through subdirectories and call handleDir on all directories:
-def traverseFileTree(starting_directory):
-    keys = []
-    notTermList = []
-    os.path.walk(starting_directory, handleDir, (keys, notTermList))
-    print "Keys found: " + str(len(keys))
-    return keys
-
-
 def append_property(properties_file, key, value):
     f = open(properties_file, "a")
     f.write(key + "=" + value + "\n")
     f.close()
-
-def find_missing_and_obsolete_keys(properties_file, source_code_directory, append_missing_keys_to_properties_file):
-    """
-    Searches out all translation calls in the Java source files, and reports which
-    are not present in the given resource file.
-
-    :param properties_file: the properties file with the keys to sync with
-    :param source_code_directory: the directory containing the source code to be checked
-    :param append_missing_keys_to_properties_file: boolean whether the missing keys are appended to the properties_file
-    """
-    keys_in_property_file = get_keys_from_lines(read_all_lines(properties_file))
-    keys_used_in_code = traverseFileTree(source_code_directory)
-
-    keys_obsolete = find_missing_keys(keys_in_property_file, keys_used_in_code)
-    keys_missing = find_missing_keys(keys_used_in_code, keys_in_property_file)
-
-    if append_missing_keys_to_properties_file:
-        f1 = open(properties_file, "a")
-        f1.write("\n")
-        f1.close()
-
-    for key in keys_missing:
-        value = key.replace("\\:", ":").replace("\\=", "=")
-        file_name, line_number = keyFiles[key]
-        print "%s:%i:Missing key: %s" % (file_name, line_number + 1, value)
-        if append_missing_keys_to_properties_file:
-            append_property(properties_file, key, value)
-
-    for key in keys_obsolete:
-        print "Possible obsolete key: " + key
 
 
 def find_duplicate_keys_and_keys_with_no_value(current_file, display_keys):
@@ -321,18 +146,7 @@ Option can be one of the following:
         translations for the same key. There is currently no option to remove duplicates
         automatically.
         
-    -s [-u]: Search the Java source files for language keys. All keys that are found in the source files
-        but not in "JabRef_en.properties" are listed. If the -u option is specified, these keys will
-        automatically be added to "JabRef_en.properties".
-        
-        The program will also list "Not terminated" keys. These are keys that are concatenated over 
-        more than one line, that the program is not (currently) able to resolve.
-        
-        Finally, the program will list "Possible obsolete keys". These are keys that are present in
-        "JabRef_en.properties", but could not be found in the Java source code. Note that the 
-        "Not terminated" keys will be likely to appear here, since they were not resolved.
-        
-    -t [-u]: Compare the contents of "JabRef_en.properties" and "Menu_en.properties" against the other 
+    -t [-u]: Compare the contents of "JabRef_en.properties" and "Menu_en.properties" against the other
         language files. The program will list for all the other files which keys from the English
         file are missing. Additionally, the program will list keys in the other files which are
         not present in the English file - possible obsolete keys.
@@ -340,13 +154,6 @@ Option can be one of the following:
         If the -u option is specified, all missing keys will automatically be added to the files.
         There is currently no option to remove obsolete keys automatically.
 """
-
-elif (len(sys.argv) >= 2) and (sys.argv[1] == "-s"):
-    if (len(sys.argv) >= 3) and (sys.argv[2] == "-u"):
-        update = True
-    else:
-        update = False
-    find_missing_and_obsolete_keys(os.path.join(res_dir, "JabRef_en.properties"), ".", update)
 
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
     if (len(sys.argv) >= 3) and (sys.argv[2] == "-u"):
