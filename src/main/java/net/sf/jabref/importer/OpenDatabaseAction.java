@@ -220,8 +220,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // prompting.
                 int answer = JOptionPane.showConfirmDialog(null,
                         "<html>" + Localization
-                                .lang("An autosave file was found for this database. This could indicate ")
-                                + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.")
+                                .lang("An autosave file was found for this database. This could indicate "
+                                        + "that JabRef didn't shut down cleanly last time the file was used.")
                                 + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
                                 + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {

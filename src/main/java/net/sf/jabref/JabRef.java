@@ -354,8 +354,9 @@ public class JabRef {
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
                                             + Localization.lang(
-                                                    "The chosen encoding '%0' could not encode the following characters: ",
+                                                    "The chosen encoding '%0' could not encode the following characters:",
                                                     session.getEncoding().displayName())
+                                            + " "
                                             + session.getWriter().getProblemCharacters());
                                 }
                                 session.commit();
@@ -441,8 +442,9 @@ public class JabRef {
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
                                             + Localization.lang(
-                                                    "The chosen encoding '%0' could not encode the following characters: ",
+                                                    "The chosen encoding '%0' could not encode the following characters:",
                                                     session.getEncoding().displayName())
+                                            + " "
                                             + session.getWriter().getProblemCharacters());
                                 }
                                 session.commit();

@@ -82,6 +82,7 @@ public class LocalizationTest {
         private static boolean isJavaFile(Path path) {
             return path.toString().endsWith(".java");
         }
+
         private static final String INFINITE_WHITESPACE = "\\s*";
         private static final String DOT = "\\.";
         private static final Pattern LOCALIZATION_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "lang" + INFINITE_WHITESPACE + "\\(");
@@ -155,6 +156,10 @@ public class LocalizationTest {
 
                 // escape chars which are not allowed in property file keys
                 String languagePropertyKey = languageKey.replaceAll(" ", "_").replaceAll("=", "\\=").replaceAll(":", "\\:");
+
+                if(languagePropertyKey.endsWith("_")) {
+                    throw new RuntimeException("Key " + languageKey + " ends with a space");
+                }
 
                 if (!languagePropertyKey.trim().isEmpty()) {
                     result.add(languagePropertyKey);

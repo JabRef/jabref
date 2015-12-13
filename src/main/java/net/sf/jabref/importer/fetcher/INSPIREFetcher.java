@@ -191,7 +191,7 @@ public class INSPIREFetcher implements EntryFetcher {
             // dialog.setProgress(i + 1, keys.length);
             /* inform the inspection dialog, that we're done */
         } catch (Exception e) {
-            frame.showMessage(Localization.lang("Error while fetching from Inspire: ") + e.getMessage());
+            frame.showMessage(Localization.lang("Error while fetching from Inspire:") + " " + e.getMessage());
             e.printStackTrace();
         }
         return true;
