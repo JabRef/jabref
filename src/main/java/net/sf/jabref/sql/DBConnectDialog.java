@@ -212,7 +212,7 @@ public class DBConnectDialog extends JDialog {
             cnt++;
         }
 
-        String errMsg = Localization.lang("Please specify the ");
+        String errMsg = Localization.lang("Please specify the") + " ";
 
         switch (cnt) {
         case 0:

@@ -41,7 +41,7 @@ public class UndoableInsertString extends AbstractUndoableEdit {
     public String getUndoPresentationName() {
         // @formatter:off
         return Localization.lang("Undo") + ": " +
-                Localization.lang("insert string ");
+                Localization.lang("insert string");
         // @formatter:on
     }
 
@@ -49,7 +49,7 @@ public class UndoableInsertString extends AbstractUndoableEdit {
     public String getRedoPresentationName() {
         // @formatter:off
         return Localization.lang("Redo") + ": " +
-                Localization.lang("insert string ");
+                Localization.lang("insert string");
         // @formatter:on
     }
 

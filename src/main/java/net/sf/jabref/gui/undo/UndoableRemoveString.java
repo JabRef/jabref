@@ -41,7 +41,7 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
     public String getUndoPresentationName() {
         // @formatter:off
         return Localization.lang("Undo") + ": " +
-                Localization.lang("remove string ");
+                Localization.lang("remove string");
         // @formatter:on
     }
 
@@ -49,7 +49,7 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
     public String getRedoPresentationName() {
         // @formatter:off
         return Localization.lang("Redo") + ": " +
-                Localization.lang("remove string ");
+                Localization.lang("remove string");
         // @formatter:on
     }
 

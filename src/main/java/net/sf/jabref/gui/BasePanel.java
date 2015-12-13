@@ -1286,7 +1286,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
-            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
+            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:",
                     session.getEncoding().displayName())).xy(1, 1);
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);

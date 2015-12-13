@@ -1,6 +1,7 @@
 package net.sf.jabref;
 
 import com.google.common.base.Charsets;
+import net.sf.jabref.logic.l10n.Localization;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -20,15 +21,23 @@ import static org.junit.Assert.assertEquals;
 public class LocalizationTest {
 
     @Test
+    public void findComplicatedKeys() {
+        Localization.lang("Copy_\\=:cite{BibTeX_key}");
+    }
+
+    @Test
     public void findMissingLocalizationKeys() throws IOException {
-        assertEquals("source code contains language keys for the messages which are not in the corresponding properties file",
-                "", String.join("\n\n", LocalizationParser.find(LocalizationParser.Type.LANG)));
+        String missingKeys = LocalizationParser.find(LocalizationParser.Type.LANG).stream().map(Object::toString).collect(Collectors.joining("\n"));
+        System.out.println(missingKeys);
+        assertEquals("source code contains language keys for the messages which are not in the corresponding properties file", "", missingKeys);
     }
 
     @Test
     public void findMissingMenuLocalizationKeys() throws IOException {
+        String missingKeys = LocalizationParser.find(LocalizationParser.Type.MENU).stream().map(Object::toString).collect(Collectors.joining("\n"));
+        System.out.println(missingKeys);
         assertEquals("source code contains language keys for the menu which are not in the corresponding properties file",
-                "", String.join("\n\n", LocalizationParser.find(LocalizationParser.Type.MENU)));
+                "", missingKeys);
     }
 
     @Test
@@ -53,13 +62,46 @@ public class LocalizationTest {
     public static class LocalizationParser {
         private enum Type {
             LANG, MENU
+        }
+        private static class LocalizationEntry {
 
+            private final Path path;
+            private final String key;
+            private final int lineNumber;
+            private final LocalizationParser.Type type;
+
+            private LocalizationEntry(Path path, String key, int lineNumber, LocalizationParser.Type type) {
+                this.path = path;
+                this.key = key;
+                this.lineNumber = lineNumber;
+                this.type = type;
+            }
+
+            public Path getPath() {
+                return path;
+            }
+
+            public String getKey() {
+                return key;
+            }
+
+            public LocalizationParser.Type getType() {
+                return type;
+            }
+
+            public String toString() {
+                return String.format("%s:%d %s (%s)", path, lineNumber, key, type);
+            }
         }
 
-        private static List<String> find(Type type) throws IOException {
-            List<String> keysInJavaFiles = Files.walk(Paths.get("src/main"))
+        private static List<LocalizationEntry> find(Type type) throws IOException {
+            List<LocalizationEntry> entries = Files.walk(Paths.get("src/main"))
                     .filter(LocalizationParser::isJavaFile)
                     .flatMap(p -> getLanguageKeysInJavaFile(p, type).stream())
+                    .collect(Collectors.toList());
+
+            List<String> keysInJavaFiles = entries.stream()
+                    .map(LocalizationEntry::getKey)
                     .distinct()
                     .sorted()
                     .collect(Collectors.toList());
@@ -78,12 +120,14 @@ public class LocalizationTest {
                     .collect(Collectors.toList());
             List<String> missingKeys = new LinkedList<>(keysInJavaFiles);
             missingKeys.removeAll(englishKeys);
-            return missingKeys;
+
+            return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(Collectors.toList());
         }
 
         private static boolean isJavaFile(Path path) {
             return path.toString().endsWith(".java");
         }
+
         private static final String INFINITE_WHITESPACE = "\\s*";
         private static final String DOT = "\\.";
         private static final Pattern LOCALIZATION_START_PATTERN = Pattern.compile("Localization" + INFINITE_WHITESPACE + DOT + INFINITE_WHITESPACE + "lang" + INFINITE_WHITESPACE + "\\(");
@@ -93,13 +137,18 @@ public class LocalizationTest {
 
         private static final Pattern QUOTATION_SYMBOL = Pattern.compile("QUOTATIONPLACEHOLDER");
 
-        private static List<String> getLanguageKeysInJavaFile(Path path, Type type) {
-            List<String> result = new LinkedList<>();
+        private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, Type type) {
+            List<LocalizationEntry> result = new LinkedList<>();
 
             try {
                 String content = String.join("\n", Files.readAllLines(path, Charsets.UTF_8));
 
-                result.addAll(getLanguageKeysInString(content, type));
+                List<String> keys = getLanguageKeysInString(content, type);
+
+                for (String key : keys) {
+                    result.add(new LocalizationEntry(path, key, 1, type));
+                }
+
             } catch (IOException ignore) {
                 ignore.printStackTrace();
             }
@@ -157,6 +206,10 @@ public class LocalizationTest {
 
                 // escape chars which are not allowed in property file keys
                 String languagePropertyKey = languageKey.replaceAll(" ", "_").replaceAll("=", "\\=").replaceAll(":", "\\:");
+
+                if (languagePropertyKey.endsWith("_")) {
+                    throw new RuntimeException("Key " + languageKey + " ends with a space");
+                }
 
                 if (!languagePropertyKey.trim().isEmpty()) {
                     result.add(languagePropertyKey);
