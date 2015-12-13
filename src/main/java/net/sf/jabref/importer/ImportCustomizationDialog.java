@@ -145,7 +145,7 @@ public class ImportCustomizationDialog extends JDialog {
                 }
             }
         });
-        addFromFolderButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a class path. \nThe path need not be on the classpath of JabRef."));
+        addFromFolderButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a class path.") + "\n" + Localization.lang("The path need not be on the classpath of JabRef."));
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from jar"));
         addFromJarButton.addActionListener(new ActionListener() {
@@ -174,7 +174,8 @@ public class ImportCustomizationDialog extends JDialog {
                 }
             }
         });
-        addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.\nThe Zip-archive need not be on the classpath of JabRef."));
+        addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.") + "\n" +
+                Localization.lang("The Zip-archive need not be on the classpath of JabRef."));
 
         JButton showDescButton = new JButton(Localization.lang("Show description"));
         showDescButton.addActionListener(new ActionListener() {

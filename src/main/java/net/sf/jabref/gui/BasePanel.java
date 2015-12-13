@@ -2149,7 +2149,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (bes.length > 1) {
             int choice = JOptionPane.showConfirmDialog(this,
                     // @formatter:off
-                    Localization.lang("Multiple entries selected. Do you want to change\nthe type of all these to '%0'?", type.getName()),
+                    Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?", type.getName()),
                     Localization.lang("Change entry type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                     // @formatter:on
             if (choice == JOptionPane.NO_OPTION) {

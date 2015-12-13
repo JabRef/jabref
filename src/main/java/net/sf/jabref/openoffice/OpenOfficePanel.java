@@ -600,9 +600,14 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
             }
             else {
-                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Could not connect to running OpenOffice.\n"
-                        + "Make sure you have installed OpenOffice with Java support.\nIf connecting manually, please verify program and library paths.\n"
-                        + "\nError message:") + " " + e.getMessage());
+                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Could not connect to running OpenOffice.")
+                        + "\n"
+                        + Localization.lang("Make sure you have installed OpenOffice with Java support.")
+                        + "\n"
+                        + Localization.lang("If connecting manually, please verify program and library paths.")
+                        + "\n"
+                        + "\n"
+                        + Localization.lang("Error message:") + " " + e.getMessage());
             }
         }
     }
