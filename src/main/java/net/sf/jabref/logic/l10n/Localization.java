@@ -26,10 +26,10 @@ public class Localization {
                     new EncodingControl(StandardCharsets.UTF_8));
 
             // silent fallback to system locale when bundle is not found
-            if(!messages.getLocale().equals(locale)) {
+            if (!messages.getLocale().equals(locale)) {
                 LOGGER.warn("Bundle for locale <" + locale + "> not found. Falling back to system locale <" + defaultLocale + ">");
             }
-        } catch(MissingResourceException e) {
+        } catch (MissingResourceException e) {
             LOGGER.warn("Bundle for locale <" + locale + "> not found. Fallback to system locale <" + defaultLocale
                     + "> failed, using locale <en> instead", e);
 
@@ -45,19 +45,19 @@ public class Localization {
     }
 
     /**
-     * In the translation, %c is translated to ":", %e is translated to "=", %<anythingelse> to <anythingelse>, %0, ...
-     * %9 to the respective params given
+     * In the translation, %0, ..., %9 is replaced by the respective params given
      *
-     * @param resBundle the ResourceBundle to use
-     * @param idForErrorMessage output when translation is not found ö * @param key the key to lookup in resBundle
-     * @param params a list of Strings to replace %0, %1, ...
+     * @param resBundle         the ResourceBundle to use
+     * @param idForErrorMessage output when translation is not found
+     * @param key               the key to lookup in resBundle
+     * @param params            a list of Strings to replace %0, %1, ...
      * @return
      */
     private static String translate(ResourceBundle resBundle, String idForErrorMessage, String key, String... params) {
         String translation = null;
         try {
             if (resBundle != null) {
-                translation = resBundle.getString(new TranslationKey(key).getPropertiesKey());
+                translation = resBundle.getString(new LocalizationKey(key).getPropertiesKey());
             }
         } catch (MissingResourceException ex) {
             LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
@@ -73,44 +73,44 @@ public class Localization {
         // replace %0, %1, ...
         if ((translation != null) && !translation.isEmpty()) {
             // also done if no params are given
-            //  Then, %c is translated to ":", %e is translated to "=", ...
-            new Translation(translation, params).translate();
+            return new LocalizationKeyParams(translation, params).translate();
         }
         return key;
     }
 
-    public static class TranslationKey {
+    public static class LocalizationKey {
 
         private final String key;
 
-        public TranslationKey(String key) {
+        public LocalizationKey(String key) {
             this.key = Objects.requireNonNull(key);
         }
 
         public String getPropertiesKey() {
-            return this.key.replaceAll(" ", "_");
+            // space, = and : are not allowed in properties file keys
+            return this.key.replaceAll(" ", "_").replace("=", "\\=").replace(":", "\\:").replace("\\\\", "\\");
         }
 
-        public String getHumanReadableKey() {
-            return this.key.replaceAll("_", " ");
+        public String getTranslationValue() {
+            return this.key.replaceAll("_", " ").replaceAll("\\\\=", "=").replaceAll("\\\\:", ":");
         }
     }
 
-    public static class Translation {
+    public static class LocalizationKeyParams {
 
-        private final TranslationKey key;
+        private final LocalizationKey key;
         private final List<String> params;
 
-        public Translation(String key, String... params) {
-            this.key = new TranslationKey(key);
+        public LocalizationKeyParams(String key, String... params) {
+            this.key = new LocalizationKey(key);
             this.params = Arrays.asList(params);
-            if(this.params.size() > 10) {
+            if (this.params.size() > 10) {
                 throw new IllegalStateException("Translations can only have at most 10 parameters");
             }
         }
 
         public String translate() {
-            String translation = key.getHumanReadableKey();
+            String translation = key.getTranslationValue();
 
             for (int i = 0; i < params.size(); i++) {
                 String param = params.get(i);
@@ -124,10 +124,6 @@ public class Localization {
 
     public static String lang(String key, String... params) {
         return translate(messages, "message", key, params);
-    }
-
-    public static String lang(String key) {
-        return lang(key, (String[]) null);
     }
 
     public static String menuTitle(String key, String... params) {
