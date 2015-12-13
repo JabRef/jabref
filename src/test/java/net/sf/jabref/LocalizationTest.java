@@ -5,6 +5,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,12 +18,28 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LocalizationTest {
 
     @Test
     public void findComplicatedKeys() {
-        Localization.lang("Copy_\\=:cite{BibTeX_key}");
+        Localization.lang("Copy_\\cite{BibTeX_key}");
+    }
+
+    @Test
+    public void testTranslation() {
+        assertEquals("What \n : %e %c a b", new Localization.Translation("What \n : %e %c_%0 %1", "a", "b").translate());
+    }
+
+    @Test
+    public void readWriteTranslationKeys() throws IOException {
+        Properties properties = new Properties();
+        properties.put("Copy_\\cite{BibTeX_key}", "Something with \\ and : =");
+        assertEquals("Copy_\\cite{BibTeX_key}", properties.propertyNames().nextElement());
+        StringWriter writer = new StringWriter();
+        properties.store(writer, "");
+        assertTrue(writer.toString().contains("Copy_\\\\cite{BibTeX_key}=Something with \\\\ and \\: \\="));
     }
 
     @Test
@@ -181,7 +198,7 @@ public class LocalizationTest {
                     index++;
                 }
 
-                String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(buffer.toString()).replaceAll("QUOTATIONPLACEHOLDER").replaceAll("\\\\\\\\","\\\\");
+                String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(buffer.toString()).replaceAll("QUOTATIONPLACEHOLDER");
 
                 // only retain what is within quotation
                 StringBuilder b = new StringBuilder();

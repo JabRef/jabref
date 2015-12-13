@@ -291,8 +291,8 @@ public class SynchronizeFileField extends AbstractWorker {
         }
 
         int entriesChangedCount = 0;
-        panel.output(Localization.lang("Finished synchronizing %0 links. Entries changed%c %1.",
-                new String[]{fieldName.toUpperCase(), String.valueOf(entriesChangedCount)}));
+        panel.output(Localization.lang("Finished synchronizing %0 links. Entries changed: %1.",
+                fieldName.toUpperCase(), String.valueOf(entriesChangedCount)));
         panel.frame().setProgressBarVisible(false);
         if (entriesChangedCount > 0) {
             panel.markBaseChanged();

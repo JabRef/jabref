@@ -57,7 +57,7 @@ public class Localization {
         String translation = null;
         try {
             if (resBundle != null) {
-                translation = resBundle.getString(key.replaceAll(" ", "_"));
+                translation = resBundle.getString(new TranslationKey(key).getPropertiesKey());
             }
         } catch (MissingResourceException ex) {
             LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
@@ -79,13 +79,30 @@ public class Localization {
         return key;
     }
 
-    private static class Translation {
+    public static class TranslationKey {
 
         private final String key;
+
+        public TranslationKey(String key) {
+            this.key = Objects.requireNonNull(key);
+        }
+
+        public String getPropertiesKey() {
+            return this.key.replaceAll(" ", "_");
+        }
+
+        public String getHumanReadableKey() {
+            return this.key.replaceAll("_", " ");
+        }
+    }
+
+    public static class Translation {
+
+        private final TranslationKey key;
         private final List<String> params;
 
         public Translation(String key, String... params) {
-            this.key = Objects.requireNonNull(key);
+            this.key = new TranslationKey(key);
             this.params = Arrays.asList(params);
             if(this.params.size() > 10) {
                 throw new IllegalStateException("Translations can only have at most 10 parameters");
@@ -93,7 +110,7 @@ public class Localization {
         }
 
         public String translate() {
-            String translation = key.replaceAll("_", " ").replaceAll("%e", "=").replaceAll("%c", ":");
+            String translation = key.getHumanReadableKey();
 
             for (int i = 0; i < params.size(); i++) {
                 String param = params.get(i);

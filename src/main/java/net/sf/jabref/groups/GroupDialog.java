@@ -439,10 +439,10 @@ class GroupDialog extends JDialog {
             s1 = m_sgSearchExpression.getText().trim();
             okEnabled = okEnabled & !s1.isEmpty();
             if (!okEnabled) {
-                setDescription(Localization.lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter%c<p>"
+                setDescription(Localization.lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p>"
                         + "<tt>smith</tt><p>"
-                        + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter%c<p>"
-                        + "<tt>author%esmith and title%eelectrical</tt>"));
+                        + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter:<p>"
+                        + "<tt>author=smith and title=electrical</tt>"));
             } else {
                 setDescription(SearchDescribers.getSearchDescriberFor(SearchRules.getSearchRuleByQuery(s1, isCaseSensitive(), isRegex()), s1).getDescription());
 
@@ -520,7 +520,7 @@ class GroupDialog extends JDialog {
             sb.append(StringUtil.quoteForHTML(sa[i]));
         }
         String s = Localization.lang(
-                "The regular expression <b>%0</b> is invalid%c",
+                "The regular expression <b>%0</b> is invalid:",
                 StringUtil.quoteForHTML(regExp))
                 + "<p><tt>"
                 + sb
