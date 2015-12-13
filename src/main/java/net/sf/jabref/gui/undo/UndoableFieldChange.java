@@ -17,6 +17,7 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +44,10 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
         this.field = field;
         this.oldValue = oldValue;
         this.newValue = newValue;
+    }
+
+    public UndoableFieldChange(FieldChange change) {
+        this(change.getEntry(), change.getField(), change.getOldValue(), change.getNewValue());
     }
 
     @Override

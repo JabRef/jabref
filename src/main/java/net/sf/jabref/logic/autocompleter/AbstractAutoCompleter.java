@@ -14,55 +14,61 @@
 package net.sf.jabref.logic.autocompleter;
 
 import java.util.ArrayList;
-
 import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sf.jabref.model.entry.BibtexEntry;
-
 /**
- * An autocompleter delivers possible completions for a given string. There are different types of autocompleters for
- * different use cases.
- * 
- * Example: {@link NameFieldAutoCompleter}, {@link EntireFieldAutoCompleter}
+ * Delivers possible completions for a given string.
  *
  * @author kahlert, cordes, olly98
  * @see AutoCompleterFactory
  */
 public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
 
-    private static final int SHORTEST_WORD = 4;
+    private static final int SHORTEST_WORD_TO_ADD = 4;
+    private final AutoCompletePreferences preferences;
 
-    // stores the strings as is
-    private final TreeSet<String> indexCaseSensitive = new TreeSet<>();
 
-    // stores strings in lowercase
-    private final TreeSet<String> indexCaseInsensitive = new TreeSet<>();
+    public AbstractAutoCompleter(AutoCompletePreferences preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
+    }
 
-    // stores for a lowercase string the possible expanded strings
-    private final HashMap<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<>();
-
-    @Override
-    public abstract void addBibtexEntry(BibtexEntry entry);
 
     /**
-     * Returns one or more possible completions for a given String. The returned
-     * completion depends on which informations were stored while adding
-     * BibtexEntries by the used implementation of {@link AbstractAutoCompleter}
-     * .
-     *
-     * @see AbstractAutoCompleter#addBibtexEntry(BibtexEntry)
+     * Stores the strings as is.
+     */
+    private final TreeSet<String> indexCaseSensitive = new TreeSet<>();
+
+    /**
+     * Stores strings in lowercase.
+     */
+    private final TreeSet<String> indexCaseInsensitive = new TreeSet<>();
+
+    /**
+     * Stores for a lowercase string the possible expanded strings.
+     */
+    private final HashMap<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<>();
+
+    /**
+     * {@inheritDoc}
+     * The completion is case sensitive if the string contains upper case letters.
+     * Otherwise the completion is case insensitive.
      */
     @Override
-    public String[] complete(String toComplete) {
-        if (AbstractAutoCompleter.stringMinLength(toComplete)) {
-            return null;
+    public List<String> complete(String toComplete) {
+        if(toComplete == null) {
+            return new ArrayList<>();
+        }
+        if (isTooShortToComplete(toComplete)) {
+            return new ArrayList<>();
         }
         String lowerCase = toComplete.toLowerCase();
 
         if (lowerCase.equals(toComplete)) {
-            // user typed in lower case word -> we do an case-insenstive search
+            // user typed in lower case word -> we do an case-insensitive search
             String ender = AbstractAutoCompleter.incrementLastCharacter(lowerCase);
             SortedSet<String> subset = indexCaseInsensitive.subSet(lowerCase, ender);
 
@@ -72,13 +78,13 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
             for (String s : subset) {
                 result.addAll(possibleStringsForSearchString.get(s));
             }
-            return result.toArray(new String[result.size()]);
+            return result;
         } else {
             // user typed in a mix of upper case and lower case,
             // we assume user wants to have exact search
             String ender = AbstractAutoCompleter.incrementLastCharacter(toComplete);
             SortedSet<String> subset = indexCaseSensitive.subSet(toComplete, ender);
-            return subset.toArray(new String[subset.size()]);
+            return new ArrayList<>(subset);
         }
     }
 
@@ -96,32 +102,32 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
         return toIncrement.substring(0, toIncrement.length() - 1) + Character.toString((char) (lastChar + 1));
     }
 
-    private static boolean stringMinLength(String toCheck) {
-        return toCheck.length() < AutoCompleterFactory.SHORTEST_TO_COMPLETE;
+    /**
+     * Returns whether the string is to short to be completed.
+     */
+    private boolean isTooShortToComplete(String toCheck) {
+        return toCheck.length() < preferences.getShortestLengthToComplete();
     }
 
     @Override
-    public void addWordToIndex(String word) {
-        if (word.length() >= AbstractAutoCompleter.SHORTEST_WORD) {
-            indexCaseSensitive.add(word);
-
-            // insensitive treatment
-            // first, add the lower cased word to search index
-            // second, add a mapping from the lower cased word to the real word
-            String lowerCase = word.toLowerCase();
-            indexCaseInsensitive.add(lowerCase);
-            TreeSet<String> set = possibleStringsForSearchString.get(lowerCase);
-            if (set == null) {
-                set = new TreeSet<>();
-            }
-            set.add(word);
-            possibleStringsForSearchString.put(lowerCase, set);
+    public void addItemToIndex(String word) {
+        if (word.length() < getLengthOfShortestWordToAdd()) {
+            return;
         }
-    }
 
-    @Override
-    public boolean indexContainsWord(String word) {
-        return indexCaseInsensitive.contains(word.toLowerCase());
+        indexCaseSensitive.add(word);
+
+        // insensitive treatment
+        // first, add the lower cased word to search index
+        // second, add a mapping from the lower cased word to the real word
+        String lowerCase = word.toLowerCase();
+        indexCaseInsensitive.add(lowerCase);
+        TreeSet<String> set = possibleStringsForSearchString.get(lowerCase);
+        if (set == null) {
+            set = new TreeSet<>();
+        }
+        set.add(word);
+        possibleStringsForSearchString.put(lowerCase, set);
     }
 
     @Override
@@ -132,5 +138,9 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
     @Override
     public String getAutoCompleteText(String item) {
         return item;
+    }
+
+    protected int getLengthOfShortestWordToAdd() {
+        return AbstractAutoCompleter.SHORTEST_WORD_TO_ADD;
     }
 }

@@ -13,6 +13,9 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Add options to close other/all databases in tab right-click menu
+- Implements #470: Show editor (as an alternative to author) and booktitle (as an alternative to journal) in the main table by default
+- Restore focus to last focused tab on start
 - Add ability to format/cleanup the date field
 - Add support for proxy authentication via VM args and GUI settings, this implements Feature Request #388
 - Move Bibtex and Biblatex mode switcher to File menu
@@ -20,6 +23,9 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
 
 ### Fixed
+- Fixed #434: Revert to old 'JabRef' installation folder name instead of 'jabref'
+- Fixed #435: Retrieve non open access ScienceDirect PDFs via HTTP DOM
+- Fixed: Cleanup process aborts if linked file does not exists
 - Fixed #420: Reenable preference changes
 - Fixed #414: Rework BibLatex entry types with correct required and optional fields
 - Fixed #413: Help links in released jar version are not working
@@ -29,6 +35,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Removed
 - Removed file history size preference (never available from the UI)
+- Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
 
 
 

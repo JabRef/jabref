@@ -34,13 +34,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -49,6 +43,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.exporter.*;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinds;
@@ -65,6 +60,7 @@ import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -72,11 +68,6 @@ import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.exporter.AutoSaveManager;
-import net.sf.jabref.exporter.ExportCustomizationDialog;
-import net.sf.jabref.exporter.ExportFormats;
-import net.sf.jabref.exporter.SaveAllAction;
-import net.sf.jabref.exporter.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;
 import net.sf.jabref.external.push.PushToApplications;
@@ -120,7 +111,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public SidePaneManager sidePaneManager;
 
     public JTabbedPane tabbedPane; // initialized at constructor
-    final String htmlPadding = "<html><div style='padding:2px 5px;'>";
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
@@ -542,18 +532,47 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     }
 
+    private JPopupMenu tabPopupMenu() {
+        JPopupMenu popupMenu = new JPopupMenu();
+
+        // Close actions
+        JMenuItem close = new JMenuItem(Localization.lang("Close"));
+        JMenuItem closeOthers = new JMenuItem(Localization.lang("Close Others"));
+        JMenuItem closeAll = new JMenuItem(Localization.lang("Close All"));
+        close.addActionListener(closeDatabaseAction);
+        closeOthers.addActionListener(closeOtherDatabasesAction);
+        closeAll.addActionListener(closeAllDatabasesAction);
+        popupMenu.add(close);
+        popupMenu.add(closeOthers);
+        popupMenu.add(closeAll);
+
+        popupMenu.addSeparator();
+
+        JMenuItem databasePropertiesBtn = new JMenuItem(Localization.lang("Database properties"));
+        databasePropertiesBtn.addActionListener(databaseProperties);
+        popupMenu.add(databasePropertiesBtn);
+
+        JMenuItem bibtexKeyPatternBtn = new JMenuItem(Localization.lang("Bibtex key patterns"));
+        bibtexKeyPatternBtn.addActionListener(bibtexKeyPattern);
+        popupMenu.add(bibtexKeyPatternBtn);
+
+        JMenuItem manageSelectorsBtn = new JMenuItem(Localization.lang("Manage content selectors"));
+        manageSelectorsBtn.addActionListener(manageSelectors);
+        popupMenu.add(manageSelectorsBtn);
+
+        return popupMenu;
+    }
+
     private void init() {
-        tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern, closeDatabaseAction);
+        tabbedPane = new DragDropPopupPane(tabPopupMenu());
 
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
-        // glassPane.setVisible(true);
 
         setTitle(GUIGlobals.frameTitle);
         setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowClosing(WindowEvent e) {
                 if (OS.OS_X) {
@@ -580,7 +599,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // Set up a ComponentListener that saves the last size and position of the dialog
         this.addComponentListener(new ComponentAdapter() {
-
             @Override
             public void componentResized(ComponentEvent e) {
                 // Save dialog position
@@ -594,7 +612,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         });
 
-
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
 
@@ -604,7 +621,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          * cut/paste/copy operations would some times occur in the wrong tab.
          */
         tabbedPane.addChangeListener(new ChangeListener() {
-
             @Override
             public void stateChanged(ChangeEvent e) {
                 markActiveBasePanel();
@@ -673,7 +689,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             return;
         }
 
-        String changeFlag = panel.isBaseChanged() ? "*" : "";
+        String changeFlag = panel.isModified() ? "*" : "";
 
         if (panel.getDatabaseFile() != null) {
             String databaseFile = panel.getDatabaseFile().getPath();
@@ -782,6 +798,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     names[i] = filenames.elementAt(i);
                 }
                 prefs.putStringArray(JabRefPreferences.LAST_EDITED, names);
+                File focusedDatabase = getCurrentBasePanel().getDatabaseFile();
+                new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
 
         }
@@ -827,7 +845,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         Vector<String> filenames = new Vector<>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (getBasePanelAt(i).isBaseChanged()) {
+                if (getBasePanelAt(i).isModified()) {
                     tabbedPane.setSelectedIndex(i);
                     Object[] options = {Localization.lang("Save changes"),
                             Localization.lang("Discard changes"),
@@ -1019,7 +1037,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * handle the color of active and inactive JTabbedPane tabs
      */
-    private void markActiveBasePanel() {
+    public void markActiveBasePanel() {
         int now = tabbedPane.getSelectedIndex();
         int len = tabbedPane.getTabCount();
         if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
@@ -1044,20 +1062,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return tabbedPane;
     }
 
-    public String getTabTitle(JComponent comp) {
-        return tabbedPane.getTitleAt(getTabIndex(comp));
-    }
-
-    public String getTabTooltip(JComponent comp) {
-        return tabbedPane.getToolTipTextAt(getTabIndex(comp));
-    }
-
     public void setTabTitle(JComponent comp, String title, String toolTip) {
         int index = getTabIndex(comp);
-        tabbedPane.setTitleAt(index, htmlPadding + title);
+        tabbedPane.setTitleAt(index, title);
         tabbedPane.setToolTipTextAt(index, toolTip);
     }
-
 
     class GeneralAction extends MnemonicAwareAction {
 
@@ -1467,28 +1476,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         tlb.addSeparator();
 
-        // Removing the separate push-to buttons, replacing them by the
-        // multipurpose button:
-        //tlb.addAction(emacsPushAction);
-        //tlb.addAction(lyxPushAction);
-        //tlb.addAction(winEdtPushAction);
         tlb.add(pushExternalButton.getComponent());
         tlb.addSeparator();
         tlb.add(donationAction);
-//        tlb.addAction(openFolder);
-//        tlb.addAction(openFile);
-        //tlb.addAction(openPdf);
-        //tlb.addAction(openUrl);
-
-        //tlb.addSeparator();
-        //tlb.addAction(showPrefs);
-        tlb.add(Box.createHorizontalGlue());
-        //tlb.add(new JabRefLabel(GUIGlobals.frameTitle+" "+GUIGlobals.version));
-
-        tlb.addAction(closeDatabaseAction);
-        //Insets margin = new Insets(0, 0, 0, 0);
-        //for (int i=0; i<tlb.getComponentCount(); i++)
-        //  ((JButton)tlb.getComponentAtIndex(i)).setMargin(margin);
     }
 
     public void output(final String s) {
@@ -1570,7 +1560,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * <p>
      * The action that are affected are set in initActions.
      */
-    private void updateEnabledState() {
+    public void updateEnabledState() {
         int tabCount = tabbedPane.getTabCount();
         if (tabCount != previousTabCount) {
             previousTabCount = tabCount;
@@ -1739,84 +1729,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     // The action for closing the current database and leaving the window open.
     private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
-
-    class CloseDatabaseAction extends MnemonicAwareAction {
-        public CloseDatabaseAction() {
-            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-            putValue(Action.NAME, Localization.menuTitle("Close database"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
-            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.CLOSE_DATABASE));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Ask here if the user really wants to close, if the base
-            // has not been saved since last save.
-            boolean close = true;
-            if (getCurrentBasePanel() == null) { // when it is initially empty
-                return; // nbatada nov 7
-            }
-
-            if (getCurrentBasePanel().isBaseChanged()) {
-
-                String filename;
-
-                if (getCurrentBasePanel().getDatabaseFile() != null) {
-                    filename = getCurrentBasePanel().getDatabaseFile().getAbsolutePath();
-                } else {
-                    filename = GUIGlobals.untitledTitle;
-                }
-
-                int answer = showSaveDialog(filename);
-                if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
-                    close = false; // The user has cancelled.
-                }
-                if (answer == JOptionPane.YES_OPTION) {
-                    // The user wants to save.
-                    try {
-                        SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
-                        saveAction.runCommand();
-                        if (saveAction.isCancelled() || !saveAction.isSuccess()) {
-                            // The action either not cancelled or unsuccessful.
-                            // Break!
-                            close = false;
-                        }
-
-                    } catch (Throwable ex) {
-                        // Something prevented the file
-                        // from being saved. Break!!!
-                        close = false;
-                    }
-
-                }
-            }
-
-            if (close) {
-                close();
-            }
-        }
-
-        public void close() {
-            BasePanel pan = getCurrentBasePanel();
-            pan.cleanUp();
-            AutoSaveManager.deleteAutoSaveFile(pan); // Delete autosave
-            tabbedPane.remove(pan);
-            if (tabbedPane.getTabCount() > 0) {
-                markActiveBasePanel();
-            }
-            setWindowTitle();
-            updateEnabledState(); // FIXME: Man, this is what I call a bug that this is not called.
-            output(Localization.lang("Closed database") + '.');
-            // update tab titles
-            updateAllTabTitles();
-        }
-    }
+    private final CloseAllDatabasesAction closeAllDatabasesAction = new CloseAllDatabasesAction();
+    private final CloseOtherDatabasesAction closeOtherDatabasesAction = new CloseOtherDatabasesAction();
 
     // The action for opening the preferences dialog.
     private final AbstractAction showPrefs = new ShowPrefsAction();
 
-    class ShowPrefsAction
-            extends MnemonicAwareAction {
+    class ShowPrefsAction extends MnemonicAwareAction {
 
         public ShowPrefsAction() {
             super(IconTheme.JabRefIcon.PREFERENCES.getIcon());
@@ -2324,7 +2243,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JOptionPane.showMessageDialog(this, message);
     }
 
-    private int showSaveDialog(String filename) {
+    public int showSaveDialog(String filename) {
         Object[] options = {Localization.lang("Save changes"),
                 Localization.lang("Discard changes"),
                 Localization.lang("Return to JabRef")};
@@ -2333,5 +2252,104 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 Localization.lang("Database '%0' has changed.", filename),
                 Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+    }
+
+    private void closeTab(BasePanel panel) {
+        // empty tab without database
+        if (panel == null) {
+            return;
+        }
+
+        if (panel.isModified()) {
+            if(confirmClose(panel)) {
+                removeTab(panel);
+            }
+        } else {
+            removeTab(panel);
+        }
+    }
+
+    // Ask if the user really wants to close, if the base has not been saved
+    private boolean confirmClose(BasePanel panel) {
+        boolean close = false;
+        String filename;
+
+        if (panel.getDatabaseFile() != null) {
+            filename = panel.getDatabaseFile().getAbsolutePath();
+        } else {
+            filename = GUIGlobals.untitledTitle;
+        }
+
+        int answer = showSaveDialog(filename);
+        if (answer == JOptionPane.YES_OPTION) {
+            // The user wants to save.
+            try {
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
+                saveAction.runCommand();
+                if (saveAction.isSuccess()) {
+                    close = true;
+                }
+            } catch (Throwable ex) {
+                // do not close
+            }
+
+        } else if(answer == JOptionPane.NO_OPTION) {
+            // discard changes
+            close = true;
+        }
+        return close;
+    }
+
+    private void removeTab(BasePanel panel) {
+        panel.cleanUp();
+        AutoSaveManager.deleteAutoSaveFile(panel);
+        tabbedPane.remove(panel);
+        if (tabbedPane.getTabCount() > 0) {
+            markActiveBasePanel();
+        }
+        setWindowTitle();
+        updateEnabledState();
+        output(Localization.lang("Closed database") + '.');
+        // update tab titles
+        updateAllTabTitles();
+    }
+
+    public class CloseDatabaseAction extends MnemonicAwareAction {
+        public CloseDatabaseAction() {
+            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
+            putValue(Action.NAME, Localization.menuTitle("Close database"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
+            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.CLOSE_DATABASE));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            closeTab(getCurrentBasePanel());
+        }
+    }
+
+    public class CloseAllDatabasesAction extends MnemonicAwareAction {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            final Component[] panels = tabbedPane.getComponents();
+
+            for(Component p : panels) {
+                closeTab((BasePanel) p);
+            }
+        }
+    }
+
+    public class CloseOtherDatabasesAction extends MnemonicAwareAction {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            final BasePanel active = (BasePanel) getCurrentBasePanel();
+            final Component[] panels = tabbedPane.getComponents();
+
+            for(Component p : panels) {
+                if(p != active) {
+                    closeTab((BasePanel) p);
+                }
+            }
+        }
     }
 }

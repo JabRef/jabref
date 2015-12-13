@@ -69,63 +69,61 @@ public class DuplicateSearch implements Runnable {
 
         final ArrayList<BibtexEntry> toRemove = new ArrayList<>();
         final ArrayList<BibtexEntry> toAdd = new ArrayList<>();
-        while (!st.finished() || (current < duplicates.size()))
-        {
 
-            if (current >= duplicates.size())
-            {
-                // wait until the search thread puts something into duplicates vector
-                // or finish its work
-                synchronized (duplicates)
-                {
-                    try
-                    {
+        synchronized (duplicates) {
+            while (!st.finished() || (current < duplicates.size())) {
+
+                if (current >= duplicates.size()) {
+                    // wait until the search thread puts something into duplicates vector
+                    // or finish its work
+
+                    try {
                         duplicates.wait();
-                    } catch (Exception ignored) {
+                    } catch (InterruptedException ignored) {
                         // Ignore
                     }
-                }
-            } else // duplicates found
-            {
 
-                BibtexEntry[] be = duplicates.get(current);
-                current++;
-                if (!toRemove.contains(be[0]) && !toRemove.contains(be[1])) {
-                    // Check if they are exact duplicates:
-                    boolean askAboutExact = false;
-                    if (DuplicateCheck.compareEntriesStrictly(be[0], be[1]) > 1) {
-                        if (autoRemoveExactDuplicates) {
+                } else // duplicates found
+                {
+
+                    BibtexEntry[] be = duplicates.get(current);
+                    current++;
+                    if (!toRemove.contains(be[0]) && !toRemove.contains(be[1])) {
+                        // Check if they are exact duplicates:
+                        boolean askAboutExact = false;
+                        if (DuplicateCheck.compareEntriesStrictly(be[0], be[1]) > 1) {
+                            if (autoRemoveExactDuplicates) {
+                                toRemove.add(be[1]);
+                                duplicateCounter++;
+                                continue;
+                            }
+                            askAboutExact = true;
+                        }
+
+                        DuplicateCallBack cb = new DuplicateCallBack(panel.frame, be[0], be[1],
+                                askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
+                                        DuplicateResolverDialog.DUPLICATE_SEARCH);
+                        ((CallBack) Spin.over(cb)).update();
+
+                        duplicateCounter++;
+                        int answer = cb.getSelected();
+                        if ((answer == DuplicateResolverDialog.KEEP_UPPER)
+                                || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
                             toRemove.add(be[1]);
-                            duplicateCounter++;
-                            continue;
+                            if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT) {
+                                autoRemoveExactDuplicates = true; // Remember choice
+                            }
+                        } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
+                            toRemove.add(be[0]);
+                        } else if (answer == DuplicateResolverDialog.BREAK) {
+                            st.setFinished(); // thread killing
+                            current = Integer.MAX_VALUE;
+                            duplicateCounter--; // correct counter
+                        } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
+                            toRemove.add(be[0]);
+                            toRemove.add(be[1]);
+                            toAdd.add(cb.getMergedEntry());
                         }
-                        askAboutExact = true;
-                    }
-
-                    DuplicateCallBack cb = new DuplicateCallBack(panel.frame, be[0], be[1],
-                            askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
-                                DuplicateResolverDialog.DUPLICATE_SEARCH);
-                    ((CallBack) Spin.over(cb)).update();
-
-                    duplicateCounter++;
-                    int answer = cb.getSelected();
-                    if ((answer == DuplicateResolverDialog.KEEP_UPPER)
-                            || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
-                        toRemove.add(be[1]);
-                        if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)
-                        {
-                            autoRemoveExactDuplicates = true; // Remember choice
-                        }
-                    } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
-                        toRemove.add(be[0]);
-                    } else if (answer == DuplicateResolverDialog.BREAK) {
-                        st.setFinished(); // thread killing
-                        current = Integer.MAX_VALUE;
-                        duplicateCounter--; // correct counter
-                    } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
-                        toRemove.add(be[0]);
-                        toRemove.add(be[1]);
-                        toAdd.add(cb.getMergedEntry());
                     }
                 }
             }
@@ -154,7 +152,7 @@ public class DuplicateSearch implements Runnable {
                 }
 
                 panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size()
-                + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
+                        + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
 
                 ce.end();
                 panel.undoManager.addEdit(ce);
@@ -179,7 +177,7 @@ public class DuplicateSearch implements Runnable {
                     // If (suspected) duplicates, add them to the duplicates vector.
                     if (eq) {
                         synchronized (duplicates) {
-                            duplicates.add(new BibtexEntry[] {bes[i], bes[j]});
+                            duplicates.add(new BibtexEntry[]{bes[i], bes[j]});
                             duplicates.notifyAll(); // send wake up all
                         }
                     }
@@ -198,8 +196,7 @@ public class DuplicateSearch implements Runnable {
 
         // Thread cancel option
         // no synchronized used because no "realy" critical situations expected
-        public void setFinished()
-        {
+        public void setFinished() {
             finished = true;
         }
     }
@@ -216,7 +213,7 @@ public class DuplicateSearch implements Runnable {
 
 
         public DuplicateCallBack(JabRefFrame frame, BibtexEntry one, BibtexEntry two,
-                int dialogType) {
+                                 int dialogType) {
 
             this.frame = frame;
             this.one = one;

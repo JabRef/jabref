@@ -435,14 +435,16 @@ class StyleSelectDialog {
         File dirF = new File(dir);
         if (dirF.isDirectory()) {
             File[] files = dirF.listFiles();
-            for (File file : files) {
-                // If the file looks like a style file, parse it:
-                if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
-                    addSingleFile(file);
-                }
-                // If the file is a directory, and we should recurse, do:
-                else if (file.isDirectory() && recurse) {
-                    addStyles(file.getPath(), recurse);
+            if (files != null) {
+                for (File file : files) {
+                    // If the file looks like a style file, parse it:
+                    if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
+                        addSingleFile(file);
+                    }
+                    // If the file is a directory, and we should recurse, do:
+                    else if (file.isDirectory() && recurse) {
+                        addStyles(file.getPath(), recurse);
+                    }
                 }
             }
         }

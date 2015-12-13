@@ -19,8 +19,23 @@ public class UtilTest {
 
     @Test
     public void testCheckLegalKey() {
+        // Enforce legal keys
+        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA", true));
+        Assert.assertEquals("SPECIALCHARS", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", true));
+        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r", true));
+
+        // Do not enforce legal keys
+        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA", false));
+        Assert.assertEquals("SPECIALCHARS#~^", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", false));
+        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r", false));
+
+        // Check null input
+        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null));
+        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null, true));
+        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null, false));
+
+        // Use preferences setting
         Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA"));
-        Assert.assertEquals("SPECIALCHARS", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^"));
         Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r"));
     }
 

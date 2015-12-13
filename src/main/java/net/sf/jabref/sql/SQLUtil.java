@@ -15,6 +15,7 @@
  */
 package net.sf.jabref.sql;
 
+import java.io.Closeable;
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -215,7 +216,7 @@ public class SQLUtil {
      * @param query The DML statements to be processed
      * @return the result of the statement
      */
-    public static Object processQueryWithResults(Object out, String query) throws SQLException {
+    public static AutoCloseable processQueryWithResults(Object out, String query) throws SQLException {
         if (out instanceof PrintStream) {// TODO: how to handle the PrintStream
             // case?
             PrintStream fout = (PrintStream) out;

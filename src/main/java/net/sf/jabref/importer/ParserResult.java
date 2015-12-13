@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.MetaData;
@@ -45,10 +46,6 @@ public class ParserResult {
     private boolean invalid;
     private boolean toOpenTab;
 
-    // Which JabRef version wrote the file, if any?
-    private String jabrefVersion;
-    private int jabrefMajorVersion;
-    private int jabrefMinorVersion;
 
     public ParserResult(Collection<BibtexEntry> entries) {
         this(ImportFormatReader.createDatabase(entries), null, new HashMap<>());
@@ -62,6 +59,7 @@ public class ParserResult {
 
     /**
      * Check if this base is marked to be added to the currently open tab. Default is false.
+     *
      * @return
      */
     public boolean toOpenTab() {
@@ -70,44 +68,6 @@ public class ParserResult {
 
     public void setToOpenTab(boolean toOpenTab) {
         this.toOpenTab = toOpenTab;
-    }
-
-    /**
-     * Find which version of JabRef, if any, produced this bib file.
-     * @return The version number string, or null if no JabRef signature could be read.
-     */
-    public String getJabrefVersion() {
-        return jabrefVersion;
-    }
-
-    /**
-     * Set the JabRef version number string for this parser result.
-     * @param jabrefVersion The version number string.
-     */
-    public void setJabrefVersion(String jabrefVersion) {
-        this.jabrefVersion = jabrefVersion;
-    }
-
-    /**
-     * @return 0 if not known (e.g., no version header in file)
-     */
-    public int getJabrefMajorVersion() {
-        return jabrefMajorVersion;
-    }
-
-    public void setJabrefMajorVersion(int jabrefMajorVersion) {
-        this.jabrefMajorVersion = jabrefMajorVersion;
-    }
-
-    /**
-     * @return 0 if not known (e.g., no version header in file)
-     */
-    public int getJabrefMinorVersion() {
-        return jabrefMinorVersion;
-    }
-
-    public void setJabrefMinorVersion(int jabrefMinorVersion) {
-        this.jabrefMinorVersion = jabrefMinorVersion;
     }
 
     public BibtexDatabase getDatabase() {
@@ -176,6 +136,7 @@ public class ParserResult {
 
     /**
      * Add a key to the list of duplicated BibTeX keys found in the database.
+     *
      * @param key The duplicated key
      */
     public void addDuplicateKey(String key) {
@@ -186,6 +147,7 @@ public class ParserResult {
 
     /**
      * Query whether any duplicated BibTeX keys have been found in the database.
+     *
      * @return true if there is at least one duplicate key.
      */
     public boolean hasDuplicateKeys() {
@@ -194,6 +156,7 @@ public class ParserResult {
 
     /**
      * Get all duplicated keys found in the database.
+     *
      * @return An array containing the duplicated keys.
      */
     public String[] getDuplicateKeys() {
@@ -223,4 +186,5 @@ public class ParserResult {
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
+
 }

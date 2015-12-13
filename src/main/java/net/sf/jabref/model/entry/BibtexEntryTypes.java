@@ -2,10 +2,11 @@ package net.sf.jabref.model.entry;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class represents all supported BibTex entry types.
- *
+ * <p>
  * Article, Book, Booklet, Conference, Inbook, Incollection, Inproceedings,
  * Manual, Mastersthesis, Misc, Phdthesis, Proceedings, Techreport, Unpublished
  */
@@ -13,7 +14,7 @@ public class BibtexEntryTypes {
 
     /**
      * An article from a journal or magazine.
-     *
+     * <p>
      * Required fields: author, title, journal, year.
      * Optional fields: volume, number, pages, month, note.
      */
@@ -32,7 +33,7 @@ public class BibtexEntryTypes {
 
     /**
      * A book with an explicit publisher.
-     *
+     * <p>
      * Required fields: author or editor, title, publisher, year.
      * Optional fields: volume or number, series, address, edition, month, note.
      */
@@ -51,7 +52,7 @@ public class BibtexEntryTypes {
 
     /**
      * A work that is printed and bound, but without a named publisher or sponsoring institution.
-     *
+     * <p>
      * Required field: title.
      * Optional fields: author, howpublished, address, month, year, note.
      */
@@ -70,7 +71,7 @@ public class BibtexEntryTypes {
 
     /**
      * An article in a conference proceedings.
-     *
+     * <p>
      * Required fields: author, title, booktitle, year.
      * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
      */
@@ -90,7 +91,7 @@ public class BibtexEntryTypes {
 
     /**
      * A part of a book, which may be a chapter (or section or whatever) and/or a range of pages.
-     *
+     * <p>
      * Required fields: author or editor, title, chapter and/or pages, publisher, year.
      * Optional fields: volume or number, series, type, address, edition, month, note.
      */
@@ -128,7 +129,7 @@ public class BibtexEntryTypes {
 
     /**
      * An article in a conference proceedings.
-     *
+     * <p>
      * Required fields: author, title, booktitle, year.
      * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
      */
@@ -166,7 +167,7 @@ public class BibtexEntryTypes {
 
     /**
      * A Master's thesis.
-     *
+     * <p>
      * Required fields: author, title, school, year.
      * Optional fields: type, address, month, note.
      */
@@ -185,7 +186,7 @@ public class BibtexEntryTypes {
 
     /**
      * Use this type when nothing else fits.
-     *
+     * <p>
      * Required fields: none.
      * Optional fields: author, title, howpublished, month, year, note.
      */
@@ -203,7 +204,7 @@ public class BibtexEntryTypes {
 
     /**
      * A PhD thesis.
-     *
+     * <p>
      * Required fields: author, title, school, year.
      * Optional fields: type, address, month, note.
      */
@@ -222,7 +223,7 @@ public class BibtexEntryTypes {
 
     /**
      * The proceedings of a conference.
-     *
+     * <p>
      * Required fields: title, year.
      * Optional fields: editor, volume or number, series, address, month, organization, publisher, note.
      */
@@ -242,7 +243,7 @@ public class BibtexEntryTypes {
 
     /**
      * A report published by a school or other institution, usually numbered within a series.
-     *
+     * <p>
      * Required fields: author, title, institution, year.
      * Optional fields: type, number, address, month, note.
      */
@@ -261,7 +262,7 @@ public class BibtexEntryTypes {
 
     /**
      * A document having an author and title, but not formally published.
-     *
+     * <p>
      * Required fields: author, title, note.
      * Optional fields: month, year.
      */

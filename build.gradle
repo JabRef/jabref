@@ -94,11 +94,12 @@ dependencies {
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.guava:guava:19.0'
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
 
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.mashape.unirest:unirest-java:1.4.7'
@@ -347,7 +348,7 @@ task releaseJar(dependsOn: "shadowJar") {
 // see http://stackoverflow.com/a/27455099/873282 for an inspiration of this task
 // better solution: https://discuss.gradle.org/t/how-to-download-maven-dependencies-into-project-local-directory-and-set-eclipse-classpath/9851
 task getdeps(type: Copy) {
-    from (configurations.compile+configurations.testCompile) {
+    from (configurations.compile+configurations.antlr3+configurations.antlr4+configurations.testCompile) {
         include "*.jar"
     }
     into 'build/tmp/alldeps/'

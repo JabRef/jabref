@@ -2,18 +2,19 @@ package net.sf.jabref.model.entry;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class represents all supported IEEETran entry types.
- * @see http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEtran_bst_HOWTO.pdf
  *
+ * @see http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEtran_bst_HOWTO.pdf
+ * <p>
  * Electronic, IEEETranBSTCTL, Periodical, Patent, Standard
  */
 public class IEEETranEntryTypes {
-
     /**
      * Electronic entry type for internet references
-     *
+     * <p>
      * Required fields:
      * Optional fields: author, month, year, title, language, howpublished, organization, address, note, url
      */
@@ -57,7 +58,7 @@ public class IEEETranEntryTypes {
 
     /**
      * The periodical entry type is used for journals and magazines.
-     *
+     * <p>
      * Required fields: title, year
      * Optional fields: editor, language, series, volume, number, organization, month, note, url
      */
@@ -76,7 +77,7 @@ public class IEEETranEntryTypes {
 
     /**
      * Entry type for patents.
-     *
+     * <p>
      * Required fields: nationality, number, year or yearfiled
      * Optional fields: author, title, language, assignee, address, type, number, day, dayfiled, month, monthfiled, note, url
      */
@@ -96,7 +97,7 @@ public class IEEETranEntryTypes {
 
     /**
      * The standard entry type is used for proposed or formally published standards.
-     *
+     * <p>
      * Required fields: title, organization or institution
      * Optional fields: author, language, howpublished, type, number, revision, address, month, year, note, url
      */

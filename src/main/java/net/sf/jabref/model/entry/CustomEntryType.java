@@ -60,6 +60,15 @@ public class CustomEntryType implements EntryType {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o instanceof CustomEntryType) {
+            return (this.compareTo(((CustomEntryType) o)) == 0);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -100,5 +109,10 @@ public class CustomEntryType implements EntryType {
             }
         }
         return serialization.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

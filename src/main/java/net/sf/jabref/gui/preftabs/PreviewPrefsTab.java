@@ -42,8 +42,6 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
-    JPanel pan = new JPanel();
-
     private final JTextArea layout1 = new JTextArea("", 1, 1);
     private final JTextArea layout2 = new JTextArea("", 1, 1);
 

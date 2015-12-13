@@ -317,12 +317,14 @@ public class LabelPatternUtil {
             // If university is detected than the previous part is suggested
             // as department
             if (isUniversity) {
-                university = "Uni";
+                StringBuilder universitySB = new StringBuilder();
+                universitySB.append("Uni");
                 for (String k : part) {
                     if ((k.length() >= 5) && !"univ".equals(k.toLowerCase().substring(0, 5))) {
-                        university += k;
+                        universitySB.append(k);
                     }
                 }
+                university = universitySB.toString();
                 if ((index > 0) && (department == null)) {
                     department = parts[index - 1];
                 }
@@ -333,44 +335,46 @@ public class LabelPatternUtil {
                 // Explicitly defined department part is build the same way as
                 // school
             } else if (isSchool || isDepartment) {
-                if (isSchool) {
-                    school = "";
-                }
-                if (isDepartment) {
-                    department = "";
-                }
-
+                StringBuilder schoolSB = new StringBuilder();
+                StringBuilder departmentSB = new StringBuilder();
                 for (String k : part) {
                     if ((k.length() >= 7) && !k.toLowerCase().substring(0, 7).matches("d[ei]part")
                             && !"school".equals(k.toLowerCase())
                             && !"faculty".equals(k.toLowerCase())
                             && !"".equals(k.replaceAll("[^A-Z]", ""))) {
                         if (isSchool) {
-                            school += k.replaceAll("[^A-Z]", "");
+                            schoolSB.append(k.replaceAll("[^A-Z]", ""));
                         }
                         if (isDepartment) {
-                            department += k.replaceAll("[^A-Z]", "");
+                            departmentSB.append(k.replaceAll("[^A-Z]", ""));
                         }
                     }
                 }
+                if (isSchool) {
+                    school = schoolSB.toString();
+                }
+                if (isDepartment) {
+                    department = departmentSB.toString();
+                }
                 // A part not matching university, department nor school.
             } else if (rest == null) {
-                rest = "";
+                StringBuilder restSB = new StringBuilder();
                 // Less than 3 parts -> concatenate those
                 if (part.size() < 3) {
                     for (String k : part)
                      {
-                        rest += k;
+                        restSB.append(k);
                     // More than 3 parts -> use 1st letter abbreviation
                     }
                 } else {
                     for (String k : part) {
                         k = k.replaceAll("[^A-Z]", "");
                         if (!"".equals(k)) {
-                            rest += k;
+                            restSB.append(k);
                         }
                     }
                 }
+                rest = restSB.toString();
             }
         }
 
@@ -553,15 +557,15 @@ public class LabelPatternUtil {
                     label = label.toUpperCase();
                 } else if ("abbr".equals(modifier)) {
                     // Abbreviate - that is,
-                    StringBuilder abbr = new StringBuilder();
+                    StringBuilder abbreviateSB = new StringBuilder();
                     String[] words = label.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
                     for (String word1 : words) {
                         if (!word1.isEmpty()) {
-                            abbr.append(word1.charAt(0));
+                            abbreviateSB.append(word1.charAt(0));
                         }
                     }
-                    label = abbr.toString();
+                    label = abbreviateSB.toString();
 
                 } else if (modifier.startsWith("(") && modifier.endsWith(")")) {
                     // Alternate text modifier in parentheses. Should be inserted if
@@ -603,13 +607,15 @@ public class LabelPatternUtil {
                     // remove the "pure" prefix so the remaining
                     // code in this section functions correctly
                     val = val.substring(4);
-                } else {
-                    if ((authString == null) || "".equals(authString)) {
-                        authString = entry.getField("editor");
-                        if (authString != null) {
-                            authString = LabelPatternUtil.normalize(
-                                    LabelPatternUtil.database.resolveForStrings(authString));
-                        }
+                }
+
+                if ((authString == null) || "".equals(authString)) {
+                    authString = entry.getField("editor");
+                    if (authString != null) {
+                        authString = LabelPatternUtil
+                                .normalize(LabelPatternUtil.database.resolveForStrings(authString));
+                    } else {
+                        authString = "";
                     }
                 }
 
@@ -735,7 +741,9 @@ public class LabelPatternUtil {
                 return LabelPatternUtil.getTitleWords(1, entry.getField("title"));
             } else if ("shortyear".equals(val)) {
                 String ss = entry.getFieldOrAlias("year");
-                if (ss.startsWith("in") || ss.startsWith("sub")) {
+                if (ss == null) {
+                    return "";
+                } else if (ss.startsWith("in") || ss.startsWith("sub")) {
                     return "IP";
                 } else if (ss.length() > 2) {
                     return ss.substring(ss.length() - 2);
@@ -950,7 +958,7 @@ public class LabelPatternUtil {
     }
 
     /**
-     * Gets the forename initals of the last author/editor
+     * Gets the forename initials of the last author/editor
      *
      * @param authorField
      *            a <code>String</code>
@@ -1028,18 +1036,18 @@ public class LabelPatternUtil {
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
     static String NAuthors(String authorField, int n) {
-        String author = "";
         String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\s+\\band\\b\\s+");
         int i = 0;
+        StringBuilder authorSB = new StringBuilder();
         while ((tokens.length > i) && (i < n)) {
             String lastName = tokens[i].replaceAll(",\\s+.*", "");
-            author += lastName;
+            authorSB.append(lastName);
             i++;
         }
-        if (tokens.length <= n) {
-            return author;
+        if (tokens.length > n) {
+            authorSB.append("EtAl");
         }
-        return author + "EtAl";
+        return authorSB.toString();
     }
 
     /**
@@ -1053,22 +1061,20 @@ public class LabelPatternUtil {
     static String oneAuthorPlusIni(String authorField) {
         final int CHARS_OF_FIRST = 5;
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
-        String author = "";
         String[] tokens = authorField.split("\\s+\\band\\b\\s+");
         int i = 1;
         if (tokens.length == 0) {
-            return author;
+            return "";
         }
         String firstAuthor = tokens[0].split(",")[0];
-        author = firstAuthor.substring(0,
-                Math.min(CHARS_OF_FIRST,
-                        firstAuthor.length()));
+        StringBuilder authorSB = new StringBuilder();
+        authorSB.append(firstAuthor.substring(0, Math.min(CHARS_OF_FIRST, firstAuthor.length())));
         while (tokens.length > i) {
             // convert lastname, firstname to firstname lastname
-            author += tokens[i].charAt(0);
+            authorSB.append(tokens[i].charAt(0));
             i++;
         }
-        return author;
+        return authorSB.toString();
     }
 
     /**

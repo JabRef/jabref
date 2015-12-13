@@ -54,6 +54,7 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
@@ -97,7 +98,6 @@ import java.util.*;
 import java.util.List;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
-
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
     public static final int SHOWING_NOTHING = 0;
@@ -219,7 +219,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         db.addDatabaseChangeListener(new GroupTreeUpdater());
 
-
         if (file == null) {
             if (!database.getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
@@ -254,13 +253,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 title = title + '*';
             }
         } else {
-            title = getDatabaseFile().getName();
+            // check if file is modified
+            String changeFlag = isModified() ? "*" : "";
+            title = getDatabaseFile().getName() + changeFlag;
         }
-
         return title;
     }
 
-    public boolean isBaseChanged() {
+    public boolean isModified() {
         return baseChanged;
     }
 
@@ -1236,7 +1236,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // The call to unblock will simply hide the glasspane, so there is no harm in calling
             // it even if the frame hasn't been blocked.
             frame.unblock();
-            LOGGER.error("runCommand error: " + ex.getMessage());
+            LOGGER.error("runCommand error: " + ex.getMessage(), ex);
         }
     }
 
@@ -1689,14 +1689,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         instantiateSearchAutoCompleter();
         this.getDatabase().addDatabaseChangeListener(new SearchAutoCompleterUpdater());
 
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
-            autoCompleters = new ContentAutoCompleters(getDatabase(), metaData);
+            autoCompleters = new ContentAutoCompleters(getDatabase(), metaData, autoCompletePreferences);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
-            autoCompleters = new ContentAutoCompleters();
+            autoCompleters = new ContentAutoCompleters(autoCompletePreferences);
         }
 
         // restore floating search result
@@ -1715,7 +1716,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void instantiateSearchAutoCompleter() {
-        searchAutoCompleter = AutoCompleterFactory.getFor("author", "editor");
+        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
+        searchAutoCompleter = autoCompleterFactory.getPersonAutoCompleter();
         for (BibtexEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);
         }
@@ -2004,13 +2007,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void markBaseChanged() {
         baseChanged = true;
 
-        // Put an asterix behind the filename to indicate the
-        // database has changed.
-        String oldTitle = frame.getTabTitle(this);
-        if (!oldTitle.endsWith("*")) {
-            frame.setTabTitle(this, oldTitle + '*', frame.getTabTooltip(this));
-            frame.setWindowTitle();
-        }
+        // Put an asterix behind the filename to indicate the database has changed.
+        frame.setTabTitle(this, getTabTitle(), getDatabaseFile().getAbsolutePath());
+        frame.setWindowTitle();
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
@@ -2033,9 +2032,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
             if (getDatabaseFile() != null) {
-                frame.setTabTitle(BasePanel.this, getDatabaseFile().getName(), getDatabaseFile().getAbsolutePath());
+                frame.setTabTitle(this, getTabTitle(), getDatabaseFile().getAbsolutePath());
             } else {
-                frame.setTabTitle(BasePanel.this, GUIGlobals.untitledTitle, null);
+                frame.setTabTitle(this, GUIGlobals.untitledTitle, null);
             }
         }
         frame.setWindowTitle();

@@ -35,13 +35,13 @@ import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
- *
+ * <p>
  * Documentation about ISI WOS format:
- *
+ * <p>
  * <ul>
  * <li>http://wos.isitrial.com/help/helpprn.html</li>
  * </ul>
- *
+ * <p>
  * <ul>
  * <li>Check compatibility with other ISI2Bib tools like:
  * http://www-lab.imr.tohoku.ac.jp/~t-nissie/computer/software/isi/ or
@@ -321,7 +321,7 @@ public class IsiImporter extends ImportFormat {
                             || "FN".equals(beg)) {
                         continue;
                     }
-                    hm.put(beg, value);
+                    hm.put(beg.toLowerCase(), value);
                 }
             }
 
@@ -395,10 +395,9 @@ public class IsiImporter extends ImportFormat {
 
     /**
      * Will expand ISI first names.
-     *
+     * <p>
      * Fixed bug from:
      * http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306
-     *
      */
     public static String isiAuthorConvert(String author) {
 

@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,6 +61,14 @@ public class BibtexEntry {
     private boolean searchHit;
     private boolean groupHit;
 
+    private String parsedSerialization;
+
+    /*
+    * marks if the complete serialization, which was read from file, should be used.
+    * Is set to false, if parts of the entry change
+     */
+    private boolean changed;
+
 
     public BibtexEntry() {
         this(IdGenerator.next());
@@ -73,6 +82,7 @@ public class BibtexEntry {
         Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
 
         this.id = id;
+        changed = true;
         setType(type);
     }
 
@@ -131,6 +141,7 @@ public class BibtexEntry {
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
             this.type = type;
+            changed = true;
             firePropertyChangedEvent(TYPE_HEADER, oldType != null ? oldType.getName() : null, type.getName());
         } catch (PropertyVetoException pve) {
             pve.printStackTrace();
@@ -152,6 +163,7 @@ public class BibtexEntry {
         }
 
         this.id = id;
+        changed = true;
     }
 
     /**
@@ -165,7 +177,13 @@ public class BibtexEntry {
      * Returns the contents of the given field, or null if it is not set.
      */
     public String getField(String name) {
-        return fields.get(name);
+        return fields.get(normalizeFieldName(name));
+    }
+
+    private String normalizeFieldName(String fieldName) {
+        Objects.requireNonNull(fieldName, "field name must not be null");
+
+        return fieldName.toLowerCase();
     }
 
     /**
@@ -191,7 +209,7 @@ public class BibtexEntry {
      * extract the year from the 'date' field (analogously for 'month').
      */
     public String getFieldOrAlias(String name) {
-        String fieldValue = getField(name);
+        String fieldValue = getField(normalizeFieldName(name));
 
         if (!Strings.isNullOrEmpty(fieldValue)) {
             return fieldValue;
@@ -294,6 +312,9 @@ public class BibtexEntry {
      * does not check values for content, so e.g. empty strings will be set as such.
      */
     public void setField(Map<String, String> fields) {
+        Objects.requireNonNull(fields, "fields must not be null");
+
+        changed = true;
         this.fields.putAll(fields);
     }
 
@@ -304,22 +325,28 @@ public class BibtexEntry {
      * @param value The value to set.
      */
     public void setField(String name, String value) {
+        Objects.requireNonNull(name, "field name must not be null");
+        Objects.requireNonNull(value, "field value must not be null");
 
-        if (BibtexEntry.ID_FIELD.equals(name)) {
+        String fieldName = normalizeFieldName(name);
+
+        if (BibtexEntry.ID_FIELD.equals(fieldName)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
 
-        String oldValue = fields.get(name);
+        changed = true;
+
+        String oldValue = fields.get(fieldName);
         try {
             // We set the field before throwing the changeEvent, to enable
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
-            fields.put(name, value);
-            firePropertyChangedEvent(name, oldValue, value);
+            fields.put(fieldName, value);
+            firePropertyChangedEvent(fieldName, oldValue, value);
         } catch (PropertyVetoException pve) {
             // Since we have already made the change, we must undo it since
             // the change was rejected:
-            fields.put(name, oldValue);
+            fields.put(fieldName, oldValue);
             throw new IllegalArgumentException("Change rejected: " + pve);
         }
 
@@ -332,14 +359,17 @@ public class BibtexEntry {
      * @param name The field to clear.
      */
     public void clearField(String name) {
+        String fieldName = normalizeFieldName(name);
 
-        if (BibtexEntry.ID_FIELD.equals(name)) {
+        changed = true;
+
+        if (BibtexEntry.ID_FIELD.equals(fieldName)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
-        Object oldValue = fields.get(name);
-        fields.remove(name);
+        Object oldValue = fields.get(fieldName);
+        fields.remove(fieldName);
         try {
-            firePropertyChangedEvent(name, oldValue, null);
+            firePropertyChangedEvent(fieldName, oldValue, null);
         } catch (PropertyVetoException pve) {
             throw new IllegalArgumentException("Change rejected: " + pve);
         }
@@ -351,24 +381,25 @@ public class BibtexEntry {
      * database argument is given, this method will try to look up missing fields in
      * entries linked by the "crossref" field, if any.
      *
-     * @param allFields   An array of field names to be checked.
-     * @param database The database in which to look up crossref'd entries, if any. This
-     *                 argument can be null, meaning that no attempt will be made to follow crossrefs.
+     * @param allFields An array of field names to be checked.
+     * @param database  The database in which to look up crossref'd entries, if any. This
+     *                  argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     boolean allFieldsPresent(String[] allFields, BibtexDatabase database) {
         final String orSeparator = "/";
 
         for (String field : allFields) {
+            String fieldName = normalizeFieldName(field);
             // OR fields
-            if (field.contains(orSeparator)) {
+            if (fieldName.contains(orSeparator)) {
                 String[] altFields = field.split(orSeparator);
 
                 if (!atLeastOnePresent(altFields, database)) {
                     return false;
                 }
             } else {
-                if (BibtexDatabase.getResolvedField(field, this, database) == null) {
+                if (BibtexDatabase.getResolvedField(fieldName, this, database) == null) {
                     return false;
                 }
             }
@@ -382,7 +413,9 @@ public class BibtexEntry {
 
     private boolean atLeastOnePresent(String[] fieldsToCheck, BibtexDatabase database) {
         for (String field : fieldsToCheck) {
-            String value = BibtexDatabase.getResolvedField(field, this, database);
+            String fieldName = normalizeFieldName(field);
+
+            String value = BibtexDatabase.getResolvedField(fieldName, this, database);
             if ((value != null) && !value.isEmpty()) {
                 return true;
             }
@@ -424,7 +457,7 @@ public class BibtexEntry {
     /**
      * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
      * as is
-     *
+     * <p>
      * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
      */
     @Override
@@ -455,7 +488,7 @@ public class BibtexEntry {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {getField("author"), getField("title"), getField("year")};
+        String[] s = new String[]{getField("author"), getField("title"), getField("year")};
 
         for (int i = 0; i < s.length; ++i) {
             if (s[i] == null) {
@@ -494,6 +527,20 @@ public class BibtexEntry {
         return year;
     }
 
+
+    public void setParsedSerialization(String parsedSerialization) {
+        changed = false;
+        this.parsedSerialization = parsedSerialization;
+    }
+
+    public String getParsedSerialization() {
+        return parsedSerialization;
+    }
+
+    public boolean hasChanged() {
+        return changed;
+    }
+
     public void putKeywords(List<String> keywords) {
         Objects.requireNonNull(keywords);
         // Set Keyword Field
@@ -518,6 +565,8 @@ public class BibtexEntry {
      * @param keyword Keyword to add
      */
     public void addKeyword(String keyword) {
+        Objects.requireNonNull(keyword, "keyword must not be empty");
+
         List<String> keywords = this.getSeparatedKeywords();
         Boolean duplicate = false;
 

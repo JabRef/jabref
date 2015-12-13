@@ -1,25 +1,31 @@
 package net.sf.jabref.logic.autocompleter;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
 
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.Abbreviation;
 
 public class ContentAutoCompleters extends AutoCompleters {
 
-    public ContentAutoCompleters() {
-        // Empty AutoCompleter completes nothing
+    AutoCompletePreferences preferences;
+
+
+    public ContentAutoCompleters(AutoCompletePreferences preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
     }
 
-    public ContentAutoCompleters(BibtexDatabase database, MetaData metaData) {
-        String[] completeFields = Globals.prefs.getStringArray(JabRefPreferences.AUTO_COMPLETE_FIELDS);
+    public ContentAutoCompleters(BibtexDatabase database, MetaData metaData, AutoCompletePreferences preferences) {
+        this(preferences);
+
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
+        String[] completeFields = preferences.getCompleteNames();
         for (String field : completeFields) {
-            AutoCompleter<String> autoCompleter = AutoCompleterFactory.getFor(field);
+            AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(field);
             put(field, autoCompleter);
         }
 
@@ -40,7 +46,7 @@ public class ContentAutoCompleters extends AutoCompleters {
                 Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey());
                 if (items != null) {
                     for (String item : items) {
-                        ac.addWordToIndex(item);
+                        ac.addItemToIndex(item);
                     }
                 }
             }
@@ -55,7 +61,7 @@ public class ContentAutoCompleters extends AutoCompleters {
         AutoCompleter<String> autoCompleter = get("journal");
         if(autoCompleter != null) {
             for(Abbreviation abbreviation : Abbreviations.journalAbbrev.getAbbreviations()) {
-                autoCompleter.addWordToIndex(abbreviation.getName());
+                autoCompleter.addItemToIndex(abbreviation.getName());
             }
         }
     }
