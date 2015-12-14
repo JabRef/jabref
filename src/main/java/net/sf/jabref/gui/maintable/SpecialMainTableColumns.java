@@ -19,6 +19,11 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibtexEntry entry) {
             return "#";
         }
+
+        @Override
+        public String getDisplayName() {
+            return "#";
+        }
     };
 
     public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_RANKING,
