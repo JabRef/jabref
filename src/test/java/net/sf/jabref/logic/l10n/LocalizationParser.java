@@ -1,15 +1,15 @@
 package net.sf.jabref.logic.l10n;
 
 import com.google.common.base.Charsets;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -37,17 +37,20 @@ public class LocalizationParser {
         return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(Collectors.toList());
     }
 
-    private static List<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundle type) throws IOException {
+    private static List<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundle type)
+            throws IOException {
         return Files.walk(Paths.get("src/main"))
-                    .filter(LocalizationParser::isJavaFile)
-                    .flatMap(p -> getLanguageKeysInJavaFile(p, type).stream())
-                    .collect(Collectors.toList());
+                .filter(LocalizationParser::isJavaFile)
+                .flatMap(p -> getLanguageKeysInJavaFile(p, type).stream())
+                .collect(Collectors.toList());
     }
 
-    public static List<String> getKeysInPropertiesFile(String path) throws IOException {
+    public static List<String> getKeysInPropertiesFile(String path) {
         Properties properties = new Properties();
         try (InputStream is = LocalizationTest.class.getResourceAsStream(path)) {
             properties.load(is);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         return properties.keySet().stream()
@@ -56,6 +59,22 @@ public class LocalizationParser {
                 .map(String::trim)
                 .map(e -> new Localization.LocalizationKey(e).getPropertiesKey())
                 .collect(Collectors.toList());
+    }
+
+    @Test
+    public void allFilesMustHaveSameKeys() {
+        for (String bundle : Arrays.asList("JabRef", "Menu")) {
+            List<String> englishKeys = getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, "en"));
+
+            List<String> nonEnglishLanguages = Languages.LANGUAGES.values().stream().filter(l -> !"en".equals(l)).collect(Collectors.toList());
+            for (String lang : nonEnglishLanguages) {
+                List<String> nonEnglishKeys = getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
+
+                List<String> missing = new LinkedList<>(englishKeys);
+                missing.removeAll(nonEnglishKeys);
+                Assert.assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
+            }
+        }
     }
 
     private static boolean isJavaFile(Path path) {
