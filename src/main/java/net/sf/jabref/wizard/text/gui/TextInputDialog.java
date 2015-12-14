@@ -200,7 +200,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         }
 
         OverlayPanel testPanel = new OverlayPanel(textPane,
-                Localization.lang("Text_Input_Area"));
+                Localization.lang("paste_text_here"));
 
         testPanel.setPreferredSize(new Dimension(450, 255));
         testPanel.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
