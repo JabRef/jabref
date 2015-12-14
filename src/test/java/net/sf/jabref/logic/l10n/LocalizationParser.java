@@ -90,6 +90,14 @@ public class LocalizationParser {
         }
     }
 
+    @Test
+    public void keyValueShouldBeEqualForEnglishPropertiesMessages() {
+        Properties englishKeys = getProperties(String.format("/l10n/%s_%s.properties", "JabRef", "en"));
+        for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
+            Assert.assertEquals(String.format("%s=%s", entry.getKey(), entry.getKey()), String.format("%s=%s",entry.getKey(), entry.getValue()));
+        }
+    }
+
     private static boolean isJavaFile(Path path) {
         return path.toString().endsWith(".java");
     }

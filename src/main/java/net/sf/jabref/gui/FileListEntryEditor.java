@@ -192,7 +192,7 @@ public class FileListEntryEditor {
 
         });
 
-        diag = new JDialog(frame, Localization.lang("Edit file link"), true);
+        diag = new JDialog(frame, Localization.lang("Save file"), true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
