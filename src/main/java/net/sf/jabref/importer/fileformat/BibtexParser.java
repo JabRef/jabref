@@ -364,12 +364,9 @@ public class BibtexParser {
                 runningIndex--;
             }
 
-            // only keep newlines if there is an entry before
-            if ((runningIndex > 0) && !"}".equals(result.charAt(runningIndex - 1))) {
-                result = result.substring(indexOfAt);
-            } else {
-                result = result.substring(runningIndex + 1);
-            }
+
+            result = result.substring(runningIndex + 1);
+
             return result;
         }
     }
