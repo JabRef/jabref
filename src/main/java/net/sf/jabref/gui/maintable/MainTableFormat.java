@@ -46,7 +46,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     private final BibtexDatabase database;
 
-    private List<MainTableColumn> tableColumns = new ArrayList<>();
+    private final List<MainTableColumn> tableColumns = new ArrayList<>();
 
     public MainTableFormat(BibtexDatabase database) {
         this.database = database;

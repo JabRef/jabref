@@ -28,7 +28,7 @@ public class IconComparator implements Comparator<BibtexEntry> {
     private final List<String> fields;
 
 
-    public IconComparator(List fields) {
+    public IconComparator(List<String> fields) {
         this.fields = fields;
     }
 

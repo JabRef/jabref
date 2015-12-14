@@ -410,7 +410,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * Checks if there are duplicates to the given entry in the Collection. Does
      * not report the entry as duplicate of itself if it is in the Collection.
      *
-     * @param entries A Collection of BibtexEntry instances.
+     * @param entriesDupe A Collection of BibtexEntry instances.
      * @param entry   The entry to search for duplicates of.
      * @return A possible duplicate, if any, or null if none were found.
      */
@@ -1384,9 +1384,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
-                comparators.add(new IconComparator(Arrays.asList(Globals.FILE_FIELD)));
+                comparators.add(new IconComparator(Collections.singletonList(Globals.FILE_FIELD)));
             } else if (i == URL_COL) {
-                comparators.add(new IconComparator(Arrays.asList("url")));
+                comparators.add(new IconComparator(Collections.singletonList("url")));
             }
 
         }

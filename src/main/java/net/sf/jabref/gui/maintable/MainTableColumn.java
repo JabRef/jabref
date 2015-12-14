@@ -22,7 +22,7 @@ public class MainTableColumn {
 
     public MainTableColumn(String columnName) {
         this.columnName = columnName;
-        this.bibtexFields = new ArrayList<>();
+        this.bibtexFields = Collections.emptyList();
         this.isIconColumn = false;
         this.iconLabel = null;
         this.database = null;
@@ -50,25 +50,20 @@ public class MainTableColumn {
      * @return name to be displayed
      */
     public String getDisplayName() {
-        if(!bibtexFields.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
-            int i=0;
-            for (String field : bibtexFields) {
-                if (i > 0) {
-                    builder.append(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
-                }
-                String fieldDisplayName = BibtexFields.getFieldDisplayName(field);
-                if (fieldDisplayName != null) {
-                    builder.append(fieldDisplayName);
-                } else {
-                    builder.append(EntryUtil.capitalizeFirst(field));
-                }
-                i++;
-            }
-            return builder.toString();
-        } else {
-            return columnName;
+        if (bibtexFields.isEmpty()) {
+            return null;
         }
+
+        StringJoiner joiner = new StringJoiner(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
+        for(String field : bibtexFields) {
+            String fieldDisplayName = BibtexFields.getFieldDisplayName(field);
+            if (fieldDisplayName != null) {
+                joiner.add(fieldDisplayName);
+            } else {
+                joiner.add(EntryUtil.capitalizeFirst(field));
+            }
+        }
+        return joiner.toString();
     }
 
     /**
@@ -98,29 +93,30 @@ public class MainTableColumn {
     }
 
     public Object getColumnValue(BibtexEntry entry) {
-        if (!bibtexFields.isEmpty()) {
-            String content = null;
-            for (String field : bibtexFields) {
-                if (field.equals(BibtexEntry.TYPE_HEADER)) {
-                    content = entry.getType().getName();
-                } else {
-                    content = entry.getFieldOrAlias(field);
-                    if ((database!=null) && "Author".equalsIgnoreCase(columnName) && (content != null)) {
-                        content = database.resolveForStrings(content);
-                    }
-                }
-                if (content != null) {
-                    break;
-                }
-            }
-
-            if (isNameColumn()) {
-                return MainTableNameFormatter.formatName(content);
-            }
-            return content;
-
+        if(bibtexFields.isEmpty()) {
+            return null;
         }
-        return null;
+
+        String content = null;
+        for (String field : bibtexFields) {
+            if (field.equals(BibtexEntry.TYPE_HEADER)) {
+                content = entry.getType().getName();
+            } else {
+                content = entry.getFieldOrAlias(field);
+                if ((database != null) && "Author".equalsIgnoreCase(columnName) && (content != null)) {
+                    content = database.resolveForStrings(content);
+                }
+            }
+            if (content != null) {
+                break;
+            }
+        }
+
+        if (isNameColumn()) {
+            return MainTableNameFormatter.formatName(content);
+        }
+        return content;
+
     }
 
     public JLabel getHeaderLabel() {
