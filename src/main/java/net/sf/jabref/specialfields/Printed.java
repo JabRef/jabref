@@ -31,8 +31,8 @@ public class Printed extends SpecialField {
         ArrayList<SpecialFieldValue> values = new ArrayList<>();
         // @formatter:off
         // DO NOT TRANSLATE "printed" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Localization.lang("Toogle print status"), IconTheme.JabRefIcon.PRINTED.getSmallIcon(),
-                Localization.lang("Toogle print status")));
+        values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Localization.lang("Toggle print status"), IconTheme.JabRefIcon.PRINTED.getSmallIcon(),
+                Localization.lang("Toggle print status")));
         // @formatter:on
         this.setValues(values);
         TEXT_DONE_PATTERN = "Toggled print status for %0 entries";
