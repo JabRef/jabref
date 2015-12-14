@@ -36,13 +36,13 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed #437: The toolbar after the search field is now correctly wrapped when using a small window size for JabRef
 - Fixed #438: Cut, Copy and Paste are now translated correctly in the menu
 - Fixed #443/#445: Fixed sorting and moving special field columns
+- Fixed #498: non-working legacy PDF/PS column removed
 
 ### Removed
 - Removed file history size preference (never available from the UI)
 - Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
-
 - Removed option "Show one letter heading for icon columns" which is obsolete with the fix of #315/384
-- Removed table column "PDF/PS" which refers to legacy fields "ps" resp. "pdf" which are no longer supported
+- Removed table column "PDF/PS" which refers to legacy fields "ps" resp. "pdf" which are no longer supported (see also fix #498)
 
 
 

@@ -16,32 +16,32 @@ public class MainTableColumn {
 
     private final boolean isIconColumn;
 
-    private final JLabel iconLabel;
+    private final Optional<JLabel> iconLabel;
 
-    private final BibtexDatabase database;
+    private final Optional<BibtexDatabase> database;
 
     public MainTableColumn(String columnName) {
         this.columnName = columnName;
         this.bibtexFields = Collections.emptyList();
         this.isIconColumn = false;
-        this.iconLabel = null;
-        this.database = null;
+        this.iconLabel = Optional.empty();
+        this.database = Optional.empty();
     }
 
     public MainTableColumn(String columnName, String[] bibtexFields, BibtexDatabase database) {
         this.columnName = columnName;
         this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
         this.isIconColumn = false;
-        this.iconLabel = null;
-        this.database = database;
+        this.iconLabel = Optional.empty();
+        this.database = Optional.of(database);
     }
 
     public MainTableColumn(String columnName, String[] bibtexFields, JLabel iconLabel) {
         this.columnName = columnName;
         this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
         this.isIconColumn = true;
-        this.iconLabel = iconLabel;
-        this.database = null;
+        this.iconLabel = Optional.of(iconLabel);
+        this.database = Optional.empty();
     }
 
     /**
@@ -103,8 +103,8 @@ public class MainTableColumn {
                 content = entry.getType().getName();
             } else {
                 content = entry.getFieldOrAlias(field);
-                if ((database != null) && "Author".equalsIgnoreCase(columnName) && (content != null)) {
-                    content = database.resolveForStrings(content);
+                if (database.isPresent() && "Author".equalsIgnoreCase(columnName) && (content != null)) {
+                    content = database.get().resolveForStrings(content);
                 }
             }
             if (content != null) {
@@ -121,7 +121,7 @@ public class MainTableColumn {
 
     public JLabel getHeaderLabel() {
         if(isIconColumn) {
-            return iconLabel;
+            return iconLabel.get();
         } else {
             return new JLabel(getDisplayName());
         }
