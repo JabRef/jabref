@@ -46,12 +46,7 @@ public class LocalizationParser {
     }
 
     public static List<String> getKeysInPropertiesFile(String path) {
-        Properties properties = new Properties();
-        try (InputStream is = LocalizationTest.class.getResourceAsStream(path)) {
-            properties.load(is);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Properties properties = getProperties(path);
 
         return properties.keySet().stream()
                 .sorted()
@@ -59,6 +54,16 @@ public class LocalizationParser {
                 .map(String::trim)
                 .map(e -> new Localization.LocalizationKey(e).getPropertiesKey())
                 .collect(Collectors.toList());
+    }
+
+    private static Properties getProperties(String path) {
+        Properties properties = new Properties();
+        try (InputStream is = LocalizationTest.class.getResourceAsStream(path)) {
+            properties.load(is);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return properties;
     }
 
     @Test
@@ -74,6 +79,14 @@ public class LocalizationParser {
                 missing.removeAll(nonEnglishKeys);
                 Assert.assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
             }
+        }
+    }
+
+    @Test
+    public void keyValueShouldBeEqualForEnglishPropertiesMenu() {
+        Properties englishKeys = getProperties(String.format("/l10n/%s_%s.properties", "Menu", "en"));
+        for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
+            Assert.assertEquals(String.format("%s=%s", entry.getKey(), entry.getKey()), String.format("%s=%s",entry.getKey(), entry.getValue().toString().replace("&", "")));
         }
     }
 
