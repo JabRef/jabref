@@ -21,6 +21,9 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Move Bibtex and Biblatex mode switcher to File menu
 - Display active edit mode (BibTeX or Biblatex) at window title
 - Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
+- Icons are shown as Header for icon columns in the entry table (#315)
+- Tooltips are shown for header columns and contents which are too wide to be displayed in the entry table (#384)
+- Default order in entry table:  # | all file based icons (file, URL/DOI, ...) | all bibtex field based icons (bibtexkey, entrytype, author, title, ...) | all activated special field icons (ranking, quality, ...)
 
 ### Fixed
 - Fixed #434: Revert to old 'JabRef' installation folder name instead of 'jabref'
@@ -32,11 +35,14 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixes #412: Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete.
 - Fixed #437: The toolbar after the search field is now correctly wrapped when using a small window size for JabRef
 - Fixed #438: Cut, Copy and Paste are now translated correctly in the menu
+- Fixed #443/#445: Fixed sorting and moving special field columns
 
 ### Removed
 - Removed file history size preference (never available from the UI)
 - Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
 
+- Removed option "Show one letter heading for icon columns" which is obsolete with the fix of #315/384
+- Removed table column "PDF/PS" which refers to legacy fields "ps" resp. "pdf" which are no longer supported
 
 
 
