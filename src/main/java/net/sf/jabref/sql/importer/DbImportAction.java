@@ -181,7 +181,7 @@ public class DbImportAction extends AbstractWorker {
                 String preamble = Localization.lang("Could not import from SQL database for the following reason:");
                 String errorMessage = SQLUtil.getExceptionMessage(ex);
                 dbs.isConfigValid(false);
-                JOptionPane.showMessageDialog(frame, Localization.lang(preamble) + '\n' + errorMessage,
+                JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
                         Localization.lang("Import from SQL database"), JOptionPane.ERROR_MESSAGE);
                 frame.output(Localization.lang("Error importing from database"));
                 ex.printStackTrace();
