@@ -48,7 +48,7 @@ public class ExternalFileTypeEditor extends JDialog {
     private JTable table;
     private ExternalFileTypeEntryEditor entryEditor;
     private FileTypeTableModel tableModel;
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
     private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());

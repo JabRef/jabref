@@ -40,7 +40,7 @@ public class FieldWeightDialog extends JDialog {
 
     private final JabRefFrame frame;
     private final HashMap<JSlider, SliderInfo> sliders = new HashMap<>();
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
     private FieldWeightDialog(JabRefFrame frame) {

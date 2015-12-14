@@ -57,7 +57,7 @@ class KeyBindingsDialog extends JDialog {
     // currently not displayed as it does not get updated
     private final JTextField keyTF = new JTextField();
 
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton defB = new JButton(Localization.lang("Default"));
     private final JButton grabB = new JButton(Localization.lang("Grab"));
@@ -320,9 +320,9 @@ class KeyBindingsDialog extends JDialog {
                             Localization.lang("Resetting all key bindings"),
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE, null,
-                            new String[] {Localization.lang("Ok"),
+                            new String[] {Localization.lang("OK"),
                                     Localization.lang("Cancel")},
-                            Localization.lang("Ok"));
+                            Localization.lang("OK"));
                     // @formatter:on
                     if (answer == JOptionPane.YES_OPTION) {
                         bindHM.clear();

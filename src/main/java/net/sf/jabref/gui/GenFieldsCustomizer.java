@@ -74,7 +74,7 @@ public class GenFieldsCustomizer extends JDialog {
     }
 
     private void jbInit() {
-        ok.setText(Localization.lang("Ok"));
+        ok.setText(Localization.lang("OK"));
         ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
         cancel.setText(Localization.lang("Cancel"));
         cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));

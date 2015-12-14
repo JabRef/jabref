@@ -60,7 +60,7 @@ public class FileListEntryEditor {
     private JDialog diag;
     private final JTextField link = new JTextField();
     private final JTextField description = new JTextField();
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
 
     private final JComboBox<ExternalFileType> types;
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);

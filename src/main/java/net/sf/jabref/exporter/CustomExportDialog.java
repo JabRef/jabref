@@ -80,7 +80,7 @@ class CustomExportDialog extends JDialog {
                 dispose();
             }
         };
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(okListener);
         name.addActionListener(okListener);
         layoutFile.addActionListener(okListener);

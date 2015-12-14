@@ -107,7 +107,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         diag = new JDialog(frame, Localization.lang("Manage keywords"), true);
 
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         JButton add = new JButton(Localization.lang("Add"));
         JButton remove = new JButton(Localization.lang("Remove"));

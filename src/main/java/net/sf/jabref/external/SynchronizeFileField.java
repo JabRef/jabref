@@ -306,7 +306,7 @@ public class SynchronizeFileField extends AbstractWorker {
         final JRadioButton autoSetAll;
         final JRadioButton autoSetNone;
         final JCheckBox checkLinks;
-        final JButton ok = new JButton(Localization.lang("Ok"));
+        final JButton ok = new JButton(Localization.lang("OK"));
         final JButton cancel = new JButton(Localization.lang("Cancel"));
         JLabel description;
         private boolean canceled = true;

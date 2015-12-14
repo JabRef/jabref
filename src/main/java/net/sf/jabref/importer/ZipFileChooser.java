@@ -223,7 +223,7 @@ class ZipFileChooser extends JDialog {
         });
 
         // ok: get selected class and check if it is instantiable as an importer
-        JButton okButton = new JButton(Localization.lang("Ok"));
+        JButton okButton = new JButton(Localization.lang("OK"));
         okButton.addActionListener(new ActionListener() {
 
             @Override

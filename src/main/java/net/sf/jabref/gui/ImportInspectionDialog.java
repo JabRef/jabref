@@ -161,7 +161,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final JProgressBar progressBar = new JProgressBar(SwingConstants.HORIZONTAL);
 
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton generate = new JButton(Localization.lang("Generate now"));
 
     private final EventList<BibtexEntry> entries = new BasicEventList<>();

@@ -707,7 +707,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         }
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         //JButton auto = new JButton(Globals.lang("Autodetect"));
         ActionListener tfListener = new ActionListener() {

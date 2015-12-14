@@ -70,7 +70,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         this.frame = frame;
         this.warningLimit = warningLimit;
 
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(new ActionListener() {
 
             @Override

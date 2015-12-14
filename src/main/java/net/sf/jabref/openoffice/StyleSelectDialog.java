@@ -112,7 +112,7 @@ class StyleSelectDialog {
     private PreviewPanel preview;
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final BibtexEntry prevEntry = new BibtexEntry(IdGenerator.next());
 
@@ -594,7 +594,7 @@ class StyleSelectDialog {
             JScrollPane sp = new JScrollPane(ta);
             sp.setPreferredSize(new Dimension(700, 500));
             dd.getContentPane().add(sp, BorderLayout.CENTER);
-            JButton okButton = new JButton(Localization.lang("Ok"));
+            JButton okButton = new JButton(Localization.lang("OK"));
             ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
             bb.addButton(okButton);

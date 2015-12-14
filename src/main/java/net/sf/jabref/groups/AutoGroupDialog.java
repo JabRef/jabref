@@ -58,7 +58,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
     private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
     private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final GroupTreeNode m_groupsRoot;
     private final JabRefFrame frame;
     private final BasePanel panel;

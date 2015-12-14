@@ -74,7 +74,7 @@ public class ImportDialog extends JDialog {
         radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP_data"));
         radioButtonPDFcontent = new JRadioButton(Localization.lang("Create_entry_based_on_content"));
         radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only_attach_PDF"));
-        JButton buttonOK = new JButton(Localization.lang("Ok"));
+        JButton buttonOK = new JButton(Localization.lang("OK"));
         JButton buttonCancel = new JButton(Localization.lang("Cancel"));
         checkBoxDoNotShowAgain = new JCheckBox(Localization.lang("Do not show this box again for this import"));
         useDefaultPDFImportStyle = new JCheckBox(Localization.lang("Always use this PDF import style (and do not ask for each import)"));

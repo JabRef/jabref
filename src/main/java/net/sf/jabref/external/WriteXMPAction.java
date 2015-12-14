@@ -162,7 +162,7 @@ public class WriteXMPAction extends AbstractWorker {
                     } else {
                         try {
                             XMPUtil.writeXMP(file, entry, database);
-                            optDiag.progressArea.append("  " + Localization.lang("Ok") + ".\n");
+                            optDiag.progressArea.append("  " + Localization.lang("OK") + ".\n");
                             entriesChanged++;
                         } catch (Exception e) {
                             optDiag.progressArea.append("  " + Localization.lang("Error while writing") + " '"
@@ -198,7 +198,7 @@ public class WriteXMPAction extends AbstractWorker {
 
 
     class OptionsDialog extends JDialog {
-        final JButton okButton = new JButton(Localization.lang("Ok"));
+        final JButton okButton = new JButton(Localization.lang("OK"));
         final JButton cancelButton = new JButton(
                 Localization.lang("Cancel"));
 

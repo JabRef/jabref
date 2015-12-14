@@ -96,7 +96,7 @@ public class DatabasePropertiesDialog extends JDialog {
         super(parent, Localization.lang("Database properties"), true);
         encoding = new JComboBox<>();
         encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
-        ok = new JButton(Localization.lang("Ok"));
+        ok = new JButton(Localization.lang("OK"));
         cancel = new JButton(Localization.lang("Cancel"));
         init(parent);
     }

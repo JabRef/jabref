@@ -40,7 +40,7 @@ class AdvancedCiteDialog {
     private final JRadioButton inPar = new JRadioButton(Localization.lang("Cite selected entries between parenthesis"));
     private final JRadioButton inText = new JRadioButton(Localization.lang("Cite selected entries with in-text citation"));
     private final JTextField pageInfo = new JTextField(15);
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 

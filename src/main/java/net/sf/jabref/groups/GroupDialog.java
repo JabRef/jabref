@@ -85,7 +85,7 @@ class GroupDialog extends JDialog {
     private final JCheckBox m_sgRegExp = new JCheckBox(
             Localization.lang("regular expression"));
     // for all types
-    private final JButton m_ok = new JButton(Localization.lang("Ok"));
+    private final JButton m_ok = new JButton(Localization.lang("OK"));
     private final JPanel m_optionsPanel = new JPanel();
     private final JLabel m_description = new JLabel() {
 

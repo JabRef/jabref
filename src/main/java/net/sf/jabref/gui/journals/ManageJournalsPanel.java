@@ -139,7 +139,7 @@ class ManageJournalsPanel extends JPanel {
         add(externalFilesPanel, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         bb.addButton(ok);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);

@@ -50,7 +50,7 @@ public class AttachFileDialog extends JDialog {
     private final JButton browse = new JButton(Localization.lang("Browse"));
     private final JButton download = new JButton(Localization.lang("Download"));
     private final JButton auto = new JButton(Localization.lang("Auto"));
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final BibtexEntry entry;
     private final MetaData metaData;

@@ -45,7 +45,7 @@ class CitationManager {
     private final EventList<CitEntry> list;
     private final JTable table;
     private final DefaultEventTableModel<CitEntry> tableModel;
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 
@@ -220,7 +220,7 @@ class CitationManager {
         final JDialog singleCiteDialog;
         final JTextField pageInfo = new JTextField(20);
         final JLabel title;
-        final JButton okButton = new JButton(Localization.lang("Ok"));
+        final JButton okButton = new JButton(Localization.lang("OK"));
         final JButton cancelButton = new JButton(Localization.lang("Cancel"));
         final CitEntry _entry;
 

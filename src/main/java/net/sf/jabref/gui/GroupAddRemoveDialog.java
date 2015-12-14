@@ -59,7 +59,7 @@ public class GroupAddRemoveDialog implements BaseAction {
                     Localization.lang("Add to group")) :
                     Localization.lang("Remove from group")), true);
                 // formatter:on
-        ok = new JButton(Localization.lang("Ok"));
+        ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         tree = new JTree(groups);
         tree.setCellRenderer(new AddRemoveGroupTreeCellRenderer());

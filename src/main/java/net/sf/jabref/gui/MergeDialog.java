@@ -68,7 +68,7 @@ public class MergeDialog extends JDialog {
     private void jbInit(JabRefFrame parent) {
         //  titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
         panel1.setLayout(borderLayout1);
-        ok.setText(Localization.lang("Ok"));
+        ok.setText(Localization.lang("OK"));
         ok.addActionListener(new MergeDialog_ok_actionAdapter(this));
         Cancel.setText(Localization.lang("Cancel"));
         Cancel.addActionListener(new MergeDialog_Cancel_actionAdapter(this));
