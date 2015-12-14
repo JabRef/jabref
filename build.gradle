@@ -62,6 +62,9 @@ repositories {
 configurations {
     antlr3
     antlr4
+
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -100,6 +103,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
+    integrationTestCompile 'org.assertj:assertj-swing-junit:3.0.2'
 
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.mashape.unirest:unirest-java:1.4.7'
@@ -114,6 +118,14 @@ sourceSets {
         java {
             srcDirs = ["src/main/java", "src/main/gen"]
         }
+    }
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
     }
 }
 
@@ -202,6 +214,15 @@ test {
     testLogging {
         exceptionFormat "full" // default is "short"
     }
+}
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
 }
 
 jacocoTestReport {
