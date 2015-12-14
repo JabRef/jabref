@@ -102,6 +102,37 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         // Add numbering column to tableColumns
         tableColumns.add(SpecialMainTableColumns.NUMBER_COL);
 
+        // Add all file based columns
+        if (Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN)) {
+            tableColumns.add(SpecialMainTableColumns.FILE_COLUMN);
+        }
+
+        if (Globals.prefs.getBoolean(JabRefPreferences.URL_COLUMN)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI)) {
+                tableColumns.add(SpecialMainTableColumns
+                        .createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.DOI_FIRST,
+                                new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon())));
+            } else {
+                tableColumns.add(SpecialMainTableColumns
+                        .createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.URL_FIRST,
+                                new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon())));
+            }
+
+        }
+
+        if (Globals.prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN)) {
+            tableColumns.add(SpecialMainTableColumns
+                    .createIconColumn(JabRefPreferences.ARXIV_COLUMN, MainTableFormat.ARXIV,
+                            new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon())));
+        }
+
+        if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
+            String[] desiredColumns = Globals.prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
+            for (String desiredColumn : desiredColumns) {
+                tableColumns.add(SpecialMainTableColumns.createFileIconColumn(desiredColumn));
+            }
+        }
+
         // Add 'normal' bibtex fields as configured in the preferences
         // Read table columns from prefs:
         String[] colSettings = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
@@ -137,35 +168,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             }
         }
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN)) {
-            tableColumns.add(SpecialMainTableColumns.FILE_COLUMN);
-        }
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.URL_COLUMN)) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI)) {
-                tableColumns.add(SpecialMainTableColumns
-                        .createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.DOI_FIRST,
-                                new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon())));
-            } else {
-                tableColumns.add(SpecialMainTableColumns
-                        .createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.URL_FIRST,
-                                new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon())));
-            }
-
-        }
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN)) {
-            tableColumns.add(SpecialMainTableColumns
-                    .createIconColumn(JabRefPreferences.ARXIV_COLUMN, MainTableFormat.ARXIV,
-                            new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon())));
-        }
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
-            String[] desiredColumns = Globals.prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
-            for (String desiredColumn : desiredColumns) {
-                tableColumns.add(SpecialMainTableColumns.createFileIconColumn(desiredColumn));
-            }
-        }
     }
 
 }
