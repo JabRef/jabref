@@ -9,6 +9,7 @@ before_install:
 script:
   - ./gradlew test --info
 
+# cache gradle dependencies
 cache:
   directories:
   - $HOME/.gradle/caches/
