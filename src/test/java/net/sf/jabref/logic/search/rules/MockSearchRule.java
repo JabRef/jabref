@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.search.rules;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.search.SearchRule;
 
 /**
@@ -17,7 +17,7 @@ public class MockSearchRule implements SearchRule {
     }
 
     @Override
-    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
+    public boolean applyRule(String query, BibEntry bibEntry) {
         return result;
     }
 

@@ -34,8 +34,8 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
@@ -50,9 +50,9 @@ public class WriteXMPAction extends AbstractWorker {
 
     private final BasePanel panel;
 
-    private BibtexEntry[] entries;
+    private BibEntry[] entries;
 
-    private BibtexDatabase database;
+    private BibDatabase database;
 
     private OptionsDialog optDiag;
 
@@ -76,8 +76,8 @@ public class WriteXMPAction extends AbstractWorker {
 
         if (entries.length == 0) {
 
-            Collection<BibtexEntry> var = database.getEntries();
-            entries = var.toArray(new BibtexEntry[var.size()]);
+            Collection<BibEntry> var = database.getEntries();
+            entries = var.toArray(new BibEntry[var.size()]);
 
             if (entries.length == 0) {
 
@@ -116,7 +116,7 @@ public class WriteXMPAction extends AbstractWorker {
             return;
         }
 
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
 
             // Make a list of all PDFs linked from this entry:
             List<File> files = new ArrayList<>();

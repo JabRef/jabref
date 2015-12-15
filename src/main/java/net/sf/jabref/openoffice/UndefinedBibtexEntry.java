@@ -15,14 +15,14 @@
 */
 package net.sf.jabref.openoffice;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
 /**
- * Subclass of BibtexEntry for representing entries referenced in a document that can't
+ * Subclass of BibEntry for representing entries referenced in a document that can't
  * be found in JabRef's current database.
  */
-class UndefinedBibtexEntry extends BibtexEntry {
+class UndefinedBibtexEntry extends BibEntry {
 
     private final String key;
 

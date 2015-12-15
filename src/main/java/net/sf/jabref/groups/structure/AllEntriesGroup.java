@@ -17,8 +17,8 @@ package net.sf.jabref.groups.structure;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 
@@ -33,7 +33,7 @@ public class AllEntriesGroup extends AbstractGroup {
         super(Localization.lang("All Entries"), GroupHierarchyType.INDEPENDENT);
     }
 
-    public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
+    public static AbstractGroup fromString(String s, BibDatabase db, int version) throws Exception {
         if (!s.startsWith(AllEntriesGroup.ID)) {
             throw new Exception(
                     "Internal error: AllEntriesGroup cannot be created from \""
@@ -55,7 +55,7 @@ public class AllEntriesGroup extends AbstractGroup {
     public SearchRule getSearchRule() {
         return new SearchRule() {
             @Override
-            public boolean applyRule(String query, BibtexEntry bibtexEntry) {
+            public boolean applyRule(String query, BibEntry bibEntry) {
                 return true; // contains everything
             }
 
@@ -77,19 +77,19 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibtexEntry[] entries) {
+    public AbstractUndoableEdit add(BibEntry[] entries) {
         // not supported -> ignore
         return null;
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
+    public AbstractUndoableEdit remove(BibEntry[] entries) {
         // not supported -> ignore
         return null;
     }
 
     @Override
-    public boolean contains(String query, BibtexEntry entry) {
+    public boolean contains(String query, BibEntry entry) {
         return true; // contains everything
     }
 
@@ -109,7 +109,7 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public boolean contains(BibtexEntry entry) {
+    public boolean contains(BibEntry entry) {
         return true;
     }
 

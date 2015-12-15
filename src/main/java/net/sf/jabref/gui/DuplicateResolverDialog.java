@@ -23,7 +23,7 @@ import java.awt.event.ComponentEvent;
 
 import javax.swing.*;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -60,17 +60,17 @@ public class DuplicateResolverDialog extends JDialog {
     private MergeEntries me;
     private PositionWindow pw;
 
-    public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {
+    public DuplicateResolverDialog(JFrame frame, BibEntry one, BibEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
         init(one, two, type);
     }
 
-    public DuplicateResolverDialog(JDialog frame, BibtexEntry one, BibtexEntry two, int type) {
+    public DuplicateResolverDialog(JDialog frame, BibEntry one, BibEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
         init(one, two, type);
     }
 
-    private void init(BibtexEntry one, BibtexEntry two, int type) {
+    private void init(BibEntry one, BibEntry two, int type) {
         JButton both;
         JButton second;
         JButton first;
@@ -203,23 +203,23 @@ public class DuplicateResolverDialog extends JDialog {
         return status;
     }
 
-    public BibtexEntry getMergedEntry() {
+    public BibEntry getMergedEntry() {
         return me.getMergeEntry();
     }
 
-    public static int resolveDuplicate(JFrame frame, BibtexEntry one, BibtexEntry two) {
+    public static int resolveDuplicate(JFrame frame, BibEntry one, BibEntry two) {
         DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two, DuplicateResolverDialog.DUPLICATE_SEARCH);
         drd.setVisible(true); // drd.show(); -> deprecated since 1.5
         return drd.getSelected();
     }
 
-    public static int resolveDuplicate(JDialog frame, BibtexEntry one, BibtexEntry two) {
+    public static int resolveDuplicate(JDialog frame, BibEntry one, BibEntry two) {
         DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two, DuplicateResolverDialog.DUPLICATE_SEARCH);
         drd.setVisible(true); // drd.show(); -> deprecated since 1.5
         return drd.getSelected();
     }
 
-    public static int resolveDuplicateInImport(JabRefFrame frame, BibtexEntry existing, BibtexEntry imported) {
+    public static int resolveDuplicateInImport(JabRefFrame frame, BibEntry existing, BibEntry imported) {
         DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, existing, imported, DuplicateResolverDialog.IMPORT_CHECK);
         drd.setVisible(true); // drd.show(); -> deprecated since 1.5
         return drd.getSelected();

@@ -16,7 +16,7 @@
 package net.sf.jabref.specialfields;
 
 import net.sf.jabref.gui.actions.BaseAction;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
@@ -55,11 +55,11 @@ public class SpecialFieldAction implements BaseAction {
     public void action() {
         try {
             NamedCompound ce = new NamedCompound(undoText);
-            BibtexEntry[] bes = frame.getCurrentBasePanel().getSelectedEntries();
+            BibEntry[] bes = frame.getCurrentBasePanel().getSelectedEntries();
             if (bes == null) {
                 return;
             }
-            for (BibtexEntry be : bes) {
+            for (BibEntry be : bes) {
                 // if (value==null) and then call nullField has been ommited as updatefield also handles value==null
                 SpecialFieldsUtils.updateField(c, value, be, ce, nullFieldIfValueIsTheSame);
             }

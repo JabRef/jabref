@@ -51,7 +51,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.model.entry.EntryUtil;
 import org.apache.commons.logging.Log;
@@ -421,7 +421,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void autoSetLinks() {
         auto.setEnabled(false);
 
-        BibtexEntry entry = entryEditor.getEntry();
+        BibEntry entry = entryEditor.getEntry();
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);

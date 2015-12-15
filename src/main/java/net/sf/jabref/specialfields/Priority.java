@@ -26,7 +26,7 @@ public class Priority extends SpecialField {
 
     private static Priority INSTANCE;
 
-    private final Icon icon = IconTheme.JabRefIcon.PRIORITY.getIcon();
+    private final Icon icon = IconTheme.JabRefIcon.PRIORITY.getSmallIcon();
 
 
     private Priority() {

@@ -17,7 +17,7 @@ package net.sf.jabref.migrations;
 
 import java.util.Vector;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
@@ -60,7 +60,7 @@ public class VersionHandling {
     }
 
     public static GroupTreeNode importGroups(Vector<String> orderedData,
-            BibtexDatabase db, int version) throws Exception {
+            BibDatabase db, int version) throws Exception {
         switch (version) {
         case 0:
         case 1:
@@ -88,7 +88,7 @@ public class VersionHandling {
          * @throws Exception
          *             When a group could not be recreated
          */
-        private static GroupTreeNode fromString(String s, BibtexDatabase db,
+        private static GroupTreeNode fromString(String s, BibDatabase db,
                 int version) throws Exception {
             GroupTreeNode root = null;
             GroupTreeNode newNode;
@@ -182,7 +182,7 @@ public class VersionHandling {
 
     private static class Version2_3 {
 
-        private static GroupTreeNode fromString(Vector<String> data, BibtexDatabase db,
+        private static GroupTreeNode fromString(Vector<String> data, BibDatabase db,
                 int version) throws Exception {
             GroupTreeNode cursor = null;
             GroupTreeNode root = null;

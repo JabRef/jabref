@@ -12,26 +12,26 @@ import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.Cleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 public class RenamePdfCleanup implements Cleaner {
 
     private final String[] paths;
-    private final BibtexDatabase database;
+    private final BibDatabase database;
     private final Boolean onlyRelativePaths;
     private int unsuccessfulRenames;
 
 
-    public RenamePdfCleanup(String[] paths, Boolean onlyRelativePaths, BibtexDatabase database) {
+    public RenamePdfCleanup(String[] paths, Boolean onlyRelativePaths, BibDatabase database) {
         this.paths = paths;
         this.database = database;
         this.onlyRelativePaths = onlyRelativePaths;
     }
 
     @Override
-    public List<FieldChange> cleanup(BibtexEntry entry) {
+    public List<FieldChange> cleanup(BibEntry entry) {
         //Extract the path
         String oldValue = entry.getField(Globals.FILE_FIELD);
         if (oldValue == null) {

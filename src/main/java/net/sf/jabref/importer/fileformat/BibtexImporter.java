@@ -23,7 +23,7 @@ import java.util.List;
 
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Imported requried to support --importToOpen someEntry.bib
@@ -48,7 +48,7 @@ public class BibtexImporter extends ImportFormat {
      * @return a list of BibTeX entries contained in the given inputStream
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status)
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
         ParserResult pr = BibtexParser.parse(new InputStreamReader(in));
         return new ArrayList<>(pr.getDatabase().getEntries());

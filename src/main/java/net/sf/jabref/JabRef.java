@@ -42,8 +42,8 @@ import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -289,9 +289,9 @@ public class JabRef {
                 String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
                                                                  //? stands for a blank
                 ParserResult pr = loaded.elementAt(loaded.size() - 1);
-                BibtexDatabase dataBase = pr.getDatabase();
+                BibDatabase dataBase = pr.getDatabase();
                 SearchManagerNoGUI smng = new SearchManagerNoGUI(searchTerm, dataBase);
-                BibtexDatabase newBase = smng.getDBfromMatches(); //newBase contains only match entries
+                BibDatabase newBase = smng.getDBfromMatches(); //newBase contains only match entries
 
                 //export database
                 if ((newBase != null) && (newBase.getEntryCount() > 0)) {
@@ -425,7 +425,7 @@ public class JabRef {
                 if (data.length == 2) {
                     ParserResult pr = loaded.firstElement();
                     AuxCommandLine acl = new AuxCommandLine(data[0], pr.getDatabase());
-                    BibtexDatabase newBase = acl.perform();
+                    BibDatabase newBase = acl.perform();
 
                     boolean notSavedMsg = false;
 
@@ -518,7 +518,7 @@ public class JabRef {
 
         System.out.println(Localization.lang("Running Query '%0' with fetcher '%1'.", query, engine) + " "
                 + Localization.lang("Please wait..."));
-        Collection<BibtexEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
+        Collection<BibEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
         if ((result == null) || result.isEmpty()) {
             System.out.println(
@@ -849,7 +849,7 @@ public class JabRef {
             if ((data.length > 1) && !"*".equals(data[1])) {
                 System.out.println(Localization.lang("Importing") + ": " + data[0]);
                 try {
-                    List<BibtexEntry> entries;
+                    List<BibEntry> entries;
                     if (OS.WINDOWS) {
                         entries = Globals.importFormatReader.importFromFile(data[1], data[0], JabRef.jrf);
                     } else {

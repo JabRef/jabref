@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Removes a given field.
@@ -20,7 +20,7 @@ public class RemoveFieldCleanup implements Cleaner {
     }
 
     @Override
-    public List<FieldChange> cleanup(BibtexEntry entry) {
+    public List<FieldChange> cleanup(BibEntry entry) {
         String oldValue = entry.getField(field);
         if (oldValue == null) {
             // Not set -> nothing to do

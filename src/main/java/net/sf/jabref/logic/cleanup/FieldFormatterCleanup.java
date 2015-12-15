@@ -12,7 +12,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.LatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.MonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Formats a given entry field with the specified formatter.
@@ -37,7 +37,7 @@ public class FieldFormatterCleanup implements Cleaner {
     }
 
     @Override
-    public List<FieldChange> cleanup(BibtexEntry entry) {
+    public List<FieldChange> cleanup(BibEntry entry) {
         String oldValue = entry.getField(field);
         if (oldValue == null) {
             // Not set -> nothing to do

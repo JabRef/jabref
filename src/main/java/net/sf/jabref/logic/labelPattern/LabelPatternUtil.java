@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,7 +51,7 @@ public class LabelPatternUtil {
         LabelPatternUtil.updateDefaultPattern();
     }
 
-    private static BibtexDatabase database;
+    private static BibDatabase database;
 
     public static void updateDefaultPattern() {
         LabelPatternUtil.DEFAULT_LABELPATTERN = LabelPatternUtil.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
@@ -62,7 +62,7 @@ public class LabelPatternUtil {
      *
      * @param db the DB to use as global database
      */
-    public static void setDataBase(BibtexDatabase db) {
+    public static void setDataBase(BibDatabase db) {
         LabelPatternUtil.database = db;
     }
 
@@ -417,11 +417,11 @@ public class LabelPatternUtil {
      *
      * The given database is used to avoid duplicate keys.
      *
-     * @param dBase a <code>BibtexDatabase</code>
-     * @param entry a <code>BibtexEntry</code>
+     * @param dBase a <code>BibDatabase</code>
+     * @param entry a <code>BibEntry</code>
      * @return modified Bibtexentry
      */
-    public static void makeLabel(MetaData metaData, BibtexDatabase dBase, BibtexEntry entry) {
+    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry) {
         LabelPatternUtil.database = dBase;
         ArrayList<String> typeList;
         String key;
@@ -498,7 +498,7 @@ public class LabelPatternUtil {
             if (!key.equals(oldKey)) {
                 if (LabelPatternUtil.database.getEntryById(entry.getId()) == null) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibtexEntry.KEY_FIELD, key);
+                    entry.setField(BibEntry.KEY_FIELD, key);
                 } else {
                     LabelPatternUtil.database.setCiteKeyForEntry(entry.getId(), key);
                 }
@@ -531,7 +531,7 @@ public class LabelPatternUtil {
             if (!moddedKey.equals(oldKey)) {
                 if (LabelPatternUtil.database.getEntryById(entry.getId()) == null) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibtexEntry.KEY_FIELD, moddedKey);
+                    entry.setField(BibEntry.KEY_FIELD, moddedKey);
                 } else {
                     LabelPatternUtil.database.setCiteKeyForEntry(entry.getId(), moddedKey);
                 }
@@ -583,7 +583,7 @@ public class LabelPatternUtil {
         return label;
     }
 
-    public static String makeLabel(BibtexEntry entry, String val) {
+    public static String makeLabel(BibEntry entry, String val) {
 
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
@@ -789,13 +789,13 @@ public class LabelPatternUtil {
     }
 
     /**
-     * Look up a field of a BibtexEntry, returning its String value, or an
+     * Look up a field of a BibEntry, returning its String value, or an
      * empty string if it isn't set.
      * @param entry The entry.
      * @param field The field to look up.
      * @return The field value.
      */
-    private static String getField(BibtexEntry entry, String field) {
+    private static String getField(BibEntry entry, String field) {
         String s = entry.getFieldOrAlias(field);
         return s == null ? "" : s;
     }

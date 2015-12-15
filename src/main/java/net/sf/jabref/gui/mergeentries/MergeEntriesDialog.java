@@ -21,7 +21,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import javax.swing.*;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
@@ -47,8 +47,8 @@ public class MergeEntriesDialog extends JDialog {
     private final BasePanel panel;
     private final JabRefFrame frame;
     private final CellConstraints cc = new CellConstraints();
-    private BibtexEntry one;
-    private BibtexEntry two;
+    private BibEntry one;
+    private BibEntry two;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
 
@@ -70,7 +70,7 @@ public class MergeEntriesDialog extends JDialog {
      *
      * @param selected Selected BibtexEntries
      */
-    private void init(BibtexEntry[] selected) {
+    private void init(BibEntry[] selected) {
 
         // Check if there are two entries selected
         if (selected.length != 2) { // None selected. Inform the user to select entries first.
@@ -160,7 +160,7 @@ public class MergeEntriesDialog extends JDialog {
      * @param button Button pressed
      */
     private void buttonPressed(String button) {
-        BibtexEntry mergedEntry = mergeEntries.getMergeEntry();
+        BibEntry mergedEntry = mergeEntries.getMergeEntry();
         if ("cancel".equals(button)) {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));

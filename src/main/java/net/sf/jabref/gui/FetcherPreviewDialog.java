@@ -186,7 +186,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     }
 
     /* (non-Javadoc)
-    * @see net.sf.jabref.gui.ImportInspection#addEntry(net.sf.jabref.BibtexEntry)
+    * @see net.sf.jabref.gui.ImportInspection#addEntry(net.sf.jabref.BibEntry)
     */
     public void addEntry(String entryId, JLabel preview) {
         TableEntry entry = new TableEntry(entryId, preview);
@@ -281,7 +281,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
         @Override
         public void setValueAt(Object value, int row, int column) {
-            // Only column 0, which is controlled by BibtexEntry.searchHit, is
+            // Only column 0, which is controlled by BibEntry.searchHit, is
             // editable:
             entries.getReadWriteLock().writeLock().lock();
             TableEntry entry = entries.get(row);

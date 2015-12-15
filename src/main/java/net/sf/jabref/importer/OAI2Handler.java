@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.importer;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -30,7 +30,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class OAI2Handler extends DefaultHandler {
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
 
     private StringBuffer authors;
 
@@ -41,7 +41,7 @@ public class OAI2Handler extends DefaultHandler {
     private StringBuffer characters;
 
 
-    public OAI2Handler(BibtexEntry be) {
+    public OAI2Handler(BibEntry be) {
         this.entry = be;
     }
 

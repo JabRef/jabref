@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -45,9 +45,9 @@ public class RegExpFileSearchTests {
     @Test
     public void testFindFiles() {
         //given
-        List<BibtexEntry> entries = new ArrayList<>();
-        BibtexEntry entry = new BibtexEntry("123", BibtexEntryTypes.ARTICLE);
-        entry.setField(BibtexEntry.KEY_FIELD, "pdfInDatabase");
+        List<BibEntry> entries = new ArrayList<>();
+        BibEntry entry = new BibEntry("123", BibtexEntryTypes.ARTICLE);
+        entry.setField(BibEntry.KEY_FIELD, "pdfInDatabase");
         entry.setField("year", "2001");
         entries.add(entry);
 
@@ -56,7 +56,7 @@ public class RegExpFileSearchTests {
         List<File> dirs = Arrays.asList(new File(filesDirectory));
 
         //when
-        Map<BibtexEntry, java.util.List<File>> result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs,
+        Map<BibEntry, java.util.List<File>> result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs,
                 "**/[bibtexkey].*\\\\.[extension]");
 
         //then

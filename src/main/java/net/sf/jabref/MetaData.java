@@ -22,7 +22,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -48,7 +48,7 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(HashMap<String, String> inData, BibtexDatabase db) {
+    public MetaData(HashMap<String, String> inData, BibDatabase db) {
         boolean groupsTreePresent = false;
         Vector<String> flatGroupsData = null;
         Vector<String> treeGroupsData = null;
@@ -221,11 +221,11 @@ public class MetaData implements Iterable<String> {
      * Parse the groups metadata string
      *
      * @param orderedData The vector of metadata strings
-     * @param db          The BibtexDatabase this metadata belongs to
+     * @param db          The BibDatabase this metadata belongs to
      * @param version     The group tree version
      * @return true if parsing was successful, false otherwise
      */
-    private void putGroups(Vector<String> orderedData, BibtexDatabase db, int version) {
+    private void putGroups(Vector<String> orderedData, BibDatabase db, int version) {
         try {
             groupsRoot = VersionHandling.importGroups(orderedData, db,
                     version);

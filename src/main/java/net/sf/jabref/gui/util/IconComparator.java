@@ -15,24 +15,25 @@
 */
 package net.sf.jabref.gui.util;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Comparator that handles icon columns.
  */
-public class IconComparator implements Comparator<BibtexEntry> {
+public class IconComparator implements Comparator<BibEntry> {
 
-    private final String[] fields;
+    private final List<String> fields;
 
 
-    public IconComparator(String[] fields) {
+    public IconComparator(List<String> fields) {
         this.fields = fields;
     }
 
     @Override
-    public int compare(BibtexEntry e1, BibtexEntry e2) {
+    public int compare(BibEntry e1, BibEntry e2) {
 
         for (String field : fields) {
             String val1 = e1.getField(field);

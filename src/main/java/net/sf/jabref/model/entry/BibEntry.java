@@ -39,11 +39,10 @@ import org.apache.commons.logging.LogFactory;
 import com.google.common.base.Strings;
 
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 
-public class BibtexEntry {
-
-    private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
+public class BibEntry {
+    private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
@@ -70,16 +69,16 @@ public class BibtexEntry {
     private boolean changed;
 
 
-    public BibtexEntry() {
+    public BibEntry() {
         this(IdGenerator.next());
     }
 
-    public BibtexEntry(String id) {
-        this(id, EntryTypes.getBibtexEntryType("misc"));
+    public BibEntry(String id) {
+        this(id, EntryTypes.getTypeOrDefault("misc"));
     }
 
-    public BibtexEntry(String id, EntryType type) {
-        Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
+    public BibEntry(String id, EntryType type) {
+        Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
         changed = true;
@@ -117,7 +116,7 @@ public class BibtexEntry {
      * Returns true if this entry contains the fields it needs to be
      * complete.
      */
-    public boolean hasAllRequiredFields(BibtexDatabase database) {
+    public boolean hasAllRequiredFields(BibDatabase database) {
         return allFieldsPresent(type.getRequiredFields(), database);
     }
 
@@ -132,7 +131,7 @@ public class BibtexEntry {
      * Sets this entry's type.
      */
     public void setType(EntryType type) {
-        Objects.requireNonNull(type, "Every BibtexEntry must have a type.");
+        Objects.requireNonNull(type, "Every BibEntry must have a type.");
 
         EntryType oldType = this.type;
 
@@ -154,10 +153,10 @@ public class BibtexEntry {
      * doesn't veto the change.
      */
     public void setId(String id) {
-        Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
+        Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         try {
-            firePropertyChangedEvent(BibtexEntry.ID_FIELD, this.id, id);
+            firePropertyChangedEvent(BibEntry.ID_FIELD, this.id, id);
         } catch (PropertyVetoException pv) {
             throw new IllegalStateException("Couldn't change ID: " + pv);
         }
@@ -330,7 +329,7 @@ public class BibtexEntry {
 
         String fieldName = normalizeFieldName(name);
 
-        if (BibtexEntry.ID_FIELD.equals(fieldName)) {
+        if (BibEntry.ID_FIELD.equals(fieldName)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
 
@@ -363,7 +362,7 @@ public class BibtexEntry {
 
         changed = true;
 
-        if (BibtexEntry.ID_FIELD.equals(fieldName)) {
+        if (BibEntry.ID_FIELD.equals(fieldName)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
         Object oldValue = fields.get(fieldName);
@@ -386,7 +385,7 @@ public class BibtexEntry {
      *                  argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    boolean allFieldsPresent(String[] allFields, BibtexDatabase database) {
+    boolean allFieldsPresent(String[] allFields, BibDatabase database) {
         final String orSeparator = "/";
 
         for (String field : allFields) {
@@ -399,7 +398,7 @@ public class BibtexEntry {
                     return false;
                 }
             } else {
-                if (BibtexDatabase.getResolvedField(fieldName, this, database) == null) {
+                if (BibDatabase.getResolvedField(fieldName, this, database) == null) {
                     return false;
                 }
             }
@@ -407,15 +406,15 @@ public class BibtexEntry {
         return true;
     }
 
-    boolean allFieldsPresent(List<String> allFields, BibtexDatabase database) {
+    boolean allFieldsPresent(List<String> allFields, BibDatabase database) {
         return allFieldsPresent(allFields.toArray(new String[allFields.size()]), database);
     }
 
-    private boolean atLeastOnePresent(String[] fieldsToCheck, BibtexDatabase database) {
+    private boolean atLeastOnePresent(String[] fieldsToCheck, BibDatabase database) {
         for (String field : fieldsToCheck) {
             String fieldName = normalizeFieldName(field);
 
-            String value = BibtexDatabase.getResolvedField(fieldName, this, database);
+            String value = BibDatabase.getResolvedField(fieldName, this, database);
             if ((value != null) && !value.isEmpty()) {
                 return true;
             }
@@ -449,7 +448,7 @@ public class BibtexEntry {
      */
     @Override
     public Object clone() {
-        BibtexEntry clone = new BibtexEntry(id, type);
+        BibEntry clone = new BibEntry(id, type);
         clone.fields = new HashMap<>(fields);
         return clone;
     }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Runs a formatter on every field.
@@ -20,7 +20,7 @@ public class FormatterCleanup implements Cleaner {
     }
 
     @Override
-    public List<FieldChange> cleanup(BibtexEntry entry) {
+    public List<FieldChange> cleanup(BibEntry entry) {
         ArrayList<FieldChange> changes = new ArrayList<>();
         for (String field : entry.getFieldNames()) {
             String oldValue = entry.getField(field);

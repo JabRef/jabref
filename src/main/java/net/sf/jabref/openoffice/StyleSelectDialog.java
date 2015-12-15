@@ -57,7 +57,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -114,7 +114,7 @@ class StyleSelectDialog {
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final BibtexEntry prevEntry = new BibtexEntry(IdGenerator.next());
+    private final BibEntry prevEntry = new BibEntry(IdGenerator.next());
 
     private boolean okPressed;
     private String initSelection;

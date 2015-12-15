@@ -62,8 +62,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 
 public class AuxSubGenerator {
@@ -72,20 +72,20 @@ public class AuxSubGenerator {
 
     private final Vector<String> notFoundList; // all not solved bibtex keys
 
-    private BibtexDatabase db; // reference database
-    private BibtexDatabase auxDB; // contains only the bibtex keys who found in aux file
+    private BibDatabase db; // reference database
+    private BibDatabase auxDB; // contains only the bibtex keys who found in aux file
 
     private int nestedAuxCounter; // counts the nested aux files
     private int crossreferencedEntriesCount; // counts entries pulled in due to crossref
 
 
-    public AuxSubGenerator(BibtexDatabase refDBase) {
+    public AuxSubGenerator(BibDatabase refDBase) {
         mySet = new HashSet<>(20);
         notFoundList = new Vector<>();
         db = refDBase;
     }
 
-    private void setReferenceDatabase(BibtexDatabase newRefDB) {
+    private void setReferenceDatabase(BibDatabase newRefDB) {
         db = newRefDB;
     }
 
@@ -253,13 +253,13 @@ public class AuxSubGenerator {
      * method will fill up some intern data structures.....
      */
     private void resolveTags() {
-        auxDB = new BibtexDatabase();
+        auxDB = new BibDatabase();
         notFoundList.clear();
 
         // for all bibtex keys (found in aux-file) try to find an equivalent
         // entry into reference database
         for (String str : mySet) {
-            BibtexEntry entry = db.getEntryByKey(str);
+            BibEntry entry = db.getEntryByKey(str);
 
             if (entry == null) {
                 notFoundList.add(str);
@@ -270,7 +270,7 @@ public class AuxSubGenerator {
                 // pull in that entry as well:
                 String crossref = entry.getField("crossref");
                 if ((crossref != null) && !mySet.contains(crossref)) {
-                    BibtexEntry refEntry = db.getEntryByKey(crossref);
+                    BibEntry refEntry = db.getEntryByKey(crossref);
                     /**
                      * [ 1717849 ] Patch for aux import by Kai Eckert
                      */
@@ -303,9 +303,9 @@ public class AuxSubGenerator {
      * @param bibDB The database to insert into.
      * @param entry The entry to insert a copy of.
      */
-    private void insertEntry(BibtexDatabase bibDB, BibtexEntry entry) {
+    private void insertEntry(BibDatabase bibDB, BibEntry entry) {
 
-        BibtexEntry clonedEntry = (BibtexEntry) entry.clone();
+        BibEntry clonedEntry = (BibEntry) entry.clone();
         clonedEntry.setId(IdGenerator.next());
         bibDB.insertEntry(clonedEntry);
     }
@@ -314,10 +314,10 @@ public class AuxSubGenerator {
      * generate Shortcut method for easy generation.
      *
      * @param auxFileName String
-     * @param bibDB BibtexDatabase - reference database
+     * @param bibDB BibDatabase - reference database
      * @return Vector - contains all not resolved bibtex entries
      */
-    public final Vector<String> generate(String auxFileName, BibtexDatabase bibDB) {
+    public final Vector<String> generate(String auxFileName, BibDatabase bibDB) {
         setReferenceDatabase(bibDB);
         parseAuxFile(auxFileName);
         resolveTags();
@@ -325,9 +325,9 @@ public class AuxSubGenerator {
         return notFoundList;
     }
 
-    public BibtexDatabase getGeneratedDatabase() {
+    public BibDatabase getGeneratedDatabase() {
         if (auxDB == null) {
-            auxDB = new BibtexDatabase();
+            auxDB = new BibDatabase();
         }
 
         return auxDB;

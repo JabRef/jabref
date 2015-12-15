@@ -15,19 +15,19 @@
 */
 package net.sf.jabref.logic.search.matchers;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**
  * Matcher for filtering or sorting the table according to whether entries are
  * tagged as search matches.
  */
-public class SearchMatcher implements Matcher<BibtexEntry> {
+public class SearchMatcher implements Matcher<BibEntry> {
 
-    public static final Matcher<BibtexEntry> INSTANCE = new SearchMatcher();
+    public static final Matcher<BibEntry> INSTANCE = new SearchMatcher();
 
     @Override
-    public boolean matches(BibtexEntry entry) {
+    public boolean matches(BibEntry entry) {
         return entry.isSearchHit();
     }
 }

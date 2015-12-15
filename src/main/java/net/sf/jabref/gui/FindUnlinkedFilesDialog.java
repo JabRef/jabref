@@ -76,7 +76,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.bibtex.EntryTypes;
@@ -114,7 +114,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
 
     private JabRefFrame frame;
-    private BibtexDatabase database;
+    private BibDatabase database;
     private EntryFromFileCreatorManager creatorManager;
     private UnlinkedFilesCrawler crawler;
 

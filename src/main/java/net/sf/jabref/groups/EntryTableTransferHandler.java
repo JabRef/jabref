@@ -43,8 +43,8 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.TransferableFileLinkSelection;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.gui.maintable.MainTable;
+import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.importer.ImportMenuItem;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.pdfimport.PdfImporter;
@@ -187,17 +187,10 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
-        /* TODO: add support for dragging file link from table icon into other apps */
         if (e instanceof MouseEvent) {
-            MouseEvent me = (MouseEvent) e;
-            int col = entryTable.columnAtPoint(me.getPoint());
-            String[] res = entryTable.getIconTypeForColumn(col);
-            if (res == null) {
-                super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
-                return;
-            }
-            // We have an icon column:
-            if (res == MainTableFormat.FILE) {
+            int columnIndex = entryTable.columnAtPoint(((MouseEvent) e).getPoint());
+            int modelIndex = entryTable.getColumnModel().getColumn(columnIndex).getModelIndex();
+            if(entryTable.isFileColumn(modelIndex)) {
                 LOGGER.info("Dragging file");
                 draggingFile = true;
             }

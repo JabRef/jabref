@@ -27,13 +27,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 
 class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
-    private BibtexDatabase secondary;
+    private BibDatabase secondary;
     private final JTree tree;
     private final JPanel infoPanel = new JPanel();
     private final JCheckBox cb = new JCheckBox(Localization.lang("Accept change"));
@@ -44,13 +44,13 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
 
     public ChangeDisplayDialog(JFrame owner, final BasePanel panel,
-            BibtexDatabase secondary, final DefaultMutableTreeNode root) {
+            BibDatabase secondary, final DefaultMutableTreeNode root) {
         super(owner, Localization.lang("External changes"), true);
         this.secondary = secondary;
 
         // Just to be sure, put in an empty secondary base if none is given:
         if (secondary == null) {
-            this.secondary = new BibtexDatabase();
+            this.secondary = new BibDatabase();
         }
         tree = new JTree(root);
         tree.addTreeSelectionListener(this);

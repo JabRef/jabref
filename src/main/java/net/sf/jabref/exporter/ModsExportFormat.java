@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.mods.MODSDatabase;
@@ -41,7 +41,7 @@ class ModsExportFormat extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData,
+    public void performExport(final BibDatabase database, final MetaData metaData,
  final String file,
             final Charset encoding, Set<String> keySet) throws IOException {
         SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));

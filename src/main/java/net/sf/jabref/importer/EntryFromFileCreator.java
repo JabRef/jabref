@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
@@ -55,7 +55,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         this.externalFileType = externalFileType;
     }
 
-    protected abstract BibtexEntry createBibtexEntry(File f);
+    protected abstract BibEntry createBibtexEntry(File f);
 
     /**
      * <p>
@@ -88,17 +88,17 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     public abstract String getFormatName();
 
     /**
-     * Create one BibtexEntry containing information regarding the given File.
+     * Create one BibEntry containing information regarding the given File.
      *
      * @param f
      * @param addPathTokensAsKeywords
      * @return
      */
-    public BibtexEntry createEntry(File f, boolean addPathTokensAsKeywords) {
+    public BibEntry createEntry(File f, boolean addPathTokensAsKeywords) {
         if ((f == null) || !f.exists()) {
             return null;
         }
-        BibtexEntry newEntry = createBibtexEntry(f);
+        BibEntry newEntry = createBibtexEntry(f);
 
         if (newEntry == null) {
             return null;
@@ -149,7 +149,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         return sb.toString();
     }
 
-    private void addFileInfo(BibtexEntry entry, File file) {
+    private void addFileInfo(BibEntry entry, File file) {
         JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
         ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt(externalFileType.getFieldName());
 
@@ -163,7 +163,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         entry.setField("file", model.getStringRepresentation());
     }
 
-    void appendToField(BibtexEntry entry, String field, String value) {
+    void appendToField(BibEntry entry, String field, String value) {
         if ((value == null) || "".equals(value)) {
             return;
         }
@@ -179,15 +179,15 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         }
     }
 
-    void addEntrysToEntry(BibtexEntry entry, List<BibtexEntry> entrys) {
+    void addEntrysToEntry(BibEntry entry, List<BibEntry> entrys) {
         if (entrys != null) {
-            for (BibtexEntry e : entrys) {
+            for (BibEntry e : entrys) {
                 addEntryDataToEntry(entry, e);
             }
         }
     }
 
-    void addEntryDataToEntry(BibtexEntry entry, BibtexEntry e) {
+    void addEntryDataToEntry(BibEntry entry, BibEntry e) {
         for (String field : e.getFieldNames()) {
             appendToField(entry, field, e.getField(field));
         }

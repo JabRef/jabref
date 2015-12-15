@@ -42,7 +42,7 @@ import net.sf.jabref.gui.fieldeditors.FileListEditor;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
@@ -65,7 +65,7 @@ class EntryEditorTab {
     // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
     public FileListEditor fileListEditor;
 
-    private BibtexEntry entry;
+    private BibEntry entry;
 
     private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
 
@@ -199,7 +199,7 @@ class EntryEditorTab {
 
         // Add the edit field for Bibtex-key.
         if (addKeyField) {
-            final TextField textField = new TextField(BibtexEntry.KEY_FIELD, parent
+            final TextField textField = new TextField(BibEntry.KEY_FIELD, parent
 .getEntry().getCiteKey(), true);
             setupJTextComponent(textField, null);
 
@@ -218,7 +218,7 @@ class EntryEditorTab {
     }
 
 
-    private BibtexEntry getEntry() {
+    private BibEntry getEntry() {
         return entry;
     }
 
@@ -280,7 +280,7 @@ class EntryEditorTab {
     }
 
     /**
-     * Reset all fields from the data in the BibtexEntry.
+     * Reset all fields from the data in the BibEntry.
      */
     public void updateAll() {
         setEntry(getEntry());
@@ -290,7 +290,7 @@ class EntryEditorTab {
     private boolean updating;
 
 
-    public void setEntry(BibtexEntry entry) {
+    public void setEntry(BibEntry entry) {
         try {
             updating = true;
             for (FieldEditor editor : editors.values()) {

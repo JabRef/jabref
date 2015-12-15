@@ -12,7 +12,7 @@ import org.junit.Assert;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fetcher.GVKParser;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CanonicalBibtexEntry;
 
 public class BibtexEntryAssert {
@@ -25,7 +25,7 @@ public class BibtexEntryAssert {
      * @param resourceName the resource to read
      * @param entry the entry to compare with
      */
-    public static void assertEquals(Class<GVKParser> clazz, String resourceName, BibtexEntry entry)
+    public static void assertEquals(Class<GVKParser> clazz, String resourceName, BibEntry entry)
             throws IOException {
         Assert.assertNotNull(clazz);
         Assert.assertNotNull(resourceName);
@@ -37,13 +37,13 @@ public class BibtexEntryAssert {
     }
 
     /**
-     * Reads a bibtex database from the given InputStream. The result has to contain a single BibtexEntry. This entry is
+     * Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry. This entry is
      * compared to the given entry
      *
      * @param shouldBeIs the inputStream reading the entry from
      * @param entry the entry to compare with
      */
-    public static void assertEquals(InputStream shouldBeIs, BibtexEntry entry)
+    public static void assertEquals(InputStream shouldBeIs, BibEntry entry)
             throws UnsupportedEncodingException, IOException {
         Assert.assertNotNull(shouldBeIs);
         Assert.assertNotNull(entry);
@@ -55,14 +55,14 @@ public class BibtexEntryAssert {
         Assert.assertNotNull(result);
         Assert.assertNotEquals(ParserResult.INVALID_FORMAT, result);
         Assert.assertEquals(1, result.getDatabase().getEntryCount());
-        BibtexEntry shouldBeEntry = result.getDatabase().getEntries().iterator().next();
+        BibEntry shouldBeEntry = result.getDatabase().getEntries().iterator().next();
         assertEquals(shouldBeEntry, entry);
     }
 
     /**
      * Compares to BibTeX entries using their canonical representation
      */
-    private static void assertEquals(BibtexEntry shouldBeEntry, BibtexEntry entry) {
+    private static void assertEquals(BibEntry shouldBeEntry, BibEntry entry) {
         // use the canonical string representation to compare the entries
         Assert.assertEquals(CanonicalBibtexEntry.getCanonicalRepresentation(shouldBeEntry),
                 CanonicalBibtexEntry.getCanonicalRepresentation(entry));

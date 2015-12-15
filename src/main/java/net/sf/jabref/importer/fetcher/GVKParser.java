@@ -15,7 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
@@ -31,15 +31,15 @@ import com.google.common.base.Strings;
 public class GVKParser {
     private static final Log LOGGER = LogFactory.getLog(GVKParser.class);
 
-    public List<BibtexEntry> parseEntries(InputStream is)
+    public List<BibEntry> parseEntries(InputStream is)
             throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document content = dbuild.parse(is);
         return this.parseEntries(content);
     }
 
-    public List<BibtexEntry> parseEntries(Document content) {
-        List<BibtexEntry> result = new LinkedList<>();
+    public List<BibEntry> parseEntries(Document content) {
+        List<BibEntry> result = new LinkedList<>();
 
         // used for creating test cases
         // XMLUtil.printDocument(content);
@@ -63,7 +63,7 @@ public class GVKParser {
         return result;
     }
 
-    private BibtexEntry parseEntry(Element e) {
+    private BibEntry parseEntry(Element e) {
         String author = null;
         String editor = null;
         String title = null;
@@ -364,7 +364,7 @@ public class GVKParser {
          * dann @incollection annehmen, wenn weder ISBN noch
          * ZDB-ID vorhanden sind.
          */
-        BibtexEntry result = new BibtexEntry(IdGenerator.next(), EntryTypes.getType(entryType));
+        BibEntry result = new BibEntry(IdGenerator.next(), EntryTypes.getType(entryType));
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {

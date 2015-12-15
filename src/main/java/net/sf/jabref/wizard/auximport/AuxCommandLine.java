@@ -35,24 +35,24 @@ package net.sf.jabref.wizard.auximport;
 
 import java.util.Vector;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class AuxCommandLine {
 
     private final String auxName;
-    private final BibtexDatabase bib;
+    private final BibDatabase bib;
 
 
-    public AuxCommandLine(String auxFileName, BibtexDatabase refDBase) {
+    public AuxCommandLine(String auxFileName, BibDatabase refDBase) {
         auxName = StringUtil.getCorrectFileName(auxFileName, "aux");
         bib = refDBase;
     }
 
-    public BibtexDatabase perform()
+    public BibDatabase perform()
     {
-        BibtexDatabase back = null;
+        BibDatabase back = null;
         if (!auxName.isEmpty() && bib != null)
         {
             AuxSubGenerator auxParser = new AuxSubGenerator(bib);

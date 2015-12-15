@@ -30,7 +30,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
@@ -75,12 +75,12 @@ public class SendAsEMailAction extends AbstractWorker {
         }
 
         StringWriter sw = new StringWriter();
-        BibtexEntry[] bes = panel.getSelectedEntries();
+        BibEntry[] bes = panel.getSelectedEntries();
 
         // write the entries using sw, which is used later to form the email content
         BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
-        for (BibtexEntry entry : bes) {
+        for (BibEntry entry : bes) {
             try {
                 bibtexEntryWriter.write(entry, sw);
             } catch (IOException e) {

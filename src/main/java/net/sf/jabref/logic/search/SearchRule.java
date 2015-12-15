@@ -26,7 +26,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public interface SearchRule {
 
@@ -40,7 +40,7 @@ public interface SearchRule {
     String NULL_QUERY = null;
 
 
-    boolean applyRule(String query, BibtexEntry bibtexEntry);
+    boolean applyRule(String query, BibEntry bibEntry);
 
     boolean validateSearchStrings(String query);
 }

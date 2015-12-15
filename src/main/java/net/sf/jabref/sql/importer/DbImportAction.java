@@ -29,7 +29,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
@@ -50,7 +50,7 @@ import net.sf.jabref.sql.SQLUtil;
  */
 public class DbImportAction extends AbstractWorker {
 
-    private BibtexDatabase database;
+    private BibDatabase database;
     private MetaData metaData;
     private boolean connectToDB;
     private final JabRefFrame frame;
@@ -160,7 +160,7 @@ public class DbImportAction extends AbstractWorker {
                                 if (dialogo.moreThanOne) {
                                     databases = importer.performImport(dbs, dialogo.listOfDBs);
                                     for (Object[] res : databases) {
-                                        database = (BibtexDatabase) res[0];
+                                        database = (BibDatabase) res[0];
                                         metaData = (MetaData) res[1];
                                         dbs.isConfigValid(true);
                                     }
@@ -196,7 +196,7 @@ public class DbImportAction extends AbstractWorker {
             return;
         }
         for (Object[] res : databases) {
-            database = (BibtexDatabase) res[0];
+            database = (BibDatabase) res[0];
             metaData = (MetaData) res[1];
             if (database != null) {
                 BasePanel pan = frame.addTab(database, null, metaData,

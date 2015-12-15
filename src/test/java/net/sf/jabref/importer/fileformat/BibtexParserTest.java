@@ -3,7 +3,7 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 import org.junit.Assert;
@@ -38,10 +38,10 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@article{test,author={Ed von Test}}"));
 
-        Collection<BibtexEntry> c = result.getDatabase().getEntries();
+        Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
 
-        BibtexEntry e = c.iterator().next();
+        BibEntry e = c.iterator().next();
         Assert.assertEquals("test", e.getCiteKey());
         Assert.assertEquals(2, e.getFieldNames().size());
         Set<String> o = e.getFieldNames();
@@ -115,22 +115,22 @@ public class BibtexParserTest {
     public void testFromString() throws Exception {
 
         { // Simple case
-            Collection<BibtexEntry> c = BibtexParser.fromString("@article{test,author={Ed von Test}}");
+            Collection<BibEntry> c = BibtexParser.fromString("@article{test,author={Ed von Test}}");
             Assert.assertEquals(1, c.size());
 
-            BibtexEntry e = c.iterator().next();
+            BibEntry e = c.iterator().next();
             Assert.assertEquals("test", e.getCiteKey());
             Assert.assertEquals(2, e.getFieldNames().size());
             Assert.assertTrue(e.getFieldNames().contains("author"));
             Assert.assertEquals("Ed von Test", e.getField("author"));
         }
         { // Empty String
-            Collection<BibtexEntry> c = BibtexParser.fromString("");
+            Collection<BibEntry> c = BibtexParser.fromString("");
             Assert.assertEquals(0, c.size());
 
         }
         // Error
-        Collection<BibtexEntry> c = BibtexParser.fromString("@@article@@{{{{{{}");
+        Collection<BibEntry> c = BibtexParser.fromString("@@article@@{{{{{{}");
         Assert.assertEquals(null, c);
 
     }
@@ -140,18 +140,18 @@ public class BibtexParserTest {
         /**
          * More
          */
-        Collection<BibtexEntry> c = BibtexParser.fromString("@article{canh05,"
+        Collection<BibEntry> c = BibtexParser.fromString("@article{canh05,"
                 + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
                 + "@inProceedings{foo," + "  author={Norton Bar}}");
 
         Assert.assertEquals(2, c.size());
 
-        Iterator<BibtexEntry> i = c.iterator();
-        BibtexEntry a = i.next();
-        BibtexEntry b = i.next();
+        Iterator<BibEntry> i = c.iterator();
+        BibEntry a = i.next();
+        BibEntry b = i.next();
 
         if (a.getCiteKey().equals("foo")) {
-            BibtexEntry tmp = a;
+            BibEntry tmp = a;
             a = b;
             b = tmp;
         }
@@ -168,7 +168,7 @@ public class BibtexParserTest {
 
     @Test
     public void testFromStringSingle() {
-        BibtexEntry a = BibtexParser.singleFromString("@article{canh05,"
+        BibEntry a = BibtexParser.singleFromString("@article{canh05,"
                 + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n");
 
         Assert.assertEquals("canh05", a.getCiteKey());
@@ -176,7 +176,7 @@ public class BibtexParserTest {
         Assert.assertEquals("Title A", a.getField("title"));
         Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
 
-        BibtexEntry b = BibtexParser.singleFromString("@article{canh05,"
+        BibEntry b = BibtexParser.singleFromString("@article{canh05,"
                 + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
                 + "@inProceedings{foo," + "  author={Norton Bar}}");
 
@@ -193,10 +193,10 @@ public class BibtexParserTest {
                 "@article{test,author={Ed von Test}}"));
         ParserResult result = parser.parse();
 
-        Collection<BibtexEntry> c = result.getDatabase().getEntries();
+        Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
 
-        BibtexEntry e = c.iterator().next();
+        BibEntry e = c.iterator().next();
         Assert.assertEquals("test", e.getCiteKey());
         Assert.assertEquals(2, e.getFieldNames().size());
         Assert.assertTrue(e.getFieldNames().contains("author"));
@@ -213,14 +213,14 @@ public class BibtexParserTest {
                 "@article{test,author={Ed von Test}}"));
         ParserResult result = parser.parse();
 
-        BibtexEntry e = new BibtexEntry("", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("", BibtexEntryTypes.ARTICLE);
         e.setField("author", "Ed von Test");
         e.setField("bibtexkey", "test");
 
-        Collection<BibtexEntry> c = result.getDatabase().getEntries();
+        Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
 
-        BibtexEntry e2 = c.iterator().next();
+        BibEntry e2 = c.iterator().next();
 
         Assert.assertNotSame(e.getId(), e2.getId());
 
@@ -245,8 +245,8 @@ public class BibtexParserTest {
                 + "isbn = 1234567890123456789,\n" + "isbn2 = {1234567890123456789},\n"
                 + "small = 1234,\n" + "}"));
 
-        Collection<BibtexEntry> c = result.getDatabase().getEntries();
-        BibtexEntry e = c.iterator().next();
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        BibEntry e = c.iterator().next();
 
         Assert.assertEquals("1234567890123456789", e.getField("isbn"));
         Assert.assertEquals("1234567890123456789", e.getField("isbn2"));
@@ -262,10 +262,10 @@ public class BibtexParserTest {
                 + "	Author = bourdieu," + "	Isbn = 2707318256," + "	Publisher = {Minuit},"
                 + "	Title = {Questions de sociologie}," + "	Year = 2002" + "}"));
 
-        Collection<BibtexEntry> c = result.getDatabase().getEntries();
+        Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
 
-        BibtexEntry e = c.iterator().next();
+        BibEntry e = c.iterator().next();
 
         Assert.assertEquals("bourdieu-2002-questions-sociologie", e.getCiteKey());
         Assert.assertEquals(BibtexEntryTypes.BOOK, e.getType());
@@ -281,7 +281,7 @@ public class BibtexParserTest {
     @Ignore
     public void testNewlineHandling() {
 
-        BibtexEntry e = BibtexParser.singleFromString("@article{canh05," +
+        BibEntry e = BibtexParser.singleFromString("@article{canh05," +
                 "a = {a\nb}," +
                 "b = {a\n\nb}," +
                 "c = {a\n \nb}," +
@@ -312,7 +312,7 @@ public class BibtexParserTest {
      */
     @Test
     public void testFileNaming() {
-        BibtexEntry e = BibtexParser.singleFromString("@article{canh05,"
+        BibEntry e = BibtexParser.singleFromString("@article{canh05,"
                 + "title = {\nHallo \nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n},\n"
                 + "tabs = {\nHallo \tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t},\n"
                 + "file = {Bemerkung:H:\\bla\\ups  sala.pdf:PDF}, \n"
@@ -329,7 +329,7 @@ public class BibtexParserTest {
      */
     @Test
     public void testFileNaming1() {
-        BibtexEntry e = BibtexParser.singleFromString("@article{canh05,"
+        BibEntry e = BibtexParser.singleFromString("@article{canh05,"
                 + "title = {\nHallo \nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n},\n"
                 + "tabs = {\nHallo \tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t},\n"
                 + "file = {Bemerkung:H:\\bla\\ups  \tsala.pdf:PDF}, \n"
@@ -347,7 +347,7 @@ public class BibtexParserTest {
     @Test
     @Ignore
     public void testFileNaming3() {
-        BibtexEntry e = BibtexParser.singleFromString("@article{canh05,"
+        BibEntry e = BibtexParser.singleFromString("@article{canh05,"
                 + "title = {\nHallo \nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n},\n"
                 + "tabs = {\nHallo \tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t},\n"
                 + "file = {Bemerkung:H:\\bla\\ups \n\tsala.pdf:PDF}, \n"

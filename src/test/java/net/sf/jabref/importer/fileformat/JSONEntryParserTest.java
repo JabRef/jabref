@@ -20,7 +20,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.Assert;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 public class JSONEntryParserTest {
@@ -38,7 +38,7 @@ public class JSONEntryParserTest {
                         + "\"id\": \"1563-5171\"},{\"type\": \"doi\",\"id\": \"10.1155/2014/217495\""
                 + "}],\"created_date\":\"2014-05-09T19:38:31Z\"}\"";
         JSONObject jo = new JSONObject(jsonString);
-        BibtexEntry be = jc.BibJSONtoBibtex(jo);
+        BibEntry be = jc.BibJSONtoBibtex(jo);
 
         Assert.assertEquals(BibtexEntryTypes.ARTICLE, be.getType());
         Assert.assertEquals("VLSI Design", be.getField("journal"));
@@ -63,7 +63,7 @@ public class JSONEntryParserTest {
                 + "        }";
 
         JSONObject jo = new JSONObject(jsonString);
-        BibtexEntry be = jc.SpringerJSONtoBibtex(jo);
+        BibEntry be = jc.SpringerJSONtoBibtex(jo);
         Assert.assertEquals("1992", be.getField("year"));
         Assert.assertEquals("5", be.getField("number"));
         Assert.assertEquals("#sep#", be.getField("month"));

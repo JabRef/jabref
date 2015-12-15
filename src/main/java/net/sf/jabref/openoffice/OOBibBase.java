@@ -35,8 +35,8 @@ import com.sun.star.uno.XComponentContext;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.openoffice.sorting.AuthorYearTitleComparator;
 import net.sf.jabref.openoffice.sorting.YearAuthorTitleComparator;
 
@@ -255,7 +255,7 @@ class OOBibBase {
     }
 
     /**
-     * This method inserts a cite marker in the text for the given BibtexEntry,
+     * This method inserts a cite marker in the text for the given BibEntry,
      * and may refresh the bibliography.
      * @param entries The entries to cite.
      * @param database The database the entry belongs to.
@@ -267,8 +267,8 @@ class OOBibBase {
      * @param sync Indicates whether the reference list should be refreshed.
      * @throws Exception
      */
-    public void insertEntry(BibtexEntry[] entries, BibtexDatabase database,
-            List<BibtexDatabase> allBases, OOBibStyle style,
+    public void insertEntry(BibEntry[] entries, BibDatabase database,
+            List<BibDatabase> allBases, OOBibStyle style,
             boolean inParenthesis, boolean withText, String pageInfo,
             boolean sync) throws Exception {
 
@@ -286,7 +286,7 @@ class OOBibBase {
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < entries.length; i++) {
-                BibtexEntry entry = entries[i];
+                BibEntry entry = entries[i];
                 if (i > 0) {
                     sb.append(',');
                 }
@@ -363,7 +363,7 @@ class OOBibBase {
      * @return A list of those referenced BibTeX keys that could not be resolved.
      * @throws Exception
      */
-    public List<String> refreshCiteMarkers(List<BibtexDatabase> databases, OOBibStyle style) throws
+    public List<String> refreshCiteMarkers(List<BibDatabase> databases, OOBibStyle style) throws
             Exception {
         try {
             return refreshCiteMarkersInternal(databases, style);
@@ -394,12 +394,12 @@ class OOBibBase {
         return names;
     }
 
-    private List<String> refreshCiteMarkersInternal(List<BibtexDatabase> databases, OOBibStyle style) throws
+    private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases, OOBibStyle style) throws
             Exception {
 
         List<String> cited = findCitedKeys();
-        HashMap<String, BibtexDatabase> linkSourceBase = new HashMap<>();
-        Map<BibtexEntry, BibtexDatabase> entries = findCitedEntries(databases, cited, linkSourceBase);
+        HashMap<String, BibDatabase> linkSourceBase = new HashMap<>();
+        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase);
 
         XNameAccess nameAccess = getReferenceMarks();
 
@@ -413,14 +413,14 @@ class OOBibBase {
         else if (style.isNumberEntries()) {
             // We need to sort the reference marks according to the sorting of the bibliographic
             // entries:
-            SortedMap<BibtexEntry, BibtexDatabase> newMap = new TreeMap<>(entryComparator);
-            for (Map.Entry<BibtexEntry, BibtexDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
+            SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
+            for (Map.Entry<BibEntry, BibDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
                 newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
             }
             entries = newMap;
             // Rebuild the list of cited keys according to the sort order:
             cited.clear();
-            for (BibtexEntry entry : entries.keySet()) {
+            for (BibEntry entry : entries.keySet()) {
                 cited.add(entry.getCiteKey());
             }
             names = nameAccess.getElementNames();
@@ -459,9 +459,9 @@ class OOBibBase {
                 types[i] = type; // Remember the type in case we need to uniqiefy.
                 String[] keys = m.group(2).split(",");
                 bibtexKeys[i] = keys;
-                BibtexEntry[] cEntries = new BibtexEntry[keys.length];
+                BibEntry[] cEntries = new BibEntry[keys.length];
                 for (int j = 0; j < cEntries.length; j++) {
-                    BibtexDatabase database = linkSourceBase.get(keys[j]);
+                    BibDatabase database = linkSourceBase.get(keys[j]);
                     cEntries[j] = null;
                     if (database != null) {
                         cEntries[j] = OOUtil.createAdaptedEntry(database.getEntryByKey(keys[j]));
@@ -544,7 +544,7 @@ class OOBibBase {
                     }
                     /*System.out.println(style.getBooleanCitProperty("MultiCiteChronological"));
                     for (int j = 0; j < cEntries.length; j++) {
-                        BibtexEntry cEntry = cEntries[j];
+                        BibEntry cEntry = cEntries[j];
                         System.out.println(cEntry.getCiteKey());
                     } */
 
@@ -611,7 +611,7 @@ class OOBibBase {
                 boolean needsChange = false;
                 int[] firstLimAuthors = new int[bibtexKeys[j].length];
                 String[] uniquif = new String[bibtexKeys[j].length];
-                BibtexEntry[] cEntries = new BibtexEntry[bibtexKeys[j].length];
+                BibEntry[] cEntries = new BibEntry[bibtexKeys[j].length];
                 for (int k = 0; k < bibtexKeys[j].length; k++) {
                     firstLimAuthors[k] = -1;
                     if (maxAuthorsFirst > 0) {
@@ -623,7 +623,7 @@ class OOBibBase {
                     String uniq = uniquefiers.get(bibtexKeys[j][k]);
                     if ((uniq != null) && (uniq.length() >= 0)) {
                         needsChange = true;
-                        BibtexDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
+                        BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
                         if (database != null) {
                             cEntries[k] = OOUtil.createAdaptedEntry(database.getEntryByKey(bibtexKeys[j][k]));
                         }
@@ -631,14 +631,14 @@ class OOBibBase {
                     }
                     else if (firstLimAuthors[k] > 0) {
                         needsChange = true;
-                        BibtexDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
+                        BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
                         if (database != null) {
                             cEntries[k] = OOUtil.createAdaptedEntry(database.getEntryByKey(bibtexKeys[j][k]));
                         }
                         uniquif[k] = "";
                     }
                     else {
-                        BibtexDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
+                        BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
                         if (database != null) {
                             cEntries[k] = OOUtil.createAdaptedEntry(database.getEntryByKey(bibtexKeys[j][k]));
                         }
@@ -711,7 +711,7 @@ class OOBibBase {
         }
 
         ArrayList<String> unresolvedKeys = new ArrayList<>();
-        for (BibtexEntry entry : entries.keySet()) {
+        for (BibEntry entry : entries.keySet()) {
             if (entry instanceof UndefinedBibtexEntry) {
                 String key = ((UndefinedBibtexEntry) entry).getKey();
                 if (!unresolvedKeys.contains(key)) {
@@ -817,11 +817,11 @@ class OOBibBase {
         return names;*/
     }
 
-    public void rebuildBibTextSection(List<BibtexDatabase> databases, OOBibStyle style)
+    public void rebuildBibTextSection(List<BibDatabase> databases, OOBibStyle style)
             throws Exception {
         List<String> cited = findCitedKeys();
-        HashMap<String, BibtexDatabase> linkSourceBase = new HashMap<>();
-        Map<BibtexEntry, BibtexDatabase> entries = findCitedEntries
+        HashMap<String, BibDatabase> linkSourceBase = new HashMap<>();
+        Map<BibEntry, BibDatabase> entries = findCitedEntries
                 (databases, cited, linkSourceBase);
 
         String[] names = sortedReferenceMarks;
@@ -831,8 +831,8 @@ class OOBibBase {
             entries = getSortedEntriesFromSortedRefMarks(names, entries, linkSourceBase);
         }
         else {
-            SortedMap<BibtexEntry, BibtexDatabase> newMap = new TreeMap<>(entryComparator);
-            for (Map.Entry<BibtexEntry, BibtexDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
+            SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
+            for (Map.Entry<BibEntry, BibDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
                 newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
             }
             entries = newMap;
@@ -854,14 +854,14 @@ class OOBibBase {
         return name;
     }
 
-    private LinkedHashMap<BibtexEntry, BibtexDatabase> findCitedEntries
-            (List<BibtexDatabase> databases, List<String> keys,
-             HashMap<String, BibtexDatabase> linkSourceBase) {
-        LinkedHashMap<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<>();
+    private LinkedHashMap<BibEntry, BibDatabase> findCitedEntries
+            (List<BibDatabase> databases, List<String> keys,
+             HashMap<String, BibDatabase> linkSourceBase) {
+        LinkedHashMap<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
         for (String key : keys) {
             boolean found = false;
-            for (BibtexDatabase database : databases) {
-                BibtexEntry entry = database.getEntryByKey(key);
+            for (BibDatabase database : databases) {
+                BibEntry entry = database.getEntryByKey(key);
                 if (entry != null) {
                     entries.put(OOUtil.createAdaptedEntry(entry), database);
                     linkSourceBase.put(key, database);
@@ -900,21 +900,21 @@ class OOBibBase {
         return keys;
     }
 
-    private LinkedHashMap<BibtexEntry, BibtexDatabase> getSortedEntriesFromSortedRefMarks
+    private LinkedHashMap<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks
             (String[] names,
-             Map<BibtexEntry, BibtexDatabase> entries,
-             HashMap<String, BibtexDatabase> linkSourceBase)
+             Map<BibEntry, BibDatabase> entries,
+             HashMap<String, BibDatabase> linkSourceBase)
                     throws BibtexEntryNotFoundException {
 
-        LinkedHashMap<BibtexEntry, BibtexDatabase> newList = new LinkedHashMap<>();
-        HashMap<BibtexEntry, BibtexEntry> adaptedEntries = new HashMap<>();
+        LinkedHashMap<BibEntry, BibDatabase> newList = new LinkedHashMap<>();
+        HashMap<BibEntry, BibEntry> adaptedEntries = new HashMap<>();
         for (String name : names) {
             Matcher m = citePattern.matcher(name);
             if (m.find()) {
                 String[] keys = m.group(2).split(",");
                 for (String key : keys) {
-                    BibtexDatabase database = linkSourceBase.get(key);
-                    BibtexEntry origEntry = null;
+                    BibDatabase database = linkSourceBase.get(key);
+                    BibEntry origEntry = null;
                     if (database != null) {
                         origEntry = database.getEntryByKey(key);
                     }
@@ -924,7 +924,7 @@ class OOBibBase {
                         newList.put(new UndefinedBibtexEntry(key), null);
                         //throw new BibtexEntryNotFoundException(keys[j], "");
                     } else {
-                        BibtexEntry entry = adaptedEntries.get(origEntry);
+                        BibEntry entry = adaptedEntries.get(origEntry);
                         if (entry == null) {
                             entry = OOUtil.createAdaptedEntry(origEntry);
                             adaptedEntries.put(origEntry, entry);
@@ -1032,19 +1032,19 @@ class OOBibBase {
         return result.trim();
     }
 
-    private void insertFullReferenceAtCursor(XTextCursor cursor, Map<BibtexEntry, BibtexDatabase> entries,
+    private void insertFullReferenceAtCursor(XTextCursor cursor, Map<BibEntry, BibDatabase> entries,
                                              OOBibStyle style, String parFormat)
             throws UndefinedParagraphFormatException, Exception {
         // If we don't have numbered entries, we need to sort the entries before adding them:
         if (!style.isSortByPosition()) {
-            Map<BibtexEntry, BibtexDatabase> newMap = new TreeMap<>(entryComparator);
-            for (BibtexEntry entry : entries.keySet()) {
+            Map<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
+            for (BibEntry entry : entries.keySet()) {
                 newMap.put(entry, entries.get(entry));
             }
             entries = newMap;
         }
         int number = 1;
-        for (BibtexEntry entry : entries.keySet()) {
+        for (BibEntry entry : entries.keySet()) {
             if (entry instanceof UndefinedBibtexEntry) {
                 continue;
             }
@@ -1067,7 +1067,7 @@ class OOBibBase {
 
     }
 
-    public void insertFullReferenceAtViewCursor(Map<BibtexEntry, BibtexDatabase> entries,
+    public void insertFullReferenceAtViewCursor(Map<BibEntry, BibDatabase> entries,
             OOBibStyle style, String parFormat) throws Exception {
         XTextViewCursor xViewCursor = xViewCursorSupplier.getViewCursor();
         insertFullReferenceAtCursor(xViewCursor, entries, style, parFormat);
@@ -1174,7 +1174,7 @@ class OOBibBase {
         }
     }
 
-    private void populateBibTextSection(Map<BibtexEntry, BibtexDatabase> entries,
+    private void populateBibTextSection(Map<BibEntry, BibDatabase> entries,
                                         OOBibStyle style)
             throws UndefinedParagraphFormatException, Exception {
         XTextSectionsSupplier supp = UnoRuntime.queryInterface(XTextSectionsSupplier.class, mxDoc);
@@ -1352,7 +1352,7 @@ class OOBibBase {
         xDesktop.getCurrentFrame().getContainerWindow().setFocus();
     }
 
-    public void combineCiteMarkers(List<BibtexDatabase> databases, OOBibStyle style) throws Exception {
+    public void combineCiteMarkers(List<BibDatabase> databases, OOBibStyle style) throws Exception {
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(
                 XReferenceMarksSupplier.class, xCurrentComponent);
         XNameAccess nameAccess = supplier.getReferenceMarks();
@@ -1404,10 +1404,10 @@ class OOBibBase {
                 keys.addAll(parseRefMarkName(names[piv + 1]));
                 removeReferenceMark(names[piv]);
                 removeReferenceMark(names[piv + 1]);
-                ArrayList<BibtexEntry> entries = new ArrayList<>();
+                ArrayList<BibEntry> entries = new ArrayList<>();
                 for (String key : keys) {
-                    for (BibtexDatabase database : databases) {
-                        BibtexEntry entry = database.getEntryByKey(key);
+                    for (BibDatabase database : databases) {
+                        BibEntry entry = database.getEntryByKey(key);
                         if (entry != null) {
                             entries.add(OOUtil.createAdaptedEntry(entry));
                             break;
@@ -1417,7 +1417,7 @@ class OOBibBase {
                 Collections.sort(entries, new FieldComparator("year"));
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
-                for (BibtexEntry entry : entries) {
+                for (BibEntry entry : entries) {
                     if (i > 0) {
                         sb.append(',');
                     }

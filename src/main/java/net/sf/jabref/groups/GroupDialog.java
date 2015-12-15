@@ -30,7 +30,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 import javax.swing.*;
@@ -485,14 +485,14 @@ class GroupDialog extends JDialog {
         if (i == JOptionPane.NO_OPTION) {
             return;
         }
-        Vector<BibtexEntry> vec = new Vector<>();
-        for (BibtexEntry entry : m_basePanel.database().getEntries()) {
+        Vector<BibEntry> vec = new Vector<>();
+        for (BibEntry entry : m_basePanel.database().getEntries()) {
             if (m_editedGroup.contains(entry)) {
                 vec.add(entry);
             }
         }
         if (!vec.isEmpty()) {
-            BibtexEntry[] entries = new BibtexEntry[vec.size()];
+            BibEntry[] entries = new BibEntry[vec.size()];
             vec.toArray(entries);
             if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {m_resultingGroup},
                     entries, m_basePanel.getDatabase(), this)) {

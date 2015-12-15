@@ -28,8 +28,8 @@ import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import net.sf.jabref.exporter.layout.format.RemoveWhitespace;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,21 +47,21 @@ import ca.odell.glazedlists.SortedList;
  */
 class OpenDocumentRepresentation {
 
-    private final Collection<BibtexEntry> entries;
-    private final BibtexDatabase database;
+    private final Collection<BibEntry> entries;
+    private final BibDatabase database;
 
     private static final Log LOGGER = LogFactory.getLog(OpenDocumentRepresentation.class);
 
 
-    public OpenDocumentRepresentation(BibtexDatabase database, Set<String> keySet) {
+    public OpenDocumentRepresentation(BibDatabase database, Set<String> keySet) {
         this.database = database;
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<>();
         comparators.add(new FieldComparator("author"));
         comparators.add(new FieldComparator("year"));
-        comparators.add(new FieldComparator(BibtexEntry.KEY_FIELD));
+        comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
-        BasicEventList<BibtexEntry> entryList = new BasicEventList<>();
+        BasicEventList<BibEntry> entryList = new BasicEventList<>();
 
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
@@ -162,9 +162,9 @@ class OpenDocumentRepresentation {
             addTableCell(result, row, "ISBN");
             table.appendChild(row);
 
-            for (BibtexEntry e : entries) {
+            for (BibEntry e : entries) {
                 row = result.createElement("table:table-row");
-                addTableCell(result, row, getField(e, BibtexEntry.KEY_FIELD));
+                addTableCell(result, row, getField(e, BibEntry.KEY_FIELD));
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, "address"));
                 addTableCell(result, row, getField(e, "assignee"));
@@ -217,8 +217,8 @@ class OpenDocumentRepresentation {
         return result;
     }
 
-    private String getField(BibtexEntry e, String field) {
-        String s = BibtexDatabase.getResolvedField(field, e, database);
+    private String getField(BibEntry e, String field) {
+        String s = BibDatabase.getResolvedField(field, e, database);
         return s == null ? "" : s;
     }
 

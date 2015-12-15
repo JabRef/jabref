@@ -96,12 +96,12 @@ public class OvidImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
@@ -230,7 +230,7 @@ public class OvidImporter extends ImportFormat {
                     h.put("title", h.remove("chaptertitle"));
                 }
             }
-            BibtexEntry b = new BibtexEntry(IdGenerator.next(), EntryTypes.getBibtexEntryType(entryType));
+            BibEntry b = new BibEntry(IdGenerator.next(), EntryTypes.getTypeOrDefault(entryType));
             b.setField(h);
 
             bibitems.add(b);

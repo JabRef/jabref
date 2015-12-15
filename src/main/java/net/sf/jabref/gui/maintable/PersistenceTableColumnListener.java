@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.maintable;
 
 import java.util.Vector;
 
@@ -24,6 +24,7 @@ import javax.swing.event.TableColumnModelListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.GUIGlobals;
 
 /**
  * Listens for TableColumnModelEvents to keep track of changes made to the
@@ -39,13 +40,11 @@ import net.sf.jabref.JabRefPreferences;
  */
 public class PersistenceTableColumnListener implements TableColumnModelListener {
 
-    public static final String ACTIVATE_PREF_KEY =
-            "ActivatePersistenceTableColumnListener";
+    public static final String ACTIVATE_PREF_KEY = "ActivatePersistenceTableColumnListener";
 
     public static final boolean DEFAULT_ENABLED = true;
 
-    private static final String simpleClassName =
-            PersistenceTableColumnListener.class.getSimpleName();
+    private static final String simpleClassName = PersistenceTableColumnListener.class.getSimpleName();
 
     // needed to get column names / indices mapped from view to model
     // and to access the table model
@@ -71,13 +70,11 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
         for (int i = 0; i < columnCount; i++) {
             final String name = mainTable.getColumnName(i);
             if ((name != null) && !name.isEmpty()) {
-                if ("#".equals(name)) { // TODO: get "#" from prefs?
+                if (GUIGlobals.NUMBER_COL.equals(name)) {
                     ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
                 } else {
                     storedColumns.add(name.toLowerCase());
-                    columnsWidths.add(String.valueOf(mainTable.getColumnModel().getColumn(
-                            i).getWidth()));
-
+                    columnsWidths.add(String.valueOf(mainTable.getColumnModel().getColumn(i).getWidth()));
                 }
             }
         }

@@ -43,14 +43,14 @@ import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.search.SearchTextListener;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Displays an BibtexEntry using the given layout format.
+ * Displays an BibEntry using the given layout format.
  */
 public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchTextListener, EntryContainer {
 
@@ -59,13 +59,13 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     /**
      * The bibtex entry currently shown
      */
-    private Optional<BibtexEntry> entry = Optional.empty();
+    private Optional<BibEntry> entry = Optional.empty();
 
     /**
      * If a database is set, the preview will attempt to resolve strings in the
      * previewed entry using that database.
      */
-    private Optional<BibtexDatabase> database = Optional.empty();
+    private Optional<BibDatabase> database = Optional.empty();
 
     private Optional<Layout> layout = Optional.empty();
 
@@ -106,7 +106,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      * @param layoutFile
      *            (must be given) Used for layout
      */
-    public PreviewPanel(BibtexDatabase database, BibtexEntry entry,
+    public PreviewPanel(BibDatabase database, BibEntry entry,
             BasePanel panel, MetaData metaData, String layoutFile) {
         this(database, entry, panel, metaData, layoutFile, false);
     }
@@ -127,7 +127,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      *            (must be given) Used for layout
      * @param withPDFPreview if true, a PDF preview is included in the PreviewPanel
      */
-    public PreviewPanel(BibtexDatabase database, BibtexEntry entry,
+    public PreviewPanel(BibDatabase database, BibEntry entry,
             BasePanel panel, MetaData metaData, String layoutFile, boolean withPDFPreview) {
         this(panel, metaData, layoutFile, withPDFPreview);
         this.database = Optional.ofNullable(database);
@@ -314,7 +314,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         this.layout = Optional.of(layout);
     }
 
-    public void setEntry(BibtexEntry newEntry) {
+    public void setEntry(BibEntry newEntry) {
         if(entry.isPresent() && (entry.get() != newEntry)) {
             entry.ifPresent(e -> e.removePropertyChangeListener(this));
             newEntry.addPropertyChangeListener(this);
@@ -326,7 +326,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     @Override
-    public BibtexEntry getEntry() {
+    public BibEntry getEntry() {
         return this.entry.orElse(null);
     }
 
@@ -353,7 +353,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     /**
      * The PreviewPanel has registered itself as an event listener with the
-     * currently displayed BibtexEntry. If the entry changes, an event is
+     * currently displayed BibEntry. If the entry changes, an event is
      * received here, and we can update the preview immediately.
      */
     @Override
@@ -390,7 +390,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
                 public void run() {
                     try {
                         PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                        pras.add(new JobName(entry.map(BibtexEntry::getCiteKey).orElse("NO ENTRY"), null));
+                        pras.add(new JobName(entry.map(BibEntry::getCiteKey).orElse("NO ENTRY"), null));
                         previewPane.print(null, null, true, null, pras, false);
 
                     } catch (PrinterException e) {

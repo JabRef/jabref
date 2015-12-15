@@ -22,15 +22,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.entry.EntryType;
 
 public class ParserResult {
     public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
     public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private MetaData metaData;
     private final HashMap<String, EntryType> entryTypes;
 
@@ -47,11 +47,11 @@ public class ParserResult {
     private boolean toOpenTab;
 
 
-    public ParserResult(Collection<BibtexEntry> entries) {
+    public ParserResult(Collection<BibEntry> entries) {
         this(ImportFormatReader.createDatabase(entries), null, new HashMap<>());
     }
 
-    public ParserResult(BibtexDatabase base, MetaData metaData, HashMap<String, EntryType> entryTypes) {
+    public ParserResult(BibDatabase base, MetaData metaData, HashMap<String, EntryType> entryTypes) {
         this.base = base;
         this.metaData = metaData;
         this.entryTypes = entryTypes;
@@ -70,7 +70,7 @@ public class ParserResult {
         this.toOpenTab = toOpenTab;
     }
 
-    public BibtexDatabase getDatabase() {
+    public BibDatabase getDatabase() {
         return base;
     }
 

@@ -37,8 +37,8 @@ import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.util.Util;
 
@@ -125,11 +125,11 @@ public class AppendDatabaseAction implements BaseAction {
             boolean importGroups, boolean importSelectorWords)
                     throws KeyCollisionException {
 
-        BibtexDatabase fromDatabase = pr.getDatabase();
-        ArrayList<BibtexEntry> appendedEntries = new ArrayList<>();
-        ArrayList<BibtexEntry> originalEntries = new ArrayList<>();
-        BibtexDatabase database = panel.database();
-        BibtexEntry originalEntry;
+        BibDatabase fromDatabase = pr.getDatabase();
+        ArrayList<BibEntry> appendedEntries = new ArrayList<>();
+        ArrayList<BibEntry> originalEntries = new ArrayList<>();
+        BibDatabase database = panel.database();
+        BibEntry originalEntry;
         NamedCompound ce = new NamedCompound(Localization.lang("Append database"));
         MetaData meta = pr.getMetaData();
 
@@ -139,7 +139,7 @@ public class AppendDatabaseAction implements BaseAction {
 
             for (String key : fromDatabase.getKeySet()) {
                 originalEntry = fromDatabase.getEntryById(key);
-                BibtexEntry be = (BibtexEntry) originalEntry.clone();
+                BibEntry be = (BibEntry) originalEntry.clone();
                 be.setId(IdGenerator.next());
                 Util.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp);
                 database.insertEntry(be);
@@ -167,7 +167,7 @@ public class AppendDatabaseAction implements BaseAction {
                     // create a dummy group
                     ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
                     newGroups.setGroup(group);
-                    for (BibtexEntry appendedEntry : appendedEntries) {
+                    for (BibEntry appendedEntry : appendedEntries) {
                         group.addEntry(appendedEntry);
                     }
                 }
@@ -181,7 +181,7 @@ public class AppendDatabaseAction implements BaseAction {
                 // to the new fromDatabase is added.
                 GroupTreeNode node;
                 ExplicitGroup group;
-                BibtexEntry entry;
+                BibEntry entry;
 
                 for (Enumeration<GroupTreeNode> e = newGroups
                         .preorderEnumeration(); e.hasMoreElements(); ) {

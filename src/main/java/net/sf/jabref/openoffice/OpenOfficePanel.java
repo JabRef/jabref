@@ -29,8 +29,8 @@ import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -313,7 +313,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
                     OpenOfficePanel.ooBase.updateSortedReferenceMarks();
 
-                    java.util.List<BibtexDatabase> databases = getBaseList();
+                    java.util.List<BibDatabase> databases = getBaseList();
                     java.util.List<String> unresolvedKeys = OpenOfficePanel.ooBase.refreshCiteMarkers
                             (databases, OpenOfficePanel.style);
                     OpenOfficePanel.ooBase.rebuildBibTextSection(databases, OpenOfficePanel.style);
@@ -469,8 +469,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         //diag.setVisible(true);
     }
 
-    private java.util.List<BibtexDatabase> getBaseList() {
-        java.util.List<BibtexDatabase> databases = new ArrayList<>();
+    private java.util.List<BibDatabase> getBaseList() {
+        java.util.List<BibDatabase> databases = new ArrayList<>();
         if (Globals.prefs.getBoolean("useAllOpenBases")) {
             for (int i = 0; i < OpenOfficePanel.frame.getBasePanelCount(); i++) {
                 databases.add(OpenOfficePanel.frame.getBasePanelAt(i).database());
@@ -779,8 +779,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
         BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
         if (panel != null) {
-            final BibtexDatabase database = panel.database();
-            BibtexEntry[] entries = panel.getSelectedEntries();
+            final BibDatabase database = panel.database();
+            BibEntry[] entries = panel.getSelectedEntries();
             if (entries.length > 0) {
                 try {
                     if (OpenOfficePanel.style == null) {
@@ -820,11 +820,11 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 ooBase.clearBibTextSectionContent();
               */
             BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
-            Map<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<>();
+            Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
             if (panel != null) {
-                final BibtexDatabase database = panel.database();
-                BibtexEntry[] e = panel.getSelectedEntries();
-                for (BibtexEntry anE : e) {
+                final BibDatabase database = panel.database();
+                BibEntry[] e = panel.getSelectedEntries();
+                for (BibEntry anE : e) {
                     entries.put(anE, database);
                 }
 
@@ -858,9 +858,9 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         try {
             BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
             if (panel != null) {
-                final BibtexDatabase database = panel.database();
-                BibtexEntry[] entries = panel.getSelectedEntries();
-                ArrayList<BibtexEntry> el = new ArrayList<>();
+                final BibDatabase database = panel.database();
+                BibEntry[] entries = panel.getSelectedEntries();
+                ArrayList<BibEntry> el = new ArrayList<>();
                 Collections.addAll(el, entries);
 
                 BstWrapper wrapper = new BstWrapper();
@@ -943,9 +943,9 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         menu.show(OpenOfficePanel.settingsB, 0, OpenOfficePanel.settingsB.getHeight());
     }
 
-    private void pushEntries(boolean inParenthesis, BibtexEntry[] entries) {
+    private void pushEntries(boolean inParenthesis, BibEntry[] entries) {
 
-        final BibtexDatabase database = OpenOfficePanel.frame.getCurrentBasePanel().database();
+        final BibDatabase database = OpenOfficePanel.frame.getCurrentBasePanel().database();
         if (entries.length > 0) {
 
             String pageInfo = null;
@@ -1024,7 +1024,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     @Override
-    public void pushEntries(BibtexDatabase bibtexDatabase, BibtexEntry[] entries, String s, MetaData metaData) {
+    public void pushEntries(BibDatabase bibDatabase, BibEntry[] entries, String s, MetaData metaData) {
         if (OpenOfficePanel.ooBase == null) {
             connect(true);
         }

@@ -43,7 +43,7 @@ import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 
 public class FileActions {
 
@@ -74,7 +74,7 @@ public class FileActions {
      * @param database The database whose strings we should write.
      * @throws IOException If anthing goes wrong in writing.
      */
-    private static void writeStrings(Writer fw, BibtexDatabase database) throws IOException {
+    private static void writeStrings(Writer fw, BibDatabase database) throws IOException {
         FileActions.previousStringType = BibtexString.Type.AUTHOR;
         List<BibtexString> strings = new ArrayList<>();
         for (String s : database.getStringKeySet()) {
@@ -160,7 +160,7 @@ public class FileActions {
      */
     private static void writeBibFileHeader(Writer out, Charset encoding) throws IOException {
         out.write("% ");
-        out.write(Globals.encPrefix + encoding + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE);
+        out.write(Globals.encPrefix + encoding);
     }
 
     /**
@@ -170,7 +170,7 @@ public class FileActions {
      * let the user save only the results of a search. False and false means all
      * entries are saved.
      */
-    public static SaveSession saveDatabase(BibtexDatabase database,
+    public static SaveSession saveDatabase(BibDatabase database,
                                            MetaData metaData, File file, JabRefPreferences prefs,
                                            boolean checkSearch, boolean checkGroup, Charset encoding, boolean suppressBackup)
             throws SaveException {
@@ -183,7 +183,7 @@ public class FileActions {
         }
 
         SaveSession session;
-        BibtexEntry exceptionCause = null;
+        BibEntry exceptionCause = null;
         try {
             session = new SaveSession(file, encoding, backup);
         } catch (Throwable e) {
@@ -214,11 +214,11 @@ public class FileActions {
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            List<BibtexEntry> sorter = FileActions.getSortedEntries(database, metaData, null, true);
+            List<BibEntry> sorter = FileActions.getSortedEntries(database, metaData, null, true);
 
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
-            for (BibtexEntry entry : sorter) {
+            for (BibEntry entry : sorter) {
                 exceptionCause = entry;
 
                 // Check if we must write the type definition for this
@@ -345,17 +345,17 @@ public class FileActions {
     }
 
 
-    private static List<Comparator<BibtexEntry>> getSaveComparators(boolean isSaveOperation, MetaData metaData) {
+    private static List<Comparator<BibEntry>> getSaveComparators(boolean isSaveOperation, MetaData metaData) {
         SaveSettings saveSettings = new SaveSettings(isSaveOperation, metaData);
 
-        List<Comparator<BibtexEntry>> comparators = new ArrayList<>();
+        List<Comparator<BibEntry>> comparators = new ArrayList<>();
         if (isSaveOperation) {
             comparators.add(new CrossRefEntryComparator());
         }
         comparators.add(new FieldComparator(saveSettings.pri, saveSettings.priD));
         comparators.add(new FieldComparator(saveSettings.sec, saveSettings.secD));
         comparators.add(new FieldComparator(saveSettings.ter, saveSettings.terD));
-        comparators.add(new FieldComparator(BibtexEntry.KEY_FIELD));
+        comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
 
         return comparators;
     }
@@ -366,9 +366,9 @@ public class FileActions {
      *
      * @return A List containing warnings, if any.
      */
-    public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
+    public static SaveSession savePartOfDatabase(BibDatabase database, MetaData metaData,
                                                  File file,
-                                                 JabRefPreferences prefs, BibtexEntry[] bes, Charset encoding, DatabaseSaveType saveType)
+                                                 JabRefPreferences prefs, BibEntry[] bes, Charset encoding, DatabaseSaveType saveType)
             throws SaveException {
 
         TreeMap<String, EntryType> types = new TreeMap<>(); // Map
@@ -379,7 +379,7 @@ public class FileActions {
         // definitions
         // that we must save along with entries using them.
 
-        BibtexEntry be = null;
+        BibEntry be = null;
         boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
 
         SaveSession session;
@@ -407,16 +407,16 @@ public class FileActions {
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            List<Comparator<BibtexEntry>> comparators = FileActions.getSaveComparators(true, metaData);
+            List<Comparator<BibEntry>> comparators = FileActions.getSaveComparators(true, metaData);
 
             // Use glazed lists to get a sorted view of the entries:
-            List<BibtexEntry> sorter = new ArrayList<>(bes.length);
+            List<BibEntry> sorter = new ArrayList<>(bes.length);
             Collections.addAll(sorter, bes);
             Collections.sort(sorter, new FieldComparatorStack<>(comparators));
 
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
-            for (BibtexEntry aSorter : sorter) {
+            for (BibEntry aSorter : sorter) {
                 be = aSorter;
 
                 // Check if we must write the type definition for this
@@ -493,7 +493,7 @@ public class FileActions {
      * (such as the exportDatabase call), we do not wish to use the
      * global preference of saving in standard order.
      */
-    public static List<BibtexEntry> getSortedEntries(BibtexDatabase database, MetaData metaData, Set<String> keySet, boolean isSaveOperation) {
+    public static List<BibEntry> getSortedEntries(BibDatabase database, MetaData metaData, Set<String> keySet, boolean isSaveOperation) {
         boolean inOriginalOrder;
         if (isSaveOperation) {
             Vector<String> storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
@@ -506,7 +506,7 @@ public class FileActions {
         } else {
             inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
         }
-        List<Comparator<BibtexEntry>> comparators;
+        List<Comparator<BibEntry>> comparators;
         if (inOriginalOrder) {
             // Sort entries based on their creation order, utilizing the fact
             // that IDs used for entries are increasing, sortable numbers.
@@ -517,8 +517,8 @@ public class FileActions {
             comparators = FileActions.getSaveComparators(isSaveOperation, metaData);
         }
 
-        FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<>(comparators);
-        List<BibtexEntry> sorter = new ArrayList<>();
+        FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
+        List<BibEntry> sorter = new ArrayList<>();
 
         if (keySet == null) {
             keySet = database.getKeySet();
@@ -540,7 +540,7 @@ public class FileActions {
     /**
      * @return true iff the entry has a nonzero value in its field.
      */
-    private static boolean nonZeroField(BibtexEntry be, String field) {
+    private static boolean nonZeroField(BibEntry be, String field) {
         String o = be.getField(field);
 
         return (o != null) && !"0".equals(o);

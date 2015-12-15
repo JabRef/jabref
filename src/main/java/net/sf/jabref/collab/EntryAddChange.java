@@ -25,16 +25,16 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 class EntryAddChange extends Change {
 
-    private final BibtexEntry diskEntry;
+    private final BibEntry diskEntry;
     private final JScrollPane sp;
 
 
-    public EntryAddChange(BibtexEntry diskEntry) {
+    public EntryAddChange(BibEntry diskEntry) {
         super(Localization.lang("Added entry"));
         this.diskEntry = diskEntry;
 
@@ -43,7 +43,7 @@ class EntryAddChange extends Change {
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         diskEntry.setId(IdGenerator.next());
         panel.database().insertEntry(diskEntry);
         secondary.insertEntry(diskEntry);

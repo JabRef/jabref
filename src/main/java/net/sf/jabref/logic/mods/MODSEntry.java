@@ -26,7 +26,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.XMLChars;
@@ -79,7 +79,7 @@ class MODSEntry {
 
     }
 
-    public MODSEntry(BibtexEntry bibtex) {
+    public MODSEntry(BibEntry bibtex) {
         this();
         handledExtensions.add(MODSEntry.BIBTEX + "publisher");
         handledExtensions.add(MODSEntry.BIBTEX + "title");
@@ -88,7 +88,7 @@ class MODSEntry {
         populateFromBibtex(bibtex);
     }
 
-    private void populateFromBibtex(BibtexEntry bibtex) {
+    private void populateFromBibtex(BibEntry bibtex) {
         if (bibtex.getField("title") != null) {
             if (CHARFORMAT) {
                 title = chars.format(bibtex.getField("title"));
@@ -140,7 +140,7 @@ class MODSEntry {
 
     }
 
-    private void populateExtensionFields(BibtexEntry e) {
+    private void populateExtensionFields(BibEntry e) {
 
         for (String field : e.getFieldNames()) {
             String value = e.getField(field);
@@ -174,7 +174,7 @@ class MODSEntry {
     }
 
     /* construct a MODS date object */
-    private static String getDate(BibtexEntry bibtex) {
+    private static String getDate(BibEntry bibtex) {
         String result = "";
         if (bibtex.getField("year") != null) {
             result += bibtex.getField("year");
@@ -187,7 +187,7 @@ class MODSEntry {
     }
 
     // must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
-    private static String getMODSgenre(BibtexEntry bibtex) {
+    private static String getMODSgenre(BibEntry bibtex) {
         /**
          * <pre> String result; if (bibtexType.equals("Mastersthesis")) result =
          * "theses"; else result = "conference publication"; // etc... </pre>

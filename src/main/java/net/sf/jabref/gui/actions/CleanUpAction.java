@@ -41,8 +41,8 @@ import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.cleanup.FormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 public class CleanUpAction extends AbstractWorker {
@@ -268,7 +268,7 @@ public class CleanUpAction extends AbstractWorker {
             }
         }
 
-        for (BibtexEntry entry : panel.getSelectedEntries()) {
+        for (BibEntry entry : panel.getSelectedEntries()) {
             // undo granularity is on entry level
             NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
 
@@ -359,43 +359,43 @@ public class CleanUpAction extends AbstractWorker {
     /**
      * Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
      */
-    private void doUpgradePdfPsToFile(BibtexEntry entry, NamedCompound ce) {
+    private void doUpgradePdfPsToFile(BibEntry entry, NamedCompound ce) {
         Util.upgradePdfPsToFile(entry, new String[] {"pdf", "ps"}, ce);
     }
 
     /**
      * Converts the text in 1st, 2nd, ... to real superscripts by wrapping in \textsuperscript{st}, ...
      */
-    private static void doCleanUpSuperscripts(BibtexEntry entry, NamedCompound ce) {
+    private static void doCleanUpSuperscripts(BibEntry entry, NamedCompound ce) {
         doCleanup(new FormatterCleanup(BibtexFieldFormatters.SUPERSCRIPTS), entry, ce);
     }
 
     /**
      * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
      */
-    private static void doCleanUpDOI(BibtexEntry entry, NamedCompound ce) {
+    private static void doCleanUpDOI(BibEntry entry, NamedCompound ce) {
         doCleanup(new DoiCleanup(), entry, ce);
     }
 
-    private static void doCleanUpMonth(BibtexEntry entry, NamedCompound ce) {
+    private static void doCleanUpMonth(BibEntry entry, NamedCompound ce) {
         doCleanup(FieldFormatterCleanup.MONTH, entry, ce);
     }
 
-    private static void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
+    private static void doCleanUpPageNumbers(BibEntry entry, NamedCompound ce) {
         doCleanup(FieldFormatterCleanup.PAGE_NUMBERS, entry, ce);
     }
 
-    private static void fixWrongFileEntries(BibtexEntry entry, NamedCompound ce) {
+    private static void fixWrongFileEntries(BibEntry entry, NamedCompound ce) {
         doCleanup(new FileEntryCleaner(), entry, ce);
     }
 
-    private void doMakePathsRelative(BibtexEntry entry, NamedCompound ce) {
+    private void doMakePathsRelative(BibEntry entry, NamedCompound ce) {
         doCleanup(new RelativePathsCleanup(panel.metaData().getFileDirectory(Globals.FILE_FIELD)), entry, ce);
     }
 
-    private void doRenamePDFs(BibtexEntry entry, NamedCompound ce) {
+    private void doRenamePDFs(BibEntry entry, NamedCompound ce) {
         String[] paths = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
-        BibtexDatabase database = panel.database();
+        BibDatabase database = panel.database();
         Boolean onlyRelativePaths = cleanUpRenamePDFonlyRelativePaths.isSelected();
         RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, onlyRelativePaths, database);
         doCleanup(cleaner, entry, ce);
@@ -405,50 +405,50 @@ public class CleanUpAction extends AbstractWorker {
     /**
      * Converts HTML code to LaTeX code
      */
-    private static void doConvertHTML(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertHTML(BibEntry entry, NamedCompound ce) {
         doCleanup(FieldFormatterCleanup.TITLE_HTML, entry, ce);
     }
 
     /**
      * Converts Unicode characters to LaTeX code
      */
-    private static void doConvertUnicode(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertUnicode(BibEntry entry, NamedCompound ce) {
         doCleanup(new UnicodeCleanup(), entry, ce);
     }
 
     /**
      * Adds curly brackets {} around keywords
      */
-    private static void doConvertCase(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertCase(BibEntry entry, NamedCompound ce) {
         doCleanup(FieldFormatterCleanup.TITLE_CASE, entry, ce);
     }
 
-    private static void doConvertUnits(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertUnits(BibEntry entry, NamedCompound ce) {
         doCleanup(FieldFormatterCleanup.TITLE_UNITS, entry, ce);
     }
 
-    private static void doConvertLaTeX(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertLaTeX(BibEntry entry, NamedCompound ce) {
         doCleanup(FieldFormatterCleanup.TITLE_LATEX, entry, ce);
     }
 
     /**
      * Converts to BibLatex format
      */
-    private static void doConvertToBiblatex(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertToBiblatex(BibEntry entry, NamedCompound ce) {
         doCleanup(new BiblatexCleanup(), entry, ce);
     }
 
     /**
      * Format dates correctly (yyyy-mm-dd or yyyy-mm)
      */
-    private static void doCleanUpDate(BibtexEntry entry, NamedCompound ce) {
+    private static void doCleanUpDate(BibEntry entry, NamedCompound ce) {
         doCleanup(FieldFormatterCleanup.DATES, entry, ce);
     }
 
     /**
      * Runs the field formatter on the entry and records the change.
      */
-    private static void doCleanup(Cleaner cleaner, BibtexEntry entry, NamedCompound ce) {
+    private static void doCleanup(Cleaner cleaner, BibEntry entry, NamedCompound ce) {
         // Run cleaner
         List<FieldChange> changes = cleaner.cleanup(entry);
 

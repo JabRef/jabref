@@ -47,7 +47,7 @@ import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeperList;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 public class IEEEXploreFetcher implements EntryFetcher {
@@ -213,7 +213,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     private void parse(ImportInspector dialog, String text) {
-        BibtexEntry entry;
+        BibEntry entry;
         while (((entry = parseNextEntry(text)) != null) && shouldContinue) {
             if (entry.getField("title") != null) {
                 dialog.addEntry(entry);
@@ -223,7 +223,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
     }
 
-    private BibtexEntry cleanup(BibtexEntry entry) {
+    private BibEntry cleanup(BibEntry entry) {
         if (entry == null) {
             return null;
         }
@@ -485,8 +485,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return entry;
     }
 
-    private BibtexEntry parseNextEntry(String allText) {
-        BibtexEntry entry = null;
+    private BibEntry parseNextEntry(String allText) {
+        BibEntry entry = null;
 
         int index = allText.indexOf("<div class=\"detail", piv);
         int endIndex = allText.indexOf("</div>", index);
@@ -544,7 +544,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 unparseable++;
             }
 
-            entry = new BibtexEntry(IdGenerator.next(), type);
+            entry = new BibEntry(IdGenerator.next(), type);
 
             if ("IEEE Standards".equalsIgnoreCase(typeName)) {
                 entry.setField("organization", "IEEE");

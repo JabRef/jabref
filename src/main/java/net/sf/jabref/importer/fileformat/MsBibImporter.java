@@ -23,8 +23,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 
 import org.w3c.dom.Document;
@@ -80,7 +79,7 @@ public class MsBibImporter extends ImportFormat {
     }
 
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
 
         MSBibDatabase dbase = new MSBibDatabase();
 

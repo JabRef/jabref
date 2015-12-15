@@ -21,8 +21,8 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,21 +45,21 @@ public class MODSDatabase {
         entries = new HashSet<>();
     }
 
-    public MODSDatabase(BibtexDatabase bibtex) {
+    public MODSDatabase(BibDatabase bibtex) {
         addEntries(bibtex, bibtex.getKeySet());
     }
 
-    public MODSDatabase(BibtexDatabase bibtex, Set<String> keySet) {
+    public MODSDatabase(BibDatabase bibtex, Set<String> keySet) {
         if (keySet == null) {
             keySet = bibtex.getKeySet();
         }
         addEntries(bibtex, keySet);
     }
 
-    private void addEntries(BibtexDatabase database, Set<String> keySet) {
+    private void addEntries(BibDatabase database, Set<String> keySet) {
         entries = new HashSet<>();
         for (String aKeySet : keySet) {
-            BibtexEntry entry = database.getEntryById(aKeySet);
+            BibEntry entry = database.getEntryById(aKeySet);
             MODSEntry newMods = new MODSEntry(entry);
             entries.add(newMods);
         }

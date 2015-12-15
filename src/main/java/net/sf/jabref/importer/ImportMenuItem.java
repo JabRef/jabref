@@ -34,8 +34,8 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
@@ -147,7 +147,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             // Ok, done. Then try to gather in all we have found. Since we might
             // have found
             // one or more bibtex results, it's best to gather them in a
-            // BibtexDatabase.
+            // BibDatabase.
             bibtexResult = mergeImportResults(imports);
 
             /* show parserwarnings, if any. */
@@ -218,7 +218,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
 
     private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
-        BibtexDatabase database = new BibtexDatabase();
+        BibDatabase database = new BibDatabase();
         ParserResult directParserResult = null;
         boolean anythingUseful = false;
 
@@ -239,7 +239,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
 
                 // Merge entries:
-                for (BibtexEntry entry : pr.getDatabase().getEntries()) {
+                for (BibEntry entry : pr.getDatabase().getEntries()) {
                     database.insertEntry(entry);
                 }
 
@@ -255,7 +255,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             } else {
 
                 ParserResult pr = importResult.parserResult;
-                Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
+                Collection<BibEntry> entries = pr.getDatabase().getEntries();
 
                 anythingUseful = anythingUseful | !entries.isEmpty();
 
@@ -264,7 +264,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP),
                         !openInNew && Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)); // set timestamp and owner
 
-                for (BibtexEntry entry : entries) {
+                for (BibEntry entry : entries) {
                     database.insertEntry(entry);
                 }
             }

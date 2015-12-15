@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Vector;
 
 import net.sf.jabref.logic.journals.Abbreviations;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.Abbreviation;
@@ -19,7 +19,7 @@ public class ContentAutoCompleters extends AutoCompleters {
         this.preferences = Objects.requireNonNull(preferences);
     }
 
-    public ContentAutoCompleters(BibtexDatabase database, MetaData metaData, AutoCompletePreferences preferences) {
+    public ContentAutoCompleters(BibDatabase database, MetaData metaData, AutoCompletePreferences preferences) {
         this(preferences);
 
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);

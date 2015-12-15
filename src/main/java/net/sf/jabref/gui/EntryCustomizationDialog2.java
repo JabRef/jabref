@@ -374,7 +374,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             // Invalidate associated cached entry editor
             bp.entryEditors.remove(typeName);
 
-            for (BibtexEntry entry : bp.database().getEntries()) {
+            for (BibEntry entry : bp.database().getEntries()) {
                 EntryType newType = EntryTypes.getType(entry.getType().getName());
                 if (newType != null) {
                     entry.setType(newType);

@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.util.Util;
 
@@ -77,12 +77,12 @@ public class EndnoteImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String ENDOFRECORD = "__EOREOR__";
@@ -249,7 +249,7 @@ public class EndnoteImporter extends ImportFormat {
                         Type = "mastersthesis";
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(BibtexEntry.KEY_FIELD, Util
+                    hm.put(BibEntry.KEY_FIELD, Util
                             .checkLegalKey(val));
                 }
             }
@@ -273,8 +273,8 @@ public class EndnoteImporter extends ImportFormat {
                 hm.put("pages", artnum);
             }
 
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getBibtexEntryType(Type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getTypeOrDefault(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(hm);
             //if (hm.isEmpty())

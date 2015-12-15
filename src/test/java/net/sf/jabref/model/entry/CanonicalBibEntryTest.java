@@ -3,15 +3,15 @@ package net.sf.jabref.model.entry;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class CanonicalBibtexEntryTest {
+public class CanonicalBibEntryTest {
 
     /**
      * Simple test for the canonical format
      */
     @Test
     public void canonicalRepresentation() {
-        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
-        e.setField(BibtexEntry.KEY_FIELD, "key");
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
+        e.setField(BibEntry.KEY_FIELD, "key");
         e.setField("author", "abc");
         e.setField("title", "def");
         e.setField("journal", "hij");

@@ -17,7 +17,7 @@ package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -76,12 +76,12 @@ public class BiomailImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         BufferedReader in =
@@ -200,8 +200,8 @@ public class BiomailImporter extends ImportFormat {
                 hm.put("author", shortauthor);
             }
 
-            BibtexEntry b =
-                    new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes.getBibtexEntryType(Type)); // id assumes an existing database so don't
+            BibEntry b =
+                    new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes.getTypeOrDefault(Type)); // id assumes an existing database so don't
 
             // create one here
             b.setField(hm);

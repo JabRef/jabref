@@ -31,7 +31,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,7 +55,7 @@ public class BibtexParser {
     private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
 
     private final PushbackReader pushbackReader;
-    private BibtexDatabase database;
+    private BibDatabase database;
     private HashMap<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
@@ -94,7 +94,7 @@ public class BibtexParser {
      * @param bibtexString
      * @return Returns null if an error occurred, returns an empty collection if no entries where found.
      */
-    public static Collection<BibtexEntry> fromString(String bibtexString) {
+    public static Collection<BibEntry> fromString(String bibtexString) {
         StringReader reader = new StringReader(bibtexString);
         BibtexParser parser = new BibtexParser(reader);
 
@@ -111,10 +111,10 @@ public class BibtexParser {
      * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
      *
      * @param bibtexString
-     * @return The bibtexentry or null if non was found or an error occurred.
+     * @return The BibEntry or null if non was found or an error occurred.
      */
-    public static BibtexEntry singleFromString(String bibtexString) {
-        Collection<BibtexEntry> entries = BibtexParser.fromString(bibtexString);
+    public static BibEntry singleFromString(String bibtexString) {
+        Collection<BibEntry> entries = BibtexParser.fromString(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
             return null;
         }
@@ -169,7 +169,7 @@ public class BibtexParser {
 
 
     private void initializeParserResult() {
-        database = new BibtexDatabase();
+        database = new BibDatabase();
         entryTypes = new HashMap<>(); // To store custem entry types parsed.
         parserResult = new ParserResult(database, null, entryTypes);
     }
@@ -246,7 +246,7 @@ public class BibtexParser {
          * for the user.
          */
         try {
-            BibtexEntry entry = parseEntry(type);
+            BibEntry entry = parseEntry(type);
 
             boolean duplicateKey = database.insertEntry(entry);
             entry.setParsedSerialization(dumpTextReadSoFarToString());
@@ -362,12 +362,9 @@ public class BibtexParser {
                 runningIndex--;
             }
 
-            // only keep newlines if there is an entry before
-            if ((runningIndex > 0) && !"}".equals(result.charAt(runningIndex - 1))) {
-                result = result.substring(indexOfAt);
-            } else {
-                result = result.substring(runningIndex + 1);
-            }
+
+            result = result.substring(runningIndex + 1);
+
             return result;
         }
     }
@@ -486,9 +483,9 @@ public class BibtexParser {
         return parseBracketedText().toString();
     }
 
-    private BibtexEntry parseEntry(EntryType entryType) throws IOException {
+    private BibEntry parseEntry(EntryType entryType) throws IOException {
         String id = IdGenerator.next();
-        BibtexEntry result = new BibtexEntry(id, entryType);
+        BibEntry result = new BibEntry(id, entryType);
         skipWhitespace();
         consume('{', '(');
         int character = peek();
@@ -497,7 +494,7 @@ public class BibtexParser {
         }
         String key = parseKey();
 
-        result.setField(BibtexEntry.KEY_FIELD, key);
+        result.setField(BibEntry.KEY_FIELD, key);
         skipWhitespace();
 
         while (true) {
@@ -523,7 +520,7 @@ public class BibtexParser {
         return result;
     }
 
-    private void parseField(BibtexEntry entry) throws IOException {
+    private void parseField(BibEntry entry) throws IOException {
         String key = parseTextToken().toLowerCase();
         // Util.pr("Field: _"+key+"_");
         skipWhitespace();
@@ -968,17 +965,17 @@ public class BibtexParser {
     }
 
     private void checkEntryTypes(ParserResult parserResult) {
-        for (BibtexEntry bibtexEntry : database.getEntries()) {
-            if (bibtexEntry.getType() instanceof UnknownEntryType) {
+        for (BibEntry bibEntry : database.getEntries()) {
+            if (bibEntry.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
-                String name = bibtexEntry.getType().getName();
+                String name = bibEntry.getType().getName();
                 EntryType type = entryTypes.get(name);
                 if (type != null) {
-                    bibtexEntry.setType(type);
+                    bibEntry.setType(type);
                 } else {
                     parserResult.addWarning(
                             Localization.lang("Unknown entry type")
-                                    + ": " + name + "; key: " + bibtexEntry.getCiteKey()
+                                    + ": " + name + "; key: " + bibEntry.getCiteKey()
                     );
                 }
             }

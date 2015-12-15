@@ -23,7 +23,7 @@ import javax.swing.*;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
@@ -32,7 +32,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 class PreambleEditor extends JDialog {
     // A reference to the entry this object works on.
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private final BasePanel panel;
     private final JabRefPreferences prefs;
 
@@ -40,7 +40,7 @@ class PreambleEditor extends JDialog {
 
 
     public PreambleEditor(JabRefFrame baseFrame,
-            BasePanel panel, BibtexDatabase base,
+            BasePanel panel, BibDatabase base,
             JabRefPreferences prefs) {
         super(baseFrame);
         this.panel = panel;

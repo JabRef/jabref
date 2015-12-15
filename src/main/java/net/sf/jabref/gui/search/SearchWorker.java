@@ -3,7 +3,7 @@ package net.sf.jabref.gui.search;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,7 +23,7 @@ class SearchWorker extends AbstractWorker {
     private final SearchQuery searchQuery;
     private final SearchMode mode;
 
-    private List<BibtexEntry> matchedEntries = new LinkedList<>();
+    private List<BibEntry> matchedEntries = new LinkedList<>();
     private int hits = 0;
 
     public SearchWorker(BasePanel basePanel, SearchQuery searchQuery, SearchMode mode) {
@@ -39,7 +39,7 @@ class SearchWorker extends AbstractWorker {
     @Override
     public void run() {
         // Search the current database
-        for (BibtexEntry entry : basePanel.getDatabase().getEntries()) {
+        for (BibEntry entry : basePanel.getDatabase().getEntries()) {
             boolean hit = searchQuery.isMatch(entry);
             if (hit) {
                 this.matchedEntries.add(entry);
@@ -61,11 +61,11 @@ class SearchWorker extends AbstractWorker {
         }
 
         // clear
-        for (BibtexEntry entry : basePanel.getDatabase().getEntries()) {
+        for (BibEntry entry : basePanel.getDatabase().getEntries()) {
             entry.setSearchHit(false);
         }
 
-        for (BibtexEntry entry : this.matchedEntries) {
+        for (BibEntry entry : this.matchedEntries) {
             entry.setSearchHit(true);
         }
 

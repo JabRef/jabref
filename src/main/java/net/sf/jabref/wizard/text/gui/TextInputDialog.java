@@ -87,7 +87,7 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.l10n.Localization;
@@ -109,7 +109,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private JList<String> fieldList;
     private JRadioButton overRadio;
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
 
     private final JPopupMenu inputMenu = new JPopupMenu();
     private StyledDocument doc; // content from inputPane
@@ -122,7 +122,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private boolean okPressed;
 
-    public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal, BibtexEntry bibEntry) {
+    public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal, BibEntry bibEntry) {
         super(frame, title, modal);
 
         _frame = frame;
@@ -484,10 +484,10 @@ public class TextInputDialog extends JDialog implements ActionListener {
         text = text.replace(Globals.NEWLINE, " ");
         text = text.replace("##NEWLINE##", Globals.NEWLINE);
 
-        List<BibtexEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
+        List<BibEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
         if (importedEntries != null) {
             Util.setAutomaticFields(importedEntries, false, false, true);
-            for (BibtexEntry e : importedEntries) {
+            for (BibEntry e : importedEntries) {
                 JabRef.jrf.getCurrentBasePanel().insertEntry(e);
             }
             return true;

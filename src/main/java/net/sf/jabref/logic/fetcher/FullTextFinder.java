@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.net.URL;
 import java.io.IOException;
@@ -20,5 +20,5 @@ public interface FullTextFinder {
      * @throws NullPointerException if no BibTex entry is given
      * @throws java.io.IOException
      */
-    Optional<URL> findFullText(BibtexEntry entry) throws IOException;
+    Optional<URL> findFullText(BibEntry entry) throws IOException;
 }

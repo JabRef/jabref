@@ -17,7 +17,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 
 public class GroupsUtilTest {
 
@@ -37,7 +37,7 @@ public class GroupsUtilTest {
 
             ParserResult result = BibtexParser.parse(fr);
 
-            BibtexDatabase db = result.getDatabase();
+            BibDatabase db = result.getDatabase();
 
             List<String> fieldList = new ArrayList<>();
             fieldList.add("author");

@@ -26,7 +26,7 @@ public class ReadStatus extends SpecialField {
 
     private static ReadStatus INSTANCE;
 
-    private final Icon icon = IconTheme.JabRefIcon.READ_STATUS.getIcon();
+    private final Icon icon = IconTheme.JabRefIcon.READ_STATUS.getSmallIcon();
 
 
     private ReadStatus() {

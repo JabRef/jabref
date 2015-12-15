@@ -44,8 +44,8 @@ import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,16 +69,16 @@ public class ExternalFilePanel extends JPanel {
 
     private final OpenFileFilter off;
 
-    private BibtexEntry entry;
+    private BibEntry entry;
 
-    private BibtexDatabase database;
+    private BibDatabase database;
 
     private final MetaData metaData;
 
     private static final Log LOGGER = LogFactory.getLog(ExternalFilePanel.class);
 
 
-    public ExternalFilePanel(final String fieldName, final MetaData metaData, final BibtexEntry entry, final FieldEditor editor, final OpenFileFilter off) {
+    public ExternalFilePanel(final String fieldName, final MetaData metaData, final BibEntry entry, final FieldEditor editor, final OpenFileFilter off) {
         this(null, metaData, null, fieldName, off, editor);
         this.entry = entry;
         this.entryEditor = null;
@@ -150,16 +150,16 @@ public class ExternalFilePanel extends JPanel {
      * Change which entry this panel is operating on. This is used only when
      * this panel is not attached to an entry editor.
      */
-    public void setEntry(BibtexEntry entry, BibtexDatabase database) {
+    public void setEntry(BibEntry entry, BibDatabase database) {
         this.entry = entry;
         this.database = database;
     }
 
-    private BibtexDatabase getDatabase() {
+    private BibDatabase getDatabase() {
         return database != null ? database : entryEditor.getDatabase();
     }
 
-    private BibtexEntry getEntry() {
+    private BibEntry getEntry() {
         return entry != null ? entry : entryEditor.getEntry();
     }
 
@@ -214,7 +214,7 @@ public class ExternalFilePanel extends JPanel {
                     JOptionPane.showMessageDialog(editor.getParent(),
                             Localization.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
                             Localization.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info("Error while converting BibtexEntry to XMP " + finalFile.getAbsolutePath(), e);
+                    LOGGER.info("Error while converting BibEntry to XMP " + finalFile.getAbsolutePath(), e);
                     output(Localization.lang("Error converting XMP to '%0'...", finalFile.getName()));
                 }
             }
@@ -281,7 +281,7 @@ public class ExternalFilePanel extends JPanel {
          * If this panel belongs in an entry editor, note which entry is
          * currently shown:
          */
-        final BibtexEntry targetEntry;
+        final BibEntry targetEntry;
         if (entryEditor != null) {
             targetEntry = entryEditor.getEntry();
         } else {

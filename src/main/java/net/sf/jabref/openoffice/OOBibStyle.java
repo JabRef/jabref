@@ -16,8 +16,8 @@
 package net.sf.jabref.openoffice;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  * JabRef LayoutFormatter classes.
  * <p>
  * 3) If the entries are not numbered, a citation marker must be produced for each entry. This
- * operation is performed for each JabRef BibtexEntry.
+ * operation is performed for each JabRef BibEntry.
  */
 class OOBibStyle implements Comparable<OOBibStyle> {
 
@@ -436,15 +436,15 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * Format the marker for the in-text citation according to this bib style.
      *
-     * @param entry         The JabRef BibtexEntry providing the data.
+     * @param entry         The JabRef BibEntry providing the data.
      * @param inParenthesis Signals whether a parenthesized citation or an in-text citation is wanted.
      * @param uniquefier    String to add behind the year in case it's needed to separate similar
      *                      entries.
      * @return The formatted citation.
      */
-    public String getCitationMarker(BibtexEntry entry, BibtexDatabase database, boolean inParenthesis,
+    public String getCitationMarker(BibEntry entry, BibDatabase database, boolean inParenthesis,
                                     String uniquefier, int unlimAuthors) {
-        return getCitationMarker(new BibtexEntry[]{entry}, database, inParenthesis, new String[]{uniquefier},
+        return getCitationMarker(new BibEntry[]{entry}, database, inParenthesis, new String[]{uniquefier},
                 new int[]{unlimAuthors});
     }
 
@@ -453,7 +453,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * provided by the uniquefiers argument. If successive entries within the citation are uniquefied from each other,
      * this method will perform a grouping of these entries.
      *
-     * @param entries       The array of JabRef BibtexEntry providing the data.
+     * @param entries       The array of JabRef BibEntry providing the data.
      * @param inParenthesis Signals whether a parenthesized citation or an in-text citation is wanted.
      * @param uniquefiers   Strings to add behind the year for each entry in case it's needed to separate similar
      *                      entries.
@@ -461,9 +461,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      *                      of the number of authors. Can be null to indicate that no entries should have unlimited names.
      * @return The formatted citation.
      */
-    public String getCitationMarker(BibtexEntry[] entries, BibtexDatabase database, boolean inParenthesis,
+    public String getCitationMarker(BibEntry[] entries, BibDatabase database, boolean inParenthesis,
                                     String[] uniquefiers, int[] unlimAuthors) {
-
         // Look for groups of uniquefied entries that should be combined in the output.
         // E.g. (Olsen, 2005a, b) should be output instead of (Olsen, 2005a; Olsen, 2005b).
         int piv = -1;
@@ -476,7 +475,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                     int maxAuthors = (Integer) citProperties.get("MaxAuthors");
                     if (piv == -1) {
                         piv = i;
-                        tmpMarker = getAuthorYearParenthesisMarker(new BibtexEntry[]{entries[i]}, database,
+                        tmpMarker = getAuthorYearParenthesisMarker(new BibEntry[]{entries[i]}, database,
                                 authorField,
                                 (String) citProperties.get("YearField"),
                                 maxAuthors,
@@ -490,7 +489,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                         //System.out.println("piv="+piv+" tmpMarker='"+tmpMarker+"'");
                     } else {
                         // See if this entry can go into a group with the previous one:
-                        String thisMarker = getAuthorYearParenthesisMarker(new BibtexEntry[]{entries[i]}, database,
+                        String thisMarker = getAuthorYearParenthesisMarker(new BibEntry[]{entries[i]}, database,
                                 authorField,
                                 (String) citProperties.get("YearField"),
                                 maxAuthors,
@@ -581,7 +580,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @param to          The last index to group (inclusive)
      * @param separator   The separator for the uniquefier letters.
      */
-    private void group(BibtexEntry[] entries, String[] uniquefiers, int from, int to, String separator) {
+    private void group(BibEntry[] entries, String[] uniquefiers, int from, int to, String separator) {
         StringBuilder sb = new StringBuilder(uniquefiers[from]);
         for (int i = from + 1; i <= to; i++) {
             sb.append(separator);
@@ -594,7 +593,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * This method produces (Author, year) style citation strings in many different forms.
      *
-     * @param entries           The array of BibtexEntry to get fields from.
+     * @param entries           The array of BibEntry to get fields from.
      * @param authorField       The bibtex field providing author names, e.g. "author" or "editor".
      * @param yearField         The bibtex field providing the year, e.g. "year".
      * @param maxA              The maximum number of authors to write out in full without using etal. Set to
@@ -609,7 +608,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @param uniquifiers       Optional parameter to separate similar citations. Elements can be null if not needed.
      * @return The formatted citation.
      */
-    private String getAuthorYearParenthesisMarker(BibtexEntry[] entries, BibtexDatabase database,
+    private String getAuthorYearParenthesisMarker(BibEntry[] entries, BibDatabase database,
                                                   String authorField, String yearField,
                                                   int maxA, String authorSep,
                                                   String andString, String etAlString, String yearSep,
@@ -622,7 +621,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             int unlimA = unlimAuthors != null ? unlimAuthors[j] : -1;
             int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
-            BibtexEntry entry = entries[j];
+            BibEntry entry = entries[j];
 
             // Check if this entry has been nulled due to grouping with the previous entry(ies):
             if (entry == null) {
@@ -669,7 +668,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * This method produces "Author (year)" style citation strings in many different forms.
      *
-     * @param entries     The array of BibtexEntry to get fields from.
+     * @param entries     The array of BibEntry to get fields from.
      * @param authorField The bibtex field providing author names, e.g. "author" or "editor".
      * @param yearField   The bibtex field providing the year, e.g. "year".
      * @param maxA        The maximum number of authors to write out in full without using etal. Set to
@@ -683,7 +682,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @param uniquefiers Optional parameters to separate similar citations. Can be null if not needed.
      * @return The formatted citation.
      */
-    private String getAuthorYearInTextMarker(BibtexEntry[] entries, BibtexDatabase database, String authorField,
+    private String getAuthorYearInTextMarker(BibEntry[] entries, BibDatabase database, String authorField,
                                              String yearField, int maxA, String authorSep,
                                              String andString, String etAlString, String yearSep,
                                              String startBrace, String endBrace, String citationSeparator,
@@ -746,10 +745,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      *                 field names by /. E.g. to use "author" with "editor" as backup, specify "author/editor".
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
-    private String getCitationMarkerField(BibtexEntry entry, BibtexDatabase database, String field) {
+    private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
         String[] fields = field.split("/");
         for (String s : fields) {
-            String content = BibtexDatabase.getResolvedField(s, entry, database);
+            String content = BibDatabase.getResolvedField(s, entry, database);
             if ((content != null) && !content.trim().isEmpty()) {
                 if (fieldFormatter != null) {
                     content = fieldFormatter.format(content);
