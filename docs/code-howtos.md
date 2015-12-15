@@ -1,4 +1,4 @@
-This page provides some development support in the form of howtos. 
+This page provides some development support in the form of howtos. See also [[High Level Documentation]]
 
 ## Error Handling in JabRef
 ### Throwing and Catching Exceptions
