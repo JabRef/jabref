@@ -14,7 +14,7 @@ This version is a development version. Features may not work as expected.
 The branch of this README file is `master`.
 The intention of this branch is to move JabRef forward to modern technologies such as Java8 and JavaFX.
 
-The last version with Java6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
+The last version with Java 6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
 Development builds are available at [builds.jabref.org](http://builds.jabref.org/master/), the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
 
