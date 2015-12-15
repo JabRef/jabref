@@ -27,7 +27,7 @@ public class RemoveFieldCleanup implements Cleaner {
             return new ArrayList<>();
         }
 
-        entry.setField(field, null);
+        entry.clearField(field);
         FieldChange change = new FieldChange(entry, field, oldValue, null);
         return Arrays.asList(new FieldChange[] {change});
     }

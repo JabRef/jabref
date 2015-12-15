@@ -4,9 +4,7 @@
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
 [![Coverity Status](https://badges.ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)](https://ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)
-[![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)
 [![Donation](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?item_name=JabRef+Bibliography+Manager&cmd=_donations&lc=US&currency_code=EUR&business=jabrefmail%40gmail.com)
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=koppor&url=https%3A%2F%2Fgithub.com%2FJabRef%2Fjabref&title=JabRef&language=Java&tags=github&category=software)
 [![Download JabRef](https://img.shields.io/sourceforge/dw/jabref.svg)](http://sourceforge.net/projects/jabref/files/)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/pr)](http://www.issuestats.com/github/jabref/jabref)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/issue)](http://www.issuestats.com/github/jabref/jabref)
@@ -16,7 +14,7 @@ This version is a development version. Features may not work as expected.
 The branch of this README file is `master`.
 The intention of this branch is to move JabRef forward to modern technologies such as Java8 and JavaFX.
 
-The last version with Java6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
+The last version with Java 6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
 Development builds are available at [builds.jabref.org](http://builds.jabref.org/master/), the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
 
@@ -40,11 +38,8 @@ JabRef also lets you easily link to PDF or web sources for your reference entrie
 JabRef can import from and export to several formats, and you can customize export filters.
 JabRef can be run as a command line application to convert from any import format to any export format.
 
-* Homepage: http://jabref.sourceforge.net/
-* Development mailing list: https://lists.sourceforge.net/lists/listinfo/jabref-devel
-* Development page: https://github.com/JabRef
-* Main git repository: https://github.com/JabRef/jabref
-* CI Server: https://circleci.com/gh/JabRef/jabref
+* Homepage: http://www.jabref.org
+* Development page: https://github.com/JabRef/jabref
 * Open HUB page: https://www.openhub.net/p/jabref
 
 ### Bug Reports, Suggestions, Other Feedback

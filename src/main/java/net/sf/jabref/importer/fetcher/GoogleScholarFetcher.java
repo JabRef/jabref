@@ -270,10 +270,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                 Collection<BibEntry> entries = pr.getDatabase().getEntries();
                 if (entries.size() == 1) {
                     BibEntry entry = entries.iterator().next();
-                    boolean clearKeys = true;
-                    if (clearKeys) {
-                        entry.setField(BibEntry.KEY_FIELD, null);
-                    }
+                    entry.clearField(BibEntry.KEY_FIELD);
                     // If the entry's url field is not set, and we have stored an url for this
                     // entry, set it:
                     if (entry.getField("url") == null) {

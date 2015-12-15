@@ -408,7 +408,7 @@ public class MergeEntries {
                 } else if (rb[2][i + 1].isSelected()) {
                     mergedEntry.setField(jointStrings[i], two.getField(jointStrings[i]));
                 } else {
-                    mergedEntry.setField(jointStrings[i], null);
+                    mergedEntry.clearField(jointStrings[i]);
                 }
             }
         }
