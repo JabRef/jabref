@@ -113,7 +113,7 @@ public class FileFinder {
 
     /**
      * Convenience menthod for findPDF. Searches for a file of the given type.
-     * @param entry The BibtexEntry to search for a link for.
+     * @param entry The BibEntry to search for a link for.
      * @param fileType The file type to search for.
      * @return The link to the file found, or null if not found.
      */
@@ -183,7 +183,7 @@ public class FileFinder {
     /**
      * Convenience function for absolute search.
      *
-     * Uses findFile(BibtexEntry, BibtexDatabase, (String)null, String, false).
+     * Uses findFile(BibEntry, BibDatabase, (String)null, String, false).
      */
     public static String findFile(BibEntry entry, BibDatabase database, String file) {
         return FileFinder.findFile(entry, database, (String) null, file, false);

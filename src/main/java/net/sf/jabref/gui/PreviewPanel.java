@@ -50,7 +50,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Displays an BibtexEntry using the given layout format.
+ * Displays an BibEntry using the given layout format.
  */
 public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchTextListener, EntryContainer {
 
@@ -353,7 +353,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     /**
      * The PreviewPanel has registered itself as an event listener with the
-     * currently displayed BibtexEntry. If the entry changes, an event is
+     * currently displayed BibEntry. If the entry changes, an event is
      * received here, and we can update the preview immediately.
      */
     @Override

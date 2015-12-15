@@ -271,8 +271,8 @@ public class ExplicitGroup extends AbstractGroup {
 
     /**
      * Update the group to handle the situation where the group
-     * is applied to a different BibtexDatabase than it was created for.
-     * This group type contains a Set of BibtexEntry objects, and these will not
+     * is applied to a different BibDatabase than it was created for.
+     * This group type contains a Set of BibEntry objects, and these will not
      * be the same objects as in the new database. We must reset the entire Set with
      * matching entries from the new database.
      *

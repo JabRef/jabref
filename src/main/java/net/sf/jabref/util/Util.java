@@ -781,9 +781,9 @@ public class Util {
      * The entries' bibtex keys must have been set - entries lacking key are ignored. The operation is done in a new
      * thread, which is returned for the caller to wait for if needed.
      *
-     * @param entries A collection of BibtexEntry objects to find links for.
+     * @param entries A collection of BibEntry objects to find links for.
      * @param ce A NamedCompound to add UndoEdit elements to.
-     * @param changedEntries MODIFIED, optional. A Set of BibtexEntry objects to which all modified entries is added.
+     * @param changedEntries MODIFIED, optional. A Set of BibEntry objects to which all modified entries is added.
      *            This is used for status output and debugging
      * @param singleTableModel UGLY HACK. The table model to insert links into. Already existing links are not
      *            duplicated or removed. This parameter has to be null if entries.count() != 1. The hack has been
@@ -933,7 +933,7 @@ public class Util {
      * Automatically add links for this entry to the table model given as an argument, based on the globally stored list
      * of external file types. The entry itself is not modified. The entry's bibtex key must have been set.
      *
-     * @param entry The BibtexEntry to find links for.
+     * @param entry The BibEntry to find links for.
      * @param singleTableModel The table model to insert links into. Already existing links are not duplicated or
      *            removed.
      * @param metaData The MetaData providing the relevant file directory, if any.

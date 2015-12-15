@@ -32,7 +32,7 @@ public class GroupsUtil {
      * Returns a HashMap containing all words used in the database in the given field type. Characters in
      * <code>remove</code> are not included.
      *
-     * @param db a <code>BibtexDatabase</code> value
+     * @param db a <code>BibDatabase</code> value
      * @param field a <code>String</code> value
      * @param remove a <code>String</code> value
      * @return a <code>HashSet</code> value

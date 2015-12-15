@@ -255,7 +255,7 @@ class OOBibBase {
     }
 
     /**
-     * This method inserts a cite marker in the text for the given BibtexEntry,
+     * This method inserts a cite marker in the text for the given BibEntry,
      * and may refresh the bibliography.
      * @param entries The entries to cite.
      * @param database The database the entry belongs to.
@@ -544,7 +544,7 @@ class OOBibBase {
                     }
                     /*System.out.println(style.getBooleanCitProperty("MultiCiteChronological"));
                     for (int j = 0; j < cEntries.length; j++) {
-                        BibtexEntry cEntry = cEntries[j];
+                        BibEntry cEntry = cEntries[j];
                         System.out.println(cEntry.getCiteKey());
                     } */
 

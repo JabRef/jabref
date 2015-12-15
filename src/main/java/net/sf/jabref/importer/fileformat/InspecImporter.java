@@ -80,7 +80,7 @@ public class InspecImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry objects.
+     * Parse the entries in the source, and return a List of BibEntry objects.
      */
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {

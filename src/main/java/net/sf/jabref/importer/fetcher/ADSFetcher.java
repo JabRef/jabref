@@ -74,7 +74,7 @@ public class ADSFetcher implements EntryFetcher {
             query = query.replaceAll("^(doi:|DOI:)", "");
             /* Allow fetching only 1 key */
             String key = query;
-            /* Query ADS and load the results into the BibtexDatabase */
+            /* Query ADS and load the results into the BibDatabase */
             status.setStatus(Localization.lang("Processing ") + key);
             BibDatabase bd = importADSEntries(key, status);
             if ((bd != null) && (bd.getEntryCount() > 0)) {
@@ -129,7 +129,7 @@ public class ADSFetcher implements EntryFetcher {
     }
 
     private void importADSAbstract(String key, BibEntry entry, OutputPrinter status) {
-        /* TODO: construct ADSUrl from BibtexEntry */
+        /* TODO: construct ADSUrl from BibEntry */
         String url = constructUrl(key);
         try {
             URL ADSUrl = new URL(url + "&data_type=XML");

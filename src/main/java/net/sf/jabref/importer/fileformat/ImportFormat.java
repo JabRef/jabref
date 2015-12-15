@@ -57,7 +57,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
     public abstract boolean isRecognizedFormat(InputStream in) throws IOException;
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      *
      * This method can be called in two different contexts - either when importing in

@@ -30,7 +30,7 @@ import java.util.Comparator;
 
 /**
  * 
- * A comparator for BibtexEntry fields
+ * A comparator for BibEntry fields
  * 
  * Initial Version:
  * 

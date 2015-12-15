@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  * JabRef LayoutFormatter classes.
  * <p>
  * 3) If the entries are not numbered, a citation marker must be produced for each entry. This
- * operation is performed for each JabRef BibtexEntry.
+ * operation is performed for each JabRef BibEntry.
  */
 class OOBibStyle implements Comparable<OOBibStyle> {
 
@@ -436,7 +436,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * Format the marker for the in-text citation according to this bib style.
      *
-     * @param entry         The JabRef BibtexEntry providing the data.
+     * @param entry         The JabRef BibEntry providing the data.
      * @param inParenthesis Signals whether a parenthesized citation or an in-text citation is wanted.
      * @param uniquefier    String to add behind the year in case it's needed to separate similar
      *                      entries.
@@ -453,7 +453,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * provided by the uniquefiers argument. If successive entries within the citation are uniquefied from each other,
      * this method will perform a grouping of these entries.
      *
-     * @param entries       The array of JabRef BibtexEntry providing the data.
+     * @param entries       The array of JabRef BibEntry providing the data.
      * @param inParenthesis Signals whether a parenthesized citation or an in-text citation is wanted.
      * @param uniquefiers   Strings to add behind the year for each entry in case it's needed to separate similar
      *                      entries.
@@ -593,7 +593,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * This method produces (Author, year) style citation strings in many different forms.
      *
-     * @param entries           The array of BibtexEntry to get fields from.
+     * @param entries           The array of BibEntry to get fields from.
      * @param authorField       The bibtex field providing author names, e.g. "author" or "editor".
      * @param yearField         The bibtex field providing the year, e.g. "year".
      * @param maxA              The maximum number of authors to write out in full without using etal. Set to
@@ -668,7 +668,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * This method produces "Author (year)" style citation strings in many different forms.
      *
-     * @param entries     The array of BibtexEntry to get fields from.
+     * @param entries     The array of BibEntry to get fields from.
      * @param authorField The bibtex field providing author names, e.g. "author" or "editor".
      * @param yearField   The bibtex field providing the year, e.g. "year".
      * @param maxA        The maximum number of authors to write out in full without using etal. Set to

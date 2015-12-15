@@ -105,11 +105,11 @@ public class INSPIREFetcher implements EntryFetcher {
      */
 
     /**
-     * Import an entry from an OAI2 archive. The BibtexEntry provided has to have the field OAI2_IDENTIFIER_FIELD set to
+     * Import an entry from an OAI2 archive. The BibEntry provided has to have the field OAI2_IDENTIFIER_FIELD set to
      * the search string.
      *
      * @param key The OAI2 key to fetch from ArXiv.
-     * @return The imported BibtexEntry or null if none.
+     * @return The imported BibEntry or null if none.
      */
     private BibDatabase importInspireEntries(String key, OutputPrinter frame) {
         String url = constructUrl(key);
@@ -131,14 +131,14 @@ public class INSPIREFetcher implements EntryFetcher {
         return null;
     }
 
-    // public void addSpiresURL(BibtexEntry entry) {
+    // public void addSpiresURL(BibEntry entry) {
     // String url = "http://"+spiresHost+"/spires/find/hep/www?texkey+";
     // url = url+entry.getCiteKey();
     // entry.setField("url", url);
     // }
     //
-    // public void addSpiresURLtoDatabase(BibtexDatabase db) {
-    // Iterator<BibtexEntry> iter = db.getEntries().iterator();
+    // public void addSpiresURLtoDatabase(BibDatabase db) {
+    // Iterator<BibEntry> iter = db.getEntries().iterator();
     // while (iter.hasNext())
     // addSpiresURL(iter.next());
     // }
@@ -174,7 +174,7 @@ public class INSPIREFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
         try {
             frame.setStatus("Fetching entries from Inspire");
-            /* query the archive and load the results into the BibtexEntry */
+            /* query the archive and load the results into the BibEntry */
             BibDatabase bd = importInspireEntries(query, frame);
 
             /* addSpiresURLtoDatabase(bd); */

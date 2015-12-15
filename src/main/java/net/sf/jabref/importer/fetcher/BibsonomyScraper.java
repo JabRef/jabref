@@ -36,7 +36,7 @@ class BibsonomyScraper {
 
 
     /**
-     * Return a BibtexEntry by looking up the given url from the BibSonomy scraper.
+     * Return a BibEntry by looking up the given url from the BibSonomy scraper.
      * @param entryUrl
      * @return
      */

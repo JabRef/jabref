@@ -55,7 +55,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
                     break;
                 }
                 BibEntry entry = getSingleCitation(citation);
-                //BibtexEntry entry = BibsonomyScraper.getEntry(citation);
+                //BibEntry entry = BibsonomyScraper.getEntry(citation);
 
                 //dialog.setProgress(++i, citations.size());
                 if (entry != null) {

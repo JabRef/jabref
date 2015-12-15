@@ -221,7 +221,7 @@ public class MetaData implements Iterable<String> {
      * Parse the groups metadata string
      *
      * @param orderedData The vector of metadata strings
-     * @param db          The BibtexDatabase this metadata belongs to
+     * @param db          The BibDatabase this metadata belongs to
      * @param version     The group tree version
      * @return true if parsing was successful, false otherwise
      */

@@ -185,12 +185,12 @@ public class OAI2Fetcher implements EntryFetcher {
     }
 
     /**
-     * Import an entry from an OAI2 archive. The BibtexEntry provided has to
+     * Import an entry from an OAI2 archive. The BibEntry provided has to
      * have the field OAI2_IDENTIFIER_FIELD set to the search string.
      *
      * @param key
      *            The OAI2 key to fetch from ArXiv.
-     * @return The imported BibtexEntry or null if none.
+     * @return The imported BibEntry or null if none.
      */
     public BibEntry importOai2Entry(String key) {
         /**
@@ -206,7 +206,7 @@ public class OAI2Fetcher implements EntryFetcher {
             oai2Connection.setRequestProperty("User-Agent", "Jabref");
             InputStream inputStream = oai2Connection.getInputStream();
 
-            /* create an empty BibtexEntry and set the oai2identifier field */
+            /* create an empty BibEntry and set the oai2identifier field */
             BibEntry be = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
             be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, key);
             DefaultHandler handlerBase = new OAI2Handler(be);
@@ -300,7 +300,7 @@ public class OAI2Fetcher implements EntryFetcher {
                     break;
                 }
 
-                /* query the archive and load the results into the BibtexEntry */
+                /* query the archive and load the results into the BibEntry */
                 BibEntry be = importOai2Entry(key);
 
                 if (shouldWait()) {

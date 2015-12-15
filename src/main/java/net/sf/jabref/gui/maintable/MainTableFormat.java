@@ -90,9 +90,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
 
     @Override
     public Object getColumnValue(BibEntry be, int col) {
-
         return tableColumns.get(col).getColumnValue(be);
-
     }
 
     public void updateTableFormat() {

@@ -372,7 +372,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     }
 
     /* (non-Javadoc)
-     * @see net.sf.jabref.gui.ImportInspection#addEntry(net.sf.jabref.BibtexEntry)
+     * @see net.sf.jabref.gui.ImportInspection#addEntry(net.sf.jabref.BibEntry)
      */
     @Override
     public void addEntry(BibEntry entry) {
@@ -410,7 +410,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * Checks if there are duplicates to the given entry in the Collection. Does
      * not report the entry as duplicate of itself if it is in the Collection.
      *
-     * @param entriesDupe A Collection of BibtexEntry instances.
+     * @param entriesDupe A Collection of BibEntry instances.
      * @param entry   The entry to search for duplicates of.
      * @return A possible duplicate, if any, or null if none were found.
      */
@@ -1452,7 +1452,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         @Override
         public void setValueAt(Object value, int row, int column) {
-            // Only column 0, which is controlled by BibtexEntry.searchHit, is
+            // Only column 0, which is controlled by BibEntry.searchHit, is
             // editable:
             entries.getReadWriteLock().writeLock().lock();
             BibEntry entry = sortedList.get(row);

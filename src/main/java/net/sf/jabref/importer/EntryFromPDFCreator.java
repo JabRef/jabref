@@ -20,7 +20,7 @@ import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
- * Uses XMPUtils to get one BibtexEntry for a PDF-File.
+ * Uses XMPUtils to get one BibEntry for a PDF-File.
  * Also imports the non-XMP Data (PDDocument-Information) using XMPUtil.getBibtexEntryFromDocumentInformation.
  * If data from more than one entry is read by XMPUtil then this entys are merged into one.
  * @author Dan

@@ -69,7 +69,7 @@ public abstract class DBExporter extends DBImporterExporter {
      * Method for the exportDatabase methods.
      *
      * @param database The DBTYPE of the database
-     * @param database The BibtexDatabase to export
+     * @param database The BibDatabase to export
      * @param metaData The MetaData object containing the groups information
      * @param keySet   The set of IDs of the entries to export.
      * @param out      The output (PrintStream or Connection) object to which the DML should be written.
@@ -326,7 +326,7 @@ public abstract class DBExporter extends DBImporterExporter {
     /**
      * Generates the SQL required to populate the strings table with jabref data.
      *
-     * @param database    BibtexDatabase object used from where the strings will be exported
+     * @param database    BibDatabase object used from where the strings will be exported
      * @param out         The output (PrintStream or Connection) object to which the DML should be written.
      * @param database_id ID of Jabref database related to the entries to be exported This information can be gathered
      *                    using getDatabaseIDByPath(metaData, out)
@@ -365,10 +365,10 @@ public abstract class DBExporter extends DBImporterExporter {
     protected abstract void createTables(Object out) throws SQLException;
 
     /**
-     * Accepts the BibtexDatabase and MetaData, generates the DML required to create and populate SQL database tables,
+     * Accepts the BibDatabase and MetaData, generates the DML required to create and populate SQL database tables,
      * and writes this DML to the specified output file.
      *
-     * @param database The BibtexDatabase to export
+     * @param database The BibDatabase to export
      * @param metaData The MetaData object containing the groups information
      * @param keySet   The set of IDs of the entries to export.
      * @param file     The name of the file to which the DML should be written
@@ -392,10 +392,10 @@ public abstract class DBExporter extends DBImporterExporter {
     }
 
     /**
-     * Accepts the BibtexDatabase and MetaData, generates the DML required to create and populate SQL database tables,
+     * Accepts the BibDatabase and MetaData, generates the DML required to create and populate SQL database tables,
      * and writes this DML to the specified SQL database.
      *
-     * @param database        The BibtexDatabase to export
+     * @param database        The BibDatabase to export
      * @param metaData        The MetaData object containing the groups information
      * @param keySet          The set of IDs of the entries to export.
      * @param databaseStrings The necessary database connection information

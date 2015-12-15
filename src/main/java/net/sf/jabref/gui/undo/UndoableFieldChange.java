@@ -26,7 +26,7 @@ import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This class represents a change in any field value. The relevant
- * information is the BibtexEntry, the field name, the old and the
+ * information is the BibEntry, the field name, the old and the
  * new value. Old/new values can be null.
  */
 public class UndoableFieldChange extends AbstractUndoableEdit {

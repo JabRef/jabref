@@ -75,7 +75,7 @@ public class ChangeScanner implements Runnable {
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
 
-    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) { //, BibtexDatabase inMem, MetaData mdInMem) {
+    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) { //, BibDatabase inMem, MetaData mdInMem) {
         this.panel = bp;
         this.frame = frame;
         this.inMem = bp.database();
@@ -355,7 +355,7 @@ public class ChangeScanner implements Runnable {
      * @param old EntrySorter
      * @param neu EntrySorter
      * @param index int
-     * @return BibtexEntry
+     * @return BibEntry
      */
     private static BibEntry bestFit(EntrySorter old, EntrySorter neu, int index) {
         double comp = -1;

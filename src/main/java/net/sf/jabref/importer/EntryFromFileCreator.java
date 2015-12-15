@@ -88,7 +88,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     public abstract String getFormatName();
 
     /**
-     * Create one BibtexEntry containing information regarding the given File.
+     * Create one BibEntry containing information regarding the given File.
      *
      * @param f
      * @param addPathTokensAsKeywords

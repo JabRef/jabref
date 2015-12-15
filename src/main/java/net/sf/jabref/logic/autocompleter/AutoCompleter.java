@@ -19,7 +19,7 @@ public interface AutoCompleter<E> {
     String getAutoCompleteText(E item);
 
     /**
-     * Add a BibtexEntry to this AutoCompleter.
+     * Add a BibEntry to this AutoCompleter.
      * @note The AutoCompleter itself decides which information should be stored for later completion.
      */
     void addBibtexEntry(BibEntry entry);
@@ -49,7 +49,7 @@ public interface AutoCompleter<E> {
 
     /**
      * Directly adds an item to the AutoCompleter.
-     * This method should be called only if the information does not comes directly from a BibtexEntry.
+     * This method should be called only if the information does not comes directly from a BibEntry.
      * Otherwise the {@link #addBibtexEntry(BibEntry)} is preferred.
      * @param item item to add
      */

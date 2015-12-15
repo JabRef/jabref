@@ -111,7 +111,7 @@ public class BibtexParser {
      * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
      *
      * @param bibtexString
-     * @return The bibtexentry or null if non was found or an error occurred.
+     * @return The BibEntry or null if non was found or an error occurred.
      */
     public static BibEntry singleFromString(String bibtexString) {
         Collection<BibEntry> entries = BibtexParser.fromString(bibtexString);

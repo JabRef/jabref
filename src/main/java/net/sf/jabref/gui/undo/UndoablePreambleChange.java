@@ -23,7 +23,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class represents a change in any field value. The relevant
- * information is the BibtexEntry, the field name, the old and the
+ * information is the BibEntry, the field name, the old and the
  * new value. Old/new values can be null.
  */
 public class UndoablePreambleChange extends AbstractUndoableEdit {

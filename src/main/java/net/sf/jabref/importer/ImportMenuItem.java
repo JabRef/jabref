@@ -147,7 +147,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             // Ok, done. Then try to gather in all we have found. Since we might
             // have found
             // one or more bibtex results, it's best to gather them in a
-            // BibtexDatabase.
+            // BibDatabase.
             bibtexResult = mergeImportResults(imports);
 
             /* show parserwarnings, if any. */

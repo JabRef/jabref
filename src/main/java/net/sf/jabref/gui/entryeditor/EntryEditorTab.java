@@ -280,7 +280,7 @@ class EntryEditorTab {
     }
 
     /**
-     * Reset all fields from the data in the BibtexEntry.
+     * Reset all fields from the data in the BibEntry.
      */
     public void updateAll() {
         setEntry(getEntry());

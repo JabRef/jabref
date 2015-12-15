@@ -38,10 +38,10 @@ public class JSONEntryParser {
     }
 
     /**
-     * Convert a JSONObject containing a bibJSON entry to a BibtexEntry
+     * Convert a JSONObject containing a bibJSON entry to a BibEntry
      *
      * @param bibJsonEntry The JSONObject to convert
-     * @return the converted BibtexEntry
+     * @return the converted BibEntry
      */
     public BibEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
         // Fields that are directly accessible at the top level BibJson object
@@ -153,10 +153,10 @@ public class JSONEntryParser {
     }
 
     /**
-     * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibtexEntry
+     * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry
      *
      * @param springerJsonEntry the JSONObject from search results
-     * @return the converted BibtexEntry
+     * @return the converted BibEntry
      */
     public static BibEntry SpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object

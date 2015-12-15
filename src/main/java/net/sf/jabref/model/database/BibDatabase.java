@@ -316,7 +316,7 @@ public class BibDatabase {
     }
 
     /**
-     * Take the given collection of BibtexEntry and resolve any string
+     * Take the given collection of BibEntry and resolve any string
      * references.
      *
      * @param entries A collection of BibtexEntries in which all strings of the form
@@ -339,15 +339,15 @@ public class BibDatabase {
     }
 
     /**
-     * Take the given BibtexEntry and resolve any string references.
+     * Take the given BibEntry and resolve any string references.
      *
-     * @param entry   A BibtexEntry in which all strings of the form #xxx# will be
+     * @param entry   A BibEntry in which all strings of the form #xxx# will be
      *                resolved against the hash map of string references stored in
      *                the databasee.
-     * @param inPlace If inPlace is true then the given BibtexEntry will be
+     * @param inPlace If inPlace is true then the given BibEntry will be
      *                modified, if false then a copy is made using close made before
      *                resolving the strings.
-     * @return a BibtexEntry with all string references resolved. It is
+     * @return a BibEntry with all string references resolved. It is
      * dependent on the value of inPlace whether a copy is made or the
      * given BibtexEntries is modified.
      */
@@ -614,8 +614,8 @@ public class BibDatabase {
 
     /*
      * Entries are stored in a HashMap with the ID as key. What happens if
-     * someone changes a BibtexEntry's ID after it has been added to this
-     * BibtexDatabase? The key of that entry would be the old ID, not the new
+     * someone changes a BibEntry's ID after it has been added to this
+     * BibDatabase? The key of that entry would be the old ID, not the new
      * one. Use a PropertyChangeListener to identify an ID change and update the
      * Map.
      */

@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * The LayoutEntry creates a human readable String assinged with html formaters.
  * To test the Highlighting Feature, an instance of LayoutEntry will be instatiated via Layout and LayoutHelper.
  * With these instance the doLayout() Method is called several times for each test case.
- * To simulate a search, a BibtexEntry will be created, wich will be used by LayoutEntry.
+ * To simulate a search, a BibEntry will be created, wich will be used by LayoutEntry.
  * The definiton of the search is set by
  * <p/>
  * LayoutEntry.setWordsToHighlight(words); and

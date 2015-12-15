@@ -246,7 +246,7 @@ public class KeywordGroup extends AbstractGroup {
      * (non-Javadoc)
      *
      * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
-     *      net.sf.jabref.BibtexEntry)
+     *      net.sf.jabref.BibEntry)
      */
     @Override
     public boolean contains(String query, BibEntry entry) {

@@ -77,7 +77,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * GUI component that allows editing of the fields of a BibtexEntry (i.e. the
+ * GUI component that allows editing of the fields of a BibEntry (i.e. the
  * one that shows up, when you double click on an entry in the table)
  * <p>
  * It hosts the tabs (required, general, optional) and the buttons to the left.
@@ -841,7 +841,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Updates this editor to show the given entry, regardless of type
      * correspondence.
      *
-     * @param swtichEntry a <code>BibtexEntry</code> value
+     * @param swtichEntry a <code>BibEntry</code> value
      */
     public synchronized void switchTo(BibEntry swtichEntry) {
         if (this.entry == swtichEntry) {

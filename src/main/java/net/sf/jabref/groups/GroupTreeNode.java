@@ -110,7 +110,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
 
     /**
      * Update all groups, if necessary, to handle the situation where the group
-     * tree is applied to a different BibtexDatabase than it was created for. This
+     * tree is applied to a different BibDatabase than it was created for. This
      * is for instance used when updating the group tree due to an external change.
      *
      * @param db The database to refresh for.

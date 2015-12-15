@@ -173,10 +173,10 @@ public class BibEntryWriterTest {
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
 
-        Collection<BibtexEntry> entries = result.getDatabase().getEntries();
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
         Assert.assertEquals(1, entries.size());
 
-        BibtexEntry entry = entries.iterator().next();
+        BibEntry entry = entries.iterator().next();
         Assert.assertEquals("test", entry.getCiteKey());
         Assert.assertEquals(6, entry.getFieldNames().size());
         entry.setField("author", "BlaBla");

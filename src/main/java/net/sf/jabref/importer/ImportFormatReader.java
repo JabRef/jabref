@@ -355,7 +355,7 @@ public class ImportFormatReader {
     }
 
     /**
-     * Receives an ArrayList of BibtexEntry instances, iterates through them, and
+     * Receives an ArrayList of BibEntry instances, iterates through them, and
      * removes all entries that have no fields set. This is useful for rooting out
      * an unsucessful import (wrong format) that returns a number of empty entries.
      */

@@ -288,7 +288,7 @@ class OOUtil {
     }
 
     /**
-     * Make a cloned BibtexEntry and do the necessary preprocessing for use by the plugin.
+     * Make a cloned BibEntry and do the necessary preprocessing for use by the plugin.
      * If the running JabRef version doesn't support post-processing in Layout, this
      * preprocessing includes running the OOPreFormatter formatter for all fields except the
      * BibTeX key.

@@ -1334,7 +1334,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * user is prompted for an entry type.
      *
      * @param type The type of the entry to create.
-     * @return The newly created BibtexEntry or null the operation was canceled by the user.
+     * @return The newly created BibEntry or null the operation was canceled by the user.
      */
     public BibEntry newEntry(EntryType type) {
         if (type == null) {
@@ -1954,7 +1954,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     /**
      * Closes the entry editor if it is showing the given entry.
      *
-     * @param be a <code>BibtexEntry</code> value
+     * @param be a <code>BibEntry</code> value
      */
     public void ensureNotShowing(BibEntry be) {
         if ((mode == BasePanel.SHOWING_EDITOR) && (currentEditor.getEntry() == be)) {

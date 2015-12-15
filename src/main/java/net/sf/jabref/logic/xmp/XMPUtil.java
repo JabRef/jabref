@@ -79,7 +79,7 @@ public class XMPUtil {
      * The method will overwrite existing BibTeX-XMP-data, but keep other
      * existing metadata.
      *
-     * This is a convenience method for writeXMP(File, BibtexEntry).
+     * This is a convenience method for writeXMP(File, BibEntry).
      *
      * @param filename
      *            The filename from which to open the file.
@@ -184,17 +184,17 @@ public class XMPUtil {
     }
 
     /**
-     * Helper function for retrieving a BibtexEntry from the
+     * Helper function for retrieving a BibEntry from the
      * PDDocumentInformation in a PDF file.
      *
      * To understand how to get hold of a PDDocumentInformation have a look in
      * the test cases for XMPUtil.
      *
-     * The BibtexEntry is build by mapping individual fields in the document
+     * The BibEntry is build by mapping individual fields in the document
      * information (like author, title, keywords) to fields in a bibtex entry.
      *
      * @param di
-     *            The document information from which to build a BibtexEntry.
+     *            The document information from which to build a BibEntry.
      *
      * @return The bibtex entry found in the document information.
      */
@@ -245,17 +245,17 @@ public class XMPUtil {
     }
 
     /**
-     * Helper function for retrieving a BibtexEntry from the DublinCore metadata
+     * Helper function for retrieving a BibEntry from the DublinCore metadata
      * in a PDF file.
      *
      * To understand how to get hold of a XMPSchemaDublinCore have a look in the
      * test cases for XMPUtil.
      *
-     * The BibtexEntry is build by mapping individual fields in the dublin core
+     * The BibEntry is build by mapping individual fields in the dublin core
      * (like creator, title, subject) to fields in a bibtex entry.
      *
      * @param dcSchema
-     *            The document information from which to build a BibtexEntry.
+     *            The document information from which to build a BibEntry.
      *
      * @return The bibtex entry found in the document information.
      */
@@ -511,7 +511,7 @@ public class XMPUtil {
     }
 
     /**
-     * Convenience method for toXMP(Collection<BibtexEntry>, BibtexDatabase,
+     * Convenience method for toXMP(Collection<BibEntry>, BibDatabase,
      * OutputStream) returning a String containing the XMP-metadata of the given
      * collection of BibtexEntries.
      *
@@ -1170,7 +1170,7 @@ public class XMPUtil {
      * @throws IOException
      *             If any of the given files could not be read or written.
      * @throws TransformerException
-     *             If the given BibtexEntry is malformed.
+     *             If the given BibEntry is malformed.
      */
     public static void main(String[] args) throws IOException,
     TransformerException {
@@ -1205,7 +1205,7 @@ public class XMPUtil {
                     Collection<BibEntry> entries = result.getDatabase().getEntries();
 
                     if (entries.isEmpty()) {
-                        System.err.println("Could not find BibtexEntry in " + args[0]);
+                        System.err.println("Could not find BibEntry in " + args[0]);
                     } else {
                         System.out.println(XMPUtil.toXMP(entries, result.getDatabase()));
                     }
@@ -1236,7 +1236,7 @@ public class XMPUtil {
                         .getEntries();
 
                 if (entries.isEmpty()) {
-                    System.err.println("Could not find BibtexEntry in "
+                    System.err.println("Could not find BibEntry in "
                             + args[0]);
                 } else {
                     XMPUtil.writeXMP(new File(args[1]), entries, result
@@ -1259,7 +1259,7 @@ public class XMPUtil {
             BibEntry e = result.getDatabase().getEntryByKey(args[0]);
 
             if (e == null) {
-                System.err.println("Could not find BibtexEntry " + args[0]
+                System.err.println("Could not find BibEntry " + args[0]
                         + " in " + args[0]);
             } else {
                 XMPUtil.writeXMP(new File(args[2]), e, result.getDatabase());
@@ -1282,7 +1282,7 @@ public class XMPUtil {
      *
      * @param is
      *            The inputstream to read the PDF from.
-     * @return whether a BibtexEntry was found in the given PDF.
+     * @return whether a BibEntry was found in the given PDF.
      */
     public static boolean hasMetadata(InputStream is) {
         try {

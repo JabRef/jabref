@@ -76,7 +76,7 @@ public abstract class DBImporter extends DBImporterExporter {
      *
      * @param dbs The necessary database connection information
      * @return An ArrayList containing pairs of Objects. Each position of the ArrayList stores three Objects: a
-     *         BibtexDatabase, a MetaData and a String with the bib database name stored in the DBMS
+     *         BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
      * @throws Exception
      */
     public ArrayList<Object[]> performImport(DBStrings dbs, List<String> listOfDBs) throws Exception {
@@ -113,7 +113,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         rsColumns.getStatement().close();
 
                         String database_id = rsDatabase.getString("database_id");
-                        // Read the entries and create BibtexEntry instances:
+                        // Read the entries and create BibEntry instances:
                         HashMap<String, BibEntry> entries = new HashMap<>();
                         try (ResultSet rsEntries = SQLUtil.queryAllFromTable(conn,
                                 "entries WHERE database_id= '" + database_id + "';")) {

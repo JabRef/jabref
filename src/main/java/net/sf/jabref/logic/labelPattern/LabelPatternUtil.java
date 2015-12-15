@@ -417,8 +417,8 @@ public class LabelPatternUtil {
      *
      * The given database is used to avoid duplicate keys.
      *
-     * @param dBase a <code>BibtexDatabase</code>
-     * @param entry a <code>BibtexEntry</code>
+     * @param dBase a <code>BibDatabase</code>
+     * @param entry a <code>BibEntry</code>
      * @return modified Bibtexentry
      */
     public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry) {
@@ -789,7 +789,7 @@ public class LabelPatternUtil {
     }
 
     /**
-     * Look up a field of a BibtexEntry, returning its String value, or an
+     * Look up a field of a BibEntry, returning its String value, or an
      * empty string if it isn't set.
      * @param entry The entry.
      * @param field The field to look up.

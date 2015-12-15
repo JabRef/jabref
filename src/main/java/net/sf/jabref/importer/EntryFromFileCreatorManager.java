@@ -80,7 +80,7 @@ public final class EntryFromFileCreatorManager {
 
     /**
      * Returns a EntryFromFileCreator object that is capable of creating a
-     * BibtexEntry for the given File.
+     * BibEntry for the given File.
      *
      * @param file the pdf file
      * @return null if there is no EntryFromFileCreator for this File.
@@ -151,7 +151,7 @@ public final class EntryFromFileCreatorManager {
                     entry.setId(IdGenerator.next());
                 }
                 /*
-                 * TODO: database.insertEntry(BibtexEntry) is not sensible. Why
+                 * TODO: database.insertEntry(BibEntry) is not sensible. Why
                  * does 'true' mean "There were duplicates", while 'false' means
                  * "Everything alright"?
                  */
@@ -160,7 +160,7 @@ public final class EntryFromFileCreatorManager {
                     // Therefore, we only insert the entry if it is not already present
                     if (database.insertEntry(entry)) {
                         importGUIMessages.add("Problem importing " + f.getPath()
-                        + ": Insert into BibtexDatabase failed.");
+                        + ": Insert into BibDatabase failed.");
                     } else {
                         count++;
                         if (panel != null) {

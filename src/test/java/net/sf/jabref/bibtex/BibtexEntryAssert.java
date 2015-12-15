@@ -37,7 +37,7 @@ public class BibtexEntryAssert {
     }
 
     /**
-     * Reads a bibtex database from the given InputStream. The result has to contain a single BibtexEntry. This entry is
+     * Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry. This entry is
      * compared to the given entry
      *
      * @param shouldBeIs the inputStream reading the entry from

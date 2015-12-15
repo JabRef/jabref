@@ -214,7 +214,7 @@ public class ExternalFilePanel extends JPanel {
                     JOptionPane.showMessageDialog(editor.getParent(),
                             Localization.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
                             Localization.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info("Error while converting BibtexEntry to XMP " + finalFile.getAbsolutePath(), e);
+                    LOGGER.info("Error while converting BibEntry to XMP " + finalFile.getAbsolutePath(), e);
                     output(Localization.lang("Error converting XMP to '%0'...", finalFile.getName()));
                 }
             }

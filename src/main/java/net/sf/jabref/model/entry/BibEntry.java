@@ -78,7 +78,7 @@ public class BibEntry {
     }
 
     public BibEntry(String id, EntryType type) {
-        Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
+        Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
         changed = true;
@@ -131,7 +131,7 @@ public class BibEntry {
      * Sets this entry's type.
      */
     public void setType(EntryType type) {
-        Objects.requireNonNull(type, "Every BibtexEntry must have a type.");
+        Objects.requireNonNull(type, "Every BibEntry must have a type.");
 
         EntryType oldType = this.type;
 
@@ -153,7 +153,7 @@ public class BibEntry {
      * doesn't veto the change.
      */
     public void setId(String id) {
-        Objects.requireNonNull(id, "Every BibtexEntry must have an ID");
+        Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         try {
             firePropertyChangedEvent(BibEntry.ID_FIELD, this.id, id);

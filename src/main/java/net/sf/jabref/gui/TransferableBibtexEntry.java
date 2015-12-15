@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 /*
- * A transferable object containing an array of BibtexEntry objects. Used
+ * A transferable object containing an array of BibEntry objects. Used
  * for copy-paste operations.
  */
 public class TransferableBibtexEntry implements Transferable {

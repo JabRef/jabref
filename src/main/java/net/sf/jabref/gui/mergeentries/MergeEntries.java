@@ -372,7 +372,7 @@ public class MergeEntries {
     }
 
     /**
-     * @return Merged BibtexEntry
+     * @return Merged BibEntry
      */
     public BibEntry getMergeEntry() {
         return mergedEntry;
@@ -386,7 +386,7 @@ public class MergeEntries {
     }
 
     /**
-     * Update the merged BibtexEntry with source and preview panel everytime something is changed
+     * Update the merged BibEntry with source and preview panel everytime something is changed
      */
     private void updateAll() {
         if (!doneBuilding) {

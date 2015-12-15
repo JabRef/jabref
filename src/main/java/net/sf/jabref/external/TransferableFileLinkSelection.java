@@ -76,7 +76,7 @@ public class TransferableFileLinkSelection implements Transferable {
     /*
     private StringSelection ss;
 
-    public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {
+    public TransferableFileLinkSelection(BasePanel panel, BibEntry[] selection) {
         String s = selection[0].getField(GUIGlobals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
         if (s != null)

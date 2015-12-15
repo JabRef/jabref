@@ -64,8 +64,8 @@ public class DuplicateCheck {
     /**
      * Checks if the two entries represent the same publication.
      *
-     * @param one BibtexEntry
-     * @param two BibtexEntry
+     * @param one BibEntry
+     * @param two BibEntry
      * @return boolean
      */
     public static boolean isDuplicate(BibEntry one, BibEntry two) {
@@ -200,7 +200,7 @@ public class DuplicateCheck {
     /**
      * Goes through all entries in the given database, and if at least one of
      * them is a duplicate of the given entry, as per
-     * Util.isDuplicate(BibtexEntry, BibtexEntry), the duplicate is returned.
+     * Util.isDuplicate(BibEntry, BibEntry), the duplicate is returned.
      * The search is terminated when the first duplicate is found.
      *
      * @param database The database to search.

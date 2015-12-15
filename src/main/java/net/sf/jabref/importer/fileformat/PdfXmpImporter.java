@@ -44,7 +44,7 @@ public class PdfXmpImporter extends ImportFormat {
 
     /**
      * Returns whether the given stream contains data that is a.) a pdf and b.)
-     * contains at least one BibtexEntry.
+     * contains at least one BibEntry.
      */
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
