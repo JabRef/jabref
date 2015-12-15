@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Objects;
@@ -52,6 +53,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.TransferableBibtexEntry;
+import net.sf.jabref.gui.maintable.MainTableNameFormatter;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -238,9 +240,9 @@ public class SearchResultsDialog {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
-                comparators.add(new IconComparator(new String[] {Globals.FILE_FIELD}));
+                comparators.add(new IconComparator(Arrays.asList(Globals.FILE_FIELD)));
             } else if (i == URL_COL) {
-                comparators.add(new IconComparator(new String[] {"url"}));
+                comparators.add(new IconComparator(Arrays.asList("url")));
             }
 
         }
@@ -498,8 +500,7 @@ public class SearchResultsDialog {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
                     if (frame.getCurrentBasePanel() != null) {
-                        return frame.getCurrentBasePanel().tableFormat.formatName
-                                (entry.getField(field));
+                        return MainTableNameFormatter.formatName(entry.getField(field));
                     }
                 }
                 return entry.getField(field);

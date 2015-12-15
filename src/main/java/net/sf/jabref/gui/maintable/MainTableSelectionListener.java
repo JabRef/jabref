@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.maintable;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -27,6 +27,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
@@ -42,6 +43,7 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -230,15 +232,18 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         final int col = table.columnAtPoint(e.getPoint());
         final int row = table.rowAtPoint(e.getPoint());
 
-        // Check if the user has clicked on an icon cell to open url or pdf.
-        final String[] iconType = table.getIconTypeForColumn(col);
+        // get the MainTableColumn which is currently visible at col
+        int modelIndex = table.getColumnModel().getColumn(col).getModelIndex();
+        MainTableColumn modelColumn = table.getMainTableColumn(modelIndex);
 
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
-            if (iconType == null) {
+            if (modelColumn == null || !modelColumn.isIconColumn()) {
+                // show normal right click menu
                 processPopupTrigger(e, row);
             } else {
-                showIconRightClickMenu(e, row, iconType);
+                // show right click menu for icon columns
+                showIconRightClickMenu(e, row, modelColumn);
             }
         }
     }
@@ -257,66 +262,36 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
         // A double click on an entry should open the entry's editor.
         if (e.getClickCount() == 2) {
-
             BibtexEntry toShow = tableRows.get(row);
             editSignalled(toShow);
+            return;
         }
 
-        // Check if the user has clicked on an icon cell to open url or pdf.
-        final String[] iconType = table.getIconTypeForColumn(col);
+        // get the MainTableColumn which is currently visible at col
+        int modelIndex = table.getColumnModel().getColumn(col).getModelIndex();
+        MainTableColumn modelColumn = table.getMainTableColumn(modelIndex);
 
         // Workaround for Windows. Right-click is not popup trigger on mousePressed, but
         // on mouseReleased. Therefore we need to avoid taking action at this point, because
         // action will be taken when the button is released:
-        if (OS.WINDOWS && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1)) {
+        if (OS.WINDOWS && (modelColumn.isIconColumn()) && (e.getButton() != MouseEvent.BUTTON1)) {
             return;
         }
 
-        if (iconType != null) {
-            // left click on icon field
-            SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(iconType[0]);
-            if ((e.getClickCount() == 1) && (field != null)) {
-                // special field found
-                if (field.isSingleValueField()) {
-                    // directly execute toggle action instead of showing a menu with one action
-                    field.getValues().get(0).getAction(panel.frame()).action();
-                } else {
-                    JPopupMenu menu = new JPopupMenu();
-                    for (SpecialFieldValue val : field.getValues()) {
-                        menu.add(val.getMenuAction(panel.frame()));
-                    }
-                    menu.show(table, e.getX(), e.getY());
-                }
-                return;
-            }
+        // Check if the clicked colum is a specialfield column
+        if(modelColumn.isIconColumn() && SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(modelColumn.getColumnName())!=null) {
+            // handle specialfield
+            handleSpecialFieldLeftClick(e, modelColumn.getColumnName());
+        } else if (modelColumn.isIconColumn()) { // left click on icon field
 
             Object value = table.getValueAt(row, col);
-            if (value == null)
-             {
+            if (value == null) {
                 return; // No icon here, so we do nothing.
             }
 
             final BibtexEntry entry = tableRows.get(row);
 
-            // Get the icon type. Corresponds to the field name.
-            int hasField = -1;
-            for (int i = iconType.length - 1; i >= 0; i--) {
-                if (entry.getField(iconType[i]) != null) {
-                    hasField = i;
-                }
-            }
-            if (hasField == -1) {
-                return;
-            }
-            final String fieldName = iconType[hasField];
-
-            //If this is a file link field with specified file types,
-            //we should also pass the types.
-            String[] fileTypes = {};
-            if ((hasField == 0) && iconType[hasField].equals(Globals.FILE_FIELD) && (iconType.length > 1)) {
-                fileTypes = iconType;
-            }
-            final List<String> listOfFileTypes = Collections.unmodifiableList(Arrays.asList(fileTypes));
+            final List<String> fieldNames = modelColumn.getBibtexFields();
 
             // Open it now. We do this in a thread, so the program won't freeze during the wait.
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
@@ -324,81 +299,79 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 @Override
                 public void run() {
                     panel.output(Localization.lang("External viewer called") + '.');
+                    // check for all field names whether a link is present
+                    // (is relevant for combinations such as "url/doi")
+                    for(String fieldName : fieldNames) {
+                        String link = entry.getField(fieldName);
+                        if (link == null) {
+                            continue; // There is no content for this field continue with the next one
+                        }
 
-                    Object link = entry.getField(fieldName);
-                    if (link == null) {
-                        LOGGER.info("Error: no link to " + fieldName + '.');
-                        return; // There is an icon, but the field is not set.
-                    }
+                        // See if this is a simple file link field, or if it is a file-list
+                        // field that can specify a list of links:
+                        if (fieldName.equals(Globals.FILE_FIELD)) {
 
-                    // See if this is a simple file link field, or if it is a file-list
-                    // field that can specify a list of links:
-                    if (fieldName.equals(Globals.FILE_FIELD)) {
+                            // We use a FileListTableModel to parse the field content:
+                            FileListTableModel fileList = new FileListTableModel();
+                            fileList.setContent(link);
 
-                        // We use a FileListTableModel to parse the field content:
-                        FileListTableModel fileList = new FileListTableModel();
-                        fileList.setContent((String) link);
-
-                        FileListEntry flEntry = null;
-                        // If there are one or more links of the correct type,
-                        // open the first one:
-                        if (!listOfFileTypes.isEmpty()) {
-                            for (int i = 0; i < fileList.getRowCount(); i++) {
-                                flEntry = fileList.getEntry(i);
-                                boolean correctType = false;
-                                for (String listOfFileType : listOfFileTypes) {
-                                    if (flEntry.getType().toString().equals(listOfFileType)) {
-                                        correctType = true;
+                            FileListEntry flEntry = null;
+                            // If there are one or more links of the correct type, open the first one:
+                            if (modelColumn.isFileFilter()) {
+                                for (int i = 0; i < fileList.getRowCount(); i++) {
+                                    if (fileList.getEntry(i).getType().toString().equals(modelColumn.getColumnName())) {
+                                        flEntry = fileList.getEntry(i);
+                                        break;
                                     }
                                 }
-                                if (correctType) {
-                                    break;
-                                }
-                                flEntry = null;
+                            } else if (fileList.getRowCount() > 0) {
+                                //If there are no file types specified open the first file
+                                flEntry = fileList.getEntry(0);
                             }
-                        }
-                        //If there are no file types specified, consider all files.
-                        else if (fileList.getRowCount() > 0) {
-                            flEntry = fileList.getEntry(0);
-                        }
-                        if (flEntry != null) {
-                            //                            if (fileList.getRowCount() > 0) {
-                            //                                FileListEntry flEntry = fileList.getEntry(0);
-
-                            ExternalFileMenuItem item = new ExternalFileMenuItem
-                                    (panel.frame(), entry, "",
-                                            flEntry.getLink(), flEntry.getType().getIcon(),
-                                            panel.metaData(), flEntry.getType());
-                            boolean success = item.openLink();
-                            if (!success) {
+                            if (flEntry != null) {
+                                ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
+                                        flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
+                                        flEntry.getType());
+                                boolean success = item.openLink();
+                                if (!success) {
+                                    panel.output(Localization.lang("Unable to open link."));
+                                }
+                            }
+                        } else {
+                            try {
+                                JabRefDesktop.openExternalViewer(panel.metaData(), link, fieldName);
+                            } catch (IOException ex) {
                                 panel.output(Localization.lang("Unable to open link."));
                             }
                         }
-                    } else {
-                        try {
-                            JabRefDesktop.openExternalViewer(panel.metaData(), (String) link, fieldName);
-                        } catch (IOException ex) {
-                            panel.output(Localization.lang("Unable to open link."));
-                        }
-
-                        /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");
-                        ExternalFileMenuItem item = new ExternalFileMenuItem
-                                (panel.frame(), entry, "",
-                                (String)link, type.getIcon(),
-                                panel.metaData(), type);
-                        boolean success = item.openLink();
-                        if (!success) {
-                            panel.output(Localization.lang("Unable to open link."));
-                        } */
-                        //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
+                        break; // only open the first link
                     }
-
-                    //catch (IOException ex) {
-                    //    panel.output(Globals.lang("Error") + ": " + ex.getMessage());
-                    //}
                 }
-
             });
+        }
+    }
+
+    /**
+     * Method to handle a single left click on one the special fields (e.g., ranking, quality, ...)
+     * Shows either a popup to select/clear a value or simply toggles the functionality to set/unset the special field
+     *
+     * @param e MouseEvent used to determine the position of the popups
+     * @param columnName the name of the specialfield column
+     */
+    private void handleSpecialFieldLeftClick(MouseEvent e, String columnName) {
+        SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(columnName);
+        if ((e.getClickCount() == 1) && (field != null)) {
+            // special field found
+            if (field.isSingleValueField()) {
+                // directly execute toggle action instead of showing a menu with one action
+                field.getValues().get(0).getAction(panel.frame()).action();
+            } else {
+                JPopupMenu menu = new JPopupMenu();
+                for (SpecialFieldValue val : field.getValues()) {
+                    menu.add(val.getMenuAction(panel.frame()));
+                }
+                menu.show(table, e.getX(), e.getY());
+            }
         }
     }
 
@@ -420,77 +393,62 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     }
 
     /**
-     * Process popup trigger events occurring on an icon cell in the table. Show
-     * a menu where the user can choose which external resource to open for the
-     * entry. If no relevant external resources exist, let the normal popup trigger
+     * Process popup trigger events occurring on an icon cell in the table. Show a menu where the user can choose which
+     * external resource to open for the entry. If no relevant external resources exist, let the normal popup trigger
      * handler do its thing instead.
+     *
      * @param e The mouse event defining this popup trigger.
      * @param row The row where the event occurred.
-     * @param iconType A string array containing the resource fields associated with
-     *  this table cell.
+     * @param column the MainTableColumn associated with this table cell.
      */
-    private void showIconRightClickMenu(MouseEvent e, int row, String[] iconType) {
+    private void showIconRightClickMenu(MouseEvent e, int row, MainTableColumn column) {
         BibtexEntry entry = tableRows.get(row);
         JPopupMenu menu = new JPopupMenu();
         boolean showDefaultPopup = true;
 
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
-        if (iconType[0].equals(Globals.FILE_FIELD)) {
-            // We use a FileListTableModel to parse the field content:
-            Object o = entry.getField(iconType[0]);
-            FileListTableModel fileList = new FileListTableModel();
-            fileList.setContent((String) o);
-            // If there are one or more links, open the first one:
-            for (int i = 0; i < fileList.getRowCount(); i++) {
-                FileListEntry flEntry = fileList.getEntry(i);
-
-                //If file types are specified, ignore files of other types.
-                if (iconType.length > 1) {
-                    boolean correctType = false;
-                    for (int j = 1; j < iconType.length; j++) {
-                        if (flEntry.getType().toString().equals(iconType[j])) {
-                            correctType = true;
+        if(!column.getBibtexFields().isEmpty()) {
+            for(String field : column.getBibtexFields()) {
+                if (Globals.FILE_FIELD.equals(field)) {
+                    // We use a FileListTableModel to parse the field content:
+                    String fileFieldContent = entry.getField(field);
+                    FileListTableModel fileList = new FileListTableModel();
+                    fileList.setContent(fileFieldContent);
+                    for (int i = 0; i < fileList.getRowCount(); i++) {
+                        FileListEntry flEntry = fileList.getEntry(i);
+                        if(column.isFileFilter() && !flEntry.getType().toString().equals(column.getColumnName())) {
+                            continue;
                         }
-                    }
-                    if (!correctType) {
-                        continue;
-                    }
-                }
-
-                String description = flEntry.getDescription();
-                if ((description == null) || (description.trim().isEmpty())) {
-                    description = flEntry.getLink();
-                }
-                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
-                        flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
-                        flEntry.getType()));
-                showDefaultPopup = false;
-            }
-        } else {
-            SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(iconType[0]);
-            if (field != null) {
-                //                for (SpecialFieldValue val: field.getValues()) {
-                //                	menu.add(val.getMenuAction(panel.frame()));
-                //                }
-                // full pop should be shown as left click already shows short popup
-                showDefaultPopup = true;
-            } else {
-                for (String anIconType : iconType) {
-                    Object o = entry.getField(anIconType);
-                    if (o != null) {
-                        menu.add(new ExternalFileMenuItem(panel.frame(), entry, (String) o, (String) o,
-                                GUIGlobals.getTableIcon(anIconType).getIcon(),
-                                panel.metaData(), anIconType));
+                        String description = flEntry.getDescription();
+                        if ((description == null) || (description.trim().isEmpty())) {
+                            description = flEntry.getLink();
+                        }
+                        menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
+                                flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
+                                flEntry.getType()));
                         showDefaultPopup = false;
                     }
+                } else {
+                    SpecialField specialField = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(column.getColumnName());
+                    if (specialField != null) {
+                        // full pop should be shown as left click already shows short popup
+                        showDefaultPopup = true;
+                    } else {
+                        String content = entry.getField(field);
+                        if (content != null) {
+                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content,
+                                    GUIGlobals.getTableIcon(field).getIcon(), panel.metaData(), field));
+                            showDefaultPopup = false;
+                        }
+                    }
                 }
             }
-        }
-        if (showDefaultPopup) {
-            processPopupTrigger(e, row);
-        } else {
-            menu.show(table, e.getX(), e.getY());
+            if (showDefaultPopup) {
+                processPopupTrigger(e, row);
+            } else {
+                menu.show(table, e.getX(), e.getY());
+            }
         }
     }
 

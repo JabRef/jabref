@@ -16,7 +16,7 @@
 package net.sf.jabref.bibtex.comparator;
 
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.YearUtil;

@@ -62,7 +62,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.wizard.auximport.AuxSubGenerator;

@@ -150,7 +150,7 @@ public class GUIGlobals {
 
     public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
 
-    public static final int WIDTH_ICON_COL = 19;
+    public static final int WIDTH_ICON_COL = 26;
 
     // Column widths for export customization dialog table:
     public static final int EXPORT_DIALOG_COL_0_WIDTH = 50;

@@ -18,16 +18,17 @@ package net.sf.jabref.gui.util;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Comparator that handles icon columns.
  */
 public class IconComparator implements Comparator<BibtexEntry> {
 
-    private final String[] fields;
+    private final List<String> fields;
 
 
-    public IconComparator(String[] fields) {
+    public IconComparator(List<String> fields) {
         this.fields = fields;
     }
 

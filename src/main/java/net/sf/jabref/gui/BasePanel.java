@@ -45,6 +45,9 @@ import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.journals.AbbreviateAction;
 import net.sf.jabref.gui.journals.UnabbreviateAction;
 import net.sf.jabref.gui.labelPattern.SearchFixDuplicateLabels;
+import net.sf.jabref.gui.maintable.MainTable;
+import net.sf.jabref.gui.maintable.MainTableFormat;
+import net.sf.jabref.gui.maintable.MainTableSelectionListener;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.search.SearchBar;
@@ -1505,7 +1508,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (filterSearchToggle != null) {
             filterSearchToggle.updateFilterList(searchFilterList);
         }
-        tableFormat = new MainTableFormat(this);
+        tableFormat = new MainTableFormat(database);
         tableFormat.updateTableFormat();
         mainTable = new MainTable(tableFormat, searchFilterList, frame, this);
 
