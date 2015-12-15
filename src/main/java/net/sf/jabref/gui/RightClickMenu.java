@@ -187,6 +187,9 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(JabRef.jrf.massSetField);
         add(JabRef.jrf.manageKeywords);
+        // TODO: QUICK HACK. This should be done using panel.runCommand(...);
+        // TODO: This should be disabled if (!multiple)
+        add(JabRef.jrf.mergeEntries);
 
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
 
