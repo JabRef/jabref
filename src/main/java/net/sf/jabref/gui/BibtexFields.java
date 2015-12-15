@@ -40,7 +40,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -65,7 +65,7 @@ public class BibtexFields {
     public static final String EXTRA_MONTH = "month"; // Button to show the months and set abbreviation
 
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
-            {"author", "title", "year", BibtexEntry.KEY_FIELD};
+            {"author", "title", "year", BibEntry.KEY_FIELD};
 
     // singleton instance
     private static final BibtexFields runtime = new BibtexFields();
@@ -167,7 +167,7 @@ public class BibtexFields {
         add(dummy);
 
         // some semi-standard fields
-        dummy = new BibtexSingleField(BibtexEntry.KEY_FIELD, true);
+        dummy = new BibtexSingleField(BibEntry.KEY_FIELD, true);
         dummy.setPrivate();
         add(dummy);
 

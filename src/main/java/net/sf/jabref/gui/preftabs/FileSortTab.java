@@ -34,7 +34,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Preference tab for file sorting options.
@@ -107,7 +107,7 @@ class FileSortTab extends JPanel implements PrefsTab {
             saveInSpecifiedOrder.addActionListener(listener);
 
             ArrayList<String> fieldNames = new ArrayList<>(BibtexFields.getAllFieldNames());
-            fieldNames.add(BibtexEntry.KEY_FIELD);
+            fieldNames.add(BibEntry.KEY_FIELD);
             Collections.sort(fieldNames);
             String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
             savePriSort = new JComboBox<>(allPlusKey);
@@ -227,7 +227,7 @@ class FileSortTab extends JPanel implements PrefsTab {
         exportInSpecifiedOrder.addActionListener(listener);
 
         ArrayList<String> fieldNames = new ArrayList<>(BibtexFields.getAllFieldNames());
-        fieldNames.add(BibtexEntry.KEY_FIELD);
+        fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
         exportPriSort = new JComboBox<>(allPlusKey);

@@ -5,7 +5,7 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.specialfields.*;
 
@@ -16,7 +16,7 @@ public class SpecialMainTableColumns {
     public static final MainTableColumn NUMBER_COL = new MainTableColumn(GUIGlobals.NUMBER_COL) {
 
         @Override
-        public Object getColumnValue(BibtexEntry entry) {
+        public Object getColumnValue(BibEntry entry) {
             return "#";
         }
 
@@ -31,7 +31,7 @@ public class SpecialMainTableColumns {
             new JLabel(EntryUtil.capitalizeFirst(SpecialFieldsUtils.FIELDNAME_RANKING))) {
 
         @Override
-        public Object getColumnValue(BibtexEntry entry) {
+        public Object getColumnValue(BibEntry entry) {
             SpecialFieldValue rank = Rank.getInstance().parse(entry.getField(SpecialFieldsUtils.FIELDNAME_RANKING));
             if (rank != null) {
                 return rank.createLabel();
@@ -46,7 +46,7 @@ public class SpecialMainTableColumns {
             new JLabel(Priority.getInstance().getRepresentingIcon())) {
 
         @Override
-        public Object getColumnValue(BibtexEntry entry) {
+        public Object getColumnValue(BibEntry entry) {
 
             SpecialFieldValue prio = Priority.getInstance()
                     .parse(entry.getField(SpecialFieldsUtils.FIELDNAME_PRIORITY));
@@ -63,7 +63,7 @@ public class SpecialMainTableColumns {
             new JLabel(ReadStatus.getInstance().getRepresentingIcon())) {
 
         @Override
-        public Object getColumnValue(BibtexEntry entry) {
+        public Object getColumnValue(BibEntry entry) {
 
             SpecialFieldValue status = ReadStatus.getInstance()
                     .parse(entry.getField(SpecialFieldsUtils.FIELDNAME_READ));
@@ -92,7 +92,7 @@ public class SpecialMainTableColumns {
             new String[] {Globals.FILE_FIELD}, new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
 
         @Override
-        public Object getColumnValue(BibtexEntry entry) {
+        public Object getColumnValue(BibEntry entry) {
             // We use a FileListTableModel to parse the field content:
             FileListTableModel fileList = new FileListTableModel();
             fileList.setContent(entry.getField(Globals.FILE_FIELD));
@@ -120,7 +120,7 @@ public class SpecialMainTableColumns {
         return new MainTableColumn(columnName, fields, iconLabel) {
 
             @Override
-            public Object getColumnValue(BibtexEntry entry) {
+            public Object getColumnValue(BibEntry entry) {
                 JLabel iconLabel = null;
                 boolean iconFound = false;
 
@@ -167,7 +167,7 @@ public class SpecialMainTableColumns {
             }
 
             @Override
-            public Object getColumnValue(BibtexEntry entry) {
+            public Object getColumnValue(BibEntry entry) {
 
                 boolean iconFound = false;
                 JLabel iconLabel = null;

@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class GVKParserTest {
 
@@ -21,7 +21,7 @@ public class GVKParserTest {
             throws ParserConfigurationException, SAXException, IOException {
         try (InputStream is = GVKParser.class.getResourceAsStream(xmlName)) {
             GVKParser parser = new GVKParser();
-            List<BibtexEntry> entries = parser.parseEntries(is);
+            List<BibEntry> entries = parser.parseEntries(is);
             Assert.assertNotNull(entries);
             Assert.assertEquals(expectedSize, entries.size());
             int i = 0;
@@ -51,11 +51,11 @@ public class GVKParserTest {
     public void subTitleTest() throws Exception {
         try (InputStream is = GVKParser.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
             GVKParser parser = new GVKParser();
-            List<BibtexEntry> entries = parser.parseEntries(is);
+            List<BibEntry> entries = parser.parseEntries(is);
             Assert.assertNotNull(entries);
             Assert.assertEquals(5, entries.size());
 
-            BibtexEntry entry = entries.get(0);
+            BibEntry entry = entries.get(0);
             Assert.assertEquals(null, entry.getField("subtitle"));
 
             entry = entries.get(1);

@@ -5,7 +5,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -23,7 +23,7 @@ public class CrossRef {
 
     private static final String API_URL = "http://api.crossref.org";
 
-    public static Optional<DOI> findDOI(BibtexEntry entry) {
+    public static Optional<DOI> findDOI(BibEntry entry) {
         Objects.requireNonNull(entry);
         Optional<DOI> doi = Optional.empty();
 

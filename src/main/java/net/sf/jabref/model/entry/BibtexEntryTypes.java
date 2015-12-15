@@ -2,6 +2,7 @@ package net.sf.jabref.model.entry;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -11,7 +12,6 @@ import java.util.stream.Collectors;
  * Manual, Mastersthesis, Misc, Phdthesis, Proceedings, Techreport, Unpublished
  */
 public class BibtexEntryTypes {
-
     /**
      * An article from a journal or magazine.
      * <p>
@@ -281,4 +281,8 @@ public class BibtexEntryTypes {
 
     public static final List<EntryType> ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,
             INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC);
+
+    public static Optional<EntryType> getType(String name) {
+        return ALL.stream().filter(e -> e.getName().equalsIgnoreCase(name)).findFirst();
+    }
 }

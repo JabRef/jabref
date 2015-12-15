@@ -18,6 +18,7 @@ package net.sf.jabref.model.entry;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This class defines entry types for BibLatex support.
@@ -866,4 +867,8 @@ public class BibLatexEntryTypes {
             BOOKLET, COLLECTION, MVCOLLECTION, INCOLLECTION, SUPPCOLLECTION, MANUAL, MISC, ONLINE, PATENT, PERIODICAL,
             SUPPPERIODICAL, PROCEEDINGS, MVPROCEEDINGS, INPROCEEDINGS, REFERENCE, MVREFERENCE, INREFERENCE, REPORT, SET,
             THESIS, UNPUBLISHED, CONFERENCE, ELECTRONIC, MASTERSTHESIS, PHDTHESIS, TECHREPORT, WWW, IEEETRANBSTCTL);
+
+    public static Optional<EntryType> getType(String name) {
+        return ALL.stream().filter(e -> e.getName().equalsIgnoreCase(name)).findFirst();
+    }
 }

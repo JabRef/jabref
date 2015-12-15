@@ -23,7 +23,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ class ResolveDuplicateLabelDialog {
 
 
     public ResolveDuplicateLabelDialog(BasePanel panel, String key,
-            List<BibtexEntry> entries) {
+            List<BibEntry> entries) {
         diag = new JDialog(panel.frame(), Localization.lang("Duplicate BibTeX key"), true);
 
         FormBuilder b = FormBuilder.create().layout(new FormLayout(
@@ -66,7 +66,7 @@ class ResolveDuplicateLabelDialog {
 
         boolean first = true;
         int row = 3;
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             JCheckBox cb = new JCheckBox(Localization.lang("Generate key"), !first);
             //JPanel pan = new JPanel();
             //pan.setLayout(new BorderLayout());

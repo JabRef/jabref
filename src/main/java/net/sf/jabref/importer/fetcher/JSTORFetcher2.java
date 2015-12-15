@@ -17,7 +17,7 @@ package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
@@ -109,7 +109,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibtexEntry entry = getSingleCitation(cit);
+                BibEntry entry = getSingleCitation(cit);
                 if (entry != null) {
                     dialog.addEntry(entry);
                 }
@@ -234,7 +234,7 @@ public class JSTORFetcher2 implements EntryFetcher {
         }
     }
 
-    private static BibtexEntry getSingleCitation(String cit) {
+    private static BibEntry getSingleCitation(String cit) {
         return BibsonomyScraper.getEntry(JSTORFetcher2.SINGLE_CIT_ENC + cit);
     }
 }

@@ -20,16 +20,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.importer.fetcher.EntryFetcher;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class ImportInspectionCommandLine implements ImportInspector {
 
-    private final List<BibtexEntry> entries = new LinkedList<>();
+    private final List<BibEntry> entries = new LinkedList<>();
 
 
     @Override
-    public void addEntry(BibtexEntry entry) {
+    public void addEntry(BibEntry entry) {
         entries.add(entry);
     }
 
@@ -59,7 +59,7 @@ public class ImportInspectionCommandLine implements ImportInspector {
     };
 
 
-    public Collection<BibtexEntry> query(String query, EntryFetcher fetcher) {
+    public Collection<BibEntry> query(String query, EntryFetcher fetcher) {
         entries.clear();
         if (fetcher.processQuery(query, ImportInspectionCommandLine.this, status)) {
             return entries;

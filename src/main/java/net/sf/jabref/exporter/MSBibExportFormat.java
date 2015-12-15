@@ -27,7 +27,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
@@ -42,7 +42,7 @@ class MSBibExportFormat extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, Set<String> keySet) throws IOException {
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings

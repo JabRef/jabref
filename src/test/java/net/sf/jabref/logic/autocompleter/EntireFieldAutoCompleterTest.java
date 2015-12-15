@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class EntireFieldAutoCompleterTest {
 
@@ -50,7 +50,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete("test");
@@ -62,7 +62,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("title", "testTitle");
         autoCompleter.addBibtexEntry(entry);
 
@@ -75,7 +75,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
         autoCompleter.addBibtexEntry(entry);
 
@@ -88,7 +88,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
         autoCompleter.addBibtexEntry(entry);
 
@@ -101,7 +101,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
         autoCompleter.addBibtexEntry(entry);
 
@@ -114,7 +114,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
         autoCompleter.addBibtexEntry(entry);
 
@@ -127,7 +127,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
         autoCompleter.addBibtexEntry(entry);
 
@@ -140,10 +140,10 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entryOne = new BibtexEntry();
+        BibEntry entryOne = new BibEntry();
         entryOne.setField("field", "testValueOne");
         autoCompleter.addBibtexEntry(entryOne);
-        BibtexEntry entryTwo = new BibtexEntry();
+        BibEntry entryTwo = new BibEntry();
         entryTwo.setField("field", "testValueTwo");
         autoCompleter.addBibtexEntry(entryTwo);
 
@@ -156,7 +156,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "val");
         autoCompleter.addBibtexEntry(entry);
 
@@ -170,7 +170,7 @@ public class EntireFieldAutoCompleterTest {
         when(preferences.getShortestLengthToComplete()).thenReturn(100);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
         autoCompleter.addBibtexEntry(entry);
 
@@ -183,7 +183,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
         autoCompleter.addBibtexEntry(entry);
 
@@ -196,7 +196,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
         autoCompleter.addBibtexEntry(entry);
 
@@ -209,7 +209,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
         autoCompleter.addBibtexEntry(entry);
 

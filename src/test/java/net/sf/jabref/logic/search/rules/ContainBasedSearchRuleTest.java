@@ -3,7 +3,7 @@ package net.sf.jabref.logic.search.rules;
 import net.sf.jabref.*;
 
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +17,7 @@ public class ContainBasedSearchRuleTest {
     public void testBasicSearchParsing() {
         Globals.prefs = JabRefPreferences.getInstance();
 
-        BibtexEntry be = makeBibtexEntry();
+        BibEntry be = makeBibtexEntry();
         ContainBasedSearchRule bsCaseSensitive = new ContainBasedSearchRule(true);
         ContainBasedSearchRule bsCaseInsensitive = new ContainBasedSearchRule(false);
         RegexBasedSearchRule bsCaseSensitiveRegexp = new RegexBasedSearchRule(true);
@@ -46,8 +46,8 @@ public class ContainBasedSearchRuleTest {
 
     }
 
-    public BibtexEntry makeBibtexEntry() {
-        BibtexEntry e = new BibtexEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION);
+    public BibEntry makeBibtexEntry() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION);
         e.setField("title", "Marine finfish larviculture in Europe");
         e.setField("bibtexkey", "shields01");
         e.setField("year", "2001");

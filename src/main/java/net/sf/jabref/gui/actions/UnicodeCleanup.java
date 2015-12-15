@@ -6,7 +6,7 @@ import java.util.List;
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.Cleaner;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Converts Unicode characters to LaTeX code.
@@ -14,7 +14,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 public class UnicodeCleanup implements Cleaner {
 
     @Override
-    public List<FieldChange> cleanup(BibtexEntry entry) {
+    public List<FieldChange> cleanup(BibEntry entry) {
         ArrayList<FieldChange> changes = new ArrayList<>();
         final String[] fields = {"title", "author", "abstract"};
         for (String field : fields) {

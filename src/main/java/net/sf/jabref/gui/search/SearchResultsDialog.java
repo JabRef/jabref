@@ -56,7 +56,7 @@ import net.sf.jabref.gui.TransferableBibtexEntry;
 import net.sf.jabref.gui.maintable.MainTableNameFormatter;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.util.IconComparator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
@@ -100,12 +100,12 @@ public class SearchResultsDialog {
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
-    private final EventList<BibtexEntry> entries = new BasicEventList<>();
+    private final EventList<BibEntry> entries = new BasicEventList<>();
 
-    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<>();
-    private DefaultEventTableModel<BibtexEntry> model;
+    private final HashMap<BibEntry, BasePanel> entryHome = new HashMap<>();
+    private DefaultEventTableModel<BibEntry> model;
 
-    private SortedList<BibtexEntry> sortedEntries;
+    private SortedList<BibEntry> sortedEntries;
     private JTable entryTable;
     private PreviewPanel preview;
 
@@ -123,20 +123,20 @@ public class SearchResultsDialog {
                 activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
-        model = (DefaultEventTableModel<BibtexEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
+        model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
                 new EntryTableFormat());
         entryTable = new JTable(model);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         entryTable.setDefaultRenderer(JLabel.class, renderer);
         entryTable.setDefaultRenderer(String.class, renderer);
         setWidths();
-        TableComparatorChooser<BibtexEntry> tableSorter =
+        TableComparatorChooser<BibEntry> tableSorter =
                 TableComparatorChooser.install(entryTable, sortedEntries,
                         AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
-        final DefaultEventSelectionModel<BibtexEntry> selectionModel = (DefaultEventSelectionModel<BibtexEntry>) GlazedListsSwing
+        final DefaultEventSelectionModel<BibEntry> selectionModel = (DefaultEventSelectionModel<BibEntry>) GlazedListsSwing
                 .eventSelectionModelWithThreadProxyList(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
@@ -163,8 +163,8 @@ public class SearchResultsDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!selectionModel.getSelected().isEmpty()) {
-                    BibtexEntry[] bes = selectionModel.getSelected().toArray
-                            (new BibtexEntry[selectionModel.getSelected().size()]);
+                    BibEntry[] bes = selectionModel.getSelected().toArray
+                            (new BibEntry[selectionModel.getSelected().size()]);
                     TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
@@ -226,7 +226,7 @@ public class SearchResultsDialog {
      * by clicking the column labels.
      * @param comparatorChooser The comparator chooser controlling the sort order.
      */
-    private void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
+    private void setupComparatorChooser(TableComparatorChooser<BibEntry> comparatorChooser) {
         // First column:
         java.util.List<Comparator> comparators = comparatorChooser
                 .getComparatorsForColumn(0);
@@ -282,8 +282,8 @@ public class SearchResultsDialog {
      * @param newEntries The list of entries.
      * @param panel A reference to the BasePanel where the entries belong.
      */
-    public synchronized void addEntries(java.util.List<BibtexEntry> newEntries, BasePanel panel) {
-        for (BibtexEntry entry : newEntries) {
+    public synchronized void addEntries(java.util.List<BibEntry> newEntries, BasePanel panel) {
+        for (BibEntry entry : newEntries) {
             addEntry(entry, panel);
         }
     }
@@ -293,7 +293,7 @@ public class SearchResultsDialog {
      * @param entry The entry to add.
      * @param panel A reference to the BasePanel where the entry belongs.
      */
-    public synchronized void addEntry(BibtexEntry entry, BasePanel panel) {
+    public synchronized void addEntry(BibEntry entry, BasePanel panel) {
         entries.add(entry);
         entryHome.put(entry, panel);
     }
@@ -325,7 +325,7 @@ public class SearchResultsDialog {
             // A double click on an entry should highlight the entry in its BasePanel:
             if (e.getClickCount() == 2) {
                 // Get the selected entry:
-                BibtexEntry toShow = model.getElementAt(row);
+                BibEntry toShow = model.getElementAt(row);
                 // Look up which BasePanel it belongs to:
                 BasePanel p = entryHome.get(toShow);
                 // Show the correct tab in the main window:
@@ -345,7 +345,7 @@ public class SearchResultsDialog {
             final int col = entryTable.columnAtPoint(e.getPoint());
             final int row = entryTable.rowAtPoint(e.getPoint());
             if (col < PAD) {
-                BibtexEntry entry = sortedEntries.get(row);
+                BibEntry entry = sortedEntries.get(row);
                 BasePanel p = entryHome.get(entry);
                 switch (col) {
                 case FILE_COL:
@@ -384,7 +384,7 @@ public class SearchResultsDialog {
          * @param e The triggering mouse event.
          */
         public void processPopupTrigger(MouseEvent e) {
-            BibtexEntry entry = sortedEntries.get(entryTable.rowAtPoint(e.getPoint()));
+            BibEntry entry = sortedEntries.get(entryTable.rowAtPoint(e.getPoint()));
             BasePanel p = entryHome.get(entry);
             int col = entryTable.columnAtPoint(e.getPoint());
             JPopupMenu menu = new JPopupMenu();
@@ -420,12 +420,12 @@ public class SearchResultsDialog {
      * The listener for the Glazed list monitoring the current selection.
      * When selection changes, we need to update the preview panel.
      */
-    private class EntrySelectionListener implements ListEventListener<BibtexEntry> {
+    private class EntrySelectionListener implements ListEventListener<BibEntry> {
 
         @Override
-        public void listChanged(ListEvent<BibtexEntry> listEvent) {
+        public void listChanged(ListEvent<BibEntry> listEvent) {
             if (listEvent.getSourceList().size() == 1) {
-                BibtexEntry entry = listEvent.getSourceList().get(0);
+                BibEntry entry = listEvent.getSourceList().get(0);
                 // Find out which BasePanel the selected entry belongs to:
                 BasePanel p = entryHome.get(entry);
                 // Update the preview's metadata reference:
@@ -448,7 +448,7 @@ public class SearchResultsDialog {
      * TableFormat for the table shown in the dialog. Handles the display of entry
      * fields and icons for linked files and urls.
      */
-    private class EntryTableFormat implements AdvancedTableFormat<BibtexEntry> {
+    private class EntryTableFormat implements AdvancedTableFormat<BibEntry> {
 
         @Override
         public int getColumnCount() {
@@ -465,7 +465,7 @@ public class SearchResultsDialog {
         }
 
         @Override
-        public Object getColumnValue(BibtexEntry entry, int column) {
+        public Object getColumnValue(BibEntry entry, int column) {
             if (column < PAD) {
                 Object o;
                 switch (column) {

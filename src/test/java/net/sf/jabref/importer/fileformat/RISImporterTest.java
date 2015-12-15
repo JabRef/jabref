@@ -3,7 +3,7 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.*;
 
 import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
 import org.junit.Before;
@@ -89,9 +89,9 @@ public class RISImporterTest {
 
         try (InputStream stream = RISImporterTest.class
                 .getResourceAsStream("RisImporterTest1.ris")) {
-            List<BibtexEntry> entries = importer.importEntries(stream, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importEntries(stream, new OutputPrinterToNull());
             Assert.assertEquals(1, entries.size());
-            BibtexEntry entry = entries.get(0);
+            BibEntry entry = entries.get(0);
             Assert.assertEquals("Editorial: Open Source and Empirical Software Engineering", entry
                     .getField("title"));
             Assert.assertEquals(

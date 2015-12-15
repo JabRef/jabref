@@ -56,8 +56,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
@@ -256,7 +256,7 @@ public class Util {
     private static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
 
 
-    public static String expandBrackets(String bracketString, BibtexEntry entry, BibtexDatabase database) {
+    public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database) {
         Matcher m = net.sf.jabref.util.Util.squareBracketsPattern.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
@@ -277,7 +277,7 @@ public class Util {
      *
      * @param bibs List of bibtex entries
      */
-    public static void setAutomaticFields(Collection<BibtexEntry> bibs, boolean overwriteOwner, boolean overwriteTimestamp, boolean markEntries) {
+    public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner, boolean overwriteTimestamp, boolean markEntries) {
 
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
 
@@ -292,7 +292,7 @@ public class Util {
         }
 
         // Iterate through all entries
-        for (BibtexEntry curEntry : bibs) {
+        for (BibEntry curEntry : bibs) {
             boolean setOwner = globalSetOwner && (overwriteOwner || (curEntry.getField(BibtexFields.OWNER) == null));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (curEntry.getField(timeStampField) == null));
             net.sf.jabref.util.Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
@@ -310,7 +310,7 @@ public class Util {
      * @param overwriteOwner Indicates whether owner should be set if it is already set.
      * @param overwriteTimestamp Indicates whether timestamp should be set if it is already set.
      */
-    public static void setAutomaticFields(BibtexEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
+    public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
         String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
@@ -320,7 +320,7 @@ public class Util {
         net.sf.jabref.util.Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
 
-    private static void setAutomaticFields(BibtexEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStampField, String timeStamp) {
+    private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStampField, String timeStamp) {
 
         // Set owner field if this option is enabled:
         if (setOwner) {
@@ -345,10 +345,10 @@ public class Util {
      * @param fields The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
-    public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
+    public static NamedCompound upgradePdfPsToFile(BibDatabase database, String[] fields) {
         NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
 
-        for (BibtexEntry entry : database.getEntryMap().values()) {
+        for (BibEntry entry : database.getEntryMap().values()) {
             upgradePdfPsToFile(entry, fields, ce);
         }
 
@@ -364,7 +364,7 @@ public class Util {
      * @param fields The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
-    public static void upgradePdfPsToFile(BibtexEntry entry, String[] fields, NamedCompound ce) {
+    public static void upgradePdfPsToFile(BibEntry entry, String[] fields, NamedCompound ce) {
         FileListTableModel tableModel = new FileListTableModel();
         // If there are already links in the file field, keep those on top:
         String oldFileContent = entry.getField(Globals.FILE_FIELD);
@@ -422,10 +422,10 @@ public class Util {
      * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
      * @return A CompoundEdit for the entire operation.
      */
-    public static UndoableEdit massSetField(Collection<BibtexEntry> entries, String field, String text, boolean overwriteValues) {
+    public static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String text, boolean overwriteValues) {
 
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             String oldVal = entry.getField(field);
             // If we are not allowed to overwrite values, check if there is a
             // nonempty
@@ -454,9 +454,9 @@ public class Util {
      *            entries with existing value in the new field.
      * @return A CompoundEdit for the entire operation.
      */
-    public static UndoableEdit massRenameField(Collection<BibtexEntry> entries, String field, String newField, boolean overwriteValues) {
+    public static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField, boolean overwriteValues) {
         NamedCompound ce = new NamedCompound(Localization.lang("Rename field"));
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             String valToMove = entry.getField(field);
             // If there is no value, do nothing:
             if ((valToMove == null) || valToMove.isEmpty()) {
@@ -542,7 +542,7 @@ public class Util {
      * @param entry the entry to which the file should be linked to
      * @return a suggested fileName
      */
-    public static String getLinkedFileName(BibtexDatabase database, BibtexEntry entry) {
+    public static String getLinkedFileName(BibDatabase database, BibEntry entry) {
         String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
         StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
@@ -562,14 +562,14 @@ public class Util {
     /**
      * @param ce indicates the undo named compound. May be null
      */
-    public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
+    public static void updateField(BibEntry be, String field, String newValue, NamedCompound ce) {
         net.sf.jabref.util.Util.updateField(be, field, newValue, ce, false);
     }
 
     /**
      * @param ce indicates the undo named compound. May be null
      */
-    public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
+    public static void updateField(BibEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
         String oldValue = be.getField(field);
         if (nullFieldIfValueIsTheSame && (oldValue != null) && oldValue.equals(newValue)) {
             // if oldValue == newValue then reset field if required by parameter
@@ -698,7 +698,7 @@ public class Util {
      * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
      *         otherwise (this indicates that the user has aborted the assignment).
      */
-    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibtexEntry[] entries, BibtexDatabase db, Component parent) {
+    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibEntry[] entries, BibDatabase db, Component parent) {
         Vector<String> affectedFields = new Vector<>();
         for (AbstractGroup group : groups) {
             if (group instanceof KeywordGroup) {
@@ -764,7 +764,7 @@ public class Util {
      * Updates the timestamp of the given entry, nests the given undaoableEdit in a named compound, and returns that
      * named compound
      */
-    public static NamedCompound doUpdateTimeStamp(BibtexEntry entry, AbstractUndoableEdit undoableEdit) {
+    public static NamedCompound doUpdateTimeStamp(BibEntry entry, AbstractUndoableEdit undoableEdit) {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
@@ -781,9 +781,9 @@ public class Util {
      * The entries' bibtex keys must have been set - entries lacking key are ignored. The operation is done in a new
      * thread, which is returned for the caller to wait for if needed.
      *
-     * @param entries A collection of BibtexEntry objects to find links for.
+     * @param entries A collection of BibEntry objects to find links for.
      * @param ce A NamedCompound to add UndoEdit elements to.
-     * @param changedEntries MODIFIED, optional. A Set of BibtexEntry objects to which all modified entries is added.
+     * @param changedEntries MODIFIED, optional. A Set of BibEntry objects to which all modified entries is added.
      *            This is used for status output and debugging
      * @param singleTableModel UGLY HACK. The table model to insert links into. Already existing links are not
      *            duplicated or removed. This parameter has to be null if entries.count() != 1. The hack has been
@@ -798,7 +798,7 @@ public class Util {
      *            parameter can be null, which means that no progress update will be shown.
      * @return the thread performing the autosetting
      */
-    public static Runnable autoSetLinks(final Collection<BibtexEntry> entries, final NamedCompound ce, final Set<BibtexEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+    public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
         final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
         if (diag != null) {
             final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length - 1);
@@ -831,7 +831,7 @@ public class Util {
                 }
 
                 // Run the search operation:
-                Map<BibtexEntry, java.util.List<File>> result;
+                Map<BibEntry, java.util.List<File>> result;
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
@@ -841,7 +841,7 @@ public class Util {
 
                 boolean foundAny = false;
                 // Iterate over the entries:
-                for (Entry<BibtexEntry, List<File>> entryFilePair : result.entrySet()) {
+                for (Entry<BibEntry, List<File>> entryFilePair : result.entrySet()) {
                     FileListTableModel tableModel;
                     String oldVal = entryFilePair.getKey().getField(Globals.FILE_FIELD);
                     if (singleTableModel == null) {
@@ -933,7 +933,7 @@ public class Util {
      * Automatically add links for this entry to the table model given as an argument, based on the globally stored list
      * of external file types. The entry itself is not modified. The entry's bibtex key must have been set.
      *
-     * @param entry The BibtexEntry to find links for.
+     * @param entry The BibEntry to find links for.
      * @param singleTableModel The table model to insert links into. Already existing links are not duplicated or
      *            removed.
      * @param metaData The MetaData providing the relevant file directory, if any.
@@ -946,8 +946,8 @@ public class Util {
      *            parameter can be null, which means that no progress update will be shown.
      * @return the runnable able to perform the autosetting
      */
-    public static Runnable autoSetLinks(final BibtexEntry entry, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
-        final Collection<BibtexEntry> entries = new ArrayList<>();
+    public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+        final Collection<BibEntry> entries = new ArrayList<>();
         entries.add(entry);
 
         return net.sf.jabref.util.Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
@@ -961,9 +961,9 @@ public class Util {
      *
      * @return list of files. May be empty
      */
-    public static List<File> getListOfLinkedFiles(BibtexEntry[] bes, String[] fileDirs) {
+    public static List<File> getListOfLinkedFiles(BibEntry[] bes, String[] fileDirs) {
         ArrayList<File> res = new ArrayList<>();
-        for (BibtexEntry entry : bes) {
+        for (BibEntry entry : bes) {
             FileListTableModel tm = new FileListTableModel();
             tm.setContent(entry.getField("file"));
             for (int i = 0; i < tm.getRowCount(); i++) {
@@ -978,14 +978,14 @@ public class Util {
         return res;
     }
 
-    public static Map<BibtexEntry, List<File>> findAssociatedFiles(Collection<BibtexEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibtexEntry, List<File>> result = new HashMap<>();
+    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
+        HashMap<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
         Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
 
         // Initialize Result-Set
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             result.put(entry, new ArrayList<File>());
         }
 
@@ -996,7 +996,7 @@ public class Util {
             String name = file.getName();
             int dot = name.lastIndexOf('.');
             // First, look for exact matches:
-            for (BibtexEntry entry : entries) {
+            for (BibEntry entry : entries) {
                 String citeKey = entry.getCiteKey();
                 if ((citeKey != null) && !citeKey.isEmpty()) {
                     if (dot > 0) {
@@ -1010,7 +1010,7 @@ public class Util {
             // If we get here, we didn't find any exact matches. If non-exact
             // matches are allowed, try to find one:
             if (!exactOnly) {
-                for (BibtexEntry entry : entries) {
+                for (BibEntry entry : entries) {
                     String citeKey = entry.getCiteKey();
                     if ((citeKey != null) && !citeKey.isEmpty()) {
                         if (name.startsWith(citeKey)) {
@@ -1034,7 +1034,7 @@ public class Util {
      * @param database
      * @return
      */
-    public static String getFieldAndFormat(String fieldAndFormat, BibtexEntry entry, BibtexDatabase database) {
+    public static String getFieldAndFormat(String fieldAndFormat, BibEntry entry, BibDatabase database) {
 
         fieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
 
@@ -1055,7 +1055,7 @@ public class Util {
             return null;
         }
 
-        String fieldValue = BibtexDatabase.getResolvedField(beforeColon, entry, database);
+        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database);
 
         // If no field value was found, try to interpret it as a key generator field marker:
         if (fieldValue == null) {

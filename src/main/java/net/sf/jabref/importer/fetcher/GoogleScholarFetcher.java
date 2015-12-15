@@ -22,7 +22,7 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 
@@ -124,7 +124,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             if (isSelected) {
                 downloaded++;
                 try {
-                    BibtexEntry entry = downloadEntry(selEntry.getKey());
+                    BibEntry entry = downloadEntry(selEntry.getKey());
                     inspector.addEntry(entry);
                 } catch (IOException e) {
                     LOGGER.warn("Cannot download entry from Google scholar", e);
@@ -260,19 +260,19 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         return null;
     }
 
-    private BibtexEntry downloadEntry(String link) throws IOException {
+    private BibEntry downloadEntry(String link) throws IOException {
         try {
             URL url = new URL(GoogleScholarFetcher.URL_START + link);
             String s = new URLDownload(url).downloadToString();
             BibtexParser bp = new BibtexParser(new StringReader(s));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase() != null)) {
-                Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
+                Collection<BibEntry> entries = pr.getDatabase().getEntries();
                 if (entries.size() == 1) {
-                    BibtexEntry entry = entries.iterator().next();
+                    BibEntry entry = entries.iterator().next();
                     boolean clearKeys = true;
                     if (clearKeys) {
-                        entry.setField(BibtexEntry.KEY_FIELD, null);
+                        entry.setField(BibEntry.KEY_FIELD, null);
                     }
                     // If the entry's url field is not set, and we have stored an url for this
                     // entry, set it:

@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.layout.Layout;
@@ -170,11 +170,11 @@ public class ExportFormat implements IExportFormat {
      * @throws Exception
      *             if any other error occurred during export.
      *
-     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibtexDatabase,
+     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibDatabase,
      *      net.sf.jabref.MetaData, java.lang.String, java.lang.String, java.util.Set)
      */
     @Override
-    public void performExport(final BibtexDatabase database,
+    public void performExport(final BibDatabase database,
             final MetaData metaData, final String file,
             final Charset enc, Set<String> entryIds) throws Exception {
 
@@ -224,7 +224,7 @@ public class ExportFormat implements IExportFormat {
              * be non-null, and be used to choose entries. Otherwise, it will be
              * null, and be ignored.
              */
-            List<BibtexEntry> sorted = FileActions.getSortedEntries(database, metaData, entryIds, false);
+            List<BibEntry> sorted = FileActions.getSortedEntries(database, metaData, entryIds, false);
 
             // Load default layout
             Layout defLayout = null;
@@ -241,7 +241,7 @@ public class ExportFormat implements IExportFormat {
             Layout layout;
 
             ExportFormats.entryNumber = 0;
-            for (BibtexEntry entry : sorted) {
+            for (BibEntry entry : sorted) {
                 ExportFormats.entryNumber++; // Increment entry counter.
                 // Get the layout
                 String type = entry.getType().getName().toLowerCase();

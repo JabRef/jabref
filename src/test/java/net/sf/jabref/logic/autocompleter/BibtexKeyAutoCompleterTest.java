@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class BibtexKeyAutoCompleterTest {
 
@@ -44,7 +44,7 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete("test");
@@ -56,8 +56,8 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        BibtexEntry entry = new BibtexEntry();
-        entry.setField(BibtexEntry.KEY_FIELD, "testKey");
+        BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete("testKey");
@@ -69,8 +69,8 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        BibtexEntry entry = new BibtexEntry();
-        entry.setField(BibtexEntry.KEY_FIELD, "testKey");
+        BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete("test");
@@ -82,8 +82,8 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        BibtexEntry entry = new BibtexEntry();
-        entry.setField(BibtexEntry.KEY_FIELD, "testKey");
+        BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete("testkey");
@@ -95,8 +95,8 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        BibtexEntry entry = new BibtexEntry();
-        entry.setField(BibtexEntry.KEY_FIELD, "testKey");
+        BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete(null);
@@ -108,8 +108,8 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        BibtexEntry entry = new BibtexEntry();
-        entry.setField(BibtexEntry.KEY_FIELD, "testKey");
+        BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete("");
@@ -121,11 +121,11 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        BibtexEntry entryOne = new BibtexEntry();
-        entryOne.setField(BibtexEntry.KEY_FIELD, "testKeyOne");
+        BibEntry entryOne = new BibEntry();
+        entryOne.setField(BibEntry.KEY_FIELD, "testKeyOne");
         autoCompleter.addBibtexEntry(entryOne);
-        BibtexEntry entryTwo = new BibtexEntry();
-        entryTwo.setField(BibtexEntry.KEY_FIELD, "testKeyTwo");
+        BibEntry entryTwo = new BibEntry();
+        entryTwo.setField(BibEntry.KEY_FIELD, "testKeyTwo");
         autoCompleter.addBibtexEntry(entryTwo);
 
         List<String> result = autoCompleter.complete("testKey");
@@ -137,8 +137,8 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        BibtexEntry entry = new BibtexEntry();
-        entry.setField(BibtexEntry.KEY_FIELD, "key");
+        BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEY_FIELD, "key");
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete("k");
@@ -151,8 +151,8 @@ public class BibtexKeyAutoCompleterTest {
         when(preferences.getShortestLengthToComplete()).thenReturn(100);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        BibtexEntry entry = new BibtexEntry();
-        entry.setField(BibtexEntry.KEY_FIELD, "testKey");
+        BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEY_FIELD, "testKey");
         autoCompleter.addBibtexEntry(entry);
 
         List<String> result = autoCompleter.complete("test");

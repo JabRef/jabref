@@ -17,7 +17,7 @@ package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
@@ -91,7 +91,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibtexEntry entry = BibsonomyScraper.getEntry(cit);
+                BibEntry entry = BibsonomyScraper.getEntry(cit);
                 if (entry != null) {
                     dialog.addEntry(entry);
                 }

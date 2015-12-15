@@ -59,13 +59,13 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexString;
 
 class StringDialog extends JDialog {
 
     // A reference to the entry this object works on.
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private Object[] strings;
@@ -75,7 +75,7 @@ class StringDialog extends JDialog {
 
     private PositionWindow pw;
 
-    public StringDialog(JabRefFrame frame, BasePanel panel, BibtexDatabase base, JabRefPreferences prefs) {
+    public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base, JabRefPreferences prefs) {
         super(frame);
         this.frame = frame;
         this.panel = panel;
@@ -230,11 +230,11 @@ class StringDialog extends JDialog {
 
     class StringTableModel extends AbstractTableModel {
 
-        final BibtexDatabase tbase;
+        final BibDatabase tbase;
         final StringDialog parent;
 
 
-        public StringTableModel(StringDialog parent, BibtexDatabase base) {
+        public StringTableModel(StringDialog parent, BibDatabase base) {
             this.parent = parent;
             this.tbase = base;
         }

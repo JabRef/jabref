@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Objects;
 import java.util.StringTokenizer;
@@ -51,7 +51,7 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
      * Stores all words in the given field which are separated by SEPARATING_CHARS.
      */
     @Override
-    public void addBibtexEntry(BibtexEntry entry) {
+    public void addBibtexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }

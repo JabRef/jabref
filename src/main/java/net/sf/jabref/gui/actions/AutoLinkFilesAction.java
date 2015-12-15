@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefExecutorService;
@@ -34,7 +34,7 @@ public class AutoLinkFilesAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        ArrayList<BibtexEntry> entries = new ArrayList<>();
+        ArrayList<BibEntry> entries = new ArrayList<>();
         Collections.addAll(entries, JabRef.jrf.getCurrentBasePanel().getSelectedEntries());
         if (entries.isEmpty()) {
             JabRef.jrf.getCurrentBasePanel().output(Localization.lang("No entries selected."));

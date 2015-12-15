@@ -28,20 +28,20 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.DuplicateCheck;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 class EntryDeleteChange extends Change {
 
-    private final BibtexEntry memEntry;
-    private final BibtexEntry tmpEntry;
-    BibtexEntry diskEntry;
+    private final BibEntry memEntry;
+    private final BibEntry tmpEntry;
+    BibEntry diskEntry;
     private final JScrollPane sp;
 
     private static final Log LOGGER = LogFactory.getLog(EntryDeleteChange.class);
 
 
-    public EntryDeleteChange(BibtexEntry memEntry, BibtexEntry tmpEntry) {
+    public EntryDeleteChange(BibEntry memEntry, BibEntry tmpEntry) {
         super(Localization.lang("Deleted entry"));
         this.memEntry = memEntry;
         this.tmpEntry = tmpEntry;
@@ -60,7 +60,7 @@ class EntryDeleteChange extends Change {
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         panel.database().removeEntry(memEntry.getId());
         undoEdit.addEdit(new UndoableRemoveEntry(panel.database(), memEntry, panel));
         secondary.removeEntry(tmpEntry.getId());

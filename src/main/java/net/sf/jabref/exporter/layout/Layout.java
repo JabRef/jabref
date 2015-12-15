@@ -24,8 +24,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Main class for formatting DOCUMENT ME!
@@ -113,7 +113,7 @@ public class Layout {
         }
     }
 
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
+    public String doLayout(BibEntry bibtex, BibDatabase database) {
         return doLayout(bibtex, database, null);
     }
 
@@ -123,7 +123,7 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, List<String> wordsToHighlight) {
+    public String doLayout(BibEntry bibtex, BibDatabase database, List<String> wordsToHighlight) {
         StringBuilder sb = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {
@@ -149,7 +149,7 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibtexDatabase database, Charset encoding)
+    public String doLayout(BibDatabase database, Charset encoding)
     {
         //System.out.println("LAYOUT: " + bibtex.getId());
         StringBuilder sb = new StringBuilder(100);

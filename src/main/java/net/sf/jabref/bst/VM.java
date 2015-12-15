@@ -29,8 +29,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
@@ -981,19 +981,19 @@ public class VM implements Warn {
     private String preamble;
 
 
-    public String run(BibtexDatabase db) {
+    public String run(BibDatabase db) {
         preamble = db.getPreamble();
         return run(db.getEntries());
     }
 
-    public String run(Collection<BibtexEntry> bibtex) {
+    public String run(Collection<BibEntry> bibtex) {
 
         reset();
 
         { // Create entries
             entries = new Vector<>(bibtex.size());
             ListIterator<BstEntry> i = entries.listIterator();
-            for (BibtexEntry entry : bibtex) {
+            for (BibEntry entry : bibtex) {
                 i.add(new BstEntry(entry));
             }
         }
@@ -1350,12 +1350,12 @@ public class VM implements Warn {
 
     public static class BstEntry {
 
-        public BstEntry(BibtexEntry e) {
+        public BstEntry(BibEntry e) {
             this.entry = e;
         }
 
 
-        final BibtexEntry entry;
+        final BibEntry entry;
 
         final Map<String, String> localStrings = new HashMap<>();
 
@@ -1368,7 +1368,7 @@ public class VM implements Warn {
             return fields;
         }
 
-        public BibtexEntry getBibtexEntry() {
+        public BibEntry getBibtexEntry() {
             return entry;
         }
     }

@@ -33,14 +33,14 @@ import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import spin.Spin;
 
 public class DuplicateSearch implements Runnable {
 
     private final BasePanel panel;
-    private BibtexEntry[] bes;
-    private final Vector<BibtexEntry[]> duplicates = new Vector<>();
+    private BibEntry[] bes;
+    private final Vector<BibEntry[]> duplicates = new Vector<>();
 
 
     public DuplicateSearch(BasePanel bp) {
@@ -58,7 +58,7 @@ public class DuplicateSearch implements Runnable {
         if (keys.length < 2) {
             return;
         }
-        bes = new BibtexEntry[keys.length];
+        bes = new BibEntry[keys.length];
         for (int i = 0; i < keys.length; i++) {
             bes[i] = panel.getDatabase().getEntryById((String) keys[i]);
         }
@@ -67,8 +67,8 @@ public class DuplicateSearch implements Runnable {
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st, "Searcher");
         int current = 0;
 
-        final ArrayList<BibtexEntry> toRemove = new ArrayList<>();
-        final ArrayList<BibtexEntry> toAdd = new ArrayList<>();
+        final ArrayList<BibEntry> toRemove = new ArrayList<>();
+        final ArrayList<BibEntry> toAdd = new ArrayList<>();
 
         synchronized (duplicates) {
             while (!st.finished() || (current < duplicates.size())) {
@@ -86,7 +86,7 @@ public class DuplicateSearch implements Runnable {
                 } else // duplicates found
                 {
 
-                    BibtexEntry[] be = duplicates.get(current);
+                    BibEntry[] be = duplicates.get(current);
                     current++;
                     if (!toRemove.contains(be[0]) && !toRemove.contains(be[1])) {
                         // Check if they are exact duplicates:
@@ -136,7 +136,7 @@ public class DuplicateSearch implements Runnable {
             public void run() {
                 // Now, do the actual removal:
                 if (!toRemove.isEmpty()) {
-                    for (BibtexEntry entry : toRemove) {
+                    for (BibEntry entry : toRemove) {
                         panel.getDatabase().removeEntry(entry.getId());
                         ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
                     }
@@ -144,7 +144,7 @@ public class DuplicateSearch implements Runnable {
                 }
                 // and adding merged entries:
                 if (!toAdd.isEmpty()) {
-                    for (BibtexEntry entry : toAdd) {
+                    for (BibEntry entry : toAdd) {
                         panel.getDatabase().insertEntry(entry);
                         ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     }
@@ -177,7 +177,7 @@ public class DuplicateSearch implements Runnable {
                     // If (suspected) duplicates, add them to the duplicates vector.
                     if (eq) {
                         synchronized (duplicates) {
-                            duplicates.add(new BibtexEntry[]{bes[i], bes[j]});
+                            duplicates.add(new BibEntry[]{bes[i], bes[j]});
                             duplicates.notifyAll(); // send wake up all
                         }
                     }
@@ -206,13 +206,13 @@ public class DuplicateSearch implements Runnable {
         private int reply = -1;
         DuplicateResolverDialog diag;
         private final JabRefFrame frame;
-        private final BibtexEntry one;
-        private final BibtexEntry two;
+        private final BibEntry one;
+        private final BibEntry two;
         private final int dialogType;
-        private BibtexEntry merged;
+        private BibEntry merged;
 
 
-        public DuplicateCallBack(JabRefFrame frame, BibtexEntry one, BibtexEntry two,
+        public DuplicateCallBack(JabRefFrame frame, BibEntry one, BibEntry two,
                                  int dialogType) {
 
             this.frame = frame;
@@ -225,7 +225,7 @@ public class DuplicateSearch implements Runnable {
             return reply;
         }
 
-        public BibtexEntry getMergedEntry() {
+        public BibEntry getMergedEntry() {
             return merged;
         }
 

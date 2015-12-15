@@ -41,8 +41,8 @@ import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -335,7 +335,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     public BasePanel addNewDatabase(ParserResult result, final File file, boolean raisePanel) {
 
         String fileName = file.getPath();
-        BibtexDatabase database = result.getDatabase();
+        BibDatabase database = result.getDatabase();
         MetaData meta = result.getMetaData();
 
         if (result.hasWarnings()) {
@@ -403,7 +403,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             result.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
-                for (BibtexEntry entry : result.getDatabase().getEntries()) {
+                for (BibEntry entry : result.getDatabase().getEntries()) {
                     SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
                 }
                 LOGGER.info("Synchronized special fields based on keywords");

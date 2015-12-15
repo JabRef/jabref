@@ -1,8 +1,8 @@
 package net.sf.jabref.gui.maintable;
 
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 
 import javax.swing.*;
@@ -18,7 +18,7 @@ public class MainTableColumn {
 
     private final Optional<JLabel> iconLabel;
 
-    private final Optional<BibtexDatabase> database;
+    private final Optional<BibDatabase> database;
 
     public MainTableColumn(String columnName) {
         this.columnName = columnName;
@@ -28,7 +28,7 @@ public class MainTableColumn {
         this.database = Optional.empty();
     }
 
-    public MainTableColumn(String columnName, String[] bibtexFields, BibtexDatabase database) {
+    public MainTableColumn(String columnName, String[] bibtexFields, BibDatabase database) {
         this.columnName = columnName;
         this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
         this.isIconColumn = false;
@@ -92,14 +92,14 @@ public class MainTableColumn {
         return false; // Overridden in SpecialMainTableColumns for file filter columns
     }
 
-    public Object getColumnValue(BibtexEntry entry) {
+    public Object getColumnValue(BibEntry entry) {
         if(bibtexFields.isEmpty()) {
             return null;
         }
 
         String content = null;
         for (String field : bibtexFields) {
-            if (field.equals(BibtexEntry.TYPE_HEADER)) {
+            if (field.equals(BibEntry.TYPE_HEADER)) {
                 content = entry.getType().getName();
             } else {
                 content = entry.getFieldOrAlias(field);

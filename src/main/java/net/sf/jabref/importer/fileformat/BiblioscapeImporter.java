@@ -22,7 +22,7 @@ import java.util.*;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.EntryTypes;
 
 /**
@@ -59,13 +59,13 @@ public class BiblioscapeImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        ArrayList<BibtexEntry> bibItems = new ArrayList<>();
+        ArrayList<BibEntry> bibItems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
         HashMap<String, String> hm = new HashMap<>();
@@ -282,8 +282,8 @@ public class BiblioscapeImporter extends ImportFormat {
                     }
                     hm.put("comment", s.toString());
                 }
-                BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
-                        EntryTypes.getBibtexEntryType(bibtexType));
+                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID,
+                        EntryTypes.getTypeOrDefault(bibtexType));
                 b.setField(hm);
                 bibItems.add(b);
 

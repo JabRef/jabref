@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
@@ -50,7 +50,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-        BibtexEntry entry = getEntryFromDOI(query, status);
+        BibEntry entry = getEntryFromDOI(query, status);
         if (entry != null) {
             inspector.addEntry(entry);
             return true;
@@ -74,7 +74,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         return null;
     }
 
-    public BibtexEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
+    public BibEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
         DOI doi;
         try {
             doi = new DOI(doiStr);
@@ -127,7 +127,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         //Usually includes an en-dash in the page range. Char is in cp1252 but not
         // ISO 8859-1 (which is what latex expects). For convenience replace here.
         bibtexString = bibtexString.replaceAll("(pages=\\{[0-9]+)\u2013([0-9]+\\})", "$1--$2");
-        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+        BibEntry entry = BibtexParser.singleFromString(bibtexString);
 
         if (entry != null) {
             // Optionally add curly brackets around key words to keep the case

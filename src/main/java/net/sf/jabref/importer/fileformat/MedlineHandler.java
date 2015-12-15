@@ -21,7 +21,7 @@ import java.util.TreeSet;
 
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 
@@ -32,7 +32,7 @@ class MedlineHandler extends DefaultHandler
 {
 
     private static final HTMLConverter htmlConverter = new HTMLConverter();
-    private final ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    private final ArrayList<BibEntry> bibitems = new ArrayList<>();
     private boolean inTitle;
     private boolean inYear;
     private boolean inJournal;
@@ -97,7 +97,7 @@ class MedlineHandler extends DefaultHandler
     private static final String KEYWORD_SEPARATOR = "; ";
 
 
-    public ArrayList<BibtexEntry> getItems() {
+    public ArrayList<BibEntry> getItems() {
         return bibitems;
     }
 
@@ -243,8 +243,8 @@ class MedlineHandler extends DefaultHandler
             }
             String keywords = sb.toString();
 
-            BibtexEntry b = new BibtexEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
-            EntryTypes.getBibtexEntryType("article")); // id assumes an existing database so don't create one here
+            BibEntry b = new BibEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
+            EntryTypes.getTypeOrDefault("article")); // id assumes an existing database so don't create one here
             if (!"".equals(author)) {
                 b.setField("author", MedlineHandler.htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));

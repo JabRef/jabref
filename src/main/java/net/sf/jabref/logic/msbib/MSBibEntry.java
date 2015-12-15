@@ -31,7 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.XMLChars;
@@ -155,7 +155,7 @@ class MSBibEntry {
 
     private final String bcol = "b:";
 
-    public MSBibEntry(BibtexEntry bibtex) {
+    public MSBibEntry(BibEntry bibtex) {
         populateFromBibtex(bibtex);
     }
 
@@ -298,7 +298,7 @@ class MSBibEntry {
         }
     }
 
-    private void populateFromBibtex(BibtexEntry bibtex) {
+    private void populateFromBibtex(BibEntry bibtex) {
 
         sourceType = getMSBibSourceType(bibtex);
 
@@ -632,7 +632,7 @@ class MSBibEntry {
     }
 
     /* construct a MSBib date object */
-    protected String getDate(BibtexEntry bibtex) {
+    protected String getDate(BibEntry bibtex) {
         String result = "";
         if (bibtex.getField("year") != null) {
             result += bibtex.getField("year");
@@ -644,7 +644,7 @@ class MSBibEntry {
         return result;
     }
 
-    private String getMSBibSourceType(BibtexEntry bibtex) {
+    private String getMSBibSourceType(BibEntry bibtex) {
         String bibtexType = bibtex.getType().getName();
 
         String result = "Misc";
@@ -944,14 +944,14 @@ class MSBibEntry {
         return bibtex;
     }
 
-    public BibtexEntry getBibtexRepresentation() {
+    public BibEntry getBibtexRepresentation() {
 
-        BibtexEntry entry = null;
+        BibEntry entry = null;
         if (tag == null) {
-            entry = new BibtexEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID,
+            entry = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID,
                     mapMSBibToBibtexType(sourceType));
         } else {
-            entry = new BibtexEntry(tag,
+            entry = new BibEntry(tag,
                     mapMSBibToBibtexType(sourceType)); // id assumes an existing database so don't
         }
 

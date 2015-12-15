@@ -25,7 +25,7 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 
 /**
@@ -35,7 +35,7 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
  */
 public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
     private final String link;
     private final MetaData metaData;
     private ExternalFileType fileType;
@@ -43,7 +43,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     private String fieldName;
 
 
-    public ExternalFileMenuItem(JabRefFrame frame, BibtexEntry entry, String name,
+    public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name,
             String link, Icon icon,
             MetaData metaData,
             ExternalFileType fileType) {
@@ -56,7 +56,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
         addActionListener(this);
     }
 
-    public ExternalFileMenuItem(JabRefFrame frame, BibtexEntry entry, String name,
+    public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name,
             String link, Icon icon, MetaData metaData, String fieldName) {
         this(frame, entry, name, link, icon, metaData, (ExternalFileType) null);
         this.fieldName = fieldName;

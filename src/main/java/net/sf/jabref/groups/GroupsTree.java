@@ -35,7 +35,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -277,9 +277,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 }
                 final TransferableEntrySelection selection = (TransferableEntrySelection) transferable
                         .getTransferData(TransferableEntrySelection.flavorInternal);
-                final BibtexEntry[] entries = selection.getSelection();
+                final BibEntry[] entries = selection.getSelection();
                 int assignedEntries = 0;
-                for (BibtexEntry entry : entries) {
+                for (BibEntry entry : entries) {
                     if (!target.getGroup().contains(entry)) {
                         ++assignedEntries;
                     }

@@ -17,7 +17,7 @@ package net.sf.jabref.logic.autocompleter;
 
 import java.util.Objects;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Delivers possible completions for a given string.
@@ -48,7 +48,7 @@ class EntireFieldAutoCompleter extends AbstractAutoCompleter {
      * Stores the full original value of the given field.
      */
     @Override
-    public void addBibtexEntry(BibtexEntry entry) {
+    public void addBibtexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }

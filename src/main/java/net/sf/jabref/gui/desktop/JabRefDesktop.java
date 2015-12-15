@@ -11,7 +11,7 @@ import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.io.URLUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 import javax.swing.*;
@@ -302,7 +302,7 @@ public class JabRefDesktop {
         });
     }
 
-    public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry, MetaData metaData,
+    public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, MetaData metaData,
             String link, UnknownExternalFileType fileType) throws IOException {
 
         String cancelMessage = Localization.lang("Unable to open file.");

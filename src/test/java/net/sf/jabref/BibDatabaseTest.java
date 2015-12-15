@@ -3,7 +3,7 @@ package net.sf.jabref;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class BibtexDatabaseTest {
+public class BibDatabaseTest {
 
     @Before
     public void setup() {
@@ -37,7 +37,7 @@ public class BibtexDatabaseTest {
         try (FileReader fr = new FileReader("src/test/resources/net/sf/jabref/util/twente.bib")) {
         ParserResult result = BibtexParser.parse(fr);
 
-        BibtexDatabase db = result.getDatabase();
+        BibDatabase db = result.getDatabase();
 
         Assert.assertEquals("Arvind", db.resolveForStrings("#Arvind#"));
         Assert.assertEquals("Patterson, David", db.resolveForStrings("#Patterson#"));

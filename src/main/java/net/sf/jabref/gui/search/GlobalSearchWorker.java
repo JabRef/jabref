@@ -6,7 +6,7 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.SearchQueryLocalizer;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Objects;
 
@@ -33,7 +33,7 @@ class GlobalSearchWorker extends AbstractWorker {
         // Search all databases
         for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
             BasePanel basePanel = frame.getBasePanelAt(i);
-            for (BibtexEntry entry : basePanel.getDatabase().getEntries()) {
+            for (BibEntry entry : basePanel.getDatabase().getEntries()) {
                 if (searchQuery.isMatch(entry)) {
                     dialog.addEntry(entry, basePanel);
                 }

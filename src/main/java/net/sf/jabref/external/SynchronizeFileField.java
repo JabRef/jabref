@@ -27,7 +27,7 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
 
@@ -48,7 +48,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
     private final String fieldName = Globals.FILE_FIELD;
     private final BasePanel panel;
-    private BibtexEntry[] sel;
+    private BibEntry[] sel;
     private SynchronizeFileField.OptionsDialog optDiag;
 
     private final Object[] brokenLinkOptions = {
@@ -71,9 +71,9 @@ public class SynchronizeFileField extends AbstractWorker {
 
     @Override
     public void init() {
-        Collection<BibtexEntry> col = panel.database().getEntries();
+        Collection<BibEntry> col = panel.database().getEntries();
         goOn = true;
-        sel = new BibtexEntry[col.size()];
+        sel = new BibEntry[col.size()];
         sel = col.toArray(sel);
 
         // Ask about rules for the operation:
@@ -112,11 +112,11 @@ public class SynchronizeFileField extends AbstractWorker {
         //ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, null, off);
         //TextField editor = new TextField(fieldName, "", false);
 
-        Set<BibtexEntry> changedEntries = new HashSet<>();
+        Set<BibEntry> changedEntries = new HashSet<>();
 
         // First we try to autoset fields
         if (autoSet) {
-            Collection<BibtexEntry> entries = new ArrayList<>();
+            Collection<BibEntry> entries = new ArrayList<>();
             Collections.addAll(entries, sel);
 
             // Start the autosetting process:
@@ -149,7 +149,7 @@ public class SynchronizeFileField extends AbstractWorker {
         // The following loop checks all external links that are already set.
         if (checkExisting) {
             boolean removeAllBroken = false;
-            mainLoop: for (BibtexEntry aSel : sel) {
+            mainLoop: for (BibEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is set:

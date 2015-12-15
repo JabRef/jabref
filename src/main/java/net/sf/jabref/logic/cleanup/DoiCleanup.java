@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
@@ -24,7 +24,7 @@ public class DoiCleanup implements Cleaner {
     }
 
     @Override
-    public List<FieldChange> cleanup(BibtexEntry entry) {
+    public List<FieldChange> cleanup(BibEntry entry) {
 
         ArrayList<FieldChange> changes = new ArrayList<>();
 
@@ -71,7 +71,7 @@ public class DoiCleanup implements Cleaner {
         return changes;
     }
 
-    private void removeFieldValue(BibtexEntry entry, String field, ArrayList<FieldChange> changes) {
+    private void removeFieldValue(BibEntry entry, String field, ArrayList<FieldChange> changes) {
         RemoveFieldCleanup cleaner = new RemoveFieldCleanup(field);
         changes.addAll(cleaner.cleanup(entry));
     }

@@ -32,7 +32,7 @@ import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 
 /**
@@ -52,11 +52,11 @@ public class AttachFileDialog extends JDialog {
     private final JButton auto = new JButton(Localization.lang("Auto"));
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final BibtexEntry entry;
+    private final BibEntry entry;
     private final MetaData metaData;
     private boolean cancelled = true; // Default to true, so a pure close operation implies Cancel.
 
-    public AttachFileDialog(Dialog parent, MetaData metaData, BibtexEntry entry, String fieldName) {
+    public AttachFileDialog(Dialog parent, MetaData metaData, BibEntry entry, String fieldName) {
         super(parent, true);
         this.metaData = metaData;
         this.entry = entry;

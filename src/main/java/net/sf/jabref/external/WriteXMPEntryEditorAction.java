@@ -20,7 +20,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
@@ -58,7 +58,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         panel.output(Localization.lang("Writing XMP metadata..."));
         panel.frame().setProgressBarIndeterminate(true);
         panel.frame().setProgressBarVisible(true);
-        BibtexEntry entry = editor.getEntry();
+        BibEntry entry = editor.getEntry();
 
         // Make a list of all PDFs linked from this entry:
         List<File> files = new ArrayList<>();
@@ -105,10 +105,10 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
     class WriteXMPWorker extends AbstractWorker {
 
         private final List<File> files;
-        private final BibtexEntry entry;
+        private final BibEntry entry;
 
 
-        public WriteXMPWorker(List<File> files, BibtexEntry entry) {
+        public WriteXMPWorker(List<File> files, BibEntry entry) {
 
             this.files = files;
             this.entry = entry;

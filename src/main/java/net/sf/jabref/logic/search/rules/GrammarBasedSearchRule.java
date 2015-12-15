@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.search.rules;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.search.SearchLexer;
@@ -98,9 +98,9 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     @Override
-    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
+    public boolean applyRule(String query, BibEntry bibEntry) {
         try {
-            return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibtexEntry).visit(tree);
+            return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibEntry).visit(tree);
         } catch (Exception e) {
             LOGGER.debug("Search failed", e);
             return false;
@@ -144,7 +144,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             this.valuePattern = Pattern.compile(regex ? value : "\\Q" + value + "\\E", caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
         }
 
-        public boolean compare(BibtexEntry entry) {
+        public boolean compare(BibEntry entry) {
             // specification of fields to search is done in the search expression itself
             String[] searchKeys = entry.getFieldNames().toArray(new String[entry.getFieldNames().size()]);
 
@@ -202,12 +202,12 @@ public class GrammarBasedSearchRule implements SearchRule {
         private final boolean caseSensitive;
         private final boolean regex;
 
-        private final BibtexEntry entry;
+        private final BibEntry entry;
 
-        public BibtexSearchVisitor(boolean caseSensitive, boolean regex, BibtexEntry bibtexEntry) {
+        public BibtexSearchVisitor(boolean caseSensitive, boolean regex, BibEntry bibEntry) {
             this.caseSensitive = caseSensitive;
             this.regex = regex;
-            this.entry = bibtexEntry;
+            this.entry = bibEntry;
         }
 
         public boolean comparison(String field, ComparisonOperator operator, String value) {

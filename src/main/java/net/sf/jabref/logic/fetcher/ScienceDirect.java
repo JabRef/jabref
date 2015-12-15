@@ -19,19 +19,17 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.DOI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.io.IOException;
 import java.util.Objects;
@@ -48,7 +46,7 @@ public class ScienceDirect implements FullTextFinder {
     private static final String API_URL = "http://api.elsevier.com/content/article/doi/";
     private static final String API_KEY = "fb82f2e692b3c72dafe5f4f1fa0ac00b";
     @Override
-    public Optional<URL> findFullText(BibtexEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 

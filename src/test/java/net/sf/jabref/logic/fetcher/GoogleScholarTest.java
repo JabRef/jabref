@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.support.DevEnvironment;
 import org.junit.*;
 
@@ -10,12 +10,12 @@ import java.util.Optional;
 
 public class GoogleScholarTest {
     GoogleScholar finder;
-    BibtexEntry entry;
+    BibEntry entry;
 
     @Before
     public void setup() {
         finder = new GoogleScholar();
-        entry = new BibtexEntry();
+        entry = new BibEntry();
     }
 
     @Test(expected = NullPointerException.class)

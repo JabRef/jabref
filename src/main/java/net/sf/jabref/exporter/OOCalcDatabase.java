@@ -28,8 +28,8 @@ import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import net.sf.jabref.exporter.layout.format.RemoveWhitespace;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,19 +47,19 @@ import ca.odell.glazedlists.SortedList;
  */
 class OOCalcDatabase {
 
-    private final Collection<BibtexEntry> entries;
+    private final Collection<BibEntry> entries;
 
     private static final Log LOGGER = LogFactory.getLog(OOCalcDatabase.class);
 
 
-    public OOCalcDatabase(BibtexDatabase bibtex, Set<String> keySet) {
+    public OOCalcDatabase(BibDatabase bibtex, Set<String> keySet) {
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<>();
         comparators.add(new FieldComparator("author"));
         comparators.add(new FieldComparator("year"));
-        comparators.add(new FieldComparator(BibtexEntry.KEY_FIELD));
+        comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
-        BasicEventList<BibtexEntry> entryList = new BasicEventList<>();
+        BasicEventList<BibEntry> entryList = new BasicEventList<>();
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
         if (keySet == null) {
@@ -157,11 +157,11 @@ class OOCalcDatabase {
             addTableCell(result, row, "Custom5");
             table.appendChild(row);
 
-            for (BibtexEntry e : entries) {
+            for (BibEntry e : entries) {
                 row = result.createElement("table:table-row");
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, "isbn"));
-                addTableCell(result, row, getField(e, BibtexEntry.KEY_FIELD));
+                addTableCell(result, row, getField(e, BibEntry.KEY_FIELD));
                 addTableCell(result, row, getField(e, "author"));//new AuthorLastFirst().format(getField(e, "author")));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, "title"))));
                 addTableCell(result, row, getField(e, "journal"));
@@ -211,7 +211,7 @@ class OOCalcDatabase {
         return result;
     }
 
-    private static String getField(BibtexEntry e, String field) {
+    private static String getField(BibEntry e, String field) {
         Object o = e.getField(field);
         return o == null ? "" : o.toString();
     }

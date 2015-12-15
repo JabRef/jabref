@@ -30,14 +30,14 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 class EntryChange extends Change {
 
     private static final Log LOGGER = LogFactory.getLog(EntryChange.class);
 
-    public EntryChange(BibtexEntry memEntry, BibtexEntry tmpEntry, BibtexEntry diskEntry) {
+    public EntryChange(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
         super();
         String key = tmpEntry.getCiteKey();
         if (key == null) {
@@ -81,7 +81,7 @@ class EntryChange extends Change {
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         boolean allAccepted = true;
 
         Enumeration<Change> e = children();
@@ -111,8 +111,8 @@ class EntryChange extends Change {
 
     static class FieldChange extends Change {
 
-        final BibtexEntry entry;
-        final BibtexEntry tmpEntry;
+        final BibEntry entry;
+        final BibEntry tmpEntry;
         final String field;
         final String inMem;
         final String onTmp;
@@ -121,7 +121,7 @@ class EntryChange extends Change {
         final JScrollPane sp = new JScrollPane(tp);
 
 
-        public FieldChange(String field, BibtexEntry memEntry, BibtexEntry tmpEntry, String inMem, String onTmp, String onDisk) {
+        public FieldChange(String field, BibEntry memEntry, BibEntry tmpEntry, String inMem, String onTmp, String onDisk) {
             super(field);
             entry = memEntry;
             this.tmpEntry = tmpEntry;
@@ -156,7 +156,7 @@ class EntryChange extends Change {
         }
 
         @Override
-        public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+        public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
             //System.out.println(field+" "+onDisk);
             entry.setField(field, onDisk);
             undoEdit.addEdit(new UndoableFieldChange(entry, field, inMem, onDisk));

@@ -8,11 +8,10 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.Cleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 
 public class RelativePathsCleanup implements Cleaner {
@@ -25,7 +24,7 @@ public class RelativePathsCleanup implements Cleaner {
     }
 
     @Override
-    public List<FieldChange> cleanup(BibtexEntry entry) {
+    public List<FieldChange> cleanup(BibEntry entry) {
         String oldValue = entry.getField(Globals.FILE_FIELD);
         if (oldValue == null) {
             return new ArrayList<>();

@@ -21,14 +21,14 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 class TransferableEntrySelection implements Transferable {
 
     public static final DataFlavor flavorInternal;
     private static final DataFlavor flavorExternal;
     private static final DataFlavor[] flavors;
-    private final BibtexEntry[] selectedEntries;
+    private final BibEntry[] selectedEntries;
     private final String selectedEntriesCiteKeys;
 
     private boolean includeCiteKeyword;
@@ -49,7 +49,7 @@ class TransferableEntrySelection implements Transferable {
     }
 
 
-    public TransferableEntrySelection(BibtexEntry[] selectedEntries) {
+    public TransferableEntrySelection(BibEntry[] selectedEntries) {
         this.selectedEntries = selectedEntries;
         StringBuilder keys = new StringBuilder();
         for (int i = 0; i < selectedEntries.length; ++i) {
@@ -88,7 +88,7 @@ class TransferableEntrySelection implements Transferable {
                 TransferableEntrySelection.flavorExternal.getParameter("charset").trim()));
     }
 
-    public BibtexEntry[] getSelection() {
+    public BibEntry[] getSelection() {
         return selectedEntries;
     }
 

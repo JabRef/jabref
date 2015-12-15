@@ -31,7 +31,7 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -66,7 +66,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
 
         // If only one entry is selected, get a reference to it for adapting the menu.
-        BibtexEntry be = null;
+        BibEntry be = null;
         if (panel.mainTable.getSelectedRowCount() == 1) {
             be = panel.mainTable.getSelected().get(0);
         }
@@ -244,7 +244,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(floatMarked);
     }
 
-    private JMenu buildGroupMenu(BibtexEntry[] bes, boolean add, boolean move) {
+    private JMenu buildGroupMenu(BibEntry[] bes, boolean add, boolean move) {
         if (bes == null) {
             return null;
         }
@@ -266,7 +266,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     /**
      * @param move For add: if true, remove from previous groups
      */
-    private void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection,
+    private void insertNodes(JMenu menu, GroupTreeNode node, BibEntry[] selection,
                              boolean add, boolean move) {
         final AbstractAction action = getAction(node, selection, add, move);
 
@@ -329,7 +329,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     /**
      * @param move For add: if true, remove from all previous groups
      */
-    private AbstractAction getAction(GroupTreeNode node, BibtexEntry[] selection,
+    private AbstractAction getAction(GroupTreeNode node, BibEntry[] selection,
             boolean add, boolean move) {
         AbstractAction action = add ? new AddToGroupAction(node, move,
                 panel) : new RemoveFromGroupAction(node, panel);
@@ -357,7 +357,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
     private boolean isFieldSetForSelectedEntry(String fieldname) {
         if (panel.mainTable.getSelectedRowCount() == 1) {
-            BibtexEntry entry = panel.mainTable.getSelected().get(0);
+            BibEntry entry = panel.mainTable.getSelected().get(0);
             if (entry.getFieldNames().contains(fieldname)) {
                 return true;
             } else {
@@ -370,7 +370,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
     private Icon getFileIconForSelectedEntry() {
         if (panel.mainTable.getSelectedRowCount() == 1) {
-            BibtexEntry entry = panel.mainTable.getSelected().get(0);
+            BibEntry entry = panel.mainTable.getSelected().get(0);
             String file = entry.getField(Globals.FILE_FIELD);
             if(file!=null) {
                 return FileListTableModel.getFirstLabel(file).getIcon();

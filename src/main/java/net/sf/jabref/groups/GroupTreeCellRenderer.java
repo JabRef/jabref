@@ -21,7 +21,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
@@ -114,7 +114,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
             } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
-                for (BibtexEntry entry : JabRef.jrf.getCurrentBasePanel().getDatabase().getEntries()) {
+                for (BibEntry entry : JabRef.jrf.getCurrentBasePanel().getDatabase().getEntries()) {
                     if (group.contains(entry)) {
                         hits++;
                     }

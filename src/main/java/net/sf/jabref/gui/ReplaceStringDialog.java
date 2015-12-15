@@ -24,7 +24,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
@@ -204,18 +204,18 @@ class ReplaceStringDialog extends JDialog {
      * settings specified in this same dialog. Returns the number of
      * occurences replaced.
      */
-    public int replace(BibtexEntry be, NamedCompound ce) {
+    public int replace(BibEntry be, NamedCompound ce) {
         int counter = 0;
         if (allFields()) {
 
             for (String s : be.getFieldNames()) {
-                if (!s.equals(BibtexEntry.KEY_FIELD)) {
+                if (!s.equals(BibEntry.KEY_FIELD)) {
                     counter += replaceField(be, s, ce);
                 }
             }
         } else {
             for (String fld : flds) {
-                if (!fld.equals(BibtexEntry.KEY_FIELD)) {
+                if (!fld.equals(BibEntry.KEY_FIELD)) {
                     counter += replaceField(be, fld, ce);
                 }
             }
@@ -224,7 +224,7 @@ class ReplaceStringDialog extends JDialog {
         return counter;
     }
 
-    private int replaceField(BibtexEntry be, String fieldname, NamedCompound ce) {
+    private int replaceField(BibEntry be, String fieldname, NamedCompound ce) {
         Object o = be.getField(fieldname);
         if (o == null) {
             return 0;

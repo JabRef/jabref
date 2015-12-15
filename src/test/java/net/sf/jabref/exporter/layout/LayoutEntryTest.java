@@ -1,6 +1,6 @@
 package net.sf.jabref.exporter.layout;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * The LayoutEntry creates a human readable String assinged with html formaters.
  * To test the Highlighting Feature, an instance of LayoutEntry will be instatiated via Layout and LayoutHelper.
  * With these instance the doLayout() Method is called several times for each test case.
- * To simulate a search, a BibtexEntry will be created, wich will be used by LayoutEntry.
+ * To simulate a search, a BibEntry will be created, wich will be used by LayoutEntry.
  * The definiton of the search is set by
  * <p/>
  * LayoutEntry.setWordsToHighlight(words); and
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 
 public class LayoutEntryTest {
 
-    private BibtexEntry mBTE;
+    private BibEntry mBTE;
 
 
     /**
@@ -52,7 +52,7 @@ public class LayoutEntryTest {
 
         // create Bibtext Entry
 
-        mBTE = new BibtexEntry("testid");
+        mBTE = new BibEntry("testid");
         mBTE.setField("abstract", "In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices");
         //  Specifically, we present a core typed language to describe Android applications, and to reason about their data-flow security properties. Our operational semantics and type system provide some necessary foundations to help both users and developers of Android applications deal with their security concerns.
         mBTE.setField("keywords", "android, mobile devices, security");
@@ -79,7 +79,7 @@ public class LayoutEntryTest {
 
     // helper Methods
 
-    public String layout(String layoutFile, BibtexEntry entry, ArrayList<String> wordsToHighlight) throws Exception {
+    public String layout(String layoutFile, BibEntry entry, ArrayList<String> wordsToHighlight) throws Exception {
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
 

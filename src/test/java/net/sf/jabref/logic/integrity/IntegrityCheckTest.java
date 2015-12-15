@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.integrity;
 
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -78,16 +78,16 @@ public class IntegrityCheckTest {
 
     private void assertWrong(String value, IntegrityCheck.Checker yearChecker) {
         List<IntegrityMessage> messages = new LinkedList<>();
-        BibtexEntry entry = new BibtexEntry(IdGenerator.next());
-        entry.setField(BibtexEntry.KEY_FIELD, "key");
+        BibEntry entry = new BibEntry(IdGenerator.next());
+        entry.setField(BibEntry.KEY_FIELD, "key");
         yearChecker.check(value, "field", entry, messages);
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
     private void assertCorrect(String value, IntegrityCheck.Checker yearChecker) {
         List<IntegrityMessage> messages = new LinkedList<>();
-        BibtexEntry entry = new BibtexEntry(IdGenerator.next());
-        entry.setField(BibtexEntry.KEY_FIELD, "key");
+        BibEntry entry = new BibEntry(IdGenerator.next());
+        entry.setField(BibEntry.KEY_FIELD, "key");
         yearChecker.check(value, "field", entry, messages);
         assertEquals(Collections.emptyList(), messages);
     }

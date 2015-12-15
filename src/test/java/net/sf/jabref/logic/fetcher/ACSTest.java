@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.fetcher.ACS;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.support.DevEnvironment;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -14,12 +13,12 @@ import java.util.Optional;
 
 public class ACSTest {
     ACS finder;
-    BibtexEntry entry;
+    BibEntry entry;
 
     @Before
     public void setup() {
         finder = new ACS();
-        entry = new BibtexEntry();
+        entry = new BibEntry();
     }
 
     @Test

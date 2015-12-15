@@ -20,7 +20,7 @@ import java.util.Set;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -30,8 +30,8 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class UndoableChangeAssignment extends AbstractUndoableEdit {
 
-    private final Set<BibtexEntry> m_previousAssignmentBackup;
-    private final Set<BibtexEntry> m_newAssignmentBackup;
+    private final Set<BibEntry> m_previousAssignmentBackup;
+    private final Set<BibEntry> m_newAssignmentBackup;
     /** The path to the edited node */
     private int[] m_pathToNode;
     /** The root of the global groups tree */
@@ -46,14 +46,14 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
      * @param previousAssignment
      * @param currentAssignment
      */
-    public UndoableChangeAssignment(Set<BibtexEntry> previousAssignment,
-            Set<BibtexEntry> currentAssignment) {
+    public UndoableChangeAssignment(Set<BibEntry> previousAssignment,
+            Set<BibEntry> currentAssignment) {
         m_previousAssignmentBackup = new HashSet<>(previousAssignment);
         m_newAssignmentBackup = new HashSet<>(currentAssignment);
     }
 
-    public UndoableChangeAssignment(Set<BibtexEntry> previousAssignment,
-            Set<BibtexEntry> currentAssignment, GroupTreeNode node) {
+    public UndoableChangeAssignment(Set<BibEntry> previousAssignment,
+            Set<BibEntry> currentAssignment, GroupTreeNode node) {
         this(previousAssignment, currentAssignment);
         setEditedNode(node);
     }
@@ -89,7 +89,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
                 m_pathToNode).getGroup();
         group.clearAssignments();
-        for (BibtexEntry aM_previousAssignmentBackup : m_previousAssignmentBackup) {
+        for (BibEntry aM_previousAssignmentBackup : m_previousAssignmentBackup) {
             group.addEntry(aM_previousAssignmentBackup);
         }
     }
@@ -100,7 +100,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
                 m_pathToNode).getGroup();
         group.clearAssignments();
-        for (BibtexEntry aM_newAssignmentBackup : m_newAssignmentBackup) {
+        for (BibEntry aM_newAssignmentBackup : m_newAssignmentBackup) {
             group.addEntry(aM_newAssignmentBackup);
         }
     }

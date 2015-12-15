@@ -24,7 +24,7 @@ import net.sf.jabref.*;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.*;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchema;
 import org.w3c.dom.Element;
@@ -267,7 +267,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
 
-    public void setBibtexEntry(BibtexEntry entry) {
+    public void setBibtexEntry(BibEntry entry) {
         setBibtexEntry(entry, null);
     }
 
@@ -276,7 +276,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @param entry
      * @param database maybenull
      */
-    public void setBibtexEntry(BibtexEntry entry, BibtexDatabase database) {
+    public void setBibtexEntry(BibEntry entry, BibDatabase database) {
         // Set all the values including key and entryType
         Set<String> fields = entry.getFieldNames();
 
@@ -288,7 +288,7 @@ public class XMPSchemaBibtex extends XMPSchema {
         }
 
         for (String field : fields) {
-            String value = BibtexDatabase.getResolvedField(field, entry, database);
+            String value = BibDatabase.getResolvedField(field, entry, database);
             if ("author".equals(field) || "editor".equals(field)) {
                 setPersonList(field, value);
             } else {
@@ -298,7 +298,7 @@ public class XMPSchemaBibtex extends XMPSchema {
         setTextProperty("entrytype", entry.getType().getName());
     }
 
-    public BibtexEntry getBibtexEntry() {
+    public BibEntry getBibtexEntry() {
 
         String type = getTextProperty("entrytype");
         EntryType t;
@@ -308,7 +308,7 @@ public class XMPSchemaBibtex extends XMPSchema {
             t = BibtexEntryTypes.MISC;
         }
 
-        BibtexEntry e = new BibtexEntry(IdGenerator.next(), t);
+        BibEntry e = new BibEntry(IdGenerator.next(), t);
 
         // Get Text Properties
         Map<String, String> text = XMPSchemaBibtex.getAllProperties(this, "bibtex");
