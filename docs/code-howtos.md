@@ -4,12 +4,6 @@ This page provides some development support in the form of howtos. See also [[Hi
 
 Please read https://github.com/cxxr/better-java
 
-### Checking for null
-Should we add [Objects.requireNonNull](https://docs.oracle.com/javase/8/docs/api/java/util/Objects.html#requireNonNull-T-) to the code howtos?
-
-### Logging of Exceptions
-`LOGGER.debug("msg", e)`
-
 ## Error Handling in JabRef
 
 ### Throwing and Catching Exceptions
