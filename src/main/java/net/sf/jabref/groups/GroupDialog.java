@@ -477,7 +477,6 @@ class GroupDialog extends JDialog {
      * added to the new group.
      */
     private void addPreviousEntries() {
-        ...
         int i = JOptionPane.showConfirmDialog(m_basePanel.frame(),
                 Localization.lang("Assign the original group's entries to this group?"),
                 Localization.lang("Change of Grouping Method"),

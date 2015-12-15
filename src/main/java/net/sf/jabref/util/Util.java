@@ -720,8 +720,7 @@ public class Util {
         }
     
         // show a warning, then return
-        StringBuffer message = ...
-                new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
+        StringBuffer message = new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
         for (int i = 0; i < affectedFields.size(); ++i) {
             message.append(affectedFields.elementAt(i)).append("\n");
         }
