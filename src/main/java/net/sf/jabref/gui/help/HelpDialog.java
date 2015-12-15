@@ -22,11 +22,12 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -65,19 +66,19 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
         // Make ESC close dialog, and set shortkeys for back and forward.
         InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = tlb.getActionMap();
-        im.put(bf.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new CloseAction());
-        im.put(bf.prefs().getKey(KeyBinds.BACK_HELP_DIALOG), "left");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.BACK_HELP_DIALOG), "left");
         am.put("left", back);
-        im.put(bf.prefs().getKey(KeyBinds.FORWARD_HELP_DIALOG), "right");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.FORWARD_HELP_DIALOG), "right");
         am.put("right", forward);
 
         // Set shortkeys for back and forward specifically for the EditorPane.
         im = content.getInputMap(JComponent.WHEN_FOCUSED);
         am = content.getActionMap();
-        im.put(bf.prefs().getKey(KeyBinds.BACK_HELP_DIALOG), "left");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.BACK_HELP_DIALOG), "left");
         am.put("left", back);
-        im.put(bf.prefs().getKey(KeyBinds.FORWARD_HELP_DIALOG), "right");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.FORWARD_HELP_DIALOG), "right");
         am.put("right", forward);
 
         getContentPane().add(tlb, BorderLayout.NORTH);

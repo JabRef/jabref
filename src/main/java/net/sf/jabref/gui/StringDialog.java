@@ -34,7 +34,6 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -50,7 +49,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
@@ -123,22 +122,22 @@ class StringDialog extends JDialog {
         JToolBar tlb = new JToolBar();
         InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = tlb.getActionMap();
-        im.put(prefs.getKey(KeyBinds.STRING_DIALOG_ADD_STRING), "add");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.STRING_DIALOG_ADD_STRING), "add");
         NewStringAction newStringAction = new NewStringAction(this);
         am.put("add", newStringAction);
-        im.put(prefs.getKey(KeyBinds.STRING_DIALOG_REMOVE_STRING), "remove");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.STRING_DIALOG_REMOVE_STRING), "remove");
         RemoveStringAction removeStringAction = new RemoveStringAction(this);
         am.put("remove", removeStringAction);
-        im.put(prefs.getKey(KeyBinds.SAVE_DATABASE), "save");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
         am.put("save", saveAction);
-        im.put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
-        im.put(prefs.getKey(KeyBinds.HELP), "help");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         am.put("help", helpAction);
-        im.put(prefs.getKey(KeyBinds.UNDO), "undo");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.UNDO), "undo");
         UndoAction undoAction = new UndoAction();
         am.put("undo", undoAction);
-        im.put(prefs.getKey(KeyBinds.REDO), "redo");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.REDO), "redo");
         RedoAction redoAction = new RedoAction();
         am.put("redo", redoAction);
 
@@ -194,9 +193,9 @@ class StringDialog extends JDialog {
             cm.getColumn(0).setPreferredWidth(800);
             cm.getColumn(1).setPreferredWidth(2000);
             sp.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
-            getInputMap().put(frame.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+            getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             getActionMap().put("close", closeAction);
-            getInputMap().put(frame.prefs.getKey(KeyBinds.HELP), "help");
+            getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
             getActionMap().put("help", helpAction);
         }
 

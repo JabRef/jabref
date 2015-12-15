@@ -47,7 +47,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -237,7 +237,7 @@ public class PushToApplicationButton implements ActionListener {
         // Key bindings:
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             @Override
@@ -297,7 +297,7 @@ public class PushToApplicationButton implements ActionListener {
     class MenuAction extends MnemonicAwareAction {
 
         public MenuAction() {
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.PUSH_TO_APPLICATION));
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.PUSH_TO_APPLICATION));
         }
 
         public void setTitle(String appName) {

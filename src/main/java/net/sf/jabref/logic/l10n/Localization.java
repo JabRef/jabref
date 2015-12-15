@@ -57,7 +57,8 @@ public class Localization {
         String translation = null;
         try {
             if (resBundle != null) {
-                translation = resBundle.getString(new LocalizationKey(key).getPropertiesKey());
+                String propertiesKey = new LocalizationKey(key).getPropertiesKeyUnescaped();
+                translation = resBundle.getString(propertiesKey);
             }
         } catch (MissingResourceException ex) {
             LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
@@ -84,6 +85,11 @@ public class Localization {
 
         public LocalizationKey(String key) {
             this.key = Objects.requireNonNull(key);
+        }
+
+        public String getPropertiesKeyUnescaped() {
+            // space, = and : are not allowed in properties file keys
+            return this.key.replaceAll(" ", "_");
         }
 
         public String getPropertiesKey() {
@@ -130,8 +136,5 @@ public class Localization {
         return translate(menuTitles, "menu item", key, params);
     }
 
-    public static List<String> getMenuTitleKeys() {
-        return new LinkedList<>(menuTitles.keySet());
-    }
 }
 

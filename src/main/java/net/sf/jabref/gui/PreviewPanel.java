@@ -40,8 +40,8 @@ import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.search.SearchTextListener;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -236,10 +236,10 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         ActionMap actionMap = toolBar.getActionMap();
         InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        inputMap.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         actionMap.put("close", this.closeAction);
 
-        inputMap.put(Globals.prefs.getKey(KeyBinds.PRINT_ENTRY_PREVIEW), "print");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW), "print");
         actionMap.put("print", this.printAction);
 
         toolBar.setFloatable(false);
@@ -376,7 +376,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
             super(Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getIcon());
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print entry preview"));
-            putValue(Action.ACCELERATOR_KEY, JabRefPreferences.getInstance().getKey(KeyBinds.PRINT_ENTRY_PREVIEW));
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW));
         }
 
 

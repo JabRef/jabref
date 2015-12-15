@@ -40,7 +40,8 @@ import javax.swing.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.CleanUpAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.keyboard.KeyBindingRepository;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
@@ -339,12 +340,7 @@ public class JabRefPreferences {
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
 
-    private int SHORTCUT_MASK = -1;
-
     private final Preferences prefs;
-
-    private KeyBinds keyBinds = new KeyBinds();
-    private KeyBinds defaultKeyBinds = new KeyBinds();
 
     private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<>(4);
     private final HashSet<String> nonWrappableFields = new HashSet<>(5);
@@ -393,13 +389,8 @@ public class JabRefPreferences {
         return JabRefPreferences.singleton;
     }
 
-
-
-
-
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
-
         try {
             if (new File("jabref.xml").exists()) {
                 importPreferences("jabref.xml");
@@ -752,7 +743,8 @@ public class JabRefPreferences {
         defaults.put(INCLUDE_EMPTY_FIELDS, Boolean.FALSE);
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
-        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
+        // TODO l10n issue
+        defaults.put(EMAIL_SUBJECT, "References");
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
@@ -782,8 +774,6 @@ public class JabRefPreferences {
 
         // use BibTeX key appended with filename as default pattern
         defaults.put(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
-
-        restoreKeyBindings();
 
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
@@ -1052,85 +1042,6 @@ public class JabRefPreferences {
     }
 
     /**
-     * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences.
-     */
-    public KeyStroke getKey(String bindName) {
-
-        String s = keyBinds.get(bindName);
-        // If the current key bindings don't contain the one asked for,
-        // we fall back on the default. This should only happen when a
-        // user has his own set in Preferences, and has upgraded to a
-        // new version where new bindings have been introduced.
-        if (s == null) {
-            s = defaultKeyBinds.get(bindName);
-            if (s == null) {
-                // there isn't even a default value
-                // Output error
-                LOGGER.info("Could not get key binding for \"" + bindName + '"');
-                // fall back to a default value
-                s = "Not associated";
-            }
-            // So, if there is no configured key binding, we add the fallback value to the current
-            // hashmap, so this doesn't happen again, and so this binding
-            // will appear in the KeyBindingsDialog.
-            keyBinds.put(bindName, s);
-        }
-
-        if (OS.OS_X) {
-            return getKeyForMac(KeyStroke.getKeyStroke(s));
-        } else {
-            return KeyStroke.getKeyStroke(s);
-        }
-    }
-
-    /**
-     * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences, but adapted for Mac
-     * users, with the Command key preferred instead of Control.
-     * TODO: Move to OS.java? Or replace with portable Java key codes, i.e. KeyEvent
-     */
-    private KeyStroke getKeyForMac(KeyStroke ks) {
-        if (ks == null) {
-            return null;
-        }
-        int keyCode = ks.getKeyCode();
-        if ((ks.getModifiers() & InputEvent.CTRL_MASK) == 0) {
-            return ks;
-        } else {
-            int modifiers = 0;
-            if ((ks.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
-                modifiers = modifiers | InputEvent.SHIFT_MASK;
-            }
-            if ((ks.getModifiers() & InputEvent.ALT_MASK) != 0) {
-                modifiers = modifiers | InputEvent.ALT_MASK;
-            }
-
-            if (SHORTCUT_MASK == -1) {
-                try {
-                    SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-                } catch (Throwable ignored) {
-                    // Ignored
-                }
-            }
-
-            return KeyStroke.getKeyStroke(keyCode, SHORTCUT_MASK + modifiers);
-        }
-    }
-
-    /**
-     * Returns the HashMap containing all key bindings.
-     */
-    public HashMap<String, String> getKeyBindings() {
-        return keyBinds.getKeyBindings();
-    }
-
-    /**
-     * Returns the HashMap containing default key bindings.
-     */
-    public HashMap<String, String> getDefaultKeys() {
-        return defaultKeyBinds.getKeyBindings();
-    }
-
-    /**
      * Clear all preferences.
      *
      * @throws BackingStoreException
@@ -1158,26 +1069,6 @@ public class JabRefPreferences {
             prefs.flush();
         } catch (BackingStoreException ex) {
             ex.printStackTrace();
-        }
-    }
-
-    /**
-     * Stores new key bindings into Preferences, provided they actually differ from the old ones.
-     */
-    public void setNewKeyBindings(HashMap<String, String> newBindings) {
-        if (!newBindings.equals(keyBinds.getKeyBindings())) {
-            // This confirms that the bindings have actually changed.
-            String[] bindNames = new String[newBindings.size()];
-            String[] bindings = new String[newBindings.size()];
-            int index = 0;
-            for (Map.Entry<String, String> keyBinding : newBindings.entrySet()) {
-                bindNames[index] = keyBinding.getKey();
-                bindings[index] = keyBinding.getValue();
-                index++;
-            }
-            putStringArray("bindNames", bindNames);
-            putStringArray("bindings", bindings);
-            keyBinds.overwriteBindings(newBindings);
         }
     }
 
@@ -1232,26 +1123,7 @@ public class JabRefPreferences {
         }
     }
 
-    private void restoreKeyBindings() {
-        // Define default keybindings.
-        defaultKeyBinds = new KeyBinds();
 
-        // First read the bindings, and their names.
-        String[] bindNames = getStringArray("bindNames");
-        String[] bindings = getStringArray("bindings");
-
-        // Then set up the key bindings HashMap.
-        if ((bindNames == null) || (bindings == null)
-                || (bindNames.length != bindings.length)) {
-            // Nothing defined in Preferences, or something is wrong.
-            keyBinds = new KeyBinds();
-            return;
-        }
-
-        for (int i = 0; i < bindNames.length; i++) {
-            keyBinds.put(bindNames[i], bindings[i]);
-        }
-    }
 
     private static String getNextUnit(Reader data) throws IOException {
         // character last read
