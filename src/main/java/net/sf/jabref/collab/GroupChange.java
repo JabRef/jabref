@@ -33,10 +33,8 @@ class GroupChange extends Change {
 
 
     public GroupChange(GroupTreeNode changedGroups, GroupTreeNode tmpGroupRoot) {
-        // @formatter:off
         super(changedGroups != null ? Localization.lang("Modified groups tree") :
-            Localization.lang("Removed all groups")); // JZTODO lyrics
-        // @formatter:on
+            Localization.lang("Removed all groups"));
         this.changedGroups = changedGroups;
         this.tmpGroupRoot = tmpGroupRoot;
     }
@@ -82,10 +80,8 @@ class GroupChange extends Change {
     @Override
     JComponent description() {
         return new JLabel("<html>" + toString() + '.' + (changedGroups != null ? ' ' +
-                // @formatter:off
                 Localization.lang("Accepting the change replaces the complete groups tree with the externally modified groups tree.") : "")
-                // @formatter:on
                 + "</html>");
-        // JZTODO lyrics
+
     }
 }

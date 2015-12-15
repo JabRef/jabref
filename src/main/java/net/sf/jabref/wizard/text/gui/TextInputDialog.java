@@ -527,11 +527,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class PasteAction extends BasicAction {
         public PasteAction() {
-            // @formatter:off
             super(Localization.lang("Paste"),
                     Localization.lang("Paste from clipboard"),
                     IconTheme.JabRefIcon.PASTE.getIcon());
-            // @formatter:on
         }
 
         @Override
@@ -555,11 +553,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class LoadAction extends BasicAction {
         public LoadAction() {
-            // @formatter:off
             super(Localization.lang("Open"),
                     Localization.lang("Open file"),
                     IconTheme.JabRefIcon.OPEN.getIcon());
-            // @formatter:on
         }
 
         @Override
@@ -587,11 +583,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class ClearAction extends BasicAction {
         public ClearAction() {
-            // @formatter:off
             super(Localization.lang("Clear"),
                     Localization.lang("Clear inputarea"),
                     IconTheme.JabRefIcon.NEW.getIcon());
-            // @formatter:on
         }
 
         @Override

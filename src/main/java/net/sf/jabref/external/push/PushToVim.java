@@ -88,12 +88,10 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
         }
 
         try {
-            // @formatter:off
             String[] com = new String[] {commandPath, "--servername",
                     Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
                     "<C-\\><C-N>a" + citeCommand +
                     "{" + keys + "}"};
-            // @formatter:on
 
             final Process p = Runtime.getRuntime().exec(com);
 
@@ -131,7 +129,6 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
-            // @formatter:off
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     "<HTML>" +
@@ -144,7 +141,6 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
                     panel.frame(),
                     Localization.lang("Could not run the 'vim' program."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-            // formatter:on
         } else {
             super.operationCompleted(panel);
         }

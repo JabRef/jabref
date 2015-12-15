@@ -203,7 +203,7 @@ public class VersionHandling {
                 spaceIndex = s.indexOf(' ');
                 if (spaceIndex <= 0)
                  {
-                    throw new Exception("bad format"); // JZTODO lyrics
+                    throw new Exception("bad format");
                 }
                 level = Integer.parseInt(s.substring(0, spaceIndex));
                 group = AbstractGroup.fromString(s.substring(spaceIndex + 1),

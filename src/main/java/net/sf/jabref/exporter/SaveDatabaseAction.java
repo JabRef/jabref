@@ -72,7 +72,6 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             // Check for external modifications:
             if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
-                // @formatter:off
                 String[] opts = new String[] {Localization.lang("Review changes"),
                         Localization.lang("Save"),
                         Localization.lang("Cancel")};
@@ -82,7 +81,6 @@ public class SaveDatabaseAction extends AbstractWorker {
                         Localization.lang("File updated externally"),
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, opts, opts[0]);
-                // @formatter:on
 
                 if (answer == JOptionPane.CANCEL_OPTION) {
                     cancelled = true;
@@ -279,10 +277,8 @@ public class SaveDatabaseAction extends AbstractWorker {
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    // @formatter:off
                     new String[] {Localization.lang("Save"), tryDiff,
                             Localization.lang("Cancel")}, tryDiff);
-                    // @formatter:on
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.

@@ -157,11 +157,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             if (page.contains("Error Page")) {
-                // @formatter:off
                 status.showMessage(
                         Localization.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
                        DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
-                // @formatter:on
                 return false;
             }
 
@@ -169,11 +167,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             includeAbstract = absCheckBox.isSelected();
             if (hits > IEEEXploreFetcher.MAX_FETCH) {
-                // @formatter:off
                 status.showMessage(Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
                         new String[] {String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)}),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
-                // @formatter:on
             }
 
             parse(dialog, page);

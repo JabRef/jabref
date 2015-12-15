@@ -31,7 +31,6 @@ public class ReadStatus extends SpecialField {
 
     private ReadStatus() {
         ArrayList<SpecialFieldValue> values = new ArrayList<>();
-        // @formatter:off
         values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null,
                 Localization.lang("No read status information")));
         Icon tmpicon;
@@ -44,7 +43,6 @@ public class ReadStatus extends SpecialField {
         values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed",
                 Localization.lang("Set read status to skimmed"), tmpicon,
                 Localization.lang("Read status skimmed")));
-        // @formatter:on
         this.setValues(values);
         TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";
     }

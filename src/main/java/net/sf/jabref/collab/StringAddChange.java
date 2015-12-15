@@ -43,11 +43,9 @@ class StringAddChange extends Change {
     public StringAddChange(BibtexString string) {
         super(Localization.lang("Added string") + ": '" + string.getName() + '\'');
         this.string = string;
-        // @formatter:off
         tp.setText("<HTML><H2>" + Localization.lang("Added string") + "</H2><H3>" +
                 Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" +
                 Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
-        // @formatter:on
     }
 
     @Override

@@ -53,10 +53,8 @@ public class JabRefDesktop {
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     fieldName = "pdf";
-                    // @formatter:off
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
                         || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
-                    // @formatter:on
                     fieldName = "ps";
                 }
             }
@@ -245,11 +243,9 @@ public class JabRefDesktop {
         //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282
         if (OS.OS_X) {
             // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
-            // @formatter:off
             String[] cmd = (fileType.getOpenWith() != null) && !fileType.getOpenWith().isEmpty() ?
                     new String[] {"/usr/bin/open", "-a", fileType.getOpenWith(), filePath} :
                     new String[] {"/usr/bin/open", filePath};
-            // @formatter:on
             Runtime.getRuntime().exec(cmd);
         } else if (OS.WINDOWS) {
             if ((fileType.getOpenWith() != null) && !fileType.getOpenWith().isEmpty()) {
@@ -306,11 +302,9 @@ public class JabRefDesktop {
             String link, UnknownExternalFileType fileType) throws IOException {
 
         String cancelMessage = Localization.lang("Unable to open file.");
-        // @formatter:off
         String[] options = new String[] {Localization.lang("Define '%0'", fileType.getName()),
                 Localization.lang("Change file type"),
                 Localization.lang("Cancel")};
-        // @formatter:on
         String defOption = options[0];
         int answer = JOptionPane.showOptionDialog(frame, Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
                         fileType.getName()),

@@ -48,18 +48,14 @@ public class UndoableKeyChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        // @formatter:off
         return Localization.lang("Undo") + ": " +
                 Localization.lang("change key");
-        // @formatter:on
     }
 
     @Override
     public String getRedoPresentationName() {
-        // @formatter:off
         return Localization.lang("Redo") + ": " +
                 Localization.lang("change key");
-        // @formatter:on
     }
 
     @Override

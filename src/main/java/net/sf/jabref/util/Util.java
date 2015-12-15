@@ -720,7 +720,7 @@ public class Util {
         }
     
         // show a warning, then return
-        StringBuffer message = // JZTODO lyrics...
+        StringBuffer message = ...
                 new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
         for (int i = 0; i < affectedFields.size(); ++i) {
             message.append(affectedFields.elementAt(i)).append("\n");
@@ -737,7 +737,7 @@ public class Util {
         // for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
         // if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
         // // show a warning, then return
-        // String message = Globals // JZTODO lyrics...
+        // String message = Globals ...
         // .lang(
         // "This action will modify the \"%0\" field "
         // + "of your entries.\nThis could cause undesired changes to "

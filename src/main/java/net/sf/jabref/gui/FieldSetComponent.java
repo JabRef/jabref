@@ -73,10 +73,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * values. These are put into a JComboBox.
      */
     public FieldSetComponent(String title, List<String> fields, List<String> preset, boolean arrows, boolean forceLowerCase) {
-        // @formatter:off
         this(title, fields, preset, Localization.lang("Add"),
                 Localization.lang("Remove"), arrows, forceLowerCase);
-        // @formatter:on
     }
 
     /**
@@ -84,10 +82,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * values. Replaces the JComboBox with a JTextField.
      */
     FieldSetComponent(String title, List<String> fields, boolean arrows, boolean forceLowerCase) {
-        // @formatter:off
         this(title, fields, null, Localization.lang("Add"),
                 Localization.lang("Remove"), arrows, forceLowerCase);
-        // @formatter:on
     }
 
     private FieldSetComponent(String title, List<String> fields, List<String> preset, String addText, String removeText,

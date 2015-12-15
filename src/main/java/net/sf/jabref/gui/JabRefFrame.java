@@ -495,7 +495,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, Globals.getKeyPrefs().getKey(KeyBinding.NEW_ENTRY));
-    // @formatter:off
     private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
 
     private List<NewEntryAction> getNewEntryActions() {
@@ -2000,10 +1999,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
 
         public ChangeTabAction(boolean next) {
-            // @formatter:off
             putValue(Action.NAME, next ? Localization.menuTitle("Next tab") :
                     Localization.menuTitle("Previous tab"));
-            // @formatter:on
             this.next = next;
             putValue(Action.ACCELERATOR_KEY,
                     next ? Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB) : Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB));

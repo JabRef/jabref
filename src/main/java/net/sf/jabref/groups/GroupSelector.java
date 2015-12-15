@@ -103,7 +103,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Localization.lang("Inverted"), false);
     private final JCheckBoxMenuItem select = new JCheckBoxMenuItem(Localization.lang("Select matches"), false);
     private final JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
-            Localization.lang("Highlight overlapping groups")); // JZTODO lyrics
+            Localization.lang("Highlight overlapping groups"));
     private final JCheckBoxMenuItem showNumberOfElements = new JCheckBoxMenuItem(
             Localization.lang("Show number of elements contained in each group"));
     private final JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
@@ -350,7 +350,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         orCb.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
         autoGroup.setToolTipText(Localization.lang("Automatically create groups for database."));
         invCb.setToolTipText(Localization.lang("Show entries *not* in group selection"));
-        showOverlappingGroups.setToolTipText( // JZTODO lyrics
+        showOverlappingGroups.setToolTipText(
                 Localization.lang("Highlight groups that contain entries contained in any currently selected group"));
         floatCb.setToolTipText(Localization.lang("Move entries in group selection to the top"));
         highlCb.setToolTipText(Localization.lang("Gray out entries not in group selection"));
@@ -992,7 +992,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 if (undoAddPreviousEntries == null) {
                     panel.undoManager.addEdit(undo);
                 } else {
-                    NamedCompound nc = new NamedCompound("Modify Group"); // JZTODO lyrics
+                    NamedCompound nc = new NamedCompound("Modify Group");
                     nc.addEdit(undo);
                     nc.addEdit(undoAddPreviousEntries);
                     nc.end();
@@ -1183,7 +1183,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                     Localization.lang("sort subgroups"));
             groupsTree.sort(node, true);
             panel.undoManager.addEdit(undo);
-            panel.markBaseChanged(); // JZTODO lyrics
+            panel.markBaseChanged();
             frame.output(Localization.lang("Sorted all subgroups recursively."));
         }
     }
@@ -1408,7 +1408,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
 
     private final JMenu moveSubmenu = new JMenu(Localization.lang("Move"));
-    private final JMenu sortSubmenu = new JMenu(Localization.lang("Sort alphabetically")); // JZTODO lyrics
+    private final JMenu sortSubmenu = new JMenu(Localization.lang("Sort alphabetically"));
 
 
     public GroupTreeNode getGroupTreeRoot() {

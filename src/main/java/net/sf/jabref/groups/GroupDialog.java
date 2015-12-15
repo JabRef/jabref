@@ -64,11 +64,11 @@ class GroupDialog extends JDialog {
             Localization.lang("Dynamically group entries by searching a field for a keyword"));
     private final JRadioButton m_searchRadioButton = new JRadioButton(
             Localization.lang("Dynamically group entries by a free-form search expression"));
-    private final JRadioButton m_independentButton = new JRadioButton( // JZTODO lyrics
+    private final JRadioButton m_independentButton = new JRadioButton(
             Localization.lang("Independent group: When selected, view only this group's entries"));
-    private final JRadioButton m_intersectionButton = new JRadioButton( // JZTODO lyrics
+    private final JRadioButton m_intersectionButton = new JRadioButton(
             Localization.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
-    private final JRadioButton m_unionButton = new JRadioButton( // JZTODO lyrics
+    private final JRadioButton m_unionButton = new JRadioButton(
             Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
     // for KeywordGroup
     private final JTextField m_kgSearchField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
@@ -205,7 +205,7 @@ class GroupDialog extends JDialog {
         builderAll.append(m_searchRadioButton, 5);
         builderAll.nextLine();
         builderAll.nextLine();
-        builderAll.appendSeparator(Localization.lang("Hierarchical context")); // JZTODO lyrics
+        builderAll.appendSeparator(Localization.lang("Hierarchical context"));
         builderAll.nextLine();
         builderAll.nextLine();
         builderAll.append(m_independentButton, 5);
@@ -477,7 +477,7 @@ class GroupDialog extends JDialog {
      * added to the new group.
      */
     private void addPreviousEntries() {
-        // JZTODO lyrics...
+        ...
         int i = JOptionPane.showConfirmDialog(m_basePanel.frame(),
                 Localization.lang("Assign the original group's entries to this group?"),
                 Localization.lang("Change of Grouping Method"),

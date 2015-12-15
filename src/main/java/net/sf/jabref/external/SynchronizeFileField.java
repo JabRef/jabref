@@ -52,13 +52,11 @@ public class SynchronizeFileField extends AbstractWorker {
     private SynchronizeFileField.OptionsDialog optDiag;
 
     private final Object[] brokenLinkOptions = {
-            // @formatter:off
             Localization.lang("Ignore"),
             Localization.lang("Assign new file"),
             Localization.lang("Remove link"),
             Localization.lang("Remove all broken links"),
             Localization.lang("Quit synchronization")};
-    // @formatter:on
 
     private boolean goOn = true;
     private boolean autoSet = true;
@@ -220,12 +218,10 @@ public class SynchronizeFileField extends AbstractWorker {
 
                         // Unless we deleted this link, see if its file type is recognized:
                         if (!deleted && (flEntry.getType() instanceof UnknownExternalFileType)) {
-                            // @formatter:off
                             String[] options = new String[] {
                                     Localization.lang("Define '%0'", flEntry.getType().getName()),
                                     Localization.lang("Change file type"),
                                     Localization.lang("Cancel")};
-                            // @formatter:on
                             String defOption = options[0];
                             int answer = JOptionPane.showOptionDialog(panel.frame(), Localization.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
                                     flEntry.getType().getName()),

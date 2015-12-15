@@ -223,11 +223,9 @@ public class JabRefCLI {
     }
 
     public static String getExportMatchesSyntax() {
-        // @formatter:off
         return String.format("[%s]searchTerm,outputFile: %s[,%s]",
                 Localization.lang("field"),
                 Localization.lang("file"),
                 Localization.lang("exportFormat"));
-        // @formatter:on
     }
 }

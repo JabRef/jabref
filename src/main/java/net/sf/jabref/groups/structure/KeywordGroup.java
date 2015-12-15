@@ -375,7 +375,6 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     public static String getDescriptionForPreview(String field, String expr, boolean caseSensitive, boolean regExp) {
-        // @formatter:off
         String header = regExp ? Localization.lang("This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",
                 field, StringUtil.quoteForHTML(expr))
                 : Localization.lang("This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
@@ -395,7 +394,6 @@ public class KeywordGroup extends AbstractGroup {
                         + "This process removes the term <b>%1</b> from "
                         + "each entry's <b>%0</b> field.",
                 field, StringUtil.quoteForHTML(expr));
-        // @formatter:on
         return String.format("%s (%s). %s", header, caseSensitiveText, footer);
     }
 

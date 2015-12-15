@@ -249,7 +249,6 @@ class StringDialog extends JDialog {
                 // Change name of string.
                 if (!value.equals(((BibtexString) strings[row]).getName())) {
                     if (tbase.hasStringLabel((String) value)) {
-                        // @formatter:off
                         JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label already exists"),
                                 Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
                     } else if (((String) value).contains(" ")) {
@@ -261,7 +260,6 @@ class StringDialog extends JDialog {
                     } else if (isNumber((String) value)) {
                         JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot be a number."),
                                 Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
-                        // @formatter:on
                     } else {
                         // Store undo information.
                         BibtexString subject = (BibtexString) strings[row];
@@ -304,10 +302,8 @@ class StringDialog extends JDialog {
 
         @Override
         public String getColumnName(int col) {
-            // @formatter:off
             return col == 0 ? Localization.lang("Name") :
                 Localization.lang("Content");
-            // @formatter:on
         }
 
         @Override
@@ -378,24 +374,18 @@ class StringDialog extends JDialog {
                 return;
             }
             if (isNumber(name)) {
-                // @formatter:off
                 JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot be a number."),
                         Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
-                // @formatter:on
                 return;
             }
             if (name.contains("#")) {
-                // @formatter:off
                 JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot contain the '#' character."),
                         Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
-                // @formatter:on
                 return;
             }
             if (name.contains(" ")) {
-                // @formatter:off
                 JOptionPane.showMessageDialog(parent, Localization.lang("The label of the string cannot contain spaces."),
                         Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
-                // @formatter:on
                 return;
             }
             try {
@@ -410,11 +400,9 @@ class StringDialog extends JDialog {
                 //		table.revalidate();
                 panel.markBaseChanged();
             } catch (KeyCollisionException ex) {
-                // @formatter:off
                 JOptionPane.showMessageDialog(parent,
                         Localization.lang("A string with that label already exists"),
                         Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
-                // @formatter:on
             }
         }
     }
@@ -460,13 +448,11 @@ class StringDialog extends JDialog {
                 // keystroke. This makes the content hang on the screen.
                 assureNotEditing();
 
-                // @formatter:off
                 String msg = Localization.lang("Really delete the selected") + ' '
                         + (sel.length > 1 ? sel.length + " " + Localization.lang("entries")
                         : Localization.lang("entry")) + '?';
                 int answer = JOptionPane.showConfirmDialog(parent, msg, Localization.lang("Delete strings"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                // @formatter:on
                 if (answer == JOptionPane.YES_OPTION) {
                     CompoundEdit ce = new CompoundEdit();
                     for (int i = sel.length - 1; i >= 0; i--) {

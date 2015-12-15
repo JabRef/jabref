@@ -81,10 +81,8 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            // @formatter:off
             JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"),
                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-            // @formatter:on
             return;
         }
 
