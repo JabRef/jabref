@@ -31,7 +31,9 @@ public class LocalizationConsistencyTest {
     public void keyValueShouldBeEqualForEnglishPropertiesMenu() {
         Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "Menu", "en"));
         for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
-            Assert.assertEquals(String.format("%s=%s", entry.getKey(), entry.getKey()), String.format("%s=%s",entry.getKey(), entry.getValue().toString().replace("&", "")));
+            String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
+            String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue().toString().replace("&", ""));
+            Assert.assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
         }
     }
 
@@ -39,7 +41,9 @@ public class LocalizationConsistencyTest {
     public void keyValueShouldBeEqualForEnglishPropertiesMessages() {
         Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "JabRef", "en"));
         for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
-            Assert.assertEquals(String.format("%s=%s", entry.getKey(), entry.getKey()), String.format("%s=%s",entry.getKey(), entry.getValue()));
+            String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
+            String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue());
+            Assert.assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
         }
     }
 
