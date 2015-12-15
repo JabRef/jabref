@@ -163,7 +163,7 @@ If you modify preference, use following pattern:
 private JabRefPreferences backup;
 
 @Before
-    public void setUp() {
+public void setUp() {
     prefs = JabRefPreferences.getInstance();
     backup = prefs;
 }
