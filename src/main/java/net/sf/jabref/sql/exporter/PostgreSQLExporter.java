@@ -26,14 +26,6 @@ import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
-/**
- *
- * @author ifsteinm.
- *
- *  Jan 20th	Extends DBExporter to provide features specific for PostgreSQL
- *  			Created after a refactory on SQLUtil
- *
- */
 public class PostgreSQLExporter extends DBExporter {
 
     private static PostgreSQLExporter instance;
