@@ -187,9 +187,8 @@ public class SQLUtil {
      */
     public static ResultSet queryAllFromTable(Connection conn, String tableName) throws SQLException {
         String query = "SELECT * FROM " + tableName + ';';
-        try (Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query)) {
-            return res.getResultSet();
-        }
+        Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query);
+        return res.getResultSet();
     }
 
     /**
@@ -274,7 +273,6 @@ public class SQLUtil {
             if (warn != null) {
                 LOGGER.warn(warn);
             }
-            stmnt.close();
         }
     }
 
