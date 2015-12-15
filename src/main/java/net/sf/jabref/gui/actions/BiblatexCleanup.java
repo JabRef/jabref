@@ -27,7 +27,7 @@ public class BiblatexCleanup implements Cleaner {
                 entry.setField(newFieldName, oldValue);
                 changes.add(new FieldChange(entry, newFieldName, null, oldValue));
 
-                entry.setField(oldFieldName, null);
+                entry.clearField(oldFieldName);
                 changes.add(new FieldChange(entry, oldFieldName, oldValue, null));
             }
         }
@@ -38,8 +38,8 @@ public class BiblatexCleanup implements Cleaner {
             String oldYear = entry.getField("year");
             String oldMonth = entry.getField("month");
             entry.setField("date", newDate);
-            entry.setField("year", null);
-            entry.setField("month", null);
+            entry.clearField("year");
+            entry.clearField("month");
 
             changes.add(new FieldChange(entry, "date", null, newDate));
             changes.add(new FieldChange(entry, "year", oldYear, null));

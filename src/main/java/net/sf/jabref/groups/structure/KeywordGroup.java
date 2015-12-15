@@ -330,7 +330,11 @@ public class KeywordGroup extends AbstractGroup {
         }
 
         String result = sbOrig.toString().trim();
-        entry.setField(searchField, !result.isEmpty() ? result : null);
+        if (result.isEmpty()) {
+            entry.clearField(searchField);
+        } else {
+            entry.setField(searchField, result);
+        }
     }
 
     @Override
