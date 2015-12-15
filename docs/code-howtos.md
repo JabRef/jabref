@@ -1,6 +1,9 @@
 This page provides some development support in the form of howtos. See also [[High Level Documentation]]
 
 ## Generic code how tos
+
+Please read https://github.com/cxxr/better-java
+
 ### Checking for null
 Should we add [Objects.requireNonNull](https://docs.oracle.com/javase/8/docs/api/java/util/Objects.html#requireNonNull-T-) to the code howtos?
 
