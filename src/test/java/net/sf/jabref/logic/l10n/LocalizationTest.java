@@ -10,32 +10,56 @@ public class LocalizationTest {
 
     @Test
     public void testSetKnownLanguage() {
-        Locale.setDefault(Locale.CHINA);
-        Localization.setLanguage("en");
-        assertEquals("en", Locale.getDefault().toString());
+        Locale before = Locale.getDefault();
+
+        try {
+            Locale.setDefault(Locale.CHINA);
+            Localization.setLanguage("en");
+            assertEquals("en", Locale.getDefault().toString());
+        } finally {
+            Locale.setDefault(before);
+        }
     }
 
     @Test
     public void testSetUnknownLanguage() {
-        Locale.setDefault(Locale.CHINA);
-        Localization.setLanguage("WHATEVER");
-        assertEquals(Locale.CHINA.toString(), Locale.getDefault().toString());
+        Locale before = Locale.getDefault();
+
+        try {
+            Locale.setDefault(Locale.CHINA);
+            Localization.setLanguage("WHATEVER");
+            assertEquals(Locale.CHINA.toString(), Locale.getDefault().toString());
+        } finally {
+            Locale.setDefault(before);
+        }
     }
 
     @Test
     public void testKnownTranslation() {
-        Localization.setLanguage("en");
-        String knownKey = "Groups";
-        assertEquals(knownKey, Localization.lang(knownKey));
-        assertEquals(knownKey, Localization.menuTitle(knownKey));
+        Locale before = Locale.getDefault();
+
+        try {
+            Localization.setLanguage("en");
+            String knownKey = "Groups";
+            assertEquals(knownKey, Localization.lang(knownKey));
+            assertEquals(knownKey, Localization.menuTitle(knownKey));
+        } finally {
+            Locale.setDefault(before);
+        }
     }
 
     @Test
     public void testUnknownTranslation() {
-        Localization.setLanguage("en");
-        String knownKey = "WHATEVER";
-        assertEquals(knownKey, Localization.lang(knownKey));
-        assertEquals(knownKey, Localization.menuTitle(knownKey));
+        Locale before = Locale.getDefault();
+
+        try {
+            Localization.setLanguage("en");
+            String knownKey = "WHATEVER";
+            assertEquals(knownKey, Localization.lang(knownKey));
+            assertEquals(knownKey, Localization.menuTitle(knownKey));
+        } finally {
+            Locale.setDefault(before);
+        }
     }
 
 }
