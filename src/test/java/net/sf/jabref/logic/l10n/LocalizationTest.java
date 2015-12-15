@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.l10n;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Locale;
@@ -7,6 +9,11 @@ import java.util.Locale;
 import static org.junit.Assert.assertEquals;
 
 public class LocalizationTest {
+
+    @BeforeClass @AfterClass
+    public static void loadTranslationDefaultLocale() {
+        System.out.println(Locale.getDefault());
+    }
 
     @Test
     public void testSetKnownLanguage() {
