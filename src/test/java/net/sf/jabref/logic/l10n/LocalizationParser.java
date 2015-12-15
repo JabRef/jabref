@@ -52,50 +52,18 @@ public class LocalizationParser {
                 .sorted()
                 .map(Object::toString)
                 .map(String::trim)
-                .map(e -> new Localization.LocalizationKey(e).getPropertiesKey())
+                .map(e -> new LocalizationKey(e).getPropertiesKey())
                 .collect(Collectors.toList());
     }
 
-    private static Properties getProperties(String path) {
+    public static Properties getProperties(String path) {
         Properties properties = new Properties();
-        try (InputStream is = LocalizationTest.class.getResourceAsStream(path)) {
+        try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(path)) {
             properties.load(is);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return properties;
-    }
-
-    @Test
-    public void allFilesMustHaveSameKeys() {
-        for (String bundle : Arrays.asList("JabRef", "Menu")) {
-            List<String> englishKeys = getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, "en"));
-
-            List<String> nonEnglishLanguages = Languages.LANGUAGES.values().stream().filter(l -> !"en".equals(l)).collect(Collectors.toList());
-            for (String lang : nonEnglishLanguages) {
-                List<String> nonEnglishKeys = getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
-
-                List<String> missing = new LinkedList<>(englishKeys);
-                missing.removeAll(nonEnglishKeys);
-                Assert.assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
-            }
-        }
-    }
-
-    @Test
-    public void keyValueShouldBeEqualForEnglishPropertiesMenu() {
-        Properties englishKeys = getProperties(String.format("/l10n/%s_%s.properties", "Menu", "en"));
-        for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
-            Assert.assertEquals(String.format("%s=%s", entry.getKey(), entry.getKey()), String.format("%s=%s",entry.getKey(), entry.getValue().toString().replace("&", "")));
-        }
-    }
-
-    @Test
-    public void keyValueShouldBeEqualForEnglishPropertiesMessages() {
-        Properties englishKeys = getProperties(String.format("/l10n/%s_%s.properties", "JabRef", "en"));
-        for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
-            Assert.assertEquals(String.format("%s=%s", entry.getKey(), entry.getKey()), String.format("%s=%s",entry.getKey(), entry.getValue()));
-        }
     }
 
     private static boolean isJavaFile(Path path) {
@@ -182,7 +150,7 @@ public class LocalizationParser {
                 String languageKey = QUOTATION_SYMBOL.matcher(b.toString()).replaceAll("\\\"");
 
                 // escape chars which are not allowed in property file keys
-                String languagePropertyKey = new Localization.LocalizationKey(languageKey).getPropertiesKey();
+                String languagePropertyKey = new LocalizationKey(languageKey).getPropertiesKey();
 
                 if (languagePropertyKey.endsWith("_")) {
                     throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");

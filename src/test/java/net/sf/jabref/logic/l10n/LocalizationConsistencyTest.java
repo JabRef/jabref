@@ -1,30 +1,46 @@
 package net.sf.jabref.logic.l10n;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
-public class LocalizationTest {
+public class LocalizationConsistencyTest {
 
     @Test
-    public void testLocalizationKey() {
-        assertEquals("test_\\:_\\=", new Localization.LocalizationKey("test : =").getPropertiesKey());
+    public void allFilesMustHaveSameKeys() {
+        for (String bundle : Arrays.asList("JabRef", "Menu")) {
+            List<String> englishKeys = LocalizationParser.getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, "en"));
+
+            List<String> nonEnglishLanguages = Languages.LANGUAGES.values().stream().filter(l -> !"en".equals(l)).collect(Collectors.toList());
+            for (String lang : nonEnglishLanguages) {
+                List<String> nonEnglishKeys = LocalizationParser.getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
+
+                List<String> missing = new LinkedList<>(englishKeys);
+                missing.removeAll(nonEnglishKeys);
+                Assert.assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
+            }
+        }
     }
 
     @Test
-    public void testTranslation() {
-        assertEquals("What \n : %e %c a b", new Localization.LocalizationKeyParams("What \n : %e %c_%0 %1", "a", "b").translate());
+    public void keyValueShouldBeEqualForEnglishPropertiesMenu() {
+        Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "Menu", "en"));
+        for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
+            Assert.assertEquals(String.format("%s=%s", entry.getKey(), entry.getKey()), String.format("%s=%s",entry.getKey(), entry.getValue().toString().replace("&", "")));
+        }
     }
 
     @Test
-    public void testParamsReplacement() {
-        assertEquals("BibLaTeX mode", new Localization.LocalizationKeyParams("%0 mode", "BibLaTeX").translate());
+    public void keyValueShouldBeEqualForEnglishPropertiesMessages() {
+        Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "JabRef", "en"));
+        for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
+            Assert.assertEquals(String.format("%s=%s", entry.getKey(), entry.getKey()), String.format("%s=%s",entry.getKey(), entry.getValue()));
+        }
     }
 
     @Test
@@ -73,29 +89,6 @@ public class LocalizationTest {
             result.add(String.format("%s=", key.getKey()));
         }
         return result.toString();
-    }
-
-    @Test
-    public void testParsingCode() {
-        String code = ""
-                + "Localization.lang(\"one per line\")"
-                + "Localization.lang(\n" +
-                "            \"Copy \\\\cite{BibTeX key}\")"
-                + "Localization.lang(\"two per line\") Localization.lang(\"two per line\")"
-                + "Localization.lang(\"multi \" + \n"
-                + "\"line\")"
-                + "Localization.lang(\"one per line with var\", var)"
-                + "Localization.lang(\"Search %0\", \"Springer\")"
-                + "Localization.lang(\"Reset preferences (key1,key2,... or 'all')\")"
-                + "Localization.lang(\"Multiple entries selected. Do you want to change the type of all these to '%0'?\")"
-                + "Localization.lang(\"Run Fetcher, e.g. \\\"--fetch=Medline:cancer\\\"\");";
-
-        List<String> expectedLanguageKeys = Arrays.asList("one_per_line", "Copy_\\cite{BibTeX_key}", "two_per_line", "two_per_line", "multi_line",
-                "one_per_line_with_var", "Search_%0", "Reset_preferences_(key1,key2,..._or_'all')", "Multiple_entries_selected._Do_you_want_to_change_" +
-                        "the_type_of_all_these_to_'%0'?", "Run_Fetcher,_e.g._\"--fetch\\=Medline\\:cancer\"");
-
-        List<String> languageKeysInString = LocalizationParser.JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundle.LANG);
-        assertEquals(expectedLanguageKeys, languageKeysInString);
     }
 
 }

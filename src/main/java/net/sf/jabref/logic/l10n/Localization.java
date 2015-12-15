@@ -74,58 +74,9 @@ public class Localization {
         // replace %0, %1, ...
         if ((translation != null) && !translation.isEmpty()) {
             // also done if no params are given
-            return new LocalizationKeyParams(translation, params).translate();
+            return new LocalizationKeyParams(translation, params).replacePlaceholders();
         }
         return key;
-    }
-
-    public static class LocalizationKey {
-
-        private final String key;
-
-        public LocalizationKey(String key) {
-            this.key = Objects.requireNonNull(key);
-        }
-
-        public String getPropertiesKeyUnescaped() {
-            // space, = and : are not allowed in properties file keys
-            return this.key.replaceAll(" ", "_");
-        }
-
-        public String getPropertiesKey() {
-            // space, = and : are not allowed in properties file keys
-            return this.key.replaceAll(" ", "_").replace("=", "\\=").replace(":", "\\:").replace("\\\\", "\\");
-        }
-
-        public String getTranslationValue() {
-            return this.key.replaceAll("_", " ").replaceAll("\\\\=", "=").replaceAll("\\\\:", ":");
-        }
-    }
-
-    public static class LocalizationKeyParams {
-
-        private final LocalizationKey key;
-        private final List<String> params;
-
-        public LocalizationKeyParams(String key, String... params) {
-            this.key = new LocalizationKey(key);
-            this.params = Arrays.asList(params);
-            if (this.params.size() > 10) {
-                throw new IllegalStateException("Translations can only have at most 10 parameters");
-            }
-        }
-
-        public String translate() {
-            String translation = key.getTranslationValue();
-
-            for (int i = 0; i < params.size(); i++) {
-                String param = params.get(i);
-                translation = translation.replaceAll("%" + i, param);
-            }
-
-            return translation;
-        }
-
     }
 
     public static String lang(String key, String... params) {

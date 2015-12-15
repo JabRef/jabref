@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Checks that all property files are correctly encoded and can be loaded without errors.
  */
-public class TestL10nFiles {
+public class PropertiesLocaleCompletenessTest {
 
     @Test
     public void testi10nFiles() throws IOException {
