@@ -26,8 +26,9 @@ public class Localization {
                     new EncodingControl(StandardCharsets.UTF_8));
 
             // silent fallback to system locale when bundle is not found
-            if (!messages.getLocale().equals(locale)) {
+            if (!messages.getLocale().equals(locale) && !menuTitles.getLocale().equals(locale)) {
                 LOGGER.warn("Bundle for locale <" + locale + "> not found. Falling back to system locale <" + defaultLocale + ">");
+                locale = defaultLocale;
             }
         } catch (MissingResourceException e) {
             LOGGER.warn("Bundle for locale <" + locale + "> not found. Fallback to system locale <" + defaultLocale
@@ -71,12 +72,11 @@ public class Localization {
             translation = key;
         }
 
-        // replace %0, %1, ...
-        if ((translation != null) && !translation.isEmpty()) {
-            // also done if no params are given
-            return new LocalizationKeyParams(translation, params).replacePlaceholders();
+        if (translation == null || translation.isEmpty()) {
+            return key;
         }
-        return key;
+
+        return new LocalizationKeyParams(translation, params).replacePlaceholders();
     }
 
     public static String lang(String key, String... params) {

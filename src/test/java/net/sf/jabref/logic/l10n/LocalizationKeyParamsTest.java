@@ -13,4 +13,9 @@ public class LocalizationKeyParamsTest {
         assertEquals("What \n : %e %c a b", new LocalizationKeyParams("What \n : %e %c_%0 %1", "a", "b").replacePlaceholders());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testTooManyParams() {
+        new LocalizationKeyParams("", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
+    }
+
 }
