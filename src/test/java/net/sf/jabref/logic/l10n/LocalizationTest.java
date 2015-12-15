@@ -1,8 +1,7 @@
 package net.sf.jabref.logic.l10n;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import net.sf.jabref.JabRefPreferences;
+import org.junit.*;
 
 import java.util.Locale;
 
@@ -10,63 +9,56 @@ import static org.junit.Assert.assertEquals;
 
 public class LocalizationTest {
 
-    @BeforeClass @AfterClass
-    public static void loadTranslationDefaultLocale() {
-        System.out.println(Locale.getDefault());
+    private Locale locale;
+
+    @Before
+    public void storeDefaultLocale() {
+        locale = Locale.getDefault();
+    }
+
+    @After
+    public void restoreDefaultLocale() {
+        Locale.setDefault(locale);
+        javax.swing.JComponent.setDefaultLocale(locale);
+        Localization.setLanguage(JabRefPreferences.getInstance().get(JabRefPreferences.LANGUAGE));
     }
 
     @Test
     public void testSetKnownLanguage() {
-        Locale before = Locale.getDefault();
-
-        try {
-            Locale.setDefault(Locale.CHINA);
-            Localization.setLanguage("en");
-            assertEquals("en", Locale.getDefault().toString());
-        } finally {
-            Locale.setDefault(before);
-        }
+        Locale.setDefault(Locale.CHINA);
+        Localization.setLanguage("en");
+        assertEquals("en", Locale.getDefault().toString());
     }
 
     @Test
     public void testSetUnknownLanguage() {
-        Locale before = Locale.getDefault();
-
-        try {
-            Locale.setDefault(Locale.CHINA);
-            Localization.setLanguage("WHATEVER");
-            assertEquals(Locale.CHINA.toString(), Locale.getDefault().toString());
-        } finally {
-            Locale.setDefault(before);
-        }
+        Locale.setDefault(Locale.CHINA);
+        Localization.setLanguage("WHATEVER");
+        assertEquals("en", Locale.getDefault().toString());
     }
 
     @Test
     public void testKnownTranslation() {
-        Locale before = Locale.getDefault();
+        Localization.setLanguage("en");
+        String knownKey = "Groups";
+        assertEquals(knownKey, Localization.lang(knownKey));
+        assertEquals(knownKey, Localization.menuTitle(knownKey));
+    }
 
-        try {
-            Localization.setLanguage("en");
-            String knownKey = "Groups";
-            assertEquals(knownKey, Localization.lang(knownKey));
-            assertEquals(knownKey, Localization.menuTitle(knownKey));
-        } finally {
-            Locale.setDefault(before);
-        }
+    @Test
+    public void testKnownTranslationWithCountryModifier() {
+        Localization.setLanguage("en_US");
+        String knownKey = "Groups";
+        assertEquals(knownKey, Localization.lang(knownKey));
+        assertEquals(knownKey, Localization.menuTitle(knownKey));
     }
 
     @Test
     public void testUnknownTranslation() {
-        Locale before = Locale.getDefault();
-
-        try {
-            Localization.setLanguage("en");
-            String knownKey = "WHATEVER";
-            assertEquals(knownKey, Localization.lang(knownKey));
-            assertEquals(knownKey, Localization.menuTitle(knownKey));
-        } finally {
-            Locale.setDefault(before);
-        }
+        Localization.setLanguage("en");
+        String knownKey = "WHATEVER";
+        assertEquals(knownKey, Localization.lang(knownKey));
+        assertEquals(knownKey, Localization.menuTitle(knownKey));
     }
 
 }

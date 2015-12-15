@@ -18,31 +18,31 @@ public class Localization {
     private static ResourceBundle menuTitles;
 
     public static void setLanguage(String language) {
-        Locale locale = new Locale(language);
+        Optional<String> knownLanguage = Languages.convertToKnownLocale(language);
+        if(!knownLanguage.isPresent()) {
+            LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + Locale.getDefault()+ ")");
+            setLanguage("en");
+            return;
+        }
+
+        Locale locale = new Locale(knownLanguage.get());
+
+        Locale.setDefault(locale);
+        javax.swing.JComponent.setDefaultLocale(locale);
 
         try {
-            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
-            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale,
-                    new EncodingControl(StandardCharsets.UTF_8));
-
-            // silent fallback to system locale when bundle is not found
-            if (!messages.getLocale().equals(locale) && !menuTitles.getLocale().equals(locale)) {
-                LOGGER.warn("Bundle for locale <" + locale + "> not found. Falling back to system locale <" + defaultLocale + ">");
-                locale = defaultLocale;
-            }
+            createResourceBundles(locale);
         } catch (MissingResourceException e) {
-            LOGGER.warn("Bundle for locale <" + locale + "> not found. Fallback to system locale <" + defaultLocale
-                    + "> failed, using locale <en> instead", e);
-
-            locale = new Locale("en");
-            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
-            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale,
-                    new EncodingControl(StandardCharsets.UTF_8));
-        } finally {
-            // Set consistent VM locales
-            Locale.setDefault(locale);
-            javax.swing.JComponent.setDefaultLocale(locale);
+            // SHOULD NOT HAPPEN AS WE HAVE SCRIPTS TO COVER FOR THIS
+            LOGGER.warn("Could not find bundles for language " + locale + ", switching to full english language", e);
+            setLanguage("en");
         }
+    }
+
+    private static void createResourceBundles(Locale locale) {
+        messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
+        menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale,
+                new EncodingControl(StandardCharsets.UTF_8));
     }
 
     /**
@@ -55,24 +55,20 @@ public class Localization {
      * @return
      */
     private static String translate(ResourceBundle resBundle, String idForErrorMessage, String key, String... params) {
+        Objects.requireNonNull(resBundle);
+
         String translation = null;
         try {
-            if (resBundle != null) {
-                String propertiesKey = new LocalizationKey(key).getPropertiesKeyUnescaped();
-                translation = resBundle.getString(propertiesKey);
-            }
+            String propertiesKey = new LocalizationKey(key).getPropertiesKeyUnescaped();
+            translation = resBundle.getString(propertiesKey);
         } catch (MissingResourceException ex) {
             LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
                     + Locale.getDefault());
         }
-        if (translation == null) {
-            LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
+        if (translation == null || translation.isEmpty()) {
+            LOGGER.warn("Warning: no " + idForErrorMessage + " translation for \"" + key + "\" for locale "
                     + Locale.getDefault());
 
-            translation = key;
-        }
-
-        if (translation == null || translation.isEmpty()) {
             return key;
         }
 
@@ -80,10 +76,16 @@ public class Localization {
     }
 
     public static String lang(String key, String... params) {
+        if(messages == null) {
+            setLanguage("en");
+        }
         return translate(messages, "message", key, params);
     }
 
     public static String menuTitle(String key, String... params) {
+        if(menuTitles == null) {
+            setLanguage("en");
+        }
         return translate(menuTitles, "menu item", key, params);
     }
 
