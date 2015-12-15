@@ -28,7 +28,6 @@ import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -188,6 +187,7 @@ public class BibtexParser {
             // try to read the entry type
             String entryType = parseTextToken();
             EntryType type = EntryTypes.getType(entryType);
+            MyEntryClass myClass = MyEntryClasses.getClassFor(entryType);
             boolean isEntry = type != null;
 
             // The entry type name was not recognized. This can mean
