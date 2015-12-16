@@ -66,7 +66,7 @@ public class SpringerLink implements FullTextFinder {
                     pdfLink = Optional.of(new URL("http", CONTENT_HOST, String.format("/content/pdf/%s.pdf", doi.get().getDOI())));
                 }
             } catch(UnirestException e) {
-                LOGGER.warn("SpringerLink API request failed: " + e.getMessage(), e);
+                LOGGER.warn("SpringerLink API request failed", e);
             }
         }
 

@@ -53,7 +53,7 @@ public class FindFullTextAction extends AbstractWorker {
         // TODO: just download for all entries and save files without dialog
         entry = basePanel.getSelectedEntries()[0];
         FindFullText fft = new FindFullText();
-        result = fft.findFullText(entry);
+        result = fft.findFullTextPDF(entry);
     }
 
     @Override

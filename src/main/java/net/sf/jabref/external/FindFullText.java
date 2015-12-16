@@ -1,24 +1,22 @@
 package net.sf.jabref.external;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.logic.io.MimeTypeDetector;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.fetcher.*;
-import net.sf.jabref.logic.net.URLDownload;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Utility class for trying to resolve URLs to full-text PDF for articles.
  */
 public class FindFullText {
+    private static final Log LOGGER = LogFactory.getLog(FindFullText.class);
 
     private final List<FullTextFinder> finders = new ArrayList<>();
 
@@ -33,31 +31,22 @@ public class FindFullText {
         finders.add(new GoogleScholar());
     }
 
-    public Optional<URL> findFullText(BibEntry entry) {
+    public FindFullText(List<FullTextFinder> fetcher) {
+        finders.addAll(fetcher);
+    }
+
+    public Optional<URL> findFullTextPDF(BibEntry entry) {
         for (FullTextFinder finder : finders) {
             try {
                 Optional<URL> result = finder.findFullText(entry);
 
                 if (result.isPresent()) {
-                    // TODO: recheck this!
-                    // Check the MIME type of this URL to see if it is a PDF. If not,
-                    // it could be because the user doesn't have access:
-                    // FIXME: redirection break this!
-                    // Property-based software engineering measurement
-                    // http://drum.lib.umd.edu/bitstream/1903/19/2/CS-TR-3368.pdf
-                    // FIXME:
-                    // INFO: Fulltext PDF found @ Google: https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/sose14-towards-application-portability-in-paas.pdf
-                    // javax.net.ssl.SSLProtocolException: handshake alert:  unrecognized_name
-                    // http://stackoverflow.com/questions/7615645/ssl-handshake-alert-unrecognized-name-error-since-upgrade-to-java-1-7-0
-                    String mimeType = new URLDownload(result.get()).determineMimeType();
-                    if ((mimeType != null) && "application/pdf".equals(mimeType.toLowerCase())) {
-                        return Optional.of(result.get());
-                    } else {
-                        // TODO log
+                    if(MimeTypeDetector.isPdfContentType(result.get().toString())) {
+                        return result;
                     }
                 }
-            } catch (IOException ex) {
-                // TODO log
+            } catch (IOException e) {
+                LOGGER.debug("Failed to find fulltext PDF at given URL", e);
                 continue;
             }
         }
