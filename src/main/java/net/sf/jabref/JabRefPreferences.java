@@ -1179,7 +1179,7 @@ public class JabRefPreferences {
      * Stores all information about the entry type in preferences, with the tag given by number.
      */
     public void storeCustomEntryType(CustomEntryType tp, int number) {
-        String nr = "" + number;
+        String nr = String.valueOf(number);
         put(JabRefPreferences.CUSTOM_TYPE_NAME + nr, tp.getName());
         put(JabRefPreferences.CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());
         putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, tp.getOptionalFields().toArray(new String[0]));
@@ -1190,7 +1190,7 @@ public class JabRefPreferences {
      * Retrieves all information about the entry type in preferences, with the tag given by number.
      */
     public CustomEntryType getCustomEntryType(int number) {
-        String nr = "" + number;
+        String nr = String.valueOf(number);
         String name = get(JabRefPreferences.CUSTOM_TYPE_NAME + nr);
         String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
         String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
