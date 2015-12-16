@@ -50,10 +50,6 @@ import org.apache.pdfbox.pdmodel.common.PDMetadata;
  * in PDF-documents.
  *
  * @author Christopher Oezbek <oezi@oezi.de>
- *
- * TODO:
- *
- * Synchronization
  */
 public class XMPUtil {
 
