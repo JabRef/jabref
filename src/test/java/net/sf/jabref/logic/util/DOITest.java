@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.util;
 
 import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.util.io.URLUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -104,5 +105,6 @@ public class DOITest {
         // add / to RESOLVER url if missing
         Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("10.1006/jmbi.1998.2354").getURLAsASCIIString());
         Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("http://doi.org/10.1006/jmbi.1998.2354").getURLAsASCIIString());
+        Assert.assertEquals("http://doi.org/10.1109/VLHCC.2004.20", new DOI("doi:10.1109/VLHCC.2004.20").getURLAsASCIIString());
     }
 }

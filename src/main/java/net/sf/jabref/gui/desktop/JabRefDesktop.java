@@ -8,6 +8,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.io.URLUtil;
@@ -23,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
@@ -60,11 +62,12 @@ public class JabRefDesktop {
             }
 
         } else if ("doi".equals(fieldName)) {
+            Optional<DOI> doiUrl = DOI.build(link);
+            if(doiUrl.isPresent()) {
+                link = doiUrl.get().getURLAsASCIIString();
+            }
+            // should be opened in browser
             fieldName = "url";
-
-            // sanitizing is done below at the treatment of "URL"
-            // in sanitizeUrl a doi-link is correctly treated
-
         } else if ("eprint".equals(fieldName)) {
             fieldName = "url";
 
