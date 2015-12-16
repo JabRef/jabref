@@ -551,14 +551,14 @@ class MSBibEntry {
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     private int getLCID(String language) {
-        // TODO: add lanaguage to LCID mapping
+        // TODO: add language to LCID mapping
 
         return 0;
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     private String getLanguage(int LCID) {
-        // TODO: add lanaguage to LCID mapping
+        // TODO: add language to LCID mapping
 
         return "english";
     }

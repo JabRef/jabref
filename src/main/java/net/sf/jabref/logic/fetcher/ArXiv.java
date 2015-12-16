@@ -79,8 +79,6 @@ public class ArXiv implements FullTextFinder {
                 LOGGER.warn("arXiv API request failed", e);
             }
         }
-        // TODO: title search
-        // We can also get abstract automatically!
         return pdfLink;
     }
 }

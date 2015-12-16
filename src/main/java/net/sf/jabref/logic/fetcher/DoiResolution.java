@@ -73,7 +73,7 @@ public class DoiResolution implements FullTextFinder {
                     for (Element element : elements) {
                         String href = element.attr("abs:href");
                         // Only check if pdf is included in the link
-                        // FIXME: see https://github.com/lehner/LocalCopy for scrape ideas
+                        // See https://github.com/lehner/LocalCopy for scrape ideas
                         if(href.contains("pdf")) {
                             if(MimeTypeDetector.isPdfContentType(href)) {
                                 links.add(Optional.of(new URL(href)));

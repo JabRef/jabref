@@ -72,9 +72,6 @@ public class ScienceDirect implements FullTextFinder {
                 LOGGER.warn("ScienceDirect API request failed", e);
             }
         }
-
-        // TODO: title search
-        // We can also get abstract automatically!
         return pdfLink;
     }
 

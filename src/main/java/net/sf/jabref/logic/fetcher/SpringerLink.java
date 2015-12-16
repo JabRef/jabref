@@ -69,9 +69,6 @@ public class SpringerLink implements FullTextFinder {
                 LOGGER.warn("SpringerLink API request failed", e);
             }
         }
-
-        // TODO: title search
-        // We can also get abstract automatically!
         return pdfLink;
     }
 }

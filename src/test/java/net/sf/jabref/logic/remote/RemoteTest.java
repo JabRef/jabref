@@ -66,7 +66,6 @@ public class RemoteTest {
                 server.openAndStart(msg -> Assert.fail("should not happen"), port);
                 Assert.assertFalse(server.isOpen());
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 Assert.fail("Exception: " + e.getMessage());
             }
         }

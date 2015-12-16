@@ -303,8 +303,8 @@ public class FileFinder {
                 }
                 // Do for all direct and indirect subdirs
                 if ("**".equals(dirToProcess)) {
-                    List<File> toDo = new LinkedList<>();
-                    toDo.add(directory);
+                    List<File> files = new LinkedList<>();
+                    files.add(directory);
 
                     String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
 
@@ -315,15 +315,15 @@ public class FileFinder {
                         return result;
                     }
 
-                    while (!toDo.isEmpty()) {
+                    while (!files.isEmpty()) {
 
-                        // Get all subdirs of each of the elements found in toDo
-                        File[] subDirs = toDo.remove(0).listFiles();
+                        // Get all subdirs of each of the elements found in files
+                        File[] subDirs = files.remove(0).listFiles();
                         if (subDirs == null) {
                             continue;
                         }
 
-                        toDo.addAll(Arrays.asList(subDirs));
+                        files.addAll(Arrays.asList(subDirs));
 
                         for (File subDir : subDirs) {
                             if (!subDir.isDirectory()) {
