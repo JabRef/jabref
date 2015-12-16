@@ -28,8 +28,12 @@ public class MimeTypeDetector {
         String contentType = null;
 
         try {
-            contentType = new URL(url).openConnection().getContentType();
-        } catch(IOException e) {
+            contentType = Unirest.head(url).asBinary().getHeaders().getFirst("content-type");
+            // HEAD and GET headers might differ, try real GET request
+            if(contentType == null) {
+                contentType = Unirest.get(url).asBinary().getHeaders().getFirst("content-type");
+            }
+        } catch (UnirestException e) {
             LOGGER.debug("Error getting MIME type of URL", e);
         } finally {
             return contentType;

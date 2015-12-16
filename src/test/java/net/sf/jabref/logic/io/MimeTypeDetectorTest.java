@@ -2,6 +2,7 @@ package net.sf.jabref.logic.io;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -29,5 +30,11 @@ public class MimeTypeDetectorTest {
         // application/pdf;charset=ISO-8859-1
         String pdfUrl = "http://drum.lib.umd.edu/bitstream/1903/19/2/CS-TR-3368.pdf";
         assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
+    }
+
+    @Test
+    public void useGetRequestIfHeadRequestHasNoContentType() {
+        String pdfUrl = "http://iopscience.iop.org/article/10.1088/0004-637X/815/1/23/pdf";
+        assertEquals("application/pdf", MimeTypeDetector.getMimeType(pdfUrl));
     }
 }
