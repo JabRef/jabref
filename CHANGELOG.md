@@ -39,6 +39,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed #443/#445: Fixed sorting and moving special field columns
 - Fixed #498: non-working legacy PDF/PS column removed
 - Fixed #473: Import/export to external database works again
+- Fixed #526: OpenOffice/LibreOffice connection works again on Linux/OSX
 
 ### Removed
 - Removed file history size preference (never available from the UI)
