@@ -59,7 +59,12 @@ public class DoiResolution implements FullTextFinder {
             // follow all redirects and scan for a single pdf link
             try {
                 if (!sciLink.isEmpty()) {
-                    Connection connection = Jsoup.connect(sciLink).followRedirects(true).ignoreHttpErrors(true);
+                    Connection connection = Jsoup.connect(sciLink);
+                    connection.followRedirects(true);
+                    connection.ignoreHttpErrors(true);
+                    // some publishers are quite slow (default is 3s)
+                    connection.timeout(5000);
+
                     Document html = connection.get();
                     // scan for PDF
                     Elements elements = html.body().select("[href]");

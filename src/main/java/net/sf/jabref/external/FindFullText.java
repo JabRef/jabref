@@ -23,6 +23,7 @@ public class FindFullText {
     public FindFullText() {
         // Ordering is important, authorities first!
         // Publisher
+        finders.add(new DoiResolution());
         finders.add(new ScienceDirect());
         finders.add(new SpringerLink());
         finders.add(new ACS());
