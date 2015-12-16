@@ -24,12 +24,12 @@ public class MimeTypeDetector {
         return contentType.toLowerCase().startsWith("application/pdf");
     }
 
-    private static String getMimeType(String url) {
+    public static String getMimeType(String url) {
         String contentType = null;
 
         try {
-            contentType = Unirest.head(url).asBinary().getHeaders().getFirst("content-type");
-        } catch(UnirestException e) {
+            contentType = new URL(url).openConnection().getContentType();
+        } catch(IOException e) {
             LOGGER.debug("Error getting MIME type of URL", e);
         } finally {
             return contentType;
