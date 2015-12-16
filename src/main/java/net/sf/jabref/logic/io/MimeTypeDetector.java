@@ -34,7 +34,7 @@ public class MimeTypeDetector {
                 contentType = Unirest.get(url).asBinary().getHeaders().getFirst("content-type");
             }
         } catch (UnirestException e) {
-            LOGGER.info("Error getting MIME type of URL", e);
+            LOGGER.debug("Error getting MIME type of URL", e);
         } finally {
             return contentType;
         }
