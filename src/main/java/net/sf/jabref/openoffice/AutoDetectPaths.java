@@ -331,13 +331,7 @@ public class AutoDetectPaths extends AbstractWorker {
 
         for (String rootPath : sourceList) {
             File root = new File(rootPath);
-            File[] dirs = root.listFiles(new FileFilter() {
-
-                @Override
-                public boolean accept(File file) {
-                    return file.isDirectory();
-                }
-            });
+            File[] dirs = root.listFiles(File::isDirectory);
             if (dirs != null) {
                 Collections.addAll(dirList, dirs);
             }

@@ -136,12 +136,7 @@ public class DownloadExternalFile {
                     return;
                 }
                 // Download finished: call the method that stops the progress bar etc.:
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        downloadFinished();
-                    }
-                });
+                SwingUtilities.invokeLater(DownloadExternalFile.this::downloadFinished);
             }
         });
 
