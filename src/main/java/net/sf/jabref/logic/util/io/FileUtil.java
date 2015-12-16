@@ -70,7 +70,7 @@ public class FileUtil {
         List<String> pathSubstrings = Arrays.asList(arr);
 
         // compute shortest folder substrings
-        while(!stackList.stream().allMatch(p -> p.isEmpty())) {
+        while(!stackList.stream().allMatch(Vector::isEmpty)) {
             for(int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
