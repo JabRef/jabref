@@ -1,16 +1,9 @@
 package net.sf.jabref.logic.io;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sf.jabref.logic.net.URLDownload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Optional;
 
 public class MimeTypeDetector {
     private static final Log LOGGER = LogFactory.getLog(MimeTypeDetector.class);

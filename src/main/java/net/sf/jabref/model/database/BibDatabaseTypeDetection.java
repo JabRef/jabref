@@ -1,6 +1,5 @@
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;

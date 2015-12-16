@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.l10n;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -44,7 +44,6 @@ import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.TransferableFileLinkSelection;
 import net.sf.jabref.gui.maintable.MainTable;
-import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.importer.ImportMenuItem;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.pdfimport.PdfImporter;

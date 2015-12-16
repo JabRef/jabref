@@ -23,9 +23,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.Optional;
-
-import net.sf.jabref.logic.util.DOI;
 
 public class URLUtil {
 

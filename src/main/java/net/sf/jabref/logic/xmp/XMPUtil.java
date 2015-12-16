@@ -30,7 +30,6 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 import org.apache.jempbox.impl.DateConverter;
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;

@@ -2,7 +2,6 @@ package net.sf.jabref.bibtex;
 
 import static org.junit.Assert.*;
 
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;

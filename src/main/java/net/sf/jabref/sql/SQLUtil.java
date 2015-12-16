@@ -15,7 +15,6 @@
  */
 package net.sf.jabref.sql;
 
-import java.io.Closeable;
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.ResultSet;

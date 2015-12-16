@@ -1,14 +1,11 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.logic.fetcher.FullTextFinder;
-import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;

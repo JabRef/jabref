@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.util.*;
-import java.util.List;
+
 public class UtilTest {
 
     @Test

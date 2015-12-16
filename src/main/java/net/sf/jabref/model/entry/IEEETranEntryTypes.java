@@ -2,7 +2,6 @@ package net.sf.jabref.model.entry;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class represents all supported IEEETran entry types.
