@@ -2331,7 +2331,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public class CloseOtherDatabasesAction extends MnemonicAwareAction {
         @Override
         public void actionPerformed(ActionEvent e) {
-            final BasePanel active = (BasePanel) getCurrentBasePanel();
+            final BasePanel active = getCurrentBasePanel();
             final Component[] panels = tabbedPane.getComponents();
 
             for(Component p : panels) {

@@ -25,7 +25,6 @@ import javax.swing.JTabbedPane;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
