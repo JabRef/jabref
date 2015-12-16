@@ -123,9 +123,8 @@ public class SQLUtil {
     public static String fieldsAsCols(ArrayList<String> fields, String datatype) {
         String field;
         ArrayList<String> newFields = new ArrayList<>();
-        ListIterator<String> li = fields.listIterator();
-        while (li.hasNext()) {
-            field = li.next();
+        for (String field1 : fields) {
+            field = field1;
             if (SQLUtil.reservedDBWords.contains(field)) {
                 field = field + '_';
             }

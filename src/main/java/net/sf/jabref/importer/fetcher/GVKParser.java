@@ -93,10 +93,7 @@ public class GVKParser {
         // Alle relevanten Informationen einsammeln
 
         List<Element> datafields = getChildren("datafield", e);
-        Iterator<Element> iter = datafields.iterator();
-        while (iter.hasNext()) {
-            Element datafield = iter.next();
-
+        for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
             LOGGER.debug("tag: " + tag);
 
@@ -447,10 +444,8 @@ public class GVKParser {
 
     private String getSubfield(String a, Element datafield) {
         List<Element> liste = getChildren("subfield", datafield);
-        Iterator<Element> iter = liste.iterator();
 
-        while (iter.hasNext()) {
-            Element subfield = iter.next();
+        for (Element subfield : liste) {
             if (subfield.getAttribute("code").equals(a)) {
                 return (subfield.getTextContent());
             }
