@@ -34,7 +34,7 @@ public class GVKParserTest {
 
     @Test
     public void emptyResult() throws Exception {
-        doTest("gvk_empty_result_becaue_of_bad_query.xml", 0, Collections.EMPTY_LIST);
+        doTest("gvk_empty_result_becaue_of_bad_query.xml", 0, Collections.emptyList());
     }
 
     @Test

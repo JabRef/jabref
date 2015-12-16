@@ -164,7 +164,7 @@ public class GVKFetcher implements EntryFetcher {
                 uri = new URI(searchstring);
             } catch (URISyntaxException e) {
                 LOGGER.error("URI malformed error", e);
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
             URL url = uri.toURL();
             try (InputStream is = url.openStream()) {
@@ -172,13 +172,13 @@ public class GVKFetcher implements EntryFetcher {
             }
         } catch (IOException e) {
             LOGGER.error("GVK plugin: An I/O exception occurred", e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         } catch (ParserConfigurationException e) {
             LOGGER.error("GVK plugin: An internal parser error occurred", e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         } catch (SAXException e) {
             LOGGER.error("An internal parser error occurred", e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return result;

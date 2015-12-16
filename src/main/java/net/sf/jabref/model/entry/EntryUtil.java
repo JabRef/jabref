@@ -49,7 +49,7 @@ public class EntryUtil {
             return Collections.unmodifiableList(all);
         }
         if (all.equals(subset)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         ArrayList<String> al = new ArrayList<>();
