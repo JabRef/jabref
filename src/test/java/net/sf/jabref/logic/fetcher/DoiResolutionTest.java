@@ -9,12 +9,12 @@ import java.net.URL;
 import java.util.Optional;
 
 public class DoiResolutionTest {
-    GoogleScholar finder;
+    DoiResolution finder;
     BibEntry entry;
 
     @Before
     public void setup() {
-        finder = new GoogleScholar();
+        finder = new DoiResolution();
         entry = new BibEntry();
     }
 
@@ -24,29 +24,28 @@ public class DoiResolutionTest {
     }
 
     @Test
-    public void requiresEntryTitle() throws IOException {
+    public void doiNotPresent() throws IOException {
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void linkFound() throws IOException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
-        entry.setField("title", "Towards Application Portability in Platform as a Service");
+    public void findByDOI() throws IOException {
+        entry.setField("doi", "10.1051/0004-6361/201527330");
 
         Assert.assertEquals(
-                Optional.of(new URL("https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/sose14-towards-application-portability-in-paas.pdf")),
+                Optional.of(new URL("http://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf")),
                 finder.findFullText(entry)
         );
     }
 
+    @Ignore
     @Test
-    public void noLinkFound() throws IOException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+    public void notReturnAnythingWhenMultipleLinksAreFound() throws IOException {
+    }
 
-        entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
+    @Test
+    public void notFoundByDOI() throws IOException {
+        entry.setField("doi", "10.1186/unknown-doi");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
