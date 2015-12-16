@@ -1982,8 +1982,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     }
                     String[] names = prefs.getStringArray("savedSession");
                     ArrayList<File> filesToOpen = new ArrayList<>();
-                    for (int i = 0; i < names.length; i++) {
-                        filesToOpen.add(new File(names[i]));
+                    for (String name : names) {
+                        filesToOpen.add(new File(name));
                     }
                     open.openFiles(filesToOpen, true);
                     running = false;

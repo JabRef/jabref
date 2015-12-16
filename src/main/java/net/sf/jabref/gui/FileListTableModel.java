@@ -254,8 +254,7 @@ public class FileListTableModel extends AbstractTableModel {
     public String getStringRepresentation() {
         String[][] array = new String[list.size()][];
         int i = 0;
-        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry entry = iterator.next();
+        for (FileListEntry entry : list) {
             array[i] = entry.getStringArrayRepresentation();
             i++;
         }
