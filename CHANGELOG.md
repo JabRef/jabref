@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Added new DoiResolution fetcher that tries to download full text PDF from DOI link
 - Add options to close other/all databases in tab right-click menu
 - Implements #470: Show editor (as an alternative to author) and booktitle (as an alternative to journal) in the main table by default
 - Restore focus to last focused tab on start
