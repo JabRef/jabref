@@ -276,7 +276,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            return new ParserResult(database, new MetaData(), new HashMap<String, EntryType>());
+            return new ParserResult(database, new MetaData(), new HashMap<>());
 
         }
     }

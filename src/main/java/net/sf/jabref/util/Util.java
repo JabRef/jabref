@@ -985,7 +985,7 @@ public class Util {
 
         // Initialize Result-Set
         for (BibEntry entry : entries) {
-            result.put(entry, new ArrayList<File>());
+            result.put(entry, new ArrayList<>());
         }
 
         boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);

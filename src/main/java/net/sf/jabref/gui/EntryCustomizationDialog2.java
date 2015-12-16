@@ -96,12 +96,12 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         typeComp.setListSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         //typeComp.setEnabled(false);
-        reqComp = new FieldSetComponent(Localization.lang("Required fields"), new ArrayList<String>(), preset, true, true);
+        reqComp = new FieldSetComponent(Localization.lang("Required fields"), new ArrayList<>(), preset, true, true);
         reqComp.setEnabled(false);
         reqComp.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         ListDataListener dataListener = new DataListener();
         reqComp.addListDataListener(dataListener);
-        optComp = new FieldSetComponent(Localization.lang("Optional fields"), new ArrayList<String>(), preset, true, true);
+        optComp = new FieldSetComponent(Localization.lang("Optional fields"), new ArrayList<>(), preset, true, true);
         optComp.setEnabled(false);
         optComp.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         optComp.addListDataListener(dataListener);
@@ -109,7 +109,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         right.add(optComp);
 
         if (biblatexMode) {
-            optComp2 = new FieldSetComponent(Localization.lang("Optional fields") + " 2", new ArrayList<String>(), preset, true, true);
+            optComp2 = new FieldSetComponent(Localization.lang("Optional fields") + " 2", new ArrayList<>(), preset, true, true);
             optComp2.setEnabled(false);
             optComp2.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
             optComp2.addListDataListener(dataListener);
@@ -200,12 +200,12 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 optComp.setEnabled(true);
             } else {
                 // New entry
-                reqComp.setFields(new ArrayList<String>());
+                reqComp.setFields(new ArrayList<>());
                 reqComp.setEnabled(true);
-                optComp.setFields(new ArrayList<String>());
+                optComp.setFields(new ArrayList<>());
                 optComp.setEnabled(true);
                 if (biblatexMode) {
-                    optComp2.setFields(new ArrayList<String>());
+                    optComp2.setFields(new ArrayList<>());
                     optComp2.setEnabled(true);
                 }
                 new FocusRequester(reqComp);

@@ -61,7 +61,7 @@ public class DoiResolution implements FullTextFinder {
                     Document html = connection.get();
                     // scan for PDF
                     Elements elements = html.body().select("[href]");
-                    List<Optional<URL>> links = new ArrayList<Optional<URL>>();
+                    List<Optional<URL>> links = new ArrayList<>();
 
                     for (Element element : elements) {
                         String href = element.attr("abs:href");

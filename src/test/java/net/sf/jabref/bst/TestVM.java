@@ -409,7 +409,7 @@ public class TestVM {
                 + " FUNCTION {n.dashify} { \"HELLO-WORLD\" 't := t empty$ not } "
                 + " EXECUTE {n.dashify}                    ");
 
-        vm.run(new Vector<BibEntry>());
+        vm.run(new Vector<>());
 
         Assert.assertEquals(VM.TRUE, vm.getStack().pop());
     }
