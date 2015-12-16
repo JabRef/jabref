@@ -164,8 +164,9 @@ class OOBibBase {
 
         ClassLoader loader = ClassLoader.getSystemClassLoader();
         if (loader instanceof URLClassLoader) {
-            try (URLClassLoader cl = (URLClassLoader) loader) {
-                Class<URLClassLoader> sysclass = URLClassLoader.class;
+            URLClassLoader cl = (URLClassLoader) loader;
+            Class<URLClassLoader> sysclass = URLClassLoader.class;
+            try {
 
                 Method method = sysclass.getDeclaredMethod("addURL", URL.class);
                 method.setAccessible(true);
