@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.util;
 
-import net.sf.jabref.logic.util.DOI;
 import org.junit.Assert;
 import org.junit.Test;
 

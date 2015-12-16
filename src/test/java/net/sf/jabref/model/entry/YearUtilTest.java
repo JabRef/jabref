@@ -3,8 +3,6 @@ package net.sf.jabref.model.entry;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jabref.model.entry.YearUtil;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;

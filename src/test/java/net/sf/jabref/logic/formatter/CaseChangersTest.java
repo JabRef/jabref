@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.formatter;
 
-import net.sf.jabref.logic.formatter.CaseChangers;
 import org.junit.Assert;
 import org.junit.Test;
 
