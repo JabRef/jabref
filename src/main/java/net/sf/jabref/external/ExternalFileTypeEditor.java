@@ -32,7 +32,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
@@ -48,7 +48,7 @@ public class ExternalFileTypeEditor extends JDialog {
     private JTable table;
     private ExternalFileTypeEntryEditor entryEditor;
     private FileTypeTableModel tableModel;
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
     private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
@@ -173,11 +173,11 @@ public class ExternalFileTypeEditor extends JDialog {
         // Key bindings:
         ActionMap am = upper.getActionMap();
         InputMap im = upper.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
         am = bb.getPanel().getActionMap();
         im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         if (frame != null) {

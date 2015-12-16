@@ -112,11 +112,9 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         } catch (FileNotFoundException e) {
 
             if (status != null) {
-                // @formatter:off
                 status.showMessage(Localization.lang("Unknown DOI: '%0'.", doi.getDOI()),
                         Localization.lang("Get BibTeX entry from DOI"),
                         JOptionPane.INFORMATION_MESSAGE);
-                // @formatter:on
             }
             return null;
         } catch (IOException e) {

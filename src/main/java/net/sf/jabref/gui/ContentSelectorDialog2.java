@@ -79,7 +79,7 @@ class ContentSelectorDialog2 extends JDialog {
     private final JButton removeField = new JButton(Localization.lang("Remove"));
     private final JButton newWord = new JButton(Localization.lang("New"));
     private final JButton removeWord = new JButton(Localization.lang("Remove"));
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton();
     private final JButton apply = new JButton(Localization.lang("Apply"));
     private final DefaultListModel<String> fieldListModel = new DefaultListModel<>();

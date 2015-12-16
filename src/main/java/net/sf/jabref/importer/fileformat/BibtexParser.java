@@ -253,10 +253,8 @@ public class BibtexParser {
             if (duplicateKey) {
                 parserResult.addDuplicateKey(entry.getCiteKey());
             } else if ((entry.getCiteKey() == null) || "".equals(entry.getCiteKey())) {
-                parserResult
-                        .addWarning(Localization.lang("Empty BibTeX key") + ": "
-                                + entry.getAuthorTitleYear(40) + " ("
-                                + Localization.lang("grouping may not work for this entry") + ")");
+                parserResult.addWarning(Localization.lang("Empty BibTeX key") + ": " + entry.getAuthorTitleYear(40)
+                        + " (" + Localization.lang("Grouping may not work for this entry.") + ")");
             }
         } catch (IOException ex) {
             LOGGER.warn("Could not parse entry", ex);

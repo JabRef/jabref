@@ -12,7 +12,6 @@ public class BibtexEntryGenerator {
     }
 
     private String generateBibtexEntry(int i) {
-        // @formatter:off
         return "@article{einstein1916grundlage" + i + ",\n" +
                 "  title={Die grundlage der allgemeinen relativit{\\\"a}tstheorie},\n" +
                 "  author={Einstein, Albert},\n" +
@@ -23,7 +22,6 @@ public class BibtexEntryGenerator {
                 "  year={1916},\n" +
                 "  publisher={Wiley Online Library}\n" +
                 "}\n";
-        // @formatter:on
     }
 
 }

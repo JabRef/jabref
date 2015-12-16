@@ -23,10 +23,10 @@ import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.push.PushToApplication;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
@@ -462,7 +462,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         content.add(b.getPanel(), BorderLayout.CENTER);
 
         OpenOfficePanel.frame.getTabbedPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.prefs.getKey(KeyBinds.REFRESH_OO), "Refresh OO");
+                .put(Globals.getKeyPrefs().getKey(KeyBinding.REFRESH_OO), "Refresh OO");
         OpenOfficePanel.frame.getTabbedPane().getActionMap().put("Refresh OO", updateAction);
 
         //diag.pack();
@@ -600,9 +600,14 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
             }
             else {
-                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Could not connect to running OpenOffice.\n"
-                        + "Make sure you have installed OpenOffice with Java support.\nIf connecting manually, please verify program and library paths.\n"
-                        + "\nError message: " + e.getMessage()));
+                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Could not connect to running OpenOffice.")
+                        + "\n"
+                        + Localization.lang("Make sure you have installed OpenOffice with Java support.")
+                        + "\n"
+                        + Localization.lang("If connecting manually, please verify program and library paths.")
+                        + "\n"
+                        + "\n"
+                        + Localization.lang("Error message:") + " " + e.getMessage());
             }
         }
     }
@@ -702,7 +707,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         }
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         //JButton auto = new JButton(Globals.lang("Autodetect"));
         ActionListener tfListener = new ActionListener() {

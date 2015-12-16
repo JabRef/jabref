@@ -293,7 +293,7 @@ public class OAI2Fetcher implements EntryFetcher {
                     }
                 }
 
-                status.setStatus(Localization.lang("Processing ") + key);
+                status.setStatus(Localization.lang("Processing") + " " + key);
 
                 /* the cancel button has been hit */
                 if (!shouldContinue) {

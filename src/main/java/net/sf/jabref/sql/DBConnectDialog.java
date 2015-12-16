@@ -24,7 +24,7 @@ import java.util.Arrays;
 import javax.swing.*;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -181,7 +181,7 @@ public class DBConnectDialog extends JDialog {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
     }
 
@@ -212,7 +212,7 @@ public class DBConnectDialog extends JDialog {
             cnt++;
         }
 
-        String errMsg = Localization.lang("Please specify the ");
+        String errMsg = Localization.lang("Please specify the") + " ";
 
         switch (cnt) {
         case 0:

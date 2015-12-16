@@ -47,7 +47,7 @@ public class CaseKeeper implements Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("CaseKepper");
+        return Localization.lang("CaseKeeper");
     }
 
 }

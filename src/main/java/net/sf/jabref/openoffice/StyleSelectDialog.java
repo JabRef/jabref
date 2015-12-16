@@ -56,6 +56,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.Globals;
@@ -68,7 +69,6 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -112,7 +112,7 @@ class StyleSelectDialog {
     private PreviewPanel preview;
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final BibEntry prevEntry = new BibEntry(IdGenerator.next());
 
@@ -356,7 +356,7 @@ class StyleSelectDialog {
 
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelListener);
         im.put(KeyStroke.getKeyStroke("ENTER"), "enterOk");
         am.put("enterOk", okListener);
@@ -594,7 +594,7 @@ class StyleSelectDialog {
             JScrollPane sp = new JScrollPane(ta);
             sp.setPreferredSize(new Dimension(700, 500));
             dd.getContentPane().add(sp, BorderLayout.CENTER);
-            JButton okButton = new JButton(Localization.lang("Ok"));
+            JButton okButton = new JButton(Localization.lang("OK"));
             ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
             bb.addButton(okButton);

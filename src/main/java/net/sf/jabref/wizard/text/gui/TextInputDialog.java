@@ -85,7 +85,7 @@ import javax.swing.text.StyledDocument;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
@@ -172,7 +172,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         // Key bindings:
         ActionMap am = buttons.getActionMap();
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -200,7 +200,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         }
 
         OverlayPanel testPanel = new OverlayPanel(textPane,
-                Localization.lang("Text_Input_Area"));
+                Localization.lang("paste_text_here"));
 
         testPanel.setPreferredSize(new Dimension(450, 255));
         testPanel.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
@@ -527,11 +527,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class PasteAction extends BasicAction {
         public PasteAction() {
-            // @formatter:off
             super(Localization.lang("Paste"),
                     Localization.lang("Paste from clipboard"),
                     IconTheme.JabRefIcon.PASTE.getIcon());
-            // @formatter:on
         }
 
         @Override
@@ -555,11 +553,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class LoadAction extends BasicAction {
         public LoadAction() {
-            // @formatter:off
             super(Localization.lang("Open"),
                     Localization.lang("Open file"),
                     IconTheme.JabRefIcon.OPEN.getIcon());
-            // @formatter:on
         }
 
         @Override
@@ -587,11 +583,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class ClearAction extends BasicAction {
         public ClearAction() {
-            // @formatter:off
             super(Localization.lang("Clear"),
                     Localization.lang("Clear inputarea"),
                     IconTheme.JabRefIcon.NEW.getIcon());
-            // @formatter:on
         }
 
         @Override

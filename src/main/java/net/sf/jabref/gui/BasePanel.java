@@ -357,10 +357,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if ((bes != null) && (bes.length > 0)) {
                 // Create a CompoundEdit to make the action undoable.
                 NamedCompound ce = new NamedCompound((bes.length > 1 ?
-                        // @formatter:off
                     Localization.lang("cut entries") :
                     Localization.lang("cut entry")));
-                // @formatter:on
                 // Loop through the array of entries, and delete them.
                 for (BibEntry be : bes) {
                     database.removeEntry(be.getId());
@@ -383,10 +381,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (goOn) {
                     // Create a CompoundEdit to make the action undoable.
                     NamedCompound ce = new NamedCompound((bes.length > 1 ?
-                            // @formatter:off
                         Localization.lang("delete entries") :
                         Localization.lang("delete entry")));
-                    // @formatter:on
                     // Loop through the array of entries, and delete them.
                     for (BibEntry be : bes) {
                         database.removeEntry(be.getId());
@@ -445,10 +441,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if ((bes != null) && (bes.length > 0)) {
 
                     NamedCompound ce = new NamedCompound((bes.length > 1 ?
-                            // @formatter:off
                         Localization.lang("paste entries") :
                         Localization.lang("paste entry")));
-                    // @formatter:on
 
                     // Store the first inserted bibtexentry.
                     // bes[0] does not work as bes[0] is first clonded,
@@ -585,9 +579,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         exporter.exportDatabaseToDBMS(database, metaData, null, dbs, frame);
                         dbs.isConfigValid(true);
                     } catch (Exception ex) {
-                        // @formatter:off
                         String preamble = Localization.lang("Could not export to SQL database for the following reason:");
-                        // @formatter:on
                         errorMessage = SQLUtil.getExceptionMessage(ex);
                         ex.printStackTrace();
                         dbs.isConfigValid(false);
@@ -609,9 +601,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         frame.output(Localization.lang("%0 export successful"));
                     }
                 } else { // show an error dialog if an error occurred
-                    // @formatter:off
                     String preamble = Localization.lang("Could not export to SQL database for the following reason:");
-                    // @formatter:on
                     frame.output(preamble + "  " + errorMessage);
 
                     JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
@@ -780,10 +770,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (keys.size() == bes.length) {
                     // All entries had keys.
                     output((bes.length > 1 ?
-                            // @formatter:off
                         Localization.lang("Copied keys") :
                         Localization.lang("Copied key")) + '.');
-                    // @formatter:on
                 } else {
                     output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
                             Integer.toString(bes.length - keys.size()), Integer.toString(bes.length)));
@@ -821,10 +809,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                     if (keys.size() == bes.length) {
                         // All entries had keys.
-                        // @formatter:off
                         output(bes.length > 1 ? Localization.lang("Copied keys") :
                             Localization.lang("Copied key") + '.');
-                        // @formatter:on
                     } else {
                         output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
                                 Integer.toString(bes.length - keys.size()), Integer.toString(bes.length)));
@@ -875,14 +861,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     if (copied == bes.length) {
                         // All entries had keys.
                         output((bes.length > 1 ?
-                                // @formatter:off
                             Localization.lang("Copied keys") :
                             Localization.lang("Copied key")) + '.');
-                        // @formatter:on
                     } else {
-                        // @formatter:off
                         output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(copied), Integer.toString(bes.length)));
-                        // @formatter:on
                     }
                 }
             }
@@ -1028,10 +1010,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
 
                 output(Localization.lang("Replaced") + ' ' + counter + ' ' + (counter == 1 ?
-                        // @formatter:off
                      Localization.lang("occurrence") :
                      Localization.lang("occurrences")) + '.');
-                // @formatter:on
                 if (counter > 0) {
                     ce.end();
                     undoManager.addEdit(ce);
@@ -1114,7 +1094,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
-        // @formatter:off
         actions.put(Relevance.getInstance().getValues().get(0).getActionName(),
                 new SpecialFieldAction(frame, Relevance.getInstance(),
                         Relevance.getInstance().getValues().get(0).getFieldValue(), true,
@@ -1129,7 +1108,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue(), true,
                 Localization.lang("Toggle print status"),
                 Localization.lang("Toggled print status for %0 entries")));
-        // @formatter:on
 
         for (SpecialFieldValue prio : Priority.getInstance().getValues()) {
             actions.put(prio.getActionName(), prio.getAction(this.frame));
@@ -1256,11 +1234,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
         } catch (UnsupportedCharsetException ex2) {
-            // @formatter:off
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ' '
                             + Localization.lang("Character encoding '%0' is not supported.", enc.displayName()),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
-            // @formatter:on
             throw new SaveException("rt");
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
@@ -1289,17 +1265,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
-            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
+            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:",
                     session.getEncoding().displayName())).xy(1, 1);
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    // @formatter:off
                     new String[] {Localization.lang("Save"), tryDiff,
                             Localization.lang("Cancel")}, tryDiff);
-                    // @formatter:on
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
@@ -2150,10 +2124,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
         if (bes.length > 1) {
             int choice = JOptionPane.showConfirmDialog(this,
-                    // @formatter:off
-                    Localization.lang("Multiple entries selected. Do you want to change\nthe type of all these to '%0'?", type.getName()),
+                    Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?", type.getName()),
                     Localization.lang("Change entry type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                    // @formatter:on
             if (choice == JOptionPane.NO_OPTION) {
                 return;
             }
@@ -2165,9 +2137,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             be.setType(type);
         }
 
-        // @formatter:off
         output(formatOutputMessage(Localization.lang("Changed type to '%0' for", type.getName()), bes.length));
-        // @formatter:on
         ce.end();
         undoManager.addEdit(ce);
         markBaseChanged();
@@ -2177,9 +2147,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String msg;
-            // @formatter:off
             msg = Localization.lang("Really delete the selected entry?");
-            // @formatter:on
             String title = Localization.lang("Delete entry");
             if (numberOfEntries > 1) {
                 msg = Localization.lang("Really delete the selected %0 entries?", Integer.toString(numberOfEntries));
@@ -2560,10 +2528,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private String formatOutputMessage(String start, int count) {
-        // @formatter:off
         return String.format("%s %d %s.", start, count, (count > 1 ? Localization.lang("entries") :
             Localization.lang("entry")));
-        // @formatter:on
     }
 
     private class SaveSelectedAction implements BaseAction {

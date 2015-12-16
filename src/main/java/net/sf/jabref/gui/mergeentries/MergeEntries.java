@@ -52,14 +52,12 @@ import com.jgoodies.forms.layout.ColumnSpec;
 public class MergeEntries {
 
     // Headings
-    // @formatter:off
     private final String[] columnHeadings = {Localization.lang("Field"),
             Localization.lang("Left entry"),
             Localization.lang("Left"),
             Localization.lang("None"),
             Localization.lang("Right"),
             Localization.lang("Right entry")};
-    // @formatter:on
     private final Dimension DIM = new Dimension(800, 800);
     private JRadioButton[][] rb;
     private Boolean[] identical;

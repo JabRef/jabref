@@ -164,7 +164,7 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        super.setValues(prefs.getKeyPattern());
+        super.setValues(Globals.prefs.getKeyPattern());
         defaultPat.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
         dontOverwrite.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY));
         generateOnSave.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));

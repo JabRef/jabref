@@ -24,8 +24,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -70,7 +71,7 @@ class ReplaceStringDialog extends JDialog {
                 dispose();
             }
         };
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(okListener);
         to.addActionListener(okListener);
         fields.addActionListener(okListener);
@@ -88,7 +89,7 @@ class ReplaceStringDialog extends JDialog {
         JPanel settings = new JPanel();
         ActionMap am = settings.getActionMap();
         InputMap im = settings.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent_.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.

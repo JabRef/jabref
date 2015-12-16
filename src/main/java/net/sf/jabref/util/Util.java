@@ -46,6 +46,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
@@ -67,7 +68,6 @@ import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.OpenFileFilter;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
@@ -596,7 +596,7 @@ public class Util {
     public static void bindCloseDialogKeyToCancelAction(JRootPane rootPane, Action cancelAction) {
         InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = rootPane.getActionMap();
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
     }
 
@@ -720,8 +720,7 @@ public class Util {
         }
     
         // show a warning, then return
-        StringBuffer message = // JZTODO lyrics...
-                new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
+        StringBuffer message = new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
         for (int i = 0; i < affectedFields.size(); ++i) {
             message.append(affectedFields.elementAt(i)).append("\n");
         }
@@ -737,7 +736,7 @@ public class Util {
         // for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
         // if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
         // // show a warning, then return
-        // String message = Globals // JZTODO lyrics...
+        // String message = Globals ...
         // .lang(
         // "This action will modify the \"%0\" field "
         // + "of your entries.\nThis could cause undesired changes to "

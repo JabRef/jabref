@@ -205,10 +205,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     if (importError != null) {
                         JOptionPane.showMessageDialog(frame, importError.getMessage(), Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
                     } else {
-                        // @formatter:off
                         JOptionPane.showMessageDialog(frame, Localization.lang("No entries found. Please make sure you are using the correct import filter."),
                                 Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
-                        // @formatter:on
                     }
                 }
             }

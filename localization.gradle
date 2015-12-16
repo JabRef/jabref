@@ -1,0 +1,44 @@
+repositories {
+    jcenter()
+}
+
+configurations {
+    jython
+}
+
+dependencies {
+    jython 'org.python:jython-standalone:2.7.0'
+}
+
+task checkTranslations(type: JavaExec) {
+    description "Print empty and duplicate translations."
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "-d"
+}
+
+task checkTranslationsSummary(type: JavaExec) {
+    description "Print summary of empty and duplicate translations."
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "-c"
+}
+
+task compareTranslationsWithEnglishTranslation(type: JavaExec) {
+    description "Prints differences between the english translation and translations in other languages."
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "-t"
+}
+
+task compareAndUpdateTranslationsWithEnglishTranslation(type: JavaExec) {
+    description "Prints differences between the english translation and translations in other languages, and updates translations if possible."
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "-t"
+    args "-u"
+}

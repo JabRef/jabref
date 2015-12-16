@@ -72,7 +72,6 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             // Check for external modifications:
             if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
-                // @formatter:off
                 String[] opts = new String[] {Localization.lang("Review changes"),
                         Localization.lang("Save"),
                         Localization.lang("Cancel")};
@@ -82,7 +81,6 @@ public class SaveDatabaseAction extends AbstractWorker {
                         Localization.lang("File updated externally"),
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, opts, opts[0]);
-                // @formatter:on
 
                 if (answer == JOptionPane.CANCEL_OPTION) {
                     cancelled = true;
@@ -272,17 +270,15 @@ public class SaveDatabaseAction extends AbstractWorker {
             FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
-            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
+            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:",
                     session.getEncoding().displayName())).xy(1, 1);
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    // @formatter:off
                     new String[] {Localization.lang("Save"), tryDiff,
                             Localization.lang("Cancel")}, tryDiff);
-                    // @formatter:on
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.

@@ -25,7 +25,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.container.XNameAccess;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -45,7 +45,7 @@ class CitationManager {
     private final EventList<CitEntry> list;
     private final JTable table;
     private final DefaultEventTableModel<CitEntry> tableModel;
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 
@@ -102,7 +102,7 @@ class CitationManager {
         cancel.addActionListener(cancelAction);
 
         bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                (Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+                (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(600);
@@ -220,7 +220,7 @@ class CitationManager {
         final JDialog singleCiteDialog;
         final JTextField pageInfo = new JTextField(20);
         final JLabel title;
-        final JButton okButton = new JButton(Localization.lang("Ok"));
+        final JButton okButton = new JButton(Localization.lang("OK"));
         final JButton cancelButton = new JButton(Localization.lang("Cancel"));
         final CitEntry _entry;
 
@@ -274,7 +274,7 @@ class CitationManager {
             cancelButton.addActionListener(cancelAction);
 
             b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                    (Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+                    (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             b.getPanel().getActionMap().put("close", cancelAction);
 
         }

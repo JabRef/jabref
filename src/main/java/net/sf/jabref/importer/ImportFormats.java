@@ -30,7 +30,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -92,8 +92,7 @@ public class ImportFormats {
                 putValue(Action.NAME, openInNew ? Localization.menuTitle("Import into new database") : Localization
                         .menuTitle("Import into current database"));
                 putValue(Action.ACCELERATOR_KEY,
-                        openInNew ? Globals.prefs.getKey(KeyBinds.IMPORT_INTO_NEW_DATABASE) : Globals.prefs
-                                .getKey(KeyBinds.IMPORT_INTO_CURRENT_DATABASE));
+                        openInNew ? Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_NEW_DATABASE) : Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_CURRENT_DATABASE));
             }
 
             @Override

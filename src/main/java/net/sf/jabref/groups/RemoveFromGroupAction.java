@@ -38,7 +38,7 @@ public class RemoveFromGroupAction extends AbstractAction {
     }
 
     public RemoveFromGroupAction() {
-        super(Localization.lang("Remove entry selection from this group")); // JZTODO lyrics
+        super(Localization.lang("Remove entry selection from this group"));
     }
 
     public void setNode(GroupTreeNode node) {

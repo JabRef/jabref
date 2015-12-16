@@ -27,7 +27,7 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -80,7 +80,7 @@ class CustomExportDialog extends JDialog {
                 dispose();
             }
         };
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(okListener);
         name.addActionListener(okListener);
         layoutFile.addActionListener(okListener);
@@ -121,7 +121,7 @@ class CustomExportDialog extends JDialog {
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.

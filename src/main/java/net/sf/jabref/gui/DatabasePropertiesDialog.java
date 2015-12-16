@@ -38,7 +38,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import net.sf.jabref.gui.actions.BrowseAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -96,7 +96,7 @@ public class DatabasePropertiesDialog extends JDialog {
         super(parent, Localization.lang("Database properties"), true);
         encoding = new JComboBox<>();
         encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
-        ok = new JButton(Localization.lang("Ok"));
+        ok = new JButton(Localization.lang("OK"));
         cancel = new JButton(Localization.lang("Cancel"));
         init(parent);
     }
@@ -177,7 +177,7 @@ public class DatabasePropertiesDialog extends JDialog {
         };
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
         ok.addActionListener(new ActionListener() {

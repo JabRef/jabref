@@ -47,7 +47,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.journals.Abbreviations;
@@ -169,13 +169,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private final TabListener tabListener = new TabListener();
 
-    // @formatter:off
     private final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
             + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
             + "<BR>" + Localization.lang("To set up, go to") + " <B>"
             + Localization.lang("Options") + " -> "
             + Localization.lang("Manage journal abbreviations") + "</B></HTML>";
-    // @formatter:on
 
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
@@ -339,23 +337,23 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         ActionMap actionMap = toolBar.getActionMap();
         InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        inputMap.put(prefs.getKey(KeyBinds.CLOSE_ENTRY_EDITOR), "close");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_ENTRY_EDITOR), "close");
         actionMap.put("close", closeAction);
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", storeFieldAction);
-        inputMap.put(prefs.getKey(KeyBinds.AUTOGENERATE_BIB_TE_X_KEYS), "generateKey");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS), "generateKey");
         actionMap.put("generateKey", generateKeyAction);
-        inputMap.put(prefs.getKey(KeyBinds.AUTOMATICALLY_LINK_FILES), "autoLink");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOMATICALLY_LINK_FILES), "autoLink");
         actionMap.put("autoLink", autoLinkAction);
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
         actionMap.put("prev", prevEntryAction);
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_ENTRY), "next");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
         actionMap.put("next", nextEntryAction);
-        inputMap.put(prefs.getKey(KeyBinds.UNDO), "undo");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.UNDO), "undo");
         actionMap.put("undo", undoAction);
-        inputMap.put(prefs.getKey(KeyBinds.REDO), "redo");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.REDO), "redo");
         actionMap.put("redo", redoAction);
-        inputMap.put(prefs.getKey(KeyBinds.HELP), "help");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", helpAction);
 
         toolBar.setFloatable(false);
@@ -689,25 +687,25 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         InputMap inputMap = textComponent.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = textComponent.getActionMap();
 
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", storeFieldAction);
 
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL), "right");
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL_2), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
         actionMap.put("right", switchRightAction);
 
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
         actionMap.put("left", switchLeftAction);
 
-        inputMap.put(prefs.getKey(KeyBinds.HELP), "help");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", helpAction);
-        inputMap.put(prefs.getKey(KeyBinds.SAVE_DATABASE), "save");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
         actionMap.put("save", saveDatabaseAction);
 
-        inputMap.put(Globals.prefs.getKey(KeyBinds.NEXT_TAB), "nexttab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", frame.nextTab);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.PREVIOUS_TAB), "prevtab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
         actionMap.put("prevtab", frame.prevTab);
 
 

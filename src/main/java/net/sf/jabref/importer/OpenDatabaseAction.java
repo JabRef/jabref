@@ -37,7 +37,7 @@ import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -78,7 +78,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         this.frame = frame;
         this.showDialog = showDialog;
         putValue(Action.NAME, Localization.menuTitle("Open database"));
-        putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.OPEN_DATABASE));
+        putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.OPEN_DATABASE));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX database"));
     }
 
@@ -220,8 +220,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // prompting.
                 int answer = JOptionPane.showConfirmDialog(null,
                         "<html>" + Localization
-                                .lang("An autosave file was found for this database. This could indicate ")
-                                + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.")
+                                .lang("An autosave file was found for this database. This could indicate "
+                                        + "that JabRef didn't shut down cleanly last time the file was used.")
                                 + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
                                 + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {

@@ -16,7 +16,6 @@ public class BibtexTestData {
     }
 
     public static BibDatabase getBibtexDatabase() {
-        // @formatter:off
         StringReader reader = new StringReader(
                 "@ARTICLE{HipKro03,\n"
                         + "  author = {Eric von Hippel and Georg von Krogh},\n"
@@ -30,7 +29,6 @@ public class BibtexTestData {
                         + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
                         + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" + "}"
         );
-        // @formatter:on
 
         BibtexParser parser = new BibtexParser(reader);
         ParserResult result = null;

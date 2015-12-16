@@ -93,10 +93,8 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
-            // @formatter:off
             panel.output(Localization.lang("Error") + ": "
                     + Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
-            // @formatter:on
         } else if (couldNotCall) {
             panel.output(Localization.lang("Error") + ": "
                     + Localization.lang("Could not call executable") + " '" + commandPath + "'.");

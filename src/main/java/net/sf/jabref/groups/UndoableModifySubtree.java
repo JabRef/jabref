@@ -54,7 +54,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
     @Override
     public String getUndoPresentationName() {
         return Localization.lang("Undo") + ": " + m_name;
-        // JZTODO lyrics
+
     }
 
     @Override

@@ -276,7 +276,9 @@ public class DroppedFileHandler {
         }
 
         JLabel confirmationMessage = new JLabel(
-                Localization.lang("The PDF contains one or several bibtex-records.\nDo you want to import these as new entries into the current database?"));
+                Localization.lang("The PDF contains one or several bibtex-records.")
+                        + "\n"
+                        + Localization.lang("Do you want to import these as new entries into the current database?"));
 
         int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage,
                 Localization.lang("XMP metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
@@ -520,11 +522,9 @@ public class DroppedFileHandler {
 
         if (!fromFile.renameTo(toFile)) {
             JOptionPane.showMessageDialog(frame,
-                    // @formatter:off
                     Localization.lang("Could not move file '%0'.", toFile.getAbsolutePath()) +
                             Localization.lang("Please move the file manually and link in place."),
                     Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
-                    // @formatter:on
             return false;
         } else {
             return true;

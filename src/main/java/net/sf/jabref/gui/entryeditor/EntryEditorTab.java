@@ -35,7 +35,7 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.fieldeditors.TextField;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
@@ -97,26 +97,26 @@ class EntryEditorTab {
         InputMap inputMap = panel.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = panel.getActionMap();
 
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
         actionMap.put("prev", parent.prevEntryAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_ENTRY), "next");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
         actionMap.put("next", parent.nextEntryAction);
 
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", parent.storeFieldAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL), "right");
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL_2), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
         actionMap.put("left", parent.switchLeftAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
         actionMap.put("right", parent.switchRightAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.HELP), "help");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", parent.helpAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.SAVE_DATABASE), "save");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
         actionMap.put("save", parent.saveDatabaseAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.NEXT_TAB), "nexttab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", parent.frame.nextTab);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.PREVIOUS_TAB), "prevtab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
         actionMap.put("prevtab", parent.frame.prevTab);
 
         panel.setName(title);
@@ -384,26 +384,26 @@ class EntryEditorTab {
         InputMap inputMap = component.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = component.getActionMap();
 
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
         actionMap.put("prev", parent.prevEntryAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_ENTRY), "next");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
         actionMap.put("next", parent.nextEntryAction);
 
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", parent.storeFieldAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL), "right");
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL_2), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
         actionMap.put("left", parent.switchLeftAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
-        inputMap.put(Globals.prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
         actionMap.put("right", parent.switchRightAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.HELP), "help");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", parent.helpAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.SAVE_DATABASE), "save");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
         actionMap.put("save", parent.saveDatabaseAction);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.NEXT_TAB), "nexttab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", parent.frame.nextTab);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.PREVIOUS_TAB), "prevtab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
         actionMap.put("prevtab", parent.frame.prevTab);
 
 

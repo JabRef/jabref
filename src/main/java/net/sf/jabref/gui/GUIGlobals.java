@@ -211,10 +211,7 @@ public class GUIGlobals {
         GUIGlobals.tableIcons.put("eprint", label);
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
-        // @formatter:off
-        label.setToolTipText(Localization.lang("Open") + " DOI " +
-                Localization.lang("web link"));
-        // @formatter:on
+        label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
         GUIGlobals.tableIcons.put("doi", label);
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());

@@ -68,7 +68,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
         setInfo(rootInfo);
         infoPanel.add(cb, BorderLayout.SOUTH);
 
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(ok);
         JButton cancel = new JButton(Localization.lang("Cancel"));

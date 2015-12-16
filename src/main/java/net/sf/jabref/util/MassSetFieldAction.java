@@ -30,7 +30,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.PositionWindow;
 
@@ -80,7 +80,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         renameTo = new JTextField();
         renameTo.setEnabled(false);
 
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
 
         all = new JRadioButton(Localization.lang("All entries"));
@@ -186,7 +186,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
     }
 

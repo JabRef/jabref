@@ -223,7 +223,7 @@ class ZipFileChooser extends JDialog {
         });
 
         // ok: get selected class and check if it is instantiable as an importer
-        JButton okButton = new JButton(Localization.lang("Ok"));
+        JButton okButton = new JButton(Localization.lang("OK"));
         okButton.addActionListener(new ActionListener() {
 
             @Override
@@ -270,7 +270,7 @@ class ZipFileChooser extends JDialog {
         JPanel mainPanel = new JPanel();
         //ActionMap am = mainPanel.getActionMap();
         //InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        //im.put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        //im.put(Globals.getKeyPrefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         //am.put("close", closeAction);
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(sp, BorderLayout.CENTER);
