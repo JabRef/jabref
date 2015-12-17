@@ -539,13 +539,13 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
             else if (OS.OS_X) {
                 sOffice = ooPath + "/Contents/MacOS/soffice.bin";
-                ooBaseDirectory = ooPath + "/Contents/basis-link/ure-link/share/java";
+                ooBaseDirectory = ooPath + "/Contents/basis-link/program/classes";
                 unoilDir = ooPath + "/Contents/basis-link/program/classes";
             }
             else {
                 // Linux:
                 unoilDir = ooJars + "/program/classes";
-                ooBaseDirectory = ooJars + "/ure-link/share/java";
+                ooBaseDirectory = ooJars + "/program/classes";
             }
         }
 
