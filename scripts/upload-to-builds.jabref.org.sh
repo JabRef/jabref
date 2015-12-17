@@ -22,7 +22,8 @@ command="cd www/\n"
 # the for returns the literal string "build/releases/*--snapshot--*" if no file was found
 # then, "snapshot" is extracted
 if [ "snapshot" != "$branch" ] ; then
-  command="${command}mkdir $branch\ncd $branch\n"
+  # change into dir and delete old snapshots
+  command="${command}mkdir $branch\ncd $branch\nrm *\n"
 fi
 
 #only upload [Jr]ab[Rr]ef*, not md5sums, updates.xml, etc.
