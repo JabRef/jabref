@@ -351,7 +351,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     private void scrollToTop() {
-        scrollPane.getVerticalScrollBar().setValue(0);
+        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
     }
 
     /**
