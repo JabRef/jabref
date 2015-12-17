@@ -40,6 +40,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed #498: non-working legacy PDF/PS column removed
 - Fixed #473: Import/export to external database works again
 - Fixed #526: OpenOffice/LibreOffice connection works again on Linux/OSX
+- Fixed #533: Preview parsed incorrectly when regular expression was enabled
 
 ### Removed
 - Removed file history size preference (never available from the UI)

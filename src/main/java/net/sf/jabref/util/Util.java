@@ -1075,28 +1075,4 @@ public class Util {
         return fieldValue;
     }
 
-    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
-    public static Pattern getPatternForWords(List<String> words) {
-        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
-            return Pattern.compile("");
-        }
-
-        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP);
-
-        // compile the words to a regular expression in the form (w1) | (w2) | (w3)
-        String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");
-        for (int i = 1; i < words.size(); i++) {
-            searchPattern = searchPattern.concat("|(").concat(regExSearch ? words.get(i) : Pattern.quote(words.get(i)))
-                    .concat(")");
-        }
-
-        Pattern pattern;
-        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE)) {
-            pattern = Pattern.compile(searchPattern);
-        } else {
-            pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);
-        }
-
-        return pattern;
-    }
 }

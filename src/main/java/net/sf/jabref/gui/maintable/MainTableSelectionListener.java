@@ -154,13 +154,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         newEditor.setVisiblePanel(visName);
                     }
                     panel.showEntryEditor(newEditor);
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            table.ensureVisible(table.getSelectedRow());
-                        }
-                    });
+                    table.ensureVisible(table.getSelectedRow());
                 }
 
             } else {

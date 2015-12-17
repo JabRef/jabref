@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.regex.Matcher;
 
+import net.sf.jabref.gui.search.MatchesHighlighter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,11 +50,6 @@ class LayoutEntry {
     private final String classPrefix;
 
     private ArrayList<String> invalidFormatter;
-
-    // used at highlighting in preview area.
-    // Color chosen similar to JTextComponent.getSelectionColor(), which is
-    // used at highlighting words at the editor
-    public static final String HIGHLIGHT_COLOR = "#3399FF";
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
@@ -269,11 +264,9 @@ class LayoutEntry {
                              *
                             */
                             if (bibtex.isSearchHit()) {
-                                sb.append(highlightWords(fieldText, wordsToHighlight));
-                            }
-                            else {
+                                sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, wordsToHighlight));
+                            } else {
                                 sb.append(fieldText);
-
                             }
 
                         }
@@ -471,45 +464,4 @@ class LayoutEntry {
         return invalidFormatter;
     }
 
-    /**
-     * Will return the text that was called by the method with HTML tags to highlight each word the user has searched
-     * for and will skip the highlight process if the first Char isn't a letter or a digit.
-     *
-     * This check is a quick hack to avoid highlighting of HTML tags It does not always work, but it does its job mostly
-     *
-     * @param text This is a String in which we search for different words
-     * @param wordsToHighlight List of all words which must be highlighted
-     * 
-     * @return String that was called by the method, with HTML Tags if a word was found
-     */
-    private String highlightWords(String text, List<String> wordsToHighlight) {
-        if (wordsToHighlight == null) {
-            return text;
-        }
-
-        Matcher matcher = Util.getPatternForWords(wordsToHighlight).matcher(text);
-
-        if (Character.isLetterOrDigit(text.charAt(0))) {
-            String hlColor = HIGHLIGHT_COLOR;
-            StringBuffer sb = new StringBuffer();
-            boolean foundSomething = false;
-
-            String found;
-            while (matcher.find()) {
-                matcher.end();
-                found = matcher.group();
-                // color the search keyword	-
-                // put first String Part and then html + word + html to a StringBuffer
-                matcher.appendReplacement(sb, "<span style=\"background-color:" + hlColor + ";\">" + found + "</span>");
-                foundSomething = true;
-            }
-
-            if (foundSomething) {
-                matcher.appendTail(sb);
-                text = sb.toString();
-            }
-
-        }
-        return text;
-    }
 }

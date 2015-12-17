@@ -19,22 +19,21 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
+import net.sf.jabref.gui.search.MatchesHighlighter;
 import net.sf.jabref.logic.search.SearchTextListener;
-import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.regex.Matcher;
-
-import javax.swing.AbstractAction;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
 
@@ -43,7 +42,6 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
     private List<String> wordsToHighlight;
 
     private UndoManager undo;
-
 
     public JTextAreaWithHighlighting() {
         super();
@@ -146,16 +144,20 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
             return;
         }
 
-        Matcher matcher = Util.getPatternForWords(words).matcher(content);
-
-        while (matcher.find()) {
-            try {
-                highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
-            } catch (BadLocationException ble) {
-                // should not occur if matcher works right
-                LOGGER.warn("Highlighting not possible, bad location", ble);
+        MatchesHighlighter.getPatternForWords(words, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP),
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE)).ifPresent(pattern -> {
+            Matcher matcher = pattern.matcher(content);
+            while (matcher.find()) {
+                try {
+                    highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
+                } catch (BadLocationException ble) {
+                    // should not occur if matcher works right
+                    LOGGER.warn("Highlighting not possible, bad location", ble);
+                }
             }
-        }
+        });
+
+
 
     }
 
