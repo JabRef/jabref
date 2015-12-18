@@ -153,23 +153,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             for (ImportFormatReader.UnknownFormatImport p : imports) {
                 if (p != null) {
                     ParserResult pr = p.parserResult;
-                    if (pr.hasWarnings()) {
-                        if (Globals.prefs
-                                .getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)
-                                && pr.hasWarnings()) {
-                            ArrayList<String> wrns = pr.warnings();
-                            StringBuilder wrn = new StringBuilder();
-                            for (int j = 0; j < wrns.size(); j++) {
-                                wrn.append(j + 1).append(". ").append(wrns.get(j))
-                                        .append("\n");
-                            }
-                            if (wrn.length() > 0) {
-                                wrn.deleteCharAt(wrn.length() - 1);
-                            }
-                            JOptionPane.showMessageDialog(frame, wrn.toString(),
-                                    Localization.lang("Warnings"),
-                                    JOptionPane.WARNING_MESSAGE);
-                        }
+                    if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
+                        ParserResultWarningDialog prwDialog = new ParserResultWarningDialog(pr, frame);
+                        prwDialog.show();
                     }
                 }
             }

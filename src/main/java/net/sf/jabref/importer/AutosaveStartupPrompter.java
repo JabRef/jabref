@@ -27,6 +27,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.logic.l10n.Localization;
@@ -109,19 +110,9 @@ public class AutosaveStartupPrompter implements Runnable {
             }
 
             if ((pr != null) && !pr.isInvalid()) {
-                if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP) && pr.hasWarnings()) {
-                    ArrayList<String> wrns = pr.warnings();
-                    StringBuilder wrn = new StringBuilder();
-                    for (int j = 0; j < wrns.size(); j++) {
-                        wrn.append(j + 1).append(". ").append(wrns.get(j)).append("\n");
-                    }
-                    if (wrn.length() > 0) {
-                        wrn.deleteCharAt(wrn.length() - 1);
-                    }
-                    frame.showBasePanelAt(location.get(pr));
-                    JOptionPane.showMessageDialog(frame, wrn.toString(),
-                            Localization.lang("Warnings"),
-                            JOptionPane.WARNING_MESSAGE);
+                if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
+                    ParserResultWarningDialog prwDialog = new ParserResultWarningDialog(pr, frame);
+                    prwDialog.show();
                 }
             }
         }
