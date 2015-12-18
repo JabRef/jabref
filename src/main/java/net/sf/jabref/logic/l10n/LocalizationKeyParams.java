@@ -2,6 +2,7 @@ package net.sf.jabref.logic.l10n;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 
 public class LocalizationKeyParams {
 
@@ -21,7 +22,7 @@ public class LocalizationKeyParams {
 
         for (int i = 0; i < params.size(); i++) {
             String param = params.get(i);
-            translation = translation.replaceAll("%" + i, param);
+            translation = translation.replaceAll("%" + i, Matcher.quoteReplacement(param));
         }
 
         return translation;

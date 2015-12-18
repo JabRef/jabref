@@ -10,6 +10,7 @@ public class LocalizationKeyParamsTest {
     public void testReplacePlaceholders() throws Exception {
         assertEquals("BibLaTeX mode", new LocalizationKeyParams("BibLaTeX mode").replacePlaceholders());
         assertEquals("BibLaTeX mode", new LocalizationKeyParams("%0 mode", "BibLaTeX").replacePlaceholders());
+        assertEquals("C:\\bla mode", new LocalizationKeyParams("%0 mode", "C:\\bla").replacePlaceholders());
         assertEquals("What \n : %e %c a b", new LocalizationKeyParams("What \n : %e %c_%0 %1", "a", "b").replacePlaceholders());
     }
 
