@@ -740,14 +740,14 @@ public class JabRef {
         for (int i = 0; i < loaded.size(); i++) {
             ParserResult pr = loaded.elementAt(i);
             if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP) && pr.hasWarnings()) {
-                String[] wrns = pr.warnings();
+                ArrayList<String> wrns = pr.warnings();
                 StringBuilder wrn = new StringBuilder();
-                for (int j = 0; j < Math.min(JabRef.MAX_DIALOG_WARNINGS, wrns.length); j++) {
-                    wrn.append(j + 1).append(". ").append(wrns[j]).append("\n");
+                for (int j = 0; j < Math.min(JabRef.MAX_DIALOG_WARNINGS, wrns.size()); j++) {
+                    wrn.append(j + 1).append(". ").append(wrns.get(j)).append("\n");
                 }
-                if (wrns.length > JabRef.MAX_DIALOG_WARNINGS) {
+                if (wrns.size() > JabRef.MAX_DIALOG_WARNINGS) {
                     wrn.append("... ");
-                    wrn.append(Localization.lang("%0 warnings", String.valueOf(wrns.length)));
+                    wrn.append(Localization.lang("%0 warnings", String.valueOf(wrns.size())));
                 } else if (wrn.length() > 0) {
                     wrn.deleteCharAt(wrn.length() - 1);
                 }
@@ -829,7 +829,7 @@ public class JabRef {
             }
             pr.setFile(file);
             if (pr.hasWarnings()) {
-                String[] warn = pr.warnings();
+                ArrayList<String> warn = pr.warnings();
                 for (String aWarn : warn) {
                     LOGGER.warn(aWarn);
                 }

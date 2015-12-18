@@ -37,7 +37,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
 
 /*
@@ -158,10 +157,10 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         if (Globals.prefs
                                 .getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)
                                 && pr.hasWarnings()) {
-                            String[] wrns = pr.warnings();
+                            ArrayList<String> wrns = pr.warnings();
                             StringBuilder wrn = new StringBuilder();
-                            for (int j = 0; j < wrns.length; j++) {
-                                wrn.append(j + 1).append(". ").append(wrns[j])
+                            for (int j = 0; j < wrns.size(); j++) {
+                                wrn.append(j + 1).append(". ").append(wrns.get(j))
                                         .append("\n");
                             }
                             if (wrn.length() > 0) {

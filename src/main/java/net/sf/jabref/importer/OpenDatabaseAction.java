@@ -339,14 +339,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         MetaData meta = result.getMetaData();
 
         if (result.hasWarnings()) {
-            final String[] warnings = result.warnings();
+            final ArrayList<String> warnings = result.warnings();
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 @Override
                 public void run() {
                     StringBuilder warningString = new StringBuilder();
-                    for (int i = 0; i < warnings.length; i++) {
-                        warningString.append(i + 1).append(". ").append(warnings[i]).append("\n");
+                    for (int i = 0; i < warnings.size(); i++) {
+                        warningString.append(i + 1).append(". ").append(warnings.get(i)).append("\n");
                     }
 
                     if (warningString.length() > 0) {

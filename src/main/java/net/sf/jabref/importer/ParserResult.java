@@ -127,12 +127,8 @@ public class ParserResult {
         return !warnings.isEmpty();
     }
 
-    public String[] warnings() {
-        String[] s = new String[warnings.size()];
-        for (int i = 0; i < warnings.size(); i++) {
-            s[i] = warnings.get(i);
-        }
-        return s;
+    public ArrayList<String> warnings() {
+        return warnings;
     }
 
     /**

@@ -901,7 +901,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (database.getEntryCount() < 1) {
                 if (parserResult.hasWarnings()) {
                     // put the warning into as exception text -> it will be displayed to the user
-                    throw new IllegalStateException(parserResult.warnings()[0]);
+                    throw new IllegalStateException(parserResult.warnings().get(0));
                 } else {
                     throw new IllegalStateException("No entries found.");
                 }

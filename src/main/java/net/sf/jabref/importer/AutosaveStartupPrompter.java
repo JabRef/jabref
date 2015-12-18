@@ -110,10 +110,10 @@ public class AutosaveStartupPrompter implements Runnable {
 
             if ((pr != null) && !pr.isInvalid()) {
                 if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP) && pr.hasWarnings()) {
-                    String[] wrns = pr.warnings();
+                    ArrayList<String> wrns = pr.warnings();
                     StringBuilder wrn = new StringBuilder();
-                    for (int j = 0; j < wrns.length; j++) {
-                        wrn.append(j + 1).append(". ").append(wrns[j]).append("\n");
+                    for (int j = 0; j < wrns.size(); j++) {
+                        wrn.append(j + 1).append(". ").append(wrns.get(j)).append("\n");
                     }
                     if (wrn.length() > 0) {
                         wrn.deleteCharAt(wrn.length() - 1);
