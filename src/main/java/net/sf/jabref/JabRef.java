@@ -40,6 +40,8 @@ import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.search.DatabaseSearcher;
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.database.BibDatabase;
@@ -290,8 +292,10 @@ public class JabRef {
                                                                  //? stands for a blank
                 ParserResult pr = loaded.elementAt(loaded.size() - 1);
                 BibDatabase dataBase = pr.getDatabase();
-                SearchManagerNoGUI smng = new SearchManagerNoGUI(searchTerm, dataBase);
-                BibDatabase newBase = smng.getDBfromMatches(); //newBase contains only match entries
+
+                SearchQuery query = new SearchQuery(searchTerm, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
+                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
+                BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabasefromMatches(); //newBase contains only match entries
 
                 //export database
                 if ((newBase != null) && (newBase.getEntryCount() > 0)) {

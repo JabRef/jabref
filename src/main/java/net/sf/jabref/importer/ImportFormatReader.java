@@ -21,8 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import net.sf.jabref.importer.fileformat.*;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -109,7 +108,7 @@ public class ImportFormatReader {
 
         // Remove all empty entries
         if (res != null) {
-            ImportFormatReader.purgeEmptyEntries(res);
+            BibDatabases.purgeEmptyEntries(res);
         }
 
         return res;
@@ -137,20 +136,6 @@ public class ImportFormatReader {
 
             return importer.importEntries(stream, status);
         }
-    }
-
-    public static BibDatabase createDatabase(Collection<BibEntry> bibentries) {
-        ImportFormatReader.purgeEmptyEntries(bibentries);
-
-        BibDatabase database = new BibDatabase();
-
-        for (BibEntry entry : bibentries) {
-
-            entry.setId(IdGenerator.next());
-            database.insertEntry(entry);
-        }
-
-        return database;
     }
 
     /**
@@ -354,23 +339,6 @@ public class ImportFormatReader {
         return reader;
     }
 
-    /**
-     * Receives an ArrayList of BibEntry instances, iterates through them, and
-     * removes all entries that have no fields set. This is useful for rooting out
-     * an unsucessful import (wrong format) that returns a number of empty entries.
-     */
-    private static void purgeEmptyEntries(Collection<BibEntry> entries) {
-        for (Iterator<BibEntry> i = entries.iterator(); i.hasNext(); ) {
-            BibEntry entry = i.next();
-
-            // If there are no fields, remove the entry:
-            if (entry.getFieldNames().isEmpty()) {
-                i.remove();
-            }
-        }
-    }
-
-
     public static class UnknownFormatImport {
 
         public final String format;
@@ -415,7 +383,7 @@ public class ImportFormatReader {
                 if (entries == null) {
                     entryCount = 0;
                 } else {
-                    ImportFormatReader.purgeEmptyEntries(entries);
+                    BibDatabases.purgeEmptyEntries(entries);
                     entryCount = entries.size();
                 }
 

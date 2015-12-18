@@ -47,7 +47,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
 - Removed option "Show one letter heading for icon columns" which is obsolete with the fix of #315/384
 - Removed table column "PDF/PS" which refers to legacy fields "ps" resp. "pdf" which are no longer supported (see also fix #498)
-
+- Removed the ability to export references on the CLI interface based on year ranges
 
 
 ## [3.0] - 2015-11-29

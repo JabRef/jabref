@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.entry.EntryType;
@@ -48,7 +49,7 @@ public class ParserResult {
 
 
     public ParserResult(Collection<BibEntry> entries) {
-        this(ImportFormatReader.createDatabase(entries), null, new HashMap<>());
+        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), null, new HashMap<>());
     }
 
     public ParserResult(BibDatabase base, MetaData metaData, HashMap<String, EntryType> entryTypes) {
