@@ -8,13 +8,18 @@ import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.SearchQueryLocalizer;
 import net.sf.jabref.model.entry.BibEntry;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 class GlobalSearchWorker extends AbstractWorker {
 
     private final JabRefFrame frame;
     private final SearchQuery searchQuery;
     private final SearchResultsDialog dialog;
+
+    private final List<BibEntry> matchedEntries = new LinkedList<>();
 
     public GlobalSearchWorker(JabRefFrame frame, SearchQuery query) {
         this.frame = Objects.requireNonNull(frame);
@@ -33,11 +38,8 @@ class GlobalSearchWorker extends AbstractWorker {
         // Search all databases
         for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
             BasePanel basePanel = frame.getBasePanelAt(i);
-            for (BibEntry entry : basePanel.getDatabase().getEntries()) {
-                if (searchQuery.isMatch(entry)) {
-                    dialog.addEntry(entry, basePanel);
-                }
-            }
+            List<BibEntry> matches = basePanel.getDatabase().getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
+            dialog.addEntries(matches, basePanel);
         }
     }
 

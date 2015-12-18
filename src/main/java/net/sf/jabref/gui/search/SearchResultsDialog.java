@@ -26,10 +26,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -214,14 +211,6 @@ public class SearchResultsDialog {
     }
 
     /**
-     * Remove all entries from the table.
-     */
-    public synchronized void clear() {
-        entries.clear();
-        entryHome.clear();
-    }
-
-    /**
      * Set up the comparators for each column, so the user can modify sort order
      * by clicking the column labels.
      * @param comparatorChooser The comparator chooser controlling the sort order.
@@ -282,7 +271,7 @@ public class SearchResultsDialog {
      * @param newEntries The list of entries.
      * @param panel A reference to the BasePanel where the entries belong.
      */
-    public synchronized void addEntries(java.util.List<BibEntry> newEntries, BasePanel panel) {
+    public void addEntries(List<BibEntry> newEntries, BasePanel panel) {
         for (BibEntry entry : newEntries) {
             addEntry(entry, panel);
         }
@@ -293,11 +282,10 @@ public class SearchResultsDialog {
      * @param entry The entry to add.
      * @param panel A reference to the BasePanel where the entry belongs.
      */
-    public synchronized void addEntry(BibEntry entry, BasePanel panel) {
+    private void addEntry(BibEntry entry, BasePanel panel) {
         entries.add(entry);
         entryHome.put(entry, panel);
     }
-
 
     /**
      * Mouse listener for the entry table. Processes icon clicks to open external

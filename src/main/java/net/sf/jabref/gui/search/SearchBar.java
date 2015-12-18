@@ -37,7 +37,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * The search bar at the top of the screen allowing the user to search his database.
@@ -94,7 +96,8 @@ public class SearchBar extends JPanel {
         openCurrentResultsInDialog.addActionListener(ae -> {
             SearchResultsDialog searchDialog = new SearchResultsDialog(basePanel.frame(), Localization.lang("Search results in database %0 for %1",
                     basePanel.getDatabaseFile().getName(), SearchQueryLocalizer.localize(this.getSearchQuery())));
-            basePanel.getDatabase().getEntries().stream().filter(BibEntry::isSearchHit).forEach(entry -> searchDialog.addEntry(entry, basePanel));
+            List<BibEntry> entries = basePanel.getDatabase().getEntries().stream().filter(BibEntry::isSearchHit).collect(Collectors.toList());
+            searchDialog.addEntries(entries, basePanel);
             searchDialog.selectFirstEntry();
             searchDialog.setVisible(true);
         });
