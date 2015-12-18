@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -106,14 +107,14 @@ public class DOI {
      *
      * @return an encoded URI representation of the DOI
      */
-    public URI getURI() {
+    public Optional<URI> getURI() {
         try {
             URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/" + doi, null);
-            return uri;
+            return Optional.of(uri);
         } catch(URISyntaxException e) {
             // should never happen
             LOGGER.error(doi + " could not be encoded as URI.", e);
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -123,6 +124,6 @@ public class DOI {
      * @return an encoded URL representation of the DOI
      */
     public String getURLAsASCIIString() {
-        return getURI().toASCIIString();
+        return getURI().map(URI::toASCIIString).orElse("");
     }
 }

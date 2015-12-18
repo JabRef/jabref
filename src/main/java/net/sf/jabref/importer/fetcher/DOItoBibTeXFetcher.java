@@ -19,9 +19,11 @@ package net.sf.jabref.importer.fetcher;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -90,7 +92,12 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         // construct URL
         URL url;
         try {
-            url = doi.getURI().toURL();
+            Optional<URI> uri = doi.getURI();
+            if(!uri.isPresent()) {
+                return null;
+            } else {
+                url = uri.get().toURL();
+            }
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
