@@ -202,7 +202,7 @@ public class BibtexParser {
         }
         // Before returning the database, update entries with unknown type
         // based on parsed type definitions, if possible.
-        checkEntryTypes(parserResult);
+        checkEntryTypes();
 
         // Instantiate meta data:
         parserResult.setMetaData(new MetaData(meta, database));
@@ -941,7 +941,7 @@ public class BibtexParser {
         }
     }
 
-    private void checkEntryTypes(ParserResult result) {
+    private void checkEntryTypes() {
         for (BibEntry bibEntry : database.getEntries()) {
             if (bibEntry.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
@@ -950,7 +950,7 @@ public class BibtexParser {
                 if (type != null) {
                     bibEntry.setType(type);
                 } else {
-                    result.addWarning(
+                    parserResult.addWarning(
                             Localization.lang("Unknown entry type")
                                     + ": " + name + "; key: " + bibEntry.getCiteKey()
                     );
