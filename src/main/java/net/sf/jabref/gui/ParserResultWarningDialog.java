@@ -15,7 +15,8 @@
 */
 package net.sf.jabref.gui;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import javax.swing.JOptionPane;
 
@@ -24,62 +25,67 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public class ParserResultWarningDialog {
 
-    private final ParserResult parserResult;
-    private final int maxWarnings;
-    private final JabRefFrame jabRefFrame;
-    private final int dbCount;
-
-
-    public ParserResultWarningDialog(ParserResult pr, JabRefFrame jrf) {
-        parserResult = pr;
-        maxWarnings = Integer.MAX_VALUE;
-        jabRefFrame = jrf;
-        dbCount = -1;
+    /**
+     * Shows a dialog with the warnings from an import or open of a file
+     *
+     * @param parserResult - ParserResult for the current import/open
+     * @param jabRefFrame - the JabRefFrame
+     */
+    public static void showParserResultWarningDialog(ParserResult parserResult, JabRefFrame jabRefFrame) {
+        Objects.requireNonNull(parserResult);
+        Objects.requireNonNull(jabRefFrame);
+        showParserResultWarningDialog(parserResult, jabRefFrame, Integer.MAX_VALUE, -1);
     }
 
-    public ParserResultWarningDialog(ParserResult pr, JabRefFrame jrf, int maxWarns, int dataBaseCount) {
-        parserResult = pr;
-        maxWarnings = maxWarns;
-        jabRefFrame = jrf;
-        dbCount = dataBaseCount;
-    }
-
-    public void show() {
+    /**
+     * Shows a dialog with the warnings from an import or open of a file
+     *
+     * @param parserResult - ParserResult for the current import/open
+     * @param jabRefFrame - the JabRefFrame
+     * @param maxWarnings - Maximum number of warnings to display
+     * @param dataBaseNumber - Database tab number to activate when showing the warning dialog
+     */
+    public static void showParserResultWarningDialog(ParserResult parserResult, JabRefFrame jabRefFrame,
+            int maxWarnings, int dataBaseNumber) {
+        Objects.requireNonNull(parserResult);
+        Objects.requireNonNull(jabRefFrame);
+        Objects.requireNonNull(maxWarnings);
+        Objects.requireNonNull(dataBaseNumber);
         if (parserResult.hasWarnings()) {
-            if (jabRefFrame != null) {
-                jabRefFrame.showBasePanelAt(dbCount);
+            if (dataBaseNumber < 0) {
+                jabRefFrame.showBasePanelAt(dataBaseNumber);
             }
+
+            // Generate string with warning texts
+            List<String> wrns = parserResult.warnings();
+            StringBuilder wrn = new StringBuilder();
+            for (int j = 0; j < Math.min(maxWarnings, wrns.size()); j++) {
+                wrn.append(j + 1).append(". ").append(wrns.get(j)).append("\n");
+            }
+            if (wrns.size() > maxWarnings) {
+                wrn.append("... ");
+                wrn.append(Localization.lang("%0 warnings", String.valueOf(wrns.size())));
+            } else if (wrn.length() > 0) {
+                wrn.deleteCharAt(wrn.length() - 1);
+            }
+
+            // Generate dialog title
+            String dialogTitle;
+            if (dataBaseNumber < 0) {
+                dialogTitle = Localization.lang("Warnings");
+            } else {
+                dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getFile().getName() + ")";
+            }
+
+            // Comment from the old code:
+            //
             // Note to self or to someone else: The following line causes an
             // ArrayIndexOutOfBoundsException in situations with a large number of
             // warnings; approx. 5000 for the database I opened when I observed the problem
             // (duplicate key warnings). I don't think this is a big problem for normal situations,
             // and it may possibly be a bug in the Swing code.
 
-            JOptionPane.showMessageDialog(jabRefFrame, generateString(), generateDialogTitle(),
-                    JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private String generateString() {
-        ArrayList<String> wrns = parserResult.warnings();
-        StringBuilder wrn = new StringBuilder();
-        for (int j = 0; j < Math.min(maxWarnings, wrns.size()); j++) {
-            wrn.append(j + 1).append(". ").append(wrns.get(j)).append("\n");
-        }
-        if (wrns.size() > maxWarnings) {
-            wrn.append("... ");
-            wrn.append(Localization.lang("%0 warnings", String.valueOf(wrns.size())));
-        } else if (wrn.length() > 0) {
-            wrn.deleteCharAt(wrn.length() - 1);
-        }
-        return wrn.toString();
-    }
-
-    private String generateDialogTitle() {
-        if (dbCount < 0) {
-            return Localization.lang("Warnings");
-        } else {
-            return Localization.lang("Warnings") + " (" + parserResult.getFile().getName() + ")";
+            JOptionPane.showMessageDialog(jabRefFrame, wrn.toString(), dialogTitle, JOptionPane.WARNING_MESSAGE);
         }
     }
 }

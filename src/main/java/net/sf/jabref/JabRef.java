@@ -739,9 +739,8 @@ public class JabRef {
 
         for (int i = 0; i < loaded.size(); i++) {
             if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-                ParserResultWarningDialog prwDialog = new ParserResultWarningDialog(loaded.elementAt(i), JabRef.jrf,
+                ParserResultWarningDialog.showParserResultWarningDialog(loaded.elementAt(i), JabRef.jrf,
                         JabRef.MAX_DIALOG_WARNINGS, i);
-                prwDialog.show();
             }
         }
 
@@ -816,8 +815,7 @@ public class JabRef {
             }
             pr.setFile(file);
             if (pr.hasWarnings()) {
-                ArrayList<String> warn = pr.warnings();
-                for (String aWarn : warn) {
+                for (String aWarn : pr.warnings()) {
                     LOGGER.warn(aWarn);
                 }
 

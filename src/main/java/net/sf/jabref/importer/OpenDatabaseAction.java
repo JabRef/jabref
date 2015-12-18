@@ -343,8 +343,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 @Override
                 public void run() {
-                    ParserResultWarningDialog prwDialog = new ParserResultWarningDialog(result, frame);
-                    prwDialog.show();
+                    ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
                 }
             });
         }
