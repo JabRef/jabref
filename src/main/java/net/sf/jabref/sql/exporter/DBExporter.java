@@ -99,15 +99,16 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param out         The output (PrintStream or Connection) object to which the DML should be written.
      */
     private void populateEntriesTable(int database_id, List<BibEntry> entries, Object out) throws SQLException {
-        String query;
+        StringBuilder query = new StringBuilder();
         String val;
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, " + fieldStr
                 + ", database_id) VALUES (";
         for (BibEntry entry : entries) {
-            query = insert + '\'' + entry.getId() + '\'' + ", (SELECT entry_types_id FROM entry_types WHERE label='"
-                    + entry.getType().getName().toLowerCase() + "'), '" + entry.getCiteKey() + '\'';
+            query.append(
+                    insert + '\'' + entry.getId() + '\'' + ", (SELECT entry_types_id FROM entry_types WHERE label='"
+                            + entry.getType().getName().toLowerCase() + "'), '" + entry.getCiteKey() + '\'');
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
-                query = query + ", ";
+                query.append(", ");
                 val = entry.getField(SQLUtil.getAllFields().get(i));
                 if (val != null) {
                     /**
@@ -120,13 +121,13 @@ public abstract class DBExporter extends DBImporterExporter {
                         val = val.replace("\'", "''");
                         val = val.replace("`", "\\`");
                     }
-                    query = query + '\'' + val + '\'';
+                    query.append('\'' + val + '\'');
                 } else {
-                    query = query + "NULL";
+                    query.append("NULL");
                 }
             }
-            query = query + ", '" + database_id + "');";
-            SQLUtil.processQuery(out, query);
+            query.append(", '" + database_id + "');");
+            SQLUtil.processQuery(out, query.toString());
         }
     }
 
