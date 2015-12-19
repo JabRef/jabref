@@ -161,8 +161,8 @@ class EntryEditorTab {
                 bPanel.getSearchBar().getSearchTextObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
-            
-            JComponent extra = parent.getExtra(fields[i], fieldEditor);
+
+            JComponent extra = parent.getExtra(fieldEditor);
 
             // Add autocompleter listener, if required for this field:
             AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(fields[i]);
