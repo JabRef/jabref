@@ -264,7 +264,7 @@ public class FileActions {
             }
 
             //finally write whatever remains of the file, but at least a concluding newline
-            if (database.getEpilog() != null && database.getEpilog() != "") {
+            if ((database.getEpilog() != null) && !("".equals(database.getEpilog()))) {
                writer.write(database.getEpilog());
             } else {
                writer.write(Globals.NEWLINE);
