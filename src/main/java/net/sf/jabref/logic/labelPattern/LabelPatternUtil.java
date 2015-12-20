@@ -175,8 +175,11 @@ public class LabelPatternUtil {
      * @return True if the author or editor is an institution.
      */
     private static boolean isInstitution(String author) {
-        return (author.charAt(0) == '{')
-                && (author.charAt(author.length() - 1) == '}');
+        if (!(author.isEmpty())) {
+            return (author.charAt(0) == '{') && (author.charAt(author.length() - 1) == '}');
+        } else {
+            return false; // In case of empty or null author
+        }
     }
 
     /**
