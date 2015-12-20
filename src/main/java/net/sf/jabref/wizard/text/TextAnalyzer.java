@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.importer;
+package net.sf.jabref.wizard.text;
 
 import java.util.TreeSet;
 import java.util.Vector;
@@ -23,9 +23,11 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.model.entry.BibEntry;
 
-class TextAnalyzer {
+public class TextAnalyzer {
 
-    private final BibEntry be = null;
+    private final BibEntry be = new BibEntry();
+
+    private final TreeSet<Substring> usedParts = new TreeSet<>();
 
     private static final Log LOGGER = LogFactory.getLog(TextAnalyzer.class);
 
@@ -42,9 +44,12 @@ class TextAnalyzer {
         return be;
     }
 
+    public TreeSet<Substring> getSubstrings() {
+        return new TreeSet<>(usedParts);
+    }
+
     private void guessBibtexFields(String text) {
 
-        TreeSet<Substring> usedParts = new TreeSet<>();
 
         text = "  " + text + "  ";
 
@@ -58,8 +63,9 @@ class TextAnalyzer {
             // Only one four-digit number, so we guess that is the year.
             year = clean(cand[0]);
             int pos = text.indexOf(year);
-            usedParts.add(new Substring("year", pos, pos + year.length()));
-            LOGGER.debug("Guessing 'year': '" + year + "'");
+            usedParts.add(new Substring("year", pos, pos + cand[0].length()));
+            LOGGER.info("Guessing 'year': '" + year + "'");
+            be.setField("year", year);
         } else if (cand.length > 1) {
             // More than one four-digit numbers, so we look for one giving a reasonable year:
 
@@ -89,8 +95,9 @@ class TextAnalyzer {
             if (good >= 0) {
                 year = clean(cand[good]);
                 int pos = text.indexOf(year);
-                usedParts.add(new Substring("year", pos, pos + year.length()));
-                LOGGER.debug("Guessing 'year': '" + year + "'");
+                usedParts.add(new Substring("year", pos, pos + cand[good].length()));
+                LOGGER.info("Guessing 'year': '" + year + "'");
+                be.setField("year", year);
             }
         }
 
@@ -101,8 +108,9 @@ class TextAnalyzer {
         if (cand.length == 1) {
             pages = clean(cand[0].replaceAll("-|( - )", "--"));
             int pos = text.indexOf(cand[0]);
-            usedParts.add(new Substring("pages", pos, pos + year.length()));
-            LOGGER.debug("Guessing 'pages': '" + pages + "'");
+            usedParts.add(new Substring("pages", pos, pos + cand[0].length()));
+            LOGGER.info("Guessing 'pages': '" + pages + "'");
+            be.setField("pages", pages);
         } else if (cand.length > 1) {
             int found = -1;
             for (int i = 0; i < cand.length; i++) {
@@ -118,8 +126,9 @@ class TextAnalyzer {
             if (found >= 0) {
                 pages = clean(cand[found].replaceAll("-|( - )", "--"));
                 int pos = text.indexOf(cand[found]);
-                LOGGER.debug("Guessing 'pages': '" + pages + "'");
-                usedParts.add(new Substring("pages", pos, pos + pages.length()));
+                LOGGER.info("Guessing 'pages': '" + pages + "'");
+                usedParts.add(new Substring("pages", pos, pos + cand[found].length()));
+                be.setField("pages", pages);
             }
         }
 
@@ -134,9 +143,11 @@ class TextAnalyzer {
             int pos = cand[0].lastIndexOf(' ');
             if (pos > 0) {
                 volume = clean(cand[0].substring(pos + 1));
-                LOGGER.debug("Guessing 'volume': '" + volume + "'");
+                LOGGER.info("Guessing 'volume': '" + volume + "'");
+                be.setField("volume", volume);
                 journal = clean(cand[0].substring(0, pos));
-                //Util.pr("guessing 'journal': '" + journal + "'");
+                LOGGER.info("Guessing 'journal': '" + journal + "'");
+                be.setField("journal", journal);
                 pos = journal.lastIndexOf(' ');
                 if (pos > 0) {
                     String last = journal.substring(pos + 1).toLowerCase();
@@ -146,7 +157,8 @@ class TextAnalyzer {
                 }
                 pos = text.indexOf(journal);
                 usedParts.add(new Substring("journal", pos, pos + journal.length()));
-                LOGGER.debug("Guessing 'journal': '" + journal + "'");
+                LOGGER.info("Guessing 'journal': '" + journal + "'");
+                be.setField("journal", journal);
             }
             //Util.pr("Journal? '"+cand[0]+"'");
         } else {
@@ -160,7 +172,7 @@ class TextAnalyzer {
         for (Substring usedPart : usedParts) {
             ss = usedPart;
             if ((ss.begin() - piv) > 10) {
-                LOGGER.debug("... " + text.substring(piv, ss.begin()));
+                LOGGER.info("... " + text.substring(piv, ss.begin()));
                 free.add(clean(text.substring(piv, ss.begin())));
             }
             piv = ss.end();
@@ -168,9 +180,9 @@ class TextAnalyzer {
         if ((text.length() - piv) > 10) {
             free.add(clean(text.substring(piv)));
         }
-        LOGGER.debug("Free parts:");
+        LOGGER.info("Free parts:");
         for (String s : free) {
-            LOGGER.debug(": '" + s + "'");
+            LOGGER.info(": '" + s + "'");
         }
     }
 
@@ -219,15 +231,17 @@ class TextAnalyzer {
     }
 
 
-    private static class Substring implements Comparable<Substring> {
+    public static class Substring implements Comparable<Substring> {
 
         final int begin;
         final int end;
+        final String name;
 
 
         public Substring(String name, int begin, int end) {
             this.begin = begin;
             this.end = end;
+            this.name = name;
         }
 
         public int begin() {
@@ -236,6 +250,10 @@ class TextAnalyzer {
 
         public int end() {
             return end;
+        }
+
+        public String name() {
+            return name;
         }
 
         @Override
