@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 
@@ -158,14 +159,14 @@ public class JabRef {
         // The preferences return the system newline character sequence as default
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
-        Vector<ParserResult> loaded = processArguments(args, true);
+        Optional<Vector<ParserResult>> loaded = processArguments(args, true);
 
-        if ((loaded == null) || cli.isDisableGui() || cli.isShowVersion()) {
+        if ((!(loaded.isPresent())) || cli.isDisableGui() || cli.isShowVersion()) {
             JabRefExecutorService.INSTANCE.shutdownEverything();
             return;
         }
 
-        SwingUtilities.invokeLater(() -> openWindow(loaded));
+        SwingUtilities.invokeLater(() -> openWindow(loaded.get()));
     }
 
     private void setupLogHandlerForErrorConsole() {
@@ -173,7 +174,7 @@ public class JabRef {
         ((Jdk14Logger) LOGGER).getLogger().addHandler(Globals.handler);
     }
 
-    public Vector<ParserResult> processArguments(String[] args, boolean initialStartup) {
+    public Optional<Vector<ParserResult>> processArguments(String[] args, boolean initialStartup) {
 
         cli = new JabRefCLI(args);
 
@@ -183,7 +184,7 @@ public class JabRef {
 
         if (initialStartup && cli.isHelp()) {
             cli.printUsage();
-            return null; // TODO replace with optional one day
+            return Optional.empty();
         }
 
         // Check if we should reset all preferences to default values:
@@ -246,12 +247,8 @@ public class JabRef {
                     if (initialStartup) {
                         toImport.add(aLeftOver);
                     } else {
-                        ParserResult res = JabRef.importToOpenBase(aLeftOver);
-                        if (res != null) {
-                            loaded.add(res);
-                        } else {
-                            loaded.add(ParserResult.INVALID_FORMAT);
-                        }
+                        Optional<ParserResult> res = JabRef.importToOpenBase(aLeftOver);
+                        loaded.add(res.orElse(ParserResult.INVALID_FORMAT));
                     }
                 } else if (pr != ParserResult.FILE_LOCKED) {
                     loaded.add(pr);
@@ -265,24 +262,18 @@ public class JabRef {
         }
 
         for (String filenameString : toImport) {
-            ParserResult pr = JabRef.importFile(filenameString);
-            if (pr != null) {
-                loaded.add(pr);
-            }
+            Optional<ParserResult> pr = importFile(filenameString);
+            pr.ifPresent(loaded::add);
         }
 
         if (!cli.isBlank() && cli.isImportToOpenBase()) {
-            ParserResult res = JabRef.importToOpenBase(cli.getImportToOpenBase());
-            if (res != null) {
-                loaded.add(res);
-            }
+            Optional<ParserResult> res = importToOpenBase(cli.getImportToOpenBase());
+            res.ifPresent(loaded::add);
         }
 
         if (!cli.isBlank() && cli.isFetcherEngine()) {
-            ParserResult res = fetch(cli.getFetcherEngine());
-            if (res != null) {
-                loaded.add(res);
-            }
+            Optional<ParserResult> res = fetch(cli.getFetcherEngine());
+            res.ifPresent(loaded::add);
         }
 
         if (cli.isExportMatches()) {
@@ -315,7 +306,7 @@ public class JabRef {
                         System.err.println(
                                 Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
                                         + JabRefCLI.getExportMatchesSyntax());
-                        return null; // TODO replace with optional one day
+                        return Optional.empty();
                     } //end switch
 
                     //export new database
@@ -479,7 +470,7 @@ public class JabRef {
             }
         }
 
-        return loaded;
+        return Optional.of(loaded);
     }
 
     /**
@@ -491,12 +482,12 @@ public class JabRef {
      *            the search query, separated by a :
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
-    private ParserResult fetch(String fetchCommand) {
+    private Optional<ParserResult> fetch(String fetchCommand) {
 
         if ((fetchCommand == null) || !fetchCommand.contains(":") || (fetchCommand.split(":").length != 2)) {
             System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Localization.lang("The following fetchers are available:"));
-            return null;
+            return Optional.empty();
         }
 
         String[] split = fetchCommand.split(":");
@@ -517,7 +508,7 @@ public class JabRef {
             for (EntryFetcher e : EntryFetchers.INSTANCE.getEntryFetchers()) {
                 System.out.println("  " + e.getClass().getSimpleName().replaceAll("Fetcher", "").toLowerCase());
             }
-            return null;
+            return Optional.empty();
         }
 
         System.out.println(Localization.lang("Running Query '%0' with fetcher '%1'.", query, engine) + " "
@@ -527,10 +518,10 @@ public class JabRef {
         if ((result == null) || result.isEmpty()) {
             System.out.println(
                     Localization.lang("Query '%0' with fetcher '%1' did not return any results.", query, engine));
-            return null;
+            return Optional.empty();
         }
 
-        return new ParserResult(result);
+        return Optional.of(new ParserResult(result));
     }
 
     private void setLookAndFeel() {
@@ -847,7 +838,7 @@ public class JabRef {
 
     }
 
-    private static ParserResult importFile(String argument) {
+    private static Optional<ParserResult> importFile(String argument) {
         String[] data = argument.split(",");
         try {
             if ((data.length > 1) && !"*".equals(data[1])) {
@@ -860,10 +851,10 @@ public class JabRef {
                         entries = Globals.importFormatReader.importFromFile(data[1],
                                 data[0].replaceAll("~", System.getProperty("user.home")), JabRef.jrf);
                     }
-                    return new ParserResult(entries);
+                    return Optional.of(new ParserResult(entries));
                 } catch (IllegalArgumentException ex) {
                     System.err.println(Localization.lang("Unknown import format") + ": " + data[1]);
-                    return null;
+                    return Optional.empty();
                 }
             } else {
                 // * means "guess the format":
@@ -880,7 +871,7 @@ public class JabRef {
                 if (importResult != null) {
                     System.out.println(Localization.lang("Format used") + ": " + importResult.format);
 
-                    return importResult.parserResult;
+                    return Optional.of(importResult.parserResult);
                 } else {
                     System.out.println(Localization.lang("Could not find a suitable import format."));
                 }
@@ -889,7 +880,7 @@ public class JabRef {
             System.err.println(
                     Localization.lang("Error opening file") + " '" + data[0] + "': " + ex.getLocalizedMessage());
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -898,11 +889,11 @@ public class JabRef {
      * @param argument See importFile.
      * @return ParserResult with setToOpenTab(true)
      */
-    private static ParserResult importToOpenBase(String argument) {
-        ParserResult result = JabRef.importFile(argument);
+    private static Optional<ParserResult> importToOpenBase(String argument) {
+        Optional<ParserResult> result = JabRef.importFile(argument);
 
-        if (result != null) {
-            result.setToOpenTab(true);
+        if (result.isPresent()) {
+            result.get().setToOpenTab(true);
         }
 
         return result;
