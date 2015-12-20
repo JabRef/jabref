@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class DatabaseChangeEvent {
 
@@ -24,23 +24,23 @@ public class DatabaseChangeEvent {
     }
 
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
     private final ChangeType type;
-    private final BibtexDatabase source;
+    private final BibDatabase source;
 
 
-    public DatabaseChangeEvent(BibtexDatabase source, ChangeType type,
-            BibtexEntry entry) {
+    public DatabaseChangeEvent(BibDatabase source, ChangeType type,
+            BibEntry entry) {
         this.source = source;
         this.type = type;
         this.entry = entry;
     }
 
-    public BibtexDatabase getSource() {
+    public BibDatabase getSource() {
         return source;
     }
 
-    public BibtexEntry getEntry() {
+    public BibEntry getEntry() {
         return entry;
     }
 

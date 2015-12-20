@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -38,7 +37,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
             BasePanel bp = new BasePanel(jabRefFrame,
                     dialog.getGenerateDB(), // database
                     null, // file
-                    new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)); // meta data
+                    new MetaData(), Globals.prefs.getDefaultEncoding()); // meta data
             jabRefFrame.tabbedPane.add(GUIGlobals.untitledTitle, bp);
             jabRefFrame.tabbedPane.setSelectedComponent(bp);
             jabRefFrame.output(Localization.lang("New database created."));

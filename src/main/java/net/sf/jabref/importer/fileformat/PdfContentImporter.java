@@ -32,7 +32,7 @@ import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.EntryType;
@@ -129,8 +129,8 @@ public class PdfContentImporter extends ImportFormat {
                     }
                 }
 
-                if (!curName.equals("")) {
-                    if (curName.equalsIgnoreCase("et al.")) {
+                if (!"".equals(curName)) {
+                    if ("et al.".equalsIgnoreCase(curName)) {
                         curName = "others";
                     }
                     if (isFirst) {
@@ -156,7 +156,7 @@ public class PdfContentImporter extends ImportFormat {
             res = "";
             do {
                 if (!workedOnFirstOrMiddle) {
-                    if (splitNames[i].equalsIgnoreCase("and")) {
+                    if ("and".equalsIgnoreCase(splitNames[i])) {
                         // do nothing, just increment i at the end of this iteration
                     } else {
                         if (isFirst) {
@@ -164,7 +164,7 @@ public class PdfContentImporter extends ImportFormat {
                         } else {
                             res = res.concat(" and ");
                         }
-                        if (splitNames[i].equalsIgnoreCase("et") && (splitNames.length > (i + 1)) && splitNames[i + 1].equalsIgnoreCase("al.")) {
+                        if ("et".equalsIgnoreCase(splitNames[i]) && (splitNames.length > (i + 1)) && "al.".equalsIgnoreCase(splitNames[i + 1])) {
                             res = res.concat("others");
                             break;
                         } else {
@@ -205,28 +205,11 @@ public class PdfContentImporter extends ImportFormat {
         return removeNonLettersAtEnd(title);
     }
 
-    private static boolean isYear(String yearStr) {
-        try {
-            Integer.parseInt(yearStr);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        final ArrayList<BibtexEntry> res = new ArrayList<>(1);
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
+        final ArrayList<BibEntry> res = new ArrayList<>(1);
 
-        PDDocument document;
-        try {
-            document = PDDocument.load(in);
-        } catch (IOException e) {
-            LOGGER.error("Could not load document", e);
-            return res;
-        }
-
-        try {
+        try (PDDocument document = PDDocument.load(in)) {
             if (document.isEncrypted()) {
                 LOGGER.error("Encrypted documents are not supported");
                 //return res;
@@ -259,7 +242,7 @@ public class PdfContentImporter extends ImportFormat {
                     }
 
                     @Override
-                    public void addEntry(BibtexEntry entry) {
+                    public void addEntry(BibEntry entry) {
                         // add the entry to the result object
                         res.add(entry);
                     }
@@ -338,14 +321,14 @@ public class PdfContentImporter extends ImportFormat {
 
             // after title: authors
             author = null;
-            while ((i < split.length) && !split[i].equals("")) {
+            while ((i < split.length) && !"".equals(split[i])) {
                 // author names are unlikely to be split among different lines
                 // treat them line by line
                 curString = streamlineNames(split[i]);
                 if (author == null) {
                     author = curString;
                 } else {
-                    if (curString.equals("")) {
+                    if ("".equals(curString)) {
                         // if split[i] is "and" then "" is returned by streamlineNames -> do nothing
                     } else {
                         author = author.concat(" and ").concat(curString);
@@ -359,7 +342,7 @@ public class PdfContentImporter extends ImportFormat {
             // then, abstract and keywords follow
             while (i < split.length) {
                 curString = split[i];
-                if ((curString.length() >= "Abstract".length()) && curString.substring(0, "Abstract".length()).equalsIgnoreCase("Abstract")) {
+                if ((curString.length() >= "Abstract".length()) && "Abstract".equalsIgnoreCase(curString.substring(0, "Abstract".length()))) {
                     if (curString.length() == "Abstract".length()) {
                         // only word "abstract" found -- skip line
                         curString = "";
@@ -369,13 +352,13 @@ public class PdfContentImporter extends ImportFormat {
                     i++;
                     // fillCurStringWithNonEmptyLines() cannot be used as that uses " " as line separator
                     // whereas we need linebreak as separator
-                    while ((i < split.length) && !split[i].equals("")) {
+                    while ((i < split.length) && !"".equals(split[i])) {
                         curString = curString.concat(split[i]).concat(lineBreak);
                         i++;
                     }
                     abstractT = curString;
                     i++;
-                } else if ((curString.length() >= "Keywords".length()) && curString.substring(0, "Keywords".length()).equalsIgnoreCase("Keywords")) {
+                } else if ((curString.length() >= "Keywords".length()) && "Keywords".equalsIgnoreCase(curString.substring(0, "Keywords".length()))) {
                     if (curString.length() == "Keywords".length()) {
                         // only word "Keywords" found -- skip line
                         curString = "";
@@ -496,7 +479,7 @@ public class PdfContentImporter extends ImportFormat {
                 }
             }
 
-            BibtexEntry entry = new BibtexEntry();
+            BibEntry entry = new BibEntry();
             entry.setType(type);
 
             if (author != null) {
@@ -547,15 +530,14 @@ public class PdfContentImporter extends ImportFormat {
 
             res.add(entry);
         } catch (NoClassDefFoundError e) {
-            if (e.getMessage().equals("org/bouncycastle/jce/provider/BouncyCastleProvider")) {
+            if ("org/bouncycastle/jce/provider/BouncyCastleProvider".equals(e.getMessage())) {
                 status.showMessage(Localization.lang("Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
             } else {
                 LOGGER.error("Could not find class", e);
             }
-        } finally {
-            document.close();
+        } catch (IOException e) {
+            LOGGER.error("Could not load document", e);
         }
-
         return res;
     }
 
@@ -581,7 +563,7 @@ public class PdfContentImporter extends ImportFormat {
      * proceed to next non-empty line
      */
     private void proceedToNextNonEmptyLine() {
-        while ((i < split.length) && split[i].trim().equals("")) {
+        while ((i < split.length) && "".equals(split[i].trim())) {
             i++;
         }
     }
@@ -599,9 +581,9 @@ public class PdfContentImporter extends ImportFormat {
     private void fillCurStringWithNonEmptyLines() {
         // ensure that curString does not end with " "
         curString = curString.trim();
-        while ((i < split.length) && !split[i].equals("")) {
+        while ((i < split.length) && !"".equals(split[i])) {
             String curLine = split[i].trim();
-            if (!curLine.equals("")) {
+            if (!"".equals(curLine)) {
                 if (!curString.isEmpty()) {
                     // insert separating space if necessary
                     curString = curString.concat(" ");
@@ -622,7 +604,7 @@ public class PdfContentImporter extends ImportFormat {
      * invariant before/after: i points to line before the last handled block
      */
     private void readLastBlock() {
-        while ((i >= 0) && split[i].trim().equals("")) {
+        while ((i >= 0) && "".equals(split[i].trim())) {
             i--;
         }
         // i is now at the end of a block
@@ -630,7 +612,7 @@ public class PdfContentImporter extends ImportFormat {
         int end = i;
 
         // find beginning
-        while ((i >= 0) && !split[i].equals("")) {
+        while ((i >= 0) && !"".equals(split[i])) {
             i--;
         }
         // i is now the line before the beginning of the block

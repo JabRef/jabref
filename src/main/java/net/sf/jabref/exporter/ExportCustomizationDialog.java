@@ -28,13 +28,13 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -128,7 +128,8 @@ public class ExportCustomizationDialog extends JDialog {
 
         JButton help = new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp).getIconButton();
 
-        EventTableModel<String[]> tableModel = new EventTableModel<>(Globals.prefs.customExports.getSortedList(),
+        DefaultEventTableModel<String[]> tableModel = new DefaultEventTableModel<>(
+                Globals.prefs.customExports.getSortedList(),
                 new ExportTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
@@ -148,11 +149,11 @@ public class ExportCustomizationDialog extends JDialog {
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(frame.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
         //am = table.getActionMap();
         //im = table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        //im.put(frame.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        //im.put(Globals.getKeyPrefs().getKey()KeyBinds.CLOSE_DIALOG), "close");
         //am.put("close", closeAction);
         main.setLayout(new BorderLayout());
         main.add(sp, BorderLayout.CENTER);

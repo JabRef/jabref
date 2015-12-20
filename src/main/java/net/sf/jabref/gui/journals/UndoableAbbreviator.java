@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.journals;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
@@ -28,7 +28,7 @@ public class UndoableAbbreviator {
      * @param ce        If the entry is changed, add an edit to this compound.
      * @return true if the entry was changed, false otherwise.
      */
-    public boolean abbreviate(BibtexDatabase database, BibtexEntry entry, String fieldName, CompoundEdit ce) {
+    public boolean abbreviate(BibDatabase database, BibEntry entry, String fieldName, CompoundEdit ce) {
         String text = entry.getField(fieldName);
         if (text == null) {
             return false;

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,9 +20,10 @@ import java.util.List;
 
 import net.sf.jabref.util.Util;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 public class SpecialFieldsUtils {
 
@@ -55,7 +56,7 @@ public class SpecialFieldsUtils {
     public static final Boolean PREF_SHOWCOLUMN_PRINTED_DEFAULT = Boolean.FALSE;
 
     // The choice between PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS and PREF_SERIALIZESPECIALFIELDS is mutually exclusive
-    // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled 
+    // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
     public static final String PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
     public static final Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.TRUE;
 
@@ -76,21 +77,21 @@ public class SpecialFieldsUtils {
      * @param ce - Filled with undo info (if necessary)
      * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
      */
-    public static void updateField(SpecialField e, String value, BibtexEntry be, NamedCompound ce, boolean nullFieldIfValueIsTheSame) {
+    public static void updateField(SpecialField e, String value, BibEntry be, NamedCompound ce, boolean nullFieldIfValueIsTheSame) {
         Util.updateField(be, e.getFieldName(), value, ce, nullFieldIfValueIsTheSame);
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
         SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
     }
 
-    private static void exportFieldToKeywords(SpecialField e, BibtexEntry be, NamedCompound ce) {
+    private static void exportFieldToKeywords(SpecialField e, BibEntry be, NamedCompound ce) {
         SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
     }
 
-    private static void exportFieldToKeywords(SpecialField e, String newValue, BibtexEntry be, NamedCompound ce) {
+    private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry be, NamedCompound ce) {
         if (!SpecialFieldsUtils.keywordSyncEnabled()) {
             return;
         }
-        ArrayList<String> keywordList = Util.getSeparatedKeywords(be);
+        List<String> keywordList = be.getSeparatedKeywords();
         List<String> values = e.getKeyWords();
 
         int foundPos = -1;
@@ -111,15 +112,23 @@ public class SpecialFieldsUtils {
                 keywordList.add(foundPos, newValue);
             }
         }
-        Util.putKeywords(be, keywordList, ce);
+        String oldValue = be.getField("keywords");
+        be.putKeywords(keywordList);
+        String updatedValue = be.getField("keywords");
+        if ((oldValue == null) || !oldValue.equals(updatedValue)) {
+            if (ce != null) {
+                ce.addEdit(new UndoableFieldChange(be, "keywords", oldValue, updatedValue));
+            }
+        }
+
     }
 
     /**
      * Update keywords according to values of special fields
-     * 
+     *
      * @param nc indicates the undo named compound. May be null
      */
-    public static void syncKeywordsFromSpecialFields(BibtexEntry be, NamedCompound nc) {
+    public static void syncKeywordsFromSpecialFields(BibEntry be, NamedCompound nc) {
         SpecialFieldsUtils.exportFieldToKeywords(Priority.getInstance(), be, nc);
         SpecialFieldsUtils.exportFieldToKeywords(Rank.getInstance(), be, nc);
         SpecialFieldsUtils.exportFieldToKeywords(Relevance.getInstance(), be, nc);
@@ -128,7 +137,7 @@ public class SpecialFieldsUtils {
         SpecialFieldsUtils.exportFieldToKeywords(Printed.getInstance(), be, nc);
     }
 
-    private static void importKeywordsForField(ArrayList<String> keywordList, SpecialField c, BibtexEntry be, NamedCompound nc) {
+    private static void importKeywordsForField(ArrayList<String> keywordList, SpecialField c, BibEntry be, NamedCompound nc) {
         List<String> values = c.getKeyWords();
         String newValue = null;
         for (String val : values) {
@@ -142,14 +151,15 @@ public class SpecialFieldsUtils {
 
     /**
      * updates field values according to keywords
-     * 
+     *
      * @param ce indicates the undo named compound. May be null
      */
-    public static void syncSpecialFieldsFromKeywords(BibtexEntry be, NamedCompound ce) {
+    public static void syncSpecialFieldsFromKeywords(BibEntry be, NamedCompound ce) {
         if (be.getField("keywords") == null) {
             return;
         }
-        ArrayList<String> keywordList = Util.getSeparatedKeywords(be.getField("keywords"));
+        ArrayList<String> keywordList = net.sf.jabref.model.entry.EntryUtil
+                .getSeparatedKeywords(be.getField("keywords"));
         SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), be, ce);

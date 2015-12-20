@@ -33,7 +33,7 @@ import net.sf.jabref.bst.VM.BstFunction;
  characters; furthermore, this function appends any needed matching
  |right_brace|s.  If any of the types is incorrect, it complains and
  pushes the null string.
- * 
+ *
  */
 public class TextPrefixFunction implements BstFunction {
 
@@ -59,7 +59,7 @@ public class TextPrefixFunction implements BstFunction {
             stack.push("");
             return;
         }
-        if (!(o1 instanceof String)) {
+        if (!(o2 instanceof String)) {
             vm.warn("A string is needed as second parameter to text.prefix$");
             stack.push("");
             return;

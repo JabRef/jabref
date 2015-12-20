@@ -20,18 +20,18 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexString;
 
 public class UndoableRemoveString extends AbstractUndoableEdit {
 
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private final BibtexString string;
     private final BasePanel panel;
 
 
     public UndoableRemoveString(BasePanel panel,
-            BibtexDatabase base, BibtexString string) {
+            BibDatabase base, BibtexString string) {
         this.base = base;
         this.string = string;
         this.panel = panel;
@@ -39,18 +39,14 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        // @formatter:off
         return Localization.lang("Undo") + ": " +
-                Localization.lang("remove string ");
-        // @formatter:on
+                Localization.lang("remove string");
     }
 
     @Override
     public String getRedoPresentationName() {
-        // @formatter:off
         return Localization.lang("Redo") + ": " +
-                Localization.lang("remove string ");
-        // @formatter:on
+                Localization.lang("remove string");
     }
 
     @Override

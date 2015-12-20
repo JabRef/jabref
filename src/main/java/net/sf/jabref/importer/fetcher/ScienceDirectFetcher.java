@@ -17,7 +17,7 @@ package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -90,7 +91,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibtexEntry entry = BibsonomyScraper.getEntry(cit);
+                BibEntry entry = BibsonomyScraper.getEntry(cit);
                 if (entry != null) {
                     dialog.addEntry(entry);
                 }
@@ -117,7 +118,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<>();
         try {
-            urlQuery = ScienceDirectFetcher.SEARCH_URL + URLEncoder.encode(query, "UTF-8");
+            urlQuery = ScienceDirectFetcher.SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8.name());
             int count = 1;
             String nextPage;
             while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)

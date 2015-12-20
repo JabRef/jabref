@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -74,12 +75,12 @@ public class RisImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -109,7 +110,7 @@ public class RisImporter extends ImportFormat {
                 StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
                 while (!done && (j < (fields.length - 1))) {
-                    if ((fields[j + 1].length() >= 6) && !fields[j + 1].substring(2, 6).equals("  - ")) {
+                    if ((fields[j + 1].length() >= 6) && !"  - ".equals(fields[j + 1].substring(2, 6))) {
                         if ((current.length() > 0)
                                 && !Character.isWhitespace(current.charAt(current.length() - 1))
                                 && !Character.isWhitespace(fields[j + 1].charAt(0))) {
@@ -127,25 +128,25 @@ public class RisImporter extends ImportFormat {
                 } else {
                     String lab = entry.substring(0, 2);
                     String val = entry.substring(6).trim();
-                    if (lab.equals("TY")) {
-                        if (val.equals("BOOK")) {
+                    if ("TY".equals(lab)) {
+                        if ("BOOK".equals(val)) {
                             type = "book";
-                        } else if (val.equals("JOUR") || val.equals("MGZN")) {
+                        } else if ("JOUR".equals(val) || "MGZN".equals(val)) {
                             type = "article";
-                        } else if (val.equals("THES")) {
+                        } else if ("THES".equals(val)) {
                             type = "phdthesis";
-                        } else if (val.equals("UNPB")) {
+                        } else if ("UNPB".equals(val)) {
                             type = "unpublished";
-                        } else if (val.equals("RPRT")) {
+                        } else if ("RPRT".equals(val)) {
                             type = "techreport";
-                        } else if (val.equals("CONF")) {
+                        } else if ("CONF".equals(val)) {
                             type = "inproceedings";
-                        } else if (val.equals("CHAP")) {
+                        } else if ("CHAP".equals(val)) {
                             type = "incollection";//"inbook";
                         } else {
                             type = "other";
                         }
-                    } else if (lab.equals("T1") || lab.equals("TI")) {
+                    } else if ("T1".equals(lab) || "TI".equals(lab)) {
                         String oldVal = hm.get("title");
                         if (oldVal == null) {
                             hm.put("title", val);
@@ -159,54 +160,54 @@ public class RisImporter extends ImportFormat {
                     }
                     // =
                     // val;
-                    else if (lab.equals("T2") || lab.equals("T3") || lab.equals("BT")) {
+                    else if ("T2".equals(lab) || "T3".equals(lab) || "BT".equals(lab)) {
                         hm.put("booktitle", val);
-                    } else if (lab.equals("AU") || lab.equals("A1")) {
-                        if (author.equals("")) {
+                    } else if ("AU".equals(lab) || "A1".equals(lab)) {
+                        if ("".equals(author)) {
                             author = val;
                         } else {
                             author += " and " + val;
                         }
-                    } else if (lab.equals("A2")) {
-                        if (editor.equals("")) {
+                    } else if ("A2".equals(lab)) {
+                        if ("".equals(editor)) {
                             editor = val;
                         } else {
                             editor += " and " + val;
                         }
-                    } else if (lab.equals("JA") || lab.equals("JF") || lab.equals("JO")) {
-                        if (type.equals("inproceedings")) {
+                    } else if ("JA".equals(lab) || "JF".equals(lab) || "JO".equals(lab)) {
+                        if ("inproceedings".equals(type)) {
                             hm.put("booktitle", val);
                         } else {
                             hm.put("journal", val);
                         }
-                    } else if (lab.equals("SP")) {
+                    } else if ("SP".equals(lab)) {
                         startPage = val;
-                    } else if (lab.equals("PB")) {
-                        if (type.equals("phdthesis")) {
+                    } else if ("PB".equals(lab)) {
+                        if ("phdthesis".equals(type)) {
                             hm.put("school", val);
                         } else {
                             hm.put("publisher", val);
                         }
-                    } else if (lab.equals("AD") || lab.equals("CY")) {
+                    } else if ("AD".equals(lab) || "CY".equals(lab)) {
                         hm.put("address", val);
-                    } else if (lab.equals("EP")) {
+                    } else if ("EP".equals(lab)) {
                         endPage = val;
-                    } else if (lab.equals("SN")) {
+                    } else if ("SN".equals(lab)) {
                         hm.put("issn", val);
-                    } else if (lab.equals("VL")) {
+                    } else if ("VL".equals(lab)) {
                         hm.put("volume", val);
-                    } else if (lab.equals("IS")) {
+                    } else if ("IS".equals(lab)) {
                         hm.put("number", val);
-                    } else if (lab.equals("N2") || lab.equals("AB")) {
+                    } else if ("N2".equals(lab) || "AB".equals(lab)) {
                         String oldAb = hm.get("abstract");
                         if (oldAb == null) {
                             hm.put("abstract", val);
                         } else {
                             hm.put("abstract", oldAb + "\n" + val);
                         }
-                    } else if (lab.equals("UR")) {
+                    } else if ("UR".equals(lab)) {
                         hm.put("url", val);
-                    } else if ((lab.equals("Y1") || lab.equals("PY")) && (val.length() >= 4)) {
+                    } else if (("Y1".equals(lab) || "PY".equals(lab)) && (val.length() >= 4)) {
                         String[] parts = val.split("/");
                         hm.put("year", parts[0]);
                         if ((parts.length > 1) && !parts[1].isEmpty()) {
@@ -221,23 +222,23 @@ public class RisImporter extends ImportFormat {
                                 // The month part is unparseable, so we ignore it.
                             }
                         }
-                    } else if (lab.equals("KW")) {
+                    } else if ("KW".equals(lab)) {
                         if (!hm.containsKey("keywords")) {
                             hm.put("keywords", val);
                         } else {
                             String kw = hm.get("keywords");
                             hm.put("keywords", kw + ", " + val);
                         }
-                    } else if (lab.equals("U1") || lab.equals("U2") || lab.equals("N1")) {
+                    } else if ("U1".equals(lab) || "U2".equals(lab) || "N1".equals(lab)) {
                         if (!comment.isEmpty()) {
                             comment = comment + "\n";
                         }
                         comment = comment + val;
                     }
                     // Added ID import 2005.12.01, Morten Alver:
-                    else if (lab.equals("ID")) {
+                    else if ("ID".equals(lab)) {
                         hm.put("refid", val);
-                    } else if (lab.equals("M3")) {
+                    } else if ("M3".equals(lab)) {
                         String doi = val;
                         if (doi.startsWith("doi:")) {
                             doi = doi.replaceAll("(?i)doi:", "").trim();
@@ -260,15 +261,15 @@ public class RisImporter extends ImportFormat {
 
                 hm.put("pages", startPage + "--" + endPage);
             }
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getBibtexEntryType(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getTypeOrDefault(type)); // id assumes an existing database so don't
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();
-            for (String key : hm.keySet()) {
-                String content = hm.get(key);
+            for (Map.Entry<String, String> key : hm.entrySet()) {
+                String content = key.getValue();
                 if ((content == null) || content.trim().isEmpty()) {
-                    toRemove.add(key);
+                    toRemove.add(key.getKey());
                 }
             }
             for (Object aToRemove : toRemove) {

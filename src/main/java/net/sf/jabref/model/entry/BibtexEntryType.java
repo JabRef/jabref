@@ -76,21 +76,10 @@ public abstract class BibtexEntryType implements EntryType {
 
     @Override
     public List<String> getSecondaryOptionalFields() {
-        List<String> locOptionalFields = getOptionalFields();
-
-        if (locOptionalFields == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return locOptionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
+        return getOptionalFields().stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
     }
 
     private boolean isPrimary(String field) {
-        List<String> primaryFields = getPrimaryOptionalFields();
-
-        if (primaryFields == null) {
-            return false;
-        }
-        return primaryFields.contains(field);
+        return getPrimaryOptionalFields().contains(field);
     }
 }

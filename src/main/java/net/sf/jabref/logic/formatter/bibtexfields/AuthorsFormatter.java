@@ -38,6 +38,7 @@ public class AuthorsFormatter implements Formatter {
     /**
      *
      */
+    @Override
     public String format(String value) {
         boolean andSep = false;
         // String can contain newlines. Convert each to a space
@@ -82,7 +83,7 @@ public class AuthorsFormatter implements Formatter {
         // comma separation before the last separator. If there are two or more
         // and separators, we can dismiss this possibility.
         // If there is only a single and separator, check closer:
-        if (andSep && authors.length == 2) {
+        if (andSep && (authors.length == 2)) {
             // Check if the first part is semicolon separated:
             String[] semiSep = authors[0].split("; ");
             if (semiSep.length > 1) {
@@ -119,7 +120,7 @@ public class AuthorsFormatter implements Formatter {
         for (int i = 0; i < authors.length; i++) {
             String norm = AuthorsFormatter.normalizeName(authors[i]);
             stringBuilder.append(norm);
-            if (i < authors.length - 1) {
+            if (i < (authors.length - 1)) {
                 stringBuilder.append(" and ");
             }
         }
@@ -135,7 +136,7 @@ public class AuthorsFormatter implements Formatter {
             for (int i = 0; i < initials.length(); i++) {
                 stringBuilder.append(initials.charAt(i));
                 stringBuilder.append('.');
-                if (i < initials.length() - 1) {
+                if (i < (initials.length() - 1)) {
                     stringBuilder.append(' ');
                 }
             }
@@ -149,7 +150,7 @@ public class AuthorsFormatter implements Formatter {
             for (int i = 0; i < initials.length(); i++) {
                 stringBuilder.append(initials.charAt(i));
                 stringBuilder.append('.');
-                if (i < initials.length() - 1) {
+                if (i < (initials.length() - 1)) {
                     stringBuilder.append(' ');
                 }
             }
@@ -164,7 +165,7 @@ public class AuthorsFormatter implements Formatter {
             for (int i = 0; i < initials.length(); i++) {
                 stringBuilder.append(initials.charAt(i));
                 stringBuilder.append('.');
-                if (i < initials.length() - 1) {
+                if (i < (initials.length() - 1)) {
                     stringBuilder.append(' ');
                 }
             }
@@ -178,7 +179,7 @@ public class AuthorsFormatter implements Formatter {
             for (int i = 0; i < initials.length(); i++) {
                 stringBuilder.append(initials.charAt(i));
                 stringBuilder.append('.');
-                if (i < initials.length() - 1) {
+                if (i < (initials.length() - 1)) {
                     stringBuilder.append(' ');
                 }
             }
@@ -189,7 +190,7 @@ public class AuthorsFormatter implements Formatter {
             // Name contains comma
             int index = name.lastIndexOf(',');
             // If the comma is at the end of the name, just remove it to prevent index error:
-            if (index == name.length() - 1) {
+            if (index == (name.length() - 1)) {
                 name = name.substring(0, name.length() - 1);
             }
 
@@ -206,7 +207,7 @@ public class AuthorsFormatter implements Formatter {
                     } else {
                         stringBuilder.append(firstNameParts[i]);
                     }
-                    if (i < firstNameParts.length - 1) {
+                    if (i < (firstNameParts.length - 1)) {
                         stringBuilder.append(' ');
                     }
                 }
@@ -221,7 +222,7 @@ public class AuthorsFormatter implements Formatter {
                     for (int i = 0; i < initials.length(); i++) {
                         stringBuilder.append(initials.charAt(i));
                         stringBuilder.append('.');
-                        if (i < initials.length() - 1) {
+                        if (i < (initials.length() - 1)) {
                             stringBuilder.append(' ');
                         }
                     }
@@ -246,7 +247,7 @@ public class AuthorsFormatter implements Formatter {
                 StringBuilder stringBuilder = new StringBuilder(parts[parts.length - 1]);
                 if (parts.length > 1) {
                     stringBuilder.append(',');
-                    for (int i = 0; i < parts.length - 1; i++) {
+                    for (int i = 0; i < (parts.length - 1); i++) {
                         stringBuilder.append(' ').append(parts[i]);
                         if (parts[i].length() == 1) {
                             stringBuilder.append('.');

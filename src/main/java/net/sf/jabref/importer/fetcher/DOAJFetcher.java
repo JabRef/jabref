@@ -32,7 +32,7 @@ import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.JSONEntryParser;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class DOAJFetcher implements EntryFetcher {
 
@@ -57,7 +57,7 @@ public class DOAJFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         shouldContinue = true;
         try {
-            status.setStatus(Localization.lang("Searching DOAJ..."));
+            status.setStatus(Localization.lang("Searching..."));
             HttpResponse<JsonNode> jsonResponse;
             jsonResponse = Unirest.get(searchURL + query + "?pageSize=1").header("accept", "application/json").asJson();
             JSONObject jo = jsonResponse.getBody().getObject();
@@ -73,7 +73,7 @@ public class DOAJFetcher implements EntryFetcher {
                                         Integer.toString(hits));
 
                         if (strCount == null) {
-                            status.setStatus(Localization.lang("DOAJ search canceled"));
+                            status.setStatus(Localization.lang("Search canceled"));
                             return false;
                         }
 
@@ -102,7 +102,7 @@ public class DOAJFetcher implements EntryFetcher {
                         JSONArray results = jo.getJSONArray("results");
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                            BibtexEntry entry = jsonConverter.BibJSONtoBibtex(bibJsonEntry);
+                            BibEntry entry = jsonConverter.BibJSONtoBibtex(bibJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);
@@ -112,11 +112,12 @@ public class DOAJFetcher implements EntryFetcher {
                 return true;
             } else {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
-                        Localization.lang("Search DOAJ"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "DOAJ"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
         } catch (UnirestException e) {
             LOGGER.warn("Problem searching DOAJ", e);
+            status.setStatus(Localization.lang("Search canceled"));
             return false;
         }
 

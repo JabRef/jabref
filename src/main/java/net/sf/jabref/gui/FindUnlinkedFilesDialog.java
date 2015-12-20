@@ -76,7 +76,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.bibtex.EntryTypes;
@@ -106,16 +106,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
     public static final String ACTION_COMMAND = "findUnlinkedFiles";
     public static final String ACTION_MENU_TITLE = Localization.menuTitle("Find unlinked files...");
     public static final String ACTION_ICON = "toggleSearch";
-    public static final String ACTION_KEYBINDING_ACTION = "Find unlinked files";
-    // @formatter:off
     public static final String ACTION_SHORT_DESCRIPTION = Localization.lang("Searches for unlinked PDF files on the file system");
-    // @formatter:on
 
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
 
     private JabRefFrame frame;
-    private BibtexDatabase database;
+    private BibDatabase database;
     private EntryFromFileCreatorManager creatorManager;
     private UnlinkedFilesCrawler crawler;
 
@@ -179,7 +176,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * Used via reflection in {@link net.sf.jabref.importer.DatabaseFileLookup} to construct this
      * class.
      */
-    @SuppressWarnings("unused")
     private FindUnlinkedFilesDialog() {
     }
 
@@ -239,7 +235,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         if (store != null) {
             try {
                 String[] dim = store.split(";");
-                dimension = new Dimension(new Integer(dim[0]), new Integer(dim[1]));
+                dimension = new Dimension(Integer.valueOf(dim[0]), Integer.valueOf(dim[1]));
             } catch (Exception ignored) {
                 // Ignored
             }
@@ -396,7 +392,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         }
 
         String path = textfieldDirectoryPath.getText();
-        if ((path == null) || path.equals("")) {
+        if ((path == null) || "".equals(path)) {
             fileChooser.setCurrentDirectory(lastSelectedDirectory);
         } else {
             fileChooser.setCurrentDirectory(new File(path));
@@ -781,7 +777,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonScan.setToolTipText(Localization.lang("Searches the selected directory for unlinked files."));
         buttonApply = new JButton(Localization.lang("Apply"));
         buttonApply.setMnemonic('I');
-        buttonApply.setToolTipText(Localization.lang("Starts the import of bibtex entries."));
+        buttonApply.setToolTipText(Localization.lang("Starts the import of BibTeX entries."));
         buttonClose = new JButton(Localization.lang("Close"));
         buttonClose.setToolTipText(Localization.lang("Leave this dialog."));
         buttonClose.setMnemonic('C');
@@ -851,7 +847,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         panelDirectory.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Select directory")));
         panelFiles.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Select files")));
-        panelEntryTypesSelection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Bibtex entry creation")));
+        panelEntryTypesSelection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("BibTeX entry creation")));
 
         Insets basicInsets = new Insets(6, 6, 6, 6);
         Insets smallInsets = new Insets(3, 2, 3, 1);

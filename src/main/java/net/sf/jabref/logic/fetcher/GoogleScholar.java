@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -10,6 +10,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public class GoogleScholar implements FullTextFinder {
     private static final int NUM_RESULTS = 10;
 
     @Override
-    public Optional<URL> findFullText(BibtexEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
@@ -34,7 +35,7 @@ public class GoogleScholar implements FullTextFinder {
             return pdfLink;
         }
 
-        String url = String.format(SEARCH_URL, URLEncoder.encode(entryTitle, "UTF-8"));
+        String url = String.format(SEARCH_URL, URLEncoder.encode(entryTitle, StandardCharsets.UTF_8.name()));
 
         Document doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler
@@ -47,7 +48,7 @@ public class GoogleScholar implements FullTextFinder {
             if (link.first() != null) {
                 String s = link.first().attr("href");
                 // link present?
-                if (!s.equals("")) {
+                if (!"".equals(s)) {
                     // TODO: check title inside pdf + length?
                     // TODO: report error function needed?! query -> result
                     LOGGER.info("Fulltext PDF found @ Google: " + s);

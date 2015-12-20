@@ -16,7 +16,6 @@
 package net.sf.jabref.logic.net;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -24,6 +23,7 @@ import java.io.*;
 import java.net.CookieHandler;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 
 /**
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
@@ -100,10 +100,10 @@ public class URLDownload {
      * @throws IOException
      */
     public String downloadToString() throws IOException {
-        return downloadToString(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+        return downloadToString(Globals.prefs.getDefaultEncoding());
     }
 
-    public String downloadToString(String encoding) throws IOException {
+    public String downloadToString(Charset encoding) throws IOException {
 
         try (InputStream input = new BufferedInputStream(openConnection().getInputStream());
              Writer output = new StringWriter()) {
@@ -111,11 +111,11 @@ public class URLDownload {
             return output.toString();
         } catch (IOException e) {
             LOGGER.warn("Could not copy input", e);
-            return "";
+            throw e;
         }
     }
 
-    private void copy(InputStream in, Writer out, String encoding) throws IOException {
+    private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
         InputStream monitoredInputStream = monitorInputStream(in);
         Reader r = new InputStreamReader(monitoredInputStream, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
@@ -135,6 +135,7 @@ public class URLDownload {
             copy(input, output);
         } catch (IOException e) {
             LOGGER.warn("Could not copy input", e);
+            throw e;
         }
     }
 

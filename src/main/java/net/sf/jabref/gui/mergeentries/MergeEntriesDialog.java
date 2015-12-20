@@ -21,7 +21,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import javax.swing.*;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
@@ -47,8 +47,8 @@ public class MergeEntriesDialog extends JDialog {
     private final BasePanel panel;
     private final JabRefFrame frame;
     private final CellConstraints cc = new CellConstraints();
-    private BibtexEntry one;
-    private BibtexEntry two;
+    private BibEntry one;
+    private BibEntry two;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
 
@@ -70,14 +70,12 @@ public class MergeEntriesDialog extends JDialog {
      *
      * @param selected Selected BibtexEntries
      */
-    private void init(BibtexEntry[] selected) {
+    private void init(BibEntry[] selected) {
 
         // Check if there are two entries selected
         if (selected.length != 2) { // None selected. Inform the user to select entries first.
-            // @formatter:off
             JOptionPane.showMessageDialog(frame, Localization.lang("You have to choose exactly two entries to merge."),
                     Localization.lang("Merge entries"), JOptionPane.INFORMATION_MESSAGE);
-            // @formatter:on
             this.dispose();
             return;
         }
@@ -160,11 +158,11 @@ public class MergeEntriesDialog extends JDialog {
      * @param button Button pressed
      */
     private void buttonPressed(String button) {
-        BibtexEntry mergedEntry = mergeEntries.getMergeEntry();
-        if (button.equals("cancel")) {
+        BibEntry mergedEntry = mergeEntries.getMergeEntry();
+        if ("cancel".equals(button)) {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));
-        } else if (button.equals("replace")) {
+        } else if ("replace".equals(button)) {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
             panel.insertEntry(mergedEntry);

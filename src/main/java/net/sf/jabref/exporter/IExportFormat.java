@@ -15,9 +15,10 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 
+import java.nio.charset.Charset;
 import java.util.Set;
 
 import javax.swing.filechooser.FileFilter;
@@ -42,7 +43,7 @@ public interface IExportFormat {
 
     /**
      * Perform the export.
-     * 
+     *
      * @param database
      *            The database to export from.
      * @param metaData
@@ -56,8 +57,8 @@ public interface IExportFormat {
      *            should be exported. If null, all entries will be exported.
      * @throws Exception
      */
-    void performExport(BibtexDatabase database, MetaData metaData,
-            String file, String encoding,
+    void performExport(BibDatabase database, MetaData metaData,
+ String file, Charset encoding,
             Set<String> entryIds) throws Exception;
 
 }

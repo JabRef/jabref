@@ -1,20 +1,3 @@
-/*  Copyright (C) -2015 JabRef contributors.
-    Copyright (C) 2015 Oliver Kopp
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.bibtex;
 
 import net.sf.jabref.gui.BibtexFields;
@@ -22,7 +5,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -32,25 +15,6 @@ import com.google.common.base.Strings;
 import net.sf.jabref.model.entry.EntryType;
 
 public class BibtexEntryWriter {
-
-    /**
-     * Display name map for entry field names.
-     */
-    private static final Map<String, String> tagDisplayNameMap = new HashMap<>();
-
-
-    static {
-        // The field name display map.
-        BibtexEntryWriter.tagDisplayNameMap.put("bibtexkey", "BibTeXKey");
-        BibtexEntryWriter.tagDisplayNameMap.put("doi", "DOI");
-        BibtexEntryWriter.tagDisplayNameMap.put("ee", "EE");
-        BibtexEntryWriter.tagDisplayNameMap.put("howpublished", "HowPublished");
-        BibtexEntryWriter.tagDisplayNameMap.put("lastchecked", "LastChecked");
-        BibtexEntryWriter.tagDisplayNameMap.put("isbn", "ISBN");
-        BibtexEntryWriter.tagDisplayNameMap.put("issn", "ISSN");
-        BibtexEntryWriter.tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
-        BibtexEntryWriter.tagDisplayNameMap.put("url", "URL");
-    }
 
     private static final Map<String, List<String>> requiredFieldsSorted = new HashMap<>();
 
@@ -95,7 +59,14 @@ public class BibtexEntryWriter {
         this.write = write;
     }
 
-    public void write(BibtexEntry entry, Writer out) throws IOException {
+    public void write(BibEntry entry, Writer out) throws IOException {
+        // if the entry has not been modified, write it as it was
+        if(!entry.hasChanged()){
+            out.write(entry.getParsedSerialization());
+            return;
+        }
+        out.write(Globals.NEWLINE + Globals.NEWLINE);
+
         switch (writeFieldSortStyle) {
             case 0:
                 writeRequiredFieldsFirstOptionalFieldsSecondRemainingFieldsThird(entry, out);
@@ -116,14 +87,14 @@ public class BibtexEntryWriter {
      * @param out
      * @throws IOException
      */
-    private void writeRequiredFieldsFirstOptionalFieldsSecondRemainingFieldsThird(BibtexEntry entry, Writer out) throws IOException {
+    private void writeRequiredFieldsFirstOptionalFieldsSecondRemainingFieldsThird(BibEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName() + '{');
 
         HashSet<String> writtenFields = new HashSet<>();
 
         writeKeyField(entry, out);
-        writtenFields.add(BibtexEntry.KEY_FIELD);
+        writtenFields.add(BibEntry.KEY_FIELD);
 
         // Write required fields first.
         // Thereby, write the title field first.
@@ -166,10 +137,10 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}');
     }
 
-    private List<String> getRequiredFieldsSorted(BibtexEntry entry) {
+    private List<String> getRequiredFieldsSorted(BibEntry entry) {
         String entryTypeName = entry.getType().getName();
         List<String> sortedFields = requiredFieldsSorted.get(entryTypeName);
 
@@ -183,7 +154,7 @@ public class BibtexEntryWriter {
         return sortedFields;
     }
 
-    private List<String> getOptionalFieldsSorted(BibtexEntry entry) {
+    private List<String> getOptionalFieldsSorted(BibEntry entry) {
         String entryTypeName = entry.getType().getName();
         List<String> sortedFields = optionalFieldsSorted.get(entryTypeName);
 
@@ -204,14 +175,14 @@ public class BibtexEntryWriter {
      * @param out
      * @throws IOException
      */
-    private void writeRequiredFieldsFirstRemainingFieldsSecond(BibtexEntry entry, Writer out) throws IOException {
+    private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName().toUpperCase(Locale.US) + '{');
 
         writeKeyField(entry, out);
 
         HashSet<String> written = new HashSet<>();
-        written.add(BibtexEntry.KEY_FIELD);
+        written.add(BibEntry.KEY_FIELD);
         boolean hasWritten = false;
         // Write required fields first.
         List<String> fields = entry.getRequiredFieldsFlat();
@@ -245,16 +216,16 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}');
     }
 
-    private void writeUserDefinedOrder(BibtexEntry entry, Writer out) throws IOException {
+    private void writeUserDefinedOrder(BibEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName() + '{');
 
         writeKeyField(entry, out);
         HashMap<String, String> written = new HashMap<>();
-        written.put(BibtexEntry.KEY_FIELD, null);
+        written.put(BibEntry.KEY_FIELD, null);
         boolean hasWritten = false;
 
         // Write user defined fields first.
@@ -290,11 +261,11 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}');
 
     }
 
-    private void writeKeyField(BibtexEntry entry, Writer out) throws IOException {
+    private void writeKeyField(BibEntry entry, Writer out) throws IOException {
         String keyField = StringUtil.shaveString(entry.getCiteKey());
         out.write((keyField == null ? "" : keyField) + ',' + Globals.NEWLINE);
     }
@@ -310,7 +281,7 @@ public class BibtexEntryWriter {
      *                          it was not set
      * @throws IOException In case of an IO error
      */
-    private boolean writeField(BibtexEntry entry, Writer out, String name, boolean prependWhiteSpace) throws IOException {
+    private boolean writeField(BibEntry entry, Writer out, String name, boolean prependWhiteSpace) throws IOException {
         String field = entry.getField(name);
         // only write field if is is not empty or if empty fields should be included
         // the first condition mirrors mirror behavior of com.jgoodies.common.base.Strings.isNotBlank(str)
@@ -351,20 +322,17 @@ public class BibtexEntryWriter {
             field = "UNKNOWN";
         }
 
-        String suffix = "";
+        StringBuilder suffixSB = new StringBuilder();
         if (writeFieldAddSpaces) {
             for (int i = BibtexEntryWriter.maxFieldLength - field.length(); i > 0; i--) {
-                suffix += " ";
+                suffixSB.append(" ");
             }
         }
+        String suffix = suffixSB.toString();
 
         String result;
         if (writeFieldCameCaseName) {
-            if (BibtexEntryWriter.tagDisplayNameMap.containsKey(field.toLowerCase())) {
-                result = BibtexEntryWriter.tagDisplayNameMap.get(field.toLowerCase()) + suffix;
-            } else {
-                result = (field.charAt(0) + "").toUpperCase() + field.substring(1) + suffix;
-            }
+            result = CamelCaser.toCamelCase(field) + suffix;
         } else {
             result = field + suffix;
         }

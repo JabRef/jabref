@@ -27,7 +27,7 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -44,13 +44,7 @@ class CustomExportDialog extends JDialog {
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
     private boolean ok_pressed;
-    private int index;
     private final JabRefFrame parent;
-
-    private String oldName;
-    private String oldRegexp;
-    private String oldField;
-
 
     public CustomExportDialog(JabRefFrame parent_, String name_, String layoutFile_, String extension_) {
         this(parent_);
@@ -86,7 +80,7 @@ class CustomExportDialog extends JDialog {
                 dispose();
             }
         };
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(okListener);
         name.addActionListener(okListener);
         layoutFile.addActionListener(okListener);
@@ -127,7 +121,7 @@ class CustomExportDialog extends JDialog {
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.
@@ -200,22 +194,6 @@ class CustomExportDialog extends JDialog {
 
     public boolean okPressed() {
         return ok_pressed;
-    }
-
-    public int index() {
-        return index;
-    }
-
-    public String oldField() {
-        return oldField;
-    }
-
-    public String oldName() {
-        return oldName;
-    }
-
-    public String oldRegexp() {
-        return oldRegexp;
     }
 
     public String layoutFile() {

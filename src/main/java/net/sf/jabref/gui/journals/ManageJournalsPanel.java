@@ -35,7 +35,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
@@ -139,7 +139,7 @@ class ManageJournalsPanel extends JPanel {
         add(externalFilesPanel, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         bb.addButton(ok);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
@@ -183,7 +183,7 @@ class ManageJournalsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 File old = null;
-                if (!newNameTf.getText().equals("")) {
+                if (!"".equals(newNameTf.getText())) {
                     old = new File(newNameTf.getText());
                 }
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.SAVE_DIALOG, false);
@@ -198,7 +198,7 @@ class ManageJournalsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 File old = null;
-                if (!personalFile.getText().equals("")) {
+                if (!"".equals(personalFile.getText())) {
                     old = new File(personalFile.getText());
                 }
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.OPEN_DIALOG, false);
@@ -251,7 +251,7 @@ class ManageJournalsPanel extends JPanel {
         // Key bindings:
         ActionMap am = getActionMap();
         InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         //dialog.pack();
@@ -327,7 +327,7 @@ class ManageJournalsPanel extends JPanel {
     private void setupUserTable() {
         JournalAbbreviationRepository userAbbr = new JournalAbbreviationRepository();
         String filename = personalFile.getText();
-        if (!filename.equals("") && new File(filename).exists()) {
+        if (!"".equals(filename) && new File(filename).exists()) {
             try {
                 userAbbr.readJournalListFromFile(new File(filename));
             } catch (FileNotFoundException e) {
@@ -392,7 +392,7 @@ class ManageJournalsPanel extends JPanel {
                 e.printStackTrace();
             }
             String filename = f.getPath();
-            if (filename.equals("")) {
+            if ("".equals(filename)) {
                 filename = null;
             }
             Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, filename);
@@ -401,7 +401,7 @@ class ManageJournalsPanel extends JPanel {
         // Store the list of external files set up:
         ArrayList<String> extFiles = new ArrayList<>();
         for (ExternalFileEntry efe : externals) {
-            if (!efe.getValue().equals("")) {
+            if (!"".equals(efe.getValue())) {
                 extFiles.add(efe.getValue());
             }
         }
@@ -490,10 +490,8 @@ class ManageJournalsPanel extends JPanel {
 
     class AbbreviationsTableModel extends AbstractTableModel implements ActionListener {
 
-        // @formatter:off
         final String[] names = new String[] {Localization.lang("Journal name"),
                 Localization.lang("Abbreviation")};
-        //
         List<JournalEntry> journals;
 
 
@@ -611,7 +609,7 @@ class ManageJournalsPanel extends JPanel {
         private final JTextField tf;
         private final JButton browse = new JButton(Localization.lang("Browse"));
         private final JButton view = new JButton(Localization.lang("Preview"));
-        private final JButton clear = new JButton(IconTheme.JabRefIcon.DELETE.getIcon());
+        private final JButton clear = new JButton(IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
         private final JButton download = new JButton(Localization.lang("Download"));
 
 

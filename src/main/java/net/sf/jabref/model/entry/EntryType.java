@@ -1,11 +1,10 @@
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Interface for all EntryTypes.
@@ -47,6 +46,19 @@ public interface EntryType extends Comparable<EntryType> {
                 .collect(Collectors.toList());
 
         return Collections.unmodifiableList(requiredFlat);
+    }
+
+    /**
+     * Returns all defined (required & optional) fields.
+     * No OR relationships are captured here.
+     *
+     * @return a List of all defined field name Strings
+     */
+    default List<String> getAllFields() {
+        List<String> allFields = Stream.concat(getRequiredFieldsFlat().stream(), getOptionalFields().stream())
+                .collect(Collectors.toList());
+
+        return Collections.unmodifiableList(allFields);
     }
 
     /**

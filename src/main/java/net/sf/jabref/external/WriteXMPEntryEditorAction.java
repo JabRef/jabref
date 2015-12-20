@@ -20,14 +20,16 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 import javax.swing.*;
+import javax.xml.transform.TransformerException;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -44,7 +46,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
     public WriteXMPEntryEditorAction(BasePanel panel, EntryEditor editor) {
         this.panel = panel;
         this.editor = editor;
-        // normally, the next call should be without "Localization.lang". However, the string "Write XMP" is also used in non-menu places and therefore, the translation must be also available at Localization.lang()
+        // normally, the next call should be without "Localization.lang". However, the string "Write XMP" is also used in non-menu places and therefore, the translation must be also available at Localization.lang
         putValue(Action.NAME, Localization.lang("Write XMP"));
         putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.WRITE_XMP.getIcon());
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Write BibtexEntry as XMP-metadata to PDF."));
@@ -56,7 +58,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         panel.output(Localization.lang("Writing XMP metadata..."));
         panel.frame().setProgressBarIndeterminate(true);
         panel.frame().setProgressBarVisible(true);
-        BibtexEntry entry = editor.getEntry();
+        BibEntry entry = editor.getEntry();
 
         // Make a list of all PDFs linked from this entry:
         List<File> files = new ArrayList<>();
@@ -77,7 +79,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
             tm.setContent(field);
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
-                if ((flEntry.getType() != null) && flEntry.getType().getName().toLowerCase().equals("pdf")) {
+                if ((flEntry.getType() != null) && "pdf".equals(flEntry.getType().getName().toLowerCase())) {
                     f = FileUtil.expandFilename(flEntry.getLink(), dirs);
                     if (f != null) {
                         files.add(f);
@@ -103,10 +105,10 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
     class WriteXMPWorker extends AbstractWorker {
 
         private final List<File> files;
-        private final BibtexEntry entry;
+        private final BibEntry entry;
 
 
-        public WriteXMPWorker(List<File> files, BibtexEntry entry) {
+        public WriteXMPWorker(List<File> files, BibEntry entry) {
 
             this.files = files;
             this.entry = entry;
@@ -133,7 +135,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
                                 message = Localization.lang("Wrote XMP-metadata");
                             }
                             written++;
-                        } catch (Exception e) {
+                        } catch (IOException | TransformerException e) {
                             if (files.size() == 1) {
                                 message = Localization.lang("Error while writing") + " '" + file.getPath() + "'";
                             }

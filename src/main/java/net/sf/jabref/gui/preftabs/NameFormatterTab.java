@@ -141,10 +141,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                // @formatter:off
                 return col == 0 ? Localization.lang("Formatter Name") :
                     Localization.lang("Format String");
-                // @formatter:on
             }
 
             @Override

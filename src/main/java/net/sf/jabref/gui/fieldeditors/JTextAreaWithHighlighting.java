@@ -17,32 +17,31 @@ package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.SearchTextListener;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.gui.search.MatchesHighlighter;
+import net.sf.jabref.logic.search.SearchTextListener;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-
-import javax.swing.AbstractAction;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
+import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
 
-    private ArrayList<String> wordsToHighlight;
+    private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
+
+    private List<String> wordsToHighlight;
 
     private UndoManager undo;
-
 
     public JTextAreaWithHighlighting() {
         super();
@@ -60,7 +59,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         //register "Paste" action
         getActionMap().put(Actions.PASTE, new PasteAction(this));
         // Bind paste command to KeyBinds.PASTE
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.PASTE), Actions.PASTE);
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
     }
 
     private void setupUndoRedo() {
@@ -68,13 +67,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         Document doc = getDocument();
 
         // Listen for undo and redo events
-        doc.addUndoableEditListener(new UndoableEditListener() {
-
-            @Override
-            public void undoableEditHappened(UndoableEditEvent evt) {
-                undo.addEdit(evt.getEdit());
-            }
-        });
+        doc.addUndoableEditListener(evt -> undo.addEdit(evt.getEdit()));
 
         // Create an undo action and add it to the text component
         getActionMap().put("Undo", new AbstractAction("Undo") {
@@ -92,7 +85,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         });
 
         // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
         getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
@@ -111,7 +104,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 
         // Bind the redo action to ctrl-Y
         boolean bind = true;
-        KeyStroke redoKey = Globals.prefs.getKey(KeyBinds.REDO);
+        KeyStroke redoKey = Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.REDO);
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
             // If emacs is enabled, check if we have a conflict at keys
             // If yes, do not bind
@@ -138,7 +131,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
      *
      * @param words to highlight
      */
-    private void highLight(ArrayList<String> words) {
+    private void highLight(List<String> words) {
         // highlight all characters that appear in charsToHighlight
         Highlighter highlighter = getHighlighter();
         highlighter.removeAllHighlights();
@@ -151,47 +144,36 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
             return;
         }
 
-        Matcher matcher = Util.getPatternForWords(words).matcher(content);
-
-        while (matcher.find()) {
-            try {
-                highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
-            } catch (BadLocationException ble) {
-                // should not occur if matcher works right
-                System.out.println(ble);
+        MatchesHighlighter.getPatternForWords(words, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP),
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE)).ifPresent(pattern -> {
+            Matcher matcher = pattern.matcher(content);
+            while (matcher.find()) {
+                try {
+                    highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
+                } catch (BadLocationException ble) {
+                    // should not occur if matcher works right
+                    LOGGER.warn("Highlighting not possible, bad location", ble);
+                }
             }
-        }
+        });
+
+
 
     }
 
     @Override
     public void setText(String text) {
         super.setText(text);
-        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
-            highLight(wordsToHighlight);
-        }
+        highLight(wordsToHighlight);
         if (undo != null) {
             undo.discardAllEdits();
         }
     }
 
     @Override
-    public void searchText(ArrayList<String> words) {
-        // words have to be stored in class variable as
-        // setText() makes use of them
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
-            this.wordsToHighlight = words;
-            highLight(words);
-        } else {
-            if (this.wordsToHighlight != null) {
-                // setting of "highLightWords" seems to have changed.
-                // clear all highlights and remember the clearing (by wordsToHighlight = null)
-                this.wordsToHighlight = null;
-                highLight(null);
-            }
-        }
-
+    public void searchText(List<String> words) {
+        this.wordsToHighlight = words;
+        highLight(words);
     }
 
 }

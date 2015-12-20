@@ -30,7 +30,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.PositionWindow;
 
@@ -38,7 +38,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * An Action for launching mass field.
@@ -80,7 +80,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         renameTo = new JTextField();
         renameTo.setEnabled(false);
 
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
 
         all = new JRadioButton(Localization.lang("All entries"));
@@ -186,7 +186,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
     }
 
@@ -209,7 +209,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (bp == null) {
             return;
         }
-        BibtexEntry[] entries = bp.getSelectedEntries();
+        BibEntry[] entries = bp.getSelectedEntries();
         // Lazy creation of the dialog:
         if (diag == null) {
             createDialog();
@@ -222,7 +222,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             return;
         }
 
-        Collection<BibtexEntry> entryList;
+        Collection<BibEntry> entryList;
         // If all entries should be treated, change the entries array:
         if (all.isSelected()) {
             entryList = bp.database().getEntries();

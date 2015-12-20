@@ -81,10 +81,8 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            // @formatter:off
             JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"),
                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-            // @formatter:on
             return;
         }
 
@@ -138,12 +136,7 @@ public class DownloadExternalFile {
                     return;
                 }
                 // Download finished: call the method that stops the progress bar etc.:
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        downloadFinished();
-                    }
-                });
+                SwingUtilities.invokeLater(DownloadExternalFile.this::downloadFinished);
             }
         });
 
@@ -319,23 +312,23 @@ public class DownloadExternalFile {
         }
         // First see if the stripped link gives a reasonable suffix:
         String suffix;
-        int index = strippedLink.lastIndexOf('.');
-        if ((index <= 0) || (index == (strippedLink.length() - 1))) {
+        int strippedLinkIndex = strippedLink.lastIndexOf('.');
+        if ((strippedLinkIndex <= 0) || (strippedLinkIndex == (strippedLink.length() - 1))) {
             suffix = null;
         } else {
-            suffix = strippedLink.substring(index + 1);
+            suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
         if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
             return suffix;
         } else {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
-            index = link.lastIndexOf('.');
-            if ((index <= 0) || (index == (strippedLink.length() - 1))) {
-                // No occurence, or at the end
+            int index = link.lastIndexOf('.');
+            if ((index <= 0) || (index == (link.length() - 1))) {
+                // No occurrence, or at the end
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (suffix.indexOf('/') > 0) {
+                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') > 0) {
                     return "";
                 } else {
                     return suffix; // return the first one we found, anyway.

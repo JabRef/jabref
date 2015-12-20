@@ -339,12 +339,12 @@ public class OOPreFormatter implements LayoutFormatter {
                     // Then test if we are dealing with a italics or bold
                     // command.
                     // If so, handle.
-                    if (command.equals("em") || command.equals("emph") || command.equals("textit")) {
+                    if ("em".equals(command) || "emph".equals(command) || "textit".equals(command)) {
                         String part = StringUtil.getPart(field, i, true);
 
                         i += part.length();
                         sb.append("<em>").append(part).append("</em>");
-                    } else if (command.equals("textbf")) {
+                    } else if ("textbf".equals(command)) {
                         String part = StringUtil.getPart(field, i, true);
                         i += part.length();
                         sb.append("<b>").append(part).append("</b>");

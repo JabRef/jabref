@@ -63,7 +63,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         if (forceLowerCase) {
             s = s.toLowerCase();
         }
-        if (s.equals("") || listModel.contains(s)) {
+        if ("".equals(s) || listModel.contains(s)) {
             return;
         }
 
@@ -75,7 +75,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
-        else if (s.equalsIgnoreCase("comment")) {
+        else if ("comment".equalsIgnoreCase(s)) {
             // Report error and exit.
             JOptionPane.showMessageDialog(this, Localization.lang("The name 'comment' cannot be used as an entry type name."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
@@ -98,7 +98,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             // If it is a custom entry type, we can remove it. If type == null, it means
             // the user must have added it and not yet applied it, so we can remove it
             // in this case as well. If it is a standard type it cannot be removed.
-            if ((type != null) && (type instanceof CustomEntryType)) {
+            if ((type instanceof CustomEntryType)) {
                 listModel.removeElementAt(selected[selected.length - 1 - i]);
             } else {
                 // This shouldn't happen, since the Remove button should be disabled.

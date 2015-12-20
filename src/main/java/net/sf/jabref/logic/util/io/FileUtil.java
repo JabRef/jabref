@@ -18,7 +18,6 @@ package net.sf.jabref.logic.util.io;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -71,7 +70,7 @@ public class FileUtil {
         List<String> pathSubstrings = Arrays.asList(arr);
 
         // compute shortest folder substrings
-        while(!stackList.stream().allMatch(p -> p.isEmpty())) {
+        while(!stackList.stream().allMatch(Vector::isEmpty)) {
             for(int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 

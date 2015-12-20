@@ -21,7 +21,7 @@ import java.beans.VetoableChangeListener;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.JabRef;
 
 /**
@@ -37,7 +37,7 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
     @Override
     public void vetoableChange(PropertyChangeEvent e)
             throws PropertyVetoException {
-        final BibtexEntry entry = (BibtexEntry) e.getSource();
+        final BibEntry entry = (BibEntry) e.getSource();
         final String fieldName = e.getPropertyName();
         // Source editor cycles through all entries
         // if we immediately updated the fields, the entry editor would detect a subsequent change as a user change 
@@ -47,7 +47,7 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
 
             @Override
             public void run() {
-                if (fieldName.equals("keywords")) {
+                if ("keywords".equals(fieldName)) {
                     // we do NOT pass a named component indicating that we do not want to have undo capabilities
                     // if the user undoes the change in the keyword field, this method is also called and 
                     // the special fields are updated accordingly 

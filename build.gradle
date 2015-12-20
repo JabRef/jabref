@@ -14,7 +14,6 @@ buildscript {
 plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.2'
     id "com.github.kt3k.coveralls" version "2.4.0x"
-    id "edu.sc.seis.macAppBundle" version "2.1.1"
     id "com.github.youribonnaffe.gradle.format" version "1.2"
     id "com.coverity.ondemand" version "1.4.742"
 }
@@ -40,8 +39,8 @@ gradle.taskGraph.whenReady { taskGraph ->
 }
 
 group = "net.sf.jabref"
-version = "3.0dev"
-project.ext.threeDotVersion = "3.0.0.0"
+version = "3.1dev"
+project.ext.threeDotVersion = "3.0.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -89,17 +88,18 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.5.1-1'
     compile 'org.antlr:antlr4-runtime:4.5.1-1'
 
-    compile 'mysql:mysql-connector-java:5.1.37'
-    compile 'org.postgresql:postgresql:9.4-1205-jdbc42'
+    compile 'mysql:mysql-connector-java:5.1.38'
+    compile 'org.postgresql:postgresql:9.4-1206-jdbc42'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.guava:guava:19.0'
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
 
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.mashape.unirest:unirest-java:1.4.7'
@@ -348,7 +348,7 @@ task releaseJar(dependsOn: "shadowJar") {
 // see http://stackoverflow.com/a/27455099/873282 for an inspiration of this task
 // better solution: https://discuss.gradle.org/t/how-to-download-maven-dependencies-into-project-local-directory-and-set-eclipse-classpath/9851
 task getdeps(type: Copy) {
-    from (configurations.compile+configurations.testCompile) {
+    from (configurations.compile+configurations.antlr3+configurations.antlr4+configurations.testCompile) {
         include "*.jar"
     }
     into 'build/tmp/alldeps/'

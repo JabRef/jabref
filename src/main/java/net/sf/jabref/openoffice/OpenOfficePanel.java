@@ -23,14 +23,14 @@ import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.push.PushToApplication;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -253,7 +253,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
         });
 
-        OpenOfficePanel.pushEntries.setToolTipText(Localization.lang("Cite selected entries"));
+        OpenOfficePanel.pushEntries.setToolTipText(Localization.lang("Cite selected entries between parenthesis"));
         OpenOfficePanel.pushEntries.addActionListener(new ActionListener() {
 
             @Override
@@ -313,7 +313,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
                     OpenOfficePanel.ooBase.updateSortedReferenceMarks();
 
-                    java.util.List<BibtexDatabase> databases = getBaseList();
+                    java.util.List<BibDatabase> databases = getBaseList();
                     java.util.List<String> unresolvedKeys = OpenOfficePanel.ooBase.refreshCiteMarkers
                             (databases, OpenOfficePanel.style);
                     OpenOfficePanel.ooBase.rebuildBibTextSection(databases, OpenOfficePanel.style);
@@ -462,15 +462,15 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         content.add(b.getPanel(), BorderLayout.CENTER);
 
         OpenOfficePanel.frame.getTabbedPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.prefs.getKey(KeyBinds.REFRESH_OO), "Refresh OO");
+                .put(Globals.getKeyPrefs().getKey(KeyBinding.REFRESH_OO), "Refresh OO");
         OpenOfficePanel.frame.getTabbedPane().getActionMap().put("Refresh OO", updateAction);
 
         //diag.pack();
         //diag.setVisible(true);
     }
 
-    private java.util.List<BibtexDatabase> getBaseList() {
-        java.util.List<BibtexDatabase> databases = new ArrayList<>();
+    private java.util.List<BibDatabase> getBaseList() {
+        java.util.List<BibDatabase> databases = new ArrayList<>();
         if (Globals.prefs.getBoolean("useAllOpenBases")) {
             for (int i = 0; i < OpenOfficePanel.frame.getBasePanelCount(); i++) {
                 databases.add(OpenOfficePanel.frame.getBasePanelAt(i).database());
@@ -539,13 +539,13 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
             else if (OS.OS_X) {
                 sOffice = ooPath + "/Contents/MacOS/soffice.bin";
-                ooBaseDirectory = ooPath + "/Contents/basis-link/ure-link/share/java";
+                ooBaseDirectory = ooPath + "/Contents/basis-link/program/classes";
                 unoilDir = ooPath + "/Contents/basis-link/program/classes";
             }
             else {
                 // Linux:
                 unoilDir = ooJars + "/program/classes";
-                ooBaseDirectory = ooJars + "/ure-link/share/java";
+                ooBaseDirectory = ooJars + "/program/classes";
             }
         }
 
@@ -600,9 +600,14 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
             }
             else {
-                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Could not connect to running OpenOffice.\n"
-                        + "Make sure you have installed OpenOffice with Java support.\nIf connecting manually, please verify program and library paths.\n"
-                        + "\nError message: " + e.getMessage()));
+                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Could not connect to running OpenOffice.")
+                        + "\n"
+                        + Localization.lang("Make sure you have installed OpenOffice with Java support.")
+                        + "\n"
+                        + Localization.lang("If connecting manually, please verify program and library paths.")
+                        + "\n"
+                        + "\n"
+                        + Localization.lang("Error message:") + " " + e.getMessage());
             }
         }
     }
@@ -702,7 +707,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         }
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         //JButton auto = new JButton(Globals.lang("Autodetect"));
         ActionListener tfListener = new ActionListener() {
@@ -773,9 +778,9 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         }
 
         BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
-        final BibtexDatabase database = panel.database();
         if (panel != null) {
-            BibtexEntry[] entries = panel.getSelectedEntries();
+            final BibDatabase database = panel.database();
+            BibEntry[] entries = panel.getSelectedEntries();
             if (entries.length > 0) {
                 try {
                     if (OpenOfficePanel.style == null) {
@@ -815,11 +820,11 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 ooBase.clearBibTextSectionContent();
               */
             BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
-            final BibtexDatabase database = panel.database();
-            Map<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<>();
+            Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
             if (panel != null) {
-                BibtexEntry[] e = panel.getSelectedEntries();
-                for (BibtexEntry anE : e) {
+                final BibDatabase database = panel.database();
+                BibEntry[] e = panel.getSelectedEntries();
+                for (BibEntry anE : e) {
                     entries.put(anE, database);
                 }
 
@@ -838,7 +843,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                         + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
                 + Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")
                 + "</html>",
-                Localization.lang(""), JOptionPane.ERROR_MESSAGE);
+                "", JOptionPane.ERROR_MESSAGE);
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
@@ -846,16 +851,16 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                         + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
                 + Localization.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
                 + "</html>",
-                Localization.lang(""), JOptionPane.ERROR_MESSAGE);
+                "", JOptionPane.ERROR_MESSAGE);
     }
 
     public void insertUsingBST() {
         try {
             BasePanel panel = OpenOfficePanel.frame.getCurrentBasePanel();
-            final BibtexDatabase database = panel.database();
             if (panel != null) {
-                BibtexEntry[] entries = panel.getSelectedEntries();
-                ArrayList<BibtexEntry> el = new ArrayList<>();
+                final BibDatabase database = panel.database();
+                BibEntry[] entries = panel.getSelectedEntries();
+                ArrayList<BibEntry> el = new ArrayList<>();
                 Collections.addAll(el, entries);
 
                 BstWrapper wrapper = new BstWrapper();
@@ -938,9 +943,9 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         menu.show(OpenOfficePanel.settingsB, 0, OpenOfficePanel.settingsB.getHeight());
     }
 
-    private void pushEntries(boolean inParenthesis, BibtexEntry[] entries) {
+    private void pushEntries(boolean inParenthesis, BibEntry[] entries) {
 
-        final BibtexDatabase database = OpenOfficePanel.frame.getCurrentBasePanel().database();
+        final BibDatabase database = OpenOfficePanel.frame.getCurrentBasePanel().database();
         if (entries.length > 0) {
 
             String pageInfo = null;
@@ -1019,7 +1024,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     @Override
-    public void pushEntries(BibtexDatabase bibtexDatabase, BibtexEntry[] entries, String s, MetaData metaData) {
+    public void pushEntries(BibDatabase bibDatabase, BibEntry[] entries, String s, MetaData metaData) {
         if (OpenOfficePanel.ooBase == null) {
             connect(true);
         }

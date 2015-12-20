@@ -43,10 +43,12 @@ import javax.swing.JRadioButton;
 
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FetcherPreviewDialog;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
+import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
@@ -158,8 +160,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 //address = makeUrl(firstEntry);
                 firstEntry += ACMPortalFetcher.perPage;
             }
-            for (String s : previews.keySet()) {
-                preview.addEntry(s, previews.get(s));
+            for (Map.Entry<String, JLabel> entry : previews.entrySet()) {
+                preview.addEntry(entry.getKey(), entry.getValue());
             }
 
             return true;
@@ -180,13 +182,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     @Override
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector) {
-        for (String id : selection.keySet()) {
+        for (Map.Entry<String, Boolean> selentry : selection.entrySet()) {
             if (!shouldContinue) {
                 break;
             }
-            boolean sel = selection.get(id);
+            boolean sel = selentry.getValue();
             if (sel) {
-                BibtexEntry entry = downloadEntryBibTeX(id, fetchAbstract);
+                BibEntry entry = downloadEntryBibTeX(selentry.getKey(), fetchAbstract);
                 if (entry != null) {
                     // Convert from HTML and optionally add curly brackets around key words to keep the case
                     String title = entry.getField("title");
@@ -337,14 +339,14 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         return false;
     }
 
-    private static BibtexEntry downloadEntryBibTeX(String ID, boolean downloadAbstract) {
+    private static BibEntry downloadEntryBibTeX(String ID, boolean downloadAbstract) {
         try {
             URL url = new URL(ACMPortalFetcher.startUrl + ACMPortalFetcher.bibtexUrl + ID + ACMPortalFetcher.bibtexUrlEnd);
             URLConnection connection = url.openConnection();
 
             // set user-agent to avoid being blocked as a crawler
             connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
-            Collection<BibtexEntry> items = null;
+            Collection<BibEntry> items = null;
             try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 items = BibtexParser.parse(in).getDatabase().getEntries();
             } catch (IOException e) {
@@ -353,7 +355,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             if ((items == null) || items.isEmpty()) {
                 return null;
             }
-            BibtexEntry entry = items.iterator().next();
+            BibEntry entry = items.iterator().next();
             Thread.sleep(ACMPortalFetcher.WAIT_TIME);//wait between requests or you will be blocked by ACM
 
             // get abstract

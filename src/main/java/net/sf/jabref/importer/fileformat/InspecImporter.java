@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.regex.Pattern;
@@ -80,11 +80,11 @@ public class InspecImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry objects.
+     * Parse the entries in the source, and return a List of BibEntry objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String str;
         try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
@@ -113,18 +113,18 @@ public class InspecImporter extends ImportFormat {
                 //System.out.println(fields[j]);
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
-                if (f3.equals("TI")) {
+                if ("TI".equals(f3)) {
                     h.put("title", frest);
-                } else if (f3.equals("PY")) {
+                } else if ("PY".equals(f3)) {
                     h.put("year", frest);
-                } else if (f3.equals("AU")) {
+                } else if ("AU".equals(f3)) {
                     h.put("author",
                             AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(";", " and ")));
-                } else if (f3.equals("AB")) {
+                } else if ("AB".equals(f3)) {
                     h.put("abstract", frest);
-                } else if (f3.equals("ID")) {
+                } else if ("ID".equals(f3)) {
                     h.put("keywords", frest);
-                } else if (f3.equals("SO")) {
+                } else if ("SO".equals(f3)) {
                     int m = frest.indexOf(".");
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
@@ -144,18 +144,18 @@ public class InspecImporter extends ImportFormat {
                         }
                     }
 
-                } else if (f3.equals("RT")) {
+                } else if ("RT".equals(f3)) {
                     frest = frest.trim();
-                    if (frest.equals("Journal-Paper")) {
+                    if ("Journal-Paper".equals(frest)) {
                         Type = "article";
-                    } else if (frest.equals("Conference-Paper") || frest.equals("Conference-Paper; Journal-Paper")) {
+                    } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
                         Type = "inproceedings";
                     } else {
                         Type = frest.replaceAll(" ", "");
                     }
                 }
             }
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes.getBibtexEntryType(Type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes.getTypeOrDefault(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(h);
 

@@ -56,14 +56,15 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.wizard.auximport.AuxSubGenerator;
 
@@ -167,7 +168,7 @@ public class FromAuxDialog extends JDialog {
         // Key bindings:
         ActionMap am = statusPanel.getActionMap();
         InputMap im = statusPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -235,15 +236,15 @@ public class FromAuxDialog extends JDialog {
     }
 
     private void select_actionPerformed() {
-        BibtexDatabase db = getGenerateDB();
+        BibDatabase db = getGenerateDB();
         MainTable mainTable = JabRef.jrf.getCurrentBasePanel().mainTable;
-        BibtexDatabase database = JabRef.jrf.getCurrentBasePanel().getDatabase();
+        BibDatabase database = JabRef.jrf.getCurrentBasePanel().getDatabase();
         mainTable.clearSelection();
-        for (BibtexEntry newEntry : db.getEntries()) {
+        for (BibEntry newEntry : db.getEntries()) {
             // the entries are not the same objects as in the original database
             // therefore, we have to search for the entries in the original database
             // to be able to find them in the maintable
-            BibtexEntry origEntry = database.getEntryByKey(newEntry.getCiteKey());
+            BibEntry origEntry = database.getEntryByKey(newEntry.getCiteKey());
             int row = mainTable.findEntry(origEntry);
             mainTable.addSelection(row);
         }
@@ -255,7 +256,7 @@ public class FromAuxDialog extends JDialog {
                 dbChooser.getSelectedIndex());
         notFoundList.removeAll();
         statusInfos.setText(null);
-        BibtexDatabase refBase = bp.getDatabase();
+        BibDatabase refBase = bp.getDatabase();
         String auxName = auxFileField.getText();
 
         if (auxName != null) {
@@ -298,7 +299,7 @@ public class FromAuxDialog extends JDialog {
         return generatePressed;
     }
 
-    public BibtexDatabase getGenerateDB() {
+    public BibDatabase getGenerateDB() {
         return auxParser.getGeneratedDatabase();
     }
 

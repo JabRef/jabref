@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -25,13 +25,14 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.logic.xmp.XMPUtil;
@@ -112,7 +113,7 @@ public class DroppedFileHandler {
     public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
                                   MainTable mainTable, int dropRow) {
 
-        BibtexEntry entry = mainTable.getEntryAt(dropRow);
+        BibEntry entry = mainTable.getEntryAt(dropRow);
         handleDroppedfile(fileName, fileType, localFile, entry);
     }
 
@@ -124,7 +125,7 @@ public class DroppedFileHandler {
      * @param entry     The target entry for the drop.
      */
     public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
-                                  BibtexEntry entry) {
+                                  BibEntry entry) {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
 
         if (tryXmpImport(fileName, fileType, localFile, edits)) {
@@ -170,11 +171,11 @@ public class DroppedFileHandler {
 
     // Done by MrDlib
     public void linkPdfToEntry(String fileName, MainTable entryTable, int dropRow) {
-        BibtexEntry entry = entryTable.getEntryAt(dropRow);
+        BibEntry entry = entryTable.getEntryAt(dropRow);
         linkPdfToEntry(fileName, entryTable, entry);
     }
 
-    public void linkPdfToEntry(String fileName, MainTable entryTable, BibtexEntry entry) {
+    public void linkPdfToEntry(String fileName, MainTable entryTable, BibEntry entry) {
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
 
@@ -211,12 +212,12 @@ public class DroppedFileHandler {
         panel.undoManager.addEdit(edits);
     }
 
-    public void importXmp(List<BibtexEntry> xmpEntriesInFile, String fileName) {
+    public void importXmp(List<BibEntry> xmpEntriesInFile, String fileName) {
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
 
         boolean isSingle = xmpEntriesInFile.size() == 1;
-        BibtexEntry single = isSingle ? xmpEntriesInFile.get(0) : null;
+        BibEntry single = isSingle ? xmpEntriesInFile.get(0) : null;
 
         boolean success = true;
 
@@ -239,7 +240,7 @@ public class DroppedFileHandler {
         }
         if (success) {
 
-            for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
+            for (BibEntry aXmpEntriesInFile : xmpEntriesInFile) {
 
                 aXmpEntriesInFile.setId(IdGenerator.next());
                 edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
@@ -259,11 +260,11 @@ public class DroppedFileHandler {
     private boolean tryXmpImport(String fileName, ExternalFileType fileType, boolean localFile,
                                  NamedCompound edits) {
 
-        if (!fileType.extension.equals("pdf")) {
+        if (!"pdf".equals(fileType.extension)) {
             return false;
         }
 
-        List<BibtexEntry> xmpEntriesInFile;
+        List<BibEntry> xmpEntriesInFile;
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName);
         } catch (Exception e) {
@@ -275,7 +276,9 @@ public class DroppedFileHandler {
         }
 
         JLabel confirmationMessage = new JLabel(
-                Localization.lang("The PDF contains one or several bibtex-records.\nDo you want to import these as new entries into the current database?"));
+                Localization.lang("The PDF contains one or several bibtex-records.")
+                        + "\n"
+                        + Localization.lang("Do you want to import these as new entries into the current database?"));
 
         int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage,
                 Localization.lang("XMP metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
@@ -301,7 +304,7 @@ public class DroppedFileHandler {
          */
 
         boolean isSingle = xmpEntriesInFile.size() == 1;
-        BibtexEntry single = isSingle ? xmpEntriesInFile.get(0) : null;
+        BibEntry single = isSingle ? xmpEntriesInFile.get(0) : null;
 
         boolean success = true;
 
@@ -324,7 +327,7 @@ public class DroppedFileHandler {
         }
         if (success) {
 
-            for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
+            for (BibEntry aXmpEntriesInFile : xmpEntriesInFile) {
 
                 aXmpEntriesInFile.setId(IdGenerator.next());
                 edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
@@ -342,7 +345,7 @@ public class DroppedFileHandler {
     // @return true if user pushed "Ok", false otherwise
     //
     private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
-                                                 BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
+                                                 BibEntry entry, boolean newEntry, final boolean multipleEntries, BibDatabase database) {
 
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
         String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
@@ -437,7 +440,7 @@ public class DroppedFileHandler {
      * @param edits    An NamedCompound action this action is to be added to. If none
      *                 is given, the edit is added to the panel's undoManager.
      */
-    private void doLink(BibtexEntry entry, ExternalFileType fileType, String filename,
+    private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
         String oldValue = entry.getField(Globals.FILE_FIELD);
@@ -519,10 +522,9 @@ public class DroppedFileHandler {
 
         if (!fromFile.renameTo(toFile)) {
             JOptionPane.showMessageDialog(frame,
-                    // @formatter:off
-                    Localization.lang("There was an error moving the file. Please move the file manually and link in place."),
-                    Localization.lang("Error moving file"), JOptionPane.ERROR_MESSAGE);
-                    // @formatter:on
+                    Localization.lang("Could not move file '%0'.", toFile.getAbsolutePath()) +
+                            Localization.lang("Please move the file manually and link in place."),
+                    Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
             return false;
         } else {
             return true;

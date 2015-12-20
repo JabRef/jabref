@@ -21,10 +21,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.Optional;
-
-import net.sf.jabref.logic.util.DOI;
 
 public class URLUtil {
 
@@ -68,7 +66,7 @@ public class URLUtil {
                 if (pair.startsWith("url=")) {
                     String value = pair.substring(pair.indexOf("=") + 1, pair.length());
 
-                    String decode = URLDecoder.decode(value, "UTF-8");
+                    String decode = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
                     // url?
                     if(decode.matches(URL_EXP)) {
                         return decode;
@@ -81,52 +79,35 @@ public class URLUtil {
         }
     }
 
-
     /**
      * Make sure an URL is "portable", in that it doesn't contain bad characters that break the open command in some
-     * OSes.
+     * OSes. A call to this method will also remove \\url{} enclosings.
      *
-     * A call to this method will also remove \\url{} enclosings and clean Doi links.
+     * It does:
+     * - trim whitespace
+     * - remove Latex \\url{} tags
      *
-     * @param link :the URL to sanitize.
-     * @return Sanitized URL
+     * @param link the URL to sanitize.
+     * @return the sanitized URL
      */
     public static String sanitizeUrl(String link) {
+        // remove whitespace
         link = link.trim();
-    
-        // First check if it is enclosed in \\url{}. If so, remove the wrapper.
+
+        // Remove \\url{}
         if (link.startsWith("\\url{") && link.endsWith("}")) {
             link = link.substring(5, link.length() - 1);
         }
-    
-        // DOI cleanup
-        // converts doi-only link to full http address
-        // Morten Alver 6 Nov 2012: this extracts a nonfunctional Doi from some complete
-        // http addresses (e.g. http://onlinelibrary.wiley.com/doi/10.1002/rra.999/abstract, where
-        // the trailing "/abstract" is included but doesn't lead to a resolvable Doi).
-        // To prevent mangling of working URLs I'm disabling this check if the link is already
-        // a full http link:
-        // TODO: not sure if this is allowed
-        if (link.matches("^doi:/*.*")) {
-            // Remove 'doi:'
-            link = link.replaceFirst("^doi:/*", "");
-            link = new DOI(link).getURLAsASCIIString();
-        }
-    
-        Optional<DOI> doi = DOI.build(link);
-        if (doi.isPresent() && !link.matches("^https?://.*")) {
-            link = doi.get().getURLAsASCIIString();
-        }
-    
+
         // FIXME: everything below is really flawed atm
         link = link.replaceAll("\\+", "%2B");
-    
+
         try {
-            link = URLDecoder.decode(link, "UTF-8");
+            link = URLDecoder.decode(link, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException ignored) {
             // Ignored
         }
-    
+
         /**
          * Fix for: [ 1574773 ] sanitizeUrl() breaks ftp:// and file:///
          *

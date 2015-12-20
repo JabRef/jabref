@@ -29,7 +29,6 @@ public class Actions {
     public static final String EXPORT_TO_CLIPBOARD = "exportToClipboard";
     public static final String FOCUS_TABLE = "focusTable";
     public static final String FORWARD = "forward";
-    public static final String INC_SEARCH = "incSearch";
     public static final String MAKE_KEY = "makeKey";
     public static final String MANAGE_SELECTORS = "manageSelectors";
     public static final String MARK_ENTRIES = "markEntries";
@@ -39,7 +38,6 @@ public class Actions {
     public static final String MOVE_TO_GROUP = "moveToGroup";
     public static final String OPEN_EXTERNAL_FILE = "openExternalFile";
     public static final String OPEN_FOLDER = "openFolder";
-    public static final String OPEN_SPIRES = "openSpires";
     public static final String OPEN_URL = "openUrl";
     public static final String PASTE = "paste";
     public static final String PLAIN_TEXT_IMPORT = "plainTextImport";
@@ -59,7 +57,6 @@ public class Actions {
     public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY = "toggleHighlightGroupsMatchingAny";
     public static final String TOGGLE_GROUPS = "toggleGroups";
     public static final String TOGGLE_PREVIEW = "togglePreview";
-    public static final String TOGGLE_SEARCH = "toggleSearch";
     public static final String TOGGLE_TOOLBAR = "toggleToolbar";
     public static final String UNABBREVIATE = "unabbreviate";
     public static final String UNDO = "undo";

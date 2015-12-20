@@ -21,11 +21,11 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 class TextAnalyzer {
 
-    private final BibtexEntry be = null;
+    private final BibEntry be = null;
 
     private static final Log LOGGER = LogFactory.getLog(TextAnalyzer.class);
 
@@ -38,7 +38,7 @@ class TextAnalyzer {
         guessBibtexFields(text);
     }
 
-    public BibtexEntry getEntry() {
+    public BibEntry getEntry() {
         return be;
     }
 
@@ -140,7 +140,7 @@ class TextAnalyzer {
                 pos = journal.lastIndexOf(' ');
                 if (pos > 0) {
                     String last = journal.substring(pos + 1).toLowerCase();
-                    if (last.equals("volume") || last.equals("vol") || last.equals("v")) {
+                    if ("volume".equals(last) || "vol".equals(last) || "v".equals(last)) {
                         journal = clean(journal.substring(0, pos));
                     }
                 }
@@ -219,7 +219,7 @@ class TextAnalyzer {
     }
 
 
-    private class Substring implements Comparable<Substring> {
+    private static class Substring implements Comparable<Substring> {
 
         final int begin;
         final int end;
@@ -240,7 +240,7 @@ class TextAnalyzer {
 
         @Override
         public int compareTo(Substring other) {
-            return new Integer(begin).compareTo(other.begin());
+            return Integer.valueOf(begin).compareTo(other.begin());
         }
     }
 }

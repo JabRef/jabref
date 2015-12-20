@@ -17,21 +17,21 @@ package net.sf.jabref.gui.util;
 
 import java.util.Comparator;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
-public class FirstColumnComparator implements Comparator<BibtexEntry> {
+public class FirstColumnComparator implements Comparator<BibEntry> {
 
-    private final BibtexDatabase database;
+    private final BibDatabase database;
 
 
-    public FirstColumnComparator(BibtexDatabase database) {
+    public FirstColumnComparator(BibDatabase database) {
 
         this.database = database;
     }
 
     @Override
-    public int compare(BibtexEntry e1, BibtexEntry e2) {
+    public int compare(BibEntry e1, BibEntry e2) {
 
         int score1 = 0;
         int score2 = 0;

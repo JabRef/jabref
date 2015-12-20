@@ -26,8 +26,9 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.logic.formatter.Formatter;
 
-public class HTMLConverter implements LayoutFormatter {
+public class HTMLConverter implements LayoutFormatter, Formatter {
 
     private static final Log LOGGER = LogFactory.getLog(HTMLConverter.class);
 
@@ -805,7 +806,7 @@ public class HTMLConverter implements LayoutFormatter {
         for (int i = 0; i <= (text.length() - 1); i++) {
             cp = text.codePointAt(i);
             if (cp >= 129) {
-                LOGGER.warn("Unicode character not converted: " + cp.toString());
+                LOGGER.warn("Unicode character not converted: " + cp);
             }
         }
         return text;
@@ -869,9 +870,9 @@ public class HTMLConverter implements LayoutFormatter {
             //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(2).replace("x", "#") + m.group(4));
             if (escapedAccents.containsKey(num)) {
-                if (m.group(1).equals("i")) {
+                if ("i".equals(m.group(1))) {
                     text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\" + escapedAccents.get(num) + "\\{\\\\i\\}\\}");
-                } else if (m.group(1).equals("j")) {
+                } else if ("j".equals(m.group(1))) {
                     text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\" + escapedAccents.get(num) + "\\{\\\\j\\}\\}");
                 } else {
                     text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\" + escapedAccents.get(num) + "\\{" + m.group(1) + "\\}\\}");
@@ -926,5 +927,10 @@ public class HTMLConverter implements LayoutFormatter {
         } else {
             return position; // Don't do anything.
         }
+    }
+
+    @Override
+    public String getName() {
+        return "HTMLConverter";
     }
 }

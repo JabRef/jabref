@@ -24,7 +24,7 @@ import java.util.Arrays;
 import javax.swing.*;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -81,11 +81,11 @@ public class DBConnectDialog extends JDialog {
         rhs.add(pwdPassword);
 
         // setup label text
-        lblServerType.setText(Localization.lang("Server Type :"));
-        lblServerHostname.setText(Localization.lang("Server Hostname :"));
-        lblDatabase.setText(Localization.lang("Database :"));
-        lblUsername.setText(Localization.lang("Username :"));
-        lblPassword.setText(Localization.lang("Password :"));
+        lblServerType.setText(Localization.lang("Server Type:"));
+        lblServerHostname.setText(Localization.lang("Server Hostname:"));
+        lblDatabase.setText(Localization.lang("Database:"));
+        lblUsername.setText(Localization.lang("Username:"));
+        lblPassword.setText(Localization.lang("Password:"));
 
         // set label text alignment
         for (JLabel label : lhs) {
@@ -181,7 +181,7 @@ public class DBConnectDialog extends JDialog {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
     }
 
@@ -212,7 +212,7 @@ public class DBConnectDialog extends JDialog {
             cnt++;
         }
 
-        String errMsg = Localization.lang("Please specify the ");
+        String errMsg = Localization.lang("Please specify the") + " ";
 
         switch (cnt) {
         case 0:
@@ -224,11 +224,8 @@ public class DBConnectDialog extends JDialog {
         case 2:
             errMsg = errMsg + errors[0] + " and " + errors[1] + '.';
             break;
-        case 3:
+        default: // Will be 3 at most
             errMsg = errMsg + errors[0] + ", " + errors[1] + ", and " + errors[2] + '.';
-            break;
-        default:
-
         }
 
         return errMsg;
@@ -247,10 +244,7 @@ public class DBConnectDialog extends JDialog {
         dbStrings.storeToPreferences();
 
         char[] pwd = pwdPassword.getPassword();
-        String tmp = "";
-        for (char aPwd : pwd) {
-            tmp = tmp + aPwd;
-        }
+        String tmp = new String(pwd);
         dbStrings.setPassword(tmp);
         Arrays.fill(pwd, '0');
 

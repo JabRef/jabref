@@ -178,11 +178,13 @@ public class MoveFileAction extends AbstractAction {
 
                 } catch (SecurityException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not move file") + ": " + ex.getMessage(),
+                    JOptionPane.showMessageDialog(frame,
+                            Localization.lang("Could not move file '%0'.", file.getAbsolutePath()) + ex.getMessage(),
                             Localization.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not move file") + ": " + ex.getMessage(),
+                    JOptionPane.showMessageDialog(frame,
+                            Localization.lang("Could not move file '%0'.", file.getAbsolutePath()) + ex.getMessage(),
                             Localization.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
                 }
 

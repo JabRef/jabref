@@ -25,8 +25,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.Layout;
 
 import com.sun.star.beans.Property;
@@ -62,7 +62,7 @@ class OOUtil {
      * @throws Exception
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
-            Layout layout, String parStyle, BibtexEntry entry, BibtexDatabase database, String uniquefier)
+            Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
             throws Exception {
 
         final String UNIQUEFIER_FIELD = "uniq";
@@ -126,29 +126,29 @@ class OOUtil {
             }
             String tag = m.group();
             // Handle tags:
-            if (tag.equals("<b>")) {
+            if ("<b>".equals(tag)) {
                 bold++;
-            } else if (tag.equals("</b>")) {
+            } else if ("</b>".equals(tag)) {
                 bold--;
-            } else if (tag.equals("<i>") || tag.equals("<em>")) {
+            } else if ("<i>".equals(tag) || "<em>".equals(tag)) {
                 italic++;
-            } else if (tag.equals("</i>") || tag.equals("</em>")) {
+            } else if ("</i>".equals(tag) || "</em>".equals(tag)) {
                 italic--;
-            } else if (tag.equals("</monospace>")) {
+            } else if ("</monospace>".equals(tag)) {
                 mono = 0;
-            } else if (tag.equals("<monospace>")) {
+            } else if ("<monospace>".equals(tag)) {
                 mono = 1;
-            } else if (tag.equals("</smallcaps>")) {
+            } else if ("</smallcaps>".equals(tag)) {
                 smallCaps = 0;
-            } else if (tag.equals("<smallcaps>")) {
+            } else if ("<smallcaps>".equals(tag)) {
                 smallCaps = 1;
-            } else if (tag.equals("</sup>")) {
+            } else if ("</sup>".equals(tag)) {
                 sup = 0;
-            } else if (tag.equals("<sup>")) {
+            } else if ("<sup>".equals(tag)) {
                 sup = 1;
-            } else if (tag.equals("</sub>")) {
+            } else if ("</sub>".equals(tag)) {
                 sub = 0;
-            } else if (tag.equals("<sub>")) {
+            } else if ("<sub>".equals(tag)) {
                 sub = 1;
             }
 
@@ -288,20 +288,20 @@ class OOUtil {
     }
 
     /**
-     * Make a cloned BibtexEntry and do the necessary preprocessing for use by the plugin.
+     * Make a cloned BibEntry and do the necessary preprocessing for use by the plugin.
      * If the running JabRef version doesn't support post-processing in Layout, this
      * preprocessing includes running the OOPreFormatter formatter for all fields except the
      * BibTeX key.
      * @param entry the original entry
      * @return the cloned and processed entry
      */
-    public static BibtexEntry createAdaptedEntry(BibtexEntry entry) {
+    public static BibEntry createAdaptedEntry(BibEntry entry) {
         if (entry == null) {
             return null;
         }
-        BibtexEntry e = (BibtexEntry) entry.clone();
+        BibEntry e = (BibEntry) entry.clone();
         for (String field : e.getFieldNames()) {
-            if (field.equals(BibtexEntry.KEY_FIELD)) {
+            if (field.equals(BibEntry.KEY_FIELD)) {
                 continue;
             }
             String value = e.getField(field);

@@ -1,8 +1,8 @@
 package net.sf.jabref.importer;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.JabRefPreferences;
@@ -27,11 +27,11 @@ import java.util.*;
  */
 public class DatabaseFileLookupTest {
 
-    private BibtexDatabase database;
-    private Collection<BibtexEntry> entries;
+    private BibDatabase database;
+    private Collection<BibEntry> entries;
 
-    private BibtexEntry entry1;
-    private BibtexEntry entry2;
+    private BibEntry entry1;
+    private BibEntry entry2;
 
 
     /* (non-Javadoc)
@@ -64,7 +64,7 @@ public class DatabaseFileLookupTest {
     @Ignore
     public void testInsertTestData() throws Exception {
 
-        entry1 = new BibtexEntry();
+        entry1 = new BibEntry();
         JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
         ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt("PDF");
         FileListEntry fileListEntry = new FileListEntry("", ImportDataTest.FILE_IN_DATABASE.getAbsolutePath(), fileType);
@@ -86,7 +86,6 @@ public class DatabaseFileLookupTest {
         /**
          * Select all nodes manually.
          */
-        @SuppressWarnings("unchecked")
         Enumeration<CheckableTreeNode> enumeration = treeNode.breadthFirstEnumeration();
         while (enumeration.hasMoreElements()) {
             CheckableTreeNode nextElement = enumeration.nextElement();
@@ -173,7 +172,6 @@ public class DatabaseFileLookupTest {
         return instance;
     }
 
-    @SuppressWarnings("unchecked")
     private static <T> Constructor<? extends T>[] orderByParamCount(Constructor<? extends T>[] constructors) {
         List<Constructor<? extends T>> list = Arrays.asList(constructors);
         Collections.sort(list, new Comparator<Constructor<? extends T>>() {

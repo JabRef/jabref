@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -31,8 +32,11 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
@@ -46,6 +50,8 @@ import net.sf.jabref.model.entry.EntryType;
  */
 public class FreeCiteImporter extends ImportFormat {
 
+    private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
+
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
         // TODO: We don't know how to recognize text files, therefore we return
@@ -54,7 +60,7 @@ public class FreeCiteImporter extends ImportFormat {
     }
 
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status)
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
         try(Scanner scan = new Scanner(in)) {
             String text = scan.useDelimiter("\\A").next();
@@ -62,11 +68,11 @@ public class FreeCiteImporter extends ImportFormat {
         }
     }
 
-    public List<BibtexEntry> importEntries(String text, OutputPrinter status) {
+    public List<BibEntry> importEntries(String text, OutputPrinter status) {
         // URLencode the string for transmission
         String urlencodedCitation = null;
         try {
-            urlencodedCitation = URLEncoder.encode(text, "UTF-8");
+            urlencodedCitation = URLEncoder.encode(text, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             // e.printStackTrace();
         }
@@ -93,44 +99,43 @@ public class FreeCiteImporter extends ImportFormat {
             // write parameters
             writer.write(data);
             writer.flush();
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Already connected.", e);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("Unable to connect to freecite online service."));
-            return null;
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
+            LOGGER.warn("Unable to connect to FreeCite online service.", e);
             return null;
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
 
-        List<BibtexEntry> res = new ArrayList<>();
+        List<BibEntry> res = new ArrayList<>();
 
         XMLInputFactory factory = XMLInputFactory.newInstance();
         try {
             XMLStreamReader parser = factory.createXMLStreamReader(conn.getInputStream());
             while (parser.hasNext()) {
                 if ((parser.getEventType() == XMLStreamConstants.START_ELEMENT)
-                        && parser.getLocalName().equals("citation")) {
+                        && "citation".equals(parser.getLocalName())) {
                     parser.nextTag();
 
                     StringBuilder noteSB = new StringBuilder();
 
-                    BibtexEntry e = new BibtexEntry();
+                    BibEntry e = new BibEntry();
                     // fallback type
                     EntryType type = BibtexEntryTypes.INPROCEEDINGS;
 
                     while (!((parser.getEventType() == XMLStreamConstants.END_ELEMENT)
-                            && parser.getLocalName().equals("citation"))) {
+                            && "citation".equals(parser.getLocalName()))) {
                         if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
                             String ln = parser.getLocalName();
-                            if (ln.equals("authors")) {
+                            if ("authors".equals(ln)) {
                                 StringBuilder sb = new StringBuilder();
                                 parser.nextTag();
 
                                 while (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
                                     // author is directly nested below authors
-                                    assert parser.getLocalName()
-                                    .equals("author");
+                                    assert "author".equals(parser.getLocalName());
 
                                     String author = parser.getElementText();
                                     if (sb.length() == 0) {
@@ -141,13 +146,13 @@ public class FreeCiteImporter extends ImportFormat {
                                         sb.append(author);
                                     }
                                     assert parser.getEventType() == XMLStreamConstants.END_ELEMENT;
-                                    assert parser.getLocalName().equals("author");
+                                    assert "author".equals(parser.getLocalName());
                                     parser.nextTag();
                                     // current tag is either begin:author or
                                     // end:authors
                                 }
                                 e.setField("author", sb.toString());
-                            } else if (ln.equals("journal")) {
+                            } else if ("journal".equals(ln)) {
                                 // we guess that the entry is a journal
                                 // the alternative way is to parse
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
@@ -155,22 +160,22 @@ public class FreeCiteImporter extends ImportFormat {
                                 // we would have to change the whole parser to parse that format.
                                 type = BibtexEntryTypes.ARTICLE;
                                 e.setField(ln, parser.getElementText());
-                            } else if (ln.equals("tech")) {
+                            } else if ("tech".equals(ln)) {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField("number", parser.getElementText());
-                            } else if (ln.equals("doi")
-                                    || ln.equals("institution")
-                                    || ln.equals("location")
-                                    || ln.equals("number")
-                                    || ln.equals("note")
-                                    || ln.equals("title")
-                                    || ln.equals("pages")
-                                    || ln.equals("publisher")
-                                    || ln.equals("volume")
-                                    || ln.equals("year")) {
+                            } else if ("doi".equals(ln)
+                                    || "institution".equals(ln)
+                                    || "location".equals(ln)
+                                    || "number".equals(ln)
+                                    || "note".equals(ln)
+                                    || "title".equals(ln)
+                                    || "pages".equals(ln)
+                                    || "publisher".equals(ln)
+                                    || "volume".equals(ln)
+                                    || "year".equals(ln)) {
                                 e.setField(ln, parser.getElementText());
-                            } else if (ln.equals("booktitle")) {
+                            } else if ("booktitle".equals(ln)) {
                                 String booktitle = parser.getElementText();
                                 if (booktitle.startsWith("In ")) {
                                     // special treatment for parsing of
@@ -178,7 +183,7 @@ public class FreeCiteImporter extends ImportFormat {
                                     booktitle = booktitle.substring(3);
                                 }
                                 e.setField("booktitle", booktitle);
-                            } else if (ln.equals("raw_string")) {
+                            } else if ("raw_string".equals(ln)) {
                                 // raw input string is ignored
                             } else {
                                 // all other tags are stored as note

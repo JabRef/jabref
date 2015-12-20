@@ -16,11 +16,11 @@
 package net.sf.jabref.bibtex.comparator;
 
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.YearUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 import java.text.Collator;
@@ -30,7 +30,7 @@ import java.util.Comparator;
 
 /**
  * 
- * A comparator for BibtexEntry fields
+ * A comparator for BibEntry fields
  * 
  * Initial Version:
  * 
@@ -40,7 +40,7 @@ import java.util.Comparator;
  * TODO: Testcases
  * 
  */
-public class FieldComparator implements Comparator<BibtexEntry> {
+public class FieldComparator implements Comparator<BibEntry> {
 
     private static Collator collator;
 
@@ -74,16 +74,16 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         this.fieldName = field;
         this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
         multiplier = reversed ? -1 : 1;
-        isTypeHeader = this.field[0].equals(BibtexEntry.TYPE_HEADER);
-        isNameField = this.field[0].equals("author")
-                || this.field[0].equals("editor");
-        isYearField = this.field[0].equals("year");
-        isMonthField = this.field[0].equals("month");
+        isTypeHeader = this.field[0].equals(BibEntry.TYPE_HEADER);
+        isNameField = "author".equals(this.field[0])
+                || "editor".equals(this.field[0]);
+        isYearField = "year".equals(this.field[0]);
+        isMonthField = "month".equals(this.field[0]);
         isNumeric = BibtexFields.isNumeric(this.field[0]);
     }
 
     @Override
-    public int compare(BibtexEntry e1, BibtexEntry e2) {
+    public int compare(BibEntry e1, BibEntry e2) {
         Object f1;
         Object f2;
 
@@ -177,10 +177,10 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         if (f1 instanceof Integer && f2 instanceof Integer) {
             result = ((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
-            Integer f1AsInteger = new Integer(f1.toString());
+            Integer f1AsInteger = Integer.valueOf(f1.toString());
             result = -f1AsInteger.compareTo((Integer) f2);
         } else if (f1 instanceof Integer) {
-            Integer f2AsInteger = new Integer(f2.toString());
+            Integer f2AsInteger = Integer.valueOf(f2.toString());
             result = -((Integer) f1).compareTo(f2AsInteger);
         } else {
             String ours = ((String) f1).toLowerCase();
@@ -191,7 +191,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         return result * localMultiplier;
     }
 
-    private Object getField(BibtexEntry entry) {
+    private Object getField(BibEntry entry) {
         for (String aField : field) {
             Object o = entry.getFieldOrAlias(aField);
             if (o != null) {

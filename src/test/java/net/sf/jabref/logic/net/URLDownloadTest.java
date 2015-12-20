@@ -3,13 +3,13 @@ package net.sf.jabref.logic.net;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
-import net.sf.jabref.logic.net.URLDownload;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class URLDownloadTest {
 
@@ -17,7 +17,8 @@ public class URLDownloadTest {
     public void testStringDownloadWithSetEncoding() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-        Assert.assertTrue("google.com should contain google", dl.downloadToString("UTF8").contains("Google"));
+        Assert.assertTrue("google.com should contain google",
+                dl.downloadToString(StandardCharsets.UTF_8).contains("Google"));
     }
 
     @Test

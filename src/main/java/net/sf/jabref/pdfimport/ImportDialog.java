@@ -53,7 +53,7 @@ public class ImportDialog extends JDialog {
         setContentPane(contentPane);
         JPanel panel3 = new JPanel();
         panel3.setBackground(new Color(-1643275));
-        JLabel labelHeadline = new JLabel(Localization.lang("Import_Metadata_from:"));
+        JLabel labelHeadline = new JLabel(Localization.lang("Import_metadata_from:"));
         labelHeadline.setFont(new Font(labelHeadline.getFont().getName(), Font.BOLD, 14));
         JLabel labelSubHeadline = new JLabel(Localization.lang("Choose_the_source_for_the_metadata_import"));
         labelSubHeadline.setFont(new Font(labelSubHeadline.getFont().getName(), labelSubHeadline.getFont().getStyle(), 13));
@@ -74,7 +74,7 @@ public class ImportDialog extends JDialog {
         radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP_data"));
         radioButtonPDFcontent = new JRadioButton(Localization.lang("Create_entry_based_on_content"));
         radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only_attach_PDF"));
-        JButton buttonOK = new JButton(Localization.lang("Ok"));
+        JButton buttonOK = new JButton(Localization.lang("OK"));
         JButton buttonCancel = new JButton(Localization.lang("Cancel"));
         checkBoxDoNotShowAgain = new JCheckBox(Localization.lang("Do not show this box again for this import"));
         useDefaultPDFImportStyle = new JCheckBox(Localization.lang("Always use this PDF import style (and do not ask for each import)"));

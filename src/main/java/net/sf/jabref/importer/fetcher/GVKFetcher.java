@@ -23,9 +23,10 @@ import org.xml.sax.SAXException;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Fetch or search from GVK http://gso.gbv.de/sru/DB=2.1/
@@ -90,7 +91,7 @@ public class GVKFetcher implements EntryFetcher {
         // Jeden einzelnen Suchbegriff URL-Encodieren
         for (int x = 0; x < qterms.length; x++) {
             try {
-                qterms[x] = URLEncoder.encode(qterms[x], "UTF-8");
+                qterms[x] = URLEncoder.encode(qterms[x], StandardCharsets.UTF_8.name());
             } catch (UnsupportedEncodingException e) {
                 LOGGER.error("Unsupported encoding", e);
             }
@@ -108,9 +109,9 @@ public class GVKFetcher implements EntryFetcher {
             }
         }
 
-        List<BibtexEntry> bibs = fetchGVK(gvkQuery);
+        List<BibEntry> bibs = fetchGVK(gvkQuery);
 
-        for (BibtexEntry entry : bibs) {
+        for (BibEntry entry : bibs) {
             dialog.addEntry(entry);
         }
 
@@ -148,8 +149,8 @@ public class GVKFetcher implements EntryFetcher {
         return (result);
     }
 
-    private List<BibtexEntry> fetchGVK(String query) {
-        List<BibtexEntry> result;
+    private List<BibEntry> fetchGVK(String query) {
+        List<BibEntry> result;
 
         String urlPrefix = "http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=";
         String urlQuery = query;
@@ -163,7 +164,7 @@ public class GVKFetcher implements EntryFetcher {
                 uri = new URI(searchstring);
             } catch (URISyntaxException e) {
                 LOGGER.error("URI malformed error", e);
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
             URL url = uri.toURL();
             try (InputStream is = url.openStream()) {
@@ -171,13 +172,13 @@ public class GVKFetcher implements EntryFetcher {
             }
         } catch (IOException e) {
             LOGGER.error("GVK plugin: An I/O exception occurred", e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         } catch (ParserConfigurationException e) {
             LOGGER.error("GVK plugin: An internal parser error occurred", e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         } catch (SAXException e) {
             LOGGER.error("An internal parser error occurred", e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return result;

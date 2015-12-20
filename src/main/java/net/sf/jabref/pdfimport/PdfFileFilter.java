@@ -44,7 +44,7 @@ public class PdfFileFilter implements FileFilter {
 
     private static boolean isMatchingFileFilter(String path) {
         String dateiEndung = path.substring(path.lastIndexOf(".") + 1);
-        return dateiEndung.equalsIgnoreCase("pdf");
+        return "pdf".equalsIgnoreCase(dateiEndung);
     }
 
 }

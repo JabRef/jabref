@@ -20,7 +20,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -37,10 +37,10 @@ class AdvancedCiteDialog {
     private static boolean defaultInPar = true;
     private boolean okPressed;
     private final JDialog diag;
-    private final JRadioButton inPar = new JRadioButton(Localization.lang("Cite selected entries"));
+    private final JRadioButton inPar = new JRadioButton(Localization.lang("Cite selected entries between parenthesis"));
     private final JRadioButton inText = new JRadioButton(Localization.lang("Cite selected entries with in-text citation"));
     private final JTextField pageInfo = new JTextField(15);
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 
@@ -107,7 +107,7 @@ class AdvancedCiteDialog {
         };
         cancel.addActionListener(cancelAction);
         b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+                .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         b.getPanel().getActionMap().put("close", cancelAction);
 
     }

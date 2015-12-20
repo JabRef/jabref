@@ -13,7 +13,48 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Added new DoiResolution fetcher that tries to download full text PDF from DOI link
+- Add options to close other/all databases in tab right-click menu
+- Implements #470: Show editor (as an alternative to author) and booktitle (as an alternative to journal) in the main table by default
+- Restore focus to last focused tab on start
+- Add ability to format/cleanup the date field
+- Add support for proxy authentication via VM args and GUI settings, this implements Feature Request #388
+- Move Bibtex and Biblatex mode switcher to File menu
+- Display active edit mode (BibTeX or Biblatex) at window title
+- Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
+- Icons are shown as Header for icon columns in the entry table (#315)
+- Tooltips are shown for header columns and contents which are too wide to be displayed in the entry table (#384)
+- Default order in entry table:  # | all file based icons (file, URL/DOI, ...) | all bibtex field based icons (bibtexkey, entrytype, author, title, ...) | all activated special field icons (ranking, quality, ...)
+
+### Fixed
+- Fixed #434: Revert to old 'JabRef' installation folder name instead of 'jabref'
+- Fixed #435: Retrieve non open access ScienceDirect PDFs via HTTP DOM
+- Fixed: Cleanup process aborts if linked file does not exists
+- Fixed #420: Reenable preference changes
+- Fixed #414: Rework BibLatex entry types with correct required and optional fields
+- Fixed #413: Help links in released jar version are not working
+- Fixes #412: Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete.
+- Fixed #437: The toolbar after the search field is now correctly wrapped when using a small window size for JabRef
+- Fixed #438: Cut, Copy and Paste are now translated correctly in the menu
+- Fixed #443/#445: Fixed sorting and moving special field columns
+- Fixed #498: non-working legacy PDF/PS column removed
+- Fixed #473: Import/export to external database works again
+- Fixed #526: OpenOffice/LibreOffice connection works again on Linux/OSX
+- Fixed #533: Preview parsed incorrectly when regular expression was enabled
+
+### Removed
+- Removed file history size preference (never available from the UI)
+- Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
+- Removed option "Show one letter heading for icon columns" which is obsolete with the fix of #315/384
+- Removed table column "PDF/PS" which refers to legacy fields "ps" resp. "pdf" which are no longer supported (see also fix #498)
+- Removed the ability to export references on the CLI interface based on year ranges
+
+
+## [3.0] - 2015-11-29
+
+### Changed
  - Updated to support OpenOffice 4 and LibreOffice 5
+ - Add toolbar icon for deleting an entry, and move menu item for this action to BibTeX
  - Better support for IEEEtranBSTCTL entries
  - Quick selection of month in entry editor
  - Unknown entry types will be converted to 'Misc' (was 'Other' before).
@@ -21,12 +62,23 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Tab shows the minimal unique folder name substring if multiple database files share the same name
  - Added a page numbers integrity checker
  - Position and size of certain dialogs are stored and restored.
+ - Feature: Search Springer
  - Feature: Search DOAJ, Directory of Open Access Journals
  - Changes the old integrity check by improving the code base (+tests) and converting it to a simple issues table
  - Added combo box in MassSetFieldAction to simplify selecting the correct field name
  - Feature: Merge information from both entries on duplication detection
  - Always use import inspection dialog on import from file
  - All duplicate whitespaces / tabs / newlines are now removed from non-multiline fields
+ - Improvements to search:
+   - Search bar is now at the top
+   - A summary of the search result is shown in textual form in the search bar
+   - The search text field changes its color based on the search result (red if nothing is found, green if at least one entry is found)
+   - Autocompletion suggestions are shown in a popup
+   - Search options are available via a drop-down list, this implements Feature Request #853
+   - "Clear search" button also clears search field, this implements Feature Request #601
+   - Every search is done automatically (live) as soon as the search text is changed
+   - Search is local by default. To do a global search, one has to do a local search and then this search can be done globally as well, opening a new window. 
+   - The local search results can be shown in a new window. 
  - Feature: Merge information from a DOI generated BibTex entry to an entry
  - Added more characters to HTML/Unicode converter
  - Feature: Push citations to Texmaker ([bug 318](https://sourceforge.net/p/jabref/bugs/318/), [bug 582](https://sourceforge.net/p/jabref/bugs/582/))
@@ -63,6 +115,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Show replaced journal abbreviations on console
  - Integrated [GVK-Plugin](http://www.gbv.de/wikis/cls/Jabref-GVK-Plugin)
  - The three options to manage file references are moved to their own separated group in the Tools menu. 
+ - Default preferences: Remote server (port 6050) always started on first JabRef instance. This prevents JabRef loaded twice when opening a bib file.
 
 ### Fixed
  - Fixed the bug that the file encoding was not correctly determined from the first (or second) line
@@ -99,6 +152,10 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Remove support for key bindings per external application by allowing only the key binding "push to application" for the currently selected external application.
  - Remove "edit preamble" from toolbar
  - Remove support to the move-to-SysTray action
+ - Remove incremental search
+ - Remove option to disable autocompleters for search and make this always one
+ - Remove option to highlight matches and make this always one when not using regex or grammar-based search
+ - Remove non-working web searches: JSTOR and Sciencedirect (planned to be fixed for the next release)
  - Remove option Tools -> Open PDF or PS which is replaced by Tools -> Open File
 
 ## 2.80 - never released
@@ -119,8 +176,9 @@ Since much functionality has changed during development, a release of this versi
 
 ## 2.11 - 2015-11-11
 
-The changelog of 2.11 and versions before is maintained as text file in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
+The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/dev_2.11...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v3.0...HEAD
+[3.0]: https://github.com/JabRef/jabref/compare/v2.11.1...v3.0
 [dev_2.11]: https://github.com/JabRef/jabref/compare/v2.11.1...dev_2.11
 [2.11.1]: https://github.com/JabRef/jabref/compare/v2.11...v2.11.1

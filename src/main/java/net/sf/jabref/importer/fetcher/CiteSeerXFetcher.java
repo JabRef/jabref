@@ -20,13 +20,14 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -53,8 +54,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibtexEntry entry = getSingleCitation(citation);
-                //BibtexEntry entry = BibsonomyScraper.getEntry(citation);
+                BibEntry entry = getSingleCitation(citation);
+                //BibEntry entry = BibsonomyScraper.getEntry(citation);
 
                 //dialog.setProgress(++i, citations.size());
                 if (entry != null) {
@@ -100,7 +101,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<>();
         try {
-            urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
+            urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER,
+                    URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
             int count = 1;
             String nextPage;
             while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
@@ -137,15 +139,15 @@ public class CiteSeerXFetcher implements EntryFetcher {
     private static final Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
 
-    private static BibtexEntry getSingleCitation(String urlString) throws IOException {
+    private static BibEntry getSingleCitation(String urlString) throws IOException {
 
         URL url = new URL(urlString);
-        String cont = new URLDownload(url).downloadToString("UTF8");
+        String cont = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
 
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
         Matcher m = CiteSeerXFetcher.titlePattern.matcher(cont);
         if (m.find()) {
-            BibtexEntry entry = new BibtexEntry(IdGenerator.next());
+            BibEntry entry = new BibEntry(IdGenerator.next());
             entry.setField("title", m.group(1));
 
             // Find authors:

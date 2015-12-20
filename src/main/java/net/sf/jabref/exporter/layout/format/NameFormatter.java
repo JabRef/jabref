@@ -95,7 +95,7 @@ public class NameFormatter implements LayoutFormatter {
 
         for (int i = 1; i <= al.size(); i++) {
             for (int j = 1; j < formats.length; j += 2) {
-                if (formats[j].equals("*")) {
+                if ("*".equals(formats[j])) {
                     sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
                     break;
                 } else {
@@ -149,7 +149,7 @@ public class NameFormatter implements LayoutFormatter {
                 return toFormat;
             }
 
-            if (formatString[0].equals("*")) {
+            if ("*".equals(formatString[0])) {
                 return format(toFormat, al, formatString);
             } else {
                 if (al.size() <= Integer.parseInt(formatString[0])) {

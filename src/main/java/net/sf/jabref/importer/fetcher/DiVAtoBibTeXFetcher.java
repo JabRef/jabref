@@ -20,15 +20,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
+import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
@@ -49,7 +52,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         String q;
         try {
-            q = URLEncoder.encode(query, "UTF-8");
+            q = URLEncoder.encode(query, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             // this should never happen
             status.setStatus(Localization.lang("Error"));
@@ -70,7 +73,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
         String bibtexString;
         try {
-            bibtexString = Util.getResultsWithEncoding(url, "UTF-8");
+            bibtexString = Util.getResultsWithEncoding(url, StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
             status.showMessage(Localization.lang("Unknown DiVA entry: '%0'.",
                             query),
@@ -81,7 +84,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+        BibEntry entry = BibtexParser.singleFromString(bibtexString);
         if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
             String title = entry.getField("title");
@@ -104,7 +107,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                 entry.setField("institution", institution);
             }
             // Do not use the provided key
-            // entry.setField(BibtexFields.KEY_FIELD,null);
+            // entry.clearField(BibtexFields.KEY_FIELD);
             inspector.addEntry(entry);
 
             return true;

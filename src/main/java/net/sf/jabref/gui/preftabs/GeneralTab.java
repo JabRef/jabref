@@ -16,9 +16,11 @@
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -66,7 +68,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JTextField timeStampField;
     private final JabRefPreferences prefs;
     private final JComboBox<String> language = new JComboBox<>(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
-    private final JComboBox<String> encodings = new JComboBox<>(Encodings.ENCODINGS);
+    private final JComboBox<Charset> encodings;
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
@@ -76,7 +78,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         allowEditing = new JCheckBox(Localization.lang("Allow editing in table cells"));
 
         memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
-        defSort = new JCheckBox(Localization.lang("Sort Automatically"));
+        defSort = new JCheckBox(Localization.lang("Sort automatically"));
         ctrlClick = new JCheckBox(Localization.lang("Open right-click menu with Ctrl+left button"));
         useOwner = new JCheckBox(Localization.lang("Mark new entries with owner name") + ':');
         useTimeStamp = new JCheckBox(Localization.lang("Mark new entries with addition date") + ". "
@@ -96,7 +98,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         overwriteTimeStamp.setToolTipText(Localization.lang("If a pasted or imported entry already has "
                 + "the field set, overwrite."));
         keyDuplicateWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when a duplicate BibTeX key is entered"));
-        keyEmptyWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
+        keyEmptyWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when an empty BibTeX key is entered"));
         enforceLegalKeys = new JCheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new JCheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
 
@@ -107,6 +109,8 @@ class GeneralTab extends JPanel implements PrefsTab {
         timeStampField = new JTextField();
         inspectionWarnDupli = new JCheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
 
+        encodings = new JComboBox<>();
+        encodings.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
 
         FormLayout layout = new FormLayout
                 ("8dlu, 1dlu, left:170dlu, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref", "");
@@ -194,13 +198,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
 
-        String enc = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
-        for (int i = 0; i < Encodings.ENCODINGS.length; i++) {
-            if (Encodings.ENCODINGS[i].equalsIgnoreCase(enc)) {
-                encodings.setSelectedIndex(i);
-                break;
-            }
-        }
+        Charset enc = Globals.prefs.getDefaultEncoding();
+        encodings.setSelectedItem(enc);
+
         String oldLan = prefs.get(JabRefPreferences.LANGUAGE);
 
         // Language choice
@@ -240,7 +240,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.WRAPPED_USERNAME = '[' + owner + ']';
         prefs.put(JabRefPreferences.TIME_STAMP_FORMAT, timeStampFormat.getText().trim());
         prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
-        prefs.put(JabRefPreferences.DEFAULT_ENCODING, (String) encodings.getSelectedItem());
+        prefs.setDefaultEncoding((Charset) encodings.getSelectedItem());
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
 

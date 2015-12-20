@@ -1,22 +1,22 @@
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.HashMap;
 
 class AutoCompleters {
 
-    final HashMap<String, AutoCompleter> autoCompleters = new HashMap<>();
+    final HashMap<String, AutoCompleter<String>> autoCompleters = new HashMap<>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
-    public AutoCompleter get(String fieldName) {
+    public AutoCompleter<String> get(String fieldName) {
         return autoCompleters.get(fieldName);
     }
 
-    void addDatabase(BibtexDatabase database) {
-        for (BibtexEntry entry : database.getEntries()) {
+    void addDatabase(BibDatabase database) {
+        for (BibEntry entry : database.getEntries()) {
             addEntry(entry);
         }
     }
@@ -25,13 +25,13 @@ class AutoCompleters {
      * This methods assures all words in the given entry are recorded in their
      * respective Completers, if any.
      */
-    public void addEntry(BibtexEntry bibtexEntry) {
-        for (AutoCompleter autoCompleter : autoCompleters.values()) {
-            autoCompleter.addBibtexEntry(bibtexEntry);
+    public void addEntry(BibEntry bibEntry) {
+        for (AutoCompleter<String> autoCompleter : autoCompleters.values()) {
+            autoCompleter.addBibtexEntry(bibEntry);
         }
     }
 
-    void put(String field, AutoCompleter autoCompleter) {
+    void put(String field, AutoCompleter<String> autoCompleter) {
         autoCompleters.put(field, autoCompleter);
     }
 

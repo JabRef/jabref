@@ -20,9 +20,10 @@ public class BooktitleMinifier implements Formatter {
      *     Stefan Kolb and Simon Harrer and Joerg Lenhard -> Stefan Kolb and others
      * </example>
      */
+    @Override
     public String format(String value) {
         // nothing to do
-        if (value == null || value.isEmpty()) {
+        if ((value == null) || value.isEmpty()) {
             return value;
         }
 
@@ -48,7 +49,7 @@ public class BooktitleMinifier implements Formatter {
         }
 
         // already abbreviated
-        if ("others".equals(authors[authors.length - 1]) && authors.length == 2) {
+        if ("others".equals(authors[authors.length - 1]) && (authors.length == 2)) {
             return authorField;
         }
 

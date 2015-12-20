@@ -16,20 +16,17 @@
 package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.model.entry.EntryUtil;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 
 import javax.swing.*;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
 import javax.swing.text.Document;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -169,7 +166,7 @@ public class TextField extends JTextField implements FieldEditor {
         //register "Paste" action
         getActionMap().put(Actions.PASTE, new PasteAction(this));
         // Bind paste command to KeyBinds.PASTE
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.PASTE), Actions.PASTE);
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
     }
 
     private void setupUndoRedo() {
@@ -177,13 +174,7 @@ public class TextField extends JTextField implements FieldEditor {
         Document doc = getDocument();
 
         // Listen for undo and redo events
-        doc.addUndoableEditListener(new UndoableEditListener() {
-
-            @Override
-            public void undoableEditHappened(UndoableEditEvent evt) {
-                undo.addEdit(evt.getEdit());
-            }
-        });
+        doc.addUndoableEditListener(evt -> undo.addEdit(evt.getEdit()));
 
         // Create an undo action and add it to the text component
         getActionMap().put("Undo", new AbstractAction("Undo") {
@@ -201,7 +192,7 @@ public class TextField extends JTextField implements FieldEditor {
         });
 
         // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
         getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
@@ -219,6 +210,6 @@ public class TextField extends JTextField implements FieldEditor {
         });
 
         // Bind the redo action to ctl-Y
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.REDO), "Redo");
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.REDO), "Redo");
     }
 }

@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.importer;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * An ImportInspector can be passed to a EntryFetcher and will receive entries
@@ -47,7 +47,7 @@ public interface ImportInspector {
      * @param entry
      *            The entry to add.
      */
-    void addEntry(BibtexEntry entry);
+    void addEntry(BibEntry entry);
 
     /**
      * If this is a graphical dialog, bring it to the front.

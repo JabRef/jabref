@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -26,6 +26,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -44,8 +46,8 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData, final String file,
-            final String encoding, Set<String> keySet) throws Exception {
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+            final Charset encoding, Set<String> keySet) throws Exception {
         OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, keySet);
     }
 
@@ -84,7 +86,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         }
     }
 
-    private static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database, Set<String> keySet)
+    private static void exportOpenDocumentSpreadsheet(File file, BibDatabase database, Set<String> keySet)
             throws Exception {
 
         // First store the xml formatted content to a temporary file.
@@ -99,21 +101,17 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         tmpFile.delete();
     }
 
-    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
+    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, Set<String> keySet) {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
 
         try {
-            Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8");
-            try {
+            try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
 
-                //            Writer ps = new FileWriter(tmpFile);
                 DOMSource source = new DOMSource(od.getDOMrepresentation());
                 StreamResult result = new StreamResult(ps);
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
-            } finally {
-                ps.close();
             }
         } catch (Exception e) {
             throw new Error(e);
@@ -130,8 +128,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
 
     private static void addFromResource(String resource, OutputStream out) {
         URL url = OpenDocumentSpreadsheetCreator.class.getResource(resource);
-        try {
-            InputStream in = url.openStream();
+        try (InputStream in = url.openStream()) {
             byte[] buffer = new byte[256];
             synchronized (out) {
                 while (true) {

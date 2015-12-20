@@ -15,7 +15,8 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 
 import java.awt.BorderLayout;
@@ -68,7 +69,7 @@ public class MergeDialog extends JDialog {
     private void jbInit(JabRefFrame parent) {
         //  titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
         panel1.setLayout(borderLayout1);
-        ok.setText(Localization.lang("Ok"));
+        ok.setText(Localization.lang("OK"));
         ok.addActionListener(new MergeDialog_ok_actionAdapter(this));
         Cancel.setText(Localization.lang("Cancel"));
         Cancel.addActionListener(new MergeDialog_Cancel_actionAdapter(this));
@@ -99,7 +100,7 @@ public class MergeDialog extends JDialog {
         // Key bindings:
         ActionMap am = jPanel1.getActionMap();
         InputMap im = jPanel1.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             @Override

@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 
@@ -45,15 +45,13 @@ class StringRemoveChange extends Change {
         this.string = string;
         this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
 
-        // @formatter:off
         tp.setText("<HTML><H2>" + Localization.lang("Removed string") + "</H2><H3>" +
                 Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" +
                 Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
-        // @formatter:on
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
 
         try {
             panel.database().removeString(inMem.getId());

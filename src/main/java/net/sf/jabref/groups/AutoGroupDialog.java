@@ -28,14 +28,15 @@ import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.logic.groups.GroupsUtil;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.PositionWindow;
 
@@ -58,7 +59,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
     private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
     private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final GroupTreeNode m_groupsRoot;
     private final JabRefFrame frame;
     private final BasePanel panel;
@@ -93,22 +94,22 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 String fieldText = field.getText();
                 if (keywords.isSelected()) {
                     if (nd.isSelected()) {
-                        hs = Util.findDeliminatedWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
+                        hs = GroupsUtil.findDeliminatedWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
                                 deliminator.getText());
                     } else {
-                        hs = Util.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
+                        hs = GroupsUtil.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
                                 remove.getText());
 
                     }
                 } else if (authors.isSelected()) {
                     List<String> fields = new ArrayList<>(2);
                     fields.add("author");
-                    hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
+                    hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
                     fieldText = "author";
                 } else if (editors.isSelected()) {
                     List<String> fields = new ArrayList<>(2);
                     fields.add("editor");
-                    hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
+                    hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
                     fieldText = "editor";
                 }
 
@@ -149,7 +150,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(frame.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         ButtonGroup bg = new ButtonGroup();

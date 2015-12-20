@@ -21,8 +21,8 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.List;
 public class SearchFixDuplicateLabels extends AbstractWorker {
 
     private final BasePanel panel;
-    private HashMap<String, List<BibtexEntry>> dupes;
+    private HashMap<String, List<BibEntry>> dupes;
 
 
     public SearchFixDuplicateLabels(BasePanel panel) {
@@ -48,9 +48,9 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         // Find all multiple occurences of BibTeX keys.
         dupes = new HashMap<>();
 
-        HashMap<String, BibtexEntry> foundKeys = new HashMap<>();
-        BibtexDatabase db = panel.database();
-        for (BibtexEntry entry : db.getEntries()) {
+        HashMap<String, BibEntry> foundKeys = new HashMap<>();
+        BibDatabase db = panel.database();
+        for (BibEntry entry : db.getEntries()) {
             String key = entry.getCiteKey();
             // Only handle keys that are actually set:
             if ((key != null) && !key.isEmpty()) {
@@ -67,7 +67,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                     }
                     else {
                         // Construct a list of entries for this key:
-                        ArrayList<BibtexEntry> al = new ArrayList<>();
+                        ArrayList<BibEntry> al = new ArrayList<>();
                         // Add both the first one we found, and the one we found just now:
                         al.add(foundKeys.get(key));
                         al.add(entry);
@@ -87,7 +87,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
 
     @Override
     public void update() {
-        List<BibtexEntry> toGenerateFor = new ArrayList<>();
+        List<BibEntry> toGenerateFor = new ArrayList<>();
         for (String key : dupes.keySet()) {
             ResolveDuplicateLabelDialog rdld = new ResolveDuplicateLabelDialog(panel,
                     key, dupes.get(key));
@@ -106,7 +106,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         // Do the actual generation:
         if (!toGenerateFor.isEmpty()) {
             NamedCompound ce = new NamedCompound("resolve duplicate keys");
-            for (BibtexEntry entry : toGenerateFor) {
+            for (BibEntry entry : toGenerateFor) {
                 String oldKey = entry.getCiteKey();
                 LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
                 ce.addEdit(new UndoableKeyChange(panel.database(), entry.getId(), oldKey,

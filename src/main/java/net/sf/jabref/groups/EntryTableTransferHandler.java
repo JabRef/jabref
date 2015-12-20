@@ -43,8 +43,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.TransferableFileLinkSelection;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.importer.ImportMenuItem;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.pdfimport.PdfImporter;
@@ -132,7 +131,6 @@ public class EntryTableTransferHandler extends TransferHandler {
             if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 // JOptionPane.showMessageDialog(null, "Received
                 // javaFileListFlavor");
-                @SuppressWarnings("unchecked")
                 List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
                 return handleDraggedFiles(l, dropRow);
             } else if (t.isDataFlavorSupported(urlFlavor)) {
@@ -188,17 +186,10 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
-        /* TODO: add support for dragging file link from table icon into other apps */
         if (e instanceof MouseEvent) {
-            MouseEvent me = (MouseEvent) e;
-            int col = entryTable.columnAtPoint(me.getPoint());
-            String[] res = entryTable.getIconTypeForColumn(col);
-            if (res == null) {
-                super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
-                return;
-            }
-            // We have an icon column:
-            if (res == MainTableFormat.FILE) {
+            int columnIndex = entryTable.columnAtPoint(((MouseEvent) e).getPoint());
+            int modelIndex = entryTable.getColumnModel().getColumn(columnIndex).getModelIndex();
+            if(entryTable.isFileColumn(modelIndex)) {
                 LOGGER.info("Dragging file");
                 draggingFile = true;
             }
@@ -363,7 +354,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             if ((index >= 0) && (index < fileName.length())) {
                 extension = fileName.substring(index + 1).toLowerCase();
             }
-            if (extension.equals("bib")) {
+            if ("bib".equals(extension)) {
                 // we assume that it is a BibTeX file.
                 // When a user wants to import something with file extension "bib", but which is not a BibTeX file, he should use "file -> import"
                 bibFiles.add(fileName);

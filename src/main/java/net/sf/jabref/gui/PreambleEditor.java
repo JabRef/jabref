@@ -20,28 +20,27 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.actions.Actions;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
 import net.sf.jabref.logic.l10n.Localization;
 
 class PreambleEditor extends JDialog {
-
     // A reference to the entry this object works on.
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private final BasePanel panel;
     private final JabRefPreferences prefs;
 
-    JLabel lab;
     private FieldEditor ed;
 
 
     public PreambleEditor(JabRefFrame baseFrame,
-            BasePanel panel, BibtexDatabase base,
+            BasePanel panel, BibDatabase base,
             JabRefPreferences prefs) {
         super(baseFrame);
         this.panel = panel;
@@ -102,14 +101,14 @@ class PreambleEditor extends JDialog {
 
     private void setupJTextComponent(javax.swing.text.JTextComponent ta) {
         // Set up key bindings and focus listener for the FieldEditor.
-        ta.getInputMap().put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        ta.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         ta.getActionMap().put("close", closeAction);
-        ta.getInputMap().put(prefs.getKey(KeyBinds.PREAMBLE_EDITOR_STORE_CHANGES), "store");
+        ta.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.PREAMBLE_EDITOR_STORE_CHANGES), "store");
         ta.getActionMap().put("store", storeFieldAction);
 
-        ta.getInputMap().put(prefs.getKey(KeyBinds.UNDO), "undo");
+        ta.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.UNDO), "undo");
         ta.getActionMap().put(Actions.UNDO, undoAction);
-        ta.getInputMap().put(prefs.getKey(KeyBinds.REDO), "redo");
+        ta.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.REDO), "redo");
         ta.getActionMap().put(Actions.REDO, redoAction);
 
         ta.addFocusListener(new FieldListener());

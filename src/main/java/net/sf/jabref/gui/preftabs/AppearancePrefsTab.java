@@ -136,8 +136,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         colorCodes.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
-        fontSize.setText("" + prefs.getInt(JabRefPreferences.MENU_FONT_SIZE));
-        rowPadding.setText("" + prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING));
+        fontSize.setText(String.valueOf(prefs.getInt(JabRefPreferences.MENU_FONT_SIZE)));
+        rowPadding.setText(String.valueOf(prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING)));
         oldMenuFontSize = prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
         overrideFonts.setSelected(prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS));
         oldOverrideFontSize = overrideFonts.isSelected();
@@ -203,13 +203,13 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public boolean validateSettings() {
         // Test if font size is a number:
         if (!validateIntegerField(Localization.lang("Menu and label font size"), fontSize.getText(),
-                Localization.lang("Changed font settings"))) {
+                Localization.lang("Invalid setting"))) {
             return false;
         }
 
         // Test if row padding is a number:
         if (!validateIntegerField(Localization.lang("Table row height padding"), rowPadding.getText(),
-                Localization.lang("Changed table appearance settings"))) {
+                Localization.lang("Invalid setting"))) {
             return false;
         }
 

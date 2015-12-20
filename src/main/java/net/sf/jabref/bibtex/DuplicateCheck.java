@@ -16,16 +16,21 @@
 package net.sf.jabref.bibtex;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.HashMap;
 import java.util.HashSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class contains utility method for duplicate checking of entries.
  */
 public class DuplicateCheck {
+
+    private static final Log LOGGER = LogFactory.getLog(DuplicateCheck.class);
 
     /*
      * Integer values for indicating result of duplicate check (for entries):
@@ -47,6 +52,7 @@ public class DuplicateCheck {
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
     private static final HashMap<String, Double> fieldWeights = new HashMap<>();
 
+
     static {
         DuplicateCheck.fieldWeights.put("author", 2.5);
         DuplicateCheck.fieldWeights.put("editor", 2.5);
@@ -58,11 +64,11 @@ public class DuplicateCheck {
     /**
      * Checks if the two entries represent the same publication.
      *
-     * @param one BibtexEntry
-     * @param two BibtexEntry
+     * @param one BibEntry
+     * @param two BibEntry
      * @return boolean
      */
-    public static boolean isDuplicate(BibtexEntry one, BibtexEntry two) {
+    public static boolean isDuplicate(BibEntry one, BibEntry two) {
 
         // First check if they are of the same type - a necessary condition:
         if (one.getType() != two.getType()) {
@@ -92,7 +98,7 @@ public class DuplicateCheck {
         return req[0] >= DuplicateCheck.duplicateThreshold;
     }
 
-    private static double[] compareFieldSet(String[] fields, BibtexEntry one, BibtexEntry two) {
+    private static double[] compareFieldSet(String[] fields, BibEntry one, BibEntry two) {
         double res = 0;
         double totWeights = 0.;
         for (String field : fields) {
@@ -116,7 +122,7 @@ public class DuplicateCheck {
         return new double[] {0.5, 0.0};
     }
 
-    private static int compareSingleField(String field, BibtexEntry one, BibtexEntry two) {
+    private static int compareSingleField(String field, BibEntry one, BibEntry two) {
         String s1 = one.getField(field);
         String s2 = two.getField(field);
         if (s1 == null) {
@@ -128,17 +134,17 @@ public class DuplicateCheck {
             return EMPTY_IN_TWO;
         }
 
-        if (field.equals("author") || field.equals("editor")) {
+        if ("author".equals(field) || "editor".equals(field)) {
             // Specific for name fields.
             // Harmonise case:
             String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase();
             String auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ").toLowerCase();
-            double similarity = DuplicateCheck.correlateByWords(auth1, auth2, false);
+            double similarity = DuplicateCheck.correlateByWords(auth1, auth2);
             if (similarity > 0.8) {
                 return EQUAL;
             }
             return NOT_EQUAL;
-        } else if (field.equals("pages")) {
+        } else if ("pages".equals(field)) {
             // Pages can be given with a variety of delimiters, "-", "--", " - ", " -- ".
             // We do a replace to harmonize these to a simple "-":
             // After this, a simple test for equality should be enough:
@@ -148,13 +154,13 @@ public class DuplicateCheck {
                 return EQUAL;
             }
             return NOT_EQUAL;
-        } else if (field.equals("journal")) {
+        } else if ("journal".equals(field)) {
             // We do not attempt to harmonize abbreviation state of the journal names,
             // but we remove periods from the names in case they are abbreviated with
             // and without dots:
             s1 = s1.replaceAll("\\.", "").toLowerCase();
             s2 = s2.replaceAll("\\.", "").toLowerCase();
-            double similarity = DuplicateCheck.correlateByWords(s1, s2, true);
+            double similarity = DuplicateCheck.correlateByWords(s1, s2);
             if (similarity > 0.8) {
                 return EQUAL;
             }
@@ -162,7 +168,7 @@ public class DuplicateCheck {
         } else {
             s1 = s1.toLowerCase();
             s2 = s2.toLowerCase();
-            double similarity = DuplicateCheck.correlateByWords(s1, s2, false);
+            double similarity = DuplicateCheck.correlateByWords(s1, s2);
             if (similarity > 0.8) {
                 return EQUAL;
             }
@@ -170,7 +176,7 @@ public class DuplicateCheck {
         }
     }
 
-    public static double compareEntriesStrictly(BibtexEntry one, BibtexEntry two) {
+    public static double compareEntriesStrictly(BibEntry one, BibEntry two) {
         HashSet<String> allFields = new HashSet<>();
         allFields.addAll(one.getFieldNames());
         allFields.addAll(two.getFieldNames());
@@ -194,15 +200,15 @@ public class DuplicateCheck {
     /**
      * Goes through all entries in the given database, and if at least one of
      * them is a duplicate of the given entry, as per
-     * Util.isDuplicate(BibtexEntry, BibtexEntry), the duplicate is returned.
+     * Util.isDuplicate(BibEntry, BibEntry), the duplicate is returned.
      * The search is terminated when the first duplicate is found.
      *
      * @param database The database to search.
      * @param entry    The entry of which we are looking for duplicates.
      * @return The first duplicate entry found. null if no duplicates are found.
      */
-    public static BibtexEntry containsDuplicate(BibtexDatabase database, BibtexEntry entry) {
-        for (BibtexEntry other : database.getEntries()) {
+    public static BibEntry containsDuplicate(BibDatabase database, BibEntry entry) {
+        for (BibEntry other : database.getEntries()) {
             if (DuplicateCheck.isDuplicate(entry, other)) {
                 return other; // Duplicate found.
             }
@@ -219,13 +225,13 @@ public class DuplicateCheck {
      *                 harmonize their length. If false, use interpolation to harmonize the strings.
      * @return a value in the interval [0, 1] indicating the degree of match.
      */
-    static double correlateByWords(String s1, String s2, boolean truncate) {
+    static double correlateByWords(String s1, String s2) {
         String[] w1 = s1.split("\\s");
         String[] w2 = s2.split("\\s");
         int n = Math.min(w1.length, w2.length);
         int misses = 0;
         for (int i = 0; i < n; i++) {
-            double corr = DuplicateCheck.correlateStrings(w1[i], w2[i], truncate);
+            double corr = similarity(w1[i], w2[i]);
             if (corr < 0.75) {
                 misses++;
             }
@@ -234,88 +240,59 @@ public class DuplicateCheck {
         return 1 - missRate;
     }
 
-    private static double correlateStrings(String s1, String s2, boolean truncate) {
-        int minLength = Math.min(s1.length(), s2.length());
-        if (truncate && (minLength == 1)) {
-            return s1.charAt(0) == s2.charAt(0) ? 1.0 : 0.0;
-        } else if ((s1.length() == 1) && (s2.length() == 1)) {
-            return s1.equals(s2) ? 1.0 : 0.0;
-        } else if (minLength == 0) {
-            return s1.isEmpty() && s2.isEmpty() ? 1.0 : 0;
-        }
 
-        // Convert strings to numbers and harmonize length in a method dependent on truncate:
-        if (truncate) {
-            // Harmonize length by truncation:
-            if (s1.length() > minLength) {
-                s1 = s1.substring(0, minLength);
+    /**
+     * Calculates the similarity (a number within 0 and 1) between two strings.
+     * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
+     */
+    private static double similarity(String s1, String s2) {
+        String longer = s1, shorter = s2;
+        if (s1.length() < s2.length()) { // longer should always have greater length
+            longer = s2;
+            shorter = s1;
+        }
+        int longerLength = longer.length();
+        if (longerLength == 0) {
+            return 1.0;
+            /* both strings are zero length */ }
+        double sim = (longerLength - editDistance(longer, shorter)) / (double) longerLength;
+        LOGGER.debug("Longer string: " + longer + " Shorter string: " + shorter + " Similarity: " + sim);
+        return sim;
+
+    }
+
+    /*
+    * Levenshtein Edit Distance
+    * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
+    */
+    private static int editDistance(String s1, String s2) {
+        s1 = s1.toLowerCase();
+        s2 = s2.toLowerCase();
+
+        int[] costs = new int[s2.length() + 1];
+        for (int i = 0; i <= s1.length(); i++) {
+            int lastValue = i;
+            for (int j = 0; j <= s2.length(); j++) {
+                if (i == 0) {
+                    costs[j] = j;
+                } else {
+                    if (j > 0) {
+                        int newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) != s2.charAt(j - 1)) {
+                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        }
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
             }
-            if (s2.length() > minLength) {
-                s2 = s2.substring(0, minLength);
+            if (i > 0) {
+                costs[s2.length()] = lastValue;
             }
         }
-        double[] n1 = DuplicateCheck.numberizeString(s1);
-        double[] n2 = DuplicateCheck.numberizeString(s2);
-        // If truncation is disabled, harmonize length by interpolation:
-        if (!truncate) {
-            if (n1.length < n2.length) {
-                n1 = DuplicateCheck.stretchArray(n1, n2.length);
-            } else if (n2.length < n1.length) {
-                n2 = DuplicateCheck.stretchArray(n2, n1.length);
-            }
-        }
-        return DuplicateCheck.corrCoef(n1, n2);
+        LOGGER.debug("String 1: " + s1 + " String 2: " + s2 + " Distance: " + costs[s2.length()]);
+        return costs[s2.length()];
     }
 
-    private static double corrCoef(double[] n1, double[] n2) {
-        // Calculate mean values:
-        double mean1 = 0;
-        double mean2 = 0;
-        for (int i = 0; i < n1.length; i++) {
-            mean1 += n1[i];
-            mean2 += n2[i];
-        }
-        mean1 /= n1.length;
-        mean2 /= n2.length;
-        double sigma1 = 0;
-        double sigma2 = 0;
-        // Calculate correlation coefficient:
-        double corr = 0;
-        for (int i = 0; i < n1.length; i++) {
-            sigma1 += (n1[i] - mean1) * (n1[i] - mean1);
-            sigma2 += (n2[i] - mean2) * (n2[i] - mean2);
-            corr += (n1[i] - mean1) * (n2[i] - mean2);
-        }
-        sigma1 = Math.sqrt(sigma1);
-        sigma2 = Math.sqrt(sigma2);
-        if ((sigma1 > 0) && (sigma2 > 0)) {
-            return corr / (sigma1 * sigma2);
-        }
-        return 0;
-    }
-
-    private static double[] numberizeString(String s) {
-        double[] res = new double[s.length()];
-        for (int i = 0; i < s.length(); i++) {
-            res[i] = s.charAt(i);
-        }
-        return res;
-    }
-
-    private static double[] stretchArray(double[] array, int length) {
-        if ((length <= array.length) || (array.length == 0)) {
-            return array;
-        }
-        double multip = (double) array.length / (double) length;
-        double[] newArray = new double[length];
-        for (int i = 0; i < newArray.length; i++) {
-            double index = i * multip;
-            int baseInd = (int) Math.floor(index);
-            double dist = index - Math.floor(index);
-            newArray[i] = (dist * array[Math.min(array.length - 1, baseInd + 1)])
-                    + ((1.0 - dist) * array[baseInd]);
-        }
-        return newArray;
-    }
 
 }

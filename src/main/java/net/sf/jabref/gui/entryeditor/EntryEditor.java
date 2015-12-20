@@ -44,10 +44,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
-import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.journals.Abbreviations;
@@ -61,8 +61,9 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.search.SearchTextListener;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -76,7 +77,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * GUI component that allows editing of the fields of a BibtexEntry (i.e. the
+ * GUI component that allows editing of the fields of a BibEntry (i.e. the
  * one that shows up, when you double click on an entry in the table)
  * <p>
  * It hosts the tabs (required, general, optional) and the buttons to the left.
@@ -89,7 +90,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
-    private BibtexEntry entry;
+    private BibEntry entry;
 
     private final EntryType type;
 
@@ -168,16 +169,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private final TabListener tabListener = new TabListener();
 
-    // @formatter:off
     private final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
             + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
             + "<BR>" + Localization.lang("To set up, go to") + " <B>"
             + Localization.lang("Options") + " -> "
             + Localization.lang("Manage journal abbreviations") + "</B></HTML>";
-    // @formatter:on
 
 
-    public EntryEditor(JabRefFrame frame, BasePanel panel, BibtexEntry entry) {
+    public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
 
         this.frame = frame;
         this.panel = panel;
@@ -315,11 +314,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * @return reference to the currently edited entry
      */
     @Override
-    public BibtexEntry getEntry() {
+    public BibEntry getEntry() {
         return entry;
     }
 
-    public BibtexDatabase getDatabase() {
+    public BibDatabase getDatabase() {
         return panel.getDatabase();
     }
 
@@ -338,23 +337,23 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         ActionMap actionMap = toolBar.getActionMap();
         InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        inputMap.put(prefs.getKey(KeyBinds.CLOSE_ENTRY_EDITOR), "close");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_ENTRY_EDITOR), "close");
         actionMap.put("close", closeAction);
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", storeFieldAction);
-        inputMap.put(prefs.getKey(KeyBinds.AUTOGENERATE_BIB_TE_X_KEYS), "generateKey");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS), "generateKey");
         actionMap.put("generateKey", generateKeyAction);
-        inputMap.put(prefs.getKey(KeyBinds.AUTOMATICALLY_LINK_FILES), "autoLink");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOMATICALLY_LINK_FILES), "autoLink");
         actionMap.put("autoLink", autoLinkAction);
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
         actionMap.put("prev", prevEntryAction);
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_ENTRY), "next");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
         actionMap.put("next", nextEntryAction);
-        inputMap.put(prefs.getKey(KeyBinds.UNDO), "undo");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.UNDO), "undo");
         actionMap.put("undo", undoAction);
-        inputMap.put(prefs.getKey(KeyBinds.REDO), "redo");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.REDO), "redo");
         actionMap.put("redo", redoAction);
-        inputMap.put(prefs.getKey(KeyBinds.HELP), "help");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", helpAction);
 
         toolBar.setFloatable(false);
@@ -498,7 +497,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
                 FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
                         panel.metaData, storeFieldAction, false,
-                        editor.getFieldName().equals("author") || editor.getFieldName().equals("editor") ? " and " : ", ");
+                        "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");
                 contentSelectors.add(ws);
 
                 return ws;
@@ -608,7 +607,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        frame.getSearchManager().addSearchListener((SearchTextListener) source);
+        panel.getSearchBar().getSearchTextObservable().addSearchListener((SearchTextListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);
@@ -632,13 +631,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     public void updateSource() {
         if (updateSource) {
-            StringWriter stringWriter = new StringWriter(200);
 
             try {
-                LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
-                new BibtexEntryWriter(formatter, false).write(entry, stringWriter);
-
-                String srcString = stringWriter.getBuffer().toString();
+                String srcString = getSourceString(entry);
                 source.setText(srcString);
                 lastSourceStringAccepted = srcString;
 
@@ -674,6 +669,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
+    public static String getSourceString(BibEntry entry) throws IOException {
+        StringWriter stringWriter = new StringWriter(200);
+        LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
+        new BibtexEntryWriter(formatter, false).write(entry, stringWriter);
+
+        return stringWriter.getBuffer().toString();
+    }
+
     /**
      * NOTE: This method is only used for the source panel, not for the
      * other tabs. Look at EntryEditorTab for the setup of text components
@@ -684,25 +687,25 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         InputMap inputMap = textComponent.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = textComponent.getActionMap();
 
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", storeFieldAction);
 
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL), "right");
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL_2), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
         actionMap.put("right", switchRightAction);
 
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
         actionMap.put("left", switchLeftAction);
 
-        inputMap.put(prefs.getKey(KeyBinds.HELP), "help");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", helpAction);
-        inputMap.put(prefs.getKey(KeyBinds.SAVE_DATABASE), "save");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
         actionMap.put("save", saveDatabaseAction);
 
-        inputMap.put(Globals.prefs.getKey(KeyBinds.NEXT_TAB), "nexttab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", frame.nextTab);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.PREVIOUS_TAB), "prevtab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
         actionMap.put("prevtab", frame.prevTab);
 
 
@@ -836,9 +839,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Updates this editor to show the given entry, regardless of type
      * correspondence.
      *
-     * @param swtichEntry a <code>BibtexEntry</code> value
+     * @param swtichEntry a <code>BibEntry</code> value
      */
-    public synchronized void switchTo(BibtexEntry swtichEntry) {
+    public synchronized void switchTo(BibEntry swtichEntry) {
         if (this.entry == swtichEntry) {
             /**
              * Even if the editor is already showing the same entry, update
@@ -889,7 +892,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         try {
             ParserResult parserResult = bibtexParser.parse();
-            BibtexDatabase database = parserResult.getDatabase();
+            BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {
                 throw new IllegalStateException("More than one entry found.");
@@ -905,7 +908,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
-            BibtexEntry newEntry = database.getEntryById(database.getKeySet().iterator().next());
+            BibEntry newEntry = database.getEntryById(database.getKeySet().iterator().next());
             String id = entry.getId();
             String newKey = newEntry.getCiteKey();
             boolean anyChanged = false;
@@ -1158,18 +1161,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         @Override
         public void stateChanged(ChangeEvent event) {
-
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    activateVisible();
-                }
-            });
-
-            // After the initial event train has finished, we tell the editor
-            // tab to update all
-            // its fields. This makes sure they are updated even if the tab we
+            // We tell the editor tab to update all its fields.
+            //  This makes sure they are updated even if the tab we
             // just left contained one
             // or more of the same fields as this one:
             SwingUtilities.invokeLater(new Runnable() {
@@ -1188,7 +1181,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class DeleteAction extends AbstractAction {
         public DeleteAction() {
-            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getIcon());
+            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
         }
 
@@ -1335,7 +1328,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         fieldEditor.setValidBackgroundColor();
 
                         // See if we need to update an AutoCompleter instance:
-                        AutoCompleter aComp = panel.getAutoCompleters().get(fieldEditor.getFieldName());
+                        AutoCompleter<String> aComp = panel.getAutoCompleters().get(fieldEditor.getFieldName());
                         if (aComp != null) {
                             aComp.addBibtexEntry(entry);
                         }
@@ -1528,7 +1521,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             String bibtexKeyData = entry.getCiteKey();
 
             // set the field named for "bibtexkey"
-            setField(BibtexEntry.KEY_FIELD, bibtexKeyData);
+            setField(BibEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();
 
@@ -1629,11 +1622,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
 
     private void warnDuplicateBibtexkey() {
-        panel.output(Localization.lang("Duplicate BibTeX key. Grouping may not work for this entry."));
+        panel.output(Localization.lang("Duplicate BibTeX key.")+" "+Localization.lang("Grouping may not work for this entry."));
     }
 
     private void warnEmptyBibtexkey() {
-        panel.output(Localization.lang("Empty BibTeX key. Grouping may not work for this entry."));
+        panel.output(Localization.lang("Empty BibTeX key")+". "+Localization.lang("Grouping may not work for this entry."));
     }
 
 

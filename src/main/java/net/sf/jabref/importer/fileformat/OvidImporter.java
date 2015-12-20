@@ -96,12 +96,12 @@ public class OvidImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
@@ -187,10 +187,10 @@ public class OvidImporter extends ImportFormat {
                         h.put("pages", h.get("pages").replaceAll("-", "--"));
                     }
 
-                } else if (fieldName.equals("Abstract")) {
+                } else if ("Abstract".equals(fieldName)) {
                     h.put("abstract", content);
 
-                } else if (fieldName.equals("Publication Type")) {
+                } else if ("Publication Type".equals(fieldName)) {
                     if (content.contains("Book")) {
                         h.put("entrytype", "book");
                     } else if (content.contains("Journal")) {
@@ -222,7 +222,7 @@ public class OvidImporter extends ImportFormat {
             // Set the entrytype properly:
             String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "other";
             h.remove("entrytype");
-            if (entryType.equals("book")) {
+            if ("book".equals(entryType)) {
                 if (h.containsKey("chaptertitle")) {
                     // This means we have an "incollection" entry.
                     entryType = "incollection";
@@ -230,7 +230,7 @@ public class OvidImporter extends ImportFormat {
                     h.put("title", h.remove("chaptertitle"));
                 }
             }
-            BibtexEntry b = new BibtexEntry(IdGenerator.next(), EntryTypes.getBibtexEntryType(entryType));
+            BibEntry b = new BibEntry(IdGenerator.next(), EntryTypes.getTypeOrDefault(entryType));
             b.setField(h);
 
             bibitems.add(b);

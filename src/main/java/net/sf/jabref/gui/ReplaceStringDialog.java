@@ -24,8 +24,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -62,7 +63,7 @@ class ReplaceStringDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 s1 = from.getText();
                 s2 = to.getText();
-                if (s1.equals("")) {
+                if ("".equals(s1)) {
                     return;
                 }
                 ok_pressed = true;
@@ -70,7 +71,7 @@ class ReplaceStringDialog extends JDialog {
                 dispose();
             }
         };
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(okListener);
         to.addActionListener(okListener);
         fields.addActionListener(okListener);
@@ -88,7 +89,7 @@ class ReplaceStringDialog extends JDialog {
         JPanel settings = new JPanel();
         ActionMap am = settings.getActionMap();
         InputMap im = settings.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent_.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.
@@ -204,18 +205,18 @@ class ReplaceStringDialog extends JDialog {
      * settings specified in this same dialog. Returns the number of
      * occurences replaced.
      */
-    public int replace(BibtexEntry be, NamedCompound ce) {
+    public int replace(BibEntry be, NamedCompound ce) {
         int counter = 0;
         if (allFields()) {
 
             for (String s : be.getFieldNames()) {
-                if (!s.equals(BibtexEntry.KEY_FIELD)) {
+                if (!s.equals(BibEntry.KEY_FIELD)) {
                     counter += replaceField(be, s, ce);
                 }
             }
         } else {
             for (String fld : flds) {
-                if (!fld.equals(BibtexEntry.KEY_FIELD)) {
+                if (!fld.equals(BibEntry.KEY_FIELD)) {
                     counter += replaceField(be, fld, ce);
                 }
             }
@@ -224,7 +225,7 @@ class ReplaceStringDialog extends JDialog {
         return counter;
     }
 
-    private int replaceField(BibtexEntry be, String fieldname, NamedCompound ce) {
+    private int replaceField(BibEntry be, String fieldname, NamedCompound ce) {
         Object o = be.getField(fieldname);
         if (o == null) {
             return 0;

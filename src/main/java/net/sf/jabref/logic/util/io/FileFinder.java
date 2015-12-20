@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
@@ -90,14 +90,14 @@ public class FileFinder {
      * extension parameter.
      *
      */
-    public static String findPdf(BibtexEntry entry, String extension, String directory) {
+    public static String findPdf(BibEntry entry, String extension, String directory) {
         return FileFinder.findPdf(entry, extension, new String[]{directory});
     }
 
     /**
      * Convenience method for findPDF. Can search multiple PDF directories.
      */
-    public static String findPdf(BibtexEntry entry, String extension, String[] directories) {
+    public static String findPdf(BibEntry entry, String extension, String[] directories) {
 
         String regularExpression;
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
@@ -113,11 +113,11 @@ public class FileFinder {
 
     /**
      * Convenience menthod for findPDF. Searches for a file of the given type.
-     * @param entry The BibtexEntry to search for a link for.
+     * @param entry The BibEntry to search for a link for.
      * @param fileType The file type to search for.
      * @return The link to the file found, or null if not found.
      */
-    public static String findFile(BibtexEntry entry, ExternalFileType fileType, List<String> extraDirs) {
+    public static String findFile(BibEntry entry, ExternalFileType fileType, List<String> extraDirs) {
 
         List<String> dirs = new ArrayList<>();
         dirs.addAll(extraDirs);
@@ -168,7 +168,7 @@ public class FileFinder {
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    private static String findFile(BibtexEntry entry, BibtexDatabase database, String[] directory,
+    private static String findFile(BibEntry entry, BibDatabase database, String[] directory,
                                    String file, boolean relative) {
 
         for (String aDirectory : directory) {
@@ -183,9 +183,9 @@ public class FileFinder {
     /**
      * Convenience function for absolute search.
      *
-     * Uses findFile(BibtexEntry, BibtexDatabase, (String)null, String, false).
+     * Uses findFile(BibEntry, BibDatabase, (String)null, String, false).
      */
-    public static String findFile(BibtexEntry entry, BibtexDatabase database, String file) {
+    public static String findFile(BibEntry entry, BibDatabase database, String file) {
         return FileFinder.findFile(entry, database, (String) null, file, false);
     }
 
@@ -194,7 +194,7 @@ public class FileFinder {
      * base the search on.
      *
      */
-    public static String findFile(BibtexEntry entry, BibtexDatabase database, String directory,
+    public static String findFile(BibEntry entry, BibDatabase database, String directory,
             String file, boolean relative) {
 
         File root;
@@ -239,7 +239,7 @@ public class FileFinder {
      * The actual work-horse. Will find absolute filepaths starting from the
      * given directory using the given regular expression string for search.
      */
-    private static String findFile(BibtexEntry entry, BibtexDatabase database, File directory,
+    private static String findFile(BibEntry entry, BibDatabase database, File directory,
                                    String file) {
 
         if (file.startsWith("/")) {
@@ -273,14 +273,14 @@ public class FileFinder {
                     directory = new File(dirToProcess + '/');
                     continue;
                 }
-                if (dirToProcess.equals(".")) { // Stay in current directory
+                if (".".equals(dirToProcess)) { // Stay in current directory
                     continue;
                 }
-                if (dirToProcess.equals("..")) {
+                if ("..".equals(dirToProcess)) {
                     directory = new File(directory.getParent());
                     continue;
                 }
-                if (dirToProcess.equals("*")) { // Do for all direct subdirs
+                if ("*".equals(dirToProcess)) { // Do for all direct subdirs
 
                     File[] subDirs = directory.listFiles();
                     if (subDirs == null)
@@ -302,9 +302,9 @@ public class FileFinder {
                     return null;
                 }
                 // Do for all direct and indirect subdirs
-                if (dirToProcess.equals("**")) {
-                    List<File> toDo = new LinkedList<>();
-                    toDo.add(directory);
+                if ("**".equals(dirToProcess)) {
+                    List<File> files = new LinkedList<>();
+                    files.add(directory);
 
                     String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
 
@@ -315,15 +315,15 @@ public class FileFinder {
                         return result;
                     }
 
-                    while (!toDo.isEmpty()) {
+                    while (!files.isEmpty()) {
 
-                        // Get all subdirs of each of the elements found in toDo
-                        File[] subDirs = toDo.remove(0).listFiles();
+                        // Get all subdirs of each of the elements found in files
+                        File[] subDirs = files.remove(0).listFiles();
                         if (subDirs == null) {
                             continue;
                         }
 
-                        toDo.addAll(Arrays.asList(subDirs));
+                        files.addAll(Arrays.asList(subDirs));
 
                         for (File subDir : subDirs) {
                             if (!subDir.isDirectory()) {

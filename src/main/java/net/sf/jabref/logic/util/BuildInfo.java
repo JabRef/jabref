@@ -21,8 +21,9 @@ import java.util.Properties;
 
 public class BuildInfo {
 
+    private static final String UNKOWN_VERSION = "*unknown*";
+    
     private final String version;
-    private final String UNKOWN_VERSION = "*unknown*";
 
 
     public BuildInfo() {
@@ -32,14 +33,14 @@ public class BuildInfo {
     public BuildInfo(String path) {
         Properties properties = new Properties();
 
-        String versionFromProps = UNKOWN_VERSION;
-
         try (InputStream stream = getClass().getResourceAsStream(path)) {
-            properties.load(stream);
-            versionFromProps = properties.getProperty("version", UNKOWN_VERSION);
-        } catch (IOException | NullPointerException ignored) {
+            if(stream != null) {
+                properties.load(stream);
+            }
+        } catch (IOException ignored) {
             // nothing to do -> default already set
         }
+        String versionFromProps = properties.getProperty("version", UNKOWN_VERSION);
 
         version = versionFromProps;
     }

@@ -16,14 +16,20 @@
 package net.sf.jabref.logic.fetcher;
 
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.DOI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.io.IOException;
 import java.util.Objects;
@@ -40,7 +46,7 @@ public class ScienceDirect implements FullTextFinder {
     private static final String API_URL = "http://api.elsevier.com/content/article/doi/";
     private static final String API_KEY = "fb82f2e692b3c72dafe5f4f1fa0ac00b";
     @Override
-    public Optional<URL> findFullText(BibtexEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
@@ -50,23 +56,47 @@ public class ScienceDirect implements FullTextFinder {
         if(doi.isPresent()) {
             // Available in catalog?
             try {
-                String request = API_URL + doi.get().getDOI();
-                HttpResponse<InputStream> response = Unirest.get(request)
-                        .header("X-ELS-APIKey", API_KEY)
-                        .queryString("httpAccept", "application/pdf")
-                        .asBinary();
+                String sciLink = getUrlByDoi(doi.get().getDOI());
 
-                if (response.getStatus() == 200) {
-                    LOGGER.info("Fulltext PDF found @ ScienceDirect.");
-                    pdfLink = Optional.of(new URL(request + "?httpAccept=application/pdf"));
+                if (!sciLink.isEmpty()) {
+                    // Retrieve PDF link
+                    Document html = Jsoup.connect(sciLink).ignoreHttpErrors(true).get();
+                    Element link = html.getElementById("pdfLink");
+
+                    if (link != null) {
+                        LOGGER.info("Fulltext PDF found @ ScienceDirect.");
+                        pdfLink = Optional.of(new URL(link.attr("pdfurl")));
+                    }
                 }
             } catch(UnirestException e) {
-                LOGGER.warn("Elsevier API request failed: " + e.getMessage(), e);
+                LOGGER.warn("ScienceDirect API request failed", e);
             }
         }
-
-        // TODO: title search
-        // We can also get abstract automatically!
         return pdfLink;
+    }
+
+    private String getUrlByDoi(String doi) throws UnirestException {
+        String sciLink = "";
+        try {
+            String request = API_URL + doi;
+            HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
+                    .header("X-ELS-APIKey", API_KEY)
+                    .queryString("httpAccept", "application/json")
+                    .asJson();
+
+            JSONObject json = jsonResponse.getBody().getObject();
+            JSONArray links = json.getJSONObject("full-text-retrieval-response").getJSONObject("coredata").getJSONArray("link");
+
+            for (int i=0; i < links.length(); i++) {
+                JSONObject link = links.getJSONObject(i);
+                if (link.getString("@rel").equals("scidir")) {
+                    sciLink = link.getString("@href");
+                }
+            }
+        } catch(JSONException e) {
+            LOGGER.debug("No ScienceDirect link found in API request", e);
+        } finally {
+            return sciLink;
+        }
     }
 }

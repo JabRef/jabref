@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,12 +11,12 @@ import java.util.Optional;
 
 public class ArXivTest {
     ArXiv finder;
-    BibtexEntry entry;
+    BibEntry entry;
 
     @Before
     public void setup() {
         finder = new ArXiv();
-        entry = new BibtexEntry();
+        entry = new BibEntry();
     }
 
     @Test

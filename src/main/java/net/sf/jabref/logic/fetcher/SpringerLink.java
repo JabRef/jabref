@@ -19,7 +19,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.DOI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +43,7 @@ public class SpringerLink implements FullTextFinder {
     private static final String CONTENT_HOST = "link.springer.com";
 
     @Override
-    public Optional<URL> findFullText(BibtexEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
@@ -66,12 +66,9 @@ public class SpringerLink implements FullTextFinder {
                     pdfLink = Optional.of(new URL("http", CONTENT_HOST, String.format("/content/pdf/%s.pdf", doi.get().getDOI())));
                 }
             } catch(UnirestException e) {
-                LOGGER.warn("SpringerLink API request failed: " + e.getMessage(), e);
+                LOGGER.warn("SpringerLink API request failed", e);
             }
         }
-
-        // TODO: title search
-        // We can also get abstract automatically!
         return pdfLink;
     }
 }

@@ -56,7 +56,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -68,15 +69,15 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -93,8 +94,8 @@ class StyleSelectDialog {
     private JDialog diag;
     private JTable table;
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    private EventTableModel<OOBibStyle> tableModel;
-    private EventSelectionModel<OOBibStyle> selectionModel;
+    private DefaultEventTableModel<OOBibStyle> tableModel;
+    private DefaultEventSelectionModel<OOBibStyle> selectionModel;
     private final JPopupMenu popup = new JPopupMenu();
     private final JMenuItem edit = new JMenuItem(Localization.lang("Edit"));
     private final JRadioButton useDefaultAuthoryear = new JRadioButton(Localization.lang("Default style (author-year citations)"));
@@ -111,9 +112,9 @@ class StyleSelectDialog {
     private PreviewPanel preview;
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final BibtexEntry prevEntry = new BibtexEntry(IdGenerator.next());
+    private final BibEntry prevEntry = new BibEntry(IdGenerator.next());
 
     private boolean okPressed;
     private String initSelection;
@@ -208,13 +209,15 @@ class StyleSelectDialog {
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);//PreviewPrefsTab.getTestEntry());
 
-        tableModel = new EventTableModel<>(sortedStyles, new StyleTableFormat());
+        tableModel = (DefaultEventTableModel<OOBibStyle>) GlazedListsSwing
+                .eventTableModelWithThreadProxyList(sortedStyles, new StyleTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(100);
         cm.getColumn(1).setPreferredWidth(200);
         cm.getColumn(2).setPreferredWidth(80);
-        selectionModel = new EventSelectionModel<>(sortedStyles);
+        selectionModel = (DefaultEventSelectionModel<OOBibStyle>) GlazedListsSwing
+                .eventSelectionModelWithThreadProxyList(sortedStyles);
         table.setSelectionModel(selectionModel);
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
@@ -353,7 +356,7 @@ class StyleSelectDialog {
 
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelListener);
         im.put(KeyStroke.getKeyStroke("ENTER"), "enterOk");
         am.put("enterOk", okListener);
@@ -432,14 +435,16 @@ class StyleSelectDialog {
         File dirF = new File(dir);
         if (dirF.isDirectory()) {
             File[] files = dirF.listFiles();
-            for (File file : files) {
-                // If the file looks like a style file, parse it:
-                if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
-                    addSingleFile(file);
-                }
-                // If the file is a directory, and we should recurse, do:
-                else if (file.isDirectory() && recurse) {
-                    addStyles(file.getPath(), recurse);
+            if (files != null) {
+                for (File file : files) {
+                    // If the file looks like a style file, parse it:
+                    if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
+                        addSingleFile(file);
+                    }
+                    // If the file is a directory, and we should recurse, do:
+                    else if (file.isDirectory() && recurse) {
+                        addStyles(file.getPath(), recurse);
+                    }
                 }
             }
         }
@@ -589,7 +594,7 @@ class StyleSelectDialog {
             JScrollPane sp = new JScrollPane(ta);
             sp.setPreferredSize(new Dimension(700, 500));
             dd.getContentPane().add(sp, BorderLayout.CENTER);
-            JButton okButton = new JButton(Localization.lang("Ok"));
+            JButton okButton = new JButton(Localization.lang("OK"));
             ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
             bb.addButton(okButton);

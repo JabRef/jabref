@@ -1,7 +1,7 @@
 package net.sf.jabref.util;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
@@ -14,15 +14,28 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.util.*;
-import java.util.List;
+
 public class UtilTest {
-
-
 
     @Test
     public void testCheckLegalKey() {
+        // Enforce legal keys
+        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA", true));
+        Assert.assertEquals("SPECIALCHARS", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", true));
+        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r", true));
+
+        // Do not enforce legal keys
+        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA", false));
+        Assert.assertEquals("SPECIALCHARS#~^", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", false));
+        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r", false));
+
+        // Check null input
+        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null));
+        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null, true));
+        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null, false));
+
+        // Use preferences setting
         Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA"));
-        Assert.assertEquals("SPECIALCHARS", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^"));
         Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r"));
     }
 
@@ -37,8 +50,8 @@ public class UtilTest {
 
 
 
-    BibtexDatabase database;
-    BibtexEntry entry;
+    BibDatabase database;
+    BibEntry entry;
 
 
     @Before
@@ -179,14 +192,6 @@ public class UtilTest {
 
         Assert.assertEquals("Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
                 net.sf.jabref.util.Util.expandBrackets("[author] have published [title] in [journal].", entry, database));
-    }
-
-    @Test
-    public void getSeparatedKeywords() {
-        String keywords = "w1, w2a w2b, w3";
-        ArrayList<String> separatedKeywords = net.sf.jabref.util.Util.getSeparatedKeywords(keywords);
-        String[] expected = new String[]{"w1", "w2a w2b", "w3"};
-        Assert.assertArrayEquals(expected, separatedKeywords.toArray());
     }
 
 

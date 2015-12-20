@@ -26,15 +26,13 @@ public class Priority extends SpecialField {
 
     private static Priority INSTANCE;
 
-    private final Icon icon = IconTheme.JabRefIcon.PRIORITY.getIcon();
+    private final Icon icon = IconTheme.JabRefIcon.PRIORITY.getSmallIcon();
 
 
     private Priority() {
         ArrayList<SpecialFieldValue> values = new ArrayList<>();
-        // @formatter:off
         values.add(new SpecialFieldValue(this, null, "clearPriority", Localization.lang("Clear priority"), null,
                 Localization.lang("No priority information")));
-        // @formatter:on
         Icon tmpicon;
         tmpicon = IconTheme.JabRefIcon.PRIORITY_HIGH.getSmallIcon();
         // DO NOT TRANSLATE "prio1" etc. as this makes the .bib files non portable

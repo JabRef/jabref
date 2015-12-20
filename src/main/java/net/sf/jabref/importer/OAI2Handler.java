@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.importer;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -30,7 +30,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class OAI2Handler extends DefaultHandler {
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
 
     private StringBuffer authors;
 
@@ -41,7 +41,7 @@ public class OAI2Handler extends DefaultHandler {
     private StringBuffer characters;
 
 
-    public OAI2Handler(BibtexEntry be) {
+    public OAI2Handler(BibEntry be) {
         this.entry = be;
     }
 
@@ -67,15 +67,15 @@ public class OAI2Handler extends DefaultHandler {
 
         String content = characters.toString();
 
-        if (qualifiedName.equals("error")) {
+        if ("error".equals(qualifiedName)) {
             throw new RuntimeException(content);
-        } else if (qualifiedName.equals("id")) {
+        } else if ("id".equals(qualifiedName)) {
             entry.setField("eprint", content);
-        } else if (qualifiedName.equals("keyname")) {
+        } else if ("keyname".equals(qualifiedName)) {
             keyname = content;
-        } else if (qualifiedName.equals("forenames")) {
+        } else if ("forenames".equals(qualifiedName)) {
             forenames = content;
-        } else if (qualifiedName.equals("journal-ref")) {
+        } else if ("journal-ref".equals(qualifiedName)) {
             String journal = content.replaceFirst("[0-9].*", "");
             entry.setField("journal", journal);
             String volume = content.replaceFirst(journal, "");
@@ -89,22 +89,22 @@ public class OAI2Handler extends DefaultHandler {
             pages = pages.replaceFirst("\\(" + year + "\\)", "");
             pages = pages.replaceAll(" ", "");
             entry.setField("pages", pages);
-        } else if (qualifiedName.equals("datestamp")) {
+        } else if ("datestamp".equals(qualifiedName)) {
             String year = entry.getField("year");
-            if (year == null || year.equals("")) {
+            if (year == null || "".equals(year)) {
                 entry.setField("year", content.replaceFirst("-.*", ""));
             }
-        } else if (qualifiedName.equals("title")) {
+        } else if ("title".equals(qualifiedName)) {
             entry.setField("title", content);
-        } else if (qualifiedName.equals("abstract")) {
+        } else if ("abstract".equals(qualifiedName)) {
             entry.setField("abstract", content);
-        } else if (qualifiedName.equals("comments")) {
+        } else if ("comments".equals(qualifiedName)) {
             entry.setField("comments", content);
-        } else if (qualifiedName.equals("report-no")) {
+        } else if ("report-no".equals(qualifiedName)) {
             entry.setField("reportno", content);
-        } else if(qualifiedName.equals("doi")) {
+        } else if("doi".equals(qualifiedName)) {
           entry.setField("doi", content);
-        } else if (qualifiedName.equals("author")) {
+        } else if ("author".equals(qualifiedName)) {
             String author = forenames + " " + keyname;
             if (authors.length() > 0) {
                 authors.append(" and ");

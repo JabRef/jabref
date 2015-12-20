@@ -30,14 +30,17 @@
 
 package net.sf.jabref.gui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.HashSet;
+import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -62,7 +65,7 @@ public class BibtexFields {
     public static final String EXTRA_MONTH = "month"; // Button to show the months and set abbreviation
 
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
-            {"author", "title", "year", BibtexEntry.KEY_FIELD};
+            {"author", "title", "year", BibEntry.KEY_FIELD};
 
     // singleton instance
     private static final BibtexFields runtime = new BibtexFields();
@@ -164,7 +167,7 @@ public class BibtexFields {
         add(dummy);
 
         // some semi-standard fields
-        dummy = new BibtexSingleField(BibtexEntry.KEY_FIELD, true);
+        dummy = new BibtexSingleField(BibEntry.KEY_FIELD, true);
         dummy.setPrivate();
         add(dummy);
 
@@ -395,23 +398,23 @@ public class BibtexFields {
     }
 
     /**
-     * returns an string-array with all fieldnames
+     * returns a List with all fieldnames
      */
-    public static String[] getAllFieldNames() {
-        return BibtexFields.runtime.PUBLIC_FIELDS;
+    public static List<String> getAllFieldNames() {
+        return Arrays.asList(BibtexFields.runtime.PUBLIC_FIELDS);
     }
 
     /**
-     * returns an string-array with only private fieldnames
+     * returns a List with only private fieldnames
      */
-    public static String[] getAllPrivateFieldNames() {
-        Vector<String> pFields = new Vector<>();
+    public static List<String> getAllPrivateFieldNames() {
+        List<String> pFields = new ArrayList<>();
         for (BibtexSingleField sField : BibtexFields.runtime.fieldSet.values()) {
             if (sField.isPrivate()) {
                 pFields.add(sField.getFieldName());
             }
         }
-        return pFields.toArray(new String[pFields.size()]);
+        return pFields;
 
     }
 

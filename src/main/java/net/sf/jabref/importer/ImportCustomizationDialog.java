@@ -31,6 +31,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
@@ -40,7 +41,6 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 
@@ -121,7 +121,7 @@ public class ImportCustomizationDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String chosenFileStr = null;
-                CustomImportList.Importer importer = prefs.customImports.new Importer();
+                CustomImportList.Importer importer = new CustomImportList.Importer();
                 importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), "",
                         Localization.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
                 if (importer.getBasePath() != null) {
@@ -145,7 +145,7 @@ public class ImportCustomizationDialog extends JDialog {
                 }
             }
         });
-        addFromFolderButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a class path. \nThe path need not be on the classpath of JabRef."));
+        addFromFolderButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a class path.") + "\n" + Localization.lang("The path need not be on the classpath of JabRef."));
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from jar"));
         addFromJarButton.addActionListener(new ActionListener() {
@@ -174,7 +174,8 @@ public class ImportCustomizationDialog extends JDialog {
                 }
             }
         });
-        addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.\nThe Zip-archive need not be on the classpath of JabRef."));
+        addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.") + "\n" +
+                Localization.lang("The Zip-archive need not be on the classpath of JabRef."));
 
         JButton showDescButton = new JButton(Localization.lang("Show description"));
         showDescButton.addActionListener(new ActionListener() {
@@ -247,7 +248,7 @@ public class ImportCustomizationDialog extends JDialog {
         JPanel mainPanel = new JPanel();
         ActionMap am = mainPanel.getActionMap();
         InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(frame.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(sp, BorderLayout.CENTER);

@@ -21,9 +21,9 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ class ResolveDuplicateLabelDialog {
 
 
     public ResolveDuplicateLabelDialog(BasePanel panel, String key,
-            List<BibtexEntry> entries) {
+            List<BibEntry> entries) {
         diag = new JDialog(panel.frame(), Localization.lang("Duplicate BibTeX key"), true);
 
         FormBuilder b = FormBuilder.create().layout(new FormLayout(
@@ -66,7 +66,7 @@ class ResolveDuplicateLabelDialog {
 
         boolean first = true;
         int row = 3;
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             JCheckBox cb = new JCheckBox(Localization.lang("Generate key"), !first);
             //JPanel pan = new JPanel();
             //pan.setLayout(new BorderLayout());
@@ -85,7 +85,7 @@ class ResolveDuplicateLabelDialog {
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         bb.addButton(ok);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
@@ -122,7 +122,7 @@ class ResolveDuplicateLabelDialog {
         };
         ActionMap am = b.getPanel().getActionMap();
         InputMap im = b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
     }
 

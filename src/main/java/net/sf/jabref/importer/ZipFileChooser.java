@@ -79,7 +79,7 @@ class ZipFileChooser extends JDialog {
      *   size (uncompressed) {@link Long}
      * </li></ol></p>
      */
-    class ZipFileChooserTableModel extends AbstractTableModel {
+    static class ZipFileChooserTableModel extends AbstractTableModel {
 
         private final String[] columnNames = new String[] {
                 Localization.lang("Name"),
@@ -223,7 +223,7 @@ class ZipFileChooser extends JDialog {
         });
 
         // ok: get selected class and check if it is instantiable as an importer
-        JButton okButton = new JButton(Localization.lang("Ok"));
+        JButton okButton = new JButton(Localization.lang("OK"));
         okButton.addActionListener(new ActionListener() {
 
             @Override
@@ -232,7 +232,7 @@ class ZipFileChooser extends JDialog {
                 if (row != -1) {
                     ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
                     ZipEntry tempZipEntry = model.getZipEntry(row);
-                    CustomImportList.Importer importer = prefs.customImports.new Importer();
+                    CustomImportList.Importer importer = new CustomImportList.Importer();
                     importer.setBasePath(model.getZipFile().getName());
                     String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replaceAll("/", ".");
                     importer.setClassName(className);
@@ -270,7 +270,7 @@ class ZipFileChooser extends JDialog {
         JPanel mainPanel = new JPanel();
         //ActionMap am = mainPanel.getActionMap();
         //InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        //im.put(prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        //im.put(Globals.getKeyPrefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
         //am.put("close", closeAction);
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(sp, BorderLayout.CENTER);

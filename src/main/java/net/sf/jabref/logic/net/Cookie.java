@@ -61,7 +61,7 @@ class Cookie {
             }
             String name = nameValue.substring(0, equals);
             String value = nameValue.substring(equals + 1);
-            if (name.equalsIgnoreCase("domain")) {
+            if ("domain".equalsIgnoreCase(name)) {
                 String uriDomain = uri.getHost();
                 if (uriDomain.equals(value)) {
                     this.domain = value;
@@ -77,9 +77,9 @@ class Cookie {
                     }
                     this.domain = value;
                 }
-            } else if (name.equalsIgnoreCase("path")) {
+            } else if ("path".equalsIgnoreCase(name)) {
                 this.path = value;
-            } else if (name.equalsIgnoreCase("expires")) {
+            } else if ("expires".equalsIgnoreCase(name)) {
                 try {
                     this.expires = whiteSpaceFormat.parse(value);
                 } catch (ParseException e) {

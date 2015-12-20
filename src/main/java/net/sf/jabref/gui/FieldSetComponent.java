@@ -73,10 +73,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * values. These are put into a JComboBox.
      */
     public FieldSetComponent(String title, List<String> fields, List<String> preset, boolean arrows, boolean forceLowerCase) {
-        // @formatter:off
         this(title, fields, preset, Localization.lang("Add"),
                 Localization.lang("Remove"), arrows, forceLowerCase);
-        // @formatter:on
     }
 
     /**
@@ -84,10 +82,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * values. Replaces the JComboBox with a JTextField.
      */
     FieldSetComponent(String title, List<String> fields, boolean arrows, boolean forceLowerCase) {
-        // @formatter:off
         this(title, fields, null, Localization.lang("Add"),
                 Localization.lang("Remove"), arrows, forceLowerCase);
-        // @formatter:on
     }
 
     private FieldSetComponent(String title, List<String> fields, List<String> preset, String addText, String removeText,
@@ -241,7 +237,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
         if (forceLowerCase) {
             s = s.toLowerCase();
         }
-        if (s.equals("") || listModel.contains(s)) {
+        if ("".equals(s) || listModel.contains(s)) {
             return;
         }
 
@@ -338,7 +334,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
             if ((sel != null) && (sel.getSelectedItem() != null)) {
                 String s = sel.getSelectedItem().toString();
                 addField(s);
-            } else if ((input != null) && !input.getText().equals("")) {
+            } else if ((input != null) && !"".equals(input.getText())) {
                 addField(input.getText());
             }
         }
@@ -350,7 +346,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
             removeSelected();
         }
         else if (src == sel) {
-            if (e.getActionCommand().equals("comboBoxChanged") && (e.getModifiers() == 0)) {
+            if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
                 // These conditions signify arrow key navigation in the dropdown list, so we should
                 // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
                 // everywhere.

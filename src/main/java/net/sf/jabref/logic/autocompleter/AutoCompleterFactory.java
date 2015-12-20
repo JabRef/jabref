@@ -15,33 +15,39 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Returns an autocompleter to a given fieldname.
- * 
+ *
  * @author kahlert, cordes
  */
 public class AutoCompleterFactory {
 
-    public static int SHORTEST_TO_COMPLETE = Globals.prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE);
+    private final AutoCompletePreferences preferences;
 
 
-    public static AutoCompleter getFor(String fieldName) {
+    public AutoCompleterFactory(AutoCompletePreferences preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
+    }
+
+    public AutoCompleter<String> getFor(String fieldName) {
+        Objects.requireNonNull(fieldName);
+
         if ("author".equals(fieldName) || "editor".equals(fieldName)) {
-            return new NameFieldAutoCompleter(fieldName);
+            return new NameFieldAutoCompleter(fieldName, preferences);
         } else if ("crossref".equals(fieldName)) {
-            return new CrossrefAutoCompleter();
+            return new BibtexKeyAutoCompleter(preferences);
         } else if ("journal".equals(fieldName) || "publisher".equals(fieldName)) {
-            return new EntireFieldAutoCompleter(fieldName);
+            return new EntireFieldAutoCompleter(fieldName, preferences);
         } else {
-            return new DefaultAutoCompleter(fieldName);
+            return new DefaultAutoCompleter(fieldName, preferences);
         }
     }
 
-    public static AutoCompleter getFor(String fieldName, String secondFieldName) {
-        return new NameFieldAutoCompleter(new String[] {fieldName, secondFieldName}, true);
+    public AutoCompleter<String> getPersonAutoCompleter() {
+        return new NameFieldAutoCompleter(Arrays.asList("author", "editor"), true, preferences);
     }
 
 }

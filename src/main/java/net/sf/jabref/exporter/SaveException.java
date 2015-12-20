@@ -16,7 +16,7 @@
 package net.sf.jabref.exporter;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Exception thrown if saving goes wrong. If caused by a specific
@@ -30,7 +30,7 @@ public class SaveException extends Exception {
     public static final SaveException BACKUP_CREATION = new SaveException("Unable to create backup",
             Localization.lang("Unable to create backup"));
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
     private int status;
     private String localizedMessage;
 
@@ -51,12 +51,12 @@ public class SaveException extends Exception {
         this.status = status;
     }
 
-    public SaveException(String message, BibtexEntry entry) {
+    public SaveException(String message, BibEntry entry) {
         super(message);
         this.entry = entry;
     }
 
-    public SaveException(String message, String localizedMessage, BibtexEntry entry) {
+    public SaveException(String message, String localizedMessage, BibEntry entry) {
         super(message);
         this.localizedMessage = localizedMessage;
         this.entry = entry;
@@ -66,7 +66,7 @@ public class SaveException extends Exception {
         return status;
     }
 
-    public BibtexEntry getEntry() {
+    public BibEntry getEntry() {
         return entry;
     }
 

@@ -27,7 +27,7 @@ import javax.swing.*;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.EntryTypes;
@@ -102,7 +102,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         cancel.addActionListener(this);
 
         // Make ESC close dialog, equivalent to clicking Cancel.
-        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         cancel.getActionMap().put("close", cancelAction);
 
         JPanel buttons = new JPanel();

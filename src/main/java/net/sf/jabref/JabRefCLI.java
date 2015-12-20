@@ -127,7 +127,6 @@ public class JabRefCLI {
         options.addOption("l", "loads", false, Localization.lang("Load session"));
         options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
 
-        // @formatter:off
         options.addOption(Option.builder("i").
                 longOpt("import").
                 desc(String.format("%s: %s[,import format]", Localization.lang("Import file"),
@@ -192,7 +191,6 @@ public class JabRefCLI {
                 hasArg().
                 argName("FILE").
                 build());
-        // @formatter:on
 
         return options;
     }
@@ -225,11 +223,9 @@ public class JabRefCLI {
     }
 
     public static String getExportMatchesSyntax() {
-        // @formatter:off
         return String.format("[%s]searchTerm,outputFile: %s[,%s]",
                 Localization.lang("field"),
                 Localization.lang("file"),
                 Localization.lang("exportFormat"));
-        // @formatter:on
     }
 }

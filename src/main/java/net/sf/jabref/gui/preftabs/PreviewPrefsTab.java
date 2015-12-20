@@ -32,13 +32,15 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 class PreviewPrefsTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences prefs;
+    private static final Log LOGGER = LogFactory.getLog(PrefsTab.class);
 
-    JPanel pan = new JPanel();
+    private final JabRefPreferences prefs;
 
     private final JTextArea layout1 = new JTextArea("", 1, 1);
     private final JTextArea layout2 = new JTextArea("", 1, 1);
@@ -60,7 +62,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final JPanel secondPanel = new JPanel();
     private final JScrollPane secondScrollPane = new JScrollPane(layout2);
 
-    private static BibtexEntry entry;
+    private static BibEntry entry;
 
 
     public PreviewPrefsTab(JabRefPreferences prefs) {
@@ -184,11 +186,10 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
                     JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"),
                             JOptionPane.PLAIN_MESSAGE);
                 } catch (StringIndexOutOfBoundsException ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Parsing error.", ex);
                     JOptionPane.showMessageDialog(null,
                             Localization.lang("Parsing error") + ": "
-                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage() + '\n'
-                                    + Localization.lang("Look at log for details") + '.',
+                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage(),
                             Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -206,23 +207,22 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
                     JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Localization.lang("Preview"),
                             JOptionPane.PLAIN_MESSAGE);
                 } catch (StringIndexOutOfBoundsException ex) {
-                    ex.printStackTrace();
-                    JOptionPane
-                            .showMessageDialog(null,
-                                    "Parsing error: illegal backslash expression.\n" + ex.getMessage()
-                                            + "\nLook at stderr for details.",
-                                    "Parsing error", JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("Parsing error.", ex);
+                    JOptionPane.showMessageDialog(null,
+                            Localization.lang("Parsing error") + ": "
+                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage(),
+                            Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
     }
 
-    private static BibtexEntry getTestEntry() {
+    private static BibEntry getTestEntry() {
         if (PreviewPrefsTab.entry != null) {
             return PreviewPrefsTab.entry;
         }
-        PreviewPrefsTab.entry = new BibtexEntry(IdGenerator.next(), EntryTypes.getType("article"));
-        PreviewPrefsTab.entry.setField(BibtexEntry.KEY_FIELD, "conceicao1997");
+        PreviewPrefsTab.entry = new BibEntry(IdGenerator.next(), EntryTypes.getType("article"));
+        PreviewPrefsTab.entry.setField(BibEntry.KEY_FIELD, "conceicao1997");
         PreviewPrefsTab.entry.setField("author",
                 "Luis E. C. Conceic{\\~a}o and Terje van der Meeren and Johan A. J. Verreth and M S. Evjen and D. F. Houlihan and H. J. Fyhn");
         PreviewPrefsTab.entry.setField("title",

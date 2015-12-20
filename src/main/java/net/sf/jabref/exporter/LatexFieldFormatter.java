@@ -82,7 +82,7 @@ public class LatexFieldFormatter {
             throws IllegalArgumentException {
 
         if (content == null) {
-            return valueDelimiterStartOfValue + "" + valueDelimiterEndOfValue;
+            return valueDelimiterStartOfValue + String.valueOf(valueDelimiterEndOfValue);
         }
 
         boolean shouldWrapWithBraces = Globals.prefs.putBracesAroundCapitals(fieldName) && !BIBTEX_STRING.equals(fieldName);
@@ -203,7 +203,7 @@ public class LatexFieldFormatter {
         checkBraces(content);
 
         stringBuilder = new StringBuilder(
-                valueDelimiterStartOfValue + "");
+                String.valueOf(valueDelimiterStartOfValue));
         // these two are also hard coded in net.sf.jabref.importer.fileformat.FieldContentParser.multiLineFields
         // there, JabRefPreferences.NON_WRAPPABLE_FIELDS are also included
         boolean isAbstract = "abstract".equals(fieldName);
@@ -272,10 +272,10 @@ public class LatexFieldFormatter {
             if (inCommand && (c == '}')) {
                 //System.out.println("nestedEnvironments = " + nestedEnvironments);
                 //System.out.println("Done with command: '"+commandName.toString()+"'");
-                if (commandName.toString().equals("begin")) {
+                if ("begin".equals(commandName.toString())) {
                     nestedEnvironments++;
                 }
-                if ((nestedEnvironments > 0) && commandName.toString().equals("end")) {
+                if ((nestedEnvironments > 0) && "end".equals(commandName.toString())) {
                     nestedEnvironments--;
                 }
                 //System.out.println("nestedEnvironments = " + nestedEnvironments);
@@ -287,7 +287,7 @@ public class LatexFieldFormatter {
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
             if ((c == '&') && !escape &&
-                    !(inCommand && commandName.toString().equals("url")) &&
+                    !(inCommand && "url".equals(commandName.toString())) &&
                     (nestedEnvironments == 0)) {
                 stringBuilder.append("\\&");
             } else {

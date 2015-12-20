@@ -21,6 +21,9 @@
 
 package net.sf.jabref.gui;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -31,6 +34,9 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 public class ClipBoardManager implements ClipboardOwner {
+
+    private static final Log LOGGER = LogFactory.getLog(ClipBoardManager.class);
+
     public static final ClipBoardManager clipBoard = new ClipBoardManager();
 
     /**
@@ -65,11 +71,9 @@ public class ClipBoardManager implements ClipboardOwner {
         if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            } catch (UnsupportedFlavorException ex) {
+            } catch (UnsupportedFlavorException | IOException e) {
                 //highly unlikely since we are using a standard DataFlavor
-                System.out.println(ex);
-            } catch (IOException ex) {
-                System.out.println(ex);
+                LOGGER.info("problem with getting clipboard contents", e);
             }
         }
         return result;

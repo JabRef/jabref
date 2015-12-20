@@ -16,12 +16,13 @@
 package net.sf.jabref.importer;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import net.sf.jabref.importer.fileformat.*;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabases;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,12 +48,10 @@ public class ImportFormatReader {
         formats.add(new BibteXMLImporter());
         formats.add(new BiomailImporter());
         formats.add(new CopacImporter());
-        formats.add(new CsaImporter());
         formats.add(new EndnoteImporter());
         formats.add(new FreeCiteImporter());
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
-        formats.add(new JstorImporter());
         formats.add(new MedlineImporter());
         formats.add(new MedlinePlainImporter());
         formats.add(new MsBibImporter());
@@ -97,7 +96,7 @@ public class ImportFormatReader {
         return null;
     }
 
-    public List<BibtexEntry> importFromStream(String format, InputStream in, OutputPrinter status)
+    public List<BibEntry> importFromStream(String format, InputStream in, OutputPrinter status)
             throws IOException {
         ImportFormat importer = getByCliId(format);
 
@@ -105,17 +104,17 @@ public class ImportFormatReader {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        List<BibtexEntry> res = importer.importEntries(in, status);
+        List<BibEntry> res = importer.importEntries(in, status);
 
         // Remove all empty entries
         if (res != null) {
-            ImportFormatReader.purgeEmptyEntries(res);
+            BibDatabases.purgeEmptyEntries(res);
         }
 
         return res;
     }
 
-    public List<BibtexEntry> importFromFile(String format, String filename, OutputPrinter status)
+    public List<BibEntry> importFromFile(String format, String filename, OutputPrinter status)
             throws IOException {
         ImportFormat importer = getByCliId(format);
 
@@ -126,7 +125,7 @@ public class ImportFormatReader {
         return importFromFile(importer, filename, status);
     }
 
-    public List<BibtexEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
+    public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
         File file = new File(filename);
 
         try (InputStream stream = new FileInputStream(file)) {
@@ -137,20 +136,6 @@ public class ImportFormatReader {
 
             return importer.importEntries(stream, status);
         }
-    }
-
-    public static BibtexDatabase createDatabase(Collection<BibtexEntry> bibentries) {
-        ImportFormatReader.purgeEmptyEntries(bibentries);
-
-        BibtexDatabase database = new BibtexDatabase();
-
-        for (BibtexEntry entry : bibentries) {
-
-            entry.setId(IdGenerator.next());
-            database.insertEntry(entry);
-        }
-
-        return database;
     }
 
     /**
@@ -327,49 +312,32 @@ public class ImportFormatReader {
     //==================================================
     // Set a field, unless the string to set is empty.
     //==================================================
-    public static void setIfNecessary(BibtexEntry be, String field, String content) {
-        if (!content.equals("")) {
+    public static void setIfNecessary(BibEntry be, String field, String content) {
+        if (!"".equals(content)) {
             be.setField(field, content);
         }
     }
 
     public static InputStreamReader getUTF8Reader(File f) throws IOException {
-        return getReader(f, "UTF-8");
+        return getReader(f, StandardCharsets.UTF_8);
     }
 
     public static InputStreamReader getUTF16Reader(File f) throws IOException {
-        return getReader(f, "UTF-16");
+        return getReader(f, StandardCharsets.UTF_16);
     }
 
-    public static InputStreamReader getReader(File f, String encoding)
+    public static InputStreamReader getReader(File f, Charset charset)
             throws IOException {
-        return new InputStreamReader(new FileInputStream(f), encoding);
+        return new InputStreamReader(new FileInputStream(f), charset);
     }
 
     public static Reader getReaderDefaultEncoding(InputStream in)
             throws IOException {
         InputStreamReader reader;
-        reader = new InputStreamReader(in, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+        reader = new InputStreamReader(in, Globals.prefs.getDefaultEncoding());
 
         return reader;
     }
-
-    /**
-     * Receives an ArrayList of BibtexEntry instances, iterates through them, and
-     * removes all entries that have no fields set. This is useful for rooting out
-     * an unsucessful import (wrong format) that returns a number of empty entries.
-     */
-    private static void purgeEmptyEntries(Collection<BibtexEntry> entries) {
-        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext(); ) {
-            BibtexEntry entry = i.next();
-
-            // If there are no fields, remove the entry:
-            if (entry.getFieldNames().isEmpty()) {
-                i.remove();
-            }
-        }
-    }
-
 
     public static class UnknownFormatImport {
 
@@ -400,7 +368,7 @@ public class ImportFormatReader {
         OutputPrinterToNull nullOutput = new OutputPrinterToNull();
 
         // stores ref to best result, gets updated at the next loop
-        List<BibtexEntry> bestResult = null;
+        List<BibEntry> bestResult = null;
         int bestResultCount = 0;
         String bestFormatName = null;
 
@@ -409,13 +377,13 @@ public class ImportFormatReader {
 
             try {
 
-                List<BibtexEntry> entries = importFromFile(imFo, filename, nullOutput);
+                List<BibEntry> entries = importFromFile(imFo, filename, nullOutput);
 
                 int entryCount;
                 if (entries == null) {
                     entryCount = 0;
                 } else {
-                    ImportFormatReader.purgeEmptyEntries(entries);
+                    BibDatabases.purgeEmptyEntries(entries);
                     entryCount = entries.size();
                 }
 
@@ -438,7 +406,7 @@ public class ImportFormatReader {
         // Finally, if all else fails, see if it is a BibTeX file:
         try {
             ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
-                    Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
+ Globals.prefs.getDefaultEncoding());
             if ((pr.getDatabase().getEntryCount() > 0)
                     || (pr.getDatabase().getStringCount() > 0)) {
                 pr.setFile(new File(filename));

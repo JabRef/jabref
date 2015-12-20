@@ -20,13 +20,13 @@ public class PreferencesMigrations {
         if (genFields.contains("abstract")) {
 
             String newGen;
-            if (genFields.equals("abstract")) {
+            if ("abstract".equals(genFields)) {
                 newGen = "";
             } else if (genFields.contains(";abstract;")) {
                 newGen = genFields.replaceAll(";abstract;", ";");
             } else if (genFields.indexOf("abstract;") == 0) {
                 newGen = genFields.replaceAll("abstract;", "");
-            } else if (genFields.indexOf(";abstract") == genFields.length() - 9) {
+            } else if (genFields.indexOf(";abstract") == (genFields.length() - 9)) {
                 newGen = genFields.replaceAll(";abstract", "");
             } else {
                 newGen = genFields;

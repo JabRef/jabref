@@ -16,19 +16,22 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import java.nio.charset.Charset;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabases;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.entry.EntryType;
 
 public class ParserResult {
     public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
     public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private MetaData metaData;
     private final HashMap<String, EntryType> entryTypes;
 
@@ -38,22 +41,18 @@ public class ParserResult {
 
     private String errorMessage;
     // Which encoding was used?
-    private String encoding;
+    private Charset encoding;
 
     private boolean postponedAutosaveFound;
     private boolean invalid;
     private boolean toOpenTab;
 
-    // Which JabRef version wrote the file, if any?
-    private String jabrefVersion;
-    private int jabrefMajorVersion;
-    private int jabrefMinorVersion;
 
-    public ParserResult(Collection<BibtexEntry> entries) {
-        this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, EntryType>());
+    public ParserResult(Collection<BibEntry> entries) {
+        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), null, new HashMap<>());
     }
 
-    public ParserResult(BibtexDatabase base, MetaData metaData, HashMap<String, EntryType> entryTypes) {
+    public ParserResult(BibDatabase base, MetaData metaData, HashMap<String, EntryType> entryTypes) {
         this.base = base;
         this.metaData = metaData;
         this.entryTypes = entryTypes;
@@ -61,6 +60,7 @@ public class ParserResult {
 
     /**
      * Check if this base is marked to be added to the currently open tab. Default is false.
+     *
      * @return
      */
     public boolean toOpenTab() {
@@ -71,45 +71,7 @@ public class ParserResult {
         this.toOpenTab = toOpenTab;
     }
 
-    /**
-     * Find which version of JabRef, if any, produced this bib file.
-     * @return The version number string, or null if no JabRef signature could be read.
-     */
-    public String getJabrefVersion() {
-        return jabrefVersion;
-    }
-
-    /**
-     * Set the JabRef version number string for this parser result.
-     * @param jabrefVersion The version number string.
-     */
-    public void setJabrefVersion(String jabrefVersion) {
-        this.jabrefVersion = jabrefVersion;
-    }
-
-    /**
-     * @return 0 if not known (e.g., no version header in file)
-     */
-    public int getJabrefMajorVersion() {
-        return jabrefMajorVersion;
-    }
-
-    public void setJabrefMajorVersion(int jabrefMajorVersion) {
-        this.jabrefMajorVersion = jabrefMajorVersion;
-    }
-
-    /**
-     * @return 0 if not known (e.g., no version header in file)
-     */
-    public int getJabrefMinorVersion() {
-        return jabrefMinorVersion;
-    }
-
-    public void setJabrefMinorVersion(int jabrefMinorVersion) {
-        this.jabrefMinorVersion = jabrefMinorVersion;
-    }
-
-    public BibtexDatabase getDatabase() {
+    public BibDatabase getDatabase() {
         return base;
     }
 
@@ -136,17 +98,17 @@ public class ParserResult {
     /**
      * Sets the variable indicating which encoding was used during parsing.
      *
-     * @param enc String the name of the encoding.
+     * @param enc the encoding.
      */
-    public void setEncoding(String enc) {
+    public void setEncoding(Charset enc) {
         encoding = enc;
     }
 
     /**
-     * Returns the name of the encoding used during parsing, or null if not specified
-     * (indicates that prefs.get(JabRefPreferences.DEFAULT_ENCODING) was used).
+     * Returns the encoding used during parsing, or null if not specified (indicates that
+     * prefs.get(JabRefPreferences.DEFAULT_ENCODING) was used).
      */
-    public String getEncoding() {
+    public Charset getEncoding() {
         return encoding;
     }
 
@@ -175,6 +137,7 @@ public class ParserResult {
 
     /**
      * Add a key to the list of duplicated BibTeX keys found in the database.
+     *
      * @param key The duplicated key
      */
     public void addDuplicateKey(String key) {
@@ -185,6 +148,7 @@ public class ParserResult {
 
     /**
      * Query whether any duplicated BibTeX keys have been found in the database.
+     *
      * @return true if there is at least one duplicate key.
      */
     public boolean hasDuplicateKeys() {
@@ -193,6 +157,7 @@ public class ParserResult {
 
     /**
      * Get all duplicated keys found in the database.
+     *
      * @return An array containing the duplicated keys.
      */
     public String[] getDuplicateKeys() {
@@ -222,4 +187,5 @@ public class ParserResult {
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
+
 }

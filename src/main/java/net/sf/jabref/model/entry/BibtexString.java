@@ -71,12 +71,12 @@ public class BibtexString {
             if (name.length() <= 1) {
                 return OTHER;
             }
-            if (!(name.charAt(1) + "").toUpperCase().equals(
-                    name.charAt(1) + "")) {
+            if (!(String.valueOf(name.charAt(1))).toUpperCase().equals(
+                    String.valueOf(name.charAt(1)))) {
                 return OTHER;
             }
             for (Type t : Type.values()) {
-                if (t.prefix.equals(name.charAt(0) + "")) {
+                if (t.prefix.equals(String.valueOf(name.charAt(0)))) {
                     return t;
                 }
             }
@@ -89,20 +89,16 @@ public class BibtexString {
     private String content;
     private String id;
     private Type type;
+    private String parsedSerialization;
+    private boolean hasChanged;
 
 
     public BibtexString(String id, String name, String content) {
         this.id = id;
         this.name = name;
         this.content = content;
+        hasChanged = true;
         type = Type.get(name);
-    }
-
-    public BibtexString(String id, String name, String content, Type type) {
-        this.id = id;
-        this.name = name;
-        this.content = content;
-        this.type = type;
     }
 
     public String getId() {
@@ -111,6 +107,7 @@ public class BibtexString {
 
     public void setId(String id) {
         this.id = id;
+        hasChanged = true;
     }
 
     public String getName() {
@@ -119,6 +116,7 @@ public class BibtexString {
 
     public void setName(String name) {
         this.name = name;
+        hasChanged = true;
         type = Type.get(name);
     }
 
@@ -128,6 +126,7 @@ public class BibtexString {
 
     public void setContent(String content) {
         this.content = content;
+        hasChanged = true;
     }
 
     @Override
@@ -137,5 +136,18 @@ public class BibtexString {
 
     public Type getType() {
         return type;
+    }
+
+    public void setParsedSerialization(String parsedSerialization) {
+        this.parsedSerialization = parsedSerialization;
+        hasChanged = false;
+    }
+
+    public String getParsedSerialization() {
+        return parsedSerialization;
+    }
+
+    public boolean hasChanged(){
+        return hasChanged;
     }
 }

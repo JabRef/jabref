@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 class DBLPHelper {
 
@@ -34,7 +34,7 @@ class DBLPHelper {
      * use capitals. So, we better change the text to lower case.
      */
 
-    class DBLPQueryCleaner {
+    static class DBLPQueryCleaner {
 
         public String cleanQuery(final String query) {
             String cleaned = query;
@@ -61,15 +61,15 @@ class DBLPHelper {
 
     /**
      * Takes an HTML file (as String) as input and extracts the bibtex
-     * information. After that, it will convert it into a BibtexEntry and return
+     * information. After that, it will convert it into a BibEntry and return
      * it (them).
      *
      * @param page
      *            page as String
-     * @return list of BibtexEntry
+     * @return list of BibEntry
      */
-    public List<BibtexEntry> getBibTexFromPage(final String page) {
-        final List<BibtexEntry> bibtexList = new ArrayList<>();
+    public List<BibEntry> getBibTexFromPage(final String page) {
+        final List<BibEntry> bibtexList = new ArrayList<>();
         final String startPattern = "<pre class=\"verbatim select-on-click\">";
         final String endPattern = "</pre>";
 

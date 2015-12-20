@@ -3,8 +3,12 @@ package net.sf.jabref.model.entry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class EntryUtil {
+
+    public static final String SEPARATING_CHARS_NOSPACE = ";,\n";
+
 
     /**
      * Static equals that can also return the right result when one of the objects is null.
@@ -45,7 +49,7 @@ public class EntryUtil {
             return Collections.unmodifiableList(all);
         }
         if (all.equals(subset)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         ArrayList<String> al = new ArrayList<>();
@@ -62,5 +66,26 @@ public class EntryUtil {
             }
         }
         return al;
+    }
+
+    /**
+     * @param keywords a String of keywords
+     * @return an ArrayList containing the keywords. An emtpy list if keywords are null or empty
+     */
+    public static ArrayList<String> getSeparatedKeywords(String keywords) {
+        ArrayList<String> res = new ArrayList<>();
+        if (keywords == null) {
+            return res;
+        }
+        // _NOSPACE is a hack to support keywords such as "choreography transactions"
+        // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
+        // if nothing is found, " " is likely to be the separating char.
+        // solution by RisKeywords.java: s.split(",[ ]*")
+        StringTokenizer tok = new StringTokenizer(keywords, SEPARATING_CHARS_NOSPACE);
+        while (tok.hasMoreTokens()) {
+            String word = tok.nextToken().trim();
+            res.add(word);
+        }
+        return res;
     }
 }

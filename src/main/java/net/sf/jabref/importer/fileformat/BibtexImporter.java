@@ -23,7 +23,7 @@ import java.util.List;
 
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Imported requried to support --importToOpen someEntry.bib
@@ -31,11 +31,12 @@ import net.sf.jabref.model.entry.BibtexEntry;
 public class BibtexImporter extends ImportFormat {
 
     /**
-     * @return false as that does not cause any harm in the current implementation of JabRef
+     * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
+     *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
      */
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
-        return BibtexParser.isRecognizedFormat(new InputStreamReader(in));
+        return true;
     }
 
     /**
@@ -48,7 +49,7 @@ public class BibtexImporter extends ImportFormat {
      * @return a list of BibTeX entries contained in the given inputStream
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status)
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
         ParserResult pr = BibtexParser.parse(new InputStreamReader(in));
         return new ArrayList<>(pr.getDatabase().getEntries());

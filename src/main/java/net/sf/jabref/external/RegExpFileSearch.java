@@ -16,8 +16,8 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 import java.io.File;
@@ -47,11 +47,11 @@ public class RegExpFileSearch {
      * @param regExp The expression deciding which names are acceptable.
      * @return A map linking each given entry to a list of files matching the given criteria.
      */
-    public static Map<BibtexEntry, java.util.List<File>> findFilesForSet(Collection<BibtexEntry> entries,
+    public static Map<BibEntry, java.util.List<File>> findFilesForSet(Collection<BibEntry> entries,
             Collection<String> extensions, List<File> directories, String regExp) {
 
-        Map<BibtexEntry, java.util.List<File>> res = new HashMap<>();
-        for (BibtexEntry entry : entries) {
+        Map<BibEntry, java.util.List<File>> res = new HashMap<>();
+        for (BibEntry entry : entries) {
             res.put(entry, RegExpFileSearch.findFiles(entry, extensions, directories, regExp));
         }
         return res;
@@ -66,7 +66,7 @@ public class RegExpFileSearch {
      * @param regularExpression The expression deciding which names are acceptable.
      * @return A list of files paths matching the given criteria.
      */
-    private static List<File> findFiles(BibtexEntry entry, Collection<String> extensions,
+    private static List<File> findFiles(BibEntry entry, Collection<String> extensions,
             Collection<File> directories, String regularExpression) {
 
         StringBuilder sb = new StringBuilder();
@@ -121,7 +121,7 @@ public class RegExpFileSearch {
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, Collection<File> dirs,
+    private static List<File> findFile(BibEntry entry, BibDatabase database, Collection<File> dirs,
             String file, String extensionRegExp, boolean relative) {
         ArrayList<File> res = new ArrayList<>();
         for (File directory : dirs) {
@@ -138,7 +138,7 @@ public class RegExpFileSearch {
      * base the search on.
      *
      */
-    private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, String directory,
+    private static List<File> findFile(BibEntry entry, BibDatabase database, String directory,
             String file, String extensionRegExp, boolean relative) {
 
         List<File> res;
@@ -181,7 +181,7 @@ public class RegExpFileSearch {
      * The actual work-horse. Will find absolute filepaths starting from the
      * given directory using the given regular expression string for search.
      */
-    private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, File directory,
+    private static List<File> findFile(BibEntry entry, BibDatabase database, File directory,
             String file, String extensionRegExp) {
 
         ArrayList<File> res = new ArrayList<>();
@@ -216,14 +216,14 @@ public class RegExpFileSearch {
                     directory = new File(dirToProcess + '/');
                     continue;
                 }
-                if (dirToProcess.equals(".")) { // Stay in current directory
+                if (".".equals(dirToProcess)) { // Stay in current directory
                     continue;
                 }
-                if (dirToProcess.equals("..")) {
+                if ("..".equals(dirToProcess)) {
                     directory = new File(directory.getParent());
                     continue;
                 }
-                if (dirToProcess.equals("*")) { // Do for all direct subdirs
+                if ("*".equals(dirToProcess)) { // Do for all direct subdirs
 
                     File[] subDirs = directory.listFiles();
                     if (subDirs != null) {
@@ -237,7 +237,7 @@ public class RegExpFileSearch {
                     }
                 }
                 // Do for all direct and indirect subdirs
-                if (dirToProcess.equals("**")) {
+                if ("**".equals(dirToProcess)) {
                     List<File> toDo = new LinkedList<>();
                     toDo.add(directory);
 

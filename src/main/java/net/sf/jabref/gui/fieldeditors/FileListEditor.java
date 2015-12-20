@@ -45,12 +45,13 @@ import net.sf.jabref.external.*;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.model.entry.EntryUtil;
 import org.apache.commons.logging.Log;
@@ -186,7 +187,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         });
 
         // Add input/action pair for moving an entry up:
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.FILE_LIST_EDITOR_MOVE_ENTRY_UP), "move up");
+        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.FILE_LIST_EDITOR_MOVE_ENTRY_UP), "move up");
         getActionMap().put("move up", new AbstractAction() {
 
             @Override
@@ -196,7 +197,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         });
 
         // Add input/action pair for moving an entry down:
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.FILE_LIST_EDITOR_MOVE_ENTRY_DOWN), "move down");
+        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.FILE_LIST_EDITOR_MOVE_ENTRY_DOWN), "move down");
         getActionMap().put("move down", new AbstractAction() {
 
             @Override
@@ -420,7 +421,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void autoSetLinks() {
         auto.setEnabled(false);
 
-        BibtexEntry entry = entryEditor.getEntry();
+        BibEntry entry = entryEditor.getEntry();
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);

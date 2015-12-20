@@ -15,31 +15,30 @@
 */
 package net.sf.jabref.gui.util;
 
-import javax.swing.SwingUtilities;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.Component;
 
 public class FocusRequester implements Runnable {
 
-    private final Component comp;
+    private static final Log LOGGER = LogFactory.getLog(FocusRequester.class);
 
+    private final Component comp;
 
     public FocusRequester(Component comp) {
         if (comp == null) {
             Thread.dumpStack();
         }
 
-        //System.out.println("FocusRequester: "+comp.toString());
         this.comp = comp;
-        try {
-            SwingUtilities.invokeLater(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        run();
     }
 
     @Override
     public void run() {
-
+        LOGGER.debug("requesting focus for " + comp);
         comp.requestFocus();
     }
 }

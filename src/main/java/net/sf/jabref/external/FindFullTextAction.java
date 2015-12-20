@@ -22,7 +22,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import java.util.Optional;
 public class FindFullTextAction extends AbstractWorker {
 
     private final BasePanel basePanel;
-    private BibtexEntry entry;
+    private BibEntry entry;
     private Optional<URL> result;
 
 
@@ -53,7 +53,7 @@ public class FindFullTextAction extends AbstractWorker {
         // TODO: just download for all entries and save files without dialog
         entry = basePanel.getSelectedEntries()[0];
         FindFullText fft = new FindFullText();
-        result = fft.findFullText(entry);
+        result = fft.findFullTextPDF(entry);
     }
 
     @Override

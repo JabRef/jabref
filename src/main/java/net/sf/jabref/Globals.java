@@ -19,6 +19,7 @@ import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.gui.GlobalFocusListener;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.logging.CacheableHandler;
@@ -58,6 +59,14 @@ public class Globals {
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required
     public static JabRefPreferences prefs;
+
+    private static KeyBindingPreferences keyPrefs;
+    public static KeyBindingPreferences getKeyPrefs() {
+        if(keyPrefs == null) {
+            keyPrefs = new KeyBindingPreferences(prefs);
+        }
+        return keyPrefs;
+    }
 
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 

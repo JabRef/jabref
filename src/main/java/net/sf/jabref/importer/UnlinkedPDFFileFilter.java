@@ -3,13 +3,13 @@ package net.sf.jabref.importer;
 import java.io.File;
 import java.io.FileFilter;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * {@link FileFilter} implementation, that allows only files which are not
- * linked in any of the {@link BibtexEntry}s of the specified
- * {@link BibtexDatabase}. <br>
+ * linked in any of the {@link BibEntry}s of the specified
+ * {@link BibDatabase}. <br>
  * <br>
  * This {@link FileFilter} sits on top of another {@link FileFilter}
  * -implementation, which it first consults. Only if this major filefilter
@@ -25,7 +25,7 @@ public class UnlinkedPDFFileFilter implements FileFilter {
     private final FileFilter fileFilter;
 
 
-    public UnlinkedPDFFileFilter(FileFilter aFileFilter, BibtexDatabase database) {
+    public UnlinkedPDFFileFilter(FileFilter aFileFilter, BibDatabase database) {
         this.fileFilter = aFileFilter;
         this.lookup = new DatabaseFileLookup(database);
     }

@@ -18,7 +18,6 @@ package net.sf.jabref.exporter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.TreeSet;
@@ -35,10 +34,9 @@ public class VerifyingWriter extends OutputStreamWriter {
     private final TreeSet<Character> problemCharacters = new TreeSet<>();
 
 
-    public VerifyingWriter(OutputStream out, String encoding)
-            throws UnsupportedEncodingException {
+    public VerifyingWriter(OutputStream out, Charset encoding) {
         super(out, encoding);
-        encoder = Charset.forName(encoding).newEncoder();
+        encoder = encoding.newEncoder();
     }
 
     @Override

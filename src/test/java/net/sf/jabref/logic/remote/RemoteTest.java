@@ -6,6 +6,7 @@ import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 
 public class RemoteTest {
@@ -60,10 +61,13 @@ public class RemoteTest {
         try (ServerSocket socket = new ServerSocket(port)) {
             Assert.assertTrue(socket.isBound());
 
-            RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle();
-            Assert.assertFalse(server.isOpen());
-            server.openAndStart(msg -> Assert.fail("should not happen"), port);
-            Assert.assertFalse(server.isOpen());
+            try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+                Assert.assertFalse(server.isOpen());
+                server.openAndStart(msg -> Assert.fail("should not happen"), port);
+                Assert.assertFalse(server.isOpen());
+            } catch (Exception e) {
+                Assert.fail("Exception: " + e.getMessage());
+            }
         }
     }
 
@@ -85,8 +89,8 @@ public class RemoteTest {
 
                 @Override
                 public void run() {
-                    try {
-                        socket.accept().getOutputStream().write("whatever".getBytes());
+                    try (OutputStream os = socket.accept().getOutputStream()) {
+                        os.write("whatever".getBytes());
                     } catch (IOException e) {
                         // Ignored
                     }

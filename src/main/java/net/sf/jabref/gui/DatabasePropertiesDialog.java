@@ -18,8 +18,7 @@ package net.sf.jabref.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Vector;
 
@@ -27,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -38,7 +38,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import net.sf.jabref.gui.actions.BrowseAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -49,7 +49,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Created by IntelliJ IDEA.
@@ -62,7 +62,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private MetaData metaData;
     private BasePanel panel;
-    private final JComboBox<String> encoding;
+    private final JComboBox<Charset> encoding;
     private final JButton ok;
     private final JButton cancel;
     private final JTextField fileDir = new JTextField(40);
@@ -94,8 +94,9 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Localization.lang("Database properties"), true);
-        encoding = new JComboBox<>(Encodings.ENCODINGS);
-        ok = new JButton(Localization.lang("Ok"));
+        encoding = new JComboBox<>();
+        encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
+        ok = new JButton(Localization.lang("OK"));
         cancel = new JButton(Localization.lang("Cancel"));
         init(parent);
     }
@@ -176,7 +177,7 @@ public class DatabasePropertiesDialog extends JDialog {
         };
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
         ok.addActionListener(new ActionListener() {
@@ -228,8 +229,8 @@ public class DatabasePropertiesDialog extends JDialog {
         saveInOriginalOrder.addActionListener(listener);
         saveInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> v = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
-        v.add(BibtexEntry.KEY_FIELD);
+        Vector<String> v = new Vector<>(BibtexFields.getAllFieldNames());
+        v.add(BibEntry.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
         savePriSort = new JComboBox<>(allPlusKey);
@@ -396,8 +397,8 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.putData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG, serialized);
         }
 
-        String oldEncoding = panel.getEncoding();
-        String newEncoding = (String) encoding.getSelectedItem();
+        Charset oldEncoding = panel.getEncoding();
+        Charset newEncoding = (Charset) encoding.getSelectedItem();
         panel.setEncoding(newEncoding);
 
         Vector<String> dir = new Vector<>(1);

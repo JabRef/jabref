@@ -252,15 +252,13 @@ public class FileListTableModel extends AbstractTableModel {
      * @return String representation.
      */
     public String getStringRepresentation() {
-        StringBuilder sb = new StringBuilder();
-        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry entry = iterator.next();
-            sb.append(encodeEntry(entry));
-            if (iterator.hasNext()) {
-                sb.append(';');
-            }
+        String[][] array = new String[list.size()][];
+        int i = 0;
+        for (FileListEntry entry : list) {
+            array[i] = entry.getStringArrayRepresentation();
+            i++;
         }
-        return sb.toString();
+        return StringUtil.encodeStringArray(array);
     }
 
     /**
@@ -278,11 +276,6 @@ public class FileListTableModel extends AbstractTableModel {
             }
         }
         return sb.append("</html>").toString();
-    }
-
-    private String encodeEntry(FileListEntry entry) {
-        String type = entry.getType() != null ? entry.getType().getName() : "";
-        return StringUtil.encodeString(entry.getDescription()) + ':' + StringUtil.encodeString(entry.getLink()) + ':' + StringUtil.encodeString(type);
     }
 
     public void print() {

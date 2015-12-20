@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Vector;
 
@@ -71,7 +72,6 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             // Check for external modifications:
             if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
-                // @formatter:off
                 String[] opts = new String[] {Localization.lang("Review changes"),
                         Localization.lang("Save"),
                         Localization.lang("Cancel")};
@@ -81,7 +81,6 @@ public class SaveDatabaseAction extends AbstractWorker {
                         Localization.lang("File updated externally"),
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, opts, opts[0]);
-                // @formatter:on
 
                 if (answer == JOptionPane.CANCEL_OPTION) {
                     cancelled = true;
@@ -222,7 +221,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
     }
 
-    private boolean saveDatabase(File file, boolean selectedOnly, String encoding) throws SaveException {
+    private boolean saveDatabase(File file, boolean selectedOnly, Charset encoding) throws SaveException {
         SaveSession session;
         frame.block();
         try {
@@ -235,8 +234,8 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
         } catch (UnsupportedCharsetException ex2) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file. "
-                            + "Character encoding '%0' is not supported.", encoding),
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") +
+                            Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
         } catch (SaveException ex) {
@@ -256,7 +255,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
             JOptionPane.showMessageDialog
-                    (frame, Localization.lang("Could not save file")
+                    (frame, Localization.lang("Could not save file.")
                             + ".\n" + ex.getMessage(),
                             Localization.lang("Save database"),
                             JOptionPane.ERROR_MESSAGE);
@@ -271,25 +270,24 @@ public class SaveDatabaseAction extends AbstractWorker {
             FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
-            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
-                    session.getEncoding())).xy(1, 1);
+            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:",
+                    session.getEncoding().displayName())).xy(1, 1);
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    // @formatter:off
                     new String[] {Localization.lang("Save"), tryDiff,
                             Localization.lang("Cancel")}, tryDiff);
-                    // @formatter:on
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
                 Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"),
                         Localization.lang("Save database"),
-                        JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS, encoding);
+ JOptionPane.QUESTION_MESSAGE, null,
+                        Encodings.ENCODINGS_DISPLAYNAMES, encoding);
                 if (choice != null) {
-                    String newEncoding = (String) choice;
+                    Charset newEncoding = Charset.forName((String) choice);
                     return saveDatabase(file, selectedOnly, newEncoding);
                 } else {
                     commit = false;

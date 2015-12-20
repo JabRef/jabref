@@ -21,7 +21,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +43,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.maintable.MainTable;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -158,7 +157,7 @@ public class PreferencesDialog extends JDialog {
         upper.add(two, BorderLayout.WEST);
         upper.add(main, BorderLayout.CENTER);
 
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         ok.addActionListener(new OkAction());
         CancelAction cancelAction = new CancelAction();
@@ -239,7 +238,7 @@ public class PreferencesDialog extends JDialog {
     class OkAction extends AbstractAction {
 
         public OkAction() {
-            super("Ok");
+            super("OK");
         }
 
         @Override

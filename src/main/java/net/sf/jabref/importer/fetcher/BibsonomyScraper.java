@@ -17,12 +17,13 @@ package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.net.URLDownload;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Convenience class for getting BibTeX entries from the BibSonomy scraper,
@@ -35,20 +36,20 @@ class BibsonomyScraper {
 
 
     /**
-     * Return a BibtexEntry by looking up the given url from the BibSonomy scraper.
+     * Return a BibEntry by looking up the given url from the BibSonomy scraper.
      * @param entryUrl
      * @return
      */
-    public static BibtexEntry getEntry(String entryUrl) {
+    public static BibEntry getEntry(String entryUrl) {
         try {
             // Replace special characters by corresponding sequences:
             entryUrl = entryUrl.replaceAll("%", "%25").replaceAll(":", "%3A").replaceAll("/", "%2F").replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + entryUrl + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
-            String bibtex = new URLDownload(url).downloadToString("UTF8");
+            String bibtex = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
             BibtexParser bp = new BibtexParser(new StringReader(bibtex));
             ParserResult pr = bp.parse();
-            if (pr != null && pr.getDatabase().getEntryCount() > 0) {
+            if ((pr != null) && (pr.getDatabase().getEntryCount() > 0)) {
                 return pr.getDatabase().getEntries().iterator().next();
             } else {
                 return null;

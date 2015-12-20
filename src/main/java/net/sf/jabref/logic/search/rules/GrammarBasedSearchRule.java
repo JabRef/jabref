@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.search.rules;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.search.SearchLexer;
@@ -23,7 +23,10 @@ import net.sf.jabref.search.SearchParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +34,9 @@ import java.util.regex.Pattern;
  * The search query must be specified in an expression that is acceptable by the Search.g4 grammar.
  */
 public class GrammarBasedSearchRule implements SearchRule {
+
+    private static final Log LOGGER = LogFactory.getLog(GrammarBasedSearchRule.class);
+
 
     public static class ThrowingErrorListener extends BaseErrorListener {
 
@@ -76,7 +82,7 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     private void init(String query) throws ParseCancellationException {
-        if(this.query != null && this.query.equals(query)) {
+        if(Objects.equals(this.query, query)) {
             return;
         }
 
@@ -92,8 +98,13 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     @Override
-    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
-        return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibtexEntry).visit(tree);
+    public boolean applyRule(String query, BibEntry bibEntry) {
+        try {
+            return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibEntry).visit(tree);
+        } catch (Exception e) {
+            LOGGER.debug("Search failed", e);
+            return false;
+        }
     }
 
     @Override
@@ -110,9 +121,9 @@ public class GrammarBasedSearchRule implements SearchRule {
         EXACT, CONTAINS, DOES_NOT_CONTAIN;
 
         public static ComparisonOperator build(String value) {
-            if (value.equalsIgnoreCase("CONTAINS") || value.equals("=")) {
+            if ("CONTAINS".equalsIgnoreCase(value) || "=".equals(value)) {
                 return CONTAINS;
-            } else if (value.equalsIgnoreCase("MATCHES") || value.equals("==")) {
+            } else if ("MATCHES".equalsIgnoreCase(value) || "==".equals(value)) {
                 return EXACT;
             } else {
                 return DOES_NOT_CONTAIN;
@@ -133,15 +144,15 @@ public class GrammarBasedSearchRule implements SearchRule {
             this.valuePattern = Pattern.compile(regex ? value : "\\Q" + value + "\\E", caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
         }
 
-        public boolean compare(BibtexEntry entry) {
+        public boolean compare(BibEntry entry) {
             // specification of fields to search is done in the search expression itself
             String[] searchKeys = entry.getFieldNames().toArray(new String[entry.getFieldNames().size()]);
 
             boolean noSuchField = true;
             // this loop iterates over all regular keys, then over pseudo keys like "type"
-            for (int i = 0; i < searchKeys.length + 1; i++) {
+            for (int i = 0; i < (searchKeys.length + 1); i++) {
                 String content;
-                if (i - searchKeys.length == 0) {
+                if ((i - searchKeys.length) == 0) {
                     // PSEUDOFIELD_TYPE
                     if (!fieldPattern.matcher("entrytype").matches()) {
                         continue;
@@ -164,7 +175,7 @@ public class GrammarBasedSearchRule implements SearchRule {
                 }
             }
 
-            return noSuchField && operator == ComparisonOperator.DOES_NOT_CONTAIN;
+            return noSuchField && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
         }
 
         public boolean matchInField(String content) {
@@ -191,12 +202,12 @@ public class GrammarBasedSearchRule implements SearchRule {
         private final boolean caseSensitive;
         private final boolean regex;
 
-        private final BibtexEntry entry;
+        private final BibEntry entry;
 
-        public BibtexSearchVisitor(boolean caseSensitive, boolean regex, BibtexEntry bibtexEntry) {
+        public BibtexSearchVisitor(boolean caseSensitive, boolean regex, BibEntry bibEntry) {
             this.caseSensitive = caseSensitive;
             this.regex = regex;
-            this.entry = bibtexEntry;
+            this.entry = bibEntry;
         }
 
         public boolean comparison(String field, ComparisonOperator operator, String value) {
@@ -224,7 +235,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         @Override
         public Boolean visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
-            if (ctx.operator.getText().equalsIgnoreCase("AND")) {
+            if ("AND".equalsIgnoreCase(ctx.operator.getText())) {
                 return visit(ctx.left) && visit(ctx.right); // and
             } else {
                 return visit(ctx.left) || visit(ctx.right); // or

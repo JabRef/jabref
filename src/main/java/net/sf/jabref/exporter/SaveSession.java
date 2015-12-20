@@ -25,6 +25,7 @@ import net.sf.jabref.Globals;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.commons.logging.Log;
@@ -55,7 +56,7 @@ public class SaveSession {
 
     private final File file;
     private final File tmp;
-    private final String encoding;
+    private final Charset encoding;
     private boolean backup;
     private final boolean useLockFile;
     private final VerifyingWriter writer;
@@ -63,7 +64,7 @@ public class SaveSession {
     private static final Log LOGGER = LogFactory.getLog(SaveSession.class);
 
 
-    public SaveSession(File file, String encoding, boolean backup) throws IOException, UnsupportedCharsetException {
+    public SaveSession(File file, Charset encoding, boolean backup) throws IOException, UnsupportedCharsetException {
         this.file = file;
         tmp = File.createTempFile(SaveSession.TEMP_PREFIX, SaveSession.TEMP_SUFFIX);
         useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
@@ -83,7 +84,7 @@ public class SaveSession {
         return writer;
     }
 
-    public String getEncoding() {
+    public Charset getEncoding() {
         return encoding;
     }
 

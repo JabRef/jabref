@@ -17,6 +17,8 @@ package net.sf.jabref.exporter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import javax.xml.transform.OutputKeys;
@@ -25,7 +27,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
@@ -40,26 +42,26 @@ class MSBibExportFormat extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData,
-            final String file, final String encoding, Set<String> keySet) throws IOException {
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+            final Charset encoding, Set<String> keySet) throws IOException {
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings
-        SaveSession ss = getSaveSession("UTF8", new File(file));
-        VerifyingWriter ps = ss.getWriter();
+        SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
         MSBibDatabase md = new MSBibDatabase(database, keySet);
+        try (VerifyingWriter ps = ss.getWriter()) {
 
         // PS: DOES NOT SUPPORT EXPORTING ONLY A SET OF ENTRIES
 
-        try {
-            DOMSource source = new DOMSource(md.getDOMrepresentation());
-            StreamResult result = new StreamResult(ps);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
-            trans.setOutputProperty(OutputKeys.INDENT, "yes");
-            trans.transform(source, result);
-        } catch (Exception e) {
-            throw new Error(e);
+            try {
+                DOMSource source = new DOMSource(md.getDOMrepresentation());
+                StreamResult result = new StreamResult(ps);
+                Transformer trans = TransformerFactory.newInstance().newTransformer();
+                trans.setOutputProperty(OutputKeys.INDENT, "yes");
+                trans.transform(source, result);
+            } catch (Exception e) {
+                throw new Error(e);
+            }
         }
-
         try {
             finalizeSaveSession(ss);
         } catch (SaveException ex) {

@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
@@ -32,7 +33,7 @@ import javax.swing.JPanel;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -112,7 +113,7 @@ public class JSTORFetcher implements EntryFetcher {
             String citations = getCitations(ticket, query);
 
             // Last retrieve the Bibtex-entries of the citations found
-            Collection<BibtexEntry> entries = getBibtexEntries(ticket, citations);
+            Collection<BibEntry> entries = getBibtexEntries(ticket, citations);
 
             if (entries.isEmpty()) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
@@ -121,7 +122,7 @@ public class JSTORFetcher implements EntryFetcher {
                 return false;
             }
 
-            for (BibtexEntry entry : entries) {
+            for (BibEntry entry : entries) {
                 dialog.addEntry(entry);
             }
             return true;
@@ -143,7 +144,7 @@ public class JSTORFetcher implements EntryFetcher {
      * @throws IOException
      *             Most probably related to a problem connecting to JStor.
      */
-    private static Collection<BibtexEntry> getBibtexEntries(String ticket, String citations)
+    private static Collection<BibEntry> getBibtexEntries(String ticket, String citations)
             throws IOException {
         try {
             URL url = new URL(JSTORFetcher.URL_BIBTEX);
@@ -186,7 +187,8 @@ public class JSTORFetcher implements EntryFetcher {
         String urlQuery;
         try {
             urlQuery = "http://www.jstor.org/search/BasicResults?hp=" + JSTORFetcher.MAX_CITATIONS +
-                    "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query=" + URLEncoder.encode(query, "UTF-8") +
+ "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query="
+                    + URLEncoder.encode(query, StandardCharsets.UTF_8.name()) +
                     "&wc=on&citationAction=saveAll";
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
@@ -218,7 +220,7 @@ public class JSTORFetcher implements EntryFetcher {
                 // No more headers
                 break;
             }
-            if ((headerName != null) && headerName.equals("Set-Cookie")) {
+            if ("Set-Cookie".equals(headerName)) {
                 if (headerValue.startsWith(name)) {
                     // several key-value-pairs are separated by ';'
                     StringTokenizer st = new StringTokenizer(headerValue, "; ");

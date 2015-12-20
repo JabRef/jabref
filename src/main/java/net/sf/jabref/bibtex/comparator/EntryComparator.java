@@ -17,7 +17,7 @@ package net.sf.jabref.bibtex.comparator;
 
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Comparator;
 
@@ -29,16 +29,16 @@ import java.util.Comparator;
  * there is no next entry, the entries' unique IDs will decide the ordering. Consequently, this comparator can never
  * return 0 unless the entries are the same object.
  */
-public class EntryComparator implements Comparator<BibtexEntry> {
+public class EntryComparator implements Comparator<BibEntry> {
 
     private final String sortField;
     private final boolean descending;
     private final boolean binary;
     private final boolean numeric;
-    private final Comparator<BibtexEntry> next;
+    private final Comparator<BibEntry> next;
 
 
-    public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibtexEntry> next) {
+    public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibEntry> next) {
         this.binary = binary;
         this.sortField = field;
         this.descending = desc;
@@ -55,7 +55,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
     }
 
     @Override
-    public int compare(BibtexEntry e1, BibtexEntry e2) throws ClassCastException {
+    public int compare(BibEntry e1, BibEntry e2) throws ClassCastException {
 
         if (e1 == e2) {
             return 0;
@@ -75,7 +75,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
         // If the field is author or editor, we rearrange names so they are
         // sorted according to last name.
-        if (sortField.equals("author") || sortField.equals("editor")) {
+        if ("author".equals(sortField) || "editor".equals(sortField)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
                 //ImportFormatReader.fixAuthor_lastNameFirst((String)f1);
@@ -85,7 +85,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
                 //ImportFormatReader.fixAuthor_lastNameFirst((String)f2);
             }
 
-        } else if (sortField.equals(BibtexEntry.TYPE_HEADER)) {
+        } else if (sortField.equals(BibEntry.TYPE_HEADER)) {
             // Sort by type.
             f1 = e1.getType().getName();
             f2 = e2.getType().getName();
@@ -117,10 +117,10 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
             result = -((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
-            Integer f1AsInteger = new Integer(f1.toString());
+            Integer f1AsInteger = Integer.valueOf(f1.toString());
             result = -f1AsInteger.compareTo((Integer) f2);
         } else if (f1 instanceof Integer) {
-            Integer f2AsInteger = new Integer(f2.toString());
+            Integer f2AsInteger = Integer.valueOf(f2.toString());
             result = -((Integer) f1).compareTo(f2AsInteger);
         } else {
             String ours = ((String) f1).toLowerCase();
@@ -139,7 +139,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         }
     }
 
-    private static int idCompare(BibtexEntry b1, BibtexEntry b2) {
+    private static int idCompare(BibEntry b1, BibEntry b2) {
         return b1.getId().compareTo(b2.getId());
     }
 

@@ -34,9 +34,8 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
@@ -148,7 +147,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             // Ok, done. Then try to gather in all we have found. Since we might
             // have found
             // one or more bibtex results, it's best to gather them in a
-            // BibtexDatabase.
+            // BibDatabase.
             bibtexResult = mergeImportResults(imports);
 
             /* show parserwarnings, if any. */
@@ -194,7 +193,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     diag.setVisible(true);
                     diag.toFront();
                 } else {
-                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
+                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(),
+                            Globals.prefs.getDefaultEncoding(), true);
                     frame.output(Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 }
             } else {
@@ -205,10 +205,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     if (importError != null) {
                         JOptionPane.showMessageDialog(frame, importError.getMessage(), Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
                     } else {
-                        // @formatter:off
                         JOptionPane.showMessageDialog(frame, Localization.lang("No entries found. Please make sure you are using the correct import filter."),
                                 Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
-                        // @formatter:on
                     }
                 }
             }
@@ -218,7 +216,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
 
     private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
-        BibtexDatabase database = new BibtexDatabase();
+        BibDatabase database = new BibDatabase();
         ParserResult directParserResult = null;
         boolean anythingUseful = false;
 
@@ -239,7 +237,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
 
                 // Merge entries:
-                for (BibtexEntry entry : pr.getDatabase().getEntries()) {
+                for (BibEntry entry : pr.getDatabase().getEntries()) {
                     database.insertEntry(entry);
                 }
 
@@ -255,7 +253,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             } else {
 
                 ParserResult pr = importResult.parserResult;
-                Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
+                Collection<BibEntry> entries = pr.getDatabase().getEntries();
 
                 anythingUseful = anythingUseful | !entries.isEmpty();
 
@@ -264,7 +262,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP),
                         !openInNew && Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)); // set timestamp and owner
 
-                for (BibtexEntry entry : entries) {
+                for (BibEntry entry : entries) {
                     database.insertEntry(entry);
                 }
             }
@@ -278,7 +276,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            return new ParserResult(database, new MetaData(), new HashMap<String, EntryType>());
+            return new ParserResult(database, new MetaData(), new HashMap<>());
 
         }
     }

@@ -1,8 +1,6 @@
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.logic.util.io.FileFinder;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.testutils.AssertUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.FileBasedTestCase;
@@ -59,7 +57,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
     @Test
     @Ignore(value = "works on windows but not on linux")
-    public void testFindPdf() throws IOException {
+    public void testFindPdf() {
         String pdf = FileFinder.findPdf(entry, "pdf", root.getAbsolutePath());
         AssertUtil.assertEqualPaths("HipKro03 - Hello.pdf", pdf);
 
@@ -81,13 +79,13 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
     @Test
     @Ignore(value = "works on windows but not on linux")
-    public void testFindAssociatedFiles() throws IOException {
-        Collection<BibtexEntry> entries = Collections.singletonList(entry);
+    public void testFindAssociatedFiles() {
+        Collection<BibEntry> entries = Collections.singletonList(entry);
         Collection<String> extensions = Arrays.asList("jpg", "pdf");
         Collection<File> dirs = Arrays.asList(new File(root.getAbsoluteFile() + "/pdfs/"),
                 new File(root.getAbsoluteFile() + "/graphicsDir/"));
 
-        Map<BibtexEntry, List<File>> results = Util.findAssociatedFiles(entries, extensions, dirs);
+        Map<BibEntry, List<File>> results = Util.findAssociatedFiles(entries, extensions, dirs);
 
         Assert.assertEquals(2, results.get(entry).size());
         Assert.assertTrue(
@@ -99,7 +97,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
     @Test
     @Ignore(value = "works on windows but not on linux")
-    public void testFindPdfInMultiple() throws IOException {
+    public void testFindPdfInMultiple() {
 
         {
             String[] dirsToSearch = new String[]{root.getAbsolutePath(),

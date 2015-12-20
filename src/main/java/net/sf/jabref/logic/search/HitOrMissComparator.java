@@ -16,7 +16,7 @@
 package net.sf.jabref.logic.search;
 
 import ca.odell.glazedlists.matchers.Matcher;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -25,28 +25,20 @@ import java.util.Objects;
  * This Comparator compares two objects based on whether none, one of them, or both
  * match a given Matcher. It is used to "float" group and search hits in the main table.
  */
-public class HitOrMissComparator implements Comparator<BibtexEntry> {
+public class HitOrMissComparator implements Comparator<BibEntry> {
 
-    private final Matcher<BibtexEntry> hitOrMiss;
+    private final Matcher<BibEntry> hitOrMiss;
 
-    public HitOrMissComparator(Matcher<BibtexEntry> hitOrMiss) {
+    public HitOrMissComparator(Matcher<BibEntry> hitOrMiss) {
         this.hitOrMiss = Objects.requireNonNull(hitOrMiss);
     }
 
     @Override
-    public int compare(BibtexEntry o1, BibtexEntry o2) {
+    public int compare(BibEntry o1, BibEntry o2) {
         if (hitOrMiss == null) {
             return 0;
         }
 
-        boolean hit1 = hitOrMiss.matches(o1);
-        boolean hit2 = hitOrMiss.matches(o2);
-
-        // TODO use Boolean.compareTo when converting to Java8
-        if (hit1 == hit2) {
-            return 0;
-        } else {
-            return hit1 ? -1 : 1;
-        }
+        return Boolean.compare(hitOrMiss.matches(o2), hitOrMiss.matches(o1));
     }
 }

@@ -26,7 +26,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +46,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
@@ -54,9 +57,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
@@ -66,7 +68,6 @@ import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.OpenFileFilter;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
@@ -94,18 +95,7 @@ public class Util {
 
     public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
-    private static final String SEPARATING_CHARS_NOSPACE = ";,\n";
-
     private static final UnicodeCharMap UNICODE_CHAR_MAP = new UnicodeCharMap();
-
-
-    /**
-     * This method sets the location of a Dialog such that it is centered with regard to another window, but not outside
-     * the screen on the left and the top.
-     */
-    public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
-        diag.setLocationRelativeTo(win);
-    }
 
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is
@@ -119,7 +109,36 @@ public class Util {
         if (key == null) {
             return null;
         }
-        if (!JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY)) {
+        return checkLegalKey(key,
+                JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+    }
+
+    /**
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
+     */
+    public static String replaceSpecialCharacters(String s) {
+        for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
+            s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
+        }
+        return s;
+    }
+
+
+    /**
+     * This method returns a String similar to the one passed in, except that it is molded into a form that is
+     * acceptable for bibtex.
+     *
+     * Watch-out that the returned string might be of length 0 afterwards.
+     *
+     * @param key mayBeNull
+     * @param enforceLegalKey make sure that the key is legal in all respects
+     */
+    public static String checkLegalKey(String key, boolean enforceLegalKey) {
+        if (key == null) {
+            return null;
+        }
+        if (!enforceLegalKey) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
             // interfere with parsing:
@@ -136,7 +155,8 @@ public class Util {
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"') && (c != '}') && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
+            if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"') && (c != '}')
+                    && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
                 newKey.append(c);
             }
         }
@@ -145,89 +165,6 @@ public class Util {
         // letter or letter combination that bibtex can accept.
 
         return net.sf.jabref.util.Util.replaceSpecialCharacters(newKey.toString());
-    }
-
-    /**
-     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
-     * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
-     */
-    public static String replaceSpecialCharacters(String s) {
-        for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
-            s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
-        }
-        return s;
-    }
-
-    public static TreeSet<String> findDeliminatedWordsInField(BibtexDatabase db, String field, String deliminator) {
-        TreeSet<String> res = new TreeSet<>();
-
-        for (String s : db.getKeySet()) {
-            BibtexEntry be = db.getEntryById(s);
-            Object o = be.getField(field);
-            if (o != null) {
-                String fieldValue = o.toString().trim();
-                StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
-                while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Returns a HashMap containing all words used in the database in the given field type. Characters in
-     * <code>remove</code> are not included.
-     *
-     * @param db a <code>BibtexDatabase</code> value
-     * @param field a <code>String</code> value
-     * @param remove a <code>String</code> value
-     * @return a <code>HashSet</code> value
-     */
-    public static TreeSet<String> findAllWordsInField(BibtexDatabase db, String field, String remove) {
-        TreeSet<String> res = new TreeSet<>();
-        StringTokenizer tok;
-        for (String s : db.getKeySet()) {
-            BibtexEntry be = db.getEntryById(s);
-            Object o = be.getField(field);
-            if (o != null) {
-                tok = new StringTokenizer(o.toString(), remove, false);
-                while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Finds all authors' last names in all the given fields for the given database.
-     *
-     * @param db The database.
-     * @param fields The fields to look in.
-     * @return a set containing the names.
-     */
-    public static Set<String> findAuthorLastNames(BibtexDatabase db, List<String> fields) {
-        Set<String> res = new TreeSet<>();
-        for (String s : db.getKeySet()) {
-            BibtexEntry be = db.getEntryById(s);
-            for (String field : fields) {
-                String val = be.getField(field);
-                if ((val != null) && !val.isEmpty()) {
-                    AuthorList al = AuthorList.getAuthorList(val);
-                    for (int i = 0; i < al.size(); i++) {
-                        AuthorList.Author a = al.getAuthor(i);
-                        String lastName = a.getLast();
-                        if ((lastName != null) && !lastName.isEmpty()) {
-                            res.add(lastName);
-                        }
-                    }
-                }
-
-            }
-        }
-
-        return res;
     }
 
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
@@ -319,7 +256,7 @@ public class Util {
     private static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
 
 
-    public static String expandBrackets(String bracketString, BibtexEntry entry, BibtexDatabase database) {
+    public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database) {
         Matcher m = net.sf.jabref.util.Util.squareBracketsPattern.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
@@ -340,7 +277,7 @@ public class Util {
      *
      * @param bibs List of bibtex entries
      */
-    public static void setAutomaticFields(Collection<BibtexEntry> bibs, boolean overwriteOwner, boolean overwriteTimestamp, boolean markEntries) {
+    public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner, boolean overwriteTimestamp, boolean markEntries) {
 
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
 
@@ -355,7 +292,7 @@ public class Util {
         }
 
         // Iterate through all entries
-        for (BibtexEntry curEntry : bibs) {
+        for (BibEntry curEntry : bibs) {
             boolean setOwner = globalSetOwner && (overwriteOwner || (curEntry.getField(BibtexFields.OWNER) == null));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (curEntry.getField(timeStampField) == null));
             net.sf.jabref.util.Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
@@ -373,7 +310,7 @@ public class Util {
      * @param overwriteOwner Indicates whether owner should be set if it is already set.
      * @param overwriteTimestamp Indicates whether timestamp should be set if it is already set.
      */
-    public static void setAutomaticFields(BibtexEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
+    public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
         String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
@@ -383,7 +320,7 @@ public class Util {
         net.sf.jabref.util.Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
 
-    private static void setAutomaticFields(BibtexEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStampField, String timeStamp) {
+    private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStampField, String timeStamp) {
 
         // Set owner field if this option is enabled:
         if (setOwner) {
@@ -408,118 +345,52 @@ public class Util {
      * @param fields The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
-    public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
-        return net.sf.jabref.util.Util.upgradePdfPsToFile(database.getEntryMap().values(), fields);
-    }
-
-    /**
-     * Collect file links from the given set of fields, and add them to the list contained in the field
-     * GUIGlobals.FILE_FIELD.
-     *
-     * @param entries The entries to modify.
-     * @param fields The fields to find links in.
-     * @return A CompoundEdit specifying the undo operation for the whole operation.
-     */
-    public static NamedCompound upgradePdfPsToFile(Collection<BibtexEntry> entries, String[] fields) {
+    public static NamedCompound upgradePdfPsToFile(BibDatabase database, String[] fields) {
         NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
 
-        for (BibtexEntry entry : entries) {
-            FileListTableModel tableModel = new FileListTableModel();
-            // If there are already links in the file field, keep those on top:
-            String oldFileContent = entry.getField(Globals.FILE_FIELD);
-            if (oldFileContent != null) {
-                tableModel.setContent(oldFileContent);
-            }
-            int oldRowCount = tableModel.getRowCount();
-            for (String field : fields) {
-                String o = entry.getField(field);
-                if (o != null) {
-                    if (!o.trim().isEmpty()) {
-                        File f = new File(o);
-                        FileListEntry flEntry = new FileListEntry(f.getName(), o, Globals.prefs.getExternalFileTypeByExt(field));
-                        tableModel.addEntry(tableModel.getRowCount(), flEntry);
-
-                        entry.clearField(field);
-                        ce.addEdit(new UndoableFieldChange(entry, field, o, null));
-                    }
-                }
-            }
-            if (tableModel.getRowCount() != oldRowCount) {
-                String newValue = tableModel.getStringRepresentation();
-                entry.setField(Globals.FILE_FIELD, newValue);
-                ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
-            }
+        for (BibEntry entry : database.getEntryMap().values()) {
+            upgradePdfPsToFile(entry, fields, ce);
         }
+
         ce.end();
         return ce;
     }
 
     /**
-     * Warns the user of undesired side effects of an explicit assignment/removal of entries to/from this group.
-     * Currently there are four types of groups: AllEntriesGroup, SearchGroup - do not support explicit assignment.
-     * ExplicitGroup - never modifies entries. KeywordGroup - only this modifies entries upon assignment/removal.
-     * Modifications are acceptable unless they affect a standard field (such as "author") besides the "keywords" field.
+     * TODO: Move this to cleanup class. Collect file links from the given set of fields, and add them to the list
+     * contained in the field GUIGlobals.FILE_FIELD.
      *
-     * @param parent The Component used as a parent when displaying a confirmation dialog.
-     * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
-     *         otherwise (this indicates that the user has aborted the assignment).
+     * @param entries The entries to modify.
+     * @param fields The fields to find links in.
+     * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
-    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibtexEntry[] entries, BibtexDatabase db, Component parent) {
-        Vector<String> affectedFields = new Vector<>();
-        for (AbstractGroup group : groups) {
-            if (group instanceof KeywordGroup) {
-                KeywordGroup kg = (KeywordGroup) group;
-                String field = kg.getSearchField().toLowerCase();
-                if (field.equals("keywords")) {
-                    continue; // this is not undesired
-                }
-                for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {
-                    if (field.equals(BibtexFields.getFieldName(i))) {
-                        affectedFields.add(field);
-                        break;
-                    }
+    public static void upgradePdfPsToFile(BibEntry entry, String[] fields, NamedCompound ce) {
+        FileListTableModel tableModel = new FileListTableModel();
+        // If there are already links in the file field, keep those on top:
+        String oldFileContent = entry.getField(Globals.FILE_FIELD);
+        if (oldFileContent != null) {
+            tableModel.setContent(oldFileContent);
+        }
+        int oldRowCount = tableModel.getRowCount();
+        for (String field : fields) {
+            String o = entry.getField(field);
+            if (o != null) {
+                if (!o.trim().isEmpty()) {
+                    File f = new File(o);
+                    FileListEntry flEntry = new FileListEntry(f.getName(), o,
+                            Globals.prefs.getExternalFileTypeByExt(field));
+                    tableModel.addEntry(tableModel.getRowCount(), flEntry);
+
+                    entry.clearField(field);
+                    ce.addEdit(new UndoableFieldChange(entry, field, o, null));
                 }
             }
         }
-        if (affectedFields.isEmpty()) {
-            return true; // no side effects
+        if (tableModel.getRowCount() != oldRowCount) {
+            String newValue = tableModel.getStringRepresentation();
+            entry.setField(Globals.FILE_FIELD, newValue);
+            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
         }
-
-        // show a warning, then return
-        StringBuffer message = // JZTODO lyrics...
-                new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
-        for (int i = 0; i < affectedFields.size(); ++i) {
-            message.append(affectedFields.elementAt(i)).append("\n");
-        }
-        message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
-        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        return choice != JOptionPane.NO_OPTION;
-
-        // if (groups instanceof KeywordGroup) {
-        // KeywordGroup kg = (KeywordGroup) groups;
-        // String field = kg.getSearchField().toLowerCase();
-        // if (field.equals("keywords"))
-        // return true; // this is not undesired
-        // for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
-        // if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
-        // // show a warning, then return
-        // String message = Globals // JZTODO lyrics...
-        // .lang(
-        // "This action will modify the \"%0\" field "
-        // + "of your entries.\nThis could cause undesired changes to "
-        // + "your entries, so it is\nrecommended that you change the grouping
-        // field "
-        // + "in your group\ndefinition to \"keywords\" or a non-standard name."
-        // + "\n\nDo you still want to continue?",
-        // field);
-        // int choice = JOptionPane.showConfirmDialog(parent, message,
-        // Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
-        // JOptionPane.WARNING_MESSAGE);
-        // return choice != JOptionPane.NO_OPTION;
-        // }
-        // }
-        // }
-        // return true; // found no side effects
     }
 
     /**
@@ -551,10 +422,10 @@ public class Util {
      * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
      * @return A CompoundEdit for the entire operation.
      */
-    public static UndoableEdit massSetField(Collection<BibtexEntry> entries, String field, String text, boolean overwriteValues) {
+    public static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String text, boolean overwriteValues) {
 
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             String oldVal = entry.getField(field);
             // If we are not allowed to overwrite values, check if there is a
             // nonempty
@@ -583,9 +454,9 @@ public class Util {
      *            entries with existing value in the new field.
      * @return A CompoundEdit for the entire operation.
      */
-    public static UndoableEdit massRenameField(Collection<BibtexEntry> entries, String field, String newField, boolean overwriteValues) {
+    public static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField, boolean overwriteValues) {
         NamedCompound ce = new NamedCompound(Localization.lang("Rename field"));
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             String valToMove = entry.getField(field);
             // If there is no value, do nothing:
             if ((valToMove == null) || valToMove.isEmpty()) {
@@ -671,7 +542,7 @@ public class Util {
      * @param entry the entry to which the file should be linked to
      * @return a suggested fileName
      */
-    public static String getLinkedFileName(BibtexDatabase database, BibtexEntry entry) {
+    public static String getLinkedFileName(BibDatabase database, BibEntry entry) {
         String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
         StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
@@ -689,67 +560,16 @@ public class Util {
     }
 
     /**
-     * @param keywords a String of keywords
-     * @return an ArrayList containing the keywords. An emtpy list if keywords are null or empty
-     */
-    public static ArrayList<String> getSeparatedKeywords(String keywords) {
-        ArrayList<String> res = new ArrayList<>();
-        if (keywords == null) {
-            return res;
-        }
-        // _NOSPACE is a hack to support keywords such as "choreography transactions"
-        // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
-        // if nothing is found, " " is likely to be the separating char.
-        // solution by RisKeywords.java: s.split(",[ ]*")
-        StringTokenizer tok = new StringTokenizer(keywords, net.sf.jabref.util.Util.SEPARATING_CHARS_NOSPACE);
-        while (tok.hasMoreTokens()) {
-            String word = tok.nextToken().trim();
-            res.add(word);
-        }
-        return res;
-    }
-
-    public static ArrayList<String> getSeparatedKeywords(BibtexEntry be) {
-        return net.sf.jabref.util.Util.getSeparatedKeywords(be.getField("keywords"));
-    }
-
-    public static void putKeywords(BibtexEntry entry, ArrayList<String> keywords, NamedCompound ce) {
-        // Set Keyword Field
-        String oldValue = entry.getField("keywords");
-        String newValue;
-        if (!keywords.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (String keyword : keywords) {
-                sb.append(keyword);
-                sb.append(", ");
-            }
-            sb.delete(sb.length() - 2, sb.length());
-            newValue = sb.toString();
-        } else {
-            newValue = null;
-        }
-        if ((oldValue == null) && (newValue == null)) {
-            return;
-        }
-        if ((oldValue == null) || !oldValue.equals(newValue)) {
-            entry.setField("keywords", newValue);
-            if (ce != null) {
-                ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
-            }
-        }
-    }
-
-    /**
      * @param ce indicates the undo named compound. May be null
      */
-    public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
+    public static void updateField(BibEntry be, String field, String newValue, NamedCompound ce) {
         net.sf.jabref.util.Util.updateField(be, field, newValue, ce, false);
     }
 
     /**
      * @param ce indicates the undo named compound. May be null
      */
-    public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
+    public static void updateField(BibEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
         String oldValue = be.getField(field);
         if (nullFieldIfValueIsTheSame && (oldValue != null) && oldValue.equals(newValue)) {
             // if oldValue == newValue then reset field if required by parameter
@@ -776,7 +596,7 @@ public class Util {
     public static void bindCloseDialogKeyToCancelAction(JRootPane rootPane, Action cancelAction) {
         InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = rootPane.getActionMap();
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
     }
 
@@ -811,7 +631,7 @@ public class Util {
      * @return
      * @throws IOException
      */
-    public static String getResultsWithEncoding(URL source, String encoding) throws IOException {
+    public static String getResultsWithEncoding(URL source, Charset encoding) throws IOException {
         return net.sf.jabref.util.Util.getResultsWithEncoding(source.openConnection(), encoding);
     }
     /**
@@ -821,7 +641,7 @@ public class Util {
      * @return
      * @throws IOException
      */
-    public static String getResultsWithEncoding(URLConnection source, String encoding) throws IOException {
+    public static String getResultsWithEncoding(URLConnection source, Charset encoding) throws IOException {
 
         // set user-agent to avoid being blocked as a crawler
         source.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
@@ -868,6 +688,73 @@ public class Util {
         }
     }
 
+    /**
+     * Warns the user of undesired side effects of an explicit assignment/removal of entries to/from this group.
+     * Currently there are four types of groups: AllEntriesGroup, SearchGroup - do not support explicit assignment.
+     * ExplicitGroup - never modifies entries. KeywordGroup - only this modifies entries upon assignment/removal.
+     * Modifications are acceptable unless they affect a standard field (such as "author") besides the "keywords" field.
+     *
+     * @param parent The Component used as a parent when displaying a confirmation dialog.
+     * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
+     *         otherwise (this indicates that the user has aborted the assignment).
+     */
+    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibEntry[] entries, BibDatabase db, Component parent) {
+        Vector<String> affectedFields = new Vector<>();
+        for (AbstractGroup group : groups) {
+            if (group instanceof KeywordGroup) {
+                KeywordGroup kg = (KeywordGroup) group;
+                String field = kg.getSearchField().toLowerCase();
+                if ("keywords".equals(field)) {
+                    continue; // this is not undesired
+                }
+                for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {
+                    if (field.equals(BibtexFields.getFieldName(i))) {
+                        affectedFields.add(field);
+                        break;
+                    }
+                }
+            }
+        }
+        if (affectedFields.isEmpty()) {
+            return true; // no side effects
+        }
+    
+        // show a warning, then return
+        StringBuffer message = new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
+        for (int i = 0; i < affectedFields.size(); ++i) {
+            message.append(affectedFields.elementAt(i)).append("\n");
+        }
+        message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
+        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        return choice != JOptionPane.NO_OPTION;
+    
+        // if (groups instanceof KeywordGroup) {
+        // KeywordGroup kg = (KeywordGroup) groups;
+        // String field = kg.getSearchField().toLowerCase();
+        // if (field.equals("keywords"))
+        // return true; // this is not undesired
+        // for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
+        // if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
+        // // show a warning, then return
+        // String message = Globals ...
+        // .lang(
+        // "This action will modify the \"%0\" field "
+        // + "of your entries.\nThis could cause undesired changes to "
+        // + "your entries, so it is\nrecommended that you change the grouping
+        // field "
+        // + "in your group\ndefinition to \"keywords\" or a non-standard name."
+        // + "\n\nDo you still want to continue?",
+        // field);
+        // int choice = JOptionPane.showConfirmDialog(parent, message,
+        // Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
+        // JOptionPane.WARNING_MESSAGE);
+        // return choice != JOptionPane.NO_OPTION;
+        // }
+        // }
+        // }
+        // return true; // found no side effects
+    }
+
     public static boolean updateTimeStampIsSet() {
         return Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP);
     }
@@ -876,7 +763,7 @@ public class Util {
      * Updates the timestamp of the given entry, nests the given undaoableEdit in a named compound, and returns that
      * named compound
      */
-    public static NamedCompound doUpdateTimeStamp(BibtexEntry entry, AbstractUndoableEdit undoableEdit) {
+    public static NamedCompound doUpdateTimeStamp(BibEntry entry, AbstractUndoableEdit undoableEdit) {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
@@ -893,9 +780,9 @@ public class Util {
      * The entries' bibtex keys must have been set - entries lacking key are ignored. The operation is done in a new
      * thread, which is returned for the caller to wait for if needed.
      *
-     * @param entries A collection of BibtexEntry objects to find links for.
+     * @param entries A collection of BibEntry objects to find links for.
      * @param ce A NamedCompound to add UndoEdit elements to.
-     * @param changedEntries MODIFIED, optional. A Set of BibtexEntry objects to which all modified entries is added.
+     * @param changedEntries MODIFIED, optional. A Set of BibEntry objects to which all modified entries is added.
      *            This is used for status output and debugging
      * @param singleTableModel UGLY HACK. The table model to insert links into. Already existing links are not
      *            duplicated or removed. This parameter has to be null if entries.count() != 1. The hack has been
@@ -910,7 +797,7 @@ public class Util {
      *            parameter can be null, which means that no progress update will be shown.
      * @return the thread performing the autosetting
      */
-    public static Runnable autoSetLinks(final Collection<BibtexEntry> entries, final NamedCompound ce, final Set<BibtexEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+    public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
         final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
         if (diag != null) {
             final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length - 1);
@@ -943,7 +830,7 @@ public class Util {
                 }
 
                 // Run the search operation:
-                Map<BibtexEntry, java.util.List<File>> result;
+                Map<BibEntry, java.util.List<File>> result;
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
@@ -953,9 +840,9 @@ public class Util {
 
                 boolean foundAny = false;
                 // Iterate over the entries:
-                for (BibtexEntry anEntry : result.keySet()) {
+                for (Entry<BibEntry, List<File>> entryFilePair : result.entrySet()) {
                     FileListTableModel tableModel;
-                    String oldVal = anEntry.getField(Globals.FILE_FIELD);
+                    String oldVal = entryFilePair.getKey().getField(Globals.FILE_FIELD);
                     if (singleTableModel == null) {
                         tableModel = new FileListTableModel();
                         if (oldVal != null) {
@@ -965,7 +852,7 @@ public class Util {
                         assert entries.size() == 1;
                         tableModel = singleTableModel;
                     }
-                    List<File> files = result.get(anEntry);
+                    List<File> files = entryFilePair.getValue();
                     for (File f : files) {
                         f = FileUtil.shortenFileName(f, dirsS);
                         boolean alreadyHas = false;
@@ -996,15 +883,16 @@ public class Util {
                             }
                             if (ce != null) {
                                 // store undo information
-                                UndoableFieldChange change = new UndoableFieldChange(anEntry, Globals.FILE_FIELD, oldVal, newVal);
+                                UndoableFieldChange change = new UndoableFieldChange(entryFilePair.getKey(),
+                                        Globals.FILE_FIELD, oldVal, newVal);
                                 ce.addEdit(change);
                             }
                             // hack: if table model is given, do NOT modify entry
                             if (singleTableModel == null) {
-                                anEntry.setField(Globals.FILE_FIELD, newVal);
+                                entryFilePair.getKey().setField(Globals.FILE_FIELD, newVal);
                             }
                             if (changedEntries != null) {
-                                changedEntries.add(anEntry);
+                                changedEntries.add(entryFilePair.getKey());
                             }
                         }
                     }
@@ -1044,7 +932,7 @@ public class Util {
      * Automatically add links for this entry to the table model given as an argument, based on the globally stored list
      * of external file types. The entry itself is not modified. The entry's bibtex key must have been set.
      *
-     * @param entry The BibtexEntry to find links for.
+     * @param entry The BibEntry to find links for.
      * @param singleTableModel The table model to insert links into. Already existing links are not duplicated or
      *            removed.
      * @param metaData The MetaData providing the relevant file directory, if any.
@@ -1057,8 +945,8 @@ public class Util {
      *            parameter can be null, which means that no progress update will be shown.
      * @return the runnable able to perform the autosetting
      */
-    public static Runnable autoSetLinks(final BibtexEntry entry, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
-        final Collection<BibtexEntry> entries = new ArrayList<>();
+    public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+        final Collection<BibEntry> entries = new ArrayList<>();
         entries.add(entry);
 
         return net.sf.jabref.util.Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
@@ -1072,9 +960,9 @@ public class Util {
      *
      * @return list of files. May be empty
      */
-    public static List<File> getListOfLinkedFiles(BibtexEntry[] bes, String[] fileDirs) {
+    public static List<File> getListOfLinkedFiles(BibEntry[] bes, String[] fileDirs) {
         ArrayList<File> res = new ArrayList<>();
-        for (BibtexEntry entry : bes) {
+        for (BibEntry entry : bes) {
             FileListTableModel tm = new FileListTableModel();
             tm.setContent(entry.getField("file"));
             for (int i = 0; i < tm.getRowCount(); i++) {
@@ -1089,15 +977,15 @@ public class Util {
         return res;
     }
 
-    public static Map<BibtexEntry, List<File>> findAssociatedFiles(Collection<BibtexEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibtexEntry, List<File>> result = new HashMap<>();
+    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
+        HashMap<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
         Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
 
         // Initialize Result-Set
-        for (BibtexEntry entry : entries) {
-            result.put(entry, new ArrayList<File>());
+        for (BibEntry entry : entries) {
+            result.put(entry, new ArrayList<>());
         }
 
         boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
@@ -1107,7 +995,7 @@ public class Util {
             String name = file.getName();
             int dot = name.lastIndexOf('.');
             // First, look for exact matches:
-            for (BibtexEntry entry : entries) {
+            for (BibEntry entry : entries) {
                 String citeKey = entry.getCiteKey();
                 if ((citeKey != null) && !citeKey.isEmpty()) {
                     if (dot > 0) {
@@ -1121,7 +1009,7 @@ public class Util {
             // If we get here, we didn't find any exact matches. If non-exact
             // matches are allowed, try to find one:
             if (!exactOnly) {
-                for (BibtexEntry entry : entries) {
+                for (BibEntry entry : entries) {
                     String citeKey = entry.getCiteKey();
                     if ((citeKey != null) && !citeKey.isEmpty()) {
                         if (name.startsWith(citeKey)) {
@@ -1145,7 +1033,7 @@ public class Util {
      * @param database
      * @return
      */
-    public static String getFieldAndFormat(String fieldAndFormat, BibtexEntry entry, BibtexDatabase database) {
+    public static String getFieldAndFormat(String fieldAndFormat, BibEntry entry, BibDatabase database) {
 
         fieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
 
@@ -1166,7 +1054,7 @@ public class Util {
             return null;
         }
 
-        String fieldValue = BibtexDatabase.getResolvedField(beforeColon, entry, database);
+        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database);
 
         // If no field value was found, try to interpret it as a key generator field marker:
         if (fieldValue == null) {
@@ -1187,27 +1075,4 @@ public class Util {
         return fieldValue;
     }
 
-    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
-    public static Pattern getPatternForWords(ArrayList<String> words) {
-        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
-            return Pattern.compile("");
-        }
-
-        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH);
-
-        // compile the words to a regular expression in the form (w1) | (w2) | (w3)
-        String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");
-        for (int i = 1; i < words.size(); i++) {
-            searchPattern = searchPattern.concat("|(").concat(regExSearch ? words.get(i) : Pattern.quote(words.get(i))).concat(")");
-        }
-
-        Pattern pattern;
-        if (Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH)) {
-            pattern = Pattern.compile(searchPattern);
-        } else {
-            pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);
-        }
-
-        return pattern;
-    }
 }

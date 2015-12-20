@@ -28,7 +28,7 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -256,7 +256,7 @@ public class RepecNepImporter extends ImportFormat {
     private String readMultipleLines() throws IOException {
         String result = this.lastLine.trim();
         readLine();
-        while ((this.lastLine != null) && !this.lastLine.trim().equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields) && !isStartOfWorkingPaper()) {
+        while ((this.lastLine != null) && !"".equals(this.lastLine.trim()) && !startsWithKeyword(RepecNepImporter.recognizedFields) && !isStartOfWorkingPaper()) {
             result += this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim();
             readLine();
         }
@@ -269,7 +269,7 @@ public class RepecNepImporter extends ImportFormat {
      * @param be
      * @throws IOException
      */
-    private void parseTitleString(BibtexEntry be) throws IOException {
+    private void parseTitleString(BibEntry be) throws IOException {
         // skip article number
         this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1, this.lastLine.length());
         be.setField("title", readMultipleLines());
@@ -281,11 +281,11 @@ public class RepecNepImporter extends ImportFormat {
      * @param be
      * @throws IOException
      */
-    private void parseAuthors(BibtexEntry be) throws IOException {
+    private void parseAuthors(BibEntry be) throws IOException {
         // read authors and institutions
         String authors = "";
         String institutions = "";
-        while ((this.lastLine != null) && !this.lastLine.equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields)) {
+        while ((this.lastLine != null) && !"".equals(this.lastLine) && !startsWithKeyword(RepecNepImporter.recognizedFields)) {
 
             // read single author
             String author;
@@ -308,17 +308,17 @@ public class RepecNepImporter extends ImportFormat {
             }
 
             if (author != null) {
-                authors += !authors.equals("") ? " and " + author : "" + author;
+                authors += !"".equals(authors) ? " and " + author : author;
             }
             if (institution != null) {
-                institutions += !institutions.equals("") ? " and " + institution : "" + institution;
+                institutions += !"".equals(institutions) ? " and " + institution : institution;
             }
         }
 
-        if (!authors.equals("")) {
+        if (!"".equals(authors)) {
             be.setField("author", authors);
         }
-        if (!institutions.equals("")) {
+        if (!"".equals(institutions)) {
             be.setField("institution", institutions);
         }
     }
@@ -329,10 +329,10 @@ public class RepecNepImporter extends ImportFormat {
      * @param be
      * @throws IOException
      */
-    private void parseAbstract(BibtexEntry be) throws IOException {
+    private void parseAbstract(BibEntry be) throws IOException {
         String theabstract = readMultipleLines();
 
-        if (!theabstract.equals("")) {
+        if (!"".equals(theabstract)) {
             be.setField("abstract", theabstract);
         }
     }
@@ -343,23 +343,23 @@ public class RepecNepImporter extends ImportFormat {
      * @param be
      * @throws IOException
      */
-    private void parseAdditionalFields(BibtexEntry be, boolean multilineUrlFieldAllowed) throws IOException {
+    private void parseAdditionalFields(BibEntry be, boolean multilineUrlFieldAllowed) throws IOException {
 
         // one empty line is possible before fields start
-        if ((this.lastLine != null) && this.lastLine.trim().equals("")) {
+        if ((this.lastLine != null) && "".equals(this.lastLine.trim())) {
             readLine();
         }
 
         // read other fields
-        while ((this.lastLine != null) && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.recognizedFields) || this.lastLine.equals(""))) {
+        while ((this.lastLine != null) && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.recognizedFields) || "".equals(this.lastLine))) {
 
             // if multiple lines for a field are allowed and field consists of multiple lines, join them
-            String keyword = this.lastLine.equals("") ? "" : this.lastLine.substring(0, this.lastLine.indexOf(':')).trim();
+            String keyword = "".equals(this.lastLine) ? "" : this.lastLine.substring(0, this.lastLine.indexOf(':')).trim();
             // skip keyword
-            this.lastLine = this.lastLine.equals("") ? "" : this.lastLine.substring(this.lastLine.indexOf(':') + 1, this.lastLine.length()).trim();
+            this.lastLine = "".equals(this.lastLine) ? "" : this.lastLine.substring(this.lastLine.indexOf(':') + 1, this.lastLine.length()).trim();
 
             // parse keywords field
-            if (keyword.equals("Keywords")) {
+            if ("Keywords".equals(keyword)) {
                 String content = readMultipleLines();
                 String[] keywords = content.split("[,;]");
                 String keywordStr = "";
@@ -369,7 +369,7 @@ public class RepecNepImporter extends ImportFormat {
                 be.setField("keywords", keywordStr.trim());
 
                 // parse JEL field
-            } else if (keyword.equals("JEL")) {
+            } else if ("JEL".equals(keyword)) {
                 be.setField("jel", readMultipleLines());
 
                 // parse date field
@@ -388,9 +388,9 @@ public class RepecNepImporter extends ImportFormat {
 
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(date != null ? date : new Date());
-                be.setField("year", "" + cal.get(Calendar.YEAR));
+                be.setField("year", String.valueOf(cal.get(Calendar.YEAR)));
                 if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
-                    be.setField("month", "" + cal.get(Calendar.MONTH));
+                    be.setField("month", String.valueOf(cal.get(Calendar.MONTH)));
                 }
 
                 // parse URL field
@@ -419,7 +419,7 @@ public class RepecNepImporter extends ImportFormat {
      * section, we have a working paper entry we are interested in
      */
     private boolean isStartOfWorkingPaper() {
-        return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && this.preLine.trim().equals("");
+        return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && "".equals(this.preLine.trim());
     }
 
     /*
@@ -427,8 +427,8 @@ public class RepecNepImporter extends ImportFormat {
      * @see net.sf.jabref.imports.ImportFormat#importEntries(java.io.InputStream)
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         String paperNoStr = null;
         this.line = 0;
 
@@ -442,7 +442,7 @@ public class RepecNepImporter extends ImportFormat {
                     this.inOverviewSection = this.preLine.startsWith("In this issue we have");
                 }
                 if (isStartOfWorkingPaper()) {
-                    BibtexEntry be = new BibtexEntry(IdGenerator.next());
+                    BibEntry be = new BibEntry(IdGenerator.next());
                     be.setType(EntryTypes.getType("techreport"));
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be);

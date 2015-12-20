@@ -23,10 +23,10 @@ import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 public class AddToGroupAction extends AbstractAction {
@@ -63,7 +63,7 @@ public class AddToGroupAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        final BibtexEntry[] entries = m_panel.getSelectedEntries();
+        final BibEntry[] entries = m_panel.getSelectedEntries();
         final Vector<GroupTreeNode> removeGroupsNodes = new Vector<>(); // used only when moving
 
         if (m_move) {
@@ -75,7 +75,7 @@ public class AddToGroupAction extends AbstractAction {
                 if (!node.getGroup().supportsRemove()) {
                     continue;
                 }
-                for (BibtexEntry entry : entries) {
+                for (BibEntry entry : entries) {
                     if (node.getGroup().contains(entry)) {
                         removeGroupsNodes.add(node);
                     }

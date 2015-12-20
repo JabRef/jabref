@@ -10,7 +10,7 @@ import net.sf.jabref.gui.IconTheme;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 import net.sf.jabref.JabRef;
@@ -20,12 +20,12 @@ import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
- * Uses XMPUtils to get one BibtexEntry for a PDF-File. 
+ * Uses XMPUtils to get one BibEntry for a PDF-File.
  * Also imports the non-XMP Data (PDDocument-Information) using XMPUtil.getBibtexEntryFromDocumentInformation.
- * If data from more than one entry is read by XMPUtil then this entys are merged into one.  
+ * If data from more than one entry is read by XMPUtil then this entys are merged into one.
  * @author Dan
  * @version 12.11.2008 | 22:12:48
- * 
+ *
  */
 public class EntryFromPDFCreator extends EntryFromFileCreator {
 
@@ -43,18 +43,18 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sf.jabref.imports.EntryFromFileCreator#accept(java.io.File)
-     * 
+     *
      * Accepts all Files having as suffix ".PDF" (in ignore case mode).
      */
     @Override
     public boolean accept(File f) {
-        return f != null && f.getName().toUpperCase().endsWith(".PDF");
+        return (f != null) && f.getName().toUpperCase().endsWith(".PDF");
     }
 
     @Override
-    protected BibtexEntry createBibtexEntry(File pdfFile) {
+    protected BibEntry createBibtexEntry(File pdfFile) {
 
         if (!accept(pdfFile)) {
             return null;
@@ -80,7 +80,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      * @param pdfFile
      * @param entry
      */
-    private void addEntryDataFromPDDocumentInformation(File pdfFile, BibtexEntry entry) {
+    private void addEntryDataFromPDDocumentInformation(File pdfFile, BibEntry entry) {
         PDDocument document = null;
         try {
             document = PDDocument.load(pdfFile.getAbsoluteFile());
@@ -88,13 +88,14 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
                     .getDocumentInformation();
 
             if (pdfDocInfo != null) {
-                BibtexEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
+                BibEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
                         .getDocumentInformation());
                 if (entryDI != null) {
                     addEntryDataToEntry(entry, entryDI);
                     Calendar creationDate = pdfDocInfo.getCreationDate();
                     if (creationDate != null) {
-                        String date = new SimpleDateFormat("yyyy.MM.dd")
+                        // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
+                        String date = new SimpleDateFormat("yyyy-MM-dd")
                                 .format(creationDate.getTime());
                         appendToField(entry, "timestamp", date);
                     }
@@ -122,13 +123,13 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      * Adds all data Found in all the entrys of this XMP file to the given
      * entry. This was implemented without having much knowledge of the XMP
      * format.
-     * 
+     *
      * @param aFile
      * @param entry
      */
-    private void addEntyDataFromXMP(File aFile, BibtexEntry entry) {
+    private void addEntyDataFromXMP(File aFile, BibEntry entry) {
         try {
-            List<BibtexEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
+            List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
             addEntrysToEntry(entry, entrys);
         } catch (EncryptionNotSupportedException e) {
             // no canceling here, just no data added.

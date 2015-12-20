@@ -26,8 +26,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,7 +79,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     }
 
     @Override
-    public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys, MetaData metaData) {
+    public void pushEntries(BibDatabase database, BibEntry[] entries, String keys, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;
@@ -161,7 +161,6 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
-            // @formatter:off
             JOptionPane.showMessageDialog(panel.frame(), "<HTML>" +
                     Localization.lang("Could not connect to a running gnuserv process. Make sure that "
                             + "Emacs or XEmacs is running,<BR>and that the server has been started "
@@ -172,7 +171,6 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                     Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
                             + "the emacsclient/gnuclient program installed and available in the PATH."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-            // @formatter:on
         } else {
             super.operationCompleted(panel);
         }

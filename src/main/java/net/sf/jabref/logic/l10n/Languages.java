@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.l10n;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Languages {
 
@@ -29,4 +28,20 @@ public class Languages {
         LANGUAGES.put("Simplified Chinese", "zh");
     }
 
+    public static Optional<String> convertToKnownLocale(String language) {
+        if(!LANGUAGES.values().contains(Objects.requireNonNull(language))) {
+            if(language.contains("_")) {
+                String lang = language.split("_")[0];
+                if(LANGUAGES.values().contains(lang)) {
+                    return Optional.of(lang);
+                } else {
+                    return Optional.empty();
+                }
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.of(language);
+        }
+    }
 }

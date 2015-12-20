@@ -6,13 +6,13 @@ import java.io.FileFilter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.FileNodeWrapper;
 
 /**
  * Util class for searching files on the filessystem which are not linked to a
- * provided {@link BibtexDatabase}.
+ * provided {@link BibDatabase}.
  * 
  * @author Nosh&Dan
  * @version 09.11.2008 | 19:55:20
@@ -33,7 +33,7 @@ public class UnlinkedFilesCrawler {
             return pathname.isDirectory();
         }
     };
-    private final BibtexDatabase database;
+    private final BibDatabase database;
 
 
     /**
@@ -41,7 +41,7 @@ public class UnlinkedFilesCrawler {
      * 
      * @param database
      */
-    public UnlinkedFilesCrawler(BibtexDatabase database) {
+    public UnlinkedFilesCrawler(BibDatabase database) {
         this.database = database;
     }
 

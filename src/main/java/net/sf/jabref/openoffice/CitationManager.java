@@ -18,14 +18,14 @@ package net.sf.jabref.openoffice;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.container.XNameAccess;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -44,8 +44,8 @@ class CitationManager {
     private final JDialog diag;
     private final EventList<CitEntry> list;
     private final JTable table;
-    private final EventTableModel<CitEntry> tableModel;
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final DefaultEventTableModel<CitEntry> tableModel;
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 
@@ -62,7 +62,7 @@ class CitationManager {
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
-        tableModel = new EventTableModel<>(list, new CitEntryFormat());
+        tableModel = new DefaultEventTableModel<>(list, new CitEntryFormat());
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -102,7 +102,7 @@ class CitationManager {
         cancel.addActionListener(cancelAction);
 
         bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                (Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+                (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(600);
@@ -125,7 +125,7 @@ class CitationManager {
     }
 
 
-    class CitEntry implements Comparable<CitEntry> {
+    static class CitEntry implements Comparable<CitEntry> {
 
         final String refMarkName;
         String pageInfo;
@@ -169,7 +169,7 @@ class CitationManager {
         }
     }
 
-    private class CitEntryFormat implements TableFormat<CitEntry> {
+    private static class CitEntryFormat implements TableFormat<CitEntry> {
 
         @Override
         public int getColumnCount() {
@@ -220,7 +220,7 @@ class CitationManager {
         final JDialog singleCiteDialog;
         final JTextField pageInfo = new JTextField(20);
         final JLabel title;
-        final JButton okButton = new JButton(Localization.lang("Ok"));
+        final JButton okButton = new JButton(Localization.lang("OK"));
         final JButton cancelButton = new JButton(Localization.lang("Cancel"));
         final CitEntry _entry;
 
@@ -274,7 +274,7 @@ class CitationManager {
             cancelButton.addActionListener(cancelAction);
 
             b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                    (Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+                    (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             b.getPanel().getActionMap().put("close", cancelAction);
 
         }

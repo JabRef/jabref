@@ -63,6 +63,7 @@ import java.awt.GridLayout;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 
 import javax.swing.Box;
@@ -284,7 +285,7 @@ public class FontSelectorDialog extends JDialog {
         buttons.setBorder(new EmptyBorder(12, 0, 0, 0));
         buttons.add(Box.createGlue());
 
-        ok = new JButton(Localization.lang("Ok"));
+        ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(new ActionHandler());
         getRootPane().setDefaultButton(ok);
         buttons.add(ok);
@@ -373,7 +374,8 @@ public class FontSelectorDialog extends JDialog {
             String[] _array = new String[nameVector.size()];
             nameVector.copyInto(_array);
             return _array;
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InvocationTargetException |
+                IllegalAccessException | IllegalArgumentException ex) {
             return null;//return Toolkit.getDefaultToolkit().getFontList();
         }
     }

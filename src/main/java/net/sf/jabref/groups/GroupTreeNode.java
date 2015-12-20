@@ -20,14 +20,12 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Vector;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
@@ -112,12 +110,12 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
 
     /**
      * Update all groups, if necessary, to handle the situation where the group
-     * tree is applied to a different BibtexDatabase than it was created for. This
+     * tree is applied to a different BibDatabase than it was created for. This
      * is for instance used when updating the group tree due to an external change.
      *
      * @param db The database to refresh for.
      */
-    public void refreshGroupsForNewDatabase(BibtexDatabase db) {
+    public void refreshGroupsForNewDatabase(BibDatabase db) {
         for (int i = 0; i < getChildCount(); ++i) {
             GroupTreeNode node = (GroupTreeNode) getChildAt(i);
             node.getGroup().refreshForNewDatabase(db);
@@ -223,26 +221,6 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         return super.children();
     }
 
-    /**
-     * Scans the subtree rooted at this node.
-     *
-     * @return All groups that contain the specified entry.
-     */
-    public AbstractGroup[] getMatchingGroups(BibtexEntry entry) {
-        Vector<AbstractGroup> matchingGroups = new Vector<>();
-        Enumeration<GroupTreeNode> e = preorderEnumeration();
-        AbstractGroup group;
-        while (e.hasMoreElements()) {
-            group = e.nextElement().getGroup();
-            if (group.contains(null, entry)) {
-                matchingGroups.add(group);
-            }
-        }
-        AbstractGroup[] matchingGroupsArray = new AbstractGroup[matchingGroups
-                .size()];
-        return matchingGroups.toArray(matchingGroupsArray);
-    }
-
     public boolean canMoveUp() {
         return (getPreviousSibling() != null)
                 && !(getGroup() instanceof AllEntriesGroup);
@@ -333,7 +311,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Adds the selected entries to this node's group.
      */
-    public AbstractUndoableEdit addToGroup(BibtexEntry[] entries) {
+    public AbstractUndoableEdit addToGroup(BibEntry[] entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }
@@ -347,7 +325,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Removes the selected entries from this node's group.
      */
-    public AbstractUndoableEdit removeFromGroup(BibtexEntry[] entries) {
+    public AbstractUndoableEdit removeFromGroup(BibEntry[] entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }

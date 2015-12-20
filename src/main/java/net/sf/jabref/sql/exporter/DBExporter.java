@@ -19,6 +19,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,8 +28,11 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;
@@ -45,14 +49,12 @@ import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
 /**
- *
  * @author igorsteinmacher.
- *
+ *         <p>
  *         Jan 20th Abstract Class to provide main features to export entries to a DB. To insert a new DB it is
  *         necessary to extend this class and add the DB name the enum available at
  *         net.sf.jabref.sql.DBImporterAndExporterFactory (and to the GUI). This class and its subclasses create
  *         database, entries and related stuff within a DB.
- *
  */
 
 public abstract class DBExporter extends DBImporterExporter {
@@ -61,21 +63,20 @@ public abstract class DBExporter extends DBImporterExporter {
     DBStrings dbStrings;
     private final ArrayList<String> dbNames = new ArrayList<>();
 
+    private static final Log LOGGER = LogFactory.getLog(DBExporter.class);
 
     /**
      * Method for the exportDatabase methods.
      *
      * @param database The DBTYPE of the database
-     * @param database The BibtexDatabase to export
+     * @param database The BibDatabase to export
      * @param metaData The MetaData object containing the groups information
-     * @param keySet The set of IDs of the entries to export.
-     * @param out The output (PrintStream or Connection) object to which the DML should be written.
+     * @param keySet   The set of IDs of the entries to export.
+     * @param out      The output (PrintStream or Connection) object to which the DML should be written.
      */
-
-    private void performExport(final BibtexDatabase database, final MetaData metaData, Set<String> keySet, Object out,
-            String dbName) throws Exception {
-
-        List<BibtexEntry> entries = FileActions.getSortedEntries(database, metaData, keySet, false);
+    private void performExport(final BibDatabase database, final MetaData metaData, Set<String> keySet, Object out,
+                               String dbName) throws Exception {
+        List<BibEntry> entries = FileActions.getSortedEntries(database, metaData, keySet, false);
         GroupTreeNode gtn = metaData.getGroups();
 
         int database_id = getDatabaseIDByName(metaData, out, dbName);
@@ -93,16 +94,16 @@ public abstract class DBExporter extends DBImporterExporter {
      * PrintStream.
      *
      * @param database_id ID of Jabref database related to the entries to be exported This information can be gathered
-     *            using getDatabaseIDByPath(metaData, out)
-     * @param entries The BibtexEntries to export
-     * @param out The output (PrintStream or Connection) object to which the DML should be written.
+     *                    using getDatabaseIDByPath(metaData, out)
+     * @param entries     The BibtexEntries to export
+     * @param out         The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private void populateEntriesTable(int database_id, List<BibtexEntry> entries, Object out) throws SQLException {
+    private void populateEntriesTable(int database_id, List<BibEntry> entries, Object out) throws SQLException {
         String query;
         String val;
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, " + fieldStr
                 + ", database_id) VALUES (";
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             query = insert + '\'' + entry.getId() + '\'' + ", (SELECT entry_types_id FROM entry_types WHERE label='"
                     + entry.getType().getName().toLowerCase() + "'), '" + entry.getCiteKey() + '\'';
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
@@ -113,7 +114,7 @@ public abstract class DBExporter extends DBImporterExporter {
                      * The condition below is there since PostgreSQL automatically escapes the backslashes, so the entry
                      * would double the number of slashes after storing/retrieving.
                      **/
-                    if (dbStrings.getServerType().equals("MySQL")) {
+                    if ("MySQL".equals(dbStrings.getServerType())) {
                         val = val.replace("\\", "\\\\");
                         val = val.replace("\"", "\\\"");
                         val = val.replace("\'", "''");
@@ -132,10 +133,10 @@ public abstract class DBExporter extends DBImporterExporter {
     /**
      * Recursive method to include a tree of groups.
      *
-     * @param cursor The current GroupTreeNode in the GroupsTree
-     * @param parentID The integer ID associated with the cursors's parent node
-     * @param currentID The integer value to associate with the cursor
-     * @param out The output (PrintStream or Connection) object to which the DML should be written.
+     * @param cursor      The current GroupTreeNode in the GroupsTree
+     * @param parentID    The integer ID associated with the cursors's parent node
+     * @param currentID   The integer value to associate with the cursor
+     * @param out         The output (PrintStream or Connection) object to which the DML should be written.
      * @param database_id Id of jabref database to which the group is part of
      */
 
@@ -144,7 +145,7 @@ public abstract class DBExporter extends DBImporterExporter {
         // if this group contains entries...
         if (cursor.getGroup() instanceof ExplicitGroup) {
             ExplicitGroup grp = (ExplicitGroup) cursor.getGroup();
-            for (BibtexEntry be : grp.getEntries()) {
+            for (BibEntry be : grp.getEntries()) {
                 SQLUtil.processQuery(out, "INSERT INTO entry_group (entries_id, groups_id) " + "VALUES ("
                         + "(SELECT entries_id FROM entries WHERE jabref_eid=" + '\'' + be.getId()
                         + "' AND database_id = " + database_id + "), "
@@ -153,21 +154,28 @@ public abstract class DBExporter extends DBImporterExporter {
             }
         }
         // recurse on child nodes (depth-first traversal)
-        Object response = SQLUtil.processQueryWithResults(out,
+        try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
                 "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
-                        + database_id + "' AND parent_id='" + parentID + "';");
-        // setting values to ID and myID to be used in case of textual SQL
-        // export
-        ++currentID;
-        int myID = currentID;
-        if (response instanceof Statement) {
-            try (ResultSet rs = ((Statement) response).getResultSet()) {
-                rs.next();
-                myID = rs.getInt("groups_id");
+                        + database_id + "' AND parent_id='" + parentID + "';")) {
+            // setting values to ID and myID to be used in case of textual SQL
+            // export
+            ++currentID;
+            int myID = currentID;
+            if (response instanceof Statement) {
+                try (ResultSet rs = ((Statement) response).getResultSet()) {
+                    rs.next();
+                    myID = rs.getInt("groups_id");
+                } finally {
+                    ((Statement) response).close();
+                }
             }
-        }
-        for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) {
-            currentID = populateEntryGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+
+            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+                currentID = populateEntryGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+            }
+            //Unfortunatley, AutoCloseable throws only Exception
+        } catch (Exception e) {
+            LOGGER.warn("Cannot close resource", e);
         }
         return currentID;
     }
@@ -179,55 +187,56 @@ public abstract class DBExporter extends DBImporterExporter {
      */
 
     private void populateEntryTypesTable(Object out) throws SQLException {
-        String query;
         ArrayList<String> fieldRequirement = new ArrayList<>();
 
         ArrayList<String> existentTypes = new ArrayList<>();
         if (out instanceof Connection) {
-            try (ResultSet rs = ((Statement) SQLUtil.processQueryWithResults(out, "SELECT label FROM entry_types"))
-                    .getResultSet()) {
+            try (Statement sm = (Statement) SQLUtil.processQueryWithResults(out, "SELECT label FROM entry_types");
+                 ResultSet rs = sm.getResultSet()) {
                 while (rs.next()) {
                     existentTypes.add(rs.getString(1));
                 }
             }
         }
         for (EntryType val : EntryTypes.getAllValues()) {
+            StringBuilder querySB = new StringBuilder();
+
             fieldRequirement.clear();
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 fieldRequirement.add(i, "gen");
             }
             List<String> reqFields = val.getRequiredFieldsFlat();
             List<String> optFields = val.getOptionalFields();
-            List<String> utiFields = Arrays.asList(new String[]{"search"});
+            List<String> utiFields = Arrays.asList("search");
             fieldRequirement = SQLUtil.setFieldRequirement(SQLUtil.getAllFields(), reqFields, optFields, utiFields,
                     fieldRequirement);
             if (!existentTypes.contains(val.getName().toLowerCase())) {
-                String insert = "INSERT INTO entry_types (label, " + fieldStr + ") VALUES (";
-                query = insert + '\'' + val.getName().toLowerCase() + '\'';
+                querySB.append("INSERT INTO entry_types (label, " + fieldStr + ") VALUES (");
+                querySB.append('\'' + val.getName().toLowerCase() + '\'');
                 for (String aFieldRequirement : fieldRequirement) {
-                    query = query + ", '" + aFieldRequirement + '\'';
+                    querySB.append(", '" + aFieldRequirement + '\'');
                 }
-                query = query + ");";
+                querySB.append(");");
             } else {
                 String[] update = fieldStr.split(",");
-                query = "UPDATE entry_types SET \n";
+                querySB.append("UPDATE entry_types SET \n");
                 for (int i = 0; i < fieldRequirement.size(); i++) {
-                    query += update[i] + "='" + fieldRequirement.get(i) + "',";
+                    querySB.append(update[i] + "='" + fieldRequirement.get(i) + "',");
                 }
-                query = query.substring(0, query.lastIndexOf(","));
-                query += " WHERE label='" + val.getName().toLowerCase() + '\'';
+                querySB.delete(querySB.lastIndexOf(","), querySB.length());
+                querySB.append(" WHERE label='" + val.getName().toLowerCase() + "';");
             }
-            SQLUtil.processQuery(out, query);
+            SQLUtil.processQuery(out, querySB.toString());
         }
     }
 
     /**
      * Recursive worker method for the populateGroupsTable methods.
      *
-     * @param cursor The current GroupTreeNode in the GroupsTree
-     * @param parentID The integer ID associated with the cursors's parent node
-     * @param currentID The integer value to associate with the cursor
-     * @param out The output (PrintStream or Connection) object to which the DML should be written.
+     * @param cursor      The current GroupTreeNode in the GroupsTree
+     * @param parentID    The integer ID associated with the cursors's parent node
+     * @param currentID   The integer value to associate with the cursor
+     * @param out         The output (PrintStream or Connection) object to which the DML should be written.
      * @param database_id Id of jabref database to which the groups/entries are part of
      */
     private int populateGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out, int database_id)
@@ -266,21 +275,27 @@ public abstract class DBExporter extends DBImporterExporter {
                 + (reg_exp != null ? '\'' + reg_exp + '\'' : "NULL") + ", " + hierContext.ordinal() + ", '"
                 + database_id + "');");
         // recurse on child nodes (depth-first traversal)
-        Object response = SQLUtil.processQueryWithResults(out,
+        try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
                 "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
-                        + database_id + "' AND parent_id='" + parentID + "';");
-        // setting values to ID and myID to be used in case of textual SQL
-        // export
-        int myID = currentID;
-        if (response instanceof Statement) {
-            try (ResultSet rs = ((Statement) response).getResultSet()) {
-                rs.next();
-                myID = rs.getInt("groups_id");
+                        + database_id + "' AND parent_id='" + parentID + "';")) {
+            // setting values to ID and myID to be used in case of textual SQL
+            // export
+            int myID = currentID;
+            if (response instanceof Statement) {
+                try (ResultSet rs = ((Statement) response).getResultSet()) {
+                    rs.next();
+                    myID = rs.getInt("groups_id");
+                } finally {
+                    ((Statement) response).close();
+                }
             }
-        }
-        for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) {
-            ++currentID;
-            currentID = populateGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+                ++currentID;
+                currentID = populateGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+            }
+            //Unfortunatley, AutoCloseable throws only Exception
+        } catch (Exception e) {
+            LOGGER.warn("Cannot close resource", e);
         }
         return currentID;
     }
@@ -289,21 +304,19 @@ public abstract class DBExporter extends DBImporterExporter {
      * Generates the DML required to populate the group_types table with JabRef data.
      *
      * @param out The output (PrintSream or Connection) object to which the DML should be written.
-     *
      * @throws SQLException
      */
     private static void populateGroupTypesTable(Object out) throws SQLException {
         int quantity = 0;
         if (out instanceof Connection) {
-            try (ResultSet res = ((Statement) SQLUtil.processQueryWithResults(out,
-                    "SELECT COUNT(*) AS amount FROM group_types")).getResultSet()) {
+            try (Statement sm = (Statement) SQLUtil.processQueryWithResults(out,
+                    "SELECT COUNT(*) AS amount FROM group_types"); ResultSet res = sm.getResultSet()) {
                 res.next();
                 quantity = res.getInt("amount");
-                res.getStatement().close();
             }
         }
         if (quantity == 0) {
-            String[] typeNames = new String[] {AllEntriesGroup.ID, ExplicitGroup.ID, KeywordGroup.ID, SearchGroup.ID};
+            String[] typeNames = new String[]{AllEntriesGroup.ID, ExplicitGroup.ID, KeywordGroup.ID, SearchGroup.ID};
             for (String typeName : typeNames) {
                 String insert = "INSERT INTO group_types (label) VALUES ('" + typeName + "');";
                 SQLUtil.processQuery(out, insert);
@@ -314,13 +327,13 @@ public abstract class DBExporter extends DBImporterExporter {
     /**
      * Generates the SQL required to populate the strings table with jabref data.
      *
-     * @param database BibtexDatabase object used from where the strings will be exported
-     * @param out The output (PrintStream or Connection) object to which the DML should be written.
+     * @param database    BibDatabase object used from where the strings will be exported
+     * @param out         The output (PrintStream or Connection) object to which the DML should be written.
      * @param database_id ID of Jabref database related to the entries to be exported This information can be gathered
-     *            using getDatabaseIDByPath(metaData, out)
+     *                    using getDatabaseIDByPath(metaData, out)
      * @throws SQLException
      */
-    private static void populateStringTable(BibtexDatabase database, Object out, int database_id) throws SQLException {
+    private static void populateStringTable(BibDatabase database, Object out, int database_id) throws SQLException {
         String insert = "INSERT INTO strings (label, content, database_id) VALUES (";
 
         if (database.getPreamble() != null) {
@@ -353,40 +366,43 @@ public abstract class DBExporter extends DBImporterExporter {
     protected abstract void createTables(Object out) throws SQLException;
 
     /**
-     * Accepts the BibtexDatabase and MetaData, generates the DML required to create and populate SQL database tables,
+     * Accepts the BibDatabase and MetaData, generates the DML required to create and populate SQL database tables,
      * and writes this DML to the specified output file.
      *
-     * @param database The BibtexDatabase to export
+     * @param database The BibDatabase to export
      * @param metaData The MetaData object containing the groups information
-     * @param keySet The set of IDs of the entries to export.
-     * @param file The name of the file to which the DML should be written
+     * @param keySet   The set of IDs of the entries to export.
+     * @param file     The name of the file to which the DML should be written
+     * @param encoding The encoding to be used
      */
-    public void exportDatabaseAsFile(final BibtexDatabase database, final MetaData metaData, Set<String> keySet,
-            String file) throws Exception {
-
+    public void exportDatabaseAsFile(final BibDatabase database, final MetaData metaData, Set<String> keySet,
+                                     String file, Charset encoding) throws Exception {
         // open output file
         File outfile = new File(file);
         if (outfile.exists()) {
-            outfile.delete();
-        }
-        try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outfile))) {
-            try (PrintStream fout = new PrintStream(writer)) {
-                performExport(database, metaData, keySet, fout, "file");
+            if (!outfile.delete()) {
+                LOGGER.warn("Cannot delete/overwrite file.");
+                return;
             }
+
+        }
+        try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outfile));
+             PrintStream fout = new PrintStream(writer)) {
+            performExport(database, metaData, keySet, fout, "file");
         }
     }
 
     /**
-     * Accepts the BibtexDatabase and MetaData, generates the DML required to create and populate SQL database tables,
+     * Accepts the BibDatabase and MetaData, generates the DML required to create and populate SQL database tables,
      * and writes this DML to the specified SQL database.
      *
-     * @param database The BibtexDatabase to export
-     * @param metaData The MetaData object containing the groups information
-     * @param keySet The set of IDs of the entries to export.
+     * @param database        The BibDatabase to export
+     * @param metaData        The MetaData object containing the groups information
+     * @param keySet          The set of IDs of the entries to export.
      * @param databaseStrings The necessary database connection information
      */
-    public void exportDatabaseToDBMS(final BibtexDatabase database, final MetaData metaData, Set<String> keySet,
-            DBStrings databaseStrings, JabRefFrame frame) throws Exception {
+    public void exportDatabaseToDBMS(final BibDatabase database, final MetaData metaData, Set<String> keySet,
+                                     DBStrings databaseStrings, JabRefFrame frame) throws Exception {
         String dbName;
         Connection conn = null;
         boolean redisplay = false;
@@ -408,7 +424,6 @@ public abstract class DBExporter extends DBImporterExporter {
                 conn.commit();
                 conn.setAutoCommit(true);
             }
-            conn.close();
             if (redisplay) {
                 exportDatabaseToDBMS(database, metaData, keySet, databaseStrings, frame);
             }
@@ -419,11 +434,15 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
             }
             throw ex;
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 
     private String getDBName(Vector<Vector<String>> matrix, DBStrings databaseStrings, JabRefFrame frame,
-            DBImportExportDialog dialogo) throws Exception {
+                             DBImportExportDialog dialogo) throws Exception {
         String dbName = "";
         if (matrix.size() > 1) {
             if (dialogo.hasDBSelected) {
@@ -451,7 +470,8 @@ public abstract class DBExporter extends DBImporterExporter {
     }
 
     private Vector<Vector<String>> createExistentDBNamesMatrix(DBStrings databaseStrings) throws Exception {
-        try (ResultSet rs = SQLUtil.queryAllFromTable(this.connectToDB(databaseStrings), "jabref_database")) {
+        try (Connection conn = this.connectToDB(databaseStrings);
+             ResultSet rs = SQLUtil.queryAllFromTable(conn, "jabref_database")) {
             Vector<String> v;
             Vector<Vector<String>> matrix = new Vector<>();
             dbNames.clear();

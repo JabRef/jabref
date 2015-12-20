@@ -16,15 +16,12 @@
 package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.l10n.Encodings;
-
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.common.base.CharMatcher;
 
 public class StringUtil {
 
@@ -173,17 +170,17 @@ public class StringUtil {
 
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
-        addWrappedLine(result, lines[0], wrapAmount);
+        // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
+        addWrappedLine(result, CharMatcher.WHITESPACE.trimTrailingFrom(lines[0]), wrapAmount); // See
         for (int i = 1; i < lines.length; i++) {
 
-            if (!lines[i].trim().equals("")) {
+            if (!"".equals(lines[i].trim())) {
                 result.append(Globals.NEWLINE);
                 result.append('\t');
                 result.append(Globals.NEWLINE);
                 result.append('\t');
-                String line = lines[i];
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-                line = line.replaceAll("\\s+$", "");
+                String line = CharMatcher.WHITESPACE.trimTrailingFrom(lines[i]);
                 addWrappedLine(result, line, wrapAmount);
             } else {
                 result.append(Globals.NEWLINE);
@@ -224,10 +221,6 @@ public class StringUtil {
         return result.toString();
     }
 
-    public static String quote(String toQuote, String specials, char quoteChar) {
-        return quote(toQuote, specials, quoteChar, 0);
-    }
-
     /**
      * Quote special characters.
      *
@@ -235,28 +228,22 @@ public class StringUtil {
      * @param specials  A String containing all special characters except the quoting
      *                  character itself, which is automatically quoted.
      * @param quoteChar The quoting character.
-     * @param linewrap  The number of characters after which a linebreak is inserted
-     *                  (this linebreak is undone by unquote()). Set to 0 to disable.
      * @return A String with every special character (including the quoting
      * character itself) quoted.
      */
-    private static String quote(String toQuote, String specials, char quoteChar, int linewrap) {
+    public static String quote(String toQuote, String specials, char quoteChar) {
         StringBuilder result = new StringBuilder();
         char c;
-        int lineLength = 0;
         boolean isSpecial;
         for (int i = 0; i < toQuote.length(); ++i) {
             c = toQuote.charAt(i);
-            isSpecial = (specials.indexOf(c) >= 0) || (c == quoteChar);
-            // linebreak?
-            if ((linewrap > 0) && ((++lineLength >= linewrap) || (isSpecial && (lineLength >= (linewrap - 1))))) {
-                result.append(quoteChar);
-                result.append('\n');
-                lineLength = 0;
+            if (specials != null) {
+                isSpecial = (c == quoteChar) || (specials.indexOf(c) >= 0);
+            } else {
+                isSpecial = (c == quoteChar);
             }
             if (isSpecial) {
                 result.append(quoteChar);
-                ++lineLength;
             }
             result.append(c);
         }
@@ -292,26 +279,6 @@ public class StringUtil {
 
     public static String booleanToBinaryString(boolean expression) {
         return expression ? "1" : "0";
-    }
-
-    /**
-     * Make a list of supported character encodings that can encode all
-     * characters in the given String.
-     *
-     * @param characters
-     *            A String of characters that should be supported by the
-     *            encodings.
-     * @return A List of character encodings
-     */
-    public static List<String> findEncodingsForString(String characters) {
-        List<String> encodings = new ArrayList<>();
-        for (int i = 0; i < Encodings.ENCODINGS.length; i++) {
-            CharsetEncoder encoder = Charset.forName(Encodings.ENCODINGS[i]).newEncoder();
-            if (encoder.canEncode(characters)) {
-                encodings.add(Encodings.ENCODINGS[i]);
-            }
-        }
-        return encodings;
     }
 
     /**
@@ -397,7 +364,7 @@ public class StringUtil {
         return res;
     }
 
-    public static String encodeString(String s) {
+    private static String encodeString(String s) {
         if (s == null) {
             return null;
         }

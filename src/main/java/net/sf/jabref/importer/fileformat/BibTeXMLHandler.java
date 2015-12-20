@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -32,9 +32,9 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 class BibTeXMLHandler extends DefaultHandler {
 
-    private ArrayList<BibtexEntry> bibitems;
+    private ArrayList<BibEntry> bibitems;
 
-    private BibtexEntry b; // the entry being read
+    private BibEntry b; // the entry being read
 
     // XML parsing stuff
     private String currentChars;
@@ -44,17 +44,11 @@ class BibTeXMLHandler extends DefaultHandler {
         super();
     }
 
-    public ArrayList<BibtexEntry> getItems() {
+    public ArrayList<BibEntry> getItems() {
         return bibitems;
     }
 
     // SAX parsing methods
-
-    @SuppressWarnings("unused")
-    public void doctypeDecl(String name, String publicId,
-            String systemId) {
-        // Do nothing
-    }
 
     @Override
     public void startDocument() {
@@ -74,30 +68,30 @@ class BibTeXMLHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String local, String raw, Attributes atts) {
-        if (raw.equals("bibtex:entry")) {
+        if ("bibtex:entry".equals(raw)) {
             String articleID = null;
             for (int i = 0; i < atts.getLength(); i++) {
-                if (atts.getQName(i).equals("bibtex:id") ||
-                        atts.getQName(i).equals("id")) {
+                if ("bibtex:id".equals(atts.getQName(i)) ||
+                        "id".equals(atts.getQName(i))) {
                     articleID = atts.getValue(i);
                 }
             }
-            b = new BibtexEntry(IdGenerator.next());
-            b.setField(BibtexEntry.KEY_FIELD, articleID);
-        } else if (raw.equals("bibtex:article") ||
-                raw.equals("bibtex:inbook") ||
-                raw.equals("bibtex:book") ||
-                raw.equals("bibtex:booklet") ||
-                raw.equals("bibtex:incollection") ||
-                raw.equals("bibtex:inproceedings") ||
-                raw.equals("bibtex:proceedings") ||
-                raw.equals("bibtex:manual") ||
-                raw.equals("bibtex:mastersthesis") ||
-                raw.equals("bibtex:phdthesis") ||
-                raw.equals("bibtex:techreport") ||
-                raw.equals("bibtex:unpublished") ||
-                raw.equals("bibtex:misc") ||
-                raw.equals("bibtex:other")) {
+            b = new BibEntry(IdGenerator.next());
+            b.setField(BibEntry.KEY_FIELD, articleID);
+        } else if ("bibtex:article".equals(raw) ||
+                "bibtex:inbook".equals(raw) ||
+                "bibtex:book".equals(raw) ||
+                "bibtex:booklet".equals(raw) ||
+                "bibtex:incollection".equals(raw) ||
+                "bibtex:inproceedings".equals(raw) ||
+                "bibtex:proceedings".equals(raw) ||
+                "bibtex:manual".equals(raw) ||
+                "bibtex:mastersthesis".equals(raw) ||
+                "bibtex:phdthesis".equals(raw) ||
+                "bibtex:techreport".equals(raw) ||
+                "bibtex:unpublished".equals(raw) ||
+                "bibtex:misc".equals(raw) ||
+                "bibtex:other".equals(raw)) {
             EntryType tp = EntryTypes.getType(local);
             b.setType(tp);
         }
@@ -106,7 +100,7 @@ class BibTeXMLHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String local, String raw) {
-        if (raw.equals("bibtex:entry")) {
+        if ("bibtex:entry".equals(raw)) {
             bibitems.add(b);
         } else if (raw.startsWith("bibtex:")) {
             b.setField(local, currentChars);

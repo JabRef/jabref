@@ -71,7 +71,7 @@ public class FileUpdateMonitor implements Runnable {
             throw new IOException("File not found");
         }
         numberOfUpdateListener++;
-        String key = "" + numberOfUpdateListener;
+        String key = String.valueOf(numberOfUpdateListener);
         entries.put(key, new Entry(ul, file));
         return key;
     }

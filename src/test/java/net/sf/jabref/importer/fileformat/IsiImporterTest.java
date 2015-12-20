@@ -3,7 +3,7 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.*;
 
 import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
 import org.junit.Before;
@@ -91,10 +91,10 @@ public class IsiImporterTest {
     public void testImportEntries() throws IOException {
         IsiImporter importer = new IsiImporter();
 
-        List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
+        List<BibEntry> entries = importer.importEntries(IsiImporterTest.class
                 .getResourceAsStream("IsiImporterTest1.isi"), new OutputPrinterToNull());
         Assert.assertEquals(1, entries.size());
-        BibtexEntry entry = entries.get(0);
+        BibEntry entry = entries.get(0);
         Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry
                 .getField("title"));
         Assert.assertEquals(
@@ -115,16 +115,16 @@ public class IsiImporterTest {
     public void testImportEntriesINSPEC() throws IOException {
         IsiImporter importer = new IsiImporter();
 
-        List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
+        List<BibEntry> entries = importer.importEntries(IsiImporterTest.class
                 .getResourceAsStream("IsiImporterTestInspec.isi"), new OutputPrinterToNull());
 
         Assert.assertEquals(2, entries.size());
-        BibtexEntry a = entries.get(0);
-        BibtexEntry b = entries.get(1);
+        BibEntry a = entries.get(0);
+        BibEntry b = entries.get(1);
 
         if (a.getField("title").equals(
                 "Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals")) {
-            BibtexEntry tmp = a;
+            BibEntry tmp = a;
             a = b;
             b = tmp;
         }
@@ -201,16 +201,16 @@ public class IsiImporterTest {
     public void testImportEntriesWOS() throws IOException {
         IsiImporter importer = new IsiImporter();
 
-        List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
+        List<BibEntry> entries = importer.importEntries(IsiImporterTest.class
                 .getResourceAsStream("IsiImporterTestWOS.isi"), new OutputPrinterToNull());
 
         Assert.assertEquals(2, entries.size());
-        BibtexEntry a = entries.get(0);
-        BibtexEntry b = entries.get(1);
+        BibEntry a = entries.get(0);
+        BibEntry b = entries.get(1);
 
         if (a.getField("title").equals(
                 "Optical waveguides in Sn2P2S6 by low fluence MeV He+ ion implantation")) {
-            BibtexEntry tmp = a;
+            BibEntry tmp = a;
             a = b;
             b = tmp;
         }
@@ -273,11 +273,11 @@ public class IsiImporterTest {
     public void testImportIEEEExport() throws IOException {
         IsiImporter importer = new IsiImporter();
 
-        List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
+        List<BibEntry> entries = importer.importEntries(IsiImporterTest.class
                 .getResourceAsStream("IEEEImport1.txt"), new OutputPrinterToNull());
 
         Assert.assertEquals(1, entries.size());
-        BibtexEntry a = entries.get(0);
+        BibEntry a = entries.get(0);
 
         Assert.assertEquals(a.getType().getName(), BibtexEntryTypes.ARTICLE, a.getType());
         Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
@@ -290,7 +290,7 @@ public class IsiImporterTest {
         Assert.assertEquals("4", a.getField("volume"));
         Assert.assertEquals("3", a.getField("number"));
 
-        Assert.assertEquals("1545-598X", a.getField("SN"));
+        Assert.assertEquals("1545-598X", a.getField("sn"));
 
         Assert.assertEquals("387--391", a.getField("pages"));
 
@@ -325,15 +325,15 @@ public class IsiImporterTest {
     public void testImportEntriesMedline() throws IOException {
         IsiImporter importer = new IsiImporter();
 
-        List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
+        List<BibEntry> entries = importer.importEntries(IsiImporterTest.class
                 .getResourceAsStream("IsiImporterTestMedline.isi"), new OutputPrinterToNull());
 
         Assert.assertEquals(2, entries.size());
-        BibtexEntry a = entries.get(0);
-        BibtexEntry b = entries.get(1);
+        BibEntry a = entries.get(0);
+        BibEntry b = entries.get(1);
 
         if (a.getField("title").startsWith("Estrogen")) {
-            BibtexEntry tmp = a;
+            BibEntry tmp = a;
             a = b;
             b = tmp;
         }

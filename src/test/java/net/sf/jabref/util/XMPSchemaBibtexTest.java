@@ -1,7 +1,7 @@
 package net.sf.jabref.util;
 
 import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.BibtexTestData;
 
 import org.apache.jempbox.impl.XMLUtil;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class XMPSchemaBibtexTest {
 
-    public void assertEqualsBibtexEntry(BibtexEntry e, BibtexEntry x) {
+    public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
         Assert.assertEquals(e.getCiteKey(), x.getCiteKey());
         Assert.assertEquals(e.getType(), x.getType());
 
@@ -237,10 +237,10 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = new XMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        BibtexEntry e = BibtexTestData.getBibtexEntry();
+        BibEntry e = BibtexTestData.getBibtexEntry();
         bibtex.setBibtexEntry(e, null);
 
-        BibtexEntry e2 = bibtex.getBibtexEntry();
+        BibEntry e2 = bibtex.getBibtexEntry();
 
         assertEqualsBibtexEntry(e, e2);
     }
