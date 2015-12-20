@@ -21,6 +21,7 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -207,13 +208,13 @@ public class DuplicateCheck {
      * @param entry    The entry of which we are looking for duplicates.
      * @return The first duplicate entry found. null if no duplicates are found.
      */
-    public static BibEntry containsDuplicate(BibDatabase database, BibEntry entry) {
+    public static Optional<BibEntry> containsDuplicate(BibDatabase database, BibEntry entry) {
         for (BibEntry other : database.getEntries()) {
             if (DuplicateCheck.isDuplicate(entry, other)) {
-                return other; // Duplicate found.
+                return Optional.of(other); // Duplicate found.
             }
         }
-        return null; // No duplicate found.
+        return Optional.empty(); // No duplicate found.
     }
 
     /**

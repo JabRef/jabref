@@ -395,8 +395,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Checking duplicates means both checking against the background
             // database (if
             // applicable) and against entries already in the table.
-            if (((panel != null) && (DuplicateCheck.containsDuplicate(panel.database(), entry) != null)) ||
-                    (internalDuplicate(this.entries, entry) != null)) {
+            if (((panel != null) && (DuplicateCheck.containsDuplicate(panel.database(), entry).isPresent()))
+                    || (internalDuplicate(this.entries, entry).isPresent())) {
                 entry.setGroupHit(true);
                 deselectAllDuplicates.setEnabled(true);
             }
@@ -414,16 +414,16 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * @param entry   The entry to search for duplicates of.
      * @return A possible duplicate, if any, or null if none were found.
      */
-    private static BibEntry internalDuplicate(Collection<BibEntry> entriesDupe, BibEntry entry) {
+    private static Optional<BibEntry> internalDuplicate(Collection<BibEntry> entriesDupe, BibEntry entry) {
         for (BibEntry othEntry : entriesDupe) {
             if (othEntry == entry) {
                 continue; // Don't compare the entry to itself
             }
             if (DuplicateCheck.isDuplicate(entry, othEntry)) {
-                return othEntry;
+                return Optional.of(othEntry);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -1077,12 +1077,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Is this the duplicate icon column, and is there an icon?
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibEntry first = sortedList.get(row);
-                BibEntry other = DuplicateCheck.containsDuplicate(panel.database(), first);
-                if (other != null) {
+                Optional<BibEntry> other = DuplicateCheck.containsDuplicate(panel.database(), first);
+                if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(
-                            ImportInspectionDialog.this, other, first,
+ImportInspectionDialog.this, other.get(),
+                            first,
                             DuplicateResolverDialog.INSPECTION);
                     PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
                     diag.setVisible(true);
@@ -1091,7 +1092,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         // Remove old entry. Or... add it to a list of entries
                         // to be deleted. We only delete
                         // it after Ok is clicked.
-                        entriesToDelete.add(other);
+                        entriesToDelete.add(other.get());
                         // Clear duplicate icon, which is controlled by the
                         // group hit
                         // field of the entry:
@@ -1113,7 +1114,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         // Remove old entry. Or... add it to a list of entries
                         // to be deleted. We only delete
                         // it after Ok is clicked.
-                        entriesToDelete.add(other);
+                        entriesToDelete.add(other.get());
                         // Store merged entry for later adding
                         // Clear duplicate icon, which is controlled by the
                         // group hit
@@ -1129,15 +1130,15 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
                 // Check if the duplicate is of another entry in the import:
                 other = internalDuplicate(entries, first);
-                if (other != null) {
-                    DuplicateResolverDialog diag = new DuplicateResolverDialog(
-                            ImportInspectionDialog.this, first, other, DuplicateResolverDialog.DUPLICATE_SEARCH);
+                if (other.isPresent()) {
+                    DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, first,
+                            other.get(), DuplicateResolverDialog.DUPLICATE_SEARCH);
                     PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
                     int answer = diag.getSelected();
                     if (answer == DuplicateResolverDialog.KEEP_UPPER) {
-                        entries.remove(other);
+                        entries.remove(other.get());
                         first.setGroupHit(false);
                     } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
                         entries.remove(first);
@@ -1148,7 +1149,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         diag.getMergedEntry().setSearchHit(true);
                         entries.add(diag.getMergedEntry());
                         entries.remove(first);
-                        entries.remove(other);
+                        entries.remove(other.get());
                     }
                 }
             }
