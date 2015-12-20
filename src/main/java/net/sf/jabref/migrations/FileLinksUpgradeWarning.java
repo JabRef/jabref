@@ -32,7 +32,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.util.CleanupUtil;
 
 /**
  * This class defines the warning that can be offered when opening a pre-2.3
@@ -184,7 +184,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
         if (upgradeDatabase) {
             // Update file links links in the database:
-            NamedCompound ce = Util.upgradePdfPsToFile(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
+            NamedCompound ce = CleanupUtil.upgradePdfPsToFile(pr.getDatabase(),
+                    FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
             panel.undoManager.addEdit(ce);
             panel.markBaseChanged();
         }
