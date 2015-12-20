@@ -151,6 +151,12 @@ When accessing a preference value, the method Globals.prefs.getTYPE(key) has to 
          Assert.assertEquals("a", actualList.get(0));
          Assert.assertEquals("b", actualList.get(1));
 ````
+* If you need a temporary file in tests, then add 
+```` java
+         @Rule
+         public TemporaryFolder testFolder = new TemporaryFolder();
+````
+to the test class. A temporary file is now created by `File tempFile = testFolder.newFile("file.txt");`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See the [blog of Gary Gregory](https://garygregory.wordpress.com/2010/01/20/junit-tip-use-rules-to-manage-temporary-files-and-folders/) for more details.
 
 ### Preferences in tests
 If `Globals.prefs` are not initialized in a test case, try to add
