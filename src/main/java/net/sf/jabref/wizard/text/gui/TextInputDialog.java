@@ -561,7 +561,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     class AutoAction extends BasicAction {
 
         public AutoAction() {
-            super(Localization.lang("Auto"), Localization.lang("Analyze text automatically"),
+            super("Auto", "Analyze text automatically",
                     IconTheme.JabRefIcon.AUTO_GROUP.getIcon());
         }
 
