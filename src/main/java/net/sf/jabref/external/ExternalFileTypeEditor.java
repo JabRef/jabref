@@ -301,10 +301,8 @@ public class ExternalFileTypeEditor extends JDialog {
                 return Localization.lang("Extension");
             case 3:
                 return Localization.lang("MIME type");
-            case 4:
+            default: // Five columns
                 return Localization.lang("Application");
-            default:
-                return null;
             }
         }
 
@@ -329,10 +327,8 @@ public class ExternalFileTypeEditor extends JDialog {
                 return type.getExtension();
             case 3:
                 return type.getMimeType();
-            case 4:
+            default: // Five columns
                 return type.getOpenWith();
-            default:
-                return null;
             }
         }
     }
