@@ -11,39 +11,35 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
 package net.sf.jabref.logic.cleanup;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.util.CleanupUtil;
 
-/**
- * Removes a given field.
- */
-public class RemoveFieldCleanup implements CleanupJob {
+public class RenamePdfCleanup implements CleanupJob {
 
-    private final String field;
+    private final List<String> paths;
+    private final BibDatabase database;
+    private final Boolean onlyRelativePaths;
+    private int unsuccessfulRenames;
 
 
-    public RemoveFieldCleanup(String field) {
-        this.field = field;
+    public RenamePdfCleanup(List<String> paths, Boolean onlyRelativePaths, BibDatabase database) {
+        this.paths = paths;
+        this.database = database;
+        this.onlyRelativePaths = onlyRelativePaths;
     }
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        String oldValue = entry.getField(field);
-        if (oldValue == null) {
-            // Not set -> nothing to do
-            return new ArrayList<>();
-        }
-
-        entry.clearField(field);
-        FieldChange change = new FieldChange(entry, field, oldValue, null);
-        return Collections.singletonList(change);
+        return CleanupUtil.renameFiles(entry, onlyRelativePaths, database, paths);
     }
 
+    public int getUnsuccessfulRenames() {
+        return unsuccessfulRenames;
+    }
 }

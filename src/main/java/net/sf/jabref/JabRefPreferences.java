@@ -36,12 +36,12 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.*;
 
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.actions.CleanUpAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
+import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
@@ -310,6 +310,42 @@ public final class JabRefPreferences {
     public static final String USE_CONVERT_TO_EQUATION = "useConvertToEquation";
     public static final String USE_IEEE_ABRV = "useIEEEAbrv";
 
+    public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
+    public static final String CLEANUP_DOI = "CleanUpDOI";
+    public static final String CLEANUP_MONTH = "CleanUpMonth";
+    public static final String CLEANUP_PAGE_NUMBERS = "CleanUpPageNumbers";
+    public static final String CLEANUP_DATE = "CleanUpDate";
+    public static final String CLEANUP_MAKE_PATHS_RELATIVE = "CleanUpMakePathsRelative";
+    public static final String CLEANUP_RENAME_PDF = "CleanUpRenamePDF";
+    public static final String CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
+    public static final String CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks";
+    public static final String CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts";
+    public static final String CLEANUP_HTML = "CleanUpHTML";
+    public static final String CLEANUP_CASE = "CleanUpCase";
+    public static final String CLEANUP_LATEX = "CleanUpLaTeX";
+    public static final String CLEANUP_UNITS = "CleanUpUnits";
+    public static final String CLEANUP_UNICODE = "CleanUpUnicode";
+    public static final String CLEANUP_CONVERT_TO_BIBLATEX = "CleanUpConvertToBiblatex";
+    public static final String CLEANUP_FIX_FILE_LINKS = "CleanUpFixFileLinks";
+    public static final CleanupPreset CLEANUP_DEFAULT_PRESET;
+    static {
+        CLEANUP_DEFAULT_PRESET = new CleanupPreset();
+        CLEANUP_DEFAULT_PRESET.setCleanUpSuperscripts(true);
+        CLEANUP_DEFAULT_PRESET.setCleanUpDOI(true);
+        CLEANUP_DEFAULT_PRESET.setCleanUpMonth(true);
+        CLEANUP_DEFAULT_PRESET.setCleanUpPageNumbers(true);
+        CLEANUP_DEFAULT_PRESET.setCleanUpDate(true);
+        CLEANUP_DEFAULT_PRESET.setMakePathsRelative(true);
+        CLEANUP_DEFAULT_PRESET.setRenamePDF(true);
+        CLEANUP_DEFAULT_PRESET.setConvertHTMLToLatex(true);
+        CLEANUP_DEFAULT_PRESET.setConvertCase(true);
+        CLEANUP_DEFAULT_PRESET.setConvertLaTeX(true);
+        CLEANUP_DEFAULT_PRESET.setConvertUnits(true);
+        CLEANUP_DEFAULT_PRESET.setConvertUnicodeToLatex(true);
+        CLEANUP_DEFAULT_PRESET.setFixFileLinks(true);
+    }
+
+
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
 
     // OpenOffice/LibreOffice preferences
@@ -335,6 +371,7 @@ public final class JabRefPreferences {
 
 
     private static final char[][] VALUE_DELIMITERS = new char[][] { {'"', '"'}, {'{', '}'}};
+
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
@@ -729,7 +766,9 @@ public final class JabRefPreferences {
         defaults.put(DB_CONNECT_HOSTNAME, "localhost");
         defaults.put(DB_CONNECT_DATABASE, "jabref");
         defaults.put(DB_CONNECT_USERNAME, "root");
-        CleanUpAction.putDefaults(defaults);
+
+        defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
+        insertCleanupPreset(defaults, CLEANUP_DEFAULT_PRESET);
 
         // defaults for DroppedFileHandler UI
         defaults.put(DroppedFileHandler.DFH_LEAVE, Boolean.FALSE);
@@ -1278,5 +1317,25 @@ public final class JabRefPreferences {
 
     public void setDefaultEncoding(Charset encoding) {
         put(JabRefPreferences.DEFAULT_ENCODING, encoding.name());
+    }
+
+    private static void insertCleanupPreset(Map<String, Object> storage, CleanupPreset preset) {
+
+        storage.put(CLEANUP_SUPERSCRIPTS, preset.isCleanUpSuperscripts());
+        storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
+        storage.put(CLEANUP_MONTH, preset.isCleanUpMonth());
+        storage.put(CLEANUP_PAGE_NUMBERS, preset.isCleanUpPageNumbers());
+        storage.put(CLEANUP_DATE, preset.isCleanUpDate());
+        storage.put(CLEANUP_MAKE_PATHS_RELATIVE, preset.isMakePathsRelative());
+        storage.put(CLEANUP_RENAME_PDF, preset.isRenamePDF());
+        storage.put(CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS, preset.isRenamePdfOnlyRelativePaths());
+        storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, preset.isCleanUpUpgradeExternalLinks());
+        storage.put(CLEANUP_HTML, preset.isConvertHTMLToLatex());
+        storage.put(CLEANUP_CASE, preset.isConvertCase());
+        storage.put(CLEANUP_LATEX, preset.isConvertLaTeX());
+        storage.put(CLEANUP_UNITS, preset.isConvertUnits());
+        storage.put(CLEANUP_UNICODE, preset.isConvertUnicodeToLatex());
+        storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
+        storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
     }
 }

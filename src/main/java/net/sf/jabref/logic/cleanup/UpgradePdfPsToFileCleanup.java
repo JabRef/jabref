@@ -14,36 +14,27 @@
 
 package net.sf.jabref.logic.cleanup;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.util.CleanupUtil;
 
 /**
- * Removes a given field.
+ * Collects file links from the given set of fields, and add them to the list contained in the file field.
  */
-public class RemoveFieldCleanup implements CleanupJob {
+public class UpgradePdfPsToFileCleanup implements CleanupJob {
 
-    private final String field;
+    private final List<String> fields;
 
 
-    public RemoveFieldCleanup(String field) {
-        this.field = field;
+    public UpgradePdfPsToFileCleanup(List<String> fields) {
+        this.fields = Objects.requireNonNull(fields);
     }
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        String oldValue = entry.getField(field);
-        if (oldValue == null) {
-            // Not set -> nothing to do
-            return new ArrayList<>();
-        }
-
-        entry.clearField(field);
-        FieldChange change = new FieldChange(entry, field, oldValue, null);
-        return Collections.singletonList(change);
+        return CleanupUtil.upgradePdfPsToFile(entry, fields);
     }
-
 }
