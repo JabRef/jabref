@@ -407,7 +407,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * @param string Field name
      * @return Component to show, or null if none.
      */
-    public JComponent getExtra(final FieldEditor editor) {
+    public Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
         final String fieldExtras = BibtexFields.getFieldExtras(fieldName);
@@ -444,7 +444,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         } else if (BibtexFields.EXTRA_MONTH.equals(fieldExtras)) {
             return FieldExtraComponents.getMonthExtraComponent(editor, this);
         }
-        return null;
+        return Optional.empty();
     }
 
     private void setupSourcePanel() {

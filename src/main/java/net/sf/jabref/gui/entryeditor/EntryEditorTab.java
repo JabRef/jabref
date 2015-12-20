@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -162,7 +163,7 @@ class EntryEditorTab {
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
 
-            JComponent extra = parent.getExtra(fieldEditor);
+            Optional<JComponent> extra = parent.getExtra(fieldEditor);
 
             // Add autocompleter listener, if required for this field:
             AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(fields[i]);
@@ -183,13 +184,13 @@ class EntryEditorTab {
                 fieldEditor.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
             }
             builder.append(fieldEditor.getLabel());
-            if (extra == null) {
+            if (!(extra.isPresent())) {
                 builder.append(fieldEditor.getPane(), 3);
             } else {
                 builder.append(fieldEditor.getPane());
                 JPanel pan = new JPanel();
                 pan.setLayout(new BorderLayout());
-                pan.add(extra, BorderLayout.NORTH);
+                pan.add(extra.get(), BorderLayout.NORTH);
                 builder.append(pan);
             }
             if (((i + 1) % fieldsPerRow) == 0) {

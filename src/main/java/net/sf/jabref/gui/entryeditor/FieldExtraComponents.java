@@ -25,6 +25,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.HashSet;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -71,8 +72,8 @@ public class FieldExtraComponents {
      * @param storeFieldAction
      * @return
      */
-    static JComponent getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor, BibEntry entry,
-            HashSet<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+    static Optional<JComponent> getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
+            BibEntry entry, HashSet<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
         if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
@@ -103,10 +104,18 @@ public class FieldExtraComponents {
         });
 
         controls.add(button, BorderLayout.SOUTH);
-        return controls;
+        return Optional.of(controls);
     }
 
-    public static JComponent getBrowseExtraComponent(JabRefFrame frame, FieldEditor fieldEditor,
+    /**
+     * Return a "Browse" button for fields with EXTRA_BROWSE
+     *
+     * @param frame
+     * @param fieldEditor
+     * @param entryEditor
+     * @return
+     */
+    public static Optional<JComponent> getBrowseExtraComponent(JabRefFrame frame, FieldEditor fieldEditor,
             EntryEditor entryEditor) {
         JButton but = new JButton(Localization.lang("Browse"));
         ((JComponent) fieldEditor).addMouseListener(entryEditor.new ExternalViewerListener());
@@ -133,10 +142,19 @@ public class FieldExtraComponents {
             }
         });
 
-        return but;
+        return Optional.of(but);
     }
 
-    static JComponent getBrowseDocExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor fieldEditor,
+    /**
+     *
+     * @param frame
+     * @param panel
+     * @param fieldEditor
+     * @param entryEditor
+     * @param isZip
+     * @return
+     */
+    static Optional<JComponent> getBrowseDocExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor fieldEditor,
             EntryEditor entryEditor, Boolean isZip) {
 
         final String ext = '.' + fieldEditor.getFieldName().toLowerCase();
@@ -147,17 +165,31 @@ public class FieldExtraComponents {
             off = new OpenFileFilter(new String[] {ext});
         }
 
-        return new ExternalFilePanel(frame, panel.metaData(), entryEditor, fieldEditor.getFieldName(), off,
-                fieldEditor);
+        return Optional.of(new ExternalFilePanel(frame, panel.metaData(), entryEditor, fieldEditor.getFieldName(), off,
+                fieldEditor));
     }
 
-    public static JComponent getExternalExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
+    /**
+     * Set up a mouse listener for opening an external viewer for with with EXTRA_EXTERNAL
+     *
+     * @param fieldEditor
+     * @param entryEditor
+     * @return
+     */
+    public static Optional<JComponent> getExternalExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
         ((JComponent) fieldEditor).addMouseListener(entryEditor.new ExternalViewerListener());
 
-        return null;
+        return Optional.empty();
     }
 
-    public static JComponent getYesNoExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
+    /**
+     * Return a dropdown list containing Yes and No for fields with EXTRA_YES_NO
+     *
+     * @param fieldEditor
+     * @param entryEditor
+     * @return
+     */
+    public static Optional<JComponent> getYesNoExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
         final String[] options = {"", "Yes", "No"};
         JComboBox<String> yesno = new JComboBox<>(options);
         yesno.addActionListener(new ActionListener() {
@@ -169,11 +201,18 @@ public class FieldExtraComponents {
                 entryEditor.updateField(fieldEditor);
             }
         });
-        return yesno;
+        return Optional.of(yesno);
 
     }
 
-    public static JComponent getMonthExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
+    /**
+     * Return a dropdown list with the month names for fields with EXTRA_MONTH
+     *
+     * @param fieldEditor
+     * @param entryEditor
+     * @return
+     */
+    public static Optional<JComponent> getMonthExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
         final String[] options = new String[13];
         options[0] = Localization.lang("Select");
         for (int i = 1; i <= 12; i++) {
@@ -198,11 +237,18 @@ public class FieldExtraComponents {
                 month.setSelectedIndex(0);
             }
         });
-        return month;
+        return Optional.of(month);
 
     }
 
-    public static JComponent getSetOwnerExtraComponent(FieldEditor fieldEditor, StoreFieldAction storeFieldAction) {
+    /**
+     * Return a button which sets the owner if the field for fields with EXTRA_SET_OWNER
+     * @param fieldEditor
+     * @param storeFieldAction
+     * @return
+     */
+    public static Optional<JComponent> getSetOwnerExtraComponent(FieldEditor fieldEditor,
+            StoreFieldAction storeFieldAction) {
         JButton button = new JButton(Localization.lang("Auto"));
         button.addActionListener(new ActionListener() {
 
@@ -212,27 +258,53 @@ public class FieldExtraComponents {
                 storeFieldAction.actionPerformed(new ActionEvent(fieldEditor, 0, ""));
             }
         });
-        return button;
+        return Optional.of(button);
 
     }
 
-    public static JComponent getURLExtraComponent(FieldEditor fieldEditor, StoreFieldAction storeFieldAction) {
+    /**
+     * Set up a drop target for URLs for fields with EXTRA_URL
+     *
+     * @param fieldEditor
+     * @param storeFieldAction
+     * @return
+     */
+    public static Optional<JComponent> getURLExtraComponent(FieldEditor fieldEditor,
+            StoreFieldAction storeFieldAction) {
         ((JComponent) fieldEditor).setDropTarget(new DropTarget((Component) fieldEditor, DnDConstants.ACTION_NONE,
                 new SimpleUrlDragDrop(fieldEditor, storeFieldAction)));
 
-        return null;
+        return Optional.empty();
     }
 
-    public static JComponent getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
+    /**
+     * Return a button opening a content selector for fields where one exists
+     *
+     * @param frame
+     * @param panel
+     * @param editor
+     * @param contentSelectors
+     * @param storeFieldAction
+     * @return
+     */
+    public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
             HashSet<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.metaData,
                 storeFieldAction, false,
                 "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");
         contentSelectors.add(ws);
-        return ws;
+        return Optional.of(ws);
     }
 
-    public static JComponent getDateTimeExtraComponent(FieldEditor editor, Boolean isDatePicker) {
+    /**
+     * Set up field such that double click inserts the current date
+     * If isDataPicker is True, a button with a data picker is returned
+     *
+     * @param editor
+     * @param isDatePicker
+     * @return
+     */
+    public static Optional<JComponent> getDateTimeExtraComponent(FieldEditor editor, Boolean isDatePicker) {
         ((JTextArea) editor).addMouseListener(new MouseAdapter() {
 
             @Override
@@ -248,9 +320,9 @@ public class FieldExtraComponents {
         // insert a datepicker, if the extras field contains this command
         if (isDatePicker) {
             DatePickerButton datePicker = new DatePickerButton(editor);
-            return datePicker.getDatePicker();
+            return Optional.of(datePicker.getDatePicker());
         } else {
-            return null;
+            return Optional.empty();
         }
 
     }
