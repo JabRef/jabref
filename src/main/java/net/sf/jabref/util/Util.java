@@ -55,7 +55,6 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.util.strings.UnicodeCharMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -337,61 +336,7 @@ public class Util {
         }
     }
 
-    /**
-     * Collect file links from the given set of fields, and add them to the list contained in the field
-     * GUIGlobals.FILE_FIELD.
-     *
-     * @param database The database to modify.
-     * @param fields The fields to find links in.
-     * @return A CompoundEdit specifying the undo operation for the whole operation.
-     */
-    public static NamedCompound upgradePdfPsToFile(BibDatabase database, String[] fields) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
 
-        for (BibEntry entry : database.getEntryMap().values()) {
-            upgradePdfPsToFile(entry, fields, ce);
-        }
-
-        ce.end();
-        return ce;
-    }
-
-    /**
-     * TODO: Move this to cleanup class. Collect file links from the given set of fields, and add them to the list
-     * contained in the field GUIGlobals.FILE_FIELD.
-     *
-     * @param entries The entries to modify.
-     * @param fields The fields to find links in.
-     * @return A CompoundEdit specifying the undo operation for the whole operation.
-     */
-    public static void upgradePdfPsToFile(BibEntry entry, String[] fields, NamedCompound ce) {
-        FileListTableModel tableModel = new FileListTableModel();
-        // If there are already links in the file field, keep those on top:
-        String oldFileContent = entry.getField(Globals.FILE_FIELD);
-        if (oldFileContent != null) {
-            tableModel.setContent(oldFileContent);
-        }
-        int oldRowCount = tableModel.getRowCount();
-        for (String field : fields) {
-            String o = entry.getField(field);
-            if (o != null) {
-                if (!o.trim().isEmpty()) {
-                    File f = new File(o);
-                    FileListEntry flEntry = new FileListEntry(f.getName(), o,
-                            Globals.prefs.getExternalFileTypeByExt(field));
-                    tableModel.addEntry(tableModel.getRowCount(), flEntry);
-
-                    entry.clearField(field);
-                    ce.addEdit(new UndoableFieldChange(entry, field, o, null));
-                }
-            }
-        }
-        if (tableModel.getRowCount() != oldRowCount) {
-            String newValue = tableModel.getStringRepresentation();
-            entry.setField(Globals.FILE_FIELD, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
-        }
-    }
 
     /**
      * This method looks up what kind of external binding is used for the given field, and constructs on OpenFileFilter
@@ -718,7 +663,7 @@ public class Util {
         if (affectedFields.isEmpty()) {
             return true; // no side effects
         }
-    
+
         // show a warning, then return
         StringBuffer message = new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
         for (int i = 0; i < affectedFields.size(); ++i) {
@@ -727,7 +672,7 @@ public class Util {
         message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
         int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
-    
+
         // if (groups instanceof KeywordGroup) {
         // KeywordGroup kg = (KeywordGroup) groups;
         // String field = kg.getSearchField().toLowerCase();
