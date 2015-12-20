@@ -49,24 +49,22 @@ public class ParserResultWarningDialog {
             int maxWarnings, int dataBaseNumber) {
         Objects.requireNonNull(parserResult);
         Objects.requireNonNull(jabRefFrame);
-        Objects.requireNonNull(maxWarnings);
-        Objects.requireNonNull(dataBaseNumber);
         if (parserResult.hasWarnings()) {
-            if (dataBaseNumber < 0) {
+            if (dataBaseNumber >= 0) {
                 jabRefFrame.showBasePanelAt(dataBaseNumber);
             }
 
             // Generate string with warning texts
-            List<String> wrns = parserResult.warnings();
-            StringBuilder wrn = new StringBuilder();
-            for (int j = 0; j < Math.min(maxWarnings, wrns.size()); j++) {
-                wrn.append(j + 1).append(". ").append(wrns.get(j)).append("\n");
+            List<String> warnings = parserResult.warnings();
+            StringBuilder dialogContent = new StringBuilder();
+            for (int j = 0; j < Math.min(maxWarnings, warnings.size()); j++) {
+                dialogContent.append(j + 1).append(". ").append(warnings.get(j)).append("\n");
             }
-            if (wrns.size() > maxWarnings) {
-                wrn.append("... ");
-                wrn.append(Localization.lang("%0 warnings", String.valueOf(wrns.size())));
-            } else if (wrn.length() > 0) {
-                wrn.deleteCharAt(wrn.length() - 1);
+            if (warnings.size() > maxWarnings) {
+                dialogContent.append("... ");
+                dialogContent.append(Localization.lang("%0 warnings", String.valueOf(warnings.size())));
+            } else if (dialogContent.length() > 0) {
+                dialogContent.deleteCharAt(dialogContent.length() - 1);
             }
 
             // Generate dialog title
@@ -85,7 +83,8 @@ public class ParserResultWarningDialog {
             // (duplicate key warnings). I don't think this is a big problem for normal situations,
             // and it may possibly be a bug in the Swing code.
 
-            JOptionPane.showMessageDialog(jabRefFrame, wrn.toString(), dialogTitle, JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(jabRefFrame, dialogContent.toString(), dialogTitle,
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 }
