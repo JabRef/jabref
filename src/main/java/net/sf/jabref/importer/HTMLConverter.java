@@ -773,11 +773,11 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
     public HTMLConverter() {
         super();
         for (String[] aConversionList : conversionList) {
-            if (aConversionList[2].length() >= 1) {
-                if (aConversionList[1].length() >= 1) {
+            if (!(aConversionList[2].isEmpty())) {
+                if (!(aConversionList[1].isEmpty())) {
                     escapedSymbols.put("&" + aConversionList[1] + ";", aConversionList[2]);
                 }
-                if (aConversionList[0].length() >= 1) {
+                if (!(aConversionList[0].isEmpty())) {
                     numSymbols.put(Integer.decode(aConversionList[0]), aConversionList[2]);
                     if (Integer.decode(aConversionList[0]) > 128) {
                         Character c = (char) Integer.decode(aConversionList[0]).intValue();

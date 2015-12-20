@@ -123,16 +123,16 @@ public class SynchronizeFileField extends AbstractWorker {
             /*
                 progress += weightAutoSet;
                 panel.frame().setProgressBarValue(progress);
-
+            
                 Object old = sel[i].getField(fieldName);
                 FileListTableModel tableModel = new FileListTableModel();
                 if (old != null)
                     tableModel.setContent((String)old);
                 Thread t = FileListEditor.autoSetLinks(sel[i], tableModel, null, null);
-
+            
                 if (!tableModel.getStringRepresentation().equals(old)) {
                     String toSet = tableModel.getStringRepresentation();
-                    if (toSet.length() == 0)
+                    if (toSet.isEmpty())
                         toSet = null;
                     ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old, toSet));
                     sel[i].setField(fieldName, toSet);
