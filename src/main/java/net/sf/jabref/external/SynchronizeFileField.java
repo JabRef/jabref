@@ -151,7 +151,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 panel.frame().setProgressBarValue(progress++);
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is set:
-                if ((old != null) && !"".equals(old)) {
+                if ((old != null) && !(old.isEmpty())) {
                     FileListTableModel tableModel = new FileListTableModel();
                     tableModel.setContentDontGuessTypes(old);
 

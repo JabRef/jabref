@@ -5,7 +5,6 @@ package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -300,7 +299,7 @@ public class GVKParser {
                 quelle = getSubfield("8", datafield);
             }
             if ("046R".equals(tag)) {
-                if ("".equals(quelle) || (quelle == null)) {
+                if ((quelle == null) || quelle.isEmpty()) {
                     quelle = getSubfield("a", datafield);
                 }
             }
@@ -346,7 +345,7 @@ public class GVKParser {
             if (quelle.contains("ZDB-ID")) {
                 entryType = "article";
             }
-        } else if ("".equals(mak)) {
+        } else if (mak.isEmpty()) {
             entryType = "misc";
         } else if (mak.startsWith("O")) {
             entryType = "misc";
