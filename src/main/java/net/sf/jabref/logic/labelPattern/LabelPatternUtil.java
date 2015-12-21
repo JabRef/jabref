@@ -122,8 +122,8 @@ public class LabelPatternUtil {
      * @return The content without diacritics.
      */
     private static String removeDiacritics(String content) {
-        if (content == null) {
-            return null;
+        if (content.isEmpty()) {
+            return content;
         }
 
         // Replace umaut with '?e'
@@ -248,14 +248,14 @@ public class LabelPatternUtil {
      *
      * @param content the institution to generate a Bibtex key for
      * @return <ul>
-     *         <li>the institutation key</li>
+     *         <li>the institution key</li>
      *         <li>"" in the case of a failure</li>
      *         <li>null if content is null</li>
      *         </ul>
      */
     private static String generateInstitutionKey(String content) {
-        if (content == null) {
-            return null;
+        if (content.isEmpty()) {
+            return content;
         }
         content = LabelPatternUtil.unifyDiacritics(content);
         List<String> ignore = Arrays.asList("press", "the");
