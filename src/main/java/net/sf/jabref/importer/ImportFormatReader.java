@@ -128,13 +128,18 @@ public class ImportFormatReader {
     public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
         File file = new File(filename);
 
-        try (InputStream stream = new FileInputStream(file)) {
+        try (InputStream stream = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(stream)) {
 
-            if (!importer.isRecognizedFormat(stream)) {
+            bis.mark(Integer.MAX_VALUE);
+
+            if (!importer.isRecognizedFormat(bis)) {
                 throw new IOException("Wrong file format");
             }
 
-            return importer.importEntries(stream, status);
+            bis.reset();
+
+            return importer.importEntries(bis, status);
         }
     }
 
