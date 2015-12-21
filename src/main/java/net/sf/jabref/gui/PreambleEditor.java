@@ -34,18 +34,14 @@ class PreambleEditor extends JDialog {
     // A reference to the entry this object works on.
     private final BibDatabase base;
     private final BasePanel panel;
-    private final JabRefPreferences prefs;
 
     private FieldEditor ed;
 
 
-    public PreambleEditor(JabRefFrame baseFrame,
-            BasePanel panel, BibDatabase base,
-            JabRefPreferences prefs) {
+    public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase base, JabRefPreferences prefs) {
         super(baseFrame);
         this.panel = panel;
         this.base = base;
-        this.prefs = prefs;
 
         addWindowListener(new WindowAdapter() {
 
