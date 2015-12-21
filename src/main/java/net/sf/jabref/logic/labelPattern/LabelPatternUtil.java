@@ -178,7 +178,7 @@ public class LabelPatternUtil {
         if (!(author.isEmpty())) {
             return (author.charAt(0) == '{') && (author.charAt(author.length() - 1) == '}');
         } else {
-            return false; // In case of empty or null author
+            return false; // In case of empty author
         }
     }
 
