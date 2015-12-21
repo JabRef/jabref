@@ -52,7 +52,7 @@ public class EntryUtil {
             return Collections.emptyList();
         }
 
-        ArrayList<String> al = new ArrayList<>();
+        List<String> al = new ArrayList<>();
         for (String anAll : all) {
             boolean found = false;
             for (String aSubset : subset) {
@@ -70,10 +70,10 @@ public class EntryUtil {
 
     /**
      * @param keywords a String of keywords
-     * @return an ArrayList containing the keywords. An emtpy list if keywords are null or empty
+     * @return an List containing the keywords. An emtpy list if keywords are null or empty
      */
-    public static ArrayList<String> getSeparatedKeywords(String keywords) {
-        ArrayList<String> res = new ArrayList<>();
+    public static List<String> getSeparatedKeywords(String keywords) {
+        List<String> res = new ArrayList<>();
         if (keywords == null) {
             return res;
         }
