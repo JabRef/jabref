@@ -45,6 +45,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Removed
 - Removed file history size preference (never available from the UI)
 - Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
+- Removed ScifinderImporter because it's hardly ever used, and we could not get resource files to test against
 - Removed option "Show one letter heading for icon columns" which is obsolete with the fix of #315/384
 - Removed table column "PDF/PS" which refers to legacy fields "ps" resp. "pdf" which are no longer supported (see also fix #498)
 - Removed the ability to export references on the CLI interface based on year ranges
