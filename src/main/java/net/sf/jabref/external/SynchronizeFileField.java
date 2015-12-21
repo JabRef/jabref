@@ -105,11 +105,6 @@ public class SynchronizeFileField extends AbstractWorker {
         int progress = 0;
         final NamedCompound ce = new NamedCompound(Localization.lang("Autoset %0 field", fieldName));
 
-        //final OpenFileFilter off = Util.getFileFilterForField(fieldName);
-
-        //ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, null, off);
-        //TextField editor = new TextField(fieldName, "", false);
-
         Set<BibEntry> changedEntries = new HashSet<>();
 
         // First we try to autoset fields
@@ -120,30 +115,9 @@ public class SynchronizeFileField extends AbstractWorker {
             // Start the autosetting process:
             Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.metaData(), null, null);
             JabRefExecutorService.INSTANCE.executeAndWait(r);
-            /*
-                progress += weightAutoSet;
-                panel.frame().setProgressBarValue(progress);
-            
-                Object old = sel[i].getField(fieldName);
-                FileListTableModel tableModel = new FileListTableModel();
-                if (old != null)
-                    tableModel.setContent((String)old);
-                Thread t = FileListEditor.autoSetLinks(sel[i], tableModel, null, null);
-            
-                if (!tableModel.getStringRepresentation().equals(old)) {
-                    String toSet = tableModel.getStringRepresentation();
-                    if (toSet.isEmpty())
-                        toSet = null;
-                    ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old, toSet));
-                    sel[i].setField(fieldName, toSet);
-                    entriesChanged++;
-                }
-            }    */
-
         }
         progress += sel.length * weightAutoSet;
         panel.frame().setProgressBarValue(progress);
-        //System.out.println("Done setting");
         // The following loop checks all external links that are already set.
         if (checkExisting) {
             boolean removeAllBroken = false;
