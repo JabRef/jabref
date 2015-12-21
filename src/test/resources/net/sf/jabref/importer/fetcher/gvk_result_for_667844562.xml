@@ -1,0 +1,1774 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/">
+<zs:version>1.1</zs:version>
+<zs:numberOfRecords>1</zs:numberOfRecords>
+<zs:records>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="001@">
+    <subfield code="0">20-23,30-31,34,60,62,69-70,91,95,100-101,105,110,118,120,122,132,136,140,160-161,164,185-187,213,230-231,264,293,370</subfield>
+  </datafield>
+  <datafield tag="001A">
+    <subfield code="0">2031:07-09-11</subfield>
+  </datafield>
+  <datafield tag="001B">
+    <subfield code="0">0084:28-07-15</subfield>
+    <subfield code="t">08:45:12.000</subfield>
+  </datafield>
+  <datafield tag="001D">
+    <subfield code="0">0089:20-01-12</subfield>
+  </datafield>
+  <datafield tag="001U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield tag="001X">
+    <subfield code="0">0</subfield>
+  </datafield>
+  <datafield tag="002@">
+    <subfield code="0">Oaukf</subfield>
+  </datafield>
+  <datafield tag="003@">
+    <subfield code="0">667844562</subfield>
+  </datafield>
+  <datafield tag="003O">
+    <subfield code="a">OCoLC</subfield>
+    <subfield code="0">844942839</subfield>
+    <subfield code="v">2012-12-31</subfield>
+  </datafield>
+  <datafield tag="004A">
+    <subfield code="A">9783834882851</subfield>
+  </datafield>
+  <datafield tag="004P">
+    <subfield code="S">p</subfield>
+    <subfield code="A">9783834817495</subfield>
+  </datafield>
+  <datafield tag="004V">
+    <subfield code="0">10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield tag="006L">
+    <subfield code="c">ZBM</subfield>
+    <subfield code="0">1228.00003</subfield>
+  </datafield>
+  <datafield tag="006X">
+    <subfield code="c">SPEB</subfield>
+    <subfield code="0">9783834882851</subfield>
+  </datafield>
+  <datafield tag="006X">
+    <subfield code="c">CIA</subfield>
+    <subfield code="0">319859</subfield>
+  </datafield>
+  <datafield tag="007G">
+    <subfield code="c">GBV</subfield>
+    <subfield code="0">667844562</subfield>
+  </datafield>
+  <datafield tag="008E">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="b">2011</subfield>
+  </datafield>
+  <datafield tag="008E">
+    <subfield code="a">ZDB-22-CAN</subfield>
+  </datafield>
+  <datafield tag="009@">
+    <subfield code="b">Verlagsdaten - Springer</subfield>
+  </datafield>
+  <datafield tag="009@">
+    <subfield code="b">Verlagsdaten - Springer - neu</subfield>
+  </datafield>
+  <datafield tag="009@">
+    <subfield code="a">CIANDO</subfield>
+    <subfield code="b">eBook</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="009P">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+    <subfield code="3">34</subfield>
+    <subfield code="4">ZZ</subfield>
+    <subfield code="A">Springer</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="009P">
+    <subfield code="S">1</subfield>
+    <subfield code="a">http://ebooks.ciando.com/book/index.cfm/bok_id/319859</subfield>
+    <subfield code="n">CIANDO</subfield>
+    <subfield code="q">application/pdf</subfield>
+    <subfield code="v">05-07-12</subfield>
+    <subfield code="3">34</subfield>
+    <subfield code="A">CIANDO</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="S">1</subfield>
+    <subfield code="y">C</subfield>
+    <subfield code="a">http://www.ciando.com/img/books/width167/3834882852_k.jpg</subfield>
+    <subfield code="n">CIANDO</subfield>
+    <subfield code="q">image/jpeg</subfield>
+    <subfield code="3">93</subfield>
+    <subfield code="A">Ciando</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="S">1</subfield>
+    <subfield code="y">C</subfield>
+    <subfield code="a">http://www.ciando.com/pictures/bib/3834882852bib_t_1.jpg</subfield>
+    <subfield code="n">CIANDO</subfield>
+    <subfield code="q">image/jpeg</subfield>
+    <subfield code="3">93</subfield>
+    <subfield code="A">Ciando</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="S">1</subfield>
+    <subfield code="y">C</subfield>
+    <subfield code="a">http://www.ciando.com/pictures/bib/3834882852bib_t_1_4526.jpg</subfield>
+    <subfield code="n">CIANDO</subfield>
+    <subfield code="q">image/jpeg</subfield>
+    <subfield code="3">93</subfield>
+    <subfield code="A">Ciando</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="S">1</subfield>
+    <subfield code="y">C</subfield>
+    <subfield code="a">http://www.ciando.com/pictures/bib/3834882852bib_t_1_61596.jpg</subfield>
+    <subfield code="n">CIANDO</subfield>
+    <subfield code="q">image/jpeg</subfield>
+    <subfield code="3">93</subfield>
+    <subfield code="A">Ciando</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="S">0</subfield>
+    <subfield code="a">http://external.dandelon.com/download/attachments/dandelon/ids/DE00129975B65F59E1113C1257912003F4FC7.pdf</subfield>
+    <subfield code="m">DE-601</subfield>
+    <subfield code="n">AGI</subfield>
+    <subfield code="q">pdf/application</subfield>
+    <subfield code="v">2014-12-25</subfield>
+    <subfield code="3">04</subfield>
+    <subfield code="A">GBV</subfield>
+    <subfield code="B">2</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="S">1</subfield>
+    <subfield code="y">Zentralblatt MATH</subfield>
+    <subfield code="0">cgi</subfield>
+    <subfield code="a">http://zbmath.org/?q=an:1228.00003</subfield>
+    <subfield code="m">DE-601</subfield>
+    <subfield code="n">ZBM</subfield>
+    <subfield code="q">pdf/application</subfield>
+    <subfield code="v">2014-03-10</subfield>
+    <subfield code="3">01</subfield>
+    <subfield code="A">GBV</subfield>
+    <subfield code="B">1</subfield>
+  </datafield>
+  <datafield tag="010@">
+    <subfield code="a">ger</subfield>
+  </datafield>
+  <datafield tag="011@">
+    <subfield code="a">2011</subfield>
+  </datafield>
+  <datafield tag="011B">
+    <subfield code="a">2011</subfield>
+  </datafield>
+  <datafield tag="013@">
+    <subfield code="0">l5</subfield>
+  </datafield>
+  <datafield tag="013@">
+    <subfield code="0">o3</subfield>
+  </datafield>
+  <datafield tag="016D">
+    <subfield code="0">cr</subfield>
+  </datafield>
+  <datafield tag="016H">
+    <subfield code="0">Elektronische Ressource</subfield>
+  </datafield>
+  <datafield tag="021A">
+    <subfield code="a">Mathematik für Ingenieure und Naturwissenschaftler Band 1</subfield>
+    <subfield code="d">ein Lehr- und Arbeitsbuch für das Grundstudium</subfield>
+    <subfield code="h">von Lothar Papula</subfield>
+  </datafield>
+  <datafield tag="028A">
+    <subfield code="d">Lothar</subfield>
+    <subfield code="a">Papula</subfield>
+    <subfield code="9">477580653</subfield>
+    <subfield code="d">Lothar</subfield>
+    <subfield code="a">Papula</subfield>
+    <subfield code="E">1941</subfield>
+    <subfield code="0">gnd/106931628</subfield>
+  </datafield>
+  <datafield tag="032@">
+    <subfield code="a">13., durchgesehene Auflage</subfield>
+  </datafield>
+  <datafield tag="032C">
+    <subfield code="a">[Online-Ausg.]</subfield>
+  </datafield>
+  <datafield tag="033A">
+    <subfield code="p">Wiesbaden</subfield>
+    <subfield code="n">Vieweg+Teubner Verlag / Springer Fachmedien Wiesbaden GmbH, Wiesbaden</subfield>
+  </datafield>
+  <datafield tag="034D">
+    <subfield code="a">Online-Ressource</subfield>
+  </datafield>
+  <datafield tag="034M">
+    <subfield code="a">v.: digital</subfield>
+  </datafield>
+  <datafield tag="036L">
+    <subfield code="a">Springer eBook Collection</subfield>
+    <subfield code="e">Computer Science &amp; Engineering</subfield>
+  </datafield>
+  <datafield tag="039D">
+    <subfield code="c">Druckausg.</subfield>
+    <subfield code="a">Mathematik für Ingenieure und Naturwissenschaftler, Bd. 1</subfield>
+    <subfield code="C">GBV</subfield>
+    <subfield code="6">667975462</subfield>
+  </datafield>
+  <datafield tag="044A">
+    <subfield code="N">650</subfield>
+    <subfield code="S">s</subfield>
+    <subfield code="a">Engineering</subfield>
+  </datafield>
+  <datafield tag="044A">
+    <subfield code="N">650</subfield>
+    <subfield code="S">s</subfield>
+    <subfield code="a">Mathematics</subfield>
+  </datafield>
+  <datafield tag="044A">
+    <subfield code="N">650</subfield>
+    <subfield code="S">s</subfield>
+    <subfield code="a">Engineering mathematics</subfield>
+  </datafield>
+  <datafield tag="044A">
+    <subfield code="N">650</subfield>
+    <subfield code="S">s</subfield>
+    <subfield code="a">Computer engineering</subfield>
+  </datafield>
+  <datafield tag="044G">
+    <subfield code="S">s</subfield>
+    <subfield code="a">Computer engineering</subfield>
+  </datafield>
+  <datafield tag="044G">
+    <subfield code="S">s</subfield>
+    <subfield code="a">Engineering</subfield>
+  </datafield>
+  <datafield tag="044G">
+    <subfield code="S">s</subfield>
+    <subfield code="a">Engineering mathematics</subfield>
+  </datafield>
+  <datafield tag="044G">
+    <subfield code="S">s</subfield>
+    <subfield code="a">Mathematics</subfield>
+  </datafield>
+  <datafield tag="044K">
+    <subfield code="S">f</subfield>
+    <subfield code="a">Lehrbuch</subfield>
+  </datafield>
+  <datafield tag="044K">
+    <subfield code="9">106131761</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Vektorrechnung</subfield>
+    <subfield code="0">gnd/4062471-7</subfield>
+  </datafield>
+  <datafield tag="044K">
+    <subfield code="9">105363812</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Potenzreihenentwicklung</subfield>
+    <subfield code="0">gnd/4175496-7</subfield>
+  </datafield>
+  <datafield tag="044K">
+    <subfield code="9">106349155</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Differentialrechnung</subfield>
+    <subfield code="0">gnd/4012252-9</subfield>
+  </datafield>
+  <datafield tag="044K">
+    <subfield code="9">106285467</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Integralrechnung</subfield>
+    <subfield code="0">gnd/4027232-1</subfield>
+  </datafield>
+  <datafield tag="044K">
+    <subfield code="9">105039128</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Komplexe Funktion</subfield>
+    <subfield code="0">gnd/4217733-9</subfield>
+  </datafield>
+  <datafield tag="045A">
+    <subfield code="a">TA329-348</subfield>
+    <subfield code="a">TA640-643</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="045Q">
+    <subfield code="9">106407740</subfield>
+    <subfield code="a">31.25</subfield>
+    <subfield code="j">Lineare Algebra</subfield>
+    <subfield code="j">multilineare Algebra</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="045Q">
+    <subfield code="9">106408186</subfield>
+    <subfield code="a">31.41</subfield>
+    <subfield code="j">Reelle Analysis</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="045Q">
+    <subfield code="9">106407643</subfield>
+    <subfield code="a">31.24</subfield>
+    <subfield code="j">Körper</subfield>
+    <subfield code="j">Polynome</subfield>
+    <subfield code="X">Mathematik</subfield>
+  </datafield>
+  <datafield occurrence="04" tag="045Q">
+    <subfield code="9">106408178</subfield>
+    <subfield code="a">31.42</subfield>
+    <subfield code="j">Funktionen mit einer komplexen Variablen</subfield>
+  </datafield>
+  <datafield tag="045T">
+    <subfield code="a">SK 950</subfield>
+    <subfield code="A">HBZ</subfield>
+  </datafield>
+  <datafield tag="045X">
+    <subfield code="b">MSC</subfield>
+    <subfield code="a">*00A06</subfield>
+    <subfield code="A">ZBL</subfield>
+  </datafield>
+  <datafield tag="045X">
+    <subfield code="b">MSC</subfield>
+    <subfield code="a">00A05</subfield>
+    <subfield code="A">ZBL</subfield>
+  </datafield>
+  <datafield tag="045X">
+    <subfield code="b">MSC</subfield>
+    <subfield code="a">15-01</subfield>
+    <subfield code="A">ZBL</subfield>
+  </datafield>
+  <datafield tag="045X">
+    <subfield code="b">MSC</subfield>
+    <subfield code="a">26-01</subfield>
+    <subfield code="A">ZBL</subfield>
+  </datafield>
+  <datafield tag="045X">
+    <subfield code="b">MSC</subfield>
+    <subfield code="a">00A07</subfield>
+    <subfield code="A">ZBL</subfield>
+  </datafield>
+  <datafield tag="045Y">
+    <subfield code="a">mat</subfield>
+  </datafield>
+  <datafield tag="047I">
+    <subfield code="a">Lothar Papula</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">20</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">28-07-15</subfield>
+    <subfield code="t">08:45:12.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">28-07-15</subfield>
+    <subfield code="b">1011</subfield>
+    <subfield code="a">0084</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269384317</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209A">
+    <subfield code="a">MA B 309 (1)</subfield>
+    <subfield code="x">09</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">21</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:57:41.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269352636</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">zza</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Freie Nutzung im Campusnetz der Universität und der Hochschulen im Land Bremen</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237B">
+    <subfield code="0">2011.09.19</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">22</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">05-05-13</subfield>
+    <subfield code="t">04:31:59.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">05-05-13</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269365053</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">zu</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">Olr-seb-tec</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">h48-lb-ebook</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">h263-LB-A1/A4-ebook</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">Volltextzugang Campus</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">Nur für Angehörige der Universität Hamburg: Volltextzugang von außerhalb des Campus</subfield>
+    <subfield code="a">http://emedien.sub.uni-hamburg.de/han/SpringerEbooks/dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">23</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">01:43:21.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269380524</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209C">
+    <subfield code="a">2010-04683, 2010-04684, 2010-04685, 2010-04686, 2010-04688, 2010-04694</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">olr-springer</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">Springer EBook</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237B">
+    <subfield code="0">2011.09.19</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="245P">
+    <subfield code="a">i</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">30</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:07:07.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269296418</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-ESP</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">31</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">01:30:17.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269370278</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">e-book Springer</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden.</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="244Z">
+    <subfield code="a">e-book Springer Technik und Informatik</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">34</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:35:57.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269329030</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">zi002</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB-TEC</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">Zugriff nur im dem Netz der HAW-Hamburg</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">60</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:48:21.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269342576</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">Olr-seb-tec</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">Volltextzugang Campus</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="S">0</subfield>
+    <subfield code="y">Nur für Angehörige der HSU: Volltextzugang von außerhalb des Campus</subfield>
+    <subfield code="a">http://bibhan.unibw-hamburg.de/han/SpringerLink/dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">62</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">05-11-12</subfield>
+    <subfield code="t">16:33:37.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">05-11-12</subfield>
+    <subfield code="b">4433</subfield>
+    <subfield code="a">0028</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269449648</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209A">
+    <subfield code="f">28/BB1-LBS</subfield>
+    <subfield code="a">SK 950</subfield>
+    <subfield code="x">05</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">69</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">01:53:48.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269389203</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB-ZDB-2-STI</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">70</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield tag="101B">
+    <subfield code="0">08-10-14</subfield>
+    <subfield code="t">12:31:57.000</subfield>
+  </datafield>
+  <datafield tag="101D">
+    <subfield code="0">08-10-14</subfield>
+    <subfield code="b">2711</subfield>
+    <subfield code="a">0089</subfield>
+  </datafield>
+  <datafield tag="101U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield tag="107F">
+    <subfield code="0">elbmat-alt</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">05-05-12</subfield>
+    <subfield code="t">15:20:42.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">05-05-12</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">126937284X</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">zesp</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">ACQ</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Campusweiter Zugriff (Universität Hannover). - Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">91</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:18:45.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269308874</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Freie Nutzung im Campusnetz der Hochschule und für registrierte Benutzer</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">95</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">03:02:43.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269459597</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Ausdruck und Kopien sind ausschließlich für den eigenen wissenschaftlichen Gebrauch gestattet</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">100</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">04-03-15</subfield>
+    <subfield code="t">00:51:05.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">04-03-15</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">126941027X</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209A">
+    <subfield code="a">eBook Springer</subfield>
+    <subfield code="x">09</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="S">0</subfield>
+    <subfield code="y">für Uniangehörige: Zugang weltweit</subfield>
+    <subfield code="a">http://han.med.uni-magdeburg.de/han/SPR-eBooksdt2006-2008-einzeln/dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">101</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">10-03-15</subfield>
+    <subfield code="t">20:59:32.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">10-03-15</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269429353</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209A">
+    <subfield code="a">eBook Springer</subfield>
+    <subfield code="x">09</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="S">0</subfield>
+    <subfield code="y">für Uniangehörige: Zugang weltweit</subfield>
+    <subfield code="a">http://han.med.uni-magdeburg.de/han/SPR-eBooksdt2006-2008-einzeln/dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">105</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">30-12-11</subfield>
+    <subfield code="t">00:18:00.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">30-12-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1285192125</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">30-12-11</subfield>
+    <subfield code="b">x</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-ESP</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Campuslizenz Universität / Fachhochschule Lübeck. - Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">110</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">01:59:47.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269396161</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">118</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">09-12-11</subfield>
+    <subfield code="t">07:33:40.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">09-12-11</subfield>
+    <subfield code="b">touchtitle</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">126933400X</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Campusweiter Zugriff HSA - Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">120</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield tag="101B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">02:33:34.000</subfield>
+  </datafield>
+  <datafield tag="101D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield tag="101U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="99" tag="145Z">
+    <subfield code="a">ww</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">02:33:34.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269437275</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209C">
+    <subfield code="a">YH 1792</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-ESP</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Campusweiter Zugriff (Universität Oldenburg). - Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">122</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:25:06.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269315846</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">132</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">18-05-12</subfield>
+    <subfield code="t">01:31:26.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">18-05-12</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1305166051</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">18-05-12</subfield>
+    <subfield code="b">k</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-ESP-TEC</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">Zugriff nur für Angehörige der Hochschule Osnabrück im Hochschulnetz</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">136</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:53:06.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269348248</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">140</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:26:57.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269318209</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">160</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">28-07-14</subfield>
+    <subfield code="t">23:41:16.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">28-07-14</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269320556</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">olr-seb</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">161</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">29-12-11</subfield>
+    <subfield code="t">17:27:00.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">29-12-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269300385</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Campusweiter Zugriff (Hochschule Hannover). - Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="245P">
+    <subfield code="a">fhebook</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">164</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:09:49.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269297996</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-ESP</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Zugriff nur aus dem Hochschulnetz. Vervielfältigungen nur für den eigenen wissenschaftlichen Gebrauch.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">185</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:34:39.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269327259</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-ESP</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">Zugriff im Netz der Fachhochschule Stralsund</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">186</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:45:45.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269339877</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">187</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">14-12-11</subfield>
+    <subfield code="t">02:20:09.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">14-12-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1282767496</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">14-12-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">Zugriff nur im Netz Fachhochschule Kiel</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">213</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">03-03-15</subfield>
+    <subfield code="t">11:52:36.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">03-03-15</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1528675576</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">03-03-15</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Campusweiter Zugriff (HS Magdeburg-Stendal). - Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">230</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">03-03-15</subfield>
+    <subfield code="t">11:55:39.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">03-03-15</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1528685407</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">03-03-15</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Campusweiter Zugriff (HS Magdeburg-Stendal). - Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">231</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">06-09-12</subfield>
+    <subfield code="t">23:32:18.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">06-09-12</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1324773685</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">06-09-12</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">Nutzung ausschließlich für Angehörige der Hochschule Harz</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Ausdruck und Kopien sind ausschließlich für den eigenen wissenschaftlichen Gebrauch gestattet</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">264</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="t">00:30:23.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">19-09-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">126932294X</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">293</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">29-12-11</subfield>
+    <subfield code="t">19:20:33.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">29-12-11</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269303678</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">xf</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">OLR-SEB</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Campusweiter Zugriff (Hochschule Hannover). - Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="245P">
+    <subfield code="a">fhebook</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">370</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">13-12-13</subfield>
+    <subfield code="t">00:37:30.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">13-12-13</subfield>
+    <subfield code="b">add_esp</subfield>
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1269333313</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">19-09-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209B">
+    <subfield code="a">ZDB-2-STI</subfield>
+    <subfield code="x">79</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209O">
+    <subfield code="a">olr-springer</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209R">
+    <subfield code="y">E-Book: Zugriff im HCU-Netz. Zugriff von außerhalb nur für HCU-Angehörige möglich</subfield>
+    <subfield code="a">http://dx.doi.org/10.1007/978-3-8348-8285-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="237A">
+    <subfield code="a">Vervielfältigungen (z.B. Kopien, Downloads) sind nur von einzelnen Kapiteln oder Seiten und nur zum eigenen wissenschaftlichen Gebrauch erlaubt. Keine Weitergabe an Dritte. Kein systematisches Downloaden durch Robots.</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="245P">
+    <subfield code="a">i</subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>1</zs:recordPosition>
+</zs:record>
+</zs:records>
+<zs:echoedSearchRetrieveRequest>
+<zs:version>1.1</zs:version>
+<zs:query>pica.all=667844562</zs:query>
+<zs:maximumRecords>50</zs:maximumRecords>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:sortKeys>Year,,1</zs:sortKeys>
+</zs:echoedSearchRetrieveRequest>
+</zs:searchRetrieveResponse>
+

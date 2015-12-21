@@ -8,14 +8,34 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class GVKParserTest {
+
+    private JabRefPreferences backup;
+
+
+    @Before
+    public void setUp() throws Exception {
+        Globals.prefs = JabRefPreferences.getInstance();
+        backup = Globals.prefs;
+        Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, false);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        Globals.prefs.overwritePreferences(backup);
+    }
 
     private void doTest(String xmlName, int expectedSize, List<String> resourceNames)
             throws ParserConfigurationException, SAXException, IOException {
@@ -39,12 +59,12 @@ public class GVKParserTest {
 
     @Test
     public void resultFor797485368() throws Exception {
-        doTest("gvk_result_for_797485368.xml", 1, Arrays.asList(new String[] {"gvk_result_for_797485368.bib"}));
+        doTest("gvk_result_for_797485368.xml", 1, Arrays.asList("gvk_result_for_797485368.bib"));
     }
 
     @Test
     public void GMP() throws Exception {
-        doTest("gvk_gmp.xml", 2, Arrays.asList(new String[] {"gvk_gmp.1.bib", "gvk_gmp.2.bib"}));
+        doTest("gvk_gmp.xml", 2, Arrays.asList("gvk_gmp.1.bib", "gvk_gmp.2.bib"));
     }
 
     @Test
@@ -71,4 +91,21 @@ public class GVKParserTest {
             Assert.assertEquals("Word1 word2", entry.getField("subtitle"));
         }
     }
+
+    @Test
+    public void correctHandlingOfBibtexAndBiblatexMode() throws Exception {
+        // test in bibtex mode
+        Assert.assertFalse(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE));
+        doTest("gvk_result_for_667844562.xml", 1, Arrays.asList("gvk_result_for_667844562_bibtex.bib"));
+
+        // siwtch to biblatex mode and test
+        Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, true);
+        EntryTypes.resetTypeInformation();
+        doTest("gvk_result_for_667844562.xml", 1, Arrays.asList("gvk_result_for_667844562_biblatex.bib"));
+
+        // switch back to bibtex mode
+        Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, false);
+        EntryTypes.resetTypeInformation();
+    }
+
 }

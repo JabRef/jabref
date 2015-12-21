@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,6 +24,7 @@ public class EntryTypesTestBibtex {
         Globals.prefs = JabRefPreferences.getInstance();
         backup = Globals.prefs;
         Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, false);
+        EntryTypes.resetTypeInformation();
     }
 
     @After
@@ -33,13 +35,13 @@ public class EntryTypesTestBibtex {
     @Test
     public void testBibtexMode() {
         // Bibtex mode
-        EntryTypes bibtexentrytypes = new EntryTypes();
+        Assert.assertFalse(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE));
 
-        assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article"));
-        assertNull(bibtexentrytypes.getType("aaaaarticle"));
-        assertNull(bibtexentrytypes.getStandardType("aaaaarticle"));
-        assertEquals(19, bibtexentrytypes.getAllValues().size());
-        assertEquals(19, bibtexentrytypes.getAllTypes().size());
+        assertEquals(BibtexEntryTypes.ARTICLE, EntryTypes.getType("article"));
+        assertNull(EntryTypes.getType("aaaaarticle"));
+        assertNull(EntryTypes.getStandardType("aaaaarticle"));
+        assertEquals(19, EntryTypes.getAllValues().size());
+        assertEquals(19, EntryTypes.getAllTypes().size());
 
         // Edit the "article" entry type
         ArrayList<String> requiredFields = new ArrayList<>(BibtexEntryTypes.ARTICLE.getRequiredFields());
@@ -48,20 +50,19 @@ public class EntryTypesTestBibtex {
         CustomEntryType newArticle = new CustomEntryType("article", requiredFields,
                 BibtexEntryTypes.ARTICLE.getOptionalFields());
 
-        bibtexentrytypes.addOrModifyCustomEntryType(newArticle);
+        EntryTypes.addOrModifyCustomEntryType(newArticle);
         // Should not be the same any more
-        assertNotEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article"));
+        assertNotEquals(BibtexEntryTypes.ARTICLE, EntryTypes.getType("article"));
 
         // Remove the custom "article" entry type, which should restore the original
-        bibtexentrytypes.removeType("article");
+        EntryTypes.removeType("article");
         // Should not be possible to remove a standard type
-        assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article"));
+        assertEquals(BibtexEntryTypes.ARTICLE, EntryTypes.getType("article"));
     }
 
     @Test
     public void defaultType() {
-        EntryTypes types = new EntryTypes();
-        assertEquals(BibtexEntryTypes.MISC, types.getTypeOrDefault("unknowntype"));
+        assertEquals(BibtexEntryTypes.MISC, EntryTypes.getTypeOrDefault("unknowntype"));
     }
 
     @Test
