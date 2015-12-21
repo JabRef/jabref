@@ -321,10 +321,10 @@ public class AuthorListTest {
 
         Assert.assertEquals(3, AuthorListTest.size("John von Neumann and John Smith and Black Brown, Peter"));
 
-        String s = "John von Neumann";
+        StringBuilder s = new StringBuilder("John von Neumann");
         for (int i = 0; i < 25; i++) {
-            Assert.assertEquals(i + 1, AuthorListTest.size(s));
-            s += " and Albert Einstein";
+            Assert.assertEquals(i + 1, AuthorListTest.size(s.toString()));
+            s.append(" and Albert Einstein");
         }
     }
 

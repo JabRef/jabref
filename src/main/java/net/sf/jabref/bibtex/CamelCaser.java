@@ -75,7 +75,7 @@ class CamelCaser {
      * @return
      */
     public static String toCamelCase(String fieldName) {
-        if (fieldName == null || fieldName == "") {
+        if ((fieldName == null) || fieldName.isEmpty()) {
             return "";
         }
 

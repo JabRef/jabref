@@ -164,7 +164,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     }
 
     void appendToField(BibEntry entry, String field, String value) {
-        if ((value == null) || "".equals(value)) {
+        if ((value == null) || value.isEmpty()) {
             return;
         }
         String oVal = entry.getField(field);

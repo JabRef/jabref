@@ -230,7 +230,7 @@ public class BibtexParser {
             entry.setParsedSerialization(dumpTextReadSoFarToString());
             if (duplicateKey) {
                 parserResult.addDuplicateKey(entry.getCiteKey());
-            } else if ((entry.getCiteKey() == null) || "".equals(entry.getCiteKey())) {
+            } else if ((entry.getCiteKey() == null) || entry.getCiteKey().isEmpty()) {
                 parserResult.addWarning(Localization.lang("Empty BibTeX key") + ": " + entry.getAuthorTitleYear(40)
                         + " (" + Localization.lang("Grouping may not work for this entry.") + ")");
             }
@@ -841,7 +841,7 @@ public class BibtexParser {
             if (Character.isWhitespace((char) character)) {
                 String whitespacesReduced = skipAndRecordWhitespace(character);
 
-                if (!"".equals(whitespacesReduced) && !"\n\t".equals(whitespacesReduced)) { // &&
+                if (!(whitespacesReduced.isEmpty()) && !"\n\t".equals(whitespacesReduced)) { // &&
                     whitespacesReduced = whitespacesReduced.replaceAll("\t", ""); // Remove tabulators.
                     value.append(whitespacesReduced);
                 } else {
