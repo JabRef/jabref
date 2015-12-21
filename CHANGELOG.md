@@ -27,6 +27,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Default order in entry table:  # | all file based icons (file, URL/DOI, ...) | all bibtex field based icons (bibtexkey, entrytype, author, title, ...) | all activated special field icons (ranking, quality, ...)
 
 ### Fixed
+- Fixed #479: Import works again
 - Fixed #434: Revert to old 'JabRef' installation folder name instead of 'jabref'
 - Fixed #435: Retrieve non open access ScienceDirect PDFs via HTTP DOM
 - Fixed: Cleanup process aborts if linked file does not exists
