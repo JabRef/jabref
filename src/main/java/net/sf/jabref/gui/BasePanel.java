@@ -910,7 +910,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     @Override
                     public void run() {
                         final BibEntry[] bes = mainTable.getSelectedEntries();
-                        final List<File> files = Util.getListOfLinkedFiles(bes,
+                        final List<File> files = FileUtil.getListOfLinkedFiles(bes,
                                 metaData().getFileDirectory(Globals.FILE_FIELD));
                         for (final File f : files) {
                             try {
@@ -944,7 +944,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         // Look for web links in the "file" field as a fallback:
                         FileListEntry entry = null;
                         FileListTableModel tm = new FileListTableModel();
-                        tm.setContent(bes[0].getField("file"));
+                        tm.setContent(bes[0].getField(Globals.FILE_FIELD));
                         for (int i = 0; i < tm.getRowCount(); i++) {
                             FileListEntry flEntry = tm.getEntry(i);
                             if (URL_FIELD.equals(flEntry.getType().getName().toLowerCase())
@@ -2577,7 +2577,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                 result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
             } else {
-                result = Util.findAssociatedFiles(entries, extensions, dirs);
+                result = FileUtil.findAssociatedFiles(entries, extensions, dirs);
             }
             if (result.get(entry) != null) {
                 final List<File> res = result.get(entry);

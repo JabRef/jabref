@@ -48,7 +48,6 @@ import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -883,7 +882,7 @@ public class Util {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
                 } else {
-                    result = net.sf.jabref.util.Util.findAssociatedFiles(entries, extensions, dirs);
+                    result = net.sf.jabref.logic.util.io.FileUtil.findAssociatedFiles(entries, extensions, dirs);
                 }
 
                 boolean foundAny = false;
@@ -998,78 +997,6 @@ public class Util {
         entries.add(entry);
 
         return net.sf.jabref.util.Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
-    }
-
-    /**
-     * Returns the list of linked files. The files have the absolute filename
-     *
-     * @param bes list of BibTeX entries
-     * @param fileDirs list of directories to try for expansion
-     *
-     * @return list of files. May be empty
-     */
-    public static List<File> getListOfLinkedFiles(BibEntry[] bes, String[] fileDirs) {
-        ArrayList<File> res = new ArrayList<>();
-        for (BibEntry entry : bes) {
-            FileListTableModel tm = new FileListTableModel();
-            tm.setContent(entry.getField("file"));
-            for (int i = 0; i < tm.getRowCount(); i++) {
-                FileListEntry flEntry = tm.getEntry(i);
-
-                File f = FileUtil.expandFilename(flEntry.getLink(), fileDirs);
-                if (f != null) {
-                    res.add(f);
-                }
-            }
-        }
-        return res;
-    }
-
-    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibEntry, List<File>> result = new HashMap<>();
-
-        // First scan directories
-        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
-
-        // Initialize Result-Set
-        for (BibEntry entry : entries) {
-            result.put(entry, new ArrayList<>());
-        }
-
-        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
-        // Now look for keys
-        nextFile: for (File file : filesWithExtension) {
-
-            String name = file.getName();
-            int dot = name.lastIndexOf('.');
-            // First, look for exact matches:
-            for (BibEntry entry : entries) {
-                String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && !citeKey.isEmpty()) {
-                    if (dot > 0) {
-                        if (name.substring(0, dot).equals(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
-                    }
-                }
-            }
-            // If we get here, we didn't find any exact matches. If non-exact
-            // matches are allowed, try to find one:
-            if (!exactOnly) {
-                for (BibEntry entry : entries) {
-                    String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && !citeKey.isEmpty()) {
-                        if (name.startsWith(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
-                    }
-                }
-            }
-        }
-
-        return result;
     }
 
     /**

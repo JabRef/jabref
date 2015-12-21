@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 
 import net.sf.jabref.logic.l10n.Localization;
@@ -115,7 +116,7 @@ class PdfPreviewPanel extends JPanel {
         picLabel.setText("rendering preview...");
         picLabel.setIcon(null);
         FileListTableModel tm = new FileListTableModel();
-        tm.setContent(entry.getField("file"));
+        tm.setContent(entry.getField(Globals.FILE_FIELD));
         FileListEntry flEntry = null;
         for (int i = 0; i < tm.getRowCount(); i++) {
             flEntry = tm.getEntry(i);

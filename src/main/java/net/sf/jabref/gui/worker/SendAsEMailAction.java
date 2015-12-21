@@ -30,9 +30,10 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.util.Util;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -94,7 +95,7 @@ public class SendAsEMailAction extends AbstractWorker {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<File> fileList = Util.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD));
+        List<File> fileList = FileUtil.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD));
         for (File f : fileList) {
             attachments.add(f.getPath());
             if (openFolders) {

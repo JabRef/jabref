@@ -161,7 +161,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         FileListTableModel model = new FileListTableModel();
         model.addEntry(0, fileListEntry);
 
-        entry.setField("file", model.getStringRepresentation());
+        entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
     }
 
     void appendToField(BibEntry entry, String field, String value) {
