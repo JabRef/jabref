@@ -209,4 +209,41 @@ public class StringUtilTest {
         assertFalse(StringUtil.isInCitationMarks("\""));
         assertFalse(StringUtil.isInCitationMarks("a\"\"a"));
     }
+
+    @Test
+    public void testIntValueOf() {
+        assertEquals(1, StringUtil.intValueOf("1"));
+        assertEquals(1234567890, StringUtil.intValueOf("1234567890"));
+    }
+
+    @Test
+    public void testIntValueOfExceptionLetter() {
+        try {
+            StringUtil.intValueOf("12A2");
+            fail();
+        } catch (NumberFormatException ignored) {
+            // Ignored
+        }
+    }
+
+    @Test
+    public void testIntValueOfExceptionNull() {
+        try {
+            StringUtil.intValueOf(null);
+            fail();
+        } catch (NumberFormatException ignored) {
+            // Ignored
+        }
+
+    }
+
+    @Test
+    public void testIntValueOfExceptionEmpty() {
+        try {
+            StringUtil.intValueOf("");
+            fail();
+        } catch (NumberFormatException ignored) {
+            // Ignored
+        }
+    }
 }
