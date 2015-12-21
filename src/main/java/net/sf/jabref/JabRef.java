@@ -247,8 +247,7 @@ public class JabRef {
                     if (initialStartup) {
                         toImport.add(aLeftOver);
                     } else {
-                        Optional<ParserResult> res = JabRef.importToOpenBase(aLeftOver);
-                        loaded.add(res.orElse(ParserResult.INVALID_FORMAT));
+                        loaded.add(JabRef.importToOpenBase(aLeftOver).orElse(ParserResult.INVALID_FORMAT));
                     }
                 } else if (pr != ParserResult.FILE_LOCKED) {
                     loaded.add(pr);
@@ -262,18 +261,15 @@ public class JabRef {
         }
 
         for (String filenameString : toImport) {
-            Optional<ParserResult> pr = importFile(filenameString);
-            pr.ifPresent(loaded::add);
+            importFile(filenameString).ifPresent(loaded::add);
         }
 
         if (!cli.isBlank() && cli.isImportToOpenBase()) {
-            Optional<ParserResult> res = importToOpenBase(cli.getImportToOpenBase());
-            res.ifPresent(loaded::add);
+            importToOpenBase(cli.getImportToOpenBase()).ifPresent(loaded::add);
         }
 
         if (!cli.isBlank() && cli.isFetcherEngine()) {
-            Optional<ParserResult> res = fetch(cli.getFetcherEngine());
-            res.ifPresent(loaded::add);
+            fetch(cli.getFetcherEngine()).ifPresent(loaded::add);
         }
 
         if (cli.isExportMatches()) {
@@ -892,9 +888,7 @@ public class JabRef {
     private static Optional<ParserResult> importToOpenBase(String argument) {
         Optional<ParserResult> result = JabRef.importFile(argument);
 
-        if (result.isPresent()) {
-            result.get().setToOpenTab(true);
-        }
+        result.ifPresent(x -> x.setToOpenTab(true));
 
         return result;
     }
