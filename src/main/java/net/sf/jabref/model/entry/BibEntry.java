@@ -569,7 +569,7 @@ public class BibEntry {
         List<String> keywords = this.getSeparatedKeywords();
         Boolean duplicate = false;
 
-        if ((keyword == null) || (keyword.length() == 0)) {
+        if ((keyword == null) || (keyword.isEmpty())) {
             return;
         }
 

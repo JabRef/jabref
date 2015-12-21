@@ -17,6 +17,7 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import net.sf.jabref.Globals;
@@ -55,7 +56,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         this.externalFileType = externalFileType;
     }
 
-    protected abstract BibEntry createBibtexEntry(File f);
+    protected abstract Optional<BibEntry> createBibtexEntry(File f);
 
     /**
      * <p>
@@ -98,22 +99,22 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         if ((f == null) || !f.exists()) {
             return null;
         }
-        BibEntry newEntry = createBibtexEntry(f);
+        Optional<BibEntry> newEntry = createBibtexEntry(f);
 
-        if (newEntry == null) {
+        if (!(newEntry.isPresent())) {
             return null;
         }
 
         if (addPathTokensAsKeywords) {
-            appendToField(newEntry, "keywords", extractPathesToKeyWordsfield(f.getAbsolutePath()));
+            appendToField(newEntry.get(), "keywords", extractPathesToKeyWordsfield(f.getAbsolutePath()));
         }
 
-        if (newEntry.getField("title") == null) {
-            newEntry.setField("title", f.getName());
+        if (newEntry.get().getField("title") == null) {
+            newEntry.get().setField("title", f.getName());
         }
 
-        addFileInfo(newEntry, f);
-        return newEntry;
+        addFileInfo(newEntry.get(), f);
+        return newEntry.get();
     }
 
     /** Returns the ExternalFileType that is imported here */

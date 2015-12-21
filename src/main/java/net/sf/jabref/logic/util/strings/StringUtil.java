@@ -37,7 +37,7 @@ public class StringUtil {
      */
 
     public static String shaveString(String toShave) {
-        if ((toShave == null) || (toShave.length() == 0)) {
+        if ((toShave == null) || (toShave.isEmpty())) {
             return toShave;
         }
         toShave = toShave.trim();
@@ -436,7 +436,7 @@ public class StringUtil {
         return buf.toString();
 
         /*
-         * if (s.length() == 0) return s; // Protect against ArrayIndexOutOf....
+         * if (s.isEmpty()) return s; // Protect against ArrayIndexOutOf....
          * StringBuffer buf = new StringBuffer();
          *
          * Matcher mcr = titleCapitalPattern.matcher(s.substring(1)); while

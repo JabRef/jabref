@@ -133,10 +133,9 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 switch (column) {
                 case 0:
                     return tr.name;
-                case 1:
+                default: // Only two columns
                     return tr.format;
                 }
-                return null; // Unreachable.
             }
 
             @Override

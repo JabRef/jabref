@@ -326,7 +326,7 @@ public class Util {
         if (setOwner) {
             // No or empty owner field?
             // if (entry.getField(Globals.OWNER) == null
-            // || ((String) entry.getField(Globals.OWNER)).length() == 0) {
+            // || ((String) entry.getField(Globals.OWNER)).isEmpty()) {
             // Set owner field to default value
             entry.setField(BibtexFields.OWNER, owner);
             // }
