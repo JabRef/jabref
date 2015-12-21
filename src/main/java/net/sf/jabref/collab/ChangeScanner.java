@@ -478,10 +478,9 @@ public class ChangeScanner implements Runnable {
             // Still one or more non-matched strings. So they must have been removed.
             for (String nmId : notMatched) {
                 BibtexString tmp = onTmp.getString(nmId);
-                Optional<BibtexString> mem = findString(inMem1, tmp.getName(), usedInMem);
-                if (mem.isPresent()) { // The removed string is not removed from the mem version.
-                    changes.add(new StringRemoveChange(tmp, tmp, mem.get()));
-                }
+                // The removed string is not removed from the mem version.
+                findString(inMem1, tmp.getName(), usedInMem)
+                        .ifPresent(x -> changes.add(new StringRemoveChange(tmp, tmp, x)));
             }
         }
 
