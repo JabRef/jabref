@@ -31,6 +31,8 @@ public class SpringerLinkTest {
 
     @Test
     public void findByDOI() throws IOException {
+
+
         entry.setField("doi", "10.1186/s13677-015-0042-8");
 
         Assert.assertEquals(

@@ -1,7 +1,9 @@
 package net.sf.jabref.logic.fetcher;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.support.DevEnvironment;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,6 +33,9 @@ public class ScienceDirectTest {
 
     @Test
     public void findByDOI() throws IOException {
+        // CI server is blocked
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
         entry.setField("doi", "10.1016/j.jrmge.2015.08.004");
 
         Assert.assertEquals(
@@ -41,6 +46,9 @@ public class ScienceDirectTest {
 
     @Test
     public void notFoundByDOI() throws IOException {
+        // CI server is blocked
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
         entry.setField("doi", "10.1016/j.aasri.2014.0559.002");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
