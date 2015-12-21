@@ -148,7 +148,7 @@ public class BibtexParser {
 
     private void initializeParserResult() {
         database = new BibDatabase();
-        entryTypes = new HashMap<>(); // To store custem entry types parsed.
+        entryTypes = new HashMap<>(); // To store custom entry types parsed.
         parserResult = new ParserResult(database, null, entryTypes);
     }
 
@@ -202,7 +202,7 @@ public class BibtexParser {
         }
         // Before returning the database, update entries with unknown type
         // based on parsed type definitions, if possible.
-        checkEntryTypes(parserResult);
+        checkEntryTypes();
 
         // Instantiate meta data:
         parserResult.setMetaData(new MetaData(meta, database));
@@ -441,18 +441,17 @@ public class BibtexParser {
     private BibtexString parseString() throws IOException {
         skipWhitespace();
         consume('{', '(');
-        // while (read() != '}');
         skipWhitespace();
-        // Util.pr("Parsing string name");
+        LOGGER.debug("Parsing string name");
         String name = parseTextToken();
-        // Util.pr("Parsed string name");
+        LOGGER.debug("Parsed string name");
         skipWhitespace();
-        // Util.pr("Now the contents");
+        LOGGER.debug("Now the contents");
         consume('=');
         String content = parseFieldContent(name);
-        // Util.pr("Now I'm going to consume a }");
+        LOGGER.debug("Now I'm going to consume a }");
         consume('}', ')');
-        // Util.pr("Finished string parsing.");
+        LOGGER.debug("Finished string parsing.");
         String id = IdGenerator.next();
         return new BibtexString(id, name, content);
     }
@@ -941,7 +940,7 @@ public class BibtexParser {
         }
     }
 
-    private void checkEntryTypes(ParserResult result) {
+    private void checkEntryTypes() {
         for (BibEntry bibEntry : database.getEntries()) {
             if (bibEntry.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
@@ -950,7 +949,7 @@ public class BibtexParser {
                 if (type != null) {
                     bibEntry.setType(type);
                 } else {
-                    result.addWarning(
+                    parserResult.addWarning(
                             Localization.lang("Unknown entry type")
                                     + ": " + name + "; key: " + bibEntry.getCiteKey()
                     );
