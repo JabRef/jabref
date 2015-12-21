@@ -122,9 +122,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Optional<Font> f = new FontSelectorDialog(null, GUIGlobals.CURRENTFONT).getSelectedFont();
-                if (f.isPresent()) {
-                    font = f.get();
-                }
+                f.ifPresent(x -> font = x);
             }
         });
 
