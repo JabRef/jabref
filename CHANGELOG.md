@@ -43,6 +43,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed #533: Preview parsed incorrectly when regular expression was enabled
 
 ### Removed
+- Removed BioMail format importer
 - Removed file history size preference (never available from the UI)
 - Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
 - Removed option "Show one letter heading for icon columns" which is obsolete with the fix of #315/384

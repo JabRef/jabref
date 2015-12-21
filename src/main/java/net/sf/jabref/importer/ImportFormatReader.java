@@ -46,7 +46,6 @@ public class ImportFormatReader {
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter());
         formats.add(new BibteXMLImporter());
-        formats.add(new BiomailImporter());
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter());
         formats.add(new FreeCiteImporter());
@@ -355,7 +354,7 @@ public class ImportFormatReader {
     /**
      * Tries to import a file by iterating through the available import filters,
      * and keeping the import that seems most promising.
-     * <p>
+     * <p/>
      * If all fails this method attempts to read this file as bibtex.
      *
      * @throws IOException
@@ -406,7 +405,7 @@ public class ImportFormatReader {
         // Finally, if all else fails, see if it is a BibTeX file:
         try {
             ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
- Globals.prefs.getDefaultEncoding());
+                    Globals.prefs.getDefaultEncoding());
             if ((pr.getDatabase().getEntryCount() > 0)
                     || (pr.getDatabase().getStringCount() > 0)) {
                 pr.setFile(new File(filename));
