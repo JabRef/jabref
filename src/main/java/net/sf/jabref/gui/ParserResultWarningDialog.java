@@ -49,42 +49,46 @@ public class ParserResultWarningDialog {
             int maxWarnings, int dataBaseNumber) {
         Objects.requireNonNull(parserResult);
         Objects.requireNonNull(jabRefFrame);
-        if (parserResult.hasWarnings()) {
-            if (dataBaseNumber >= 0) {
-                jabRefFrame.showBasePanelAt(dataBaseNumber);
-            }
-
-            // Generate string with warning texts
-            List<String> warnings = parserResult.warnings();
-            StringBuilder dialogContent = new StringBuilder();
-            for (int j = 0; j < Math.min(maxWarnings, warnings.size()); j++) {
-                dialogContent.append(j + 1).append(". ").append(warnings.get(j)).append("\n");
-            }
-            if (warnings.size() > maxWarnings) {
-                dialogContent.append("... ");
-                dialogContent.append(Localization.lang("%0 warnings", String.valueOf(warnings.size())));
-            } else if (dialogContent.length() > 0) {
-                dialogContent.deleteCharAt(dialogContent.length() - 1);
-            }
-
-            // Generate dialog title
-            String dialogTitle;
-            if (dataBaseNumber < 0) {
-                dialogTitle = Localization.lang("Warnings");
-            } else {
-                dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getFile().getName() + ")";
-            }
-
-            // Comment from the old code:
-            //
-            // Note to self or to someone else: The following line causes an
-            // ArrayIndexOutOfBoundsException in situations with a large number of
-            // warnings; approx. 5000 for the database I opened when I observed the problem
-            // (duplicate key warnings). I don't think this is a big problem for normal situations,
-            // and it may possibly be a bug in the Swing code.
-
-            JOptionPane.showMessageDialog(jabRefFrame, dialogContent.toString(), dialogTitle,
-                    JOptionPane.WARNING_MESSAGE);
+        // Return if no warnings
+        if (!(parserResult.hasWarnings())) {
+            return;
         }
+
+        // Switch tab if asked to do so
+        if (dataBaseNumber >= 0) {
+            jabRefFrame.showBasePanelAt(dataBaseNumber);
+        }
+
+        // Generate string with warning texts
+        List<String> warnings = parserResult.warnings();
+        StringBuilder dialogContent = new StringBuilder();
+        for (int j = 0; j < Math.min(maxWarnings, warnings.size()); j++) {
+            dialogContent.append(j + 1).append(". ").append(warnings.get(j)).append("\n");
+        }
+        if (warnings.size() > maxWarnings) {
+            dialogContent.append("... ");
+            dialogContent.append(Localization.lang("%0 warnings", String.valueOf(warnings.size())));
+        } else if (dialogContent.length() > 0) {
+            dialogContent.deleteCharAt(dialogContent.length() - 1);
+        }
+
+        // Generate dialog title
+        String dialogTitle;
+        if (dataBaseNumber < 0) {
+            dialogTitle = Localization.lang("Warnings");
+        } else {
+            dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getFile().getName() + ")";
+        }
+
+        // Comment from the old code:
+        //
+        // Note to self or to someone else: The following line causes an
+        // ArrayIndexOutOfBoundsException in situations with a large number of
+        // warnings; approx. 5000 for the database I opened when I observed the problem
+        // (duplicate key warnings). I don't think this is a big problem for normal situations,
+        // and it may possibly be a bug in the Swing code.
+
+        // Show dialog
+        JOptionPane.showMessageDialog(jabRefFrame, dialogContent.toString(), dialogTitle, JOptionPane.WARNING_MESSAGE);
     }
 }
