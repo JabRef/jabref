@@ -26,7 +26,7 @@ public class OS {
     public static final boolean WINDOWS = osName.startsWith("win");
     public static final boolean OS_X = osName.startsWith("mac");
 
-    public static final String guessProgramPath(String programName, String windowsDirectory) {
+    public static String guessProgramPath(String programName, String windowsDirectory) {
         if (OS.WINDOWS) {
             String progFiles = System.getenv("ProgramFiles(x86)");
             if (progFiles == null) {

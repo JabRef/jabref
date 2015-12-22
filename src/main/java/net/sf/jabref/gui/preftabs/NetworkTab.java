@@ -121,12 +121,11 @@ public class NetworkTab extends JPanel implements PrefsTab {
     }
 
     private int getProxyConfigHash() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefs.get(JabRefPreferences.PROXY_USERNAME)).append(':')
-                .append(prefs.get(JabRefPreferences.PROXY_PASSWORD));
-        sb.append('@').append(prefs.get(JabRefPreferences.PROXY_HOSTNAME)).append(':')
-                .append(prefs.get(JabRefPreferences.PROXY_PORT));
-        return sb.toString().hashCode();
+        String sb = prefs.get(JabRefPreferences.PROXY_USERNAME) + ':' +
+                prefs.get(JabRefPreferences.PROXY_PASSWORD) +
+                '@' + prefs.get(JabRefPreferences.PROXY_HOSTNAME) + ':' +
+                prefs.get(JabRefPreferences.PROXY_PORT);
+        return sb.hashCode();
     }
 
     @Override

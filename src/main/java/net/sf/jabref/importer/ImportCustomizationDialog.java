@@ -165,7 +165,6 @@ public class ImportCustomizationDialog extends JDialog {
                         LOGGER.info("Could not open Zip-archive.", exc);
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not open %0", basePath)
                                 + "\n" + Localization.lang("Have you chosen the correct package path?"));
-                        return;
                     } catch (NoClassDefFoundError exc) {
                         LOGGER.info("Could not instantiate Zip-archive reader.", exc);
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", basePath)

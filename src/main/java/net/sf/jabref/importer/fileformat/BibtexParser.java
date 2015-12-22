@@ -374,9 +374,7 @@ public class BibtexParser {
                 return;
             }
 
-            if (Character.isWhitespace((char) character)) {
-                continue;
-            } else {
+            if (!Character.isWhitespace((char) character)) {
                 // found non-whitespace char
                 unread(character);
                 break;
@@ -404,7 +402,6 @@ public class BibtexParser {
                 if (nextCharacter != ' ') {
                     stringBuilder.append((char) nextCharacter);
                 }
-                continue;
             } else {
                 // found non-whitespace char
                 unread(nextCharacter);

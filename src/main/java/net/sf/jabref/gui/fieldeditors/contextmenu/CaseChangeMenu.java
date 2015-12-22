@@ -22,8 +22,6 @@ import net.sf.jabref.logic.formatter.CaseChangers;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.text.JTextComponent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Objects;
 
 public class CaseChangeMenu extends JMenu {

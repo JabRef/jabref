@@ -104,9 +104,8 @@ public abstract class DBExporter extends DBImporterExporter {
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, " + fieldStr
                 + ", database_id) VALUES (";
         for (BibEntry entry : entries) {
-            query.append(
-                    insert + '\'' + entry.getId() + '\'' + ", (SELECT entry_types_id FROM entry_types WHERE label='"
-                            + entry.getType().getName().toLowerCase() + "'), '" + entry.getCiteKey() + '\'');
+            query.append(insert).append('\'').append(entry.getId()).append('\'').append(", (SELECT entry_types_id FROM entry_types WHERE label='")
+                    .append(entry.getType().getName().toLowerCase()).append("'), '").append(entry.getCiteKey()).append('\'');
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 query.append(", ");
                 val = entry.getField(SQLUtil.getAllFields().get(i));
@@ -121,12 +120,12 @@ public abstract class DBExporter extends DBImporterExporter {
                         val = val.replace("\'", "''");
                         val = val.replace("`", "\\`");
                     }
-                    query.append('\'' + val + '\'');
+                    query.append('\'').append(val).append('\'');
                 } else {
                     query.append("NULL");
                 }
             }
-            query.append(", '" + database_id + "');");
+            query.append(", '").append(database_id).append("');");
             SQLUtil.processQuery(out, query.toString());
         }
     }
@@ -208,24 +207,24 @@ public abstract class DBExporter extends DBImporterExporter {
             }
             List<String> reqFields = val.getRequiredFieldsFlat();
             List<String> optFields = val.getOptionalFields();
-            List<String> utiFields = Arrays.asList("search");
+            List<String> utiFields = Collections.singletonList("search");
             fieldRequirement = SQLUtil.setFieldRequirement(SQLUtil.getAllFields(), reqFields, optFields, utiFields,
                     fieldRequirement);
             if (!existentTypes.contains(val.getName().toLowerCase())) {
-                querySB.append("INSERT INTO entry_types (label, " + fieldStr + ") VALUES (");
-                querySB.append('\'' + val.getName().toLowerCase() + '\'');
+                querySB.append("INSERT INTO entry_types (label, ").append(fieldStr).append(") VALUES (");
+                querySB.append('\'').append(val.getName().toLowerCase()).append('\'');
                 for (String aFieldRequirement : fieldRequirement) {
-                    querySB.append(", '" + aFieldRequirement + '\'');
+                    querySB.append(", '").append(aFieldRequirement).append('\'');
                 }
                 querySB.append(");");
             } else {
                 String[] update = fieldStr.split(",");
                 querySB.append("UPDATE entry_types SET \n");
                 for (int i = 0; i < fieldRequirement.size(); i++) {
-                    querySB.append(update[i] + "='" + fieldRequirement.get(i) + "',");
+                    querySB.append(update[i]).append("='").append(fieldRequirement.get(i)).append("',");
                 }
                 querySB.delete(querySB.lastIndexOf(","), querySB.length());
-                querySB.append(" WHERE label='" + val.getName().toLowerCase() + "';");
+                querySB.append(" WHERE label='").append(val.getName().toLowerCase()).append("';");
             }
             SQLUtil.processQuery(out, querySB.toString());
         }

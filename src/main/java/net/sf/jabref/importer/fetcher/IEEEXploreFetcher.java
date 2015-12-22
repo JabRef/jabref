@@ -168,7 +168,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             includeAbstract = absCheckBox.isSelected();
             if (hits > IEEEXploreFetcher.MAX_FETCH) {
                 status.showMessage(Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
-                        new String[] {String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)}),
+                        String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
             }
 

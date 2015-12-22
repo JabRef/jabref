@@ -156,7 +156,7 @@ public class SynchronizeFileField extends AbstractWorker {
                             if (!removeAllBroken) {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
                                         Localization.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                new String[]{flEntry.getLink(), aSel.getCiteKey()}),
+                                                flEntry.getLink(), aSel.getCiteKey()),
                                         Localization.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]

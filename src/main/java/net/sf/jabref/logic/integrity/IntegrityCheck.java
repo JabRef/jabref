@@ -72,7 +72,7 @@ public class IntegrityCheck {
         return result;
     }
 
-    public static interface Checker {
+    public interface Checker {
 
         void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector);
     }

@@ -173,10 +173,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private SaveDatabaseAction saveAction;
 
-    public boolean sortingByGroup;
-    public boolean sortingByCiteSeerResults;
-    public boolean coloringByGroup;
-
     // MetaData parses, keeps and writes meta data.
     public final MetaData metaData;
 

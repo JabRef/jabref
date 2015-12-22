@@ -45,8 +45,6 @@ class CitationManager {
     private final EventList<CitEntry> list;
     private final JTable table;
     private final DefaultEventTableModel<CitEntry> tableModel;
-    private final JButton ok = new JButton(Localization.lang("OK"));
-    private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase) throws Exception {
@@ -68,7 +66,9 @@ class CitationManager {
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
+        JButton ok = new JButton(Localization.lang("OK"));
         bb.addButton(ok);
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

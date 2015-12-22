@@ -48,7 +48,6 @@ public class FindFullText {
                 }
             } catch (IOException e) {
                 LOGGER.debug("Failed to find fulltext PDF at given URL", e);
-                continue;
             }
         }
         return Optional.empty();

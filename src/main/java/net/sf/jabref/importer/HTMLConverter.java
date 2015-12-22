@@ -903,7 +903,7 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
     }
 
 
-    private final int MAX_TAG_LENGTH = 100;
+    private static final int MAX_TAG_LENGTH = 100;
 
 
     /*private final int MAX_TAG_LENGTH = 30;*/

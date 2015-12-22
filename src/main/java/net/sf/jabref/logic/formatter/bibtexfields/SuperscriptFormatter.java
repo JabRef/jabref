@@ -50,8 +50,7 @@ public class SuperscriptFormatter implements Formatter {
 
         Matcher matcher = pattern.matcher(value);
         // replace globally
-        String newValue = matcher.replaceAll(replace);
 
-        return newValue;
+        return matcher.replaceAll(replace);
     }
 }

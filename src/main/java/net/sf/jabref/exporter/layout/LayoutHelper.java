@@ -393,9 +393,7 @@ public class LayoutHelper {
     }
 
     private int read() throws IOException {
-        int c = _in.read();
-
-        return c;
+        return _in.read();
     }
 
     private void skipWhitespace() throws IOException {

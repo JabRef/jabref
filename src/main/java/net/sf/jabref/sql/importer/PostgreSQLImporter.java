@@ -53,7 +53,7 @@ public class PostgreSQLImporter extends DBImporter {
     @Override
     protected List<String> readColumnNames(Connection conn) throws SQLException {
         try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
-                "SELECT column_name FROM information_schema.columns WHERE table_name ='entries';");) {
+                "SELECT column_name FROM information_schema.columns WHERE table_name ='entries';")) {
             List<String> colNames = new ArrayList<>();
             ResultSet rsColumns = statement.getResultSet();
             while (rsColumns.next()) {

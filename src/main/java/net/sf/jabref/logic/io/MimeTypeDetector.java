@@ -18,18 +18,16 @@ public class MimeTypeDetector {
     }
 
     public static String getMimeType(String url) {
-        String contentType = null;
-
         try {
-            contentType = Unirest.head(url).asBinary().getHeaders().getFirst("content-type");
+            String contentType = Unirest.head(url).asBinary().getHeaders().getFirst("content-type");
             // HEAD and GET headers might differ, try real GET request
             if(contentType == null) {
                 contentType = Unirest.get(url).asBinary().getHeaders().getFirst("content-type");
             }
+            return contentType;
         } catch (UnirestException e) {
             LOGGER.debug("Error getting MIME type of URL", e);
-        } finally {
-            return contentType;
+            return null;
         }
     }
 }

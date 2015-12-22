@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.importer.HTMLConverter;
@@ -50,7 +50,7 @@ public class FieldFormatterCleanup implements Cleaner {
         if (!oldValue.equals(newValue)) {
             entry.setField(field, newValue);
             FieldChange change = new FieldChange(entry, field, oldValue, newValue);
-            return Arrays.asList(new FieldChange[] {change});
+            return Collections.singletonList(change);
         } else {
             return new ArrayList<>();
         }

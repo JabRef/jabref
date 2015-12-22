@@ -31,9 +31,7 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import java.awt.event.ActionEvent;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
 

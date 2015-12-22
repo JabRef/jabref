@@ -1632,9 +1632,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private List<String> getUniquePathParts() {
         List<String> dbPaths = collectDatabaseFilePaths();
-        List<String> uniquePaths = FileUtil.uniquePathSubstrings(dbPaths);
 
-        return uniquePaths;
+        return FileUtil.uniquePathSubstrings(dbPaths);
     }
 
     public void updateAllTabTitles() {

@@ -49,7 +49,7 @@ public class ExportFormat implements IExportFormat {
 
     private FileFilter fileFilter;
     private boolean customExport;
-    private final String LAYOUT_PREFIX = "/resource/layout/";
+    private static final String LAYOUT_PREFIX = "/resource/layout/";
 
     private static final Log LOGGER = LogFactory.getLog(ExportFormat.class);
 

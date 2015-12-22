@@ -188,7 +188,7 @@ class FontSelector extends JButton {
         @Override
         public void actionPerformed(ActionEvent evt) {
             Optional<Font> font = new FontSelectorDialog(FontSelector.this, getFont()).getSelectedFont();
-            font.ifPresent(f -> setFont(f));
+            font.ifPresent(FontSelector.this::setFont);
         }
     }
 

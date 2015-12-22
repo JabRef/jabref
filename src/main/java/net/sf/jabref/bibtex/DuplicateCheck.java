@@ -77,7 +77,8 @@ public class DuplicateCheck {
         }
 
         // The check if they have the same required fields:
-        String[] fields = one.getType().getRequiredFieldsFlat().toArray(new String[0]);
+        java.util.List<String> var = one.getType().getRequiredFieldsFlat();
+        String[] fields = var.toArray(new String[var.size()]);
         double[] req;
         if (fields == null) {
             req = new double[]{0., 0.};
@@ -90,7 +91,8 @@ public class DuplicateCheck {
             return req[0] >= DuplicateCheck.duplicateThreshold;
         }
         // Close to the threshold value, so we take a look at the optional fields, if any:
-        fields = one.getType().getOptionalFields().toArray(new String[0]);
+        java.util.List<String> var = one.getType().getOptionalFields();
+        fields = var.toArray(new String[var.size()]);
         if (fields != null) {
             double[] opt = DuplicateCheck.compareFieldSet(fields, one, two);
             double totValue = ((DuplicateCheck.reqWeight * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.reqWeight) + opt[1]);

@@ -181,8 +181,7 @@ public class SQLUtil {
      */
     public static Statement queryAllFromTable(Connection conn, String tableName) throws SQLException {
         String query = "SELECT * FROM " + tableName + ';';
-        Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query);
-        return res;
+        return (Statement) SQLUtil.processQueryWithResults(conn, query);
     }
 
     /**

@@ -153,10 +153,9 @@ public class GVKFetcher implements EntryFetcher {
         List<BibEntry> result;
 
         String urlPrefix = "http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=";
-        String urlQuery = query;
         String urlSuffix = "&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1";
 
-        String searchstring = (urlPrefix + urlQuery + urlSuffix);
+        String searchstring = (urlPrefix + query + urlSuffix);
         LOGGER.debug(searchstring);
         try {
             URI uri = null;

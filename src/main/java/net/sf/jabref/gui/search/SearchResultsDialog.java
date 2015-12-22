@@ -229,9 +229,9 @@ public class SearchResultsDialog {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
-                comparators.add(new IconComparator(Arrays.asList(Globals.FILE_FIELD)));
+                comparators.add(new IconComparator(Collections.singletonList(Globals.FILE_FIELD)));
             } else if (i == URL_COL) {
-                comparators.add(new IconComparator(Arrays.asList("url")));
+                comparators.add(new IconComparator(Collections.singletonList("url")));
             }
 
         }

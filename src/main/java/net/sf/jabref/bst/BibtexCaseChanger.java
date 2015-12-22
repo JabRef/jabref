@@ -56,7 +56,7 @@ public class BibtexCaseChanger {
 
         private final char asChar;
 
-        private FORMAT_MODE(char asChar) {
+        FORMAT_MODE(char asChar) {
             this.asChar = asChar;
         }
 

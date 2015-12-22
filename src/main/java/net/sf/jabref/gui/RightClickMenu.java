@@ -52,7 +52,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private final JMenu groupAddMenu = new JMenu(Localization.lang("Add to group"));
     private final JMenu groupRemoveMenu = new JMenu(Localization.lang("Remove from group"));
     private final JMenu groupMoveMenu = new JMenu(Localization.lang("Assign exclusively to group"));
-    private JMenu typeMenu;
     private final JMenuItem groupAdd;
     private final JMenuItem groupRemove;
     private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Localization.lang("Float marked entries"),
@@ -61,7 +60,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
         panel = panel_;
         metaData = metaData_;
-        typeMenu = ChangeEntryTypeMenu.getChangeEntryTypeMenu(panel);
+        JMenu typeMenu = ChangeEntryTypeMenu.getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
         boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
 
@@ -358,11 +357,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private boolean isFieldSetForSelectedEntry(String fieldname) {
         if (panel.mainTable.getSelectedRowCount() == 1) {
             BibEntry entry = panel.mainTable.getSelected().get(0);
-            if (entry.getFieldNames().contains(fieldname)) {
-                return true;
-            } else {
-                return false;
-            }
+            return entry.getFieldNames().contains(fieldname);
         } else {
             return false;
         }

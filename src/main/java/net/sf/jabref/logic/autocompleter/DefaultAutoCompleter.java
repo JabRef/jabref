@@ -30,7 +30,7 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
 
     private final String fieldName;
 
-    private final String SEPARATING_CHARS = ";,\n ";
+    private static final String SEPARATING_CHARS = ";,\n ";
 
     /**
      * @see AutoCompleterFactory
