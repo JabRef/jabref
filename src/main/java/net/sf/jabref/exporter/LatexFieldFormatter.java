@@ -71,7 +71,7 @@ public class LatexFieldFormatter {
     /**
      * Formats the content of a field.
      *
-     * @param content the content of the field
+     * @param content   the content of the field
      * @param fieldName the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
      * @return a formatted string suitable for output
      * @throws IllegalArgumentException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
@@ -167,14 +167,7 @@ public class LatexFieldFormatter {
             }
         }
 
-        // currently, we do not add newlines and new formatting
-        if (!Globals.prefs.isNonWrappableField(fieldName)) {
-            //             introduce a line break to be read at the parser
-            return parser.format(StringUtil.wrap(stringBuilder.toString(), GUIGlobals.LINE_LENGTH), fieldName);//, but that lead to ugly .tex
-
-        } else {
-            return parser.format(stringBuilder.toString(), fieldName);
-        }
+        return parser.format(stringBuilder.toString(), fieldName);
     }
 
     private boolean shouldResolveStrings(String fieldName) {
@@ -202,17 +195,8 @@ public class LatexFieldFormatter {
 
         stringBuilder = new StringBuilder(
                 String.valueOf(valueDelimiterStartOfValue));
-        // these two are also hard coded in net.sf.jabref.importer.fileformat.FieldContentParser.multiLineFields
-        // there, JabRefPreferences.NON_WRAPPABLE_FIELDS are also included
-        boolean isAbstract = "abstract".equals(fieldName);
-        boolean isReview = "review".equals(fieldName);
-        boolean doWrap = !isAbstract || !isReview;
 
-        if (!Globals.prefs.isNonWrappableField(fieldName) && doWrap) {
-            stringBuilder.append(parser.format(StringUtil.wrap(content, GUIGlobals.LINE_LENGTH), fieldName));
-        } else {
-            stringBuilder.append(parser.format(content, fieldName));
-        }
+        stringBuilder.append(parser.format(content, fieldName));
 
         stringBuilder.append(valueDelimiterEndOfValue);
 
@@ -221,9 +205,7 @@ public class LatexFieldFormatter {
 
     private void writeText(String text, int start_pos,
                            int end_pos) {
-        /*sb.append("{");
-        sb.append(text.substring(start_pos, end_pos));
-        sb.append("}");*/
+
         stringBuilder.append(valueDelimiterStartOfValue);
         boolean escape = false;
         boolean inCommandName = false;
