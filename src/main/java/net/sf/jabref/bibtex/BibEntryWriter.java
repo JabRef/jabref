@@ -75,7 +75,7 @@ public class BibEntryWriter {
      */
     private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
-        out.write('@' + entry.getType().getName().toUpperCase(Locale.US) + '{');
+        out.write('@' + entry.getType().getName() + '{');
 
         writeKeyField(entry, out);
 
