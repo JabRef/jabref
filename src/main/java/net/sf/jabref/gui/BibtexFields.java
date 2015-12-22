@@ -362,15 +362,6 @@ public class BibtexFields {
         return GUIGlobals.DEFAULT_FIELD_LENGTH;
     }
 
-    // returns an alternative name for the given fieldname
-    public static String getFieldDisplayName(String fieldName) {
-        BibtexSingleField sField = BibtexFields.getField(fieldName);
-        if (sField != null) {
-            return sField.getAlternativeDisplayName();
-        }
-        return null;
-    }
-
     public static boolean isWriteableField(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
         return (sField == null) || sField.isWriteable();
@@ -447,8 +438,7 @@ public class BibtexFields {
     // --------------------------------------------------------------------------
     private static class BibtexSingleField {
 
-        private static final int
-        STANDARD = 0x01; // it is a standard bibtex-field
+        private static final int STANDARD = 0x01; // it is a standard bibtex-field
         private static final int PRIVATE = 0x02; // internal use, e.g. owner, timestamp
         private static final int DISPLAYABLE = 0x04; // These fields cannot be shown inside the source editor panel
         private static final int WRITEABLE = 0x08; // These fields will not be saved to the .bib file.
@@ -520,19 +510,23 @@ public class BibtexFields {
         // -----------------------------------------------------------------------
         // -----------------------------------------------------------------------
 
-        private void setFlag(boolean onOff, int flagID) {
-            if (onOff) // set the flag
-            {
+        /**
+         * Sets or onsets the given flag
+         * @param setToOn if true, set the flag; if false, unset the flat
+         * @param flagID, the id of the flag
+         */
+        private void setFlag(boolean setToOn, int flagID) {
+            if (setToOn) {
+                // set the flag
                 flag = flag | flagID;
-            } else // unset the flag,
-            {
+            } else {
+                // unset the flag
                 flag = flag & (0xff ^ flagID);
             }
         }
 
         private boolean isSet(int flagID) {
             return (flag & flagID) == flagID;
-
         }
 
         // -----------------------------------------------------------------------
@@ -562,15 +556,6 @@ public class BibtexFields {
 
         public boolean isWriteable() {
             return isSet(BibtexSingleField.WRITEABLE);
-        }
-
-        // -----------------------------------------------------------------------
-        public void setAlternativeDisplayName(String aName) {
-            alternativeDisplayName = aName;
-        }
-
-        public String getAlternativeDisplayName() {
-            return alternativeDisplayName;
         }
 
         // -----------------------------------------------------------------------
