@@ -25,6 +25,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Icons are shown as Header for icon columns in the entry table (#315)
 - Tooltips are shown for header columns and contents which are too wide to be displayed in the entry table (#384)
 - Default order in entry table:  # | all file based icons (file, URL/DOI, ...) | all bibtex field based icons (bibtexkey, entrytype, author, title, ...) | all activated special field icons (ranking, quality, ...)
+- Write all field keys in lower case. No more camel casing of field names. E.g., `title` is written instead of `Title`, `howpublished` instead of `HowPublished`, and `doi` instead of `DOI`. The configuration option `Use camel case for field names (e.g., "HowPublished" instead of "howpublished")` is gone.
 
 ### Fixed
 - Fixed #479: Import works again

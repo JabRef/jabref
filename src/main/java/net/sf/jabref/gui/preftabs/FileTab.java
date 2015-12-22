@@ -61,7 +61,6 @@ class FileTab extends JPanel implements PrefsTab {
     private final JCheckBox autoSave;
     private final JCheckBox promptBeforeUsingAutoSave;
     private final JCheckBox includeEmptyFields;
-    private final JCheckBox camelCase;
     private final JCheckBox sameColumn;
     private final JComboBox<String> valueDelimiter;
     private final JComboBox<String> newlineSeparator;
@@ -93,7 +92,6 @@ class FileTab extends JPanel implements PrefsTab {
                 Localization.lang("Curly Brackets") + ": {, }"});
         includeEmptyFields = new JCheckBox(Localization.lang("Include empty fields"));
         sameColumn = new JCheckBox(Localization.lang("Start field contents in same column"));
-        camelCase = new JCheckBox(Localization.lang("Use camel case for field names (e.g., \"HowPublished\" instead of \"howpublished\")"));
         resolveStringsAll = new JRadioButton(Localization.lang("Resolve strings for all fields except") + ":");
         resolveStringsStandard = new JRadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
         ButtonGroup bg = new ButtonGroup();
@@ -165,8 +163,6 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(promptBeforeUsingAutoSave);
         builder.nextLine();
         builder.appendSeparator(Localization.lang("Field saving options"));
-        builder.nextLine();
-        builder.append(camelCase);
         builder.nextLine();
         builder.append(sameColumn);
         builder.append(new JPanel());
@@ -279,7 +275,6 @@ class FileTab extends JPanel implements PrefsTab {
         origAutoSaveSetting = autoSave.isSelected();
         valueDelimiter.setSelectedIndex(prefs.getInt(JabRefPreferences.VALUE_DELIMITERS2));
         includeEmptyFields.setSelected(prefs.getBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS));
-        camelCase.setSelected(prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME));
         sameColumn.setSelected(prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES));
 
         //for LWang_AdjustableFieldOrder
@@ -315,7 +310,6 @@ class FileTab extends JPanel implements PrefsTab {
         prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
         prefs.putInt(JabRefPreferences.VALUE_DELIMITERS2, valueDelimiter.getSelectedIndex());
         prefs.putBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS, includeEmptyFields.isSelected());
-        prefs.putBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME, camelCase.isSelected());
         prefs.putBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES, sameColumn.isSelected());
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 

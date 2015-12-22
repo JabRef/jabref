@@ -48,7 +48,6 @@ public class BibtexEntryWriter {
 
     private final LatexFieldFormatter fieldFormatter;
     private final boolean write;
-    private final boolean writeFieldCameCaseName = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME);
     private final boolean writeFieldAddSpaces = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES);
     private final boolean includeEmptyFields = Globals.prefs.getBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS);
     private final int writeFieldSortStyle = Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE);
@@ -307,11 +306,12 @@ public class BibtexEntryWriter {
      * Get display version of a entry field.
      * <p>
      * BibTeX is case-insensitive therefore there is no difference between:
-     * howpublished, HOWPUBLISHED, HowPublished, etc. Since the camel case
-     * version is the most easy to read this should be the one written in the
-     * *.bib file. Since there is no way how do detect multi-word strings by
-     * default the first character will be made uppercase. In other characters
-     * case needs to be changed the {@link #tagDisplayNameMap} will be used.
+     * howpublished, HOWPUBLISHED, HowPublished, etc.
+     *
+     * The was a long discussion about how JabRef should write the fields.
+     * See https://github.com/JabRef/jabref/issues/116
+     *
+     * The team decided to do the biber way and use lower case for the field names.
      *
      * @param field The name of the field.
      * @return The display version of the field name.
@@ -331,11 +331,8 @@ public class BibtexEntryWriter {
         String suffix = suffixSB.toString();
 
         String result;
-        if (writeFieldCameCaseName) {
-            result = CamelCaser.toCamelCase(field) + suffix;
-        } else {
-            result = field + suffix;
-        }
+        result = field.toLowerCase() + suffix;
+
         return result;
     }
 }
