@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 public class BibEntryWriterTest {
 
-    private BibtexEntryWriter writer;
+    private BibEntryWriter writer;
     private static JabRefPreferences backup;
 
     @BeforeClass
@@ -43,7 +43,7 @@ public class BibEntryWriterTest {
 
     @Before
     public void setUpWriter() {
-        writer = new BibtexEntryWriter(new LatexFieldFormatter(), true);
+        writer = new BibEntryWriter(new LatexFieldFormatter(), true);
     }
 
     @Test

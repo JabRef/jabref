@@ -9,7 +9,7 @@ import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -116,7 +116,7 @@ public class XMPUtilTest {
 
     public static String bibtexEntry2BibtexString(BibEntry e) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibtexEntryWriter(new LatexFieldFormatter(), false).write(e, sw);
+        new BibEntryWriter(new LatexFieldFormatter(), false).write(e, sw);
         return sw.getBuffer().toString();
     }
 
