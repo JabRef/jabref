@@ -60,10 +60,10 @@ public class BibEntryWriterTest {
 
         // @formatter:off
         String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
-                "  author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  number                   = {1}," + Globals.NEWLINE +
-                "  note                     = {some note}" + Globals.NEWLINE +
+                "  author =                   {Foo Bar}," + Globals.NEWLINE +
+                "  journal =                  {International Journal of Something}," + Globals.NEWLINE +
+                "  number =                   {1}," + Globals.NEWLINE +
+                "  note =                     {some note}" + Globals.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -169,10 +169,10 @@ public class BibEntryWriterTest {
 
         // @formatter:off
         String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
-                "  author                   = {BlaBla}," + Globals.NEWLINE +
-                "  journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  number                   = {1}," + Globals.NEWLINE +
-                "  note                     = {some note}" + Globals.NEWLINE +
+                "  author =                   {BlaBla}," + Globals.NEWLINE +
+                "  journal =                  {International Journal of Something}," + Globals.NEWLINE +
+                "  number =                   {1}," + Globals.NEWLINE +
+                "  note =                     {some note}" + Globals.NEWLINE +
                 "}";
         // @formatter:on
         assertEquals(expected, actual);
@@ -215,11 +215,11 @@ public class BibEntryWriterTest {
 
         // @formatter:off
         String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
-                "  author                   = {BlaBla}," + Globals.NEWLINE +
-                "  journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  number                   = {1}," + Globals.NEWLINE +
-                "  note                     = {some note}," + Globals.NEWLINE +
-                "  howpublished             = {asdf}" + Globals.NEWLINE +
+                "  author =                   {BlaBla}," + Globals.NEWLINE +
+                "  journal =                  {International Journal of Something}," + Globals.NEWLINE +
+                "  number =                   {1}," + Globals.NEWLINE +
+                "  note =                     {some note}," + Globals.NEWLINE +
+                "  howpublished =             {asdf}" + Globals.NEWLINE +
                 "}";
         // @formatter:on
         assertEquals(expected, actual);

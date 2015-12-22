@@ -142,7 +142,7 @@ public class BibEntryWriter {
                 out.write(',' + Globals.NEWLINE);
             }
 
-            out.write("  " + getFieldDisplayName(name) + " = ");
+            out.write("  " + getFieldDisplayName(name));
 
             try {
                 out.write(fieldFormatter.format(field, name));
@@ -184,7 +184,7 @@ public class BibEntryWriter {
         String suffix = suffixSB.toString();
 
         String result;
-        result = field.toLowerCase() + suffix;
+        result = field.toLowerCase() + " = " + suffix;
 
         return result;
     }
