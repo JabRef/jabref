@@ -16,6 +16,8 @@
 package net.sf.jabref.logic.search;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * Every Listener that wants to receive events from a search needs to
@@ -24,12 +26,12 @@ import java.util.List;
  * @author Ben
  * 
  */
-public interface SearchTextListener {
+public interface SearchQueryHighlightListener {
 
     /**
-     * Array of words that were searched for
+     * Pattern with which one can determine what to highlight
      * 
      * @param words null if nothing is searched for
      */
-    void searchText(List<String> words);
+    void highlightPattern(Optional<Pattern> highlightPattern);
 }

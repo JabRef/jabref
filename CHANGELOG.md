@@ -25,6 +25,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Icons are shown as Header for icon columns in the entry table (#315)
 - Tooltips are shown for header columns and contents which are too wide to be displayed in the entry table (#384)
 - Default order in entry table:  # | all file based icons (file, URL/DOI, ...) | all bibtex field based icons (bibtexkey, entrytype, author, title, ...) | all activated special field icons (ranking, quality, ...)
+- Implements #565: Highlighting matches works now also for regular expressions in preview panel and entry editor
 
 ### Fixed
 - Fixed #479: Import works again

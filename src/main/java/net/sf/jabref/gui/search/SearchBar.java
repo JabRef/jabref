@@ -28,7 +28,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.SearchQueryLocalizer;
-import net.sf.jabref.logic.search.SearchTextObservable;
+import net.sf.jabref.logic.search.SearchQueryHighlightObservable;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,7 +58,7 @@ public class SearchBar extends JPanel {
 
     private final BasePanel basePanel;
 
-    private final SearchTextObservable searchTextObservable;
+    private final SearchQueryHighlightObservable searchQueryHighlightObservable;
     private final JSearchTextField searchField;
 
     private SearchMode searchMode = getSearchModeFromSettings();
@@ -80,7 +80,7 @@ public class SearchBar extends JPanel {
         super();
 
         this.basePanel = Objects.requireNonNull(basePanel);
-        this.searchTextObservable = new SearchTextObservable();
+        this.searchQueryHighlightObservable = new SearchQueryHighlightObservable();
 
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
 
@@ -248,7 +248,7 @@ public class SearchBar extends JPanel {
         searchField.setText("");
         searchField.setBackground(Color.WHITE);
 
-        searchTextObservable.fireSearchlistenerEvent(null);
+        searchQueryHighlightObservable.fireSearchlistenerEvent(null);
 
         this.currentResults.setText("");
 
@@ -288,7 +288,7 @@ public class SearchBar extends JPanel {
     private void informUserAboutInvalidSearchQuery() {
         searchField.setBackground(NO_RESULTS_COLOR);
 
-        searchTextObservable.fireSearchlistenerEvent(null);
+        searchQueryHighlightObservable.fireSearchlistenerEvent(null);
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
@@ -311,8 +311,8 @@ public class SearchBar extends JPanel {
         this.autoCompleteSupport.setAutoCompleter(searchCompleter);
     }
 
-    public SearchTextObservable getSearchTextObservable() {
-        return searchTextObservable;
+    public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
+        return searchQueryHighlightObservable;
     }
 
     public boolean isStillValidQuery(SearchQuery query) {

@@ -20,7 +20,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.search.MatchesHighlighter;
-import net.sf.jabref.logic.search.SearchTextListener;
+import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,11 +35,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
+public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryHighlightListener {
 
     private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
 
-    private List<String> wordsToHighlight;
+    private Optional<Pattern> highlightPattern = Optional.empty();
 
     private UndoManager undo;
 
@@ -131,12 +131,12 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
      *
      * @param words to highlight
      */
-    private void highLight(List<String> words) {
+    private void highLight(Optional<Pattern> highlightPattern) {
         // highlight all characters that appear in charsToHighlight
         Highlighter highlighter = getHighlighter();
         highlighter.removeAllHighlights();
 
-        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
+        if (highlightPattern == null || !highlightPattern.isPresent()) {
             return;
         }
         String content = getText();
@@ -144,8 +144,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
             return;
         }
 
-        MatchesHighlighter.getPatternForWords(words, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP),
-                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE)).ifPresent(pattern -> {
+        highlightPattern.ifPresent(pattern -> {
             Matcher matcher = pattern.matcher(content);
             while (matcher.find()) {
                 try {
@@ -157,23 +156,21 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
             }
         });
 
-
-
     }
 
     @Override
     public void setText(String text) {
         super.setText(text);
-        highLight(wordsToHighlight);
+        highLight(highlightPattern);
         if (undo != null) {
             undo.discardAllEdits();
         }
     }
 
     @Override
-    public void searchText(List<String> words) {
-        this.wordsToHighlight = words;
-        highLight(words);
+    public void highlightPattern(Optional<Pattern> highlightPattern) {
+        this.highlightPattern = highlightPattern;
+        highLight(highlightPattern);
     }
 
 }
