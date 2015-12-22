@@ -11,10 +11,7 @@ public class MimeTypeDetector {
     public static boolean isPdfContentType(String url) {
         String contentType = getMimeType(url);
 
-        if (contentType == null) {
-            return false;
-        }
-        return contentType.toLowerCase().startsWith("application/pdf");
+        return contentType != null && contentType.toLowerCase().startsWith("application/pdf");
     }
 
     public static String getMimeType(String url) {
@@ -25,7 +22,7 @@ public class MimeTypeDetector {
                 contentType = Unirest.get(url).asBinary().getHeaders().getFirst("content-type");
             }
             return contentType;
-        } catch (UnirestException e) {
+        } catch (UnirestException | RuntimeException e) {
             LOGGER.debug("Error getting MIME type of URL", e);
             return null;
         }

@@ -91,8 +91,8 @@ public class DuplicateCheck {
             return req[0] >= DuplicateCheck.duplicateThreshold;
         }
         // Close to the threshold value, so we take a look at the optional fields, if any:
-        java.util.List<String> var = one.getType().getOptionalFields();
-        fields = var.toArray(new String[var.size()]);
+        java.util.List<String> optionalFields = one.getType().getOptionalFields();
+        fields = optionalFields.toArray(new String[optionalFields.size()]);
         if (fields != null) {
             double[] opt = DuplicateCheck.compareFieldSet(fields, one, two);
             double totValue = ((DuplicateCheck.reqWeight * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.reqWeight) + opt[1]);

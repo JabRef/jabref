@@ -1180,10 +1180,10 @@ public class JabRefPreferences {
         String nr = String.valueOf(number);
         put(JabRefPreferences.CUSTOM_TYPE_NAME + nr, tp.getName());
         put(JabRefPreferences.CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());
-        List<String> var = tp.getOptionalFields();
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, var.toArray(new String[var.size()]));
-        List<String> var = tp.getPrimaryOptionalFields();
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, var.toArray(new String[var.size()]));
+        List<String> optionalFields = tp.getOptionalFields();
+        putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, optionalFields.toArray(new String[optionalFields.size()]));
+        List<String> primaryOptionalFields = tp.getPrimaryOptionalFields();
+        putStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, primaryOptionalFields.toArray(new String[primaryOptionalFields.size()]));
     }
 
     /**
