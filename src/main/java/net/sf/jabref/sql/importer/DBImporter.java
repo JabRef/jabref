@@ -19,6 +19,7 @@ package net.sf.jabref.sql.importer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 import net.sf.jabref.bibtex.EntryTypes;
@@ -87,8 +88,9 @@ public abstract class DBImporter extends DBImporterExporter {
             }
             jabrefDBs = jabrefDBs.substring(0, jabrefDBs.length() - 1) + ')';
 
-            try (ResultSet rsDatabase = SQLUtil.queryAllFromTable(conn,
-                    "jabref_database WHERE database_name IN " + jabrefDBs).getResultSet()) {
+            try (Statement statement = SQLUtil.queryAllFromTable(conn,
+                    "jabref_database WHERE database_name IN " + jabrefDBs)) {
+                ResultSet rsDatabase = statement.getResultSet();
                 while (rsDatabase.next()) {
                     BibDatabase database = new BibDatabase();
                     // Find entry type IDs and their mappings to type names:
@@ -179,8 +181,9 @@ public abstract class DBImporter extends DBImporterExporter {
         LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<>();
         GroupTreeNode rootNode = new GroupTreeNode(new AllEntriesGroup());
 
-        try (ResultSet rsGroups = SQLUtil.queryAllFromTable(conn,
-                "groups WHERE database_id='" + database_id + "' ORDER BY groups_id").getResultSet()) {
+        try (Statement statement = SQLUtil.queryAllFromTable(conn,
+                "groups WHERE database_id='" + database_id + "' ORDER BY groups_id")) {
+            ResultSet rsGroups = statement.getResultSet();
             while (rsGroups.next()) {
                 AbstractGroup group = null;
                 String typeId = findGroupTypeName(rsGroups.getString("group_types_id"), conn);

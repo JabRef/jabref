@@ -18,6 +18,7 @@ package net.sf.jabref.sql.importer;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -43,10 +44,9 @@ import net.sf.jabref.sql.SQLUtil;
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 27, 2008 Time: 6:09:08 PM To change this template use File | Settings
  * | File Templates.
- *
+ * <p>
  * Jan. 20th Changed to accommodate the new way to connect to DB and also to show the exceptions and to display more than
  * one DB imported (by ifsteinm)
- *
  */
 public class DbImportAction extends AbstractWorker {
 
@@ -138,7 +138,8 @@ public class DbImportAction extends AbstractWorker {
                 DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
                 DBImporter importer = factory.getImporter(dbs.getServerType());
                 try (Connection conn = importer.connectToDB(dbs);
-                        ResultSet rs = SQLUtil.queryAllFromTable(conn, "jabref_database").getResultSet()) {
+                     Statement statement = SQLUtil.queryAllFromTable(conn, "jabref_database")) {
+                    ResultSet rs = statement.getResultSet();
                     Vector<String> v;
                     Vector<Vector<String>> matrix = new Vector<>();
 
