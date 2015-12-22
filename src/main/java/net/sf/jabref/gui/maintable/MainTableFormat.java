@@ -58,11 +58,10 @@ public class MainTableFormat implements TableFormat<BibEntry> {
     }
 
     /**
-     * @return the string that should be put in the column header
+     * @return the string that should be put in the column header. null if field is empty.
      */
     @Override
     public String getColumnName(int col) {
-
         return tableColumns.get(col).getDisplayName();
 
     }

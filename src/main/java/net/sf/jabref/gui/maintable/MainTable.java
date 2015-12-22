@@ -293,7 +293,7 @@ public class MainTable extends JTable {
 
         Rectangle bounds = getCellRect(row, col, false);
 
-        if (comp.getPreferredSize().width > bounds.width && getValueAt(row, col) != null) {
+        if ((comp.getPreferredSize().width > bounds.width) && (getValueAt(row, col) != null)) {
             toolTipText = getValueAt(row, col).toString();
         }
         return toolTipText;
@@ -378,21 +378,21 @@ public class MainTable extends JTable {
         String[] widthsFromPreferences = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
         TableColumnModel cm = getColumnModel();
         cm.getColumn(0).setPreferredWidth(ncWidth);
-        for(int i=1; i<cm.getColumnCount(); i++) {
+        for (int i = 1; i < cm.getColumnCount(); i++) {
             MainTableColumn mainTableColumn = tableFormat.getTableColumn(cm.getColumn(i).getModelIndex());
-            if(SpecialFieldsUtils.FIELDNAME_RANKING.equals(mainTableColumn.getColumnName())) {
+            if (SpecialFieldsUtils.FIELDNAME_RANKING.equals(mainTableColumn.getColumnName())) {
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-            } else if(mainTableColumn.isIconColumn()) {
+            } else if (mainTableColumn.isIconColumn()) {
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
                 cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
             } else {
                 String[] allColumns = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
                 // find index of current mainTableColumn in allColumns
-                for(int j=0; j<allColumns.length; j++) {
-                    if(allColumns[j].equalsIgnoreCase(mainTableColumn.getDisplayName())) {
+                for (int j = 0; j < allColumns.length; j++) {
+                    if (allColumns[j].equalsIgnoreCase(mainTableColumn.getDisplayName())) {
                         try {
                             // set preferred width by using found index j in the width array
                             cm.getColumn(i).setPreferredWidth(Integer.parseInt(widthsFromPreferences[j]));
@@ -604,7 +604,7 @@ public class MainTable extends JTable {
      * @return true if the column shows the "file" field; false otherwise
      */
     public boolean isFileColumn(int modelIndex) {
-        return tableFormat.getTableColumn(modelIndex) != null && tableFormat.getTableColumn(modelIndex)
+        return (tableFormat.getTableColumn(modelIndex) != null) && tableFormat.getTableColumn(modelIndex)
                 .getBibtexFields().contains(Globals.FILE_FIELD);
     }
 
