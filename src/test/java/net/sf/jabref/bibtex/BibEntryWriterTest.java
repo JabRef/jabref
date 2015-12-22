@@ -30,8 +30,6 @@ public class BibEntryWriterTest {
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         backup = Globals.prefs;
-        // make sure that we use the "new style" serialization
-        Globals.prefs.putInt(JabRefPreferences.WRITEFIELD_SORTSTYLE, 0);
     }
 
     @AfterClass

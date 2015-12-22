@@ -48,9 +48,6 @@ public class BibEntryWriter {
 
     private final LatexFieldFormatter fieldFormatter;
     private final boolean write;
-    private final boolean writeFieldAddSpaces = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES);
-    private final boolean includeEmptyFields = Globals.prefs.getBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS);
-    private final int writeFieldSortStyle = Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE);
 
 
     public BibEntryWriter(LatexFieldFormatter fieldFormatter, boolean write) {
@@ -60,115 +57,17 @@ public class BibEntryWriter {
 
     public void write(BibEntry entry, Writer out) throws IOException {
         // if the entry has not been modified, write it as it was
-        if(!entry.hasChanged()){
+        if (!entry.hasChanged()) {
             out.write(entry.getParsedSerialization());
             return;
         }
         out.write(Globals.NEWLINE + Globals.NEWLINE);
 
-        switch (writeFieldSortStyle) {
-            case 0:
-                writeRequiredFieldsFirstOptionalFieldsSecondRemainingFieldsThird(entry, out);
-                break;
-            case 1:
-                writeRequiredFieldsFirstRemainingFieldsSecond(entry, out);
-                break;
-            case 2:
-                writeUserDefinedOrder(entry, out);
-                break;
-        }
+        writeRequiredFieldsFirstRemainingFieldsSecond(entry, out);
     }
 
     /**
-     * new style ver>=2.10, sort the field for requiredFields, optionalFields and other fields separately
-     *
-     * @param entry
-     * @param out
-     * @throws IOException
-     */
-    private void writeRequiredFieldsFirstOptionalFieldsSecondRemainingFieldsThird(BibEntry entry, Writer out) throws IOException {
-        // Write header with type and bibtex-key.
-        out.write('@' + entry.getType().getName() + '{');
-
-        HashSet<String> writtenFields = new HashSet<>();
-
-        writeKeyField(entry, out);
-        writtenFields.add(BibEntry.KEY_FIELD);
-
-        // Write required fields first.
-        // Thereby, write the title field first.
-        boolean hasWritten = writeField(entry, out, "title", false);
-        writtenFields.add("title");
-
-        if (entry.getRequiredFieldsFlat() != null) {
-            List<String> requiredFields = getRequiredFieldsSorted(entry);
-            for (String value : requiredFields) {
-                if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
-                    writtenFields.add(value);
-                }
-            }
-        }
-
-        // Then optional fields
-        if (entry.getOptionalFields() != null) {
-            List<String> optionalFields = getOptionalFieldsSorted(entry);
-            for (String value : optionalFields) {
-                if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
-                    writtenFields.add(value);
-                }
-            }
-        }
-
-        // Then write remaining fields in alphabetic order.
-        TreeSet<String> remainingFields = new TreeSet<>();
-        for (String key : entry.getFieldNames()) {
-            boolean writeIt = write ? BibtexFields.isWriteableField(key) :
-                    BibtexFields.isDisplayableField(key);
-            if (!writtenFields.contains(key) && writeIt) {
-                remainingFields.add(key);
-            }
-        }
-
-        for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten);
-        }
-
-        // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + '}');
-    }
-
-    private List<String> getRequiredFieldsSorted(BibEntry entry) {
-        String entryTypeName = entry.getType().getName();
-        List<String> sortedFields = requiredFieldsSorted.get(entryTypeName);
-
-        // put into cache if necessary
-        if (sortedFields == null) {
-            sortedFields = new ArrayList<>(entry.getRequiredFieldsFlat());
-            Collections.sort(sortedFields);
-            requiredFieldsSorted.put(entryTypeName, sortedFields);
-        }
-
-        return sortedFields;
-    }
-
-    private List<String> getOptionalFieldsSorted(BibEntry entry) {
-        String entryTypeName = entry.getType().getName();
-        List<String> sortedFields = optionalFieldsSorted.get(entryTypeName);
-
-        // put into chache if necessary
-        if (sortedFields == null) {
-            sortedFields = new ArrayList<>(entry.getOptionalFields());
-            Collections.sort(sortedFields);
-            optionalFieldsSorted.put(entryTypeName, sortedFields);
-        }
-
-        return sortedFields;
-    }
-
-    /**
-     * old style ver<=2.9.2, write fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
+     * Write fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
      *
      * @param entry
      * @param out
@@ -218,52 +117,6 @@ public class BibEntryWriter {
         out.write((hasWritten ? Globals.NEWLINE : "") + '}');
     }
 
-    private void writeUserDefinedOrder(BibEntry entry, Writer out) throws IOException {
-        // Write header with type and bibtex-key.
-        out.write('@' + entry.getType().getName() + '{');
-
-        writeKeyField(entry, out);
-        HashMap<String, String> written = new HashMap<>();
-        written.put(BibEntry.KEY_FIELD, null);
-        boolean hasWritten = false;
-
-        // Write user defined fields first.
-        String[] fields = Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
-        if (fields != null) {
-            //do not sort, write as it is.
-            for (String value : fields) {
-                if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
-                    written.put(value, null);
-                }
-            }
-        }
-
-        // Then write remaining fields in alphabetic order.
-
-        //STA get remaining fields
-        TreeSet<String> remainingFields = new TreeSet<>();
-        for (String key : entry.getFieldNames()) {
-            //iterate through all fields
-            boolean writeIt = write ? BibtexFields.isWriteableField(key) :
-                    BibtexFields.isDisplayableField(key);
-            //find the ones has not been written.
-            if (!written.containsKey(key) && writeIt) {
-                remainingFields.add(key);
-            }
-        }
-        //END get remaining fields
-
-
-        for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten);
-        }
-
-        // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + '}');
-
-    }
-
     private void writeKeyField(BibEntry entry, Writer out) throws IOException {
         String keyField = StringUtil.shaveString(entry.getCiteKey());
         out.write((keyField == null ? "" : keyField) + ',' + Globals.NEWLINE);
@@ -284,7 +137,7 @@ public class BibEntryWriter {
         String field = entry.getField(name);
         // only write field if is is not empty or if empty fields should be included
         // the first condition mirrors mirror behavior of com.jgoodies.common.base.Strings.isNotBlank(str)
-        if (!Strings.nullToEmpty(field).trim().isEmpty() || includeEmptyFields) {
+        if (!Strings.nullToEmpty(field).trim().isEmpty()) {
             if (prependWhiteSpace) {
                 out.write(',' + Globals.NEWLINE);
             }
@@ -307,10 +160,10 @@ public class BibEntryWriter {
      * <p>
      * BibTeX is case-insensitive therefore there is no difference between:
      * howpublished, HOWPUBLISHED, HowPublished, etc.
-     *
+     * <p>
      * The was a long discussion about how JabRef should write the fields.
      * See https://github.com/JabRef/jabref/issues/116
-     *
+     * <p>
      * The team decided to do the biber way and use lower case for the field names.
      *
      * @param field The name of the field.
@@ -323,11 +176,11 @@ public class BibEntryWriter {
         }
 
         StringBuilder suffixSB = new StringBuilder();
-        if (writeFieldAddSpaces) {
-            for (int i = BibEntryWriter.maxFieldLength - field.length(); i > 0; i--) {
-                suffixSB.append(" ");
-            }
+
+        for (int i = BibEntryWriter.maxFieldLength - field.length(); i > 0; i--) {
+            suffixSB.append(" ");
         }
+
         String suffix = suffixSB.toString();
 
         String result;

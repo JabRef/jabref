@@ -48,7 +48,6 @@ public class LatexFieldFormatter {
     private final boolean resolveStringsAllFields;
     private final char valueDelimiterStartOfValue;
     private final char valueDelimiterEndOfValue;
-    private final boolean writefieldWrapfield;
     private final String[] doNotResolveStringsFors;
 
     private final FieldContentParser parser;
@@ -65,7 +64,6 @@ public class LatexFieldFormatter {
         valueDelimiterStartOfValue = Globals.prefs.getValueDelimiters(0);
         valueDelimiterEndOfValue = Globals.prefs.getValueDelimiters(1);
         doNotResolveStringsFors = Globals.prefs.getStringArray(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
-        writefieldWrapfield = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD);
 
         parser = new FieldContentParser();
     }
@@ -170,7 +168,7 @@ public class LatexFieldFormatter {
         }
 
         // currently, we do not add newlines and new formatting
-        if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
+        if (!Globals.prefs.isNonWrappableField(fieldName)) {
             //             introduce a line break to be read at the parser
             return parser.format(StringUtil.wrap(stringBuilder.toString(), GUIGlobals.LINE_LENGTH), fieldName);//, but that lead to ugly .tex
 
@@ -209,9 +207,8 @@ public class LatexFieldFormatter {
         boolean isAbstract = "abstract".equals(fieldName);
         boolean isReview = "review".equals(fieldName);
         boolean doWrap = !isAbstract || !isReview;
-        boolean strangePrefSettings = writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName);
 
-        if (strangePrefSettings && doWrap) {
+        if (!Globals.prefs.isNonWrappableField(fieldName) && doWrap) {
             stringBuilder.append(parser.format(StringUtil.wrap(content, GUIGlobals.LINE_LENGTH), fieldName));
         } else {
             stringBuilder.append(parser.format(content, fieldName));

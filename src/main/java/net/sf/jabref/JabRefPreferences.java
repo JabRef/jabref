@@ -263,10 +263,6 @@ public class JabRefPreferences {
     public static final String ALLOW_TABLE_EDITING = "allowTableEditing";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
     public static final String USE_OWNER = "useOwner";
-    public static final String WRITEFIELD_ADDSPACES = "writeFieldAddSpaces";
-    public static final String WRITEFIELD_SORTSTYLE = "writefieldSortStyle";
-    public static final String WRITEFIELD_USERDEFINEDORDER = "writefieldUserdefinedOrder";
-    public static final String WRITEFIELD_WRAPFIELD = "wrapFieldLine";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
@@ -284,7 +280,6 @@ public class JabRefPreferences {
     public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
-    public static final String INCLUDE_EMPTY_FIELDS = "includeEmptyFields";
     public static final String VALUE_DELIMITERS2 = "valueDelimiters";
     public static final String BIBLATEX_MODE = "biblatexMode";
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
@@ -693,15 +688,6 @@ public class JabRefPreferences {
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
-        // behavior of JabRef before 2.10: false
-        defaults.put(WRITEFIELD_ADDSPACES, Boolean.TRUE);
-
-        //behavior of JabRef before LWang_AdjustableFieldOrder 1
-        //0 sorted order (2.10 default), 1 unsorted order (2.9.2 default), 2 user defined
-        defaults.put(WRITEFIELD_SORTSTYLE, 0);
-        defaults.put(WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
-        defaults.put(WRITEFIELD_WRAPFIELD, Boolean.FALSE);
-
         defaults.put(RemotePreferences.USE_REMOTE_SERVER, Boolean.TRUE);
         defaults.put(RemotePreferences.REMOTE_SERVER_PORT, 6050);
 
@@ -730,7 +716,6 @@ public class JabRefPreferences {
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
         defaults.put(VALUE_DELIMITERS2, 1);
-        defaults.put(INCLUDE_EMPTY_FIELDS, Boolean.FALSE);
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
         // TODO l10n issue
