@@ -114,12 +114,12 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
             // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
             // so cmd receives: (insert \"\\cite{Blah2001}\")
             // so emacs receives: (insert "\cite{Blah2001}")
-            prefix.concat("\\\"\\" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
+            prefix.concat("\\\"\\" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
             // Linux gnuclient escaping:
             // java string: "(insert \"\\\\cite{Blah2001}\")"
             // so sh receives: (insert "\\cite{Blah2001}")
             // so emacs receives: (insert "\cite{Blah2001}")
-            prefix.concat("\"" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
+            prefix.concat("\"" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
 
             final Process p = Runtime.getRuntime().exec(com);
 

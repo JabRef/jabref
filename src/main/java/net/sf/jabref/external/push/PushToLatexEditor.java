@@ -37,7 +37,7 @@ public class PushToLatexEditor extends AbstractPushToApplication implements Push
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        return new String[] {commandPath, "-i", citeCommand + "{" + keyString + "}"};
+        return new String[] {commandPath, "-i", getCiteCommand() + "{" + keyString + "}"};
     }
 
     @Override
