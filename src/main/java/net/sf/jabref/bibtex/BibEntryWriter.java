@@ -10,41 +10,12 @@ import net.sf.jabref.model.entry.BibEntry;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
+import java.util.function.Predicate;
 
 import com.google.common.base.Strings;
 import net.sf.jabref.model.entry.EntryType;
 
 public class BibEntryWriter {
-
-    private static final Map<String, List<String>> requiredFieldsSorted = new HashMap<>();
-
-    private static final Map<String, List<String>> optionalFieldsSorted = new HashMap<>();
-
-
-    /**
-     * The maximum length of a field name to properly make the alignment of the
-     * equal sign.
-     */
-    private static final int maxFieldLength;
-
-    static {
-        // Looking for the longest field name.
-        // XXX JK: Look for all used field names not only defined once, since
-        //         there may be some unofficial field name used.
-        int max = 0;
-        for (EntryType type : EntryTypes.getAllValues()) {
-            for (String field : type.getRequiredFieldsFlat()) {
-                max = Math.max(max, field.length());
-            }
-
-            if (type.getOptionalFields() != null) {
-                for (String field : type.getOptionalFields()) {
-                    max = Math.max(max, field.length());
-                }
-            }
-        }
-        maxFieldLength = max;
-    }
 
     private final LatexFieldFormatter fieldFormatter;
     private final boolean write;
@@ -82,11 +53,12 @@ public class BibEntryWriter {
         HashSet<String> written = new HashSet<>();
         written.add(BibEntry.KEY_FIELD);
         boolean hasWritten = false;
+        int indentation = getLengthOfLongestFieldName(entry);
         // Write required fields first.
         List<String> fields = entry.getRequiredFieldsFlat();
         if (fields != null) {
             for (String value : fields) {
-                hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
+                hasWritten = hasWritten | writeField(entry, out, value, hasWritten, indentation);
                 written.add(value);
             }
         }
@@ -95,7 +67,7 @@ public class BibEntryWriter {
         if (fields != null) {
             for (String value : fields) {
                 if (!written.contains(value)) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
+                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten, indentation);
                     written.add(value);
                 }
             }
@@ -110,7 +82,7 @@ public class BibEntryWriter {
             }
         }
         for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten);
+            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, indentation);
         }
 
         // Finally, end the entry.
@@ -133,7 +105,7 @@ public class BibEntryWriter {
      *                          it was not set
      * @throws IOException In case of an IO error
      */
-    private boolean writeField(BibEntry entry, Writer out, String name, boolean prependWhiteSpace) throws IOException {
+    private boolean writeField(BibEntry entry, Writer out, String name, boolean prependWhiteSpace, int indentation) throws IOException {
         String field = entry.getField(name);
         // only write field if is is not empty or if empty fields should be included
         // the first condition mirrors mirror behavior of com.jgoodies.common.base.Strings.isNotBlank(str)
@@ -142,7 +114,7 @@ public class BibEntryWriter {
                 out.write(',' + Globals.NEWLINE);
             }
 
-            out.write("  " + getFieldDisplayName(name));
+            out.write("  " + getFieldDisplayName(name, indentation));
 
             try {
                 out.write(fieldFormatter.format(field, name));
@@ -153,6 +125,11 @@ public class BibEntryWriter {
         } else {
             return false;
         }
+    }
+
+    private int getLengthOfLongestFieldName(BibEntry entry) {
+        Predicate<String> isNotBibtexKey = field -> !"bibtexkey".equals(field);
+        return entry.getFieldNames().stream().filter(isNotBibtexKey).mapToInt(field -> field.length()).max().orElse(0);
     }
 
     /**
@@ -169,7 +146,7 @@ public class BibEntryWriter {
      * @param field The name of the field.
      * @return The display version of the field name.
      */
-    private String getFieldDisplayName(String field) {
+    private String getFieldDisplayName(String field, int intendation) {
         if (field.isEmpty()) {
             // hard coded "UNKNOWN" is assigned to a field without any name
             field = "UNKNOWN";
@@ -177,7 +154,7 @@ public class BibEntryWriter {
 
         StringBuilder suffixSB = new StringBuilder();
 
-        for (int i = BibEntryWriter.maxFieldLength - field.length(); i > 0; i--) {
+        for (int i = (intendation - field.length()); i > 0; i--) {
             suffixSB.append(" ");
         }
 
