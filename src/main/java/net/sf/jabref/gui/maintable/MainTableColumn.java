@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.maintable;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -55,13 +54,8 @@ public class MainTableColumn {
         }
 
         StringJoiner joiner = new StringJoiner(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
-        for(String field : bibtexFields) {
-            String fieldDisplayName = BibtexFields.getFieldDisplayName(field);
-            if (fieldDisplayName != null) {
-                joiner.add(fieldDisplayName);
-            } else {
-                joiner.add(EntryUtil.capitalizeFirst(field));
-            }
+        for (String field : bibtexFields) {
+            joiner.add(EntryUtil.capitalizeFirst(field));
         }
         return joiner.toString();
     }

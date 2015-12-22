@@ -41,7 +41,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -514,7 +514,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     public static String getSourceString(BibEntry entry) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
-        new BibtexEntryWriter(formatter, false).write(entry, stringWriter);
+        new BibEntryWriter(formatter, false).write(entry, stringWriter);
 
         return stringWriter.getBuffer().toString();
     }

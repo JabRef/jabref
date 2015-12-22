@@ -86,7 +86,7 @@ import javax.swing.text.StyledDocument;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
@@ -500,7 +500,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored) {

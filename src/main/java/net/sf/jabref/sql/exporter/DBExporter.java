@@ -472,7 +472,8 @@ public abstract class DBExporter extends DBImporterExporter {
 
     private Vector<Vector<String>> createExistentDBNamesMatrix(DBStrings databaseStrings) throws Exception {
         try (Connection conn = this.connectToDB(databaseStrings);
-             ResultSet rs = SQLUtil.queryAllFromTable(conn, "jabref_database")) {
+             Statement statement = SQLUtil.queryAllFromTable(conn, "jabref_database")) {
+            ResultSet rs = statement.getResultSet();
             Vector<String> v;
             Vector<Vector<String>> matrix = new Vector<>();
             dbNames.clear();

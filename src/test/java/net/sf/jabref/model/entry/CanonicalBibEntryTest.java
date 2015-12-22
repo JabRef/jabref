@@ -5,11 +5,8 @@ import org.junit.Test;
 
 public class CanonicalBibEntryTest {
 
-    /**
-     * Simple test for the canonical format
-     */
     @Test
-    public void canonicalRepresentation() {
+    public void simpleCanonicalRepresentation() {
         BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
         e.setField(BibEntry.KEY_FIELD, "key");
         e.setField("author", "abc");
@@ -18,6 +15,15 @@ public class CanonicalBibEntryTest {
         String canonicalRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(e);
         Assert.assertEquals("@article{key,\n  author = {abc},\n  journal = {hij},\n  title = {def}\n}",
                 canonicalRepresentation);
+    }
+
+    @Test
+    public void canonicalRepresentationWithNewlines() {
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
+        e.setField(BibEntry.KEY_FIELD, "key");
+        e.setField("abstract", "line 1\nline 2");
+        String canonicalRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(e);
+        Assert.assertEquals("@article{key,\n  abstract = {line 1\nline 2}\n}", canonicalRepresentation);
     }
 
 }

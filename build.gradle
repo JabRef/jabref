@@ -77,10 +77,10 @@ dependencies {
 
     compile 'commons-cli:commons-cli:1.3.1'
 
-    compile 'org.openoffice:juh:3.2.1'
-    compile 'org.openoffice:jurt:3.2.1'
-    compile 'org.openoffice:ridl:3.2.1'
-    compile 'org.openoffice:unoil:3.2.1'
+    compile 'org.openoffice:juh:4.1.2'
+    compile 'org.openoffice:jurt:4.1.2'
+    compile 'org.openoffice:ridl:4.1.2'
+    compile 'org.openoffice:unoil:4.1.2'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'

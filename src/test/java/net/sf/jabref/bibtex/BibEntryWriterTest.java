@@ -6,6 +6,8 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -21,18 +23,25 @@ import static org.junit.Assert.assertEquals;
 
 public class BibEntryWriterTest {
 
-    private BibtexEntryWriter writer;
+    private BibEntryWriter writer;
+    private static JabRefPreferences backup;
 
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
+        backup = Globals.prefs;
         // make sure that we use the "new style" serialization
         Globals.prefs.putInt(JabRefPreferences.WRITEFIELD_SORTSTYLE, 0);
     }
 
+    @AfterClass
+    public static void tearDown() {
+        Globals.prefs.overwritePreferences(backup);
+    }
+
     @Before
     public void setUpWriter() {
-        writer = new BibtexEntryWriter(new LatexFieldFormatter(), true);
+        writer = new BibEntryWriter(new LatexFieldFormatter(), true);
     }
 
     @Test

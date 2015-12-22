@@ -14,7 +14,7 @@ import java.util.*;
 import com.google.common.base.Strings;
 import net.sf.jabref.model.entry.EntryType;
 
-public class BibtexEntryWriter {
+public class BibEntryWriter {
 
     private static final Map<String, List<String>> requiredFieldsSorted = new HashMap<>();
 
@@ -53,7 +53,7 @@ public class BibtexEntryWriter {
     private final int writeFieldSortStyle = Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE);
 
 
-    public BibtexEntryWriter(LatexFieldFormatter fieldFormatter, boolean write) {
+    public BibEntryWriter(LatexFieldFormatter fieldFormatter, boolean write) {
         this.fieldFormatter = fieldFormatter;
         this.write = write;
     }
@@ -324,7 +324,7 @@ public class BibtexEntryWriter {
 
         StringBuilder suffixSB = new StringBuilder();
         if (writeFieldAddSpaces) {
-            for (int i = BibtexEntryWriter.maxFieldLength - field.length(); i > 0; i--) {
+            for (int i = BibEntryWriter.maxFieldLength - field.length(); i > 0; i--) {
                 suffixSB.append(" ");
             }
         }

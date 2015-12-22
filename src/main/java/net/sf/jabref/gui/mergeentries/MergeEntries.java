@@ -29,7 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -336,7 +336,7 @@ public class MergeEntries {
         jta.setEditable(false);
         StringWriter sw = new StringWriter();
         try {
-            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
         }
@@ -419,7 +419,7 @@ public class MergeEntries {
         // Update the Bibtex source view
         StringWriter sw = new StringWriter();
         try {
-            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
         }

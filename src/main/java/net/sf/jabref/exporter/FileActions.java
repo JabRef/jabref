@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
@@ -216,7 +216,7 @@ public class FileActions {
             // sorted as they appear on the screen.
             List<BibEntry> sorter = FileActions.getSortedEntries(database, metaData, null, true);
 
-            BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
+            BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
 
             for (BibEntry entry : sorter) {
                 exceptionCause = entry;
@@ -414,7 +414,7 @@ public class FileActions {
             Collections.addAll(sorter, bes);
             Collections.sort(sorter, new FieldComparatorStack<>(comparators));
 
-            BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
+            BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
 
             for (BibEntry aSorter : sorter) {
                 be = aSorter;
