@@ -264,7 +264,6 @@ public class JabRefPreferences {
     public static final String OVERWRITE_OWNER = "overwriteOwner";
     public static final String USE_OWNER = "useOwner";
     public static final String WRITEFIELD_ADDSPACES = "writeFieldAddSpaces";
-    public static final String WRITEFIELD_CAMELCASENAME = "writeFieldCamelCase";
     public static final String WRITEFIELD_SORTSTYLE = "writefieldSortStyle";
     public static final String WRITEFIELD_USERDEFINEDORDER = "writefieldUserdefinedOrder";
     public static final String WRITEFIELD_WRAPFIELD = "wrapFieldLine";
@@ -694,9 +693,8 @@ public class JabRefPreferences {
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
-        // behavior of JabRef before 2.10: both: false
+        // behavior of JabRef before 2.10: false
         defaults.put(WRITEFIELD_ADDSPACES, Boolean.TRUE);
-        defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
 
         //behavior of JabRef before LWang_AdjustableFieldOrder 1
         //0 sorted order (2.10 default), 1 unsorted order (2.9.2 default), 2 user defined
