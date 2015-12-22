@@ -47,7 +47,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected final JTextField Path = new JTextField(30);
     protected String commandPath;
     protected String commandPathPreferenceKey;
-    protected String citeCommand = Globals.prefs.get(JabRefPreferences.CITE_COMMAND);
     protected FormBuilder builder;
 
 
@@ -174,4 +173,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         Globals.prefs.put(commandPathPreferenceKey, Path.getText());
     }
 
+    protected String getCiteCommand() {
+        return Globals.prefs.get(JabRefPreferences.CITE_COMMAND);
+    }
 }
