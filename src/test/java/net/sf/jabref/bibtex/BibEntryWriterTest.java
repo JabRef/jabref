@@ -62,8 +62,8 @@ public class BibEntryWriterTest {
         String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
                 "  author                   = {Foo Bar}," + Globals.NEWLINE +
                 "  journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  note                     = {some note}," + Globals.NEWLINE +
-                "  number                   = {1}" + Globals.NEWLINE +
+                "  number                   = {1}," + Globals.NEWLINE +
+                "  note                     = {some note}" + Globals.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -171,8 +171,8 @@ public class BibEntryWriterTest {
         String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
                 "  author                   = {BlaBla}," + Globals.NEWLINE +
                 "  journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  note                     = {some note}," + Globals.NEWLINE +
-                "  number                   = {1}" + Globals.NEWLINE +
+                "  number                   = {1}," + Globals.NEWLINE +
+                "  note                     = {some note}" + Globals.NEWLINE +
                 "}";
         // @formatter:on
         assertEquals(expected, actual);
@@ -217,8 +217,8 @@ public class BibEntryWriterTest {
         String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
                 "  author                   = {BlaBla}," + Globals.NEWLINE +
                 "  journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  note                     = {some note}," + Globals.NEWLINE +
                 "  number                   = {1}," + Globals.NEWLINE +
+                "  note                     = {some note}," + Globals.NEWLINE +
                 "  howpublished             = {asdf}" + Globals.NEWLINE +
                 "}";
         // @formatter:on
