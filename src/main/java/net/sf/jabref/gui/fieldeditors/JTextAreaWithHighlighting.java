@@ -19,7 +19,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
-import net.sf.jabref.gui.search.MatchesHighlighter;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,8 +29,9 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import java.awt.event.ActionEvent;
-import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryHighlightListener {
 
@@ -134,7 +134,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryH
         Highlighter highlighter = getHighlighter();
         highlighter.removeAllHighlights();
 
-        if (highlightPattern == null || !highlightPattern.isPresent()) {
+        if ((highlightPattern == null) || !highlightPattern.isPresent()) {
             return;
         }
         String content = getText();
