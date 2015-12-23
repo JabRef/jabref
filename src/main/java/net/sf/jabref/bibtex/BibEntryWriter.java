@@ -37,6 +37,16 @@ public class BibEntryWriter {
         writeRequiredFieldsFirstRemainingFieldsSecond(entry, out);
     }
 
+    public void writeWithoutPrependingNewlines(BibEntry entry, Writer out) throws IOException {
+        // if the entry has not been modified, write it as it was
+        if (!entry.hasChanged()) {
+            out.write(entry.getParsedSerialization());
+            return;
+        }
+
+        writeRequiredFieldsFirstRemainingFieldsSecond(entry, out);
+    }
+
     /**
      * Write fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
      *
