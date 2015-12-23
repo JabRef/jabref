@@ -30,6 +30,8 @@ public class BibEntryWriterTest {
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         backup = Globals.prefs;
+        // ensure BibTeX mode
+        Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, false);
     }
 
     @AfterClass
@@ -328,5 +330,42 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         assertEquals(bibtexEntry, actual);
+    }
+
+    @Test
+    public void addFieldWithLongerLength() throws IOException {
+        // @formatter:off
+        String bibtexEntry = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+                "  author =  {BlaBla}," + Globals.NEWLINE +
+                "  journal = {International Journal of Something}," + Globals.NEWLINE +
+                "  number =  {1}," + Globals.NEWLINE +
+                "  note =    {some note}" + Globals.NEWLINE +
+                "}";
+        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // modify entry
+        entry.setField("howpublished", "asdf");
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+
+        writer.write(entry, stringWriter);
+        String actual = stringWriter.toString();
+
+        // @formatter:off
+        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+                "  author =       {BlaBla}," + Globals.NEWLINE +
+                "  journal =      {International Journal of Something}," + Globals.NEWLINE +
+                "  number =       {1}," + Globals.NEWLINE +
+                "  note =         {some note}," + Globals.NEWLINE +
+                "  howpublished = {asdf}" + Globals.NEWLINE +
+                "}";
+        // @formatter:on
+        assertEquals(expected, actual);
     }
 }
