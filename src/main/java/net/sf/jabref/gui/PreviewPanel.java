@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
@@ -41,7 +42,7 @@ import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.search.SearchTextListener;
+import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -52,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Displays an BibEntry using the given layout format.
  */
-public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchTextListener, EntryContainer {
+public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchQueryHighlightListener, EntryContainer {
 
     private static final Log LOGGER = LogFactory.getLog(PreviewPanel.class);
 
@@ -90,7 +91,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private final CloseAction closeAction;
 
-    private final List<String> wordsToHighlight = new LinkedList<>();
+    private Optional<Pattern> highlightPattern = Optional.empty();
 
     /**
      * @param database
@@ -335,7 +336,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
         entry.ifPresent(entry ->
                 layout.ifPresent(layout ->
-                        sb.append(layout.doLayout(entry, database.orElse(null), wordsToHighlight))
+                        sb.append(layout.doLayout(entry, database.orElse(null), highlightPattern))
                 )
         );
         String newValue = sb.toString();
@@ -368,9 +369,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     @Override
-    public void searchText(List<String> words) {
-        this.wordsToHighlight.clear();
-        this.wordsToHighlight.addAll(words);
+    public void highlightPattern(Optional<Pattern> highlightPattern) {
+        this.highlightPattern = highlightPattern;
         update();
     }
 

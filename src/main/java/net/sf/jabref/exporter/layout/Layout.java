@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.exporter.layout;
 
+import java.util.Optional;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
@@ -23,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -123,11 +125,11 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibEntry bibtex, BibDatabase database, List<String> wordsToHighlight) {
+    public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
         StringBuilder sb = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {
-            String fieldText = layoutEntry.doLayout(bibtex, database, wordsToHighlight);
+            String fieldText = layoutEntry.doLayout(bibtex, database, highlightPattern);
 
             // 2005.05.05 M. Alver
             // The following change means we treat null fields as "". This is to fix the

@@ -17,10 +17,8 @@ package net.sf.jabref.exporter.layout;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.gui.search.MatchesHighlighter;
 import org.apache.commons.logging.Log;
@@ -173,7 +171,7 @@ class LayoutEntry {
         return doLayout(bibtex, database, null);
     }
 
-    public String doLayout(BibEntry bibtex, BibDatabase database, List<String> wordsToHighlight) {
+    public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
@@ -264,7 +262,7 @@ class LayoutEntry {
                              *
                             */
                             if (bibtex.isSearchHit()) {
-                                sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, wordsToHighlight));
+                                sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern));
                             } else {
                                 sb.append(fieldText);
                             }
