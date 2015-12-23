@@ -161,7 +161,9 @@ public class FileUpdateMonitor implements Runnable {
             timeStamp = file.lastModified();
             fileSize = file.length();
             tmpFile = FileUpdateMonitor.getTempFile();
-            tmpFile.deleteOnExit();
+            if (tmpFile != null) {
+                tmpFile.deleteOnExit();
+            }
             copy();
         }
 
