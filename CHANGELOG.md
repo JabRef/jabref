@@ -26,6 +26,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Tooltips are shown for header columns and contents which are too wide to be displayed in the entry table (#384)
 - Default order in entry table:  # | all file based icons (file, URL/DOI, ...) | all bibtex field based icons (bibtexkey, entrytype, author, title, ...) | all activated special field icons (ranking, quality, ...)
 - Write all field keys in lower case. No more camel casing of field names. E.g., `title` is written instead of `Title`, `howpublished` instead of `HowPublished`, and `doi` instead of `DOI`. The configuration option `Use camel case for field names (e.g., "HowPublished" instead of "howpublished")` is gone.
+- All field saving options are removed. There is no more customization of field sorting. '=' is now appended to the field key instead of its value. The intendation is aligned for an entry and not for the entire database. Entry names are written in title case format.
+- Entries are only reformatted if they were changed during a session. There is no more mandatory reformatting of the entire database on save.
 
 ### Fixed
 - Fixed #479: Import works again
