@@ -106,7 +106,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     fields.add("author");
                     hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
                     fieldText = "author";
-                } else if (editors.isSelected()) {
+                } else { // editors.isSelected() as it is a radio button group.
                     List<String> fields = new ArrayList<>(2);
                     fields.add("editor");
                     hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
