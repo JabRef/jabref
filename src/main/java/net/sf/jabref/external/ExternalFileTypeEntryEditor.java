@@ -56,7 +56,6 @@ public class ExternalFileTypeEntryEditor {
     final String emptyMessage = "<" + Localization.lang("Use default viewer") + ">";
     private final String editFileTitle = Localization.lang("Edit file type");
     private final String newFileTitle = Localization.lang("Add new file type");
-    boolean applicationFieldEmpty;
 
     private ExternalFileType entry;
     private boolean okPressed;
