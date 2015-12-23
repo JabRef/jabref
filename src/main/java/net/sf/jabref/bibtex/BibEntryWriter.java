@@ -2,7 +2,6 @@ package net.sf.jabref.bibtex;
 
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -13,7 +12,6 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import com.google.common.base.Strings;
-import net.sf.jabref.model.entry.EntryType;
 
 public class BibEntryWriter {
 
@@ -37,10 +35,10 @@ public class BibEntryWriter {
         writeRequiredFieldsFirstRemainingFieldsSecond(entry, out);
     }
 
-    public void writeWithoutPrependingNewlines(BibEntry entry, Writer out) throws IOException {
+    public void writeWithoutPrependedNewlines(BibEntry entry, Writer out) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!entry.hasChanged()) {
-            out.write(entry.getParsedSerialization());
+            out.write(entry.getParsedSerialization().trim());
             return;
         }
 

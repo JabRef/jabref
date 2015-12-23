@@ -56,7 +56,6 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
@@ -515,7 +514,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     public static String getSourceString(BibEntry entry) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
-        new BibEntryWriter(formatter, false).write(entry, stringWriter);
+        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter);
 
         return stringWriter.getBuffer().toString();
     }
@@ -1202,9 +1201,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             } else if (source.isEditable()
                     && !source.getText().equals(lastSourceStringAccepted)) {
                 boolean accepted = storeSource(true);
-
             }
-            ////////////////////////////////////
+
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
             //System.out.println(getType().getName()+": movingAway="+movingAway+", isShowing="+isShowing());
