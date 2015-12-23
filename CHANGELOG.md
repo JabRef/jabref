@@ -30,6 +30,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Entries are only reformatted if they were changed during a session. There is no more mandatory reformatting of the entire database on save.
 - Implements #565: Highlighting matches works now also for regular expressions in preview panel and entry editor
 - IEEEXplore search now downloads the full Bibtex record instead of parsing the fields from the HTML webpage result (fixes [bug 1146](https://sourceforge.net/p/jabref/bugs/1146/) and [bug 1267](https://sourceforge.net/p/jabref/bugs/1267/))
+- Christmas color theme (red and green)
 
 ### Fixed
 - Fixed #479: Import works again
