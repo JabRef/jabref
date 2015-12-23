@@ -29,6 +29,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - All field saving options are removed. There is no more customization of field sorting. '=' is now appended to the field key instead of its value. The intendation is aligned for an entry and not for the entire database. Entry names are written in title case format.
 - Entries are only reformatted if they were changed during a session. There is no more mandatory reformatting of the entire database on save.
 - Implements #565: Highlighting matches works now also for regular expressions in preview panel and entry editor
+- IEEEXplore search now downloads the full Bibtex record instead of parsing the fields from the HTML webpage result (fixes [bug 1146](https://sourceforge.net/p/jabref/bugs/1146/) and [bug 1267](https://sourceforge.net/p/jabref/bugs/1267/))
 
 ### Fixed
 - Fixed #479: Import works again

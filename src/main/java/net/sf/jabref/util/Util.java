@@ -624,7 +624,6 @@ public class Util {
      * @throws IOException
      */
     public static String getResults(URLConnection source) throws IOException {
-
         return net.sf.jabref.util.Util.getResultsWithEncoding(source, null);
     }
 
@@ -666,6 +665,54 @@ public class Util {
             sb.append((char) byteRead);
         }
         return sb.toString();
+    }
+
+    /**
+     * Get the results of HTTP post on a URL and return contents as a String.
+     *
+     * @param source postData encoding
+     * @return
+     * @throws IOException
+     */
+    public static String getPostResults(URL source, String postData, Charset encoding) throws IOException {
+        HttpURLConnection con = (HttpURLConnection) source.openConnection();
+        return getPostResults(con, postData, encoding);
+    }
+
+    /**
+     * Get the results of HTTP post on a URL and return contents as a String.
+     *
+     * @param source postData encoding
+     * @return
+     * @throws IOException
+     */
+    public static String getPostResults(HttpURLConnection source, String postData, Charset encoding)
+            throws IOException {
+
+        //add a default request header
+        source.setRequestMethod("POST");
+        source.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
+        source.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        // Send post request
+        source.setDoOutput(true);
+        try (DataOutputStream wr = new DataOutputStream(source.getOutputStream());) {
+            wr.writeBytes(postData);
+        }
+
+        int responseCode = source.getResponseCode();
+
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(source.getInputStream(), encoding));) {
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+        }
+
+
+        return response.toString();
     }
 
     /**

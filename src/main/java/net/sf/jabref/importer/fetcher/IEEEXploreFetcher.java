@@ -18,15 +18,17 @@ package net.sf.jabref.importer.fetcher;
 import java.awt.BorderLayout;
 
 import java.io.IOException;
-
+//import java.lang.reflect.Array;
 import java.net.ConnectException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import java.util.HashMap;
-import java.util.Set;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.net.HttpURLConnection;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,17 +36,18 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
-import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeperList;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -53,65 +56,25 @@ import net.sf.jabref.util.Util;
 public class IEEEXploreFetcher implements EntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(IEEEXploreFetcher.class);
+    private static final String URL_SEARCH = "http://ieeexplore.ieee.org/rest/search?reload=true";
+    private static final String URL_BIBTEX_START = "http://ieeexplore.ieee.org/xpl/downloadCitations?reload=true&recordIds=";
+    private static final String URL_BIBTEX_END = "&download-format=download-bibtex&x=0&y=0";
+    private static final String DIALOG_TITLE = Localization.lang("Search %0", "IEEEXplore");
+    private static final int MAX_FETCH = 100;
 
-    final CaseKeeperList caseKeeperList = new CaseKeeperList();
+    private static final Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
+    private static final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
+
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
-
     private final HTMLConverter htmlConverter = new HTMLConverter();
-
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
-    private static final int MAX_FETCH = 100;
-    private final int perPage = IEEEXploreFetcher.MAX_FETCH;
-    private int hits;
-    private int unparseable;
-    private int parsed;
-    private int piv;
     private boolean shouldContinue;
-    private boolean includeAbstract;
-
-    private String terms;
-    private final String endUrl = "&rowsPerPage=" + Integer.toString(perPage) + "&pageNumber=";
-    private String searchUrl;
-
-    private final Pattern hitsPattern = Pattern.compile("([0-9,]+) Results");
-    private final Pattern typePattern = Pattern.compile("<span class=\"type\">\\s*(.+)");
-    private final HashMap<String, String> fieldPatterns = new HashMap<>();
-    private final Pattern absPattern = Pattern.compile("<p>\\s*(.+)");
-
-    Pattern stdEntryPattern = Pattern.compile(".*<strong>(.+)</strong><br>" + "\\s+(.+)");
-
-    private final Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
-    private final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
-    Pattern abstractLinkPattern = Pattern.compile("<a href=\'(.+)\'>\\s*<span class=\"more\">View full.*</span> </a>");
-
-    Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
-
-    private final Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
-    private static final String START_URL = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
-
-    private static final String DIALOG_TITLE = Localization.lang("Search %0", "IEEEXplore");
-
-
-    // Common words in IEEE Xplore that should always be
 
     public IEEEXploreFetcher() {
         super();
         CookieHandler.setDefault(new CookieManager());
-
-        fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
-        //fieldPatterns.put("author", "</h3>\\s*(.+)");
-        //fieldPatterns.put("author", "(?s)</h3>\\s*(.+)</br>");
-        // fieldPatterns.put("author", "<span id=\"preferredName\" class=\"(.+)\">");
-        fieldPatterns.put("volume", "Volume:\\s*([A-Za-z-]*\\d+)");
-        fieldPatterns.put("number", "Issue:\\s*(\\d+)");
-        //fieldPatterns.put("part", "Part (\\d+),&nbsp;(.+)");
-        fieldPatterns.put("year", "(?:Copyright|Publication) Year:\\s*(\\d{4})");
-        fieldPatterns.put("pages", "Page\\(s\\):\\s*(\\d+)\\s*-\\s*(\\d*)");
-        //fieldPatterns.put("doi", "Digital Object Identifier:\\s*<a href=.*>(.+)</a>");
-        fieldPatterns.put("doi", "<a href=\"http://dx.doi.org/(.+)\" target");
-        fieldPatterns.put("url", "<a href=\"(/stamp/stamp[^\"]+)");
     }
 
     @Override
@@ -125,66 +88,97 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
-        terms = query;
+        //IEEE API seems to use .QT. as a marker for the quotes for exact phrase searching
+        String terms = query.replaceAll("\"", "\\.QT\\.");
+
         shouldContinue = true;
-        parsed = 0;
-        unparseable = 0;
-        piv = 0;
+        int parsed = 0;
         int pageNumber = 1;
 
-        searchUrl = makeUrl(pageNumber);//start at page 1
+        String postData = makeSearchPostRequestPayload(pageNumber, terms);
 
         try {
-            URL url = new URL(searchUrl);
-            String page = Util.getResults(url);
+            //open the search URL
+            URL url = new URL(IEEEXploreFetcher.URL_SEARCH);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            if (page.contains("You have entered an invalid search")) {
-                status.showMessage(Localization.lang("You have entered an invalid search '%0'.", terms),
+            //add request header
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("Content-type", "application/json");
+
+            //retrieve the search results
+            String page = Util.getPostResults(con, postData, StandardCharsets.UTF_8);
+
+            //the page can be blank if the search did not work (not sure the exact conditions that lead to this, but declaring it an invalid search for now)
+            if (page.isEmpty()) {
+                status.showMessage(Localization.lang("You have entered an invalid search '%0'.", query),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
-            if (page.contains("Bad request")) {
-                status.showMessage(Localization.lang("Bad Request '%0'.", terms),
+            //parses the JSON data returned by the query
+            //TODO: a faster way would be to parse the JSON tokens one at a time just to extract the article number, but this seems to be fast enough...
+            JSONObject searchResultsJson = new JSONObject(page);
+            int hits = searchResultsJson.getInt("totalRecords");
+
+            //if no search results were found
+            if (hits == 0) {
+                status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
-            if (page.contains("No results were found.")) {
-                status.showMessage(Localization.lang("No entries found for the search string '%0'", terms),
-                        DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
-                return false;
-            }
-
-            if (page.contains("Error Page")) {
-                status.showMessage(
-                        Localization.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
-                       DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
-                return false;
-            }
-
-            hits = getNumberOfHits(page, "display-status", hitsPattern);
-
-            includeAbstract = absCheckBox.isSelected();
+            //if max hits were exceeded, display the warning
             if (hits > IEEEXploreFetcher.MAX_FETCH) {
-                status.showMessage(Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
-                        String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)),
+                status.showMessage(
+                        Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
+                                String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
             }
 
-            parse(dialog, page);
+            //fetch the raw Bibtex results from IEEEXplore
+            URL bibtexURL = new URL(createBibtexQueryURL(searchResultsJson));
+            String bibtexPage = Util.getResults(bibtexURL);
+
+            //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
+            bibtexPage = preprocessBibtexResultsPage(bibtexPage);
+
+            //parse the page into Bibtex entries
+            Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage);
+            if (parsedBibtexCollection == null) {
+                status.showMessage(Localization.lang("Error occured parsing Bibtex returned from IEEEXplore"),
+                        DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
+                return false;
+            }
+            int nEntries = parsedBibtexCollection.size();
+            Iterator<BibEntry> parsedBibtexCollectionIterator = parsedBibtexCollection.iterator();
+            while (parsedBibtexCollectionIterator.hasNext() && shouldContinue) {
+                dialog.addEntry(cleanup(parsedBibtexCollectionIterator.next()));
+                dialog.setProgress(parsed, nEntries);
+                parsed++;
+            }
+
             return true;
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ConnectException e) {
-            status.showMessage(Localization.lang("Connection to IEEEXplore failed"),
-                    DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("Connection to IEEEXplore failed"), DIALOG_TITLE,
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (UnknownHostException e) {
+            status.showMessage(Localization.lang("Connection to IEEEXplore failed"), DIALOG_TITLE,
+                    JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
+        } catch (JSONException e) {
+            status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
+            LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
         }
+
         return false;
     }
+
 
     @Override
     public String getTitle() {
@@ -204,19 +198,56 @@ public class IEEEXploreFetcher implements EntryFetcher {
         shouldContinue = false;
     }
 
-    private String makeUrl(int startIndex) {
-        return IEEEXploreFetcher.START_URL + terms.replaceAll(" ", "+") + endUrl + startIndex;
+    private String makeSearchPostRequestPayload(int startIndex, String terms) {
+        return "{\"queryText\":" + JSONObject.quote(terms) + ",\"refinements\":[],\"pageNumber\":\"" + startIndex
+                + "\",\"searchWithin\":[],\"newsearch\":\"true\",\"searchField\":\"Search_All\",\"rowsPerPage\":\"100\"}";
     }
 
-    private void parse(ImportInspector dialog, String text) {
-        BibEntry entry;
-        while (((entry = parseNextEntry(text)) != null) && shouldContinue) {
-            if (entry.getField("title") != null) {
-                dialog.addEntry(entry);
-                dialog.setProgress(parsed + unparseable, hits);
-                parsed++;
+    private String createBibtexQueryURL(JSONObject searchResultsJson) {
+
+        //buffer to use for building the URL for fetching the bibtex data from IEEEXplore
+        StringBuffer bibtexQueryURLStringBuf = new StringBuffer();
+        bibtexQueryURLStringBuf.append(URL_BIBTEX_START);
+
+        //loop over each record and create a comma-separate list of article numbers which will be used to download the raw Bibtex
+        JSONArray recordsJsonArray = searchResultsJson.getJSONArray("records");
+        for (int n = 0; n < recordsJsonArray.length(); n++) {
+            if (!recordsJsonArray.getJSONObject(n).isNull("articleNumber")) {
+                bibtexQueryURLStringBuf.append(recordsJsonArray.getJSONObject(n).getString("articleNumber") + ",");
             }
         }
+        //delete the last comma
+        bibtexQueryURLStringBuf.deleteCharAt(bibtexQueryURLStringBuf.length() - 1);
+
+        //add the abstract setting
+        boolean includeAbstract = absCheckBox.isSelected();
+        if (includeAbstract) {
+            bibtexQueryURLStringBuf.append("&citations-format=citation-abstract");
+        } else {
+            bibtexQueryURLStringBuf.append("&citations-format=citation-only");
+        }
+
+        //append the remaining URL
+        bibtexQueryURLStringBuf.append(URL_BIBTEX_END);
+
+        return bibtexQueryURLStringBuf.toString();
+    }
+
+    private String preprocessBibtexResultsPage(String bibtexPage) {
+        //for some reason, the escaped HTML characters in the titles are in the format "#xNNNN" (they are missing the ampersand)
+        //add the ampersands back in before passing to the HTML formatter so they can be properly converted
+        //TODO: Maybe edit the HTMLconverter to also recognize escaped characters even when the & is missing?
+        //Pattern escapedPattern = Pattern.compile("(?<!&)#([x]*)([0]*)(\\p{XDigit}+);");
+        bibtexPage = bibtexPage.replaceAll("(?<!&)(#[x]*[0]*\\p{XDigit}+;)", "&$1");
+
+        //Also, percent signs are not escaped by the IEEEXplore Bibtex output nor, it would appear, the subsequent processing in JabRef
+        //TODO: Maybe find a better spot for this if it applies more universally
+        bibtexPage = bibtexPage.replaceAll("(?<!\\\\)%", "\\\\%");
+
+        //Format the bibtexResults using the HTML formatter (clears up numerical and text escaped characters and remaining HTML tags)
+        bibtexPage = htmlConverter.format(bibtexPage);
+
+        return bibtexPage;
     }
 
     private BibEntry cleanup(BibEntry entry) {
@@ -265,23 +296,28 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up author
-        /*   	String author = (String)entry.getField("author");
-           	if (author != null) {
-            if (author.indexOf("a href=") >= 0) {  // Author parsing failed because it was empty
-        	entry.setField("author","");  // Maybe not needed anymore due to another change
-            } else {
-            	author = author.replaceAll("\\s+", " ");
-            	author = author.replaceAll("\\.", ". ");
-            	author = author.replaceAll("([^;]+),([^;]+),([^;]+)","$1,$3,$2"); // Change order in case of Jr. etc
-            	author = author.replaceAll("  ", " ");
-            	author = author.replaceAll("\\. -", ".-");
-                       author = author.replaceAll("; ", " and ");
-            	author = author.replaceAll(" ,", ",");
-            	author = author.replaceAll("  ", " ");
-            	author = author.replaceAll("[ ,;]+$", "");
-            	entry.setField("author", author);
+        String author = entry.getField("author");
+        if (author != null) {
+            author = author.replaceAll("\\s+", " ");
+
+            //reorder the "Jr." "Sr." etc to the correct ordering
+            String[] authorSplit = author.split("(^\\s*|\\s*$|\\s+and\\s+)");
+            for (int n = 0; n < authorSplit.length; n++) {
+                authorSplit[n] = authorSplit[n].replaceAll("(.+?),(.+?),(.+)", "$1,$3,$2");
             }
-        }*/
+            author = String.join(" and ", authorSplit);
+
+            author = author.replaceAll("\\.", ". ");
+            author = author.replaceAll("  ", " ");
+            author = author.replaceAll("\\. -", ".-");
+            author = author.replaceAll("; ", " and ");
+            author = author.replaceAll(" ,", ",");
+            author = author.replaceAll("  ", " ");
+            author = author.replaceAll("[ ,;]+$", "");
+            //TODO: remove trailing commas
+            entry.setField("author", author);
+        }
+
         // clean up month
         String month = entry.getField("month");
         if ((month != null) && !month.isEmpty()) {
@@ -481,169 +517,5 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return entry;
     }
 
-    private BibEntry parseNextEntry(String allText) {
-        BibEntry entry = null;
 
-        int index = allText.indexOf("<div class=\"detail", piv);
-        int endIndex = allText.indexOf("</div>", index);
-
-        if ((index >= 0) && (endIndex > 0)) {
-            endIndex += 6;
-            piv = endIndex;
-            String text = allText.substring(index, endIndex);
-
-            EntryType type = null;
-            String sourceField = null;
-
-            String typeName = "";
-            Matcher typeMatcher = typePattern.matcher(text);
-            if (typeMatcher.find()) {
-                typeName = typeMatcher.group(1);
-                if ("IEEE Journals &amp; Magazines".equalsIgnoreCase(typeName)
-                        || "IEEE Early Access Articles".equalsIgnoreCase(typeName)
-                        || "IET Journals &amp; Magazines".equalsIgnoreCase(typeName)
-                        || "AIP Journals &amp; Magazines".equalsIgnoreCase(typeName)
-                        || "AVS Journals &amp; Magazines".equalsIgnoreCase(typeName)
-                        || "IBM Journals &amp; Magazines".equalsIgnoreCase(typeName)
-                        || "TUP Journals &amp; Magazines".equalsIgnoreCase(typeName)
-                        || "BIAI Journals &amp; Magazines".equalsIgnoreCase(typeName)
-                        || "MIT Press Journals".equalsIgnoreCase(typeName)
-                        || "Alcatel-Lucent Journal".equalsIgnoreCase(typeName)) {
-                    type = EntryTypes.getType("article");
-                    sourceField = "journal";
-                } else if ("IEEE Conference Publications".equalsIgnoreCase(typeName)
-                        || "IET Conference Publications".equalsIgnoreCase(typeName)
-                        || "VDE Conference Publications".equalsIgnoreCase(typeName)) {
-                    type = EntryTypes.getType("inproceedings");
-                    sourceField = "booktitle";
-                } else if ("IEEE Standards".equalsIgnoreCase(typeName) || "Standards".equalsIgnoreCase(typeName)) {
-                    type = EntryTypes.getType("standard");
-                    sourceField = "number";
-                } else if ("IEEE eLearning Library Courses".equalsIgnoreCase(typeName)) {
-                    type = EntryTypes.getType("electronic");
-                    sourceField = "note";
-                } else if ("Wiley-IEEE Press eBook Chapters".equalsIgnoreCase(typeName)
-                        || "MIT Press eBook Chapters".equalsIgnoreCase(typeName)
-                        || "IEEE USA Books &amp; eBooks".equalsIgnoreCase(typeName)) {
-                    type = EntryTypes.getType("incollection");
-                    sourceField = "booktitle";
-                } else if ("Morgan and Claypool eBooks".equalsIgnoreCase(typeName)) {
-                    type = EntryTypes.getType("book");
-                    sourceField = "note";
-                }
-            }
-
-            if (type == null) {
-                type = EntryTypes.getType("misc");
-                sourceField = "note";
-                IEEEXploreFetcher.LOGGER.warn("Type detection failed. Use MISC instead. Type string: " + text);
-                unparseable++;
-            }
-
-            entry = new BibEntry(IdGenerator.next(), type);
-
-            if ("IEEE Standards".equalsIgnoreCase(typeName)) {
-                entry.setField("organization", "IEEE");
-            }
-
-            if ("Wiley-IEEE Press eBook Chapters".equalsIgnoreCase(typeName)) {
-                entry.setField("publisher", "Wiley-IEEE Press");
-            } else if ("MIT Press eBook Chapters".equalsIgnoreCase(typeName)) {
-                entry.setField("publisher", "MIT Press");
-            } else if ("IEEE USA Books &amp; eBooks".equalsIgnoreCase(typeName)) {
-                entry.setField("publisher", "IEEE USA");
-            } else if ("Morgan \\& Claypool eBooks".equalsIgnoreCase(typeName)) {
-                entry.setField("publisher", "Morgan and Claypool");
-            }
-
-            if ("IEEE Early Access Articles".equalsIgnoreCase(typeName)) {
-                entry.setField("note", "Early Access");
-            }
-
-            Set<String> fields = fieldPatterns.keySet();
-            for (String field : fields) {
-                Matcher fieldMatcher = Pattern.compile(fieldPatterns.get(field)).matcher(text);
-                if (fieldMatcher.find()) {
-                    entry.setField(field, htmlConverter.format(fieldMatcher.group(1)));
-                    if ("title".equals(field) && fieldMatcher.find()) {
-                        String sec_title = htmlConverter.format(fieldMatcher.group(1));
-                        if (entry.getType() == EntryTypes.getStandardType("standard")) {
-                            sec_title = sec_title.replaceAll("IEEE Std ", "");
-                        }
-                        entry.setField(sourceField, sec_title);
-
-                    }
-                    if ("pages".equals(field) && (fieldMatcher.groupCount() == 2)) {
-                        entry.setField(field, fieldMatcher.group(1) + "-" + fieldMatcher.group(2));
-                    }
-                }
-            }
-
-            Matcher authorMatcher = authorPattern.matcher(text);
-            // System.out.println(text);
-            StringBuilder authorNames = new StringBuilder("");
-            int authorCount = 0;
-            while (authorMatcher.find()) {
-                if (authorCount >= 1) {
-                    authorNames.append(" and ");
-                }
-                authorNames.append(htmlConverter.format(authorMatcher.group(1)));
-                //System.out.println(authorCount + ": " + authorMatcher.group(1));
-                authorCount++;
-            }
-
-            String authorString = authorNames.toString();
-            if ((authorString == null) || authorString.startsWith("a href") || authorString.startsWith("Topic(s)")) { // Fix for some documents without authors
-                entry.setField("author", "");
-            } else {
-                entry.setField("author", authorString);
-            }
-
-            if ((entry.getType() == EntryTypes.getStandardType("inproceedings"))
-                    && "".equals(entry.getField("author"))) {
-                entry.setType(EntryTypes.getStandardType("proceedings"));
-            }
-
-            if (includeAbstract) {
-                index = text.indexOf("id=\"abstract");
-                if (index >= 0) {
-                    endIndex = text.indexOf("</div>", index) + 6;
-
-                    text = text.substring(index, endIndex);
-                    Matcher absMatcher = absPattern.matcher(text);
-                    if (absMatcher.find()) {
-                        // Clean-up abstract
-                        String abstr = absMatcher.group(1);
-                        abstr = abstr.replaceAll("<span class='snippet'>([\\w]+)</span>", "$1");
-
-                        entry.setField("abstract", htmlConverter.format(abstr));
-                    }
-                }
-            }
-        }
-
-        if (entry == null) {
-            return null;
-        }
-        return cleanup(entry);
-    }
-
-    /**
-     * Find out how many hits were found.
-     *
-     * @param page
-     */
-    private static int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
-        int ind = page.indexOf(marker);
-        if (ind < 0) {
-            LOGGER.debug(page);
-            throw new IOException("Cannot parse number of hits");
-        }
-        String substring = page.substring(ind, page.length());
-        Matcher m = pattern.matcher(substring);
-        if (m.find()) {
-            return Integer.parseInt(m.group(1));
-        }
-        throw new IOException("Cannot parse number of hits");
-    }
 }

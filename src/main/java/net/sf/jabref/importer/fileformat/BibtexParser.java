@@ -97,7 +97,8 @@ public class BibtexParser {
         try {
             return parser.parse().getDatabase().getEntries();
         } catch (Exception e) {
-            return new ArrayList<>();
+            LOGGER.warn("BibtexParser.fromString(String): " + e.getMessage(), e);
+            return Collections.EMPTY_LIST;
         }
     }
 
