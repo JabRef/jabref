@@ -861,23 +861,27 @@ public class BibtexParser {
         consume('{');
 
         int brackets = 0;
+        char character;
+        char lastCharacter = '\0';
 
-        while (!((peek() == '}') && (brackets == 0))) {
+        while (true) {
+            character = (char) read();
 
-            int character = read();
-            if (isEOFCharacter(character)) {
+            boolean isClosingBracket = (character == '}') && (lastCharacter != '\\');
+            if (isClosingBracket && (brackets == 0)) {
+                return value;
+            } else if (isEOFCharacter(character)) {
                 throw new IOException("Error in line " + line + ": EOF in mid-string");
-            } else if (character == '{') {
+            } else if ((character == '{') && (lastCharacter != '\\')) {
                 brackets++;
-            } else if (character == '}') {
+            } else if (isClosingBracket) {
                 brackets--;
             }
 
-            value.append((char) character);
-        }
-        consume('}');
+            value.append(character);
 
-        return value;
+            lastCharacter = character;
+        }
     }
 
     private StringBuffer parseQuotedFieldExactly() throws IOException {
