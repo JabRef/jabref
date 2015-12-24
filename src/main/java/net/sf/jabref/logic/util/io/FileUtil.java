@@ -33,19 +33,29 @@ import java.util.regex.Pattern;
 public class FileUtil {
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
+
     /**
-     * Returns the extension of a file or null if the file does not have one (no . in name).
+     * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
      * @param file
      * @return The extension, trimmed and in lowercase.
      */
-    public static String getFileExtension(File file) {
-        String name = file.getName();
-        int pos = name.lastIndexOf('.');
-        if ((pos >= 0) && (pos < (name.length() - 1))) {
-            return name.substring(pos + 1).trim().toLowerCase();
+    public static Optional<String> getFileExtension(File file) {
+        return getFileExtension(file.getName());
+    }
+
+    /**
+     * Returns the extension of a file name or Optional.empty() if the file does not have one (no . in name).
+     *
+     * @param fileName
+     * @return The extension, trimmed and in lowercase.
+     */
+    public static Optional<String> getFileExtension(String fileName) {
+        int pos = fileName.lastIndexOf('.');
+        if ((pos > 0) && (pos < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(pos + 1).trim().toLowerCase());
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -167,11 +177,9 @@ public class FileUtil {
      * @param name     The filename, may also be a relative path to the file
      */
     public static File expandFilename(final MetaData metaData, String name) {
-        int pos = name.lastIndexOf('.');
-        String extension = (pos >= 0) && (pos < (name.length() - 1)) ? name
-                .substring(pos + 1).trim().toLowerCase() : null;
+        Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        String[] dir = metaData.getFileDirectory(extension);
+        String[] dir = metaData.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
         String[] fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
         // Include the directory of the bib file:

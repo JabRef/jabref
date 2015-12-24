@@ -67,14 +67,11 @@ public class FileFinder {
             if (child.isDirectory()) {
                 result.addAll(FileFinder.findFiles(extensions, child));
             } else {
-
-                String extension = FileUtil.getFileExtension(child);
-
-                if (extension != null) {
+                FileUtil.getFileExtension(child).ifPresent(extension -> {
                     if (extensions.contains(extension)) {
                         result.add(child);
                     }
-                }
+                });
             }
         }
 
@@ -209,7 +206,7 @@ public class FileFinder {
 
         String found = FileFinder.findFile(entry, database, root, file);
 
-        if (directory == null || !relative) {
+        if ((directory == null) || !relative) {
             return found;
         }
 
@@ -223,7 +220,7 @@ public class FileFinder {
                 // Changed by M. Alver 2007.01.04:
                 // Remove first character if it is a directory separator character:
                 String tmp = found.substring(root.getCanonicalPath().length());
-                if (tmp.length() > 1 && tmp.charAt(0) == File.separatorChar) {
+                if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar)) {
                     tmp = tmp.substring(1);
                 }
                 return tmp;
@@ -263,7 +260,7 @@ public class FileFinder {
 
         if (fileParts.length > 1) {
 
-            for (int i = 0; i < fileParts.length - 1; i++) {
+            for (int i = 0; i < (fileParts.length - 1); i++) {
 
                 String dirToProcess = fileParts[i];
 
@@ -343,7 +340,7 @@ public class FileFinder {
                         .compile(dirToProcess.replaceAll("\\\\\\\\", "\\\\"));
 
                 File[] matches = directory.listFiles((arg0, arg1) -> toMatch.matcher(arg1).matches());
-                if (matches == null || matches.length == 0) {
+                if ((matches == null) || (matches.length == 0)) {
                     return null;
                 }
 
@@ -362,7 +359,7 @@ public class FileFinder {
                 + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$');
 
         File[] matches = directory.listFiles((arg0, arg1) -> toMatch.matcher(arg1).matches());
-        if (matches == null || matches.length == 0) {
+        if ((matches == null) || (matches.length == 0)) {
             return null;
         }
 
