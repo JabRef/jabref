@@ -35,7 +35,9 @@ public class SimpleFileListEntry {
     public SimpleFileListEntry(String description, String link, String typeName) {
         this.description = description;
         this.link = link;
-        this.typeName = typeName;
+        if (typeName != null) {
+            this.typeName = typeName;
+        }
     }
 
     public SimpleFileListEntry(List<String> entry) {
@@ -74,6 +76,14 @@ public class SimpleFileListEntry {
 
     public String getTypeName() {
         return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String[] getStringArrayRepresentation() {
+        return new String[] {getDescription(), getLink(), getTypeName()};
     }
 
     @Override

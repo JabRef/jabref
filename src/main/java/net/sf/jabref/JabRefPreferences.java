@@ -1283,6 +1283,21 @@ public final class JabRefPreferences {
     }
 
     /**
+     * Check if there is an external file type registered with this name.
+     *
+     * @param name The file type name.
+     * @return true if there is an ExternalFileType with this name, false if not.
+     */
+    public Boolean isExternalFileTypeName(String name) {
+        for (ExternalFileType type : externalFileTypes) {
+            if (type.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Look up the external file type registered for this extension, if any.
      *
      * @param extension The file extension.
@@ -1292,6 +1307,21 @@ public final class JabRefPreferences {
         for (ExternalFileType type : externalFileTypes) {
             if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
                 return type;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Look up the external file type name registered for this extension, if any.
+     *
+     * @param extension The file extension.
+     * @return The name of the ExternalFileType registered, or null if none.
+     */
+    public String getExternalFileTypeNameByExt(String extension) {
+        for (ExternalFileType type : externalFileTypes) {
+            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
+                return type.getName();
             }
         }
         return null;
@@ -1331,6 +1361,26 @@ public final class JabRefPreferences {
         }
         if ("text/html".equals(mimeType)) {
             return HTML_FALLBACK_TYPE;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Look up the external file type name registered for this MIME type, if any.
+     *
+     * @param mimeType The MIME type.
+     * @return The name of the ExternalFileType registered, or null if none. For the mime type "text/html", a valid file type name is
+     *         guaranteed to be returned.
+     */
+    public String getExternalFileTypeNameByMimeType(String mimeType) {
+        for (ExternalFileType type : externalFileTypes) {
+            if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
+                return type.getName();
+            }
+        }
+        if ("text/html".equals(mimeType)) {
+            return HTML_FALLBACK_TYPE.getName();
         } else {
             return null;
         }
