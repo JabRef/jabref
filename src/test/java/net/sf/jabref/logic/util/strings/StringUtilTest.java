@@ -211,39 +211,34 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testIntValueOf() {
+    public void testIntValueOfSingleDigit() {
         assertEquals(1, StringUtil.intValueOf("1"));
+        assertEquals(2, StringUtil.intValueOf("2"));
+        assertEquals(8, StringUtil.intValueOf("8"));
+    }
+
+    @Test
+    public void testIntValueOfLongString() {
         assertEquals(1234567890, StringUtil.intValueOf("1234567890"));
     }
 
     @Test
-    public void testIntValueOfExceptionLetter() {
-        try {
+    public void testIntValueOfStartWithZeros() {
+        assertEquals(1234, StringUtil.intValueOf("001234"));
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testIntValueOfExceptionIfStringContainsLetter() {
             StringUtil.intValueOf("12A2");
-            fail();
-        } catch (NumberFormatException ignored) {
-            // Ignored
-        }
     }
 
-    @Test
-    public void testIntValueOfExceptionNull() {
-        try {
+    @Test(expected = NumberFormatException.class)
+    public void testIntValueOfExceptionIfStringNull() {
             StringUtil.intValueOf(null);
-            fail();
-        } catch (NumberFormatException ignored) {
-            // Ignored
-        }
-
     }
 
-    @Test
-    public void testIntValueOfExceptionEmpty() {
-        try {
+    @Test(expected = NumberFormatException.class)
+    public void testIntValueOfExceptionfIfStringEmpty() {
             StringUtil.intValueOf("");
-            fail();
-        } catch (NumberFormatException ignored) {
-            // Ignored
-        }
     }
 }

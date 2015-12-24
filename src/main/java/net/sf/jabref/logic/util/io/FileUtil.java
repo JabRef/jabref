@@ -441,8 +441,8 @@ public class FileUtil {
         ArrayList<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
             List<List<String>> fileList = decodeFileField(entry.getField(Globals.FILE_FIELD));
-            for (int i = 0; i < fileList.size(); i++) {
-                File f = expandFilename(fileList.get(i).get(1), fileDirs);
+            for (List<String> file : fileList) {
+                File f = expandFilename(file.get(1), fileDirs);
                 if (f != null) {
                     result.add(f);
                 }
