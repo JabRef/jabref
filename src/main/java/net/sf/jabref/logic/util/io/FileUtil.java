@@ -411,8 +411,8 @@ public class FileUtil {
                 sb = new StringBuilder();
             } else if (!escaped && (c == ';') && !inXmlChar) {
                 thisEntry.add(sb.toString());
-                sb = new StringBuilder();
                 newList.add(new SimpleFileListEntry(thisEntry));
+                sb = new StringBuilder();
                 thisEntry = new ArrayList<>();
             } else {
                 sb.append(c);

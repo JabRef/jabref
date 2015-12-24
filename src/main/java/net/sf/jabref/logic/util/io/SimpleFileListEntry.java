@@ -22,8 +22,9 @@ import java.util.List;
  */
 public class SimpleFileListEntry {
 
-    protected String description;
-    protected String link;
+    protected String description = "";
+    protected String link = "";
+    private String typeName = "";
 
 
     public SimpleFileListEntry(String description, String link) {
@@ -31,22 +32,28 @@ public class SimpleFileListEntry {
         this.link = link;
     }
 
+    public SimpleFileListEntry(String description, String link, String typeName) {
+        this.description = description;
+        this.link = link;
+        this.typeName = typeName;
+    }
+
     public SimpleFileListEntry(List<String> entry) {
         if (entry.isEmpty()) {
-            this.description = "";
-            this.link = "";
             return;
         }
 
         // A single string, probably the link
         if (entry.size() == 1) {
-            this.description = "";
             this.link = entry.get(0);
             return;
         }
 
         this.description = entry.get(0);
         this.link = entry.get(1);
+        if (entry.size() >= 3) {
+            this.typeName = entry.get(2);
+        }
     }
 
     public String getDescription() {
@@ -63,6 +70,10 @@ public class SimpleFileListEntry {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public String getTypeName() {
+        return typeName;
     }
 
     @Override
