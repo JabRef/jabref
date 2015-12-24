@@ -33,6 +33,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Christmas color theme (red and green)
 
 ### Fixed
+- Fixed [bug 482](https://sourceforge.net/p/jabref/bugs/482/) partly: escaped brackets are now parsed properly when opening a bib file
 - Fixed #479: Import works again
 - Fixed #434: Revert to old 'JabRef' installation folder name instead of 'jabref'
 - Fixed #435: Retrieve non open access ScienceDirect PDFs via HTTP DOM

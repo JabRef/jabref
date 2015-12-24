@@ -558,6 +558,41 @@ public class BibtexParserTest {
         Assert.assertEquals(0, c.size());
     }
 
+    /**
+     * Test for SF bug 482
+     */
+    @Test
+    public void parseAddsEscapedOpenBracketToFieldValue() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,review={escaped \\{ bracket}}"));
+
+        Assert.assertFalse(result.hasWarnings());
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, e.getType());
+        Assert.assertEquals("test", e.getCiteKey());
+        Assert.assertEquals("escaped \\{ bracket", e.getField("review"));
+    }
+
+    @Test
+    public void parseAddsEscapedClosingBracketToFieldValue() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,review={escaped \\} bracket}}"));
+
+        Assert.assertFalse(result.hasWarnings());
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, e.getType());
+        Assert.assertEquals("test", e.getCiteKey());
+        Assert.assertEquals("escaped \\} bracket", e.getField("review"));
+    }
+
     @Test
     public void parseIgnoresAndWarnsAboutEntryWithUnmatchedOpenBracketInQuotationMarks() throws IOException {
 
