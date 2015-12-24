@@ -83,4 +83,50 @@ public class FileUtilTest {
         List<String> result = FileUtil.uniquePathSubstrings(paths);
         assertEquals(uniqPath, result);
     }
+
+    @Test
+    public void testDecodeFileFieldSingleString() {
+        assertEquals("test.pdf", FileUtil.decodeFileField("test.pdf").get(0).get(1));
+    }
+
+    @Test
+    public void testDecodeFileFieldSingleItem() {
+        List<List<String>> fileList = FileUtil.decodeFileField("paper:test.pdf:PDF");
+        assertEquals("paper", fileList.get(0).get(0));
+        assertEquals("test.pdf", fileList.get(0).get(1));
+    }
+
+    @Test
+    public void testDecodeFileFieldMultipleItems() {
+        List<List<String>> fileList = FileUtil.decodeFileField("paper:test.pdf:PDF;presentation:test.ppt:PPT");
+        assertEquals("paper", fileList.get(0).get(0));
+        assertEquals("test.pdf", fileList.get(0).get(1));
+        assertEquals("presentation", fileList.get(1).get(0));
+        assertEquals("test.ppt", fileList.get(1).get(1));
+    }
+
+    @Test
+    public void testDecodeFileFieldEscaping() {
+        List<List<String>> fileList = FileUtil.decodeFileField("paper:c\\:\\\\test.pdf:PDF");
+        assertEquals("paper", fileList.get(0).get(0));
+        assertEquals("c:\\test.pdf", fileList.get(0).get(1));
+    }
+
+    @Test
+    public void testDecodeFileFieldXMLCharacter() {
+        List<List<String>> fileList = FileUtil.decodeFileField("pap&#44;er:c\\:\\\\test.pdf:PDF");
+        assertEquals("pap&#44;er", fileList.get(0).get(0));
+        assertEquals("c:\\test.pdf", fileList.get(0).get(1));
+    }
+
+    @Test
+    public void testDecodeFileFieldEmptyString() {
+        assertTrue(FileUtil.decodeFileField("").isEmpty());
+    }
+
+    @Test
+    public void testDecodeFileFieldNullString() {
+        assertTrue(FileUtil.decodeFileField(null).isEmpty());
+    }
+
 }

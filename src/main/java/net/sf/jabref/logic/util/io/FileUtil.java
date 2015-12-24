@@ -423,6 +423,12 @@ public class FileUtil {
             thisEntry.add(sb.toString());
         }
         if (!thisEntry.isEmpty()) {
+            if (thisEntry.size() == 1) { // If a single string, probably the file name
+                String fileName = thisEntry.get(0);
+                thisEntry.clear();
+                thisEntry.add("");
+                thisEntry.add(fileName);
+            }
             newList.add(thisEntry);
         }
 

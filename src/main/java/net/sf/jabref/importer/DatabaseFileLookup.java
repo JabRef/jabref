@@ -121,10 +121,10 @@ class DatabaseFileLookup {
         String fileField = anEntry.getField(Globals.FILE_FIELD);
         List<List<String>> fileList = FileUtil.decodeFileField(fileField);
 
-        for (int i = 0; i < fileList.size(); i++) {
-            String link = fileList.get(i).get(1);
+        for (List<String> fileInfo : fileList) {
+            String link = fileInfo.get(1);
 
-            if (link == null) {
+            if ((link == null)) {
                 break;
             }
 
