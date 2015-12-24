@@ -34,9 +34,6 @@ public class DatabaseFileLookupTest {
     private BibEntry entry2;
 
 
-    /* (non-Javadoc)
-     * @see junit.framework.TestCase#setUp()
-     */
     @Before
     public void setUp() throws Exception {
         try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
@@ -63,7 +60,6 @@ public class DatabaseFileLookupTest {
     @Test
     @Ignore
     public void testInsertTestData() throws Exception {
-
         entry1 = new BibEntry();
         JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
         ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt("PDF");

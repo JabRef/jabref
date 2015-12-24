@@ -1110,9 +1110,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
             this.entryType = bibtexType;
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#toString()
-         */
         @Override
         public String toString() {
             if (entryType == null) {
