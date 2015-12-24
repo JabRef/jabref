@@ -919,9 +919,9 @@ public class Util {
                         if (!alreadyHas) {
                             foundAny = true;
                             ExternalFileType type;
-                            int index = f.getPath().lastIndexOf('.');
-                            if ((index >= 0) && (index < (f.getPath().length() - 1))) {
-                                type = Globals.prefs.getExternalFileTypeByExt(f.getPath().substring(index + 1).toLowerCase());
+                            Optional<String> extension = FileUtil.getFileExtension(f);
+                            if (extension.isPresent()) {
+                                type = Globals.prefs.getExternalFileTypeByExt(extension.get());
                             } else {
                                 type = new UnknownExternalFileType("");
                             }

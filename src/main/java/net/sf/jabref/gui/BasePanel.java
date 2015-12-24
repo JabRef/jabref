@@ -67,6 +67,7 @@ import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.matchers.EverythingMatcher;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeEvent.ChangeType;
@@ -2598,10 +2599,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 List<File> res = result.get(entry);
                 if (!res.isEmpty()) {
                     String filepath = res.get(0).getPath();
-                    int index = filepath.lastIndexOf('.');
-                    if ((index >= 0) && (index < (filepath.length() - 1))) {
-                        String extension = filepath.substring(index + 1);
-                        ExternalFileType type = Globals.prefs.getExternalFileTypeByExt(extension);
+                    Optional<String> extension = FileUtil.getFileExtension(filepath);
+                    if (extension.isPresent()) {
+                        ExternalFileType type = Globals.prefs.getExternalFileTypeByExt(extension.get());
                         if (type != null) {
                             try {
                                 JabRefDesktop.openExternalFileAnyFormat(basePanel.metaData, filepath, type);

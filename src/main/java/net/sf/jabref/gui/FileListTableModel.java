@@ -17,6 +17,7 @@ package net.sf.jabref.gui;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Optional;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -26,6 +27,7 @@ import javax.swing.table.AbstractTableModel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
@@ -222,10 +224,9 @@ public class FileListTableModel extends AbstractTableModel {
                 //System.out.println("Not found by mime: '"+getElementIfAvailable(contents, 2));
                 ExternalFileType typeGuess = null;
                 String link = getElementIfAvailable(contents, 1);
-                int index = link.lastIndexOf('.');
-                if ((index >= 0) && (index < (link.length() - 1))) {
-                    String extension = link.substring(index + 1);
-                    typeGuess = Globals.prefs.getExternalFileTypeByExt(extension);
+                Optional<String> extension = FileUtil.getFileExtension(link);
+                if (extension.isPresent()) {
+                    typeGuess = Globals.prefs.getExternalFileTypeByExt(extension.get());
                 }
                 if (typeGuess != null) {
                     type = typeGuess;

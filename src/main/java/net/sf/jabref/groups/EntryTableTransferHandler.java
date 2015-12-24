@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -46,6 +47,7 @@ import net.sf.jabref.external.TransferableFileLinkSelection;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.importer.ImportMenuItem;
 import net.sf.jabref.importer.OpenDatabaseAction;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
@@ -348,20 +350,19 @@ public class EntryTableTransferHandler extends TransferHandler {
         List<String> bibFiles = new ArrayList<>();
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
-            String extension = "";
+            Optional<String> extension = FileUtil.getFileExtension(fileName);
             ExternalFileType fileType = null;
-            int index = fileName.lastIndexOf('.');
-            if ((index >= 0) && (index < fileName.length())) {
-                extension = fileName.substring(index + 1).toLowerCase();
-            }
-            if ("bib".equals(extension)) {
-                // we assume that it is a BibTeX file.
-                // When a user wants to import something with file extension "bib", but which is not a BibTeX file, he should use "file -> import"
-                bibFiles.add(fileName);
-                continue;
+
+            if (extension.isPresent()) {
+                if ("bib".equals(extension.get())) {
+                    // we assume that it is a BibTeX file.
+                    // When a user wants to import something with file extension "bib", but which is not a BibTeX file, he should use "file -> import"
+                    bibFiles.add(fileName);
+                    continue;
+                }
             }
 
-            fileType = Globals.prefs.getExternalFileTypeByExt(extension);
+            fileType = Globals.prefs.getExternalFileTypeByExt(extension.orElse(""));
             /*
              * This is a linkable file. If the user dropped it on an entry, we
              * should offer options for autolinking to this files:
