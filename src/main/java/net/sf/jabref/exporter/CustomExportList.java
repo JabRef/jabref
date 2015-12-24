@@ -16,6 +16,7 @@
 package net.sf.jabref.exporter;
 
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
@@ -68,9 +69,9 @@ public class CustomExportList {
         int i = 0;
         String[] s;
         while ((s = Globals.prefs.getStringArray("customExportFormat" + i)) != null) {
-            ExportFormat format = createFormat(s);
-            if (format != null) {
-                formats.put(format.getConsoleName(), format);
+            Optional<ExportFormat> format = createFormat(s);
+            if (format.isPresent()) {
+                formats.put(format.get().getConsoleName(), format.get());
                 list.add(s);
             } else {
                 String customExportFormat = Globals.prefs.get("customExportFormat" + i);
@@ -80,9 +81,9 @@ public class CustomExportList {
         }
     }
 
-    private ExportFormat createFormat(String[] s) {
+    private Optional<ExportFormat> createFormat(String[] s) {
         if (s.length < 3) {
-            return null;
+            return Optional.empty();
         }
         String lfFileName;
         if (s[1].endsWith(".layout")) {
@@ -90,24 +91,23 @@ public class CustomExportList {
         } else {
             lfFileName = s[1];
         }
-        ExportFormat format = new ExportFormat(s[0], s[0], lfFileName, null,
-                s[2]);
+        ExportFormat format = new ExportFormat(s[0], s[0], lfFileName, null, s[2]);
         format.setCustomExport(true);
-        return format;
+        return Optional.of(format);
     }
 
     public void addFormat(String[] s) {
-        list.add(s);
-        ExportFormat format = createFormat(s);
-        formats.put(format.getConsoleName(), format);
+        createFormat(s).ifPresent(format -> {
+            formats.put(format.getConsoleName(), format);
+            list.add(s);
+        });
     }
 
     public void remove(String[] toRemove) {
-
-        ExportFormat format = createFormat(toRemove);
-        formats.remove(format.getConsoleName());
-        list.remove(toRemove);
-
+        createFormat(toRemove).ifPresent(format -> {
+            formats.remove(format.getConsoleName());
+            list.remove(toRemove);
+        });
     }
 
     public void store() {
@@ -116,9 +116,7 @@ public class CustomExportList {
             purge(0);
         } else {
             for (int i = 0; i < list.size(); i++) {
-                // System.out.println(i+"..");
-                Globals.prefs.putStringArray("customExportFormat" + i,
-                        list.get(i));
+                Globals.prefs.putStringArray("customExportFormat" + i, list.get(i));
             }
             purge(list.size());
         }

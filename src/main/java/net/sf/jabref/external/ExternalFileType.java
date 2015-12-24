@@ -56,12 +56,12 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      * TODO: The icon argument needs special treatment. At the moment, we assume that the fourth
      * element of the array contains the icon keyword to be looked up in the current icon theme.
      * To support icons found elsewhere on the file system we simply need to prefix the icon name
-     * with a marker. 
+     * with a marker.
      *
      * @param val Constructor arguments.
      */
     public ExternalFileType(String[] val) {
-        if (val == null || val.length < 4) {
+        if ((val == null) || (val.length < 4)) {
             throw new IllegalArgumentException("Cannot construct ExternalFileType without four elements in String[] argument.");
         }
         this.name = val[0];
@@ -200,10 +200,13 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      */
     @Override
     public boolean equals(Object object) {
-        ExternalFileType other = (ExternalFileType) object;
-        if (other == null) {
+        if (object == null) {
             return false;
         }
+        if (!(object instanceof ExternalFileType)) {
+            return false;
+        }
+        ExternalFileType other = (ExternalFileType) object;
         return (name == null ? other.name == null : name.equals(other.name))
                 && (extension == null ? other.extension == null : extension.equals(other.extension))
                 && (mimeType == null ? other.mimeType == null : mimeType.equals(other.mimeType))
