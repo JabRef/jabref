@@ -379,11 +379,11 @@ public class FileUtil {
         return result;
     }
 
-    public static List<List<String>> decodeFileField(String value) {
+    public static List<SimpleFileListEntry> decodeFileField(String value) {
         if (value == null) {
             value = "";
         }
-        List<List<String>> newList = new ArrayList<>();
+        List<SimpleFileListEntry> newList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         List<String> thisEntry = new ArrayList<>();
         boolean inXmlChar = false;
@@ -412,7 +412,7 @@ public class FileUtil {
             } else if (!escaped && (c == ';') && !inXmlChar) {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
-                newList.add(thisEntry);
+                newList.add(new SimpleFileListEntry(thisEntry));
                 thisEntry = new ArrayList<>();
             } else {
                 sb.append(c);
@@ -423,13 +423,7 @@ public class FileUtil {
             thisEntry.add(sb.toString());
         }
         if (!thisEntry.isEmpty()) {
-            if (thisEntry.size() == 1) { // If a single string, probably the file name
-                String fileName = thisEntry.get(0);
-                thisEntry.clear();
-                thisEntry.add("");
-                thisEntry.add(fileName);
-            }
-            newList.add(thisEntry);
+            newList.add(new SimpleFileListEntry(thisEntry));
         }
 
         return newList;
@@ -446,9 +440,9 @@ public class FileUtil {
     public static List<File> getListOfLinkedFiles(BibEntry[] bes, String[] fileDirs) {
         ArrayList<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            List<List<String>> fileList = decodeFileField(entry.getField(Globals.FILE_FIELD));
-            for (List<String> file : fileList) {
-                File f = expandFilename(file.get(1), fileDirs);
+            List<SimpleFileListEntry> fileList = decodeFileField(entry.getField(Globals.FILE_FIELD));
+            for (SimpleFileListEntry file : fileList) {
+                File f = expandFilename(file.getLink(), fileDirs);
                 if (f != null) {
                     result.add(f);
                 }

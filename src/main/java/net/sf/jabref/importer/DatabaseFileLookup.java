@@ -26,6 +26,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.SimpleFileListEntry;
 import net.sf.jabref.JabRef;
 
 /**
@@ -119,10 +120,10 @@ class DatabaseFileLookup {
         }
 
         String fileField = anEntry.getField(Globals.FILE_FIELD);
-        List<List<String>> fileList = FileUtil.decodeFileField(fileField);
+        List<SimpleFileListEntry> fileList = FileUtil.decodeFileField(fileField);
 
-        for (List<String> fileInfo : fileList) {
-            String link = fileInfo.get(1);
+        for (SimpleFileListEntry fileInfo : fileList) {
+            String link = fileInfo.getLink();
 
             if ((link == null)) {
                 break;
