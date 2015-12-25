@@ -365,11 +365,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
      * the right-click menus' change type menu is up-to-date.
      */
     private void updateTypesForEntries(String typeName) {
-        if (frame.getTabbedPane().getTabCount() == 0) {
-            return;
-        }
-        for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-            BasePanel bp = (BasePanel) frame.getTabbedPane().getComponentAt(i);
+        for (int i = 0; i < frame.getBasePanelCount(); i++) {
+            BasePanel bp = frame.getBasePanelAt(i);
 
             // Invalidate associated cached entry editor
             bp.entryEditors.remove(typeName);
@@ -385,11 +382,9 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     }
 
     private void updateTables() {
-        if (frame.getTabbedPane().getTabCount() == 0) {
-            return;
-        }
-        for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-            frame.getTabbedPane().getComponentAt(i);
+        for (int i = 0; i < frame.getBasePanelCount(); i++) {
+            ((javax.swing.table.AbstractTableModel) frame.getBasePanelAt(i).mainTable.getModel())
+                    .fireTableDataChanged();
         }
     }
 
