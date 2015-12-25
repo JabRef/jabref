@@ -301,22 +301,7 @@ public class BibtexCaseChanger {
                 return Optional.of("aa");
             }
         }
-        if (c[pos] == 'i') {
-            return Optional.of(String.valueOf(c[pos]));
-        }
-        if (c[pos] == 'j') {
-            return Optional.of(String.valueOf(c[pos]));
-        }
-        if (c[pos] == 'o') {
-            return Optional.of(String.valueOf(c[pos]));
-        }
-        if (c[pos] == 'O') {
-            return Optional.of(String.valueOf(c[pos]));
-        }
-        if (c[pos] == 'l') {
-            return Optional.of(String.valueOf(c[pos]));
-        }
-        if (c[pos] == 'L') {
+        if ("ijoOlL".indexOf(c[pos]) >= 0) {
             return Optional.of(String.valueOf(c[pos]));
         }
         return Optional.empty();
