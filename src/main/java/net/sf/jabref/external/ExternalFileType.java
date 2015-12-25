@@ -27,7 +27,7 @@ import net.sf.jabref.gui.IconTheme;
 public class ExternalFileType implements Comparable<ExternalFileType> {
 
     private String name;
-    String extension;
+    private String extension;
     private String openWith;
     private String iconName;
     private String mimeType;
