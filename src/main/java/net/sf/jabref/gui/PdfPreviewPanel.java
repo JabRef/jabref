@@ -33,6 +33,8 @@ import net.sf.jabref.MetaData;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.SimpleFileList;
+import net.sf.jabref.logic.util.io.SimpleFileListEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -115,12 +117,12 @@ class PdfPreviewPanel extends JPanel {
         }
         picLabel.setText("rendering preview...");
         picLabel.setIcon(null);
-        FileListTableModel tm = new FileListTableModel();
-        tm.setContent(entry.getField(Globals.FILE_FIELD));
-        FileListEntry flEntry = null;
-        for (int i = 0; i < tm.getRowCount(); i++) {
-            flEntry = tm.getEntry(i);
-            if ("pdf".equals(flEntry.getType().getName().toLowerCase())) {
+        SimpleFileList fileList = new SimpleFileList();
+        fileList.setContent(entry.getField(Globals.FILE_FIELD));
+        SimpleFileListEntry flEntry = null;
+        for (SimpleFileListEntry tmpFileListEntry : fileList.getEntryList()) {
+            if ("pdf".equals(tmpFileListEntry.getTypeName().toLowerCase())) {
+                flEntry = tmpFileListEntry;
                 break;
             }
         }

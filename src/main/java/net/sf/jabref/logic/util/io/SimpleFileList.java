@@ -52,6 +52,9 @@ public class SimpleFileList {
             list.add(entry);
     }
 
+    public List<SimpleFileListEntry> getEntryList() {
+        return new ArrayList<>(list);
+    }
     /**
      * Set up the list contents based on the flat string representation of the file list
      * @param value The string representation
