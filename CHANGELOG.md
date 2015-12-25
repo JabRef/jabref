@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- All import/open database warnings are now shown in a scrolling text area
 
 ### Fixed
 
