@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.junit.Assert;
 
@@ -57,6 +58,21 @@ public class BibtexEntryAssert {
         Assert.assertEquals(1, result.getDatabase().getEntryCount());
         BibEntry shouldBeEntry = result.getDatabase().getEntries().iterator().next();
         assertEquals(shouldBeEntry, entry);
+    }
+
+    /**
+     * Compares to lists of bibtex entries
+     *
+     * @param shouldBeIs the list with the expected entries
+     * @param actualEntries the list with the actual entries
+     */
+    public static void assertEquals(List<BibEntry> shouldBeIs, List<BibEntry> actualEntries) {
+        Assert.assertNotNull(shouldBeIs);
+        Assert.assertNotNull(actualEntries);
+        Assert.assertEquals(shouldBeIs.size(), actualEntries.size());
+        for (int i = 0; i < actualEntries.size(); i++) {
+            assertEquals(shouldBeIs.get(i), actualEntries.get(i));
+        }
     }
 
     /**
