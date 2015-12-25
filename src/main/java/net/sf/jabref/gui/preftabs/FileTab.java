@@ -17,11 +17,6 @@ package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -158,51 +153,6 @@ class FileTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
-    private int getBgValue(ButtonGroup buttonGroup) {
-        int index = 0;
-        for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
-            if (buttons.nextElement().isSelected()) {
-                return index;
-            }
-            index++;
-
-        }
-        return 0;
-
-    }
-
-    private void setBgSelected(ButtonGroup buttonGroup, int buttonIndex) {
-        int currentIndex = 0;
-
-        for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
-            if (currentIndex == buttonIndex) {
-                buttons.nextElement().setSelected(true);
-
-            } else {
-                buttons.nextElement().setSelected(false);
-
-            }
-            currentIndex++;
-
-        }
-
-    }
-
-    //    private void setValueFieldOrderStyle(){
-    //        fieldOrderStyle=getBgValue(bgFieldOrderStyle);
-    //    }
-
-    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup,
-            JTextField textField) {
-        //for LWang_AdjustableFieldOrder
-
-        for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
-            builder.append(buttons.nextElement());
-            builder.nextLine();
-        }
-        builder.append(textField);
-        builder.nextLine();
-    }
 
     @Override
     public void setValues() {

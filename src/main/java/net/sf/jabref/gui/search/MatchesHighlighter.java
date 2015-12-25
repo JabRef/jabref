@@ -1,12 +1,7 @@
 package net.sf.jabref.gui.search;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.logic.search;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 

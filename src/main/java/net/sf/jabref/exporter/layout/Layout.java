@@ -188,7 +188,7 @@ public class Layout {
 
     // added section - end (arudert)
 
-    public ArrayList<String> getMissingFormatters() {
-        return missingFormatters;
+    public List<String> getMissingFormatters() {
+        return new ArrayList<>(missingFormatters);
     }
 }

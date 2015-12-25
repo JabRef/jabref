@@ -23,7 +23,6 @@ import org.junit.Test;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.regex.Pattern;
 

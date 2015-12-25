@@ -455,9 +455,6 @@ public class BibtexFields {
 
         private int editorType = GUIGlobals.STANDARD_EDITOR;
 
-        // a alternative displayname, e.g. used for
-        // "citeseercitationcount"="Popularity"
-        private String alternativeDisplayName;
 
         // the extras data
         // fieldExtras contains mappings to tell the EntryEditor to add a specific
@@ -478,9 +475,6 @@ public class BibtexFields {
         // private HashMap props = new HashMap() ;
 
         // some constructors ;-)
-        public BibtexSingleField(String fieldName) {
-            name = fieldName;
-        }
 
         public BibtexSingleField(String fieldName, boolean pStandard) {
             name = fieldName;

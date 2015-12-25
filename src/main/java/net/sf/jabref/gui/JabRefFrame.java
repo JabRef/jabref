@@ -848,9 +848,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (getBasePanelAt(i).isModified()) {
                     tabbedPane.setSelectedIndex(i);
-                    Object[] options = {Localization.lang("Save changes"),
-                            Localization.lang("Discard changes"),
-                            Localization.lang("Return to JabRef")};
                     String filename;
 
                     if (getBasePanelAt(i).getDatabaseFile() != null) {
@@ -1360,19 +1357,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         createDisabledIconsForMenuEntries(mb);
     }
 
-
-    private static void createEntryTypeSection(JMenu menu, String title, java.util.List<NewEntryAction> actions) {
-        // bibtex
-        JMenuItem header = new JMenuItem(title);
-        Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());
-        header.setFont(font);
-        header.setEnabled(false);
-        menu.add(header);
-
-        for (NewEntryAction action : actions) {
-            menu.add(action);
-        }
-    }
 
     public static JMenu subMenu(String name) {
         int i = name.indexOf('&');

@@ -1030,7 +1030,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 String id = IdGenerator.next();
                 BibEntry bibEntry = new BibEntry(id, tp);
-                TextInputDialog tidialog = new TextInputDialog(frame, BasePanel.this, "import", true, bibEntry);
+                TextInputDialog tidialog = new TextInputDialog(frame, "import", true, bibEntry);
                 PositionWindow.placeDialog(tidialog, BasePanel.this);
                 tidialog.setVisible(true);
 
@@ -2317,7 +2317,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     sidePaneManager.hideComponent(FileUpdatePanel.NAME);
                     sidePaneManager.unregisterComponent(FileUpdatePanel.NAME);
                 }
-                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, getDatabaseFile(), scanner);
+                FileUpdatePanel pan = new FileUpdatePanel(BasePanel.this, sidePaneManager, getDatabaseFile(), scanner);
                 sidePaneManager.register(FileUpdatePanel.NAME, pan);
                 sidePaneManager.show(FileUpdatePanel.NAME);
                 //setUpdatedExternally(false);

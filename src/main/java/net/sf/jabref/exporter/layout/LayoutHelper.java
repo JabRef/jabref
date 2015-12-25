@@ -133,7 +133,7 @@ public class LayoutHelper {
     /**
      *
      */
-    private String getBracketedOptionField(int _field) throws IOException {
+    private String getBracketedOptionField() throws IOException {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
@@ -330,7 +330,7 @@ public class LayoutHelper {
                         if (c == '[') {
                             // get format parameter
                             // get field name
-                            getBracketedOptionField(LayoutHelper.IS_OPTION_FIELD);
+                            getBracketedOptionField();
 
                             return;
                         } else {

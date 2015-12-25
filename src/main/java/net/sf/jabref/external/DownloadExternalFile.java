@@ -156,7 +156,7 @@ public class DownloadExternalFile {
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        String[] fDirectory = getFileDirectory(res);
+        String[] fDirectory = getFileDirectory();
         final String directory;
         if (fDirectory.length == 0) {
             directory = null;
@@ -346,7 +346,7 @@ public class DownloadExternalFile {
 
     }
 
-    private String[] getFileDirectory(String link) {
+    private String[] getFileDirectory() {
         return metaData.getFileDirectory(Globals.FILE_FIELD);
     }
 

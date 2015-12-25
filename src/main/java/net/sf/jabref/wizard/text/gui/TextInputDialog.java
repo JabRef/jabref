@@ -122,7 +122,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private boolean okPressed;
 
-    public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal, BibEntry bibEntry) {
+
+    public TextInputDialog(JabRefFrame frame, String title, boolean modal, BibEntry bibEntry) {
         super(frame, title, modal);
 
         _frame = frame;
@@ -131,7 +132,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         marked = new TagToMarkedTextStore();
 
         try {
-            jbInit(frame);
+            jbInit();
             pack();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -139,7 +140,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         updateSourceView();
     }
 
-    private void jbInit(JabRefFrame parent) {
+    private void jbInit() {
         this.setModal(true);
         //this.setResizable( false ) ;
         getContentPane().setLayout(new BorderLayout());
@@ -349,7 +350,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     // Panel with bibtex source code
     private void initSourcePanel() {
-        //    preview =  new PreviewPanel(entry) ;
         preview = new JTextArea();
         preview.setEditable(false);
 
