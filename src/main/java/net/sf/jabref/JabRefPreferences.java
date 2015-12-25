@@ -1243,7 +1243,8 @@ public final class JabRefPreferences {
         list.add(new ExternalFileType(Localization.lang("%0 image", "PNG"), "png", "image/png", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType(Localization.lang("%0 image", "GIF"), "gif", "image/gif", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType(Localization.lang("%0 image", "JPG"), "jpg", "image/jpeg", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
-        list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall", IconTheme.JabRefIcon.FILE.getSmallIcon()));
+        list.add(new ExternalFileType("Djvu", "djvu", "image/vnd.djvu", "evince", "psSmall",
+                IconTheme.JabRefIcon.FILE.getSmallIcon()));
         list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
         list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
         list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));

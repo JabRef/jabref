@@ -88,7 +88,7 @@ public class SimpleFileListEntry {
 
     @Override
     public String toString() {
-        return description + " : " + link;
+        return description + " : " + link + " : " + typeName;
     }
 
 }

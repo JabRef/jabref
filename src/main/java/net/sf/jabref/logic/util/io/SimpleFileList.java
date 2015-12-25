@@ -32,35 +32,28 @@ public class SimpleFileList {
 
     private final List<SimpleFileListEntry> list = new ArrayList<>();
 
-
     public SimpleFileListEntry getEntry(int index) {
-        synchronized (list) {
             return list.get(index);
-        }
+    }
+
+    public int size() {
+        return list.size();
+    }
+
+    public Boolean isEmpty() {
+        return list.isEmpty();
     }
 
     public void removeEntry(int index) {
-        synchronized (list) {
             list.remove(index);
-        }
+    }
 
+    public void addEntry(final SimpleFileListEntry entry) {
+            list.add(entry);
     }
 
     /**
-     * Add an entry to the table model, and fire a change event. The change event
-     * is fired on the event dispatch thread.
-     * @param index The row index to insert the entry at.
-     * @param entry The entry to insert.
-     */
-    public void addEntry(final int index, final SimpleFileListEntry entry) {
-        synchronized (list) {
-            list.add(index, entry);
-        }
-
-    }
-
-    /**
-     * Set up the table contents based on the flat string representation of the file list
+     * Set up the list contents based on the flat string representation of the file list
      * @param value The string representation
      */
     public void setContent(String value) {
@@ -73,10 +66,8 @@ public class SimpleFileList {
             newList.add(decodeEntry(thisEntry));
         }
 
-        synchronized (list) {
-            list.clear();
-            list.addAll(newList);
-        }
+        list.clear();
+        list.addAll(newList);
     }
 
 
@@ -106,7 +97,7 @@ public class SimpleFileList {
     }
 
     /**
-     * Transform the file list shown in the table into a flat string representable
+     * Transform the file list into a flat string representable
      * as a BibTeX field:
      * @return String representation.
      */

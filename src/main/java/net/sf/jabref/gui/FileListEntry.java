@@ -44,6 +44,7 @@ public class FileListEntry extends SimpleFileListEntry {
         this.type = type;
     }
 
+    @Override
     public String[] getStringArrayRepresentation() {
         String typeString = getType() != null ? getType().getName() : "";
         return new String[] {getDescription(), getLink(), typeString};
