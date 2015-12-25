@@ -50,6 +50,8 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.SimpleFileList;
+import net.sf.jabref.logic.util.io.SimpleFileListEntry;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.util.strings.UnicodeToReadableCharMap;
 import org.apache.commons.logging.Log;
@@ -361,29 +363,29 @@ public class Util {
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static void upgradePdfPsToFile(BibEntry entry, String[] fields, NamedCompound ce) {
-        FileListTableModel tableModel = new FileListTableModel();
+        SimpleFileList fileList = new SimpleFileList();
         // If there are already links in the file field, keep those on top:
         String oldFileContent = entry.getField(Globals.FILE_FIELD);
         if (oldFileContent != null) {
-            tableModel.setContent(oldFileContent);
+            fileList.setContent(oldFileContent);
         }
-        int oldRowCount = tableModel.getRowCount();
+        int oldItemCount = fileList.size();
         for (String field : fields) {
             String o = entry.getField(field);
             if (o != null) {
                 if (!o.trim().isEmpty()) {
                     File f = new File(o);
-                    FileListEntry flEntry = new FileListEntry(f.getName(), o,
-                            Globals.prefs.getExternalFileTypeByExt(field));
-                    tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                    SimpleFileListEntry flEntry = new SimpleFileListEntry(f.getName(), o,
+                            Globals.prefs.getExternalFileTypeNameByExt(field));
+                    fileList.addEntry(flEntry);
 
                     entry.clearField(field);
                     ce.addEdit(new UndoableFieldChange(entry, field, o, null));
                 }
             }
         }
-        if (tableModel.getRowCount() != oldRowCount) {
-            String newValue = tableModel.getStringRepresentation();
+        if (fileList.size() != oldItemCount) {
+            String newValue = fileList.getStringRepresentation();
             entry.setField(Globals.FILE_FIELD, newValue);
             ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
         }
