@@ -147,9 +147,6 @@ public class LabelPatternUtil {
      * @return The content with unified diacritics.
      */
     private static String unifyDiacritics(String content) {
-        if (content == null) {
-            return null;
-        }
         return content.replaceAll(
                 "\\$\\\\ddot\\{\\\\mathrm\\{([^\\}])\\}\\}\\$",
                 "{\\\"$1}").replaceAll(
