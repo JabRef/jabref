@@ -68,7 +68,7 @@ public class UndoableRemoveEntry extends AbstractUndoableEdit {
 
         // Redo the change.
         try {
-            base.removeEntry(entry.getId());
+            base.removeEntry(entry);
             // If the entry has an editor currently open, we must close it.
             panel.ensureNotShowing(entry);
         } catch (Throwable ex) {

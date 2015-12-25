@@ -1037,7 +1037,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             panel.entryEditorClosing(EntryEditor.this);
-            panel.getDatabase().removeEntry(entry.getId());
+            panel.getDatabase().removeEntry(entry);
             panel.markBaseChanged();
             panel.undoManager.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
             panel.output(Localization.lang("Deleted entry"));

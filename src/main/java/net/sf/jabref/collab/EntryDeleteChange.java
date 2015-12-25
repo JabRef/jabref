@@ -61,9 +61,9 @@ class EntryDeleteChange extends Change {
 
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-        panel.database().removeEntry(memEntry.getId());
+        panel.database().removeEntry(memEntry);
         undoEdit.addEdit(new UndoableRemoveEntry(panel.database(), memEntry, panel));
-        secondary.removeEntry(tmpEntry.getId());
+        secondary.removeEntry(tmpEntry);
         return true;
     }
 

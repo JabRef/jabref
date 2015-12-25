@@ -354,7 +354,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     Localization.lang("cut entry")));
                 // Loop through the array of entries, and delete them.
                 for (BibEntry be : bes) {
-                    database.removeEntry(be.getId());
+                    database.removeEntry(be);
                     ensureNotShowing(be);
                     ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                 }
@@ -378,7 +378,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         Localization.lang("delete entry")));
                     // Loop through the array of entries, and delete them.
                     for (BibEntry be : bes) {
-                        database.removeEntry(be.getId());
+                        database.removeEntry(be);
                         ensureNotShowing(be);
                         ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                     }

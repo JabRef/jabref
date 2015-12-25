@@ -197,18 +197,16 @@ public class BibDatabase {
      * <p>
      * Returns null if not found.
      */
-    public synchronized BibEntry removeEntry(String id) {
-        BibEntry oldValue = entries.remove(id);
-
+    public synchronized void removeEntry(BibEntry oldValue) {
         if (oldValue == null) {
-            return null;
+            return;
         }
+
+        entries.remove(oldValue.getId());
 
         removeKeyFromSet(oldValue.getCiteKey());
         oldValue.removePropertyChangeListener(listener);
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, oldValue));
-
-        return oldValue;
     }
 
     public synchronized boolean setCiteKeyForEntry(String id, String key) {
