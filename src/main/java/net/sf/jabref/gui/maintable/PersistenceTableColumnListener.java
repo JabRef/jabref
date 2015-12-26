@@ -44,12 +44,13 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 
     public static final boolean DEFAULT_ENABLED = true;
 
-    private static final String simpleClassName = PersistenceTableColumnListener.class.getSimpleName();
+    private static final String SIMPLE_CLASS_NAME = PersistenceTableColumnListener.class.getSimpleName();
 
     // needed to get column names / indices mapped from view to model
     // and to access the table model
     private final MainTable mainTable;
 
+    private static final String RECEIVED_NULL_EVENT = " received null event";
 
     /**
      * @param mainTable
@@ -94,7 +95,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     @Override
     public void columnAdded(TableColumnModelEvent e) {
-        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.SIMPLE_CLASS_NAME + RECEIVED_NULL_EVENT;
 
         updateColumnPrefs();
     }
@@ -104,7 +105,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     @Override
     public void columnMarginChanged(ChangeEvent e) {
-        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.SIMPLE_CLASS_NAME + RECEIVED_NULL_EVENT;
 
         updateColumnPrefs();
     }
@@ -114,7 +115,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     @Override
     public void columnMoved(TableColumnModelEvent e) {
-        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.SIMPLE_CLASS_NAME + RECEIVED_NULL_EVENT;
 
         // not really moved, ignore ...
         if (e.getFromIndex() == e.getToIndex()) {
@@ -130,7 +131,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     @Override
     public void columnRemoved(TableColumnModelEvent e) {
-        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.SIMPLE_CLASS_NAME + RECEIVED_NULL_EVENT;
 
         updateColumnPrefs();
 

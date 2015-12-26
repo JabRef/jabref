@@ -33,10 +33,10 @@ public class SpecialMainTableColumns {
         @Override
         public Object getColumnValue(BibEntry entry) {
             SpecialFieldValue rank = Rank.getInstance().parse(entry.getField(SpecialFieldsUtils.FIELDNAME_RANKING));
-            if (rank != null) {
-                return rank.createLabel();
-            } else {
+            if (rank == null) {
                 return null;
+            } else {
+                return rank.createLabel();
             }
         }
     };
@@ -50,10 +50,10 @@ public class SpecialMainTableColumns {
 
             SpecialFieldValue prio = Priority.getInstance()
                     .parse(entry.getField(SpecialFieldsUtils.FIELDNAME_PRIORITY));
-            if (prio != null) {
-                return prio.createLabel();
-            } else {
+            if (prio == null) {
                 return null;
+            } else {
+                return prio.createLabel();
             }
         }
     };
@@ -67,10 +67,10 @@ public class SpecialMainTableColumns {
 
             SpecialFieldValue status = ReadStatus.getInstance()
                     .parse(entry.getField(SpecialFieldsUtils.FIELDNAME_READ));
-            if (status != null) {
-                return status.createLabel();
-            } else {
+            if (status == null) {
                 return null;
+            } else {
+                return status.createLabel();
             }
         }
     };
@@ -174,15 +174,14 @@ public class SpecialMainTableColumns {
                 FileListTableModel fileList = new FileListTableModel();
                 fileList.setContent(entry.getField(Globals.FILE_FIELD));
                 for (int i = 0; i < fileList.getRowCount(); i++) {
-                    if (fileList.getEntry(i).getType() != null) {
-                        if (externalFileTypeName.equalsIgnoreCase(fileList.getEntry(i).getType().getName())) {
-                            if (iconFound) {
-                                // already found another file of the desired type - show FILE_MULTIPLE Icon
-                                return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
-                            } else {
-                                iconLabel = fileList.getEntry(i).getType().getIconLabel();
-                                iconFound = true;
-                            }
+                    if ((fileList.getEntry(i).getType() != null)
+                            && externalFileTypeName.equalsIgnoreCase(fileList.getEntry(i).getType().getName())) {
+                        if (iconFound) {
+                            // already found another file of the desired type - show FILE_MULTIPLE Icon
+                            return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
+                        } else {
+                            iconLabel = fileList.getEntry(i).getType().getIconLabel();
+                            iconFound = true;
                         }
                     }
                 }
