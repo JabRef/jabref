@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.formatter;
+package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
 import org.junit.After;
