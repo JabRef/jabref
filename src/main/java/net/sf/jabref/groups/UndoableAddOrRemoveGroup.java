@@ -38,7 +38,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
      */
     private final int m_editType;
     private final GroupSelector m_groupSelector;
-    private boolean m_revalidate = true;
+    private boolean mRevalidate = true;
     /** Adding of a single node (group). */
     public static final int ADD_NODE = 0;
     /** Removal of a single node. Children, if any, are kept. */
@@ -91,6 +91,8 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
             return Localization.lang("remove group (keep subgroups)");
         case REMOVE_NODE_AND_CHILDREN:
             return Localization.lang("remove group and subgroups");
+        default:
+            break;
         }
         return "? (" + Localization.lang("unknown edit") + ")";
     }
@@ -136,6 +138,8 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
             case REMOVE_NODE_AND_CHILDREN:
                 cursor.insert(m_subtreeBackup.deepCopy(), childIndex);
                 break;
+            default:
+                break;
             }
         } else { // redo
             switch (m_editType) {
@@ -155,9 +159,11 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
             case REMOVE_NODE_AND_CHILDREN:
                 cursor.remove(childIndex);
                 break;
+            default:
+                break;
             }
         }
-        if (m_revalidate) {
+        if (mRevalidate) {
             m_groupSelector.revalidateGroups();
         }
     }
@@ -170,6 +176,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
      *            a <code>boolean</code> value
      */
     public void setRevalidate(boolean val) {
-        m_revalidate = val;
+        mRevalidate = val;
     }
 }
