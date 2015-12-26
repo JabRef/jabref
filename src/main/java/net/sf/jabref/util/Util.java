@@ -363,12 +363,9 @@ public class Util {
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static void upgradePdfPsToFile(BibEntry entry, String[] fields, NamedCompound ce) {
-        SimpleFileList fileList = new SimpleFileList();
         // If there are already links in the file field, keep those on top:
         String oldFileContent = entry.getField(Globals.FILE_FIELD);
-        if (oldFileContent != null) {
-            fileList.setContent(oldFileContent);
-        }
+        SimpleFileList fileList = new SimpleFileList(oldFileContent);
         int oldItemCount = fileList.size();
         for (String field : fields) {
             String o = entry.getField(field);

@@ -18,40 +18,35 @@ public class SimpleFileListTest {
 
     @Test
     public void testIncompleteSingleItemConstructor() {
-        SimpleFileList list = new SimpleFileList();
-        list.setContent("test.pdf");
+        SimpleFileList list = new SimpleFileList("test.pdf");
         assertEquals(1, list.size());
         assertFalse(list.isEmpty());
     }
 
     @Test
     public void testSingleItemConstructor() {
-        SimpleFileList list = new SimpleFileList();
-        list.setContent("test:test.pdf:PDF");
+        SimpleFileList list = new SimpleFileList("test:test.pdf:PDF");
         assertEquals(1, list.size());
         assertFalse(list.isEmpty());
     }
 
     @Test
     public void testNullConstructor() {
-        SimpleFileList list = new SimpleFileList();
-        list.setContent(null);
+        SimpleFileList list = new SimpleFileList(null);
         assertEquals(0, list.size());
         assertTrue(list.isEmpty());
     }
 
     @Test
     public void testMultiItemConstructors() {
-        SimpleFileList list = new SimpleFileList();
-        list.setContent("test:test.pdf:PDF;presentation:file.ppt:PPT");
+        SimpleFileList list = new SimpleFileList("test:test.pdf:PDF;presentation:file.ppt:PPT");
         assertEquals(2, list.size());
         assertFalse(list.isEmpty());
     }
 
     @Test
     public void testIncompleteMultiItemConstructors() {
-        SimpleFileList list = new SimpleFileList();
-        list.setContent("test.pdf;presentation:file.ppt:PPT");
+        SimpleFileList list = new SimpleFileList("test.pdf;presentation:file.ppt:PPT");
         assertEquals(2, list.size());
         assertFalse(list.isEmpty());
         assertEquals("pdf", list.getEntry(0).getTypeName().toLowerCase());
@@ -59,15 +54,13 @@ public class SimpleFileListTest {
 
     @Test
     public void testStringArrayRepresentation() {
-        SimpleFileList list = new SimpleFileList();
-        list.setContent("test:test.pdf:pdf");
+        SimpleFileList list = new SimpleFileList("test:test.pdf:pdf");
         assertEquals("test:test.pdf:PDF", list.getStringRepresentation());
     }
 
     @Test
     public void testIncompleteStringArrayRepresentation() {
-        SimpleFileList list = new SimpleFileList();
-        list.setContent("test.pdf;presentation:file.ppt");
+        SimpleFileList list = new SimpleFileList("test.pdf;presentation:file.ppt");
         assertEquals(2, list.size());
         assertFalse(list.isEmpty());
         assertEquals(":test.pdf:PDF;presentation:file.ppt:PowerPoint", list.getStringRepresentation());
@@ -75,8 +68,7 @@ public class SimpleFileListTest {
 
     @Test
     public void testRemoveItem() {
-        SimpleFileList list = new SimpleFileList();
-        list.setContent("test:test.pdf:PDF;presentation:file.ppt:PPT");
+        SimpleFileList list = new SimpleFileList("test:test.pdf:PDF;presentation:file.ppt:PPT");
         assertEquals(2, list.size());
         assertFalse(list.isEmpty());
         assertEquals("test.pdf", list.getEntry(0).getLink());
@@ -91,8 +83,7 @@ public class SimpleFileListTest {
 
     @Test
     public void testAddEntry() {
-        SimpleFileList list = new SimpleFileList();
-        list.setContent(null);
+        SimpleFileList list = new SimpleFileList(null);
         assertEquals(0, list.size());
         assertTrue(list.isEmpty());
         list.addEntry(new SimpleFileListEntry("test", "test.pdf", "PDF"));

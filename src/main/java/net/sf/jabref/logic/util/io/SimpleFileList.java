@@ -32,7 +32,27 @@ public class SimpleFileList {
 
     private final List<SimpleFileListEntry> list = new ArrayList<>();
 
-    public SimpleFileListEntry getEntry(int index) {
+
+    public SimpleFileList() {
+        // Empty constructor
+    }
+
+    /**
+     * Set up the list contents based on the flat string representation of the file list
+     * @param fieldValue The string representation
+     */
+    public SimpleFileList(String fieldValue) {
+        if (fieldValue == null) {
+            fieldValue = "";
+        }
+        final List<SimpleFileListEntry> fileEntryList = FileUtil.decodeFileField(fieldValue);
+        for (final SimpleFileListEntry thisEntry : fileEntryList) {
+            list.add(decodeEntry(thisEntry));
+        }
+
+    }
+
+    public SimpleFileListEntry getEntry(final int index) {
             return list.get(index);
     }
 
@@ -44,7 +64,7 @@ public class SimpleFileList {
         return list.isEmpty();
     }
 
-    public void removeEntry(int index) {
+    public void removeEntry(final int index) {
             list.remove(index);
     }
 
@@ -55,27 +75,9 @@ public class SimpleFileList {
     public List<SimpleFileListEntry> getEntryList() {
         return new ArrayList<>(list);
     }
-    /**
-     * Set up the list contents based on the flat string representation of the file list
-     * @param value The string representation
-     */
-    public void setContent(String value) {
-        if (value == null) {
-            value = "";
-        }
-        List<SimpleFileListEntry> fileEntryList = FileUtil.decodeFileField(value);
-        List<SimpleFileListEntry> newList = new ArrayList<>();
-        for (SimpleFileListEntry thisEntry : fileEntryList) {
-            newList.add(decodeEntry(thisEntry));
-        }
 
-        list.clear();
-        list.addAll(newList);
-    }
-
-
-    private SimpleFileListEntry decodeEntry(SimpleFileListEntry entry) {
-        Boolean validName = Globals.prefs.isExternalFileTypeName(entry.getTypeName());
+    private SimpleFileListEntry decodeEntry(final SimpleFileListEntry entry) {
+        final Boolean validName = Globals.prefs.isExternalFileTypeName(entry.getTypeName());
         String typeName = entry.getTypeName();
 
         if (!validName) {
@@ -84,9 +86,8 @@ public class SimpleFileList {
             typeName = Globals.prefs.getExternalFileTypeNameByMimeType(entry.getTypeName());
             if (typeName == null) {
                 // No type could be found from mime type on the extension:
-                //System.out.println("Not found by mime: '"+getElementIfAvailable(contents, 2));
                 String typeGuess = null;
-                Optional<String> extension = FileUtil.getFileExtension(entry.getLink());
+                final Optional<String> extension = FileUtil.getFileExtension(entry.getLink());
                 if (extension.isPresent()) {
                     typeGuess = Globals.prefs.getExternalFileTypeNameByExt(extension.get());
                 }
@@ -106,10 +107,10 @@ public class SimpleFileList {
      */
     public String getStringRepresentation() {
         String[][] array = new String[list.size()][];
-        int i = 0;
-        for (SimpleFileListEntry entry : list) {
-            array[i] = entry.getStringArrayRepresentation();
-            i++;
+        int entryRowCount = 0;
+        for (final SimpleFileListEntry entry : list) {
+            array[entryRowCount] = entry.getStringArrayRepresentation();
+            entryRowCount++;
         }
         return StringUtil.encodeStringArray(array);
     }

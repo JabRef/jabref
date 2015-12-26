@@ -39,9 +39,8 @@ public class FileLink implements ParamLayoutFormatter {
             return "";
         }
 
-        SimpleFileList fileList = new SimpleFileList();
+        SimpleFileList fileList = new SimpleFileList(field);
 
-        fileList.setContent(field);
         String link = null;
         if (fileType == null) {
             // No file type specified. Simply take the first link.

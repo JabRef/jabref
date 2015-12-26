@@ -116,8 +116,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
             return "";
         }
         // Build the list containing the links:
-        SimpleFileList fileList = new SimpleFileList();
-        fileList.setContent(field);
+        SimpleFileList fileList = new SimpleFileList(field);
 
         int piv = 1; // counter for relevant iterations
         for (SimpleFileListEntry flEntry : fileList.getEntryList()) {

@@ -117,8 +117,7 @@ class PdfPreviewPanel extends JPanel {
         }
         picLabel.setText("rendering preview...");
         picLabel.setIcon(null);
-        SimpleFileList fileList = new SimpleFileList();
-        fileList.setContent(entry.getField(Globals.FILE_FIELD));
+        SimpleFileList fileList = new SimpleFileList(entry.getField(Globals.FILE_FIELD));
         SimpleFileListEntry flEntry = null;
         for (SimpleFileListEntry tmpFileListEntry : fileList.getEntryList()) {
             if ("pdf".equals(tmpFileListEntry.getTypeName().toLowerCase())) {
