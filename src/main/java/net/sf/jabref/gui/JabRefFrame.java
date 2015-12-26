@@ -104,7 +104,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     final JSplitPane contentPane = new JSplitPane();
 
-    final JabRefPreferences prefs = Globals.prefs;
+    private final JabRefPreferences prefs = Globals.prefs;
     private PreferencesDialog prefsDialog;
 
     private int lastTabbedPanelSelectionIndex = -1;
@@ -207,7 +207,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
-    final ToolBar tlb = new ToolBar();
+    private final ToolBar tlb = new ToolBar();
 
     private final JMenuBar mb = new JMenuBar();
 
@@ -286,7 +286,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Forward"), Globals.getKeyPrefs().getKey(KeyBinding.FORWARD), IconTheme.JabRefIcon.RIGHT.getIcon());
     final AbstractAction back = new GeneralAction(Actions.BACK, Localization.menuTitle("Back"),
             Localization.lang("Back"), Globals.getKeyPrefs().getKey(KeyBinding.BACK), IconTheme.JabRefIcon.LEFT.getIcon());
-    final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
+    private final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
             Localization.lang("Delete entry"), Globals.getKeyPrefs().getKey(KeyBinding.DELETE_ENTRY), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
     private final AbstractAction copy = new EditAction(Actions.COPY, Localization.menuTitle("Copy"),
             Localization.lang("Copy"), Globals.getKeyPrefs().getKey(KeyBinding.COPY), IconTheme.JabRefIcon.COPY.getIcon());
@@ -487,7 +487,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private PushToApplicationButton pushExternalButton;
 
-    GeneralFetcher generalFetcher;
+    private GeneralFetcher generalFetcher;
 
     private final List<Action> fetcherActions = new LinkedList<>();
 
@@ -2105,7 +2105,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     class DatabasePropertiesAction extends MnemonicAwareAction {
 
-        DatabasePropertiesDialog propertiesDialog;
+        private DatabasePropertiesDialog propertiesDialog;
 
 
         public DatabasePropertiesAction() {
@@ -2126,7 +2126,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     class BibtexKeyPatternAction extends MnemonicAwareAction {
 
-        BibtexKeyPatternDialog bibtexKeyPatternDialog;
+        private BibtexKeyPatternDialog bibtexKeyPatternDialog;
 
 
         public BibtexKeyPatternAction() {
