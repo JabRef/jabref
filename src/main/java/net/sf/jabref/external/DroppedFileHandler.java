@@ -126,7 +126,7 @@ public class DroppedFileHandler {
      */
     public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
                                   BibEntry entry) {
-        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
+        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (tryXmpImport(fileName, fileType, localFile, edits)) {
             edits.end();
@@ -177,7 +177,7 @@ public class DroppedFileHandler {
 
     public void linkPdfToEntry(String fileName, MainTable entryTable, BibEntry entry) {
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
-        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
+        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         // Show dialog
         boolean newEntry = false;
@@ -214,7 +214,7 @@ public class DroppedFileHandler {
 
     public void importXmp(List<BibEntry> xmpEntriesInFile, String fileName) {
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
-        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
+        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         boolean isSingle = xmpEntriesInFile.size() == 1;
         BibEntry single = isSingle ? xmpEntriesInFile.get(0) : null;
@@ -229,7 +229,7 @@ public class DroppedFileHandler {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
             } else {
-                destFilename = single.getCiteKey() + "." + fileType.extension;
+                destFilename = single.getCiteKey() + "." + fileType.getExtension();
             }
 
             if (copyRadioButton.isSelected()) {
@@ -260,7 +260,7 @@ public class DroppedFileHandler {
     private boolean tryXmpImport(String fileName, ExternalFileType fileType, boolean localFile,
                                  NamedCompound edits) {
 
-        if (!"pdf".equals(fileType.extension)) {
+        if (!"pdf".equals(fileType.getExtension())) {
             return false;
         }
 
@@ -316,7 +316,7 @@ public class DroppedFileHandler {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
             } else {
-                destFilename = single.getCiteKey() + "." + fileType.extension;
+                destFilename = single.getCiteKey() + "." + fileType.getExtension();
             }
 
             if (copyRadioButton.isSelected()) {
@@ -401,7 +401,7 @@ public class DroppedFileHandler {
         // Determine which name to suggest:
         String targetName = Util.getLinkedFileName(database, entry);
 
-        renameToTextBox.setText(targetName.concat(".").concat(fileType.extension));
+        renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
         linkInPlace.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_LEAVE));
         copyRadioButton.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_COPY));

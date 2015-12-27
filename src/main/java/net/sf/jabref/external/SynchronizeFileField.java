@@ -46,7 +46,6 @@ import java.util.List;
  */
 public class SynchronizeFileField extends AbstractWorker {
 
-    private final String fieldName = Globals.FILE_FIELD;
     private final BasePanel panel;
     private BibEntry[] sel;
     private SynchronizeFileField.OptionsDialog optDiag;
@@ -76,7 +75,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
         // Ask about rules for the operation:
         if (optDiag == null) {
-            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.metaData(), fieldName);
+            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.metaData());
         }
         PositionWindow.placeDialog(optDiag, panel.frame());
         optDiag.setVisible(true);
@@ -87,7 +86,7 @@ public class SynchronizeFileField extends AbstractWorker {
         autoSet = !optDiag.autoSetNone.isSelected();
         checkExisting = optDiag.checkLinks.isSelected();
 
-        panel.output(Localization.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
+        panel.output(Localization.lang("Synchronizing %0 links...", Globals.FILE_FIELD.toUpperCase()));
     }
 
     @Override
@@ -103,7 +102,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 + (checkExisting ? sel.length : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        final NamedCompound ce = new NamedCompound(Localization.lang("Autoset %0 field", fieldName));
+        final NamedCompound ce = new NamedCompound(Localization.lang("Autoset %0 field", Globals.FILE_FIELD));
 
         Set<BibEntry> changedEntries = new HashSet<>();
 
@@ -123,7 +122,7 @@ public class SynchronizeFileField extends AbstractWorker {
             boolean removeAllBroken = false;
             mainLoop: for (BibEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
-                final String old = aSel.getField(fieldName);
+                final String old = aSel.getField(Globals.FILE_FIELD);
                 // Check if a extension is set:
                 if ((old != null) && !(old.isEmpty())) {
                     FileListTableModel tableModel = new FileListTableModel();
@@ -233,13 +232,13 @@ public class SynchronizeFileField extends AbstractWorker {
                         // The table has been modified. Store the change:
                         String toSet = tableModel.getStringRepresentation();
                         if (toSet.isEmpty()) {
-                            toSet = null;
+                            ce.addEdit(new UndoableFieldChange(aSel, Globals.FILE_FIELD, old, null));
+                            aSel.clearField(Globals.FILE_FIELD);
+                        } else {
+                            ce.addEdit(new UndoableFieldChange(aSel, Globals.FILE_FIELD, old, toSet));
+                            aSel.setField(Globals.FILE_FIELD, toSet);
                         }
-                        ce.addEdit(new UndoableFieldChange(aSel, fieldName, old,
-                                toSet));
-                        aSel.setField(fieldName, toSet);
                         changedEntries.add(aSel);
-                        //System.out.println("Changed to: "+tableModel.getStringRepresentation());
                     }
 
                 }
@@ -262,7 +261,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
         int entriesChangedCount = 0;
         panel.output(Localization.lang("Finished synchronizing %0 links. Entries changed: %1.",
-                fieldName.toUpperCase(), String.valueOf(entriesChangedCount)));
+                Globals.FILE_FIELD.toUpperCase(), String.valueOf(entriesChangedCount)));
         panel.frame().setProgressBarVisible(false);
         if (entriesChangedCount > 0) {
             panel.markBaseChanged();
@@ -283,8 +282,8 @@ public class SynchronizeFileField extends AbstractWorker {
         private final MetaData metaData;
 
 
-        public OptionsDialog(JFrame parent, MetaData metaData, String fieldName) {
-            super(parent, Localization.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
+        public OptionsDialog(JFrame parent, MetaData metaData) {
+            super(parent, Localization.lang("Synchronize %0 links", Globals.FILE_FIELD.toUpperCase()), true);
             this.metaData = metaData;
             final String fn = Localization.lang("file");
             ok.addActionListener(new ActionListener() {
