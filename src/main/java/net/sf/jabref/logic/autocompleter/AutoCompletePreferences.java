@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.JabRefPreferences;
@@ -31,7 +31,7 @@ public class AutoCompletePreferences {
     private static final String PREF_COMPLETE_FIELDS = "autoCompleteFields";
 
 
-    public static void putDefaults(HashMap<String, Object> defaults) {
+    public static void putDefaults(Map<String, Object> defaults) {
         defaults.put(PREF_SHORTEST_TO_COMPLETE, 1);
         defaults.put(PREF_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
         defaults.put(PREF_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"

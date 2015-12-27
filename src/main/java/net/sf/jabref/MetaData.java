@@ -198,7 +198,7 @@ public class MetaData implements Iterable<String> {
             }
             dirs.add(dir);
         } else {
-            String dir = Globals.prefs.get(fieldName + "Directory");
+            String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX);
             if (dir != null) {
                 dirs.add(dir);
             }

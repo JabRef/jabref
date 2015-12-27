@@ -68,7 +68,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         // Only offer to upgrade links if the pdf/ps fields are used:
         offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
-        offerSetFileDir = !Globals.prefs.hasKey(Globals.FILE_FIELD + "Directory")
+        offerSetFileDir = !Globals.prefs.hasKey(Globals.FILE_FIELD + Globals.DIR_SUFFIX)
                 && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
         // First check if this warning is disabled:
@@ -190,7 +190,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         }
 
         if (fileDir != null) {
-            Globals.prefs.put(Globals.FILE_FIELD + "Directory", fileDir);
+            Globals.prefs.put(Globals.FILE_FIELD + Globals.DIR_SUFFIX, fileDir);
         }
 
         if (upgradePrefs) {
