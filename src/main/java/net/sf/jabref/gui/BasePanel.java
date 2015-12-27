@@ -1722,21 +1722,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    /**
-     * Stores the source view in the entry editor, if one is open, has the source view selected and the source has been
-     * edited.
-     *
-     * @return boolean false if there is a validation error in the source panel, true otherwise.
-     */
-    public boolean entryEditorAllowsChange() {
-        Component c = splitPane.getBottomComponent();
-        if (c instanceof EntryEditor) {
-            return ((EntryEditor) c).lastSourceAccepted();
-        } else {
-            return true;
-        }
-    }
-
     private boolean isShowingEditor() {
         return (splitPane.getBottomComponent() != null) && (splitPane.getBottomComponent() instanceof EntryEditor);
     }
