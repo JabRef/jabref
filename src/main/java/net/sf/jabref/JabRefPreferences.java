@@ -60,13 +60,13 @@ import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
-public class JabRefPreferences {
+public final class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
 
     /**
      * HashMap that contains all preferences which are set by default
      */
-    public final HashMap<String, Object> defaults = new HashMap<>();
+    public final Map<String, Object> defaults = new HashMap<>();
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
@@ -343,12 +343,15 @@ public class JabRefPreferences {
 
     private final Preferences prefs;
 
-    private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<>(4);
-    private final HashSet<String> nonWrappableFields = new HashSet<>(5);
+    private final Set<String> putBracesAroundCapitalsFields = new HashSet<>(4);
+    private final Set<String> nonWrappableFields = new HashSet<>(5);
     private GlobalLabelPattern keyPattern;
 
     // Object containing custom export formats:
     public final CustomExportList customExports;
+
+    // Helper string
+    private static final String USER_HOME = System.getProperty("user.home");
 
     /**
      * Set with all custom {@link ImportFormat}s
@@ -358,7 +361,7 @@ public class JabRefPreferences {
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList;
     // Map containing all registered external file types:
-    private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<>();
+    private final Set<ExternalFileType> externalFileTypes = new TreeSet<>();
 
     private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www", IconTheme.JabRefIcon.WWW.getSmallIcon());
 
@@ -377,7 +380,7 @@ public class JabRefPreferences {
     // The following field is used as a global variable during the export of a database.
     // It is used to hold custom name formatters defined by a custom export filter.
     // It is set before the export starts:
-    public HashMap<String, String> customExportNameFormatters;
+    public Map<String, String> customExportNameFormatters;
 
     // The only instance of this class:
     private static JabRefPreferences singleton;
@@ -450,7 +453,7 @@ public class JabRefPreferences {
         defaults.put(PROXY_PASSWORD, "");
         defaults.put(PDF_PREVIEW, Boolean.FALSE);
         defaults.put(USE_DEFAULT_LOOK_AND_FEEL, Boolean.TRUE);
-        defaults.put(LYXPIPE, System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
+        defaults.put(LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(VIM, "vim");
         defaults.put(VIM_SERVER, "vim");
         defaults.put(POS_X, 0);
@@ -514,10 +517,10 @@ public class JabRefPreferences {
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put(NUMBER_COL_WIDTH, GUIGlobals.NUMBER_COL_LENGTH);
-        defaults.put(WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(EXPORT_WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(IMPORT_WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(FILE_WORKING_DIRECTORY, System.getProperty("user.home"));
+        defaults.put(WORKING_DIRECTORY, USER_HOME);
+        defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
+        defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
+        defaults.put(FILE_WORKING_DIRECTORY, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
         defaults.put(ENTRY_TYPE_FORM_HEIGHT_FACTOR, 1);
         defaults.put(ENTRY_TYPE_FORM_WIDTH, 1);
@@ -779,14 +782,14 @@ public class JabRefPreferences {
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
-        defaults.put(USER_FILE_DIR, Globals.FILE_FIELD + "Directory");
+        defaults.put(USER_FILE_DIR, Globals.FILE_FIELD + Globals.DIR_SUFFIX);
         try {
-            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
+            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
+            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
         } catch (UnknownHostException ex) {
             LOGGER.info("Hostname not found.", ex);
-            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
+            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
+            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
         }
     }
 
@@ -1003,7 +1006,7 @@ public class JabRefPreferences {
      * @param color The Color to store.
      */
     public void putColor(String key, Color color) {
-        String rgb = String.valueOf(color.getRed()) + ':' + String.valueOf(color.getGreen()) + ':' + String.valueOf(color.getBlue());
+        String rgb = String.valueOf(color.getRed()) + ':' + color.getGreen() + ':' + color.getBlue();
         put(key, rgb);
     }
 
@@ -1056,7 +1059,7 @@ public class JabRefPreferences {
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Can not communicate with backing store", ex);
         }
     }
 
@@ -1128,18 +1131,18 @@ public class JabRefPreferences {
         StringBuilder res = new StringBuilder();
         while (!done && ((c = data.read()) != -1)) {
             if (c == '\\') {
-                if (!escape) {
-                    escape = true;
-                } else {
+                if (escape) {
                     escape = false;
                     res.append('\\');
+                } else {
+                    escape = true;
                 }
             } else {
                 if (c == ';') {
-                    if (!escape) {
-                        done = true;
-                    } else {
+                    if (escape) {
                         res.append(';');
+                    } else {
+                        done = true;
                     }
                 } else {
                     res.append((char) c);
@@ -1189,12 +1192,12 @@ public class JabRefPreferences {
     public CustomEntryType getCustomEntryType(int number) {
         String nr = String.valueOf(number);
         String name = get(JabRefPreferences.CUSTOM_TYPE_NAME + nr);
-        String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
-        String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
-        String[] priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
         if (name == null) {
             return null;
         }
+        String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
+        String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
+        String[] priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
         if (priOpt == null) {
             return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(opt));
         }
@@ -1290,12 +1293,10 @@ public class JabRefPreferences {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && filename.toLowerCase().
-                    endsWith(type.getExtension().toLowerCase())) {
-                if (type.getExtension().length() > longestFound) {
-                    longestFound = type.getExtension().length();
-                    foundType = type;
-                }
+            if ((type.getExtension() != null) && filename.toLowerCase().endsWith(type.getExtension().toLowerCase())
+                    && (type.getExtension().length() > longestFound)) {
+                longestFound = type.getExtension().length();
+                foundType = type;
             }
         }
         return foundType;

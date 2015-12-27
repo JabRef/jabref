@@ -445,7 +445,7 @@ public class ExternalFilePanel extends JPanel {
      */
     public Runnable autoSetFile(final String fieldName, final FieldEditor editor) {
         Object o = getKey();
-        if ((o == null) || (Globals.prefs.get(fieldName + "Directory") == null)) {
+        if ((o == null) || (Globals.prefs.get(fieldName + Globals.DIR_SUFFIX) == null)) {
             output(Localization.lang("You must set both BibTeX key and %0 directory", fieldName
                     .toUpperCase())
                     + '.');

@@ -15,8 +15,9 @@
  */
 package net.sf.jabref.gui.actions;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -64,7 +65,8 @@ public class CleanUpAction extends AbstractWorker {
     private static final String CLEANUP_UNICODE = "CleanUpUnicode";
     private static final String CLEANUP_CONVERTTOBIBLATEX = "CleanUpConvertToBiblatex";
 
-    public static void putDefaults(HashMap<String, Object> defaults) {
+
+    public static void putDefaults(Map<String, Object> defaults) {
         defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_SUPERSCRIPTS, Boolean.TRUE);
         defaults.put(CLEANUP_DOI, Boolean.TRUE);

@@ -118,8 +118,8 @@ public class FileFinder {
 
         List<String> dirs = new ArrayList<>();
         dirs.addAll(extraDirs);
-        if (Globals.prefs.hasKey(fileType.getExtension() + "Directory")) {
-            dirs.add(Globals.prefs.get(fileType.getExtension() + "Directory"));
+        if (Globals.prefs.hasKey(fileType.getExtension() + Globals.DIR_SUFFIX)) {
+            dirs.add(Globals.prefs.get(fileType.getExtension() + Globals.DIR_SUFFIX));
         }
         String[] directories = dirs.toArray(new String[dirs.size()]);
         return FileFinder.findPdf(entry, fileType.getExtension(), directories);
