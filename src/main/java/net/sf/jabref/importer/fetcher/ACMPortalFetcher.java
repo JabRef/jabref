@@ -85,20 +85,17 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private boolean fetchAbstract;
     private boolean acmOrGuide;
 
-    private static final Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+,*\\d*)</b>.*");
-    private static final Pattern maxHitsPattern = Pattern.compile(".*Results \\d+ - \\d+ of (\\d+,*\\d*).*");
-    //private static final Pattern bibPattern = Pattern.compile(".*'(exportformats.cfm\\?id=\\d+&expformat=bibtex)'.*");
+    private static final Pattern hitsPattern = Pattern.compile("<strong>(\\d+)</strong> results found");
+    private static final Pattern maxHitsPattern = Pattern.compile("Result \\d+ &ndash; \\d+ of (\\d+)");
 
-    private static final Pattern fullCitationPattern =
-            Pattern.compile("<A HREF=\"(citation.cfm.*)\" class.*");
+    private static final Pattern fullCitationPattern = Pattern.compile("<a href=\"(citation.cfm.*)\" target.*");
 
-    private static final Pattern idPattern =
-            Pattern.compile("citation.cfm\\?id=\\d*\\.?(\\d+)&.*");
+    private static final Pattern idPattern = Pattern.compile("citation.cfm\\?id=(\\d+)&.*");
 
     // Patterns used to extract information for the preview:
-    private static final Pattern titlePattern = Pattern.compile("<A HREF=.*?\">([^<]*)</A>");
-    private static final Pattern monthYearPattern = Pattern.compile("([A-Za-z]+ [0-9]{4})");
+    private static final Pattern titlePattern = Pattern.compile("<a href=.*?\">([^<]*)</a>");
     private static final Pattern absPattern = Pattern.compile("<div .*?>(.*?)</div>");
+    private static final Pattern sourcePattern = Pattern.compile("<span style=\"padding-left:10px\">([^<]*)</span>");
 
 
     @Override
@@ -126,8 +123,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         shouldContinue = true;
         acmOrGuide = acmButton.isSelected();
         fetchAbstract = absCheckBox.isSelected();
-        int firstEntry = 1;
-        String address = makeUrl(firstEntry);
+        String address = makeUrl();
         LinkedHashMap<String, JLabel> previews = new LinkedHashMap<>();
 
         try {
@@ -135,12 +131,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             String page = Util.getResults(url);
 
-            int hits = getNumberOfHits(page, "Found", ACMPortalFetcher.hitsPattern);
+            int hits = getNumberOfHits(page, "<div id=\"resfound\">", ACMPortalFetcher.hitsPattern);
 
-            int index = page.indexOf("Found");
+            int index = page.indexOf("<div id=\"resfound\">");
             if (index >= 0) {
                 page = page.substring(index + 5);
-                index = page.indexOf("Found");
+                index = page.indexOf("<div id=\"resfound\">");
                 if (index >= 0) {
                     page = page.substring(index);
                 }
@@ -153,13 +149,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 return false;
             }
 
-            hits = getNumberOfHits(page, "Results", ACMPortalFetcher.maxHitsPattern);
-
-            for (int i = 0; i < hits; i++) {
-                parse(page, 0, firstEntry, previews);
-                //address = makeUrl(firstEntry);
-                firstEntry += ACMPortalFetcher.perPage;
-            }
+            hits = getNumberOfHits(page, "<div class=\"pagerange\">", ACMPortalFetcher.maxHitsPattern);
+            parse(page, Math.min(hits, perPage), previews);
             for (Map.Entry<String, JLabel> entry : previews.entrySet()) {
                 preview.addEntry(entry.getKey(), entry.getValue());
             }
@@ -235,10 +226,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         return false;
     }
 
-    private String makeUrl(int startIndex) {
+    private String makeUrl() {
         StringBuilder sb = new StringBuilder(ACMPortalFetcher.startUrl).append(ACMPortalFetcher.searchUrlPart);
         sb.append(terms.replaceAll(" ", "%20"));
-        sb.append("&start=").append(startIndex);
         sb.append(ACMPortalFetcher.searchUrlPartII);
 
         if (acmOrGuide) {
@@ -254,10 +244,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private int piv;
 
 
-    private void parse(String text, int startIndex, int firstEntryNumber, Map<String, JLabel> entries) {
-        piv = startIndex;
-        int entryNumber = firstEntryNumber;
-        while (getNextEntryURL(text, piv, entryNumber, entries)) {
+    private void parse(String text, int hits, Map<String, JLabel> entries) {
+        int entryNumber = 1;
+        while (getNextEntryURL(text, entryNumber, entries) && (entryNumber <= hits)) {
             entryNumber++;
         }
     }
@@ -272,31 +261,29 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         return null;
     }
 
-    private boolean getNextEntryURL(String allText, int startIndex, int entryNumber,
+    private boolean getNextEntryURL(String allText, int entryNumber,
             Map<String, JLabel> entries) {
-        String toFind = "<strong>" + entryNumber + "</strong><br>";
-        int index = allText.indexOf(toFind, startIndex);
-        int endIndex = allText.length();
+        String toFind = "<div class=\"numbering\">";
+        int index = allText.indexOf(toFind, piv);
+        int endIndex = allText.indexOf("<br clear=\"all\" />", index);
+        piv = endIndex;
 
         if (index >= 0) {
-            piv = index + 1;
             String text = allText.substring(index, endIndex);
             // Always try RIS import first
             Matcher fullCitation =
                     ACMPortalFetcher.fullCitationPattern.matcher(text);
+            String item;
             if (fullCitation.find()) {
                 String link = getEntryBibTeXURL(fullCitation.group(1));
-                String part;
-                int endOfRecord = text.indexOf("<div class=\"abstract2\">");
-                if (endOfRecord > 0) {
+                if (endIndex > 0) {
                     StringBuilder sb = new StringBuilder();
-                    part = text.substring(0, endOfRecord);
 
-                    try {
+                    /*try {
                         save("part" + entryNumber + ".html", part);
                     } catch (IOException e) {
                         e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
-                    }
+                    } */
 
                     // Find authors:
                     String authMarker = "<div class=\"authors\">";
@@ -309,26 +296,35 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
                     }
                     // Find title:
-                    Matcher titM = ACMPortalFetcher.titlePattern.matcher(part);
+                    Matcher titM = ACMPortalFetcher.titlePattern.matcher(text);
                     if (titM.find()) {
                         sb.append("<p>").append(titM.group(1)).append("</p>");
                     }
-                    // Find month and year:
-                    Matcher mY = ACMPortalFetcher.monthYearPattern.matcher(part);
-                    if (mY.find()) {
-                        sb.append("<p>").append(mY.group(1)).append("</p>");
+
+                    String sourceMarker = "<div class=\"source\">";
+                    int sourceStart = text.indexOf(sourceMarker);
+                    if (sourceStart >= 0) {
+                        int sourceEnd = text.indexOf("</div>", sourceStart + sourceMarker.length());
+                        if (sourceEnd >= 0) {
+                            String sourceText = text.substring(sourceStart, sourceEnd);
+                            // Find source:
+                            Matcher source = ACMPortalFetcher.sourcePattern.matcher(sourceText);
+                            if (source.find()) {
+                                sb.append("<p>").append(source.group(1)).append("</p>");
+                            }
+                        }
                     }
 
-                    part = sb.toString();
+                    item = sb.toString();
                     /*.replaceAll("</tr>", "<br>");
                     part = part.replaceAll("</td>", "");
                     part = part.replaceAll("<tr valign=\"[A-Za-z]*\">", "");
                     part = part.replaceAll("<table style=\"padding: 5px; 5px; 5px; 5px;\" border=\"0\">", "");*/
                 } else {
-                    part = link;
+                    item = link;
                 }
 
-                JLabel preview = new JLabel("<html>" + part + "</html>");
+                JLabel preview = new JLabel("<html>" + item + "</html>");
                 preview.setPreferredSize(new Dimension(750, 100));
                 entries.put(link, preview);
                 return true;
@@ -377,9 +373,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         } catch (MalformedURLException e) {
             LOGGER.info("Malformed URL.", e);
             return null;
-        } catch (ConnectException e) {
-            LOGGER.info("Cannot connect.", e);
-            return null;
         } catch (IOException e) {
             LOGGER.info("Cannot connect.", e);
             return null;
@@ -407,7 +400,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         if (ind < 0) {
             throw new IOException("Cannot parse number of hits");
         }
-        String substring = page.substring(ind, Math.min(ind + 42, page.length()));
+        String substring = page.substring(ind, Math.min(ind + 100, page.length()));
         Matcher m = pattern.matcher(substring);
         if (!m.find()) {
             LOGGER.info("Unmatched! " + substring);
@@ -415,10 +408,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             try {
                 // get rid of ,
                 String number = m.group(1);
-                //NumberFormat nf = NumberFormat.getInstance();
-                //return nf.parse(number).intValue();
                 number = number.replaceAll(",", "");
-                //System.out.println(number);
                 return Integer.parseInt(number);
             } catch (NumberFormatException ex) {
                 throw new IOException("Cannot parse number of hits");
