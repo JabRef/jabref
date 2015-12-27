@@ -86,16 +86,16 @@ public class KeyBindingPreferences {
                 bindings[index] = keyBinding.getValue();
                 index++;
             }
-            prefs.putStringArray("bindNames", bindNames);
-            prefs.putStringArray("bindings", bindings);
+            prefs.putStringArray(JabRefPreferences.BIND_NAMES, bindNames);
+            prefs.putStringArray(JabRefPreferences.BINDINGS, bindings);
             keyBindingRepository.overwriteBindings(newBindings);
         }
     }
 
     private void restoreKeyBindings() {
         // First read the bindings, and their names.
-        String[] bindNames = prefs.getStringArray("bindNames");
-        String[] bindings = prefs.getStringArray("bindings");
+        String[] bindNames = prefs.getStringArray(JabRefPreferences.BIND_NAMES);
+        String[] bindings = prefs.getStringArray(JabRefPreferences.BINDINGS);
 
         // Then set up the key bindings HashMap.
         if ((bindNames == null) || (bindings == null)

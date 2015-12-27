@@ -472,9 +472,9 @@ public class LabelPatternUtil {
         key = Util.checkLegalKey(stringBuilder.toString());
 
         // Remove Regular Expressions while generating Keys
-        String regex = Globals.prefs.get("KeyPatternRegex");
+        String regex = Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REGEX);
         if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = Globals.prefs.get("KeyPatternReplacement");
+            String replacement = Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT);
             key = key.replaceAll(regex, replacement);
         }
 

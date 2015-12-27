@@ -732,9 +732,9 @@ public class MainTable extends JTable {
         MainTable.markedRenderers = new GeneralRenderer[EntryMarker.MARK_COLOR_LEVELS];
         MainTable.markedNumberRenderers = new CompleteRenderer[EntryMarker.MARK_COLOR_LEVELS];
         for (int i = 0; i < EntryMarker.MARK_COLOR_LEVELS; i++) {
-            Color c = Globals.prefs.getColor("markedEntryBackground" + i);
+            Color c = Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i);
             MainTable.markedRenderers[i] = new GeneralRenderer(c,
-                    Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT), MainTable.mixColors(Globals.prefs.getColor("markedEntryBackground" + i), sel));
+                    Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i), sel));
             MainTable.markedNumberRenderers[i] = new CompleteRenderer(c);
         }
 

@@ -248,6 +248,17 @@ public class JabRefPreferences {
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
 
+    public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
+    public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
+    public static final String PSVIEWER = "psviewer";
+    public static final String PDFVIEWER = "pdfviewer";
+    public static final String BINDINGS = "bindings";
+    public static final String BIND_NAMES = "bindNames";
+    public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
+    public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
+    public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
+    public static final String SAVED_SESSION = "savedSession";
+
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.LabelPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getLabelPattern(); etc
     public static final String DEFAULT_LABEL_PATTERN = "defaultLabelPattern";
@@ -271,6 +282,7 @@ public class JabRefPreferences {
     public static final String IMPORT_INSPECTION_DIALOG_WIDTH = "importInspectionDialogWidth";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
+    public static final String LAST_USED_IMPORT = "lastUsedImport";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
@@ -397,8 +409,8 @@ public class JabRefPreferences {
         defaults.put(TEXSTUDIO_PATH, OS.guessProgramPath("texstudio", "TeXstudio"));
 
         if (OS.OS_X) {
-            //defaults.put("pdfviewer", "/Applications/Preview.app");
-            //defaults.put("psviewer", "/Applications/Preview.app");
+            //defaults.put(JabRefPreferences.PDFVIEWER, "/Applications/Preview.app");
+            //defaults.put(JabRefPreferences.PSVIEWER, "/Applications/Preview.app");
             //defaults.put("htmlviewer", "/Applications/Safari.app");
             defaults.put(EMACS_PATH, "emacsclient");
             defaults.put(EMACS_23, true);
@@ -407,8 +419,8 @@ public class JabRefPreferences {
             defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
 
         } else if (OS.WINDOWS) {
-            //defaults.put("pdfviewer", "cmd.exe /c start /b");
-            //defaults.put("psviewer", "cmd.exe /c start /b");
+            //defaults.put(JabRefPreferences.PDFVIEWER, "cmd.exe /c start /b");
+            //defaults.put(JabRefPreferences.PSVIEWER, "cmd.exe /c start /b");
             //defaults.put("htmlviewer", "cmd.exe /c start /b");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
@@ -417,8 +429,8 @@ public class JabRefPreferences {
             defaults.put(FONT_FAMILY, "Arial");
 
         } else {
-            //defaults.put("pdfviewer", "evince");
-            //defaults.put("psviewer", "gv");
+            //defaults.put(JabRefPreferences.PDFVIEWER, "evince");
+            //defaults.put(JabRefPreferences.PSVIEWER, "gv");
             //defaults.put("htmlviewer", "firefox");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
             defaults.put(FONT_FAMILY, "SansSerif");

@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.BasicEventList;
@@ -68,13 +69,13 @@ public class CustomExportList {
         list.clear();
         int i = 0;
         String[] s;
-        while ((s = Globals.prefs.getStringArray("customExportFormat" + i)) != null) {
+        while ((s = Globals.prefs.getStringArray(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i)) != null) {
             Optional<ExportFormat> format = createFormat(s);
             if (format.isPresent()) {
                 formats.put(format.get().getConsoleName(), format.get());
                 list.add(s);
             } else {
-                String customExportFormat = Globals.prefs.get("customExportFormat" + i);
+                String customExportFormat = Globals.prefs.get(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
                 LOGGER.error("Error initializing custom export format from string " + customExportFormat);
             }
             i++;
@@ -116,7 +117,7 @@ public class CustomExportList {
             purge(0);
         } else {
             for (int i = 0; i < list.size(); i++) {
-                Globals.prefs.putStringArray("customExportFormat" + i, list.get(i));
+                Globals.prefs.putStringArray(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i, list.get(i));
             }
             purge(list.size());
         }
@@ -124,8 +125,8 @@ public class CustomExportList {
 
     private void purge(int from) {
         int i = from;
-        while (Globals.prefs.getStringArray("customExportFormat" + i) != null) {
-            Globals.prefs.remove("customExportFormat" + i);
+        while (Globals.prefs.getStringArray(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i) != null) {
+            Globals.prefs.remove(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
             i++;
         }
     }
