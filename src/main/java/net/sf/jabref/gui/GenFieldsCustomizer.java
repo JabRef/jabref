@@ -85,7 +85,7 @@ public class GenFieldsCustomizer extends JDialog {
         jPanel4.setLayout(gridBagLayout1);
         jLabel2.setText(Localization.lang("General fields"));
 
-        //    fieldsArea.setText(parent.prefs.get("generalFields"));
+        //    fieldsArea.setText(parent.prefs.get(JabRefPreferences.GENERAL_FIELDS));
         setFieldsText();
 
         //jPanel3.setBackground(GUIGlobals.lightGray);
@@ -160,7 +160,7 @@ public class GenFieldsCustomizer extends JDialog {
         /*
         String delimStr = fieldsArea.getText().replaceAll("\\s+","")
           .replaceAll("\\n+","").trim();
-        parent.prefs.putStringArray("generalFields", Util.split(delimStr, ";"));
+        parent.prefs.putStringArray(JabRefPreferences.GENERAL_FIELDS, Util.split(delimStr, ";"));
         */
 
         parent.removeCachedEntryEditors();

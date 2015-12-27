@@ -159,12 +159,12 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
     private void readPrefs() {
         int i = 0;
         String[] s;
-        while ((s = prefs.getStringArray("customImportFormat" + i)) != null) {
+        while ((s = prefs.getStringArray(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i)) != null) {
             try {
                 super.add(new Importer(s));
             } catch (Exception e) {
                 System.err.println("Warning! Could not load " + s[0] + " from preferences. Will ignore.");
-                // Globals.prefs.remove("customImportFormat"+i);
+                // Globals.prefs.remove(JabRefPreferences.CUSTOM_IMPORT_FORMAT+i);
             }
             i++;
         }
@@ -193,13 +193,13 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
         purgeAll();
         Importer[] importers = this.toArray(new Importer[this.size()]);
         for (int i = 0; i < importers.length; i++) {
-            Globals.prefs.putStringArray("customImportFormat" + i, importers[i].getAsStringArray());
+            Globals.prefs.putStringArray(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i, importers[i].getAsStringArray());
         }
     }
 
     private void purgeAll() {
-        for (int i = 0; Globals.prefs.getStringArray("customImportFormat" + i) != null; i++) {
-            Globals.prefs.remove("customImportFormat" + i);
+        for (int i = 0; Globals.prefs.getStringArray(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i) != null; i++) {
+            Globals.prefs.remove(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i);
         }
     }
 

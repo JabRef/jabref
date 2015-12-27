@@ -1937,7 +1937,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 for (int i = 0; i < filenames.size(); i++) {
                     names[i] = filenames.elementAt(i);
                 }
-                prefs.putStringArray("savedSession", names);
+                prefs.putStringArray(JabRefPreferences.SAVED_SESSION, names);
                 output(Localization.lang("Saved session") + '.');
             }
 
@@ -1956,7 +1956,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (prefs.get("savedSession") == null) {
+            if (prefs.get(JabRefPreferences.SAVED_SESSION) == null) {
                 output(Localization.lang("No saved session found."));
                 return;
             }
@@ -1979,7 +1979,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             }
                         }
                     }
-                    String[] names = prefs.getStringArray("savedSession");
+                    String[] names = prefs.getStringArray(JabRefPreferences.SAVED_SESSION);
                     ArrayList<File> filesToOpen = new ArrayList<>();
                     for (String name : names) {
                         filesToOpen.add(new File(name));

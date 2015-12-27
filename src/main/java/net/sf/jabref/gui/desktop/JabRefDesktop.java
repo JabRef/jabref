@@ -93,13 +93,13 @@ public class JabRefDesktop {
             try {
                 if (OS.OS_X) {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
+                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get(JabRefPreferences.PSVIEWER);
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
                 } else if (OS.WINDOWS) {
                     openFileOnWindows(link, true);
                     /*
-                     * cmdArray[0] = Globals.prefs.get("psviewer"); cmdArray[1] =
+                     * cmdArray[0] = Globals.prefs.get(JabRefPreferences.PSVIEWER); cmdArray[1] =
                      * link; Process child = Runtime.getRuntime().exec(
                      * cmdArray[0] + " " + cmdArray[1]);
                      */
@@ -112,13 +112,13 @@ public class JabRefDesktop {
                     Runtime.getRuntime().exec(cmdArray);
                 }
             } catch (IOException e) {
-                System.err.println("An error occured on the command: " + Globals.prefs.get("psviewer") + " " + link);
+                System.err.println("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PSVIEWER) + " " + link);
             }
         } else if ("pdf".equals(fieldName)) {
             try {
                 if (OS.OS_X) {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
+                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get(JabRefPreferences.PSVIEWER);
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
                 } else if (OS.WINDOWS) {
@@ -136,7 +136,7 @@ public class JabRefDesktop {
                      */
                 } else {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
+                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get(JabRefPreferences.PSVIEWER);
                     String[] cmdArray = new String[2];
                     cmdArray[0] = viewer;
                     cmdArray[1] = link;
@@ -146,7 +146,7 @@ public class JabRefDesktop {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                System.err.println("An error occured on the command: " + Globals.prefs.get("pdfviewer") + " #" + link);
+                System.err.println("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PDFVIEWER) + " #" + link);
                 System.err.println(e.getMessage());
             }
         } else {

@@ -47,7 +47,7 @@ public class ImportFormats {
 
         SortedSet<ImportFormat> importers = Globals.importFormatReader.getImportFormats();
 
-        String lastUsedFormat = Globals.prefs.get("lastUsedImport");
+        String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_IMPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
         TreeSet<ImportFileFilter> filters = new TreeSet<>();
@@ -126,9 +126,9 @@ public class ImportFormats {
                     // Make sure we remember which filter was used, to set the default
                     // for next time:
                     if (format != null) {
-                        Globals.prefs.put("lastUsedImport", format.getFormatName());
+                        Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, format.getFormatName());
                     } else {
-                        Globals.prefs.put("lastUsedImport", "__all");
+                        Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, "__all");
                     }
                     Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent());
                 } catch (Exception ex) {
