@@ -52,7 +52,7 @@ import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.util.strings.UnicodeCharMap;
+import net.sf.jabref.logic.util.strings.UnicodeToReadableCharMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -95,7 +95,7 @@ public class Util {
 
     public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
-    private static final UnicodeCharMap UNICODE_CHAR_MAP = new UnicodeCharMap();
+    private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is
@@ -115,7 +115,7 @@ public class Util {
 
     /**
      * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
-     * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
+     * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
      */
     public static String replaceSpecialCharacters(String s) {
         for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {

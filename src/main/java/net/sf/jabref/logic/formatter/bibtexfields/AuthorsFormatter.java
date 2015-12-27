@@ -24,10 +24,10 @@ import java.util.regex.Pattern;
  * Class for normalizing author lists to BibTeX format.
  */
 public class AuthorsFormatter implements Formatter {
-    private static final Pattern lastFF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) (\\p{javaUpperCase}+)");
-    private static final Pattern lastFdotF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) ([\\. \\p{javaUpperCase}]+)");
-    private static final Pattern FFlast = Pattern.compile("(\\p{javaUpperCase}+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
-    private static final Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
+    private static final Pattern LAST_F_F = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) (\\p{javaUpperCase}+)");
+    private static final Pattern LAST_FDOT_F = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) ([\\. \\p{javaUpperCase}]+)");
+    private static final Pattern F_F_LAST = Pattern.compile("(\\p{javaUpperCase}+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
+    private static final Pattern FDOT_F_LAST = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
     private static final Pattern SINGLE_NAME = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
 
     @Override
@@ -97,7 +97,7 @@ public class AuthorsFormatter implements Formatter {
             } else {
                 // Check if there is a comma in the last name. If so, we can assume that comma
                 // is not used to separate the names:
-                boolean lnfn = authors[1].indexOf(",") > 0;
+                boolean lnfn = authors[1].indexOf(',') > 0;
                 if (!lnfn) {
                     String[] cmSep = authors[0].split(", ");
                     if (cmSep.length > 1) {
@@ -128,61 +128,37 @@ public class AuthorsFormatter implements Formatter {
     }
 
     private static String normalizeName(String name) {
-        Matcher matcher = AuthorsFormatter.lastFF.matcher(name);
+        Matcher matcher = AuthorsFormatter.LAST_F_F.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(2);
             StringBuilder stringBuilder = new StringBuilder(matcher.group(1));
             stringBuilder.append(", ");
-            for (int i = 0; i < initials.length(); i++) {
-                stringBuilder.append(initials.charAt(i));
-                stringBuilder.append('.');
-                if (i < (initials.length() - 1)) {
-                    stringBuilder.append(' ');
-                }
-            }
+            fixInitials(initials, stringBuilder);
             return stringBuilder.toString();
         }
-        matcher = AuthorsFormatter.lastFdotF.matcher(name);
+        matcher = AuthorsFormatter.LAST_FDOT_F.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(2).replaceAll("[\\. ]+", "");
             StringBuilder stringBuilder = new StringBuilder(matcher.group(1));
             stringBuilder.append(", ");
-            for (int i = 0; i < initials.length(); i++) {
-                stringBuilder.append(initials.charAt(i));
-                stringBuilder.append('.');
-                if (i < (initials.length() - 1)) {
-                    stringBuilder.append(' ');
-                }
-            }
+            fixInitials(initials, stringBuilder);
             return stringBuilder.toString();
         }
 
-        matcher = AuthorsFormatter.FFlast.matcher(name);
+        matcher = AuthorsFormatter.F_F_LAST.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(1);
             StringBuilder stringBuilder = new StringBuilder(matcher.group(2));
             stringBuilder.append(", ");
-            for (int i = 0; i < initials.length(); i++) {
-                stringBuilder.append(initials.charAt(i));
-                stringBuilder.append('.');
-                if (i < (initials.length() - 1)) {
-                    stringBuilder.append(' ');
-                }
-            }
+            fixInitials(initials, stringBuilder);
             return stringBuilder.toString();
         }
-        matcher = AuthorsFormatter.FdotFlast.matcher(name);
+        matcher = AuthorsFormatter.FDOT_F_LAST.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(1).replaceAll("[\\. ]+", "");
             StringBuilder stringBuilder = new StringBuilder(matcher.group(2));
             stringBuilder.append(", ");
-            for (int i = 0; i < initials.length(); i++) {
-                stringBuilder.append(initials.charAt(i));
-                stringBuilder.append('.');
-                if (i < (initials.length() - 1)) {
-                    stringBuilder.append(' ');
-                }
-            }
+            fixInitials(initials, stringBuilder);
             return stringBuilder.toString();
         }
 
@@ -219,13 +195,7 @@ public class AuthorsFormatter implements Formatter {
                 } else {
                     // It looks like initials.
                     String initials = firstNameParts[0].replaceAll("[\\.]+", "");
-                    for (int i = 0; i < initials.length(); i++) {
-                        stringBuilder.append(initials.charAt(i));
-                        stringBuilder.append('.');
-                        if (i < (initials.length() - 1)) {
-                            stringBuilder.append(' ');
-                        }
-                    }
+                    fixInitials(initials, stringBuilder);
                 }
 
             }
@@ -259,5 +229,15 @@ public class AuthorsFormatter implements Formatter {
         }
 
         return name;
+    }
+
+    private static void fixInitials(final String initials, final StringBuilder stringBuilder) {
+        for (int i = 0; i < initials.length(); i++) {
+            stringBuilder.append(initials.charAt(i));
+            stringBuilder.append('.');
+            if (i < (initials.length() - 1)) {
+                stringBuilder.append(' ');
+            }
+        }
     }
 }
