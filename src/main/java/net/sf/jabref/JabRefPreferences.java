@@ -325,6 +325,21 @@ public final class JabRefPreferences {
 
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
 
+    // OpenOffice/LibreOffice preferences
+    public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
+    public static final String OO_PATH = "ooPath";
+    public static final String OO_JARS_PATH = "ooJarsPath";
+    public static final String SHOW_OO_PANEL = "showOOPanel";
+    public static final String SYNC_OO_WHEN_CITING = "syncOOWhenCiting";
+    public static final String USE_ALL_OPEN_BASES = "useAllOpenBases";
+    public static final String OO_IN_PAR_CITATION = "ooInParCitation";
+    public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
+    public static final String OO_USE_DEFAULT_AUTHORYEAR_STYLE = "ooUseDefaultAuthoryearStyle";
+    public static final String OO_USE_DEFAULT_NUMERICAL_STYLE = "ooUseDefaultNumericalStyle";
+    public static final String OO_CHOOSE_STYLE_DIRECTLY = "ooChooseStyleDirectly";
+    public static final String OO_DIRECT_FILE = "ooDirectFile";
+    public static final String OO_STYLE_DIRECTORY = "ooStyleDirectory";
+
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
