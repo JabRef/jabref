@@ -78,8 +78,6 @@ public class JabRef {
 
     public static JabRefFrame jrf;
 
-    private static final int MAX_DIALOG_WARNINGS = 10;
-
     private JabRefCLI cli;
 
 
@@ -726,8 +724,7 @@ public class JabRef {
 
         for (int i = 0; i < loaded.size(); i++) {
             if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-                ParserResultWarningDialog.showParserResultWarningDialog(loaded.elementAt(i), JabRef.jrf,
-                        JabRef.MAX_DIALOG_WARNINGS, i);
+                ParserResultWarningDialog.showParserResultWarningDialog(loaded.elementAt(i), JabRef.jrf, i);
             }
         }
 
