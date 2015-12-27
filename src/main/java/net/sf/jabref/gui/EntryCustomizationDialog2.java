@@ -84,7 +84,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         main.setLayout(new BorderLayout());
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
-        java.util.List<String> entryTypes = new ArrayList<>();
+        List<String> entryTypes = new ArrayList<>();
         for (String s : EntryTypes.getAllTypes()) {
             entryTypes.add(s);
         }
@@ -180,25 +180,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         List<String> rl = reqLists.get(s);
         if (rl == null) {
             EntryType type = EntryTypes.getType(s);
-            if (type != null) {
-                List<String> req = type.getRequiredFields();
-
-                List<String> opt;
-                if (!biblatexMode) {
-                    opt = type.getOptionalFields();
-                } else {
-                    opt = type.getPrimaryOptionalFields();
-
-                    List<String> opt2 = type.getSecondaryOptionalFields();
-
-                    optComp2.setFields(opt2);
-                    optComp2.setEnabled(true);
-                }
-                reqComp.setFields(req);
-                reqComp.setEnabled(true);
-                optComp.setFields(opt);
-                optComp.setEnabled(true);
-            } else {
+            if (type == null) {
                 // New entry
                 reqComp.setFields(new ArrayList<>());
                 reqComp.setEnabled(true);
@@ -209,6 +191,24 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                     optComp2.setEnabled(true);
                 }
                 new FocusRequester(reqComp);
+            } else {
+                List<String> req = type.getRequiredFields();
+
+                List<String> opt;
+                if (biblatexMode) {
+                    opt = type.getPrimaryOptionalFields();
+
+                    List<String> opt2 = type.getSecondaryOptionalFields();
+
+                    optComp2.setFields(opt2);
+                    optComp2.setEnabled(true);
+                } else {
+                    opt = type.getOptionalFields();
+                }
+                reqComp.setFields(req);
+                reqComp.setEnabled(true);
+                optComp.setFields(opt);
+                optComp.setEnabled(true);
             }
         } else {
             reqComp.setFields(rl);
@@ -365,11 +365,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
      * the right-click menus' change type menu is up-to-date.
      */
     private void updateTypesForEntries(String typeName) {
-        if (frame.getTabbedPane().getTabCount() == 0) {
-            return;
-        }
-        for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-            BasePanel bp = (BasePanel) frame.getTabbedPane().getComponentAt(i);
+        for (int i = 0; i < frame.getBasePanelCount(); i++) {
+            BasePanel bp = frame.getBasePanelAt(i);
 
             // Invalidate associated cached entry editor
             bp.entryEditors.remove(typeName);
@@ -385,11 +382,9 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     }
 
     private void updateTables() {
-        if (frame.getTabbedPane().getTabCount() == 0) {
-            return;
-        }
-        for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-            frame.getTabbedPane().getComponentAt(i);
+        for (int i = 0; i < frame.getBasePanelCount(); i++) {
+            ((javax.swing.table.AbstractTableModel) frame.getBasePanelAt(i).mainTable.getModel())
+                    .fireTableDataChanged();
         }
     }
 
@@ -412,13 +407,11 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 List<String> opt1 = new ArrayList<>();
                 List<String> opt2 = new ArrayList<>();
 
-                if (biblatexMode) {
-                    if (of.size() != 0) {
+                if (!(of.isEmpty())) {
+                    if (biblatexMode) {
                         opt1 = type.getPrimaryOptionalFields();
                         opt2 = type.getSecondaryOptionalFields();
-                    }
-                } else {
-                    if (of.size() != 0) {
+                    } else {
                         opt1 = of;
                     }
                 }

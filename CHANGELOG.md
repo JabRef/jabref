@@ -15,6 +15,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Changed
 
 ### Fixed
+- Changes in customized entry types are now directly reflected in the table when clicking "Apply" or "OK"
 
 ### Removed
 
