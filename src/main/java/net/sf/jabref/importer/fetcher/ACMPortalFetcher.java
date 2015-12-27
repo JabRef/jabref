@@ -85,8 +85,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private int piv;
 
-    private static final Pattern HITS_PATTERN = Pattern.compile("<strong>(\\d+)</strong> results found");
-    private static final Pattern MAX_HITS_PATTERN = Pattern.compile("Result \\d+ &ndash; \\d+ of (\\d+)");
+    private static final Pattern HITS_PATTERN = Pattern.compile("<strong>(\\d+,*\\d*)</strong> results found");
+    private static final Pattern MAX_HITS_PATTERN = Pattern
+            .compile("Result \\d+,*\\d* &ndash; \\d+,*\\d* of (\\d+,*\\d*)");
 
     private static final Pattern FULL_CITATION_PATTERN = Pattern.compile("<a href=\"(citation.cfm.*)\" target.*");
 
@@ -131,15 +132,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             String page = Util.getResults(url);
 
-            int hits = getNumberOfHits(page, "<div id=\"resfound\">", ACMPortalFetcher.HITS_PATTERN);
+            String resultsFound = "<div id=\"resfound\">";
+            int hits = getNumberOfHits(page, resultsFound, ACMPortalFetcher.HITS_PATTERN);
 
-            int index = page.indexOf("<div id=\"resfound\">");
+            int index = page.indexOf(resultsFound);
             if (index >= 0) {
-                page = page.substring(index + 5);
-                index = page.indexOf("<div id=\"resfound\">");
-                if (index >= 0) {
-                    page = page.substring(index);
-                }
+                page = page.substring(index + resultsFound.length());
             }
 
             if (hits == 0) {
@@ -147,6 +145,11 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                         terms),
                         Localization.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
+            } else if (hits > 20) {
+                status.showMessage(
+                        Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
+                                String.valueOf(hits), String.valueOf(PER_PAGE)),
+                        Localization.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
             }
 
             hits = getNumberOfHits(page, "<div class=\"pagerange\">", ACMPortalFetcher.MAX_HITS_PATTERN);
@@ -389,7 +392,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             Matcher m = pattern.matcher(substring);
             if (m.find()) {
                 try {
-                    return Integer.parseInt(m.group(1));
+                    String number = m.group(1);
+                    number = number.replaceAll(",", ""); // Remove , as in 1,234
+                    return Integer.parseInt(number);
                 } catch (IllegalStateException | NumberFormatException ex) {
                     throw new IOException("Cannot parse number of hits");
                 }
