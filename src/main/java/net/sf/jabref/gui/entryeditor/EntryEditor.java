@@ -1298,7 +1298,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            // 1. get Bibtexentry for selected index (already have)
+            // 1. get BibEntry for selected index (already have)
             // 2. update label
 
             // Store the current edit in case this action is called during the
