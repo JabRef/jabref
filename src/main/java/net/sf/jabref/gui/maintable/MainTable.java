@@ -102,9 +102,6 @@ public class MainTable extends JTable {
     // Constants used to define how a cell should be rendered.
     private static final int REQUIRED = 1;
     private static final int OPTIONAL = 2;
-    public static final int REQ_STRING = 1;
-    public static final int REQ_NUMBER = 2;
-    public static final int OPT_STRING = 3;
     private static final int OTHER = 3;
     private static final int BOOLEAN = 4;
 
@@ -334,11 +331,7 @@ public class MainTable extends JTable {
         }
 
         else if (column == 0) {
-            // Return a renderer with red background if the entry is incomplete.
-            if (!isComplete(row)) {
-                MainTable.incRenderer.setNumber(row);
-                renderer = MainTable.incRenderer;
-            } else {
+            if (isComplete(row)) {
                 MainTable.compRenderer.setNumber(row);
                 int marking = isMarked(row);
                 if (marking > 0) {
@@ -348,6 +341,10 @@ public class MainTable extends JTable {
                 } else {
                     renderer = MainTable.compRenderer;
                 }
+            } else {
+                // Return a renderer with red background if the entry is incomplete.
+                MainTable.incRenderer.setNumber(row);
+                renderer = MainTable.incRenderer;
             }
             renderer.setHorizontalAlignment(JLabel.CENTER);
         }
@@ -493,15 +490,15 @@ public class MainTable extends JTable {
 
                 // TODO where is this prefix set?
 //                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX))
-                if (!sortFields[i].startsWith("iconcol:")) {
-                    index = tableFormat.getColumnIndex(sortFields[i]);
-                } else {
+                if (sortFields[i].startsWith("iconcol:")) {
                     for (int j = 0; j < tableFormat.getColumnCount(); j++) {
                         if (sortFields[i].equals(tableFormat.getColumnName(j))) {
                             index = j;
                             break;
                         }
                     }
+                } else {
+                    index = tableFormat.getColumnIndex(sortFields[i]);
                 }
                 if (index >= 0) {
                     comparatorChooser.appendComparator(index, 0, sortDirections[i]);
@@ -702,8 +699,7 @@ public class MainTable extends JTable {
     private static GeneralRenderer[] markedRenderers;
 
     private static IncompleteRenderer incRenderer;
-    private static CompleteRenderer
-            compRenderer;
+    private static CompleteRenderer compRenderer;
     private static CompleteRenderer grayedOutNumberRenderer;
     private static CompleteRenderer veryGrayedOutNumberRenderer;
 

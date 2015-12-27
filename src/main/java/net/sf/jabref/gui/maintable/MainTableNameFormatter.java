@@ -12,31 +12,31 @@ public class MainTableNameFormatter {
      * @param nameToFormat The contents of the name field.
      * @return The formatted name field.
      */
-    public static String formatName(String nameToFormat) {
+    public static String formatName(final String nameToFormat) {
         if (nameToFormat == null) {
             return null;
         }
 
         // Read name format options:
-        boolean namesNatbib = Globals.prefs.getBoolean(JabRefPreferences.NAMES_NATBIB); //MK:
-        boolean namesLastOnly = Globals.prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
-        boolean namesAsIs = Globals.prefs.getBoolean(JabRefPreferences.NAMES_AS_IS);
-        boolean abbr_names = Globals.prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES); //MK:
-        boolean namesFf = Globals.prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST);
-        boolean namesLf = !(namesAsIs || namesFf || namesNatbib || namesLastOnly); // None of the above.
+        final boolean namesNatbib = Globals.prefs.getBoolean(JabRefPreferences.NAMES_NATBIB); //MK:
+        final boolean namesLastOnly = Globals.prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
+        final boolean namesAsIs = Globals.prefs.getBoolean(JabRefPreferences.NAMES_AS_IS);
+        final boolean namesFf = Globals.prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST);
+
+        final boolean abbrAuthorNames = Globals.prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES); //MK:
 
         if (namesAsIs) {
             return nameToFormat;
         } else if (namesNatbib) {
-            nameToFormat = AuthorList.fixAuthor_Natbib(nameToFormat);
+            return AuthorList.fixAuthor_Natbib(nameToFormat);
         } else if (namesLastOnly) {
-            nameToFormat = AuthorList.fixAuthor_lastNameOnlyCommas(nameToFormat, false);
+            return AuthorList.fixAuthor_lastNameOnlyCommas(nameToFormat, false);
         } else if (namesFf) {
-            nameToFormat = AuthorList.fixAuthor_firstNameFirstCommas(nameToFormat, abbr_names, false);
-        } else if (namesLf) {
-            nameToFormat = AuthorList.fixAuthor_lastNameFirstCommas(nameToFormat, abbr_names, false);
+            return AuthorList.fixAuthor_firstNameFirstCommas(nameToFormat, abbrAuthorNames, false);
         }
-        return nameToFormat;
+
+        // None of namesAsIs, namesNatbib, namesAsIs, namesFf
+        return AuthorList.fixAuthor_lastNameFirstCommas(nameToFormat, abbrAuthorNames, false);
     }
 
 }
