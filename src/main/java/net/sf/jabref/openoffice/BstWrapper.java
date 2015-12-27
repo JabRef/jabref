@@ -44,6 +44,9 @@ class BstWrapper {
 
     private static final Log LOGGER = LogFactory.getLog(BstWrapper.class);
 
+    private static final Pattern BIB_ITEM_TAG = Pattern.compile("\\\\[a-zA-Z]*item\\{.*\\}");
+
+
     public BstWrapper() {
 
     }
@@ -74,13 +77,11 @@ class BstWrapper {
     }
 
 
-    private static final Pattern bibitemTag = Pattern.compile("\\\\[a-zA-Z]*item\\{.*\\}");
-
 
     private Map<String, String> parseResult(String result) {
         Map<String, String> map = new HashMap<>();
         // Look through for instances of \bibitem :
-        Matcher m = BstWrapper.bibitemTag.matcher(result);
+        Matcher m = BstWrapper.BIB_ITEM_TAG.matcher(result);
         ArrayList<Integer> indices = new ArrayList<>();
         ArrayList<Integer> endIndices = new ArrayList<>();
         ArrayList<String> keys = new ArrayList<>();

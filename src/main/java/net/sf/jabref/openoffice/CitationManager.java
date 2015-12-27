@@ -129,10 +129,10 @@ class CitationManager {
 
         final String refMarkName;
         String pageInfo;
-        final String keyString;
+        private final String keyString;
         final String context;
-        final String origPageInfo;
-        final List<String> keys;
+        private final String origPageInfo;
+        private final List<String> keys;
 
 
         public CitEntry(String refMarkName, List<String> keys, String context, String pageInfo) {
@@ -156,10 +156,10 @@ class CitationManager {
                     || ((pageInfo == null) && (origPageInfo != null))) {
                 return true;
             }
-            if (pageInfo != null) {
-                return pageInfo.compareTo(origPageInfo) != 0;
-            } else {
+            if (pageInfo == null) {
                 return false;
+            } else {
+                return pageInfo.compareTo(origPageInfo) != 0;
             }
         }
 
@@ -194,7 +194,7 @@ class CitationManager {
             case 0:
                 return citEntry.context;
             default:
-                return citEntry.pageInfo != null ? citEntry.pageInfo : "";
+                return citEntry.pageInfo == null ? "" : citEntry.pageInfo;
             }
         }
     }
@@ -217,12 +217,12 @@ class CitationManager {
 
     class SingleCitDialog {
 
-        final JDialog singleCiteDialog;
-        final JTextField pageInfo = new JTextField(20);
-        final JLabel title;
-        final JButton okButton = new JButton(Localization.lang("OK"));
-        final JButton cancelButton = new JButton(Localization.lang("Cancel"));
-        final CitEntry _entry;
+        private final JDialog singleCiteDialog;
+        private final JTextField pageInfo = new JTextField(20);
+        private final JLabel title;
+        private final JButton okButton = new JButton(Localization.lang("OK"));
+        private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
+        private final CitEntry _entry;
 
 
         public SingleCitDialog(CitEntry entry) {
@@ -253,10 +253,10 @@ class CitationManager {
 
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (!pageInfo.getText().trim().isEmpty()) {
-                        _entry.pageInfo = pageInfo.getText().trim();
-                    } else {
+                    if (pageInfo.getText().trim().isEmpty()) {
                         _entry.pageInfo = null;
+                    } else {
+                        _entry.pageInfo = pageInfo.getText().trim();
                     }
                     tableModel.fireTableDataChanged();
                     singleCiteDialog.dispose();

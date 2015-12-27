@@ -54,10 +54,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private Layout defaultBibLayout;
 
     // reference layout mapped from entry type number:
-    private final HashMap<String, Layout> bibLayout = new HashMap<>();
+    private final Map<String, Layout> bibLayout = new HashMap<>();
 
-    private final HashMap<String, Object> properties = new HashMap<>();
-    private final HashMap<String, Object> citProperties = new HashMap<>();
+    private final Map<String, Object> properties = new HashMap<>();
+    private final Map<String, Object> citProperties = new HashMap<>();
 
     private final Pattern numPattern = Pattern.compile("-?\\d+");
 
@@ -186,10 +186,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return true if the file has not been modified, false otherwise.
      */
     private boolean isUpToDate() {
-        if (styleFile != null) {
-            return styleFile.lastModified() == OOBibStyle.styleFileModificationTime;
-        } else {
+        if (styleFile == null) {
             return true;
+        } else {
+            return styleFile.lastModified() == OOBibStyle.styleFileModificationTime;
         }
     }
 
@@ -277,7 +277,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @throws IOException
      */
     private void handleStructureLine(String line) {
-        int index = line.indexOf("=");
+        int index = line.indexOf('=');
         if ((index > 0) && (index < (line.length() - 1))) {
             String formatString = line.substring(index + 1);
             //System.out.println("'"+line.substring(0, index)+"' : '"+formatString+"'");
@@ -308,8 +308,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @param line The line containing the formatter names.
      * @throws IOException
      */
-    private void handlePropertiesLine(String line, HashMap<String, Object> map) {
-        int index = line.indexOf("=");
+    private void handlePropertiesLine(String line, Map<String, Object> map) {
+        int index = line.indexOf('=');
         if ((index > 0) && (index <= (line.length() - 1))) {
             String propertyName = line.substring(0, index).trim();
             String value = line.substring(index + 1);
@@ -342,10 +342,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     public Layout getReferenceFormat(String type) {
         Layout l = bibLayout.get(type.toLowerCase());
-        if (l != null) {
-            return l;
-        } else {
+        if (l == null) {
             return defaultBibLayout;
+        } else {
+            return l;
         }
     }
 
@@ -618,7 +618,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         StringBuffer sb = new StringBuffer(startBrace);
         for (int j = 0; j < entries.length; j++) {
 
-            int unlimA = unlimAuthors != null ? unlimAuthors[j] : -1;
+            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
             int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             BibEntry entry = entries[j];
@@ -690,7 +690,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < entries.length; i++) {
 
-            int unlimA = unlimAuthors != null ? unlimAuthors[i] : -1;
+            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[i];
             int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             // Check if this entry has been nulled due to grouping with the previous entry(ies):
@@ -898,10 +898,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     @Override
     public boolean equals(Object o) {
-        if (o != null) {
-            return styleFile.equals(((OOBibStyle) o).styleFile);
-        } else {
+        if (o == null) {
             return false;
+        } else {
+            return styleFile.equals(((OOBibStyle) o).styleFile);
         }
     }
 

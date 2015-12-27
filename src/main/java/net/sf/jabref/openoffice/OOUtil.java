@@ -45,9 +45,12 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 class OOUtil {
 
-    private static final Pattern htmlTag = Pattern.compile("</?[a-z]+>");
+    private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
 
-    static final OOPreFormatter postformatter = new OOPreFormatter();
+    static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();
+
+    private static final String UNIQUEFIER_FIELD = "uniq";
+
 
 
     /**
@@ -65,19 +68,26 @@ class OOUtil {
             Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
             throws Exception {
 
-        final String UNIQUEFIER_FIELD = "uniq";
-
         // Backup the value of the uniq field, just in case the entry already has it:
         String oldUniqVal = entry.getField(UNIQUEFIER_FIELD);
 
+
         // Set the uniq field with the supplied uniquefier:
-        entry.setField(UNIQUEFIER_FIELD, uniquefier);
+        if (uniquefier == null) {
+            entry.clearField(UNIQUEFIER_FIELD);
+        } else {
+            entry.setField(UNIQUEFIER_FIELD, uniquefier);
+        }
 
         // Do the layout for this entry:
         String lText = layout.doLayout(entry, database);
 
         // Afterwards, reset the old value:
-        entry.setField(UNIQUEFIER_FIELD, oldUniqVal);
+        if (oldUniqVal == null) {
+            entry.clearField(UNIQUEFIER_FIELD);
+        } else {
+            entry.setField(UNIQUEFIER_FIELD, oldUniqVal);
+        }
 
         // Insert the formatted text:
         OOUtil.insertOOFormattedTextAtCurrentLocation(text, cursor, lText, parStyle);
@@ -117,11 +127,11 @@ class OOUtil {
         //insertTextAtCurrentLocation(text, cursor, "_",
         //    false, false, false, false, false, false);
         //cursor.goLeft((short)1, true);
-        Matcher m = OOUtil.htmlTag.matcher(lText);
+        Matcher m = OOUtil.HTML_TAG.matcher(lText);
         while (m.find()) {
             String ss = lText.substring(piv, m.start());
             if (!ss.isEmpty()) {
-                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, bold % 2 > 0, italic % 2 > 0,
+                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
                         mono > 0, smallCaps > 0, sup > 0, sub > 0);
             }
             String tag = m.group();
@@ -158,7 +168,7 @@ class OOUtil {
 
         if (piv < lText.length()) {
             OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv),
-                    bold % 2 > 0, italic % 2 > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
+                    (bold % 2) > 0, (italic % 2) > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
         }
 
         cursor.collapseToEnd();
@@ -307,8 +317,8 @@ class OOUtil {
             String value = e.getField(field);
             // If the running JabRef version doesn't support post-processing in Layout,
             // preprocess fields instead:
-            if (!OpenOfficePanel.postLayoutSupported && value != null) {
-                e.setField(field, OOUtil.postformatter.format(value));
+            if (!OpenOfficePanel.postLayoutSupported && (value != null)) {
+                e.setField(field, OOUtil.POSTFORMATTER.format(value));
             }
         }
         return e;
