@@ -42,6 +42,11 @@ public class IconTheme {
     public static final int DEFAULT_SIZE = 24;
     public static final int SMALL_SIZE = 16;
 
+    private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
+            IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
+    private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
+
+
     private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
 
     static {
@@ -237,9 +242,6 @@ public class IconTheme {
     }
 
 
-    private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
-    private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
-
     /**
      * Constructs an ImageIcon for the image representing the given function, in the resource
      * file listing images.
@@ -292,7 +294,7 @@ public class IconTheme {
                     continue;
                 }
 
-                int index = line.indexOf("=");
+                int index = line.indexOf('=');
                 String key = line.substring(0, index).trim();
                 String value = prefix + line.substring(index + 1).trim();
                 result.put(key, value);

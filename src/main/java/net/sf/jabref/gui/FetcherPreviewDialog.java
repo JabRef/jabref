@@ -232,7 +232,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     static class PreviewRenderer implements TableCellRenderer {
 
-        final JLabel label = new JLabel();
+        private final JLabel label = new JLabel();
 
 
         @Override
@@ -247,7 +247,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     class EntryTable extends JTable {
 
-        final PreviewRenderer renderer = new PreviewRenderer();
+        private final PreviewRenderer renderer = new PreviewRenderer();
 
 
         public EntryTable(TableModel model) {

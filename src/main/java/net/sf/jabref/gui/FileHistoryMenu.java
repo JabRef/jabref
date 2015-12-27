@@ -92,7 +92,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String name = ((JMenuItem) e.getSource()).getText();
-        int pos = name.indexOf(" ");
+        int pos = name.indexOf(' ');
         name = name.substring(pos + 1);
         final File fileToOpen = new File(name);
 

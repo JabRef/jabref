@@ -86,10 +86,10 @@ public class EntryMarker {
             int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
             if (index >= 0) {
                 // Marked 1 for this user.
-                if (!onlyMaxLevel) {
-                    newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
-                } else {
+                if (onlyMaxLevel) {
                     return;
+                } else {
+                    newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
                 }
             } else {
                 Matcher m = MARK_NUMBER_PATTERN.matcher(s);

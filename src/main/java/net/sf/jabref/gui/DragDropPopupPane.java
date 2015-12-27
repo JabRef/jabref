@@ -23,7 +23,8 @@ import javax.swing.JPopupMenu;
  * Adds popup functionality to DragDropPane
  */
 public class DragDropPopupPane extends DragDropPane {
-    private JPopupMenu popupMenu;
+
+    private final JPopupMenu popupMenu;
 
     public DragDropPopupPane(JPopupMenu menu) {
         this.popupMenu = menu;

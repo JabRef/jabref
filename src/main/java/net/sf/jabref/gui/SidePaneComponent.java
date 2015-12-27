@@ -57,7 +57,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
         setBorder(BorderFactory.createEmptyBorder());
     }
 
-    void hideAway() {
+    private void hideAway() {
         manager.hideComponent(this);
     }
 

@@ -87,7 +87,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         addSeparator();
 
         JMenu markSpecific = JabRefFrame.subMenu("Mark specific color");
-        JabRefFrame frame = panel.frame;
+        JabRefFrame frame = JabRef.jrf;
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(frame, i).getMenuItem());
         }
@@ -113,7 +113,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
                 JMenu rankingMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankingMenu, Rank.getInstance(), panel.frame);
+                RightClickMenu.populateSpecialFieldMenu(rankingMenu, Rank.getInstance(), JabRef.jrf);
                 add(rankingMenu);
             }
 
@@ -121,24 +121,24 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             // if multiple values are selected ("if (multiple)"), two options (set / clear) should be offered
             // if one value is selected either set or clear should be offered
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
-                add(Relevance.getInstance().getValues().get(0).getMenuAction(panel.frame));
+                add(Relevance.getInstance().getValues().get(0).getMenuAction(JabRef.jrf));
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
-                add(Quality.getInstance().getValues().get(0).getMenuAction(panel.frame));
+                add(Quality.getInstance().getValues().get(0).getMenuAction(JabRef.jrf));
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
-                add(Printed.getInstance().getValues().get(0).getMenuAction(panel.frame));
+                add(Printed.getInstance().getValues().get(0).getMenuAction(JabRef.jrf));
             }
 
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
                 JMenu priorityMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(priorityMenu, Priority.getInstance(), panel.frame);
+                RightClickMenu.populateSpecialFieldMenu(priorityMenu, Priority.getInstance(), JabRef.jrf);
                 add(priorityMenu);
             }
 
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
                 JMenu readStatusMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(readStatusMenu, ReadStatus.getInstance(), panel.frame);
+                RightClickMenu.populateSpecialFieldMenu(readStatusMenu, ReadStatus.getInstance(), JabRef.jrf);
                 add(readStatusMenu);
             }
 

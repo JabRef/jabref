@@ -71,7 +71,7 @@ class StringDialog extends JDialog {
     private final StringTable table;
     private final HelpAction helpAction;
 
-    private PositionWindow pw;
+    private final PositionWindow pw;
 
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
@@ -148,10 +148,10 @@ class StringDialog extends JDialog {
         conPane.add(tlb, BorderLayout.NORTH);
         conPane.add(pan, BorderLayout.CENTER);
 
-        if (panel.getDatabaseFile() != null) {
-            setTitle(GUIGlobals.stringsTitle + ": " + panel.getDatabaseFile().getName());
-        } else {
+        if (panel.getDatabaseFile() == null) {
             setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
+        } else {
+            setTitle(GUIGlobals.stringsTitle + ": " + panel.getDatabaseFile().getName());
         }
         pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
@@ -177,7 +177,7 @@ class StringDialog extends JDialog {
 
     class StringTable extends JTable {
 
-        final JScrollPane sp = new JScrollPane(this);
+        private final JScrollPane sp = new JScrollPane(this);
 
 
         public StringTable(StringTableModel stm) {
@@ -228,8 +228,8 @@ class StringDialog extends JDialog {
 
     class StringTableModel extends AbstractTableModel {
 
-        final BibDatabase tbase;
-        final StringDialog parent;
+        private final BibDatabase tbase;
+        private final StringDialog parent;
 
 
         public StringTableModel(StringDialog parent, BibDatabase base) {
@@ -334,18 +334,14 @@ class StringDialog extends JDialog {
 
 
     // The action concerned with closing the window.
-    private final CloseAction closeAction = new CloseAction(this);
+    private final CloseAction closeAction = new CloseAction();
 
 
     class CloseAction extends AbstractAction {
 
-        final StringDialog parent;
-
-
-        public CloseAction(StringDialog parent) {
+        public CloseAction() {
             super("Close window");
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close dialog"));
-            this.parent = parent;
         }
 
         @Override
@@ -357,7 +353,7 @@ class StringDialog extends JDialog {
 
     class NewStringAction extends AbstractAction {
 
-        final StringDialog parent;
+        private final StringDialog parent;
 
 
         public NewStringAction(StringDialog parent) {
@@ -407,12 +403,12 @@ class StringDialog extends JDialog {
     }
 
 
-    SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
+    private final SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
 
 
     static class SaveDatabaseAction extends AbstractAction {
 
-        final StringDialog parent;
+        private final StringDialog parent;
 
 
         public SaveDatabaseAction(StringDialog parent) {
@@ -429,7 +425,7 @@ class StringDialog extends JDialog {
 
     class RemoveStringAction extends AbstractAction {
 
-        final StringDialog parent;
+        private final StringDialog parent;
 
 
         public RemoveStringAction(StringDialog parent) {

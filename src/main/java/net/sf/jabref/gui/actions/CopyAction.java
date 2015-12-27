@@ -26,7 +26,7 @@ public class CopyAction extends AbstractAction {
             String data = field.getSelectedText();
             if (data != null) {
                 if (!data.isEmpty()) {
-                    ClipBoardManager.clipBoard.setClipboardContents(data);
+                    ClipBoardManager.CLIPBOARD.setClipboardContents(data);
                 }
             }
         }
