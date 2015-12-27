@@ -33,9 +33,9 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     private final Set<BibEntry> m_previousAssignmentBackup;
     private final Set<BibEntry> m_newAssignmentBackup;
     /** The path to the edited node */
-    private int[] m_pathToNode;
+    private int[] mPathToNode;
     /** The root of the global groups tree */
-    private GroupTreeNode m_groupsRootHandle;
+    private GroupTreeNode mGroupsRootHandle;
 
 
     /**
@@ -67,8 +67,8 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
      *            The node whose assignments were edited.
      */
     public void setEditedNode(GroupTreeNode node) {
-        m_groupsRootHandle = (GroupTreeNode) node.getRoot();
-        m_pathToNode = node.getIndexedPath();
+        mGroupsRootHandle = (GroupTreeNode) node.getRoot();
+        mPathToNode = node.getIndexedPath();
     }
 
     @Override
@@ -86,10 +86,10 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     @Override
     public void undo() {
         super.undo();
-        ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
-                m_pathToNode).getGroup();
+        ExplicitGroup group = (ExplicitGroup) mGroupsRootHandle.getChildAt(
+                mPathToNode).getGroup();
         group.clearAssignments();
-        for (BibEntry aM_previousAssignmentBackup : m_previousAssignmentBackup) {
+        for (final BibEntry aM_previousAssignmentBackup : m_previousAssignmentBackup) {
             group.addEntry(aM_previousAssignmentBackup);
         }
     }
@@ -97,10 +97,10 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     @Override
     public void redo() {
         super.redo();
-        ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
-                m_pathToNode).getGroup();
+        ExplicitGroup group = (ExplicitGroup) mGroupsRootHandle.getChildAt(
+                mPathToNode).getGroup();
         group.clearAssignments();
-        for (BibEntry aM_newAssignmentBackup : m_newAssignmentBackup) {
+        for (final BibEntry aM_newAssignmentBackup : m_newAssignmentBackup) {
             group.addEntry(aM_newAssignmentBackup);
         }
     }

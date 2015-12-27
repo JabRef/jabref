@@ -25,9 +25,9 @@ import net.sf.jabref.model.entry.BibEntry;
 
 class TransferableEntrySelection implements Transferable {
 
-    public static final DataFlavor flavorInternal;
-    private static final DataFlavor flavorExternal;
-    private static final DataFlavor[] flavors;
+    public static final DataFlavor FLAVOR_INTERNAL;
+    private static final DataFlavor FLAVOR_EXTERNAL;
+    private static final DataFlavor[] FLAVORS;
     private final BibEntry[] selectedEntries;
     private final String selectedEntriesCiteKeys;
 
@@ -43,9 +43,9 @@ class TransferableEntrySelection implements Transferable {
         } catch (ClassNotFoundException e) {
             // never happens
         }
-        flavorInternal = df1;
-        flavorExternal = df2;
-        flavors = new DataFlavor[] {TransferableEntrySelection.flavorInternal, TransferableEntrySelection.flavorExternal};
+        FLAVOR_INTERNAL = df1;
+        FLAVOR_EXTERNAL = df2;
+        FLAVORS = new DataFlavor[] {TransferableEntrySelection.FLAVOR_INTERNAL, TransferableEntrySelection.FLAVOR_EXTERNAL};
     }
 
 
@@ -54,8 +54,8 @@ class TransferableEntrySelection implements Transferable {
         StringBuilder keys = new StringBuilder();
         for (int i = 0; i < selectedEntries.length; ++i) {
             keys.append(selectedEntries[i].getCiteKey());
-            if (i + 1 < selectedEntries.length) {
-                keys.append(",");
+            if ((i + 1) < selectedEntries.length) {
+                keys.append(',');
             }
         }
         selectedEntriesCiteKeys = keys.toString();
@@ -63,13 +63,13 @@ class TransferableEntrySelection implements Transferable {
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return TransferableEntrySelection.flavors;
+        return TransferableEntrySelection.FLAVORS;
     }
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor someFlavor) {
-        return someFlavor.equals(TransferableEntrySelection.flavorInternal)
-                || someFlavor.equals(TransferableEntrySelection.flavorExternal);
+        return someFlavor.equals(TransferableEntrySelection.FLAVOR_INTERNAL)
+                || someFlavor.equals(TransferableEntrySelection.FLAVOR_EXTERNAL);
     }
 
     @Override
@@ -78,14 +78,14 @@ class TransferableEntrySelection implements Transferable {
         if (!isDataFlavorSupported(someFlavor)) {
             throw new UnsupportedFlavorException(someFlavor);
         }
-        if (someFlavor.equals(TransferableEntrySelection.flavorInternal)) {
+        if (someFlavor.equals(TransferableEntrySelection.FLAVOR_INTERNAL)) {
             return this;
         }
         String s = includeCiteKeyword ?
                 "\\cite{" + selectedEntriesCiteKeys + "}"
                 : selectedEntriesCiteKeys;
         return new ByteArrayInputStream(s.getBytes(
-                TransferableEntrySelection.flavorExternal.getParameter("charset").trim()));
+                TransferableEntrySelection.FLAVOR_EXTERNAL.getParameter("charset").trim()));
     }
 
     public BibEntry[] getSelection() {
