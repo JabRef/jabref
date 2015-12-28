@@ -104,8 +104,9 @@ public abstract class DBImporter extends DBImporterExporter {
                         rsEntryType.getStatement().close();
                     }
 
-                    List<String> colNames = this.readColumnNames(conn);
-                    for (String next : colNames) {
+                    List<String> allColNames = this.readColumnNames(conn);
+                    List<String> colNames = new ArrayList<>(allColNames.size());
+                    for (String next : allColNames) {
                         if (!columnsNotConsideredForEntries.contains(next)) {
                             colNames.add(next);
                         }
