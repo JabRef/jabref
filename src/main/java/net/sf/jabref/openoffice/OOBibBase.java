@@ -968,12 +968,6 @@ class OOBibBase {
 
     }
 
-    public void insertFullReferenceAtViewCursor(Map<BibEntry, BibDatabase> entries,
-            OOBibStyle style, String parFormat) throws Exception {
-        XTextViewCursor xViewCursor = xViewCursorSupplier.getViewCursor();
-        insertFullReferenceAtCursor(xViewCursor, entries, style, parFormat);
-    }
-
     public void insertMarkedUpTextAtViewCursor(String lText, String parFormat) throws Exception {
         XTextViewCursor xViewCursor = xViewCursorSupplier.getViewCursor();
         XTextCursor cursor = text.createTextCursorByRange(xViewCursor.getEnd());
@@ -1135,17 +1129,6 @@ class OOBibBase {
         xSimple.insertString(xRange, citText, false);
     }
 
-    private void removeBookMark(String name) throws Exception {
-        XBookmarksSupplier xBookmarksSupplier = UnoRuntime.queryInterface(
-                XBookmarksSupplier.class, xCurrentComponent);
-        if (xBookmarksSupplier.getBookmarks().hasByName(name)) {
-            Object o = xBookmarksSupplier.getBookmarks().getByName(name);
-            XTextContent bm = UnoRuntime.queryInterface(
-                    XTextContent.class, o);
-            text.removeTextContent(bm);
-        }
-    }
-
     private void removeReferenceMark(String name) throws Exception {
         XReferenceMarksSupplier xSupplier = UnoRuntime.queryInterface(
                 XReferenceMarksSupplier.class, xCurrentComponent);
@@ -1270,10 +1253,8 @@ class OOBibBase {
                     i++;
                 }
                 String keyString = sb.toString();
-                boolean inParenthesis = true;
                 // Insert bookmark:
-                String bName = getUniqueReferenceMarkName(keyString,
-                        inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT);
+                String bName = getUniqueReferenceMarkName(keyString, OOBibBase.AUTHORYEAR_PAR);
                 insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
                 names[piv + 1] = bName;
                 madeModifications = true;

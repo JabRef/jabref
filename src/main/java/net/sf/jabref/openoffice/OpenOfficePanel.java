@@ -21,7 +21,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
-import net.sf.jabref.external.push.PushToApplication;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -45,15 +44,13 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
  * argument to the start() method. It displays buttons for testing interaction functions
  * between JabRef and OpenOffice.
  */
-public class OpenOfficePanel extends AbstractWorker implements PushToApplication {
+public class OpenOfficePanel extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
@@ -87,16 +84,11 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private final JButton pushEntriesInt = new JButton(Localization.lang("Cite in-text"));
     private final JButton pushEntriesEmpty = new JButton(Localization.lang("Insert empty citation"));
     private final JButton pushEntriesAdvanced = new JButton(Localization.lang("Cite special"));
-    private final JButton focus = new JButton("Focus OO document");
     private final JButton update;
-    private final JButton insertFullRef = new JButton("Insert reference text");
     private final JButton merge = new JButton(Localization.lang("Merge citations"));
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
     private final JButton help = new HelpAction(GUIGlobals.helpDiag, "OpenOfficeIntegration.html").getIconButton();
-    private final JButton test = new JButton("Test");
-    private JRadioButton inPar;
-    private JPanel settings;
     private String styleFile;
     private OOBibBase ooBase;
     private JabRefFrame frame;
@@ -282,13 +274,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
         });
 
-        focus.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ooBase.setFocus();
-            }
-        });
         update.setToolTipText(Localization.lang("Ensure that the bibliography is up-to-date"));
         Action updateAction = new AbstractAction() {
 
@@ -335,18 +320,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         };
         update.addActionListener(updateAction);
 
-        insertFullRef.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    insertFullRefs();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
-
         merge.setToolTipText(Localization.lang("Combine pairs of citations that are separated by spaces only"));
         merge.addActionListener(new ActionListener() {
 
@@ -384,39 +357,14 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
         });
 
-        test.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    //pushEntries(false, true, true);
-
-                    //ooBase.testFrameHandling();
-
-                    //ooBase.combineCiteMarkers(frame.getCurrentBasePanel().database(), style);
-                    //insertUsingBST();
-                    //ooBase.testFootnote();
-                    //ooBase.refreshCiteMarkers(frame.getCurrentBasePanel().database(), style);
-                    //ooBase.createBibTextSection(true);
-                    //ooBase.clearBibTextSectionContent();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-
         selectDocument.setEnabled(false);
         pushEntries.setEnabled(false);
         pushEntriesInt.setEnabled(false);
         pushEntriesEmpty.setEnabled(false);
         pushEntriesAdvanced.setEnabled(false);
-        focus.setEnabled(false);
         update.setEnabled(false);
-        insertFullRef.setEnabled(false);
         merge.setEnabled(false);
         manageCitations.setEnabled(false);
-        test.setEnabled(false);
         diag = new JDialog((JFrame) null, "OpenOffice panel", false);
 
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("fill:pref:grow",
@@ -432,10 +380,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         bb.append(selectDocument);
         bb.append(update);
         bb.append(help);
-
-        //b.append(connect);
-        //b.append(manualConnect);
-        //b.append(selectDocument);
         b.append(bb.getPanel());
         b.append(setStyleFile);
         b.append(pushEntries);
@@ -445,12 +389,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         b.append(merge);
         b.append(manageCitations);
         b.append(settingsB);
-        //b.append(focus);
-        //b.append(update);
-
-        //b.append(insertFullRef);
-        //b.append(test);
-        //diag.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
 
         JPanel content = new JPanel();
         comp.setContentContainer(content);
@@ -461,8 +399,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 .put(Globals.getKeyPrefs().getKey(KeyBinding.REFRESH_OO), "Refresh OO");
         frame.getTabbedPane().getActionMap().put("Refresh OO", updateAction);
 
-        //diag.pack();
-        //diag.setVisible(true);
     }
 
     private java.util.List<BibDatabase> getBaseList() {
@@ -479,16 +415,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     private void connect(boolean auto) {
-        /*if (ooBase != null) {
-            try {
-                java.util.List<XTextDocument> list = ooBase.getTextDocuments();
-                // TODO: how to find the title of the documents?
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return;
-        }*/
-
         String ooBaseDirectory;
         if (auto) {
             AutoDetectPaths adp = new AutoDetectPaths(diag);
@@ -567,12 +493,9 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             pushEntriesInt.setEnabled(true);
             pushEntriesEmpty.setEnabled(true);
             pushEntriesAdvanced.setEnabled(true);
-            focus.setEnabled(true);
             update.setEnabled(true);
-            insertFullRef.setEnabled(true);
             merge.setEnabled(true);
             manageCitations.setEnabled(true);
-            test.setEnabled(true);
 
         } catch (UnsatisfiedLinkError e) {
             e.printStackTrace();
@@ -789,31 +712,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 Localization.lang("Connection lost"), JOptionPane.ERROR_MESSAGE);
     }
 
-    private void insertFullRefs() {
-        try {
-            // Create or clear bibliography:
-            /*boolean hadBib = ooBase.createBibTextSection(true);
-            if (hadBib)
-                ooBase.clearBibTextSectionContent();
-              */
-            BasePanel panel = frame.getCurrentBasePanel();
-            Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
-            if (panel != null) {
-                final BibDatabase database = panel.database();
-                BibEntry[] e = panel.getSelectedEntries();
-                for (BibEntry anE : e) {
-                    entries.put(anE, database);
-                }
-
-                ooBase.insertFullReferenceAtViewCursor(entries, style, "Default");
-            }
-        } catch (UndefinedParagraphFormatException ex) {
-            reportUndefinedParagraphFormat(ex);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-    }
 
     private void reportUndefinedParagraphFormat(UndefinedParagraphFormatException ex) {
         JOptionPane.showMessageDialog(frame, "<html>" + Localization.lang("Your style file specifies the paragraph format '%0', "
@@ -893,113 +791,10 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         menu.show(settingsB, 0, settingsB.getHeight());
     }
 
-    private void pushEntries(boolean inParenthesis, BibEntry[] entries) {
 
-        final BibDatabase database = frame.getCurrentBasePanel().database();
-        if (entries.length > 0) {
-
-            AdvancedCiteDialog acd = new AdvancedCiteDialog(frame);
-            acd.showDialog();
-            if (acd.cancelled()) {
-                return;
-            }
-            String pageInfo = null;
-            if (!acd.getPageInfo().isEmpty()) {
-                pageInfo = acd.getPageInfo();
-            }
-            inParenthesis = acd.isInParenthesisCite();
-
-
-            try {
-                ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, true,
-                        pageInfo, Globals.prefs.getBoolean(JabRefPreferences.SYNC_OO_WHEN_CITING));
-            } catch (ConnectionLostException ex) {
-                showConnectionLostErrorMessage();
-            } catch (UndefinedCharacterFormatException ex) {
-                reportUndefinedCharacterFormat(ex);
-            } catch (UndefinedParagraphFormatException ex) {
-                reportUndefinedParagraphFormat(ex);
-            } catch (Exception ex) {
-                LOGGER.warn("Could not insert entry", ex);
-            }
-        }
-    }
-
-    @Override
     public String getName() {
-        return "Push to OpenOffice";
-    }
-
-    @Override
-    public String getApplicationName() {
         return "OpenOffice";
     }
-
-    @Override
-    public String getTooltip() {
-        return "Push selection to OpenOffice";
-    }
-
-    @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("openoffice");
-    }
-
-    @Override
-    public JPanel getSettingsPanel() {
-        if (settings == null) {
-            initSettingsPanel();
-        }
-        return settings;
-    }
-
-    private void initSettingsPanel() {
-        boolean inParen = Globals.prefs.getBoolean(JabRefPreferences.OO_IN_PAR_CITATION);
-        inPar = new JRadioButton(Localization.lang("Use in-parenthesis citation"), inParen);
-        JRadioButton inText = new JRadioButton(Localization.lang("Use in-text citation"), !inParen);
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(inPar);
-        bg.add(inText);
-        settings = new JPanel();
-        settings.setLayout(new BorderLayout());
-        settings.add(inPar, BorderLayout.NORTH);
-        settings.add(inText, BorderLayout.SOUTH);
-    }
-
-    @Override
-    public void storeSettings() {
-        Globals.prefs.putBoolean(JabRefPreferences.OO_IN_PAR_CITATION, inPar.isSelected());
-    }
-
-    @Override
-    public void pushEntries(BibDatabase bibDatabase, BibEntry[] entries, String s, MetaData metaData) {
-        if (ooBase == null) {
-            connect(true);
-        }
-        if (ooBase != null) {
-            try {
-                if (style == null) {
-                    readStyleFile();
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
-                        Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            pushEntries(Globals.prefs.getBoolean(JabRefPreferences.OO_IN_PAR_CITATION), entries);
-        }
-    }
-
-    @Override
-    public void operationCompleted(BasePanel basePanel) {
-        // Do nothing
-    }
-
-    @Override
-    public boolean requiresBibtexKeys() {
-        return true;
-    }
-
 
     class OOPanel extends SidePaneComponent {
 
