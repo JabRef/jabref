@@ -18,6 +18,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Fixed
 - Changes in customized entry types are now directly reflected in the table when clicking "Apply" or "OK"
 - Reference list generation works for OpenOffice/LibreOffice again, fixes #593
+- ACM fetcher works again, fixes #545
 
 ### Removed
 
