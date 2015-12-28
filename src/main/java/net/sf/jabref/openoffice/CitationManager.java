@@ -29,6 +29,10 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -45,6 +49,8 @@ class CitationManager {
     private final EventList<CitEntry> list;
     private final JTable table;
     private final DefaultEventTableModel<CitEntry> tableModel;
+
+    private static final Log LOGGER = LogFactory.getLog(CitationManager.class);
 
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase) throws Exception {
@@ -84,7 +90,7 @@ class CitationManager {
                 try {
                     storeSettings();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Problem modifying citation", ex);
                     JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
                 }
                 diag.dispose();
@@ -132,12 +138,10 @@ class CitationManager {
         private final String keyString;
         final String context;
         private final String origPageInfo;
-        private final List<String> keys;
 
 
         public CitEntry(String refMarkName, List<String> keys, String context, String pageInfo) {
             this.refMarkName = refMarkName;
-            this.keys = keys;
             this.context = context;
             this.pageInfo = pageInfo;
             this.origPageInfo = pageInfo;
