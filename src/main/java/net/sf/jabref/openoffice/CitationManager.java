@@ -171,22 +171,18 @@ class CitationManager {
 
         @Override
         public String getColumnName(int i) {
-            switch (i) {
-            case 0:
+            if (i == 0) {
                 return Localization.lang("Citation");
-                //case 1: return Globals.lang("Context");
-            default:
+            } else {
                 return Localization.lang("Extra information");
             }
         }
 
         @Override
         public Object getColumnValue(CitEntry citEntry, int i) {
-            switch (i) {
-            //case 0: return citEntry.keyString;
-            case 0:
+            if (i == 0) {
                 return citEntry.context;
-            default:
+            } else {
                 return citEntry.pageInfo == null ? "" : citEntry.pageInfo;
             }
         }
@@ -203,8 +199,6 @@ class CitationManager {
                     scd.showDialog();
                 }
             }
-            //else if (e.isPopupTrigger())
-            //    processPopupTrigger(e);
         }
     }
 

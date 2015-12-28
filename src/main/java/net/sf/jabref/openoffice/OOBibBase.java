@@ -70,9 +70,8 @@ class OOBibBase {
     private final XDesktop xDesktop;
     private XTextViewCursorSupplier xViewCursorSupplier;
     private XComponent xCurrentComponent;
-    private XComponentLoader xComponentLoader;
-    private XPropertyContainer userProperties;
     private XPropertySet propertySet;
+    private XPropertyContainer userProperties;
 
     private final boolean atEnd;
     private final AuthorYearTitleComparator entryComparator = new AuthorYearTitleComparator();
@@ -117,7 +116,7 @@ class OOBibBase {
             throw new Exception("No Writer documents found");
         }
         else if (ls.size() > 1) {
-            selected = OOUtil.selectComponent(null, xDesktop, ls);
+            selected = OOUtil.selectComponent(ls);
         } else {
             selected = ls.get(0);
         }
@@ -180,8 +179,7 @@ class OOBibBase {
         Object desktop = xServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
         XDesktop xD = UnoRuntime.queryInterface(XDesktop.class, desktop);
 
-        xComponentLoader = UnoRuntime.queryInterface(
-                XComponentLoader.class, desktop);
+        UnoRuntime.queryInterface(XComponentLoader.class, desktop);
 
         return xD;
 
@@ -278,7 +276,7 @@ class OOBibBase {
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
-                System.out.println("Storing page info: " + pageInfo);
+                LOGGER.info("Storing page info: " + pageInfo);
                 setCustomProperty(bName, pageInfo);
             }
 
@@ -445,10 +443,9 @@ class OOBibBase {
                         cEntries[j] = OOUtil.createAdaptedEntry(database.getEntryByKey(keys[j]));
                     }
                     if (cEntries[j] == null) {
-                        System.out.println("Bibtex key not found : '" + keys[j] + '\'');
-                        System.out.println("Problem with reference mark: '" + names[i] + '\'');
+                        LOGGER.info("Bibtex key not found : '" + keys[j] + '\'');
+                        LOGGER.info("Problem with reference mark: '" + names[i] + '\'');
                         cEntries[j] = new UndefinedBibtexEntry(keys[j]);
-                        //throw new BibtexEntryNotFoundException(keys[j], "");
                     }
                 }
 
@@ -495,10 +492,11 @@ class OOBibBase {
                         // and use that number for the cite marker:
                         int[] num = findCitedEntryIndex(names[i], cited);
 
-                        if (num != null) {
-                            citationMarker = style.getNumCitationMarker(num, minGroupingCount, false);
+                        if (num == null) {
+                            throw new BibEntryNotFoundException(names[i], Localization
+                                    .lang("Could not resolve BibTeX entry for citation marker '%0'.", names[i]));
                         } else {
-                            throw new BibEntryNotFoundException(names[i], Localization.lang("Could not resolve BibTeX entry for citation marker '%0'.", names[i]));
+                            citationMarker = style.getNumCitationMarker(num, minGroupingCount, false);
                         }
 
                         for (int j = 0; j < keys.length; j++) {
@@ -520,13 +518,9 @@ class OOBibBase {
                             bibtexKeys[i][j] = cEntries[j].getCiteKey();
                         }
                     }
-                    /*System.out.println(style.getBooleanCitProperty("MultiCiteChronological"));
-                    for (int j = 0; j < cEntries.length; j++) {
-                        BibEntry cEntry = cEntries[j];
-                        System.out.println(cEntry.getCiteKey());
-                    } */
 
-                    citationMarker = style.getCitationMarker(cEntries, entries.get(cEntries), type == OOBibBase.AUTHORYEAR_PAR, null, null);
+                    citationMarker = style.getCitationMarker(cEntries, entries.get(cEntries),
+                            type == OOBibBase.AUTHORYEAR_PAR, null, null);
                     // We need "normalized" (in parenthesis) markers for uniqueness checking purposes:
                     for (int j = 0; j < cEntries.length; j++) {
                         normCitMarker[j] = style.getCitationMarker(cEntries[j], entries.get(cEntries), true, null, -1);
