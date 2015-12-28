@@ -29,7 +29,6 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.Layout;
 
-import com.sun.star.beans.Property;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XDesktop;
 import com.sun.star.text.ControlCharacter;
@@ -267,15 +266,6 @@ class OOUtil {
         XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, o);
         return props.getPropertyValue(property);
-    }
-
-    public static void listProperties(Object o) throws Exception {
-        XPropertySet props = UnoRuntime.queryInterface(
-                XPropertySet.class, o);
-        Property[] pr = props.getPropertySetInfo().getProperties();
-        for (Property property1 : pr) {
-            System.out.println(property1.Name + " : " + props.getPropertyValue(property1.Name));
-        }
     }
 
     public static XTextDocument selectComponent(JFrame parent, XDesktop xDesktop, List<XTextDocument> list) throws Exception {

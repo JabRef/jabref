@@ -45,10 +45,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
@@ -193,10 +191,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
         });
         return item;
-    }
-
-    public String getShortcutKey() {
-        return null;
     }
 
     private void initPanel() {
@@ -837,29 +831,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 "", JOptionPane.ERROR_MESSAGE);
     }
 
-    public void insertUsingBST() {
-        try {
-            BasePanel panel = frame.getCurrentBasePanel();
-            if (panel != null) {
-                final BibDatabase database = panel.database();
-                BibEntry[] entries = panel.getSelectedEntries();
-                ArrayList<BibEntry> el = new ArrayList<>();
-                Collections.addAll(el, entries);
-
-                BstWrapper wrapper = new BstWrapper();
-                //wrapper.loadBstFile(new File("/home/usr/share/texmf-tetex/bibtex/bst/base/plain.bst"));
-                wrapper.loadBstFile(new File("/home/usr/share/texmf-tetex/bibtex/bst/ams/amsalpha.bst"));
-                Map<String, String> result = wrapper.processEntries(el, database);
-                for (Entry<String, String> entry : result.entrySet()) {
-                    LOGGER.debug("Key: " + entry.getKey() + " Entry: " + entry.getValue());
-                    ooBase.insertMarkedUpTextAtViewCursor(entry.getValue(), "Default");
-                }
-                //System.out.println(result);
-            }
-        } catch (Exception ex) {
-            LOGGER.warn("Could not insert entry", ex);
-        }
-    }
 
     private void showSettingsPopup() {
         JPopupMenu menu = new JPopupMenu();

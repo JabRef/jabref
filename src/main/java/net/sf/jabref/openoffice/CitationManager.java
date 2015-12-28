@@ -37,7 +37,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.List;
 
 /**
  * Dialog for modifying existing citations.
@@ -61,8 +60,7 @@ class CitationManager {
         XNameAccess nameAccess = ooBase.getReferenceMarks();
         String[] names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
-            List<String> keys = ooBase.parseRefMarkName(name);
-            list.add(new CitEntry(name, keys,
+            list.add(new CitEntry(name,
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
@@ -135,24 +133,15 @@ class CitationManager {
 
         final String refMarkName;
         String pageInfo;
-        private final String keyString;
         final String context;
         private final String origPageInfo;
 
 
-        public CitEntry(String refMarkName, List<String> keys, String context, String pageInfo) {
+        public CitEntry(String refMarkName, String context, String pageInfo) {
             this.refMarkName = refMarkName;
             this.context = context;
             this.pageInfo = pageInfo;
             this.origPageInfo = pageInfo;
-            StringBuilder sb = new StringBuilder();
-            for (int j = 0; j < keys.size(); j++) {
-                sb.append(keys.get(j));
-                if (j < (keys.size() - 1)) {
-                    sb.append(", ");
-                }
-            }
-            keyString = sb.toString();
         }
 
         public boolean pageInfoChanged() {

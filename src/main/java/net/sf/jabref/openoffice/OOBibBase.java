@@ -208,20 +208,6 @@ class OOBibBase {
         return res;
     }
 
-    public void testCustomProperties() throws Exception {
-        XDocumentPropertiesSupplier supp = UnoRuntime.queryInterface(
-                XDocumentPropertiesSupplier.class, mxDoc);
-        XPropertyContainer cont = supp.getDocumentProperties().getUserDefinedProperties();
-        XPropertySet set = UnoRuntime.queryInterface(XPropertySet.class, cont);
-        try {
-            cont.addProperty("JR_cite_1_Danielsen1987", (short) 0, new Any(Type.STRING, "Brum"));
-        } catch (Exception ex) {
-            System.out.println("property already exists");
-        }
-        System.out.println(set.getPropertyValue("Test"));
-
-    }
-
     public void setCustomProperty(String property, String value) throws Exception {
         if (propertySet.getPropertySetInfo().hasPropertyByName(property)) {
             userProperties.removeProperty(property);
@@ -682,25 +668,6 @@ class OOBibBase {
                 cursor.collapseToEnd();
                 OOUtil.insertParagraphBreak(text, cursor);
                 insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
-                /* The following is for resetting the paragraph format, but should probably
-                   not be done.
-
-                XParagraphCursor parCursor =
-                    (XParagraphCursor)UnoRuntime.queryInterface(
-                    java.lang.Class.forName("com.sun.star.text.XParagraphCursor"), cursor);
-                parCursor.gotoPreviousParagraph(false);
-                parCursor.gotoStartOfParagraph(false);
-                parCursor.gotoEndOfParagraph(true);
-                XPropertySet props = (XPropertySet) UnoRuntime.queryInterface(
-                    XPropertySet.class, parCursor);
-
-                try {
-                    props.setPropertyValue("ParaStyleName", "Default");
-                } catch (com.sun.star.lang.IllegalArgumentException ex) {
-                    throw new UndefinedParagraphFormatException("Default");
-                }
-                */
-
             }
         }
 
@@ -717,38 +684,6 @@ class OOBibBase {
     }
 
     private String[] getSortedReferenceMarks(final XNameAccess nameAccess) throws Exception {
-        /*
-        PropertyValue[] props = new PropertyValue[2];
-
-        props[0] = new PropertyValue();
-        props[0].Name = "Model";
-
-        props[0].Value = mxDoc.getCurrentController().getModel();
-        props[1] = new PropertyValue();
-        props[1].Name = "Hidden";
-        props[1].Value = true;
-
-        // argument xModel wins over URL.
-        System.out.println("her");
-        XComponent comp = xComponentLoader.loadComponentFromURL("private:factory/swriter",
-                           "_blank", 0, props);
-        System.out.println("her2");
-
-        XTextDocument newDoc = (XTextDocument)UnoRuntime.queryInterface(
-                XTextDocument.class, comp);
-        System.out.println("newDoc = "+newDoc);
-
-        // Controller of the hidden frame
-        XController xController = newDoc.getCurrentController();
-
-        XFrame xFrame = xController.getFrame();
-        XWindow xContainerWindow = xFrame.getContainerWindow();
-        XWindow xComponentWindow = xFrame.getComponentWindow();
-
-        xContainerWindow.setVisible(true);
-        xComponentWindow.setFocus();
-        xContainerWindow.setVisible(false);
-        */
         XTextViewCursorSupplier css = UnoRuntime.queryInterface(
                 XTextViewCursorSupplier.class, mxDoc.getCurrentController());
 
@@ -785,30 +720,6 @@ class OOBibBase {
         //xFrame.dispose();
 
         return names;
-
-        /*final XTextRangeCompare compare = (XTextRangeCompare) UnoRuntime.queryInterface
-                (XTextRangeCompare.class, text);
-        Arrays.sort(names, new Comparator<String>() {
-            public int compare(String o1, String o2) {
-                try {
-                    XTextRange r1 = ((XTextContent) UnoRuntime.queryInterface
-                            (XTextContent.class, nameAccess.getByName(o1))).getAnchor();
-                    XTextRange r2 = ((XTextContent) UnoRuntime.queryInterface
-                            (XTextContent.class, nameAccess.getByName(o2))).getAnchor();
-
-                    try {
-                        return compare.compareRegionStarts(r2, r1);
-                    } catch (com.sun.star.lang.IllegalArgumentException ex) {
-                        // problem comparing reference marks in different areas (text, table, etc.)
-                        return 0;
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return 0;
-                }
-            }
-        });
-        return names;*/
     }
 
     public void rebuildBibTextSection(List<BibDatabase> databases, OOBibStyle style)
@@ -1070,31 +981,6 @@ class OOBibBase {
 
     }
 
-    /**
-     * This method creates and inserts an XTextSection named as determined by the
-     * string BIB_SECTION_NAME.
-     * @param end true to indicate that the section should be put at the end of the document,
-     *  false to indicate that it should be put at the cursor position.
-     * @return true if the bibliography already existed, false otherwise..
-     * @throws Exception
-     */
-    private boolean createBibTextSection(boolean end) throws Exception {
-        // Check if there already is a bookmarked section:
-        XBookmarksSupplier bSupp = UnoRuntime.queryInterface(
-                XBookmarksSupplier.class, mxDoc);
-        if (bSupp.getBookmarks().hasByName(OOBibBase.BIB_SECTION_NAME)) {
-            System.out.println("Found existing JabRef bookmark");
-            return true;
-        }
-        XTextCursor mxDocCursor = text.createTextCursor();
-        if (end) {
-            mxDocCursor.gotoEnd(false);
-        }
-        OOUtil.insertParagraphBreak(text, mxDocCursor);
-        insertBookMark(OOBibBase.BIB_SECTION_NAME, mxDocCursor);
-        return false;
-    }
-
     private void createBibTextSection2(boolean end) throws Exception {
 
         XTextCursor mxDocCursor = text.createTextCursor();
@@ -1131,37 +1017,6 @@ class OOBibBase {
         }
     }
 
-    public void clearBibTextSectionContent() throws Exception {
-        // Find the bookmarks for the bibliography:
-        XTextRange range = getBookmarkRange(OOBibBase.BIB_SECTION_NAME);
-        if (range == null) {
-            createBibTextSection(atEnd);
-        }
-
-        XTextRange rangeEnd = getBookmarkRange(OOBibBase.BIB_SECTION_END_NAME);
-        if (rangeEnd == null) {
-            // No end bookmark. This means that there is no bibliography.
-            return;
-        }
-        // Get a paragraph cursor at the start of the bibliography:
-        //System.out.println("text="+text+" range="+range);
-        XTextCursor mxDocCursor = text.createTextCursorByRange(range.getEnd());
-        mxDocCursor.goRight((short) 1, true);
-        // Get a range comparator:
-        XTextRangeCompare compare = UnoRuntime.queryInterface(XTextRangeCompare.class, text);
-        boolean couldExpand = true;
-        while (couldExpand && (compare.compareRegionEnds(mxDocCursor, rangeEnd) > 0)) {
-            couldExpand = mxDocCursor.goRight((short) 1, true);
-        }
-        // Finally, clear the bibliography:
-        mxDocCursor.setString("");
-        mxDocCursor.collapseToStart();
-        removeBookMark(OOBibBase.BIB_SECTION_END_NAME);
-        // If we lost the start bookmark, recreate it:
-        if (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null) {
-            insertBookMark(OOBibBase.BIB_SECTION_NAME, mxDocCursor);
-        }
-    }
 
     private void populateBibTextSection(Map<BibEntry, BibDatabase> entries,
                                         OOBibStyle style)
