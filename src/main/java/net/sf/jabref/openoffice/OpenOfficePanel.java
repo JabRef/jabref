@@ -138,9 +138,6 @@ public class OpenOfficePanel extends AbstractWorker {
             Globals.prefs.putDefaultValue(JabRefPreferences.OO_JARS_PATH, "/opt/openoffice.org/basis3.0");
         }
 
-        //Globals.prefs.putDefaultValue("ooStyleFileDirectories", System.getProperty("user.home")+";false");
-        Globals.prefs.putDefaultValue("ooStyleFileLastDir", System.getProperty("user.home"));
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_IN_PAR_CITATION, true);
         Globals.prefs.putDefaultValue(JabRefPreferences.SYNC_OO_WHEN_CITING, false);
         Globals.prefs.putDefaultValue(JabRefPreferences.SHOW_OO_PANEL, false);
         Globals.prefs.putDefaultValue(JabRefPreferences.USE_ALL_OPEN_BASES, true);
@@ -309,7 +306,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     reportUndefinedParagraphFormat(ex);
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
-                } catch (BibtexEntryNotFoundException ex) {
+                } catch (BibEntryNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                             ex.getBibtexKey()), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                 }
@@ -798,15 +795,15 @@ public class OpenOfficePanel extends AbstractWorker {
 
     class OOPanel extends SidePaneComponent {
 
-        private final OpenOfficePanel panel;
+        private final OpenOfficePanel ooPanel;
         public OOPanel(SidePaneManager sidePaneManager, Icon url, String s, OpenOfficePanel panel) {
             super(sidePaneManager, url, s);
-            this.panel = panel;
+            ooPanel = panel;
         }
 
         @Override
         public String getName() {
-            return panel.getName();
+            return ooPanel.getName();
         }
 
         @Override

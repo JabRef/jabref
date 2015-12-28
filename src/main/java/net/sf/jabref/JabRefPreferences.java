@@ -333,7 +333,6 @@ public final class JabRefPreferences {
     public static final String SHOW_OO_PANEL = "showOOPanel";
     public static final String SYNC_OO_WHEN_CITING = "syncOOWhenCiting";
     public static final String USE_ALL_OPEN_BASES = "useAllOpenBases";
-    public static final String OO_IN_PAR_CITATION = "ooInParCitation";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_USE_DEFAULT_AUTHORYEAR_STYLE = "ooUseDefaultAuthoryearStyle";
     public static final String OO_USE_DEFAULT_NUMERICAL_STYLE = "ooUseDefaultNumericalStyle";
