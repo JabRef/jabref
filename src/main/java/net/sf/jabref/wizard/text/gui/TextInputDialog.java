@@ -534,7 +534,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String data = ClipBoardManager.clipBoard.getClipboardContents();
+            String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
             if (data != null) {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();

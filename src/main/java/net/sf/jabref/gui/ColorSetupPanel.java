@@ -23,6 +23,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -39,8 +40,7 @@ public class ColorSetupPanel extends JPanel {
 
     private static final int ICON_WIDTH = 30;
     private static final int ICON_HEIGHT = 20;
-    private final ArrayList<ColorButton> buttons = new ArrayList<>();
-
+    private final List<ColorButton> buttons = new ArrayList<>();
 
     public ColorSetupPanel() {
 

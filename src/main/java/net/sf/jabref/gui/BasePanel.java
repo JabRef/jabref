@@ -123,7 +123,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private JSplitPane splitPane;
 
-    JabRefFrame frame;
+    private final JabRefFrame frame;
 
     private String fileMonitorHandle;
     private boolean saving;
@@ -515,7 +515,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // action for exporting database to external SQL database
         actions.put(Actions.DB_EXPORT, new AbstractWorker() {
 
-            String errorMessage;
+            String errorMessage = "";
             boolean connectToDB;
 
             // run first, in EDT:
@@ -582,7 +582,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void update() {
 
                 // if no error, report success
-                if (errorMessage == null) {
+                if (errorMessage.isEmpty()) {
                     if (connectToDB) {
                         frame.output(Localization.lang("%0 export successful"));
                     }
@@ -594,7 +594,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
                             Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
 
-                    errorMessage = null;
+                    errorMessage = "";
                 }
             }
 
@@ -2471,7 +2471,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             return;
         }
         nextEntries.clear();
-        if (!(entry.equals(showing))) {
+        if (entry != showing) {
             // Add the entry we are leaving to the history:
             if (showing != null) {
                 previousEntries.add(showing);

@@ -92,8 +92,9 @@ public class WrapLayout extends FlowLayout {
 
             int targetWidth = target.getSize().width;
 
-            if (targetWidth == 0)
+            if (targetWidth == 0) {
                 targetWidth = Integer.MAX_VALUE;
+            }
 
             int hgap = getHgap();
             int vgap = getVgap();
@@ -119,7 +120,7 @@ public class WrapLayout extends FlowLayout {
 
                     //  Can't add the component to current row. Start a new row.
 
-                    if (rowWidth + d.width > maxWidth)
+                    if ((rowWidth + d.width) > maxWidth)
                     {
                         addRow(dim, rowWidth, rowHeight);
                         rowWidth = 0;
@@ -141,7 +142,7 @@ public class WrapLayout extends FlowLayout {
             addRow(dim, rowWidth, rowHeight);
 
             dim.width += horizontalInsetsAndGap;
-            dim.height += insets.top + insets.bottom + vgap * 2;
+            dim.height += insets.top + insets.bottom + (vgap * 2);
 
             //	When using a scroll pane or the DecoratedLookAndFeel we need to
             //  make sure the preferred size is less than the size of the
