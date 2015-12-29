@@ -24,7 +24,7 @@ public class BibtexEntryTests {
     public void testDefaultConstructor() {
         BibEntry entry = new BibEntry();
         // we have to use `getType("misc")` in the case of biblatex mode
-        Assert.assertEquals(EntryTypes.getType("misc"), entry.getType());
+        Assert.assertEquals("misc", entry.getType());
         Assert.assertNotNull(entry.getId());
         Assert.assertNull(entry.getField("author"));
     }
@@ -68,10 +68,10 @@ public class BibtexEntryTests {
         e.setField("title", "abc");
         e.setField("journal", "abc");
 
-        Assert.assertFalse(e.hasAllRequiredFields(null));
+        Assert.assertFalse(EntryTypes.hasAllRequiredFields(e, null));
 
         e.setField("year", "2015");
-        Assert.assertTrue(e.hasAllRequiredFields(null));
+        Assert.assertTrue(EntryTypes.hasAllRequiredFields(e, null));
     }
 
     @Test

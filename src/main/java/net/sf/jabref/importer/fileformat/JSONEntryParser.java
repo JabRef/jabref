@@ -53,7 +53,7 @@ public class JSONEntryParser {
 
 
         BibEntry entry = new BibEntry();
-        entry.setType(EntryTypes.getType("article"));
+        entry.setType("article");
 
         // Authors
         if (bibJsonEntry.has("author")) {

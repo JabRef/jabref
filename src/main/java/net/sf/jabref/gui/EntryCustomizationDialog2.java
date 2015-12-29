@@ -372,7 +372,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             bp.entryEditors.remove(typeName);
 
             for (BibEntry entry : bp.database().getEntries()) {
-                EntryType newType = EntryTypes.getType(entry.getType().getName());
+                EntryType newType = EntryTypes.getType(entry.getType());
                 if (newType != null) {
                     entry.setType(newType);
                 }

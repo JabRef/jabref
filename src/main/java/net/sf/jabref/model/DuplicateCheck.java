@@ -15,9 +15,11 @@
  */
 package net.sf.jabref.model;
 
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,12 +75,13 @@ public class DuplicateCheck {
     public static boolean isDuplicate(BibEntry one, BibEntry two) {
 
         // First check if they are of the same type - a necessary condition:
-        if (one.getType() != two.getType()) {
+        if (!one.getType().equals(two.getType())) {
             return false;
         }
+        EntryType type = EntryTypes.getType(one.getType());
 
         // The check if they have the same required fields:
-        java.util.List<String> var = one.getType().getRequiredFieldsFlat();
+        java.util.List<String> var = type.getRequiredFieldsFlat();
         String[] fields = var.toArray(new String[var.size()]);
         double[] req;
         if (fields == null) {
@@ -92,7 +95,7 @@ public class DuplicateCheck {
             return req[0] >= DuplicateCheck.duplicateThreshold;
         }
         // Close to the threshold value, so we take a look at the optional fields, if any:
-        java.util.List<String> optionalFields = one.getType().getOptionalFields();
+        java.util.List<String> optionalFields = type.getOptionalFields();
         fields = optionalFields.toArray(new String[optionalFields.size()]);
         if (fields != null) {
             double[] opt = DuplicateCheck.compareFieldSet(fields, one, two);
@@ -225,8 +228,6 @@ public class DuplicateCheck {
      *
      * @param s1       The first string
      * @param s2       The second string
-     * @param truncate if true, always truncate the longer of two words to be compared to
-     *                 harmonize their length. If false, use interpolation to harmonize the strings.
      * @return a value in the interval [0, 1] indicating the degree of match.
      */
     public static double correlateByWords(String s1, String s2) {

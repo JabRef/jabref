@@ -1,5 +1,6 @@
 package net.sf.jabref.gui.maintable;
 
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import javax.swing.*;
@@ -92,7 +93,7 @@ public class MainTableColumn {
         String content = null;
         for (String field : bibtexFields) {
             if (field.equals(BibEntry.TYPE_HEADER)) {
-                content = entry.getType().getName();
+                content = EntryTypes.getDisplayNameFor(entry.getType());
             } else {
                 content = entry.getFieldOrAlias(field);
                 if (database.isPresent() && "Author".equalsIgnoreCase(columnName) && (content != null)) {

@@ -1426,7 +1426,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 // Create an UndoableInsertEntry object.
                 undoManager.addEdit(new UndoableInsertEntry(database, bibEntry, BasePanel.this));
-                output(Localization.lang("Added new '%0' entry.", bibEntry.getType().getName().toLowerCase()));
+                output(Localization.lang("Added new '%0' entry.", bibEntry.getType()));
 
                 markBaseChanged(); // The database just changed.
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
@@ -1753,9 +1753,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             divLoc = splitPane.getDividerLocation();
         }
 
-        if (entryEditors.containsKey(be.getType().getName())) {
+        if (entryEditors.containsKey(be.getType())) {
             // We already have an editor for this entry type.
-            form = entryEditors.get(be.getType().getName());
+            form = entryEditors.get(be.getType());
             form.switchTo(be);
             if (visName != null) {
                 form.setVisiblePanel(visName);
@@ -1771,7 +1771,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             splitPane.setBottomComponent(form);
 
             //highlightEntry(be);
-            entryEditors.put(be.getType().getName(), form);
+            entryEditors.put(be.getType(), form);
 
         }
         if (divLoc > 0) {
@@ -1794,11 +1794,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
         EntryEditor form;
-        if (entryEditors.containsKey(entry.getType().getName())) {
+        if (entryEditors.containsKey(entry.getType())) {
             EntryEditor visibleNow = currentEditor;
 
             // We already have an editor for this entry type.
-            form = entryEditors.get(entry.getType().getName());
+            form = entryEditors.get(entry.getType());
 
             // If the cached editor is not the same as the currently shown one,
             // make sure the current one stores its current edit:
@@ -1818,7 +1818,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             //if (visName != null)
             //    form.setVisiblePanel(visName);
 
-            entryEditors.put(entry.getType().getName(), form);
+            entryEditors.put(entry.getType(), form);
         }
         return form;
     }
@@ -1909,7 +1909,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void updateEntryEditorIfShowing() {
         if (mode == BasePanel.SHOWING_EDITOR) {
-            if (currentEditor.getType() == currentEditor.getEntry().getType()) {
+            if (currentEditor.getType().equals(currentEditor.getEntry().getType())) {
                 currentEditor.updateAllFields();
                 currentEditor.updateSource();
             } else {
@@ -2076,16 +2076,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         stringDialog = null;
     }
 
-    public void changeType(BibEntry entry, EntryType type) {
+    public void changeType(BibEntry entry, String type) {
         changeType(new BibEntry[] {entry}, type);
     }
 
-    public void changeType(EntryType type) {
+    public void changeType(String type) {
         BibEntry[] bes = mainTable.getSelectedEntries();
         changeType(bes, type);
     }
 
-    private void changeType(BibEntry[] bes, EntryType type) {
+    private void changeType(BibEntry[] bes, String type) {
 
         if ((bes == null) || (bes.length == 0)) {
             LOGGER.error("At least one entry must be selected to be able to change the type.");
@@ -2093,7 +2093,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
         if (bes.length > 1) {
             int choice = JOptionPane.showConfirmDialog(this,
-                    Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?", type.getName()),
+                    Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?",
+                            type),
                     Localization.lang("Change entry type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (choice == JOptionPane.NO_OPTION) {
                 return;
@@ -2106,7 +2107,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             be.setType(type);
         }
 
-        output(formatOutputMessage(Localization.lang("Changed type to '%0' for", type.getName()), bes.length));
+        output(formatOutputMessage(Localization.lang("Changed type to '%0' for", type), bes.length));
         ce.end();
         undoManager.addEdit(ce);
         markBaseChanged();

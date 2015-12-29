@@ -945,7 +945,7 @@ class OOBibBase {
                         style.getNumCitationMarker(new int[] {number++}, minGroupingCount, true),
                         false, false, false, false, false, false);
             }
-            Layout layout = style.getReferenceFormat(entry.getKey().getType().getName());
+            Layout layout = style.getReferenceFormat(entry.getKey().getType());
             try {
                 layout.setPostFormatter(OOUtil.POSTFORMATTER);
             } catch (NoSuchMethodError ignore) {

@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.junit.Assert;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 public class JSONEntryParserTest {
 
@@ -40,7 +39,7 @@ public class JSONEntryParserTest {
         JSONObject jo = new JSONObject(jsonString);
         BibEntry be = jc.BibJSONtoBibtex(jo);
 
-        Assert.assertEquals(BibtexEntryTypes.ARTICLE, be.getType());
+        Assert.assertEquals("article", be.getType());
         Assert.assertEquals("VLSI Design", be.getField("journal"));
         Assert.assertEquals("10.1155/2014/217495", be.getField("doi"));
         Assert.assertEquals("Syed Asad Alam and Oscar Gustafsson", be.getField("author"));

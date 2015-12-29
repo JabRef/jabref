@@ -8,12 +8,12 @@ import java.awt.event.ActionEvent;
 
 public class ChangeTypeAction extends AbstractAction {
 
-    private final EntryType type;
+    private final String type;
     private final BasePanel panel;
 
     public ChangeTypeAction(EntryType type, BasePanel bp) {
         super(type.getName());
-        this.type = type;
+        this.type = type.getName();
         panel = bp;
     }
 

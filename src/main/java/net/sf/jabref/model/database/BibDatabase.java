@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
@@ -559,7 +560,7 @@ public class BibDatabase {
      */
     public static String getResolvedField(String field, BibEntry bibtex, BibDatabase database) {
         if ("bibtextype".equals(field)) {
-            return bibtex.getType().getName();
+            return EntryTypes.getDisplayNameFor(bibtex.getType());
         }
 
         // TODO: Changed this to also consider alias fields, which is the expected

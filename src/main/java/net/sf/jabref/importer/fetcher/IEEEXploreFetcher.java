@@ -36,7 +36,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -370,17 +369,17 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up publication field
-        EntryType type = entry.getType();
+        String type = entry.getType();
         String sourceField = "";
-        if ("Article".equals(type.getName())) {
+        if ("article".equals(type)) {
             sourceField = "journal";
             entry.clearField("booktitle");
-        } else if ("Inproceedings".equals(type.getName())) {
+        } else if ("inproceedings".equals(type)) {
             sourceField = "booktitle";
         }
         String fullName = entry.getField(sourceField);
         if (fullName != null) {
-            if ("Article".equals(type.getName())) {
+            if ("article".equals(type)) {
                 int ind = fullName.indexOf(": Accepted for future publication");
                 if (ind > 0) {
                     fullName = fullName.substring(0, ind);
@@ -433,7 +432,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     fullName = fullName.trim();
                 }
             }
-            if ("Article".equals(type.getName())) {
+            if ("article".equals(type)) {
                 fullName = fullName.replace(" - ", "-"); //IEE Proceedings-
 
                 fullName = fullName.trim();
@@ -441,7 +440,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     fullName = Abbreviations.journalAbbrev.getMedlineAbbreviation(fullName).orElse(fullName);
                 }
             }
-            if ("Inproceedings".equals(type.getName())) {
+            if ("inproceedings".equals(type)) {
                 Matcher m2 = PROCEEDINGS_PATTERN.matcher(fullName);
                 if (m2.find()) {
                     String prefix = m2.group(2);

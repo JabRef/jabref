@@ -87,7 +87,9 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.l10n.Localization;
@@ -149,7 +151,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         {
             if (entry.getType() != null)
             {
-                typeStr = typeStr + " " + entry.getType().getName();
+                typeStr = typeStr + " " + entry.getType();
             }
         }
 
@@ -512,8 +514,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private String[] getAllFields() {
         ArrayList<String> f = new ArrayList<>();
-        List<String> req = entry.getRequiredFieldsFlat();
-        List<String> opt = entry.getOptionalFields();
+        EntryType type = EntryTypes.getType(entry.getType());
+        List<String> req = type.getRequiredFieldsFlat();
+        List<String> opt = type.getOptionalFields();
         List<String> allFields = BibtexFields.getAllFieldNames();
         f.addAll(req);
         f.addAll(opt);

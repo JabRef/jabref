@@ -28,7 +28,7 @@ public class BibDatabaseTypeDetection {
      * @return the inferred database type
      */
     public static BibDatabaseType inferType(Collection<BibEntry> entries) {
-        final List<EntryType> entryTypes = getEntryTypes(entries);
+        final List<String> entryTypes = getEntryTypes(entries);
 
         // type-based check
         if (entryTypes.stream().anyMatch(isIncludedIn(exclusiveBiblatex))) {
@@ -42,9 +42,9 @@ public class BibDatabaseTypeDetection {
         return BibDatabaseType.BIBTEX;
     }
 
-    private static List<String> exclusiveBiblatexFields(EntryType type) {
-        final Optional<EntryType> biblatexType = BibLatexEntryTypes.getType(type.getName());
-        final Optional<EntryType> bibtexType = BibtexEntryTypes.getType(type.getName());
+    private static List<String> exclusiveBiblatexFields(String type) {
+        final Optional<EntryType> biblatexType = BibLatexEntryTypes.getType(type);
+        final Optional<EntryType> bibtexType = BibtexEntryTypes.getType(type);
 
         // return empty array if this is no Biblatex or BibTex type
         if (!biblatexType.isPresent() || !bibtexType.isPresent()) {
@@ -57,7 +57,7 @@ public class BibDatabaseTypeDetection {
         return biblatexFields.stream().filter(f -> !bibtexFields.contains(f)).collect(Collectors.toList());
     }
 
-    private static List<EntryType> getEntryTypes(Collection<BibEntry> collection) {
+    private static List<String> getEntryTypes(Collection<BibEntry> collection) {
         return collection.stream().map(BibEntry::getType).collect(Collectors.toList());
     }
 
@@ -69,8 +69,8 @@ public class BibDatabaseTypeDetection {
         return entry -> collection.stream().noneMatch(c -> c.getName().equalsIgnoreCase(entry.getName()));
     }
 
-    private static Predicate<EntryType> isIncludedIn(List<EntryType> collection) {
-        return entry -> collection.stream().anyMatch(c -> c.getName().equalsIgnoreCase(entry.getName()));
+    private static Predicate<String> isIncludedIn(List<EntryType> collection) {
+        return entry -> collection.stream().anyMatch(c -> c.getName().equalsIgnoreCase(entry));
     }
 
     private static Predicate<BibEntry> hasBiblatexFields() {

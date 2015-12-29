@@ -47,6 +47,7 @@ import net.sf.jabref.gui.util.FirstColumnComparator;
 import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.gui.util.IsMarkedComparator;
 import net.sf.jabref.gui.util.RankingFieldComparator;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
@@ -561,7 +562,7 @@ public class MainTable extends JTable {
     private int getCellStatus(int row, int col) {
         try {
             BibEntry be = sortedForGrouping.get(row);
-            EntryType type = be.getType();
+            EntryType type = EntryTypes.getType(be.getType());
             String columnName = getColumnName(col).toLowerCase();
             if (columnName.equals(BibEntry.KEY_FIELD) || type.getRequiredFieldsFlat().contains(columnName)) {
                 return MainTable.REQUIRED;
@@ -626,7 +627,7 @@ public class MainTable extends JTable {
     private boolean isComplete(int row) {
         try {
             BibEntry be = sortedForGrouping.get(row);
-            return be.hasAllRequiredFields(panel.database());
+            return EntryTypes.hasAllRequiredFields(be, panel.database());
         } catch (NullPointerException ex) {
             return true;
         }

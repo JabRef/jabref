@@ -44,7 +44,6 @@ import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.EntryUtil;
 
 public class LabelPatternPanel extends JPanel {
 
@@ -181,7 +180,7 @@ public class LabelPatternPanel extends JPanel {
 
     private JTextField addEntryType(Container c, String name, int y) {
 
-        JLabel lab = new JLabel(EntryUtil.capitalizeFirst(name));
+        JLabel lab = new JLabel(EntryTypes.getDisplayNameFor(name));
         name = name.toLowerCase();
         con.gridx = 0;
         con.gridy = y;

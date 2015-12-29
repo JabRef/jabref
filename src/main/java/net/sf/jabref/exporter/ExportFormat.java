@@ -246,7 +246,7 @@ public class ExportFormat implements IExportFormat {
             for (BibEntry entry : sorted) {
                 ExportFormats.entryNumber++; // Increment entry counter.
                 // Get the layout
-                String type = entry.getType().getName().toLowerCase();
+                String type = entry.getType();
                 if (layouts.containsKey(type)) {
                     layout = layouts.get(type);
                 } else {

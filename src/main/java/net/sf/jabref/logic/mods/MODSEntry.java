@@ -27,7 +27,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.XMLChars;
 import org.apache.commons.logging.Log;
@@ -121,7 +120,7 @@ class MODSEntry {
         if (bibtex.hasField("author")) {
             authors = getAuthors(bibtex.getField("author"));
         }
-        if ((bibtex.getType() == BibtexEntryTypes.ARTICLE) || (bibtex.getType() == BibtexEntryTypes.INPROCEEDINGS)) {
+        if ((bibtex.getType().equals("article")) || (bibtex.getType().equals("inproceedings"))) {
             host = new MODSEntry();
             host.entryType = "relatedItem";
             host.title = bibtex.getField("booktitle");
@@ -184,7 +183,7 @@ class MODSEntry {
          * <pre> String result; if (bibtexType.equals("Mastersthesis")) result =
          * "theses"; else result = "conference publication"; // etc... </pre>
          */
-        return bibtex.getType().getName();
+        return bibtex.getType();
     }
 
     private Node getDOMrepresentation() {

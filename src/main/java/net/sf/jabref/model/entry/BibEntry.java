@@ -51,7 +51,7 @@ public class BibEntry {
 
     private String id;
 
-    private EntryType type;
+    private String type;
 
     private Map<String, String> fields = new HashMap<>();
 
@@ -79,28 +79,15 @@ public class BibEntry {
     }
 
     public BibEntry(String id, EntryType type) {
+        this(id, type.getName());
+    }
+
+    public BibEntry(String id, String type) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
         changed = true;
         setType(type);
-    }
-
-    /**
-     * @return An array describing the optional fields for this entry. "null" if no fields are required
-     */
-    public List<String> getOptionalFields() {
-        return type.getOptionalFields();
-    }
-
-    /**
-     * Returns all required field names.
-     * No OR relationships are captured here.
-     *
-     * @return a List of required field name Strings
-     */
-    public List<String> getRequiredFieldsFlat() {
-        return type.getRequiredFieldsFlat();
     }
 
     /**
@@ -114,27 +101,20 @@ public class BibEntry {
     }
 
     /**
-     * Returns true if this entry contains the fields it needs to be
-     * complete.
-     */
-    public boolean hasAllRequiredFields(BibDatabase database) {
-        return allFieldsPresent(type.getRequiredFields(), database);
-    }
-
-    /**
      * Returns this entry's type.
      */
-    public EntryType getType() {
+    public String getType() {
         return type;
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(EntryType type) {
+    public void setType(String type) {
         Objects.requireNonNull(type, "Every BibEntry must have a type.");
 
-        EntryType oldType = this.type;
+        String oldType = this.type;
+        type = type.toLowerCase();
 
         try {
             // We set the type before throwing the changeEvent, to enable
@@ -142,11 +122,18 @@ public class BibEntry {
             // sets off a change in database sorting etc.
             this.type = type;
             changed = true;
-            firePropertyChangedEvent(TYPE_HEADER, oldType == null ? null : oldType.getName(), type.getName());
+            firePropertyChangedEvent(TYPE_HEADER, oldType == null ? null : oldType, type);
         } catch (PropertyVetoException pve) {
             LOGGER.warn(pve);
         }
 
+    }
+
+    /**
+     * Sets this entry's type.
+     */
+    public void setType(EntryType type) {
+        this.setType(type.getName());
     }
 
     /**
@@ -400,7 +387,7 @@ public class BibEntry {
      *                  argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    boolean allFieldsPresent(List<String> allFields, BibDatabase database) {
+    public boolean allFieldsPresent(List<String> allFields, BibDatabase database) {
         final String orSeparator = "/";
 
         for (String field : allFields) {
@@ -574,7 +561,7 @@ public class BibEntry {
     public void addKeyword(String keyword) {
         Objects.requireNonNull(keyword, "keyword must not be empty");
 
-        if (keyword.isEmpty()) {
+        if ((keyword == null) || (keyword.isEmpty())) {
             return;
         }
 

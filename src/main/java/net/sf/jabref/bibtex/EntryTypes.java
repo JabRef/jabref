@@ -2,6 +2,7 @@ package net.sf.jabref.bibtex;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.*;
 
 import java.util.*;
@@ -109,6 +110,27 @@ public class EntryTypes {
                 // of a standard type. We reinstate the standard type.
                 addOrModifyEntryType(STANDARD_TYPES.get(toLowerCase));
             }
+        }
+    }
+
+    /**
+     * Returns true if this entry contains the fields it needs to be
+     * complete.
+     */
+    public static boolean hasAllRequiredFields(BibEntry entry, BibDatabase database) {
+        EntryType type = getType(entry.getType());
+        return entry.allFieldsPresent(type.getRequiredFields(), database);
+    }
+
+    /**
+     * Gets the display name for the specified type.
+     */
+    public static String getDisplayNameFor(String type) {
+        EntryType entryType = getType(type);
+        if (entryType != null) {
+            return entryType.getName();
+        } else {
+            return EntryUtil.capitalizeFirst(type);
         }
     }
 }

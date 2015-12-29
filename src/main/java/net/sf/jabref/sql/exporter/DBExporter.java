@@ -105,7 +105,8 @@ public abstract class DBExporter extends DBImporterExporter {
         for (BibEntry entry : entries) {
             query.append(insert).append('\'').append(entry.getId())
                     .append("', (SELECT entry_types_id FROM entry_types WHERE label='")
-                    .append(entry.getType().getName().toLowerCase()).append("'), '").append(entry.getCiteKey()).append('\'');
+.append(entry.getType())
+                    .append("'), '").append(entry.getCiteKey()).append('\'');
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 query.append(", ");
                 if (entry.hasField(SQLUtil.getAllFields().get(i))) {

@@ -5,7 +5,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
-
+import net.sf.jabref.model.entry.EntryType;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
@@ -54,7 +54,7 @@ public class BibEntryWriter {
      */
     private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
-        out.write('@' + entry.getType().getName() + '{');
+        out.write('@' + EntryTypes.getDisplayNameFor(entry.getType()) + '{');
 
         writeKeyField(entry, out);
 
@@ -62,8 +62,11 @@ public class BibEntryWriter {
         written.add(BibEntry.KEY_FIELD);
         boolean hasWritten = false;
         int indentation = getLengthOfLongestFieldName(entry);
+
+        EntryType type = EntryTypes.getType(entry.getType());
+
         // Write required fields first.
-        List<String> fields = entry.getRequiredFieldsFlat();
+        List<String> fields = type.getRequiredFieldsFlat();
         if (fields != null) {
             for (String value : fields) {
                 hasWritten = hasWritten | writeField(entry, out, value, hasWritten, indentation);
@@ -71,7 +74,7 @@ public class BibEntryWriter {
             }
         }
         // Then optional fields.
-        fields = entry.getOptionalFields();
+        fields = type.getOptionalFields();
         if (fields != null) {
             for (String value : fields) {
                 if (!written.contains(value)) { // If field appears both in req. and opt. don't repeat.

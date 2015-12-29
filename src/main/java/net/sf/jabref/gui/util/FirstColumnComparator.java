@@ -17,6 +17,7 @@ package net.sf.jabref.gui.util;
 
 import java.util.Comparator;
 
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -36,11 +37,11 @@ public class FirstColumnComparator implements Comparator<BibEntry> {
         int score1 = 0;
         int score2 = 0;
 
-        if (e1.hasAllRequiredFields(database)) {
+        if (EntryTypes.hasAllRequiredFields(e1, database)) {
             score1++;
         }
 
-        if (e2.hasAllRequiredFields(database)) {
+        if (EntryTypes.hasAllRequiredFields(e2, database)) {
             score2++;
         }
 

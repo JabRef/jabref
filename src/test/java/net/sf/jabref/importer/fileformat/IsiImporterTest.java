@@ -4,7 +4,6 @@ import net.sf.jabref.*;
 
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -147,7 +146,7 @@ public class IsiImporterTest {
                     "James Brown and James Marc Brown and Brown, J. M. and Brown, J. and Brown, J. M. and Brown, J.",
                     entry.getField("author"));
 
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, entry.getType());
+            Assert.assertEquals("article", entry.getType());
             Assert.assertEquals("Optical Materials", entry.getField("journal"));
             Assert.assertEquals("2006", entry.getField("year"));
             Assert.assertEquals("28", entry.getField("volume"));
@@ -167,7 +166,7 @@ public class IsiImporterTest {
             BibEntry entry = entries.get(0);
             Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
 
-            Assert.assertEquals(BibtexEntryTypes.MISC, entry.getType());
+            Assert.assertEquals("misc", entry.getType());
             Assert.assertEquals("Optical Materials", entry.getField("journal"));
             Assert.assertEquals("2006", entry.getField("year"));
             Assert.assertEquals("28", entry.getField("volume"));
@@ -198,7 +197,7 @@ public class IsiImporterTest {
             Assert.assertEquals(
                     "Second harmonic generation of continuous wave ultraviolet light and production of beta -BaB$_2$O$_4$ optical waveguides",
                     a.getField("title"));
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
+            Assert.assertEquals("article", a.getType());
 
             Assert.assertEquals("Degl'Innocenti, R. and Guarino, A. and Poberaj, G. and Gunter, P.",
                     a.getField("author"));
@@ -222,7 +221,7 @@ public class IsiImporterTest {
 
             Assert.assertEquals("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals",
                     b.getField("title"));
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, b.getType());
+            Assert.assertEquals("article", b.getType());
         }
     }
 
@@ -303,7 +302,7 @@ public class IsiImporterTest {
 
             Assert.assertEquals(1, entries.size());
             BibEntry a = entries.get(0);
-            Assert.assertEquals(a.getType().getName(), BibtexEntryTypes.ARTICLE, a.getType());
+            Assert.assertEquals("article", a.getType());
             Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
             Assert.assertEquals("Improving Urban Road Extraction in High-Resolution "
                     + "Images Exploiting Directional Filtering, Perceptual "
@@ -348,7 +347,7 @@ public class IsiImporterTest {
             Assert.assertEquals(1, entries.size());
             BibEntry a = entries.get(0);
 
-            Assert.assertEquals(a.getType().getName(), BibtexEntryTypes.ARTICLE, a.getType());
+            Assert.assertEquals("article", a.getType());
             Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
             Assert.assertEquals(
                     "Improving Urban Road Extraction in High-Resolution Images Exploiting Directional Filtering, Perceptual Grouping, and Simple Topological Concepts",
@@ -403,7 +402,7 @@ public class IsiImporterTest {
             Assert.assertEquals("12", a.getField("volume"));
             Assert.assertEquals("20", a.getField("number"));
             Assert.assertEquals("2457--71", a.getField("pages"));
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
+            Assert.assertEquals("article", a.getType());
 
             Assert.assertEquals(
                     "Estrogen therapy selectively enhances prefrontal cognitive processes: a randomized, double-blind, placebo-controlled study with functional magnetic resonance imaging in perimenopausal and recently postmenopausal women.",
@@ -416,7 +415,7 @@ public class IsiImporterTest {
             Assert.assertEquals("13", b.getField("volume"));
             Assert.assertEquals("3", b.getField("number"));
             Assert.assertEquals("411--22", b.getField("pages"));
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, b.getType());
+            Assert.assertEquals("article", b.getType());
         }
     }
 

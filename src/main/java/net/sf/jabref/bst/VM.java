@@ -352,7 +352,7 @@ public class VM implements Warn {
                     throw new VMException(
                             "Call.type$ can only be called from within a context (ITERATE or REVERSE).");
                 }
-                VM.this.execute(context.getBibtexEntry().getType().getName().toLowerCase(), context);
+                VM.this.execute(context.getBibtexEntry().getType(), context);
             }
         });
 
@@ -870,7 +870,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                stack.push(context.getBibtexEntry().getType().getName());
+                stack.push(context.getBibtexEntry().getType());
             }
         });
 

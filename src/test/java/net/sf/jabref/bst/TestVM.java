@@ -475,10 +475,10 @@ public class TestVM {
         vm.run(v);
 
         Assert.assertEquals(4, vm.getStack().size());
-        Assert.assertEquals("InProceedings", vm.getStack().pop());
-        Assert.assertEquals("Misc", vm.getStack().pop());
-        Assert.assertEquals("Book", vm.getStack().pop());
-        Assert.assertEquals("Article", vm.getStack().pop());
+        Assert.assertEquals("inproceedings", vm.getStack().pop());
+        Assert.assertEquals("misc", vm.getStack().pop());
+        Assert.assertEquals("book", vm.getStack().pop());
+        Assert.assertEquals("article", vm.getStack().pop());
     }
 
     @Test
