@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.*;
@@ -104,12 +105,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         rsEntryType.getStatement().close();
                     }
 
-                    List<String> colNames = this.readColumnNames(conn);
-                    for (String next : colNames) {
-                        if (!columnsNotConsideredForEntries.contains(next)) {
-                            colNames.add(next);
-                        }
-                    }
+                    List<String> colNames = this.readColumnNames(conn).stream().filter(column -> !columnsNotConsideredForEntries.contains(column)).collect(Collectors.toList());
 
                     String database_id = rsDatabase.getString("database_id");
                     // Read the entries and create BibEntry instances:
