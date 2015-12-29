@@ -24,6 +24,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import javax.swing.*;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -39,7 +40,7 @@ class MetaDataChange extends Change {
     private final JScrollPane sp = new JScrollPane(tp);
     private final MetaData md;
     private final MetaData mdSecondary;
-    private final ArrayList<MetaDataChangeUnit> changes = new ArrayList<>();
+    private final List<MetaDataChangeUnit> changes = new ArrayList<>();
 
 
     public MetaDataChange(MetaData md, MetaData mdSecondary) {
@@ -67,22 +68,11 @@ class MetaDataChange extends Change {
     }
 
     @Override
-    JComponent description() {
+    public JComponent description() {
         StringBuilder sb = new StringBuilder("<html>" + Localization.lang("Changes have been made to the following metadata elements") + ":<p>");
         for (MetaDataChangeUnit unit : changes) {
             sb.append("<br>&nbsp;&nbsp;");
             sb.append(unit.key);
-            /*switch (unit.type) {
-                case ADD:
-                    sb.append("<p>Added: "+unit.key);
-                    break;
-                case REMOVE:
-                    sb.append("<p>Removed: "+unit.key);
-                    break;
-                case MODIFY:
-                    sb.append("<p>Modified: "+unit.key);
-                    break;
-            }*/
         }
         sb.append("</html>");
         tp.setText(sb.toString());
@@ -113,9 +103,9 @@ class MetaDataChange extends Change {
 
     static class MetaDataChangeUnit {
 
-        final int type;
-        final String key;
-        final Vector<String> value;
+        private final int type;
+        private final String key;
+        private final Vector<String> value;
 
 
         public MetaDataChangeUnit(int type, String key, Vector<String> value) {

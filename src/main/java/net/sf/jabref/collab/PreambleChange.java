@@ -32,14 +32,13 @@ class PreambleChange extends Change {
     private final JScrollPane sp = new JScrollPane(tp);
 
 
-    public PreambleChange(String tmp, String mem, String disk) {
+    public PreambleChange(String mem, String disk) {
         super(Localization.lang("Changed preamble"));
         this.disk = disk;
         this.mem = mem;
 
-        StringBuilder text = new StringBuilder();
-        text.append("<FONT SIZE=3>");
-        text.append("<H2>").append(Localization.lang("Changed preamble")).append("</H2>");
+        StringBuilder text = new StringBuilder(34);
+        text.append("<FONT SIZE=3><H2>").append(Localization.lang("Changed preamble")).append("</H2>");
 
         if ((disk != null) && !disk.isEmpty()) {
             text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
@@ -51,7 +50,6 @@ class PreambleChange extends Change {
             text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
         }
 
-        //tp.setContentType("text/html");
         tp.setText(text.toString());
     }
 
@@ -64,7 +62,7 @@ class PreambleChange extends Change {
     }
 
     @Override
-    JComponent description() {
+    public JComponent description() {
         return sp;
     }
 }

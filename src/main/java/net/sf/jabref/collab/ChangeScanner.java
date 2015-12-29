@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Vector;
 import java.util.ArrayList;
 
@@ -64,6 +65,7 @@ public class ChangeScanner implements Runnable {
 
     private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
 
+    private final double MATCH_THRESHOLD = 0.4;
 
     /**
      * We create an ArrayList to hold the changes we find. These will be added in the form
@@ -123,7 +125,7 @@ public class ChangeScanner implements Runnable {
             scanGroups(mdInTemp, mdOnDisk);
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Problem running", ex);
         }
     }
 
@@ -240,10 +242,10 @@ public class ChangeScanner implements Runnable {
             // No? Then check if another entry matches exactly.
             if (piv2 < (disk.getEntryCount() - 1)) {
                 for (int i = piv2 + 1; i < disk.getEntryCount(); i++) {
-                    if (!used.contains(String.valueOf(i))) {
-                        comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
-                    } else {
+                    if (used.contains(String.valueOf(i))) {
                         comp = -1;
+                    } else {
+                        comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
                     }
 
                     if (comp > 1) {
@@ -273,11 +275,11 @@ public class ChangeScanner implements Runnable {
 
                 if (piv2 < (disk.getEntryCount() - 1)) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {
-                        if (!used.contains(String.valueOf(i))) {
+                        if (used.contains(String.valueOf(i))) {
+                            comp = -1;
+                        } else {
                             comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1),
                                     disk.getEntryAt(i));
-                        } else {
-                            comp = -1;
                         }
 
                         if (comp > bestMatch) {
@@ -287,7 +289,6 @@ public class ChangeScanner implements Runnable {
                     }
                 }
 
-                double MATCH_THRESHOLD = 0.4;
                 if (bestMatch > MATCH_THRESHOLD) {
                     used.add(String.valueOf(bestMatchI));
                     it.remove();
@@ -379,13 +380,14 @@ public class ChangeScanner implements Runnable {
         String mem = inMem1.getPreamble();
         String tmp = onTmp.getPreamble();
         String disk = onDisk.getPreamble();
-        if (tmp != null) {
-            if ((disk == null) || !tmp.equals(disk)) {
-                changes.add(new PreambleChange(tmp, mem, disk));
+        if (tmp == null) {
+            if ((disk != null) && !disk.isEmpty()) {
+                changes.add(new PreambleChange(mem, disk));
             }
-        }
-        else if ((disk != null) && !disk.isEmpty()) {
-            changes.add(new PreambleChange(tmp, mem, disk));
+        } else {
+            if ((disk == null) || !tmp.equals(disk)) {
+                changes.add(new PreambleChange(mem, disk));
+            }
         }
     }
 
@@ -453,20 +455,21 @@ public class ChangeScanner implements Runnable {
                             BibtexString bsMem = null;
 
                             for (String memId : inMem1.getStringKeySet()) {
-                                BibtexString bsMem_cand = inMem1.getString(memId);
-                                if (bsMem_cand.getContent().equals(disk.getContent()) &&
+                                BibtexString bsMemCandidate = inMem1.getString(memId);
+                                if (bsMemCandidate.getContent().equals(disk.getContent()) &&
                                         !usedInMem.contains(memId)) {
                                     usedInMem.add(memId);
-                                    bsMem = bsMem_cand;
+                                    bsMem = bsMemCandidate;
                                     break;
                                 }
                             }
 
-                            changes.add(new StringNameChange(bsMem, tmp, bsMem.getName(),
-                                    tmp.getName(), disk.getName(),
-                                    tmp.getContent()));
-                            i.remove();
-                            used.add(diskId);
+                            if (bsMem != null) {
+                                changes.add(new StringNameChange(bsMem, tmp, bsMem.getName(), tmp.getName(),
+                                        disk.getName(), tmp.getContent()));
+                                i.remove();
+                                used.add(diskId);
+                            }
 
                         }
                     }
@@ -496,7 +499,7 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    private static Optional<BibtexString> findString(BibDatabase base, String name, HashSet<Object> used) {
+    private static Optional<BibtexString> findString(BibDatabase base, String name, Set<Object> used) {
         if (!base.hasStringLabel(name)) {
             return Optional.empty();
         }

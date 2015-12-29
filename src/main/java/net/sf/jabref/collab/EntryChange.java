@@ -48,11 +48,11 @@ class EntryChange extends Change {
 
         // We know that tmpEntry is not equal to diskEntry. Check if it has been modified
         // locally as well, since last tempfile was saved.
-        boolean isModifiedLocally = !(DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry) > 1);
+        boolean isModifiedLocally = (DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry) <= 1);
 
         // Another (unlikely?) possibility is that both disk and mem version has been modified
         // in the same way. Check for this, too.
-        boolean modificationsAgree = DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1;
+        boolean modificationsAgree = (DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1);
 
         LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally
                 + " Modifications agree: " + modificationsAgree);
@@ -85,7 +85,7 @@ class EntryChange extends Change {
         boolean allAccepted = true;
 
         Enumeration<Change> e = children();
-        for (; e.hasMoreElements();) {
+        while (e.hasMoreElements()) {
             Change c = e.nextElement();
             if (c.isAcceptable() && c.isAccepted()) {
                 c.makeChange(panel, secondary, undoEdit);
@@ -104,21 +104,20 @@ class EntryChange extends Change {
     }
 
     @Override
-    JComponent description() {
+    public JComponent description() {
         return new JLabel(name);
     }
 
 
     static class FieldChange extends Change {
 
-        final BibEntry entry;
-        final BibEntry tmpEntry;
-        final String field;
-        final String inMem;
-        final String onTmp;
-        final String onDisk;
-        final InfoPane tp = new InfoPane();
-        final JScrollPane sp = new JScrollPane(tp);
+        private final BibEntry entry;
+        private final BibEntry tmpEntry;
+        private final String field;
+        private final String inMem;
+        private final String onDisk;
+        private final InfoPane tp = new InfoPane();
+        private final JScrollPane sp = new JScrollPane(tp);
 
 
         public FieldChange(String field, BibEntry memEntry, BibEntry tmpEntry, String inMem, String onTmp, String onDisk) {
@@ -127,29 +126,23 @@ class EntryChange extends Change {
             this.tmpEntry = tmpEntry;
             this.field = field;
             this.inMem = inMem;
-            this.onTmp = onTmp;
             this.onDisk = onDisk;
 
-            StringBuilder text = new StringBuilder();
-            text.append("<FONT SIZE=10>");
-            text.append("<H2>").append(Localization.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
+            StringBuilder text = new StringBuilder(36);
+            text.append("<FONT SIZE=10><H2>").append(Localization.lang("Modification of field"))
+                    .append(" <I>").append(field).append("</I></H2>");
 
             if ((onDisk != null) && !onDisk.isEmpty()) {
-                text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + ' ').append(onDisk);
+                text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3> ").append(onDisk);
             } else {
                 text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
             }
 
             if ((inMem != null) && !inMem.isEmpty()) {
-                text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + ' ').append(inMem);
+                text.append("<H3>").append(Localization.lang("Current value")).append(":</H3> ").append(inMem);
             }
             if ((onTmp != null) && !onTmp.isEmpty()) {
-                text.append("<H3>").append(Localization.lang("Current tmp value")).append(":</H3>" + ' ').append(onTmp);
-            } else {
-                // No value in memory.
-                /*if ((onTmp != null) && !onTmp.equals(inMem))
-                  text.append("<H2>"+Globals.lang("You have cleared this field. Original value")+":</H2>"
-                              +" "+onTmp);*/
+                text.append("<H3>").append(Localization.lang("Current tmp value")).append(":</H3> ").append(onTmp);
             }
             tp.setContentType("text/html");
             tp.setText(text.toString());
@@ -165,7 +158,7 @@ class EntryChange extends Change {
         }
 
         @Override
-        JComponent description() {
+        public JComponent description() {
             return sp;
         }
 
