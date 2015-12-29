@@ -27,9 +27,9 @@ import java.util.*;
  */
 public class JournalAbbreviationRepository {
 
-    private final HashMap<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<>();
-    private final HashMap<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<>();
-    private final HashMap<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<>();
+    private final Map<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<>();
+    private final Map<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<>();
+    private final Map<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<>();
 
     private final SortedSet<Abbreviation> abbreviations = new TreeSet<>();
 

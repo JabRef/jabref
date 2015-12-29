@@ -21,6 +21,9 @@ public class DOI {
     // DOI resolver
     public static final URI RESOLVER = URI.create("http://doi.org");
 
+    // DOI
+    private final String doi;
+
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = ""
@@ -53,9 +56,6 @@ public class DOI {
             return Optional.empty();
         }
     }
-
-    // DOI
-    private final String doi;
 
     /**
      * Creates a DOI from various schemes including URL, URN, and plain DOIs.

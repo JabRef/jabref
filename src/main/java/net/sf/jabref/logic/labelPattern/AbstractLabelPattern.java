@@ -17,9 +17,10 @@
 */
 package net.sf.jabref.logic.labelPattern;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A small table, where an entry type is associated with a label pattern (an
@@ -27,9 +28,9 @@ import java.util.Hashtable;
  */
 public abstract class AbstractLabelPattern {
 
-    protected ArrayList<String> defaultPattern;
+    protected List<String> defaultPattern;
 
-    protected Hashtable<String, ArrayList<String>> data = new Hashtable<>();
+    protected Map<String, List<String>> data = new Hashtable<>();
 
     public AbstractLabelPattern() {
     }
@@ -40,7 +41,7 @@ public abstract class AbstractLabelPattern {
 
     /**
      * Remove a label pattern from the LabelPattern.
-     * 
+     *
      * @param type a <code>String</code>
      */
     public void removeLabelPattern(String type) {
@@ -56,17 +57,17 @@ public abstract class AbstractLabelPattern {
      * If this fails, we try the default.<br />
      * If that fails, we try the parent.<br />
      * If that fails, we return the DEFAULT_LABELPATTERN<br />
-     * 
+     *
      * @param key a <code>String</code>
      * @return the list of Strings for the given key. First entry: the complete key
      */
-    public abstract ArrayList<String> getValue(String key);
+    public abstract List<String> getValue(String key);
 
     /**
      * Checks whether this pattern is customized or the default value.
      */
     public final boolean isDefaultValue(String key) {
-        Object _obj = data.get(key);
+        final Object _obj = data.get(key);
         return _obj == null;
     }
 
@@ -75,7 +76,7 @@ public abstract class AbstractLabelPattern {
      *
      * @return null if not available.
      */
-    public ArrayList<String> getDefaultValue() {
+    public List<String> getDefaultValue() {
         return this.defaultPattern;
     }
 
@@ -87,7 +88,7 @@ public abstract class AbstractLabelPattern {
         this.defaultPattern = LabelPatternUtil.split(labelPattern);
     }
 
-    public Enumeration<String> getAllKeys() {
-        return data.keys();
+    public Set<String> getAllKeys() {
+        return data.keySet();
     }
 }

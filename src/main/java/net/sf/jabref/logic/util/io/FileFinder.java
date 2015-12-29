@@ -194,6 +194,10 @@ public class FileFinder {
     private static String findFile(BibEntry entry, BibDatabase database, File directory,
                                    String file) {
 
+        if (file.isEmpty()) {
+            return null;
+        }
+
         if (file.charAt(0) == '/') {
             directory = new File(".");
             file = file.substring(1);

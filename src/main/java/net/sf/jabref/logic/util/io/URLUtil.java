@@ -28,6 +28,8 @@ public class URLUtil {
 
     private static final String URL_EXP = "^(https?|ftp)://.+";
 
+    // Detect Google search URL
+    private static final String GOOGLE_SEARCH_EXP = "^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*";
 
     /**
      * Cleans URLs returned by Google search.
@@ -43,10 +45,8 @@ public class URLUtil {
     public static String cleanGoogleSearchURL(String url) {
         Objects.requireNonNull(url);
 
-        // Detect Google search URL
-        final String searchExp = "^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*";
 
-        if(!url.matches(searchExp)) {
+        if(!url.matches(GOOGLE_SEARCH_EXP)) {
             return url;
         }
         // Extract destination URL
@@ -64,7 +64,7 @@ public class URLUtil {
             for (String pair: pairs) {
                 // "clean" url is decoded value of "url" parameter
                 if (pair.startsWith("url=")) {
-                    String value = pair.substring(pair.indexOf("=") + 1, pair.length());
+                    String value = pair.substring(pair.indexOf('=') + 1, pair.length());
 
                     String decode = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
                     // url?

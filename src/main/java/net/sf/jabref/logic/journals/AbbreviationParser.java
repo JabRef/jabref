@@ -72,7 +72,7 @@ public class AbbreviationParser {
     }
 
     private void addLine(String line) {
-        if (line.startsWith("#")) {
+        if (!line.isEmpty() && (line.charAt(0) == '#')) {
             return;
         }
         String[] parts = line.split("=");

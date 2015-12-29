@@ -11,8 +11,8 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class GroupsUtil {
 
-    public static TreeSet<String> findDeliminatedWordsInField(BibDatabase db, String field, String deliminator) {
-        TreeSet<String> res = new TreeSet<>();
+    public static Set<String> findDeliminatedWordsInField(BibDatabase db, String field, String deliminator) {
+        Set<String> res = new TreeSet<>();
 
         for (String s : db.getKeySet()) {
             BibEntry be = db.getEntryById(s);
@@ -29,16 +29,16 @@ public class GroupsUtil {
     }
 
     /**
-     * Returns a HashMap containing all words used in the database in the given field type. Characters in
+     * Returns a Set containing all words used in the database in the given field type. Characters in
      * <code>remove</code> are not included.
      *
      * @param db a <code>BibDatabase</code> value
      * @param field a <code>String</code> value
      * @param remove a <code>String</code> value
-     * @return a <code>HashSet</code> value
+     * @return a <code>Set</code> value
      */
-    public static TreeSet<String> findAllWordsInField(BibDatabase db, String field, String remove) {
-        TreeSet<String> res = new TreeSet<>();
+    public static Set<String> findAllWordsInField(BibDatabase db, String field, String remove) {
+        Set<String> res = new TreeSet<>();
         StringTokenizer tok;
         for (String s : db.getKeySet()) {
             BibEntry be = db.getEntryById(s);

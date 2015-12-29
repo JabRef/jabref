@@ -20,14 +20,14 @@ package net.sf.jabref.logic.util;
  */
 public class OS {
     // https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/SystemUtils.html
-    public static final String osName = System.getProperty("os.name", "unknown").toLowerCase();
+    private static final String OS_NAME = System.getProperty("os.name", "unknown").toLowerCase();
 
-    public static final boolean LINUX = osName.startsWith("linux");
-    public static final boolean WINDOWS = osName.startsWith("win");
-    public static final boolean OS_X = osName.startsWith("mac");
+    public static final boolean LINUX = OS_NAME.startsWith("linux");
+    public static final boolean WINDOWS = OS_NAME.startsWith("win");
+    public static final boolean OS_X = OS_NAME.startsWith("mac");
 
     public static String guessProgramPath(String programName, String windowsDirectory) {
-        if (OS.WINDOWS) {
+        if (WINDOWS) {
             String progFiles = System.getenv("ProgramFiles(x86)");
             if (progFiles == null) {
                 progFiles = System.getenv("ProgramFiles");
