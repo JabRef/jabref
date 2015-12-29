@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class BibtexCaseChanger {
+public final class BibtexCaseChanger {
 
     private static final Log LOGGER = LogFactory.getLog(BibtexCaseChanger.class);
 
@@ -52,11 +52,11 @@ public class BibtexCaseChanger {
         // DIFFERENCE to old CaseChangers.TITLE: last word is NOT capitalized in all cases
         //TITLE_UPPERS('T');
 
+        private final char asChar;
+
         public char asChar() {
             return asChar;
         }
-
-        private final char asChar;
 
         FORMAT_MODE(char asChar) {
             this.asChar = asChar;
@@ -222,6 +222,9 @@ public class BibtexCaseChanger {
                 sb.append(s);
             }
             break;
+        default:
+            LOGGER.info("convertAccented - Unknown format: " + format);
+            break;
         }
         return pos;
     }
@@ -236,6 +239,9 @@ public class BibtexCaseChanger {
         case ALL_UPPERS:
             sb.append(Character.toUpperCase(c[pos]));
             pos++;
+            break;
+        default:
+            LOGGER.info("convertNonControl - Unknown format: " + format);
             break;
         }
         return pos;
@@ -262,6 +268,10 @@ public class BibtexCaseChanger {
             break;
         case ALL_UPPERS:
             sb.append(Character.toUpperCase(c[i]));
+            break;
+        default:
+            LOGGER.info("convertCharIfBraceLevelIsZero - Unknown format: " + format);
+            break;
         }
         i++;
         return i;
@@ -277,7 +287,7 @@ public class BibtexCaseChanger {
      * @param pos the position
      * @return the special LaTeX character or null
      */
-    static Optional<String> findSpecialChar(char[] c, int pos) {
+    public static Optional<String> findSpecialChar(char[] c, int pos) {
         if ((pos + 1) < c.length) {
             if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
                 return Optional.of("oe");
