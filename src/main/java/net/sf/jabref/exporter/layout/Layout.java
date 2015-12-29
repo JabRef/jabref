@@ -41,7 +41,6 @@ public class Layout {
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
     public Layout(Vector<StringInt> parsedEntries, String classPrefix) {
-        StringInt si;
         Vector<LayoutEntry> tmpEntries = new Vector<>(parsedEntries.size());
 
         Vector<StringInt> blockEntries = null;
@@ -49,33 +48,32 @@ public class Layout {
         String blockStart = null;
 
         for (StringInt parsedEntry : parsedEntries) {
-            si = parsedEntry;
             // TODO: Rewrite using switch
-            if ((si.i == LayoutHelper.IS_LAYOUT_TEXT) || (si.i == LayoutHelper.IS_SIMPLE_FIELD)) {
+            if ((parsedEntry.i == LayoutHelper.IS_LAYOUT_TEXT) || (parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD)) {
                 // Do nothing
-            } else if (si.i == LayoutHelper.IS_FIELD_START) {
+            } else if (parsedEntry.i == LayoutHelper.IS_FIELD_START) {
                 blockEntries = new Vector<>();
-                blockStart = si.s;
-            } else if (si.i == LayoutHelper.IS_FIELD_END) {
+                blockStart = parsedEntry.s;
+            } else if (parsedEntry.i == LayoutHelper.IS_FIELD_END) {
                 if ((blockStart != null) && (blockEntries != null)) {
-                    if (blockStart.equals(si.s)) {
-                        blockEntries.add(si);
+                    if (blockStart.equals(parsedEntry.s)) {
+                        blockEntries.add(parsedEntry);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        LOGGER.debug(blockStart + '\n' + si.s);
+                        LOGGER.debug(blockStart + '\n' + parsedEntry.s);
                         LOGGER.warn("Nested field entries are not implemented!");
                         Thread.dumpStack();
                     }
                 }
-            } else if (si.i == LayoutHelper.IS_GROUP_START) {
+            } else if (parsedEntry.i == LayoutHelper.IS_GROUP_START) {
                 blockEntries = new Vector<>();
-                blockStart = si.s;
-            } else if (si.i == LayoutHelper.IS_GROUP_END) {
+                blockStart = parsedEntry.s;
+            } else if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
                 if ((blockStart != null) && (blockEntries != null)) {
-                    if (blockStart.equals(si.s)) {
-                        blockEntries.add(si);
+                    if (blockStart.equals(parsedEntry.s)) {
+                        blockEntries.add(parsedEntry);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
                         tmpEntries.add(le);
                         blockEntries = null;
@@ -84,14 +82,14 @@ public class Layout {
                         Thread.dumpStack();
                     }
                 }
-            } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+            } else if (parsedEntry.i == LayoutHelper.IS_OPTION_FIELD) {
                 // Do nothing
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(si, classPrefix));
+                tmpEntries.add(new LayoutEntry(parsedEntry, classPrefix));
             } else {
-                blockEntries.add(si);
+                blockEntries.add(parsedEntry);
             }
         }
 
@@ -104,8 +102,6 @@ public class Layout {
             if (layoutEntries[i].isInvalidFormatter()) {
                 missingFormatters.addAll(layoutEntries[i].getInvalidFormatters());
             }
-
-            //System.out.println(layoutEntries[i].text);
         }
     }
 
@@ -188,7 +184,7 @@ public class Layout {
 
     // added section - end (arudert)
 
-    public ArrayList<String> getMissingFormatters() {
-        return missingFormatters;
+    public List<String> getMissingFormatters() {
+        return new ArrayList<>(missingFormatters);
     }
 }

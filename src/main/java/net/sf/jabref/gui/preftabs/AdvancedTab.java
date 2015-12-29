@@ -52,7 +52,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JTextField remoteServerPort;
     private String oldLnf = "";
     private boolean oldUseDef;
-    private boolean oldBiblMode;
     private int oldPort = -1;
 
     private final JCheckBox useConvertToEquation;

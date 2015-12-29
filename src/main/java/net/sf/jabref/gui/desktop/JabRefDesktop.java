@@ -97,7 +97,7 @@ public class JabRefDesktop {
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
                 } else if (OS.WINDOWS) {
-                    openFileOnWindows(link, true);
+                    openFileOnWindows(link);
                     /*
                      * cmdArray[0] = Globals.prefs.get(JabRefPreferences.PSVIEWER); cmdArray[1] =
                      * link; Process child = Runtime.getRuntime().exec(
@@ -122,7 +122,7 @@ public class JabRefDesktop {
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
                 } else if (OS.WINDOWS) {
-                    openFileOnWindows(link, true);
+                    openFileOnWindows(link);
                     /*
                      * String[] spl = link.split("\\\\"); StringBuffer sb = new
                      * StringBuffer(); for (int i = 0; i < spl.length; i++) { if
@@ -159,11 +159,9 @@ public class JabRefDesktop {
      *
      * @param link
      *            The filename.
-     * @param localFile
-     *            true if it is a local file, not an URL.
      * @throws IOException
      */
-    static void openFileOnWindows(String link, boolean localFile) throws IOException {
+    static void openFileOnWindows(String link) throws IOException {
         // escape & and spaces
         Runtime.getRuntime().exec("cmd.exe /c start " + link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \""));
     }
@@ -255,7 +253,7 @@ public class JabRefDesktop {
                 // Application is specified. Use it:
                 openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
             } else {
-                openFileOnWindows(filePath, true);
+                openFileOnWindows(filePath);
             }
         } else {
             // Use the given app if specified, and the universal "xdg-open" otherwise:

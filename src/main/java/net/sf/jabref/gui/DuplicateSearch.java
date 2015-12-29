@@ -136,7 +136,7 @@ public class DuplicateSearch implements Runnable {
                 // Now, do the actual removal:
                 if (!toRemove.isEmpty()) {
                     for (BibEntry entry : toRemove) {
-                        panel.getDatabase().removeEntry(entry.getId());
+                        panel.getDatabase().removeEntry(entry);
                         ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
                     }
                     panel.markBaseChanged();

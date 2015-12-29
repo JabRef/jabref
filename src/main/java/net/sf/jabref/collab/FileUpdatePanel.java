@@ -30,15 +30,12 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 
     public static final String NAME = "fileUpdate";
 
-    private final BasePanel panel;
-
     private final SidePaneManager manager;
 
     private final ChangeScanner scanner;
 
 
-    public FileUpdatePanel(JabRefFrame frame, BasePanel panel, SidePaneManager manager, File file,
-            ChangeScanner scanner) {
+    public FileUpdatePanel(BasePanel panel, SidePaneManager manager, File file, ChangeScanner scanner) {
         super(manager, IconTheme.JabRefIcon.SAVE.getIcon(), Localization.lang("File changed"));
         close.setEnabled(false);
         this.panel = panel;
@@ -81,7 +78,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 
     /**
      * actionPerformed
-     * 
+     *
      * @param e
      *            ActionEvent
      */

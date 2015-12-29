@@ -350,7 +350,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     Localization.lang("cut entry")));
                 // Loop through the array of entries, and delete them.
                 for (BibEntry be : bes) {
-                    database.removeEntry(be.getId());
+                    database.removeEntry(be);
                     ensureNotShowing(be);
                     ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                 }
@@ -374,7 +374,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         Localization.lang("delete entry")));
                     // Loop through the array of entries, and delete them.
                     for (BibEntry be : bes) {
-                        database.removeEntry(be.getId());
+                        database.removeEntry(be);
                         ensureNotShowing(be);
                         ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                     }
@@ -1031,7 +1031,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 String id = IdGenerator.next();
                 BibEntry bibEntry = new BibEntry(id, tp);
-                TextInputDialog tidialog = new TextInputDialog(frame, BasePanel.this, "import", true, bibEntry);
+                TextInputDialog tidialog = new TextInputDialog(frame, "import", true, bibEntry);
                 PositionWindow.placeDialog(tidialog, BasePanel.this);
                 tidialog.setVisible(true);
 
@@ -1723,21 +1723,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    /**
-     * Stores the source view in the entry editor, if one is open, has the source view selected and the source has been
-     * edited.
-     *
-     * @return boolean false if there is a validation error in the source panel, true otherwise.
-     */
-    public boolean entryEditorAllowsChange() {
-        Component c = splitPane.getBottomComponent();
-        if (c instanceof EntryEditor) {
-            return ((EntryEditor) c).lastSourceAccepted();
-        } else {
-            return true;
-        }
-    }
-
     private boolean isShowingEditor() {
         return (splitPane.getBottomComponent() != null) && (splitPane.getBottomComponent() instanceof EntryEditor);
     }
@@ -2328,7 +2313,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     sidePaneManager.hideComponent(FileUpdatePanel.NAME);
                     sidePaneManager.unregisterComponent(FileUpdatePanel.NAME);
                 }
-                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, getDatabaseFile(), scanner);
+                FileUpdatePanel pan = new FileUpdatePanel(BasePanel.this, sidePaneManager, getDatabaseFile(), scanner);
                 sidePaneManager.register(FileUpdatePanel.NAME, pan);
                 sidePaneManager.show(FileUpdatePanel.NAME);
                 //setUpdatedExternally(false);

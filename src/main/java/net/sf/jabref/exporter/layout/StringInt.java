@@ -55,7 +55,7 @@ class StringInt implements java.io.Serializable {
 
 
     /**
-     *  Constructor for the StringString object
+     *  Constructor for the StringInt object
      *
      * @param  _s  Description of the Parameter
      * @param  _i  Description of the Parameter

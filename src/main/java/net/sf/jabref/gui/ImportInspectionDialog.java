@@ -526,7 +526,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         // Remove the entry from the database again, since we only added it in
         // order to
         // make sure the key was unique:
-        database.removeEntry(entry.getId());
+        database.removeEntry(entry);
 
         entries.getReadWriteLock().writeLock().lock();
         glTable.repaint();
@@ -571,7 +571,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         // to keep
         // control over key uniqueness.
         for (BibEntry entry : entries) {
-            database.removeEntry(entry.getId());
+            database.removeEntry(entry);
         }
         entries.getReadWriteLock().writeLock().lock();
         glTable.repaint();
@@ -706,7 +706,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             if (!entriesToDelete.isEmpty()) {
                 for (BibEntry entry : entriesToDelete) {
                     ce.addEdit(new UndoableRemoveEntry(panel.database(), entry, panel));
-                    panel.database().removeEntry(entry.getId());
+                    panel.database().removeEntry(entry);
                 }
             }
 

@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.bst;
 
+import java.util.Optional;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -166,9 +168,9 @@ public class BibtexCaseChanger {
             i++;
             // skip over the |backslash|
 
-            String s = BibtexCaseChanger.findSpecialChar(c, i);
-            if (s != null) {
-                i = convertAccented(c, i, s, sb, format);
+            Optional<String> s = BibtexCaseChanger.findSpecialChar(c, i);
+            if (s.isPresent()) {
+                i = convertAccented(c, i, s.get(), sb, format);
             }
 
             while ((i < c.length) && (braceLevel > 0) && (c[i] != '\\')) {
@@ -275,48 +277,33 @@ public class BibtexCaseChanger {
      * @param pos the position
      * @return the special LaTeX character or null
      */
-    static String findSpecialChar(char[] c, int pos) {
+    static Optional<String> findSpecialChar(char[] c, int pos) {
         if ((pos + 1) < c.length) {
             if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
-                return "oe";
+                return Optional.of("oe");
             }
             if ((c[pos] == 'O') && (c[pos + 1] == 'E')) {
-                return "OE";
+                return Optional.of("OE");
             }
             if ((c[pos] == 'a') && (c[pos + 1] == 'e')) {
-                return "ae";
+                return Optional.of("ae");
             }
             if ((c[pos] == 'A') && (c[pos + 1] == 'E')) {
-                return "AE";
+                return Optional.of("AE");
             }
             if ((c[pos] == 's') && (c[pos + 1] == 's')) {
-                return "ss";
+                return Optional.of("ss");
             }
             if ((c[pos] == 'A') && (c[pos + 1] == 'A')) {
-                return "AA";
+                return Optional.of("AA");
             }
             if ((c[pos] == 'a') && (c[pos + 1] == 'a')) {
-                return "aa";
+                return Optional.of("aa");
             }
         }
-        if (c[pos] == 'i') {
-            return String.valueOf(c[pos]);
+        if ("ijoOlL".indexOf(c[pos]) >= 0) {
+            return Optional.of(String.valueOf(c[pos]));
         }
-        if (c[pos] == 'j') {
-            return String.valueOf(c[pos]);
-        }
-        if (c[pos] == 'o') {
-            return String.valueOf(c[pos]);
-        }
-        if (c[pos] == 'O') {
-            return String.valueOf(c[pos]);
-        }
-        if (c[pos] == 'l') {
-            return String.valueOf(c[pos]);
-        }
-        if (c[pos] == 'L') {
-            return String.valueOf(c[pos]);
-        }
-        return null;
+        return Optional.empty();
     }
 }

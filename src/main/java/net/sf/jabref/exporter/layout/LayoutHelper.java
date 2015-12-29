@@ -61,15 +61,11 @@ public class LayoutHelper {
     public Layout getLayoutFromText(String classPrefix) throws IOException {
         parse();
 
-        StringInt si;
-
         for (StringInt parsedEntry : parsedEntries) {
-            si = parsedEntry;
-
-            if ((si.i == LayoutHelper.IS_SIMPLE_FIELD) || (si.i == LayoutHelper.IS_FIELD_START)
-                    || (si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_START)
-                    || (si.i == LayoutHelper.IS_GROUP_END)) {
-                si.s = si.s.trim().toLowerCase();
+            if ((parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD) || (parsedEntry.i == LayoutHelper.IS_FIELD_START)
+                    || (parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_START)
+                    || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
+                parsedEntry.s = parsedEntry.s.trim().toLowerCase();
             }
         }
 
@@ -133,7 +129,7 @@ public class LayoutHelper {
     /**
      *
      */
-    private String getBracketedOptionField(int _field) throws IOException {
+    private String getBracketedOptionField() throws IOException {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
@@ -330,7 +326,7 @@ public class LayoutHelper {
                         if (c == '[') {
                             // get format parameter
                             // get field name
-                            getBracketedOptionField(LayoutHelper.IS_OPTION_FIELD);
+                            getBracketedOptionField();
 
                             return;
                         } else {

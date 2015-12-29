@@ -60,7 +60,7 @@ public class BibDatabase {
      */
     private final Map<String, BibEntry> entries = new ConcurrentHashMap<>();
     // use a map instead of a set since i need to know how many of each key is in there
-    private final HashMap<String, Integer> allKeys = new HashMap<>();
+    private final Map<String, Integer> allKeys = new HashMap<>();
     private String preamble;
     // All file contents below the last entry in the file
     private String epilog = "";
@@ -120,12 +120,12 @@ public class BibDatabase {
         return entries.values();
     }
 
-    public TreeSet<String> getAllVisibleFields() {
-        TreeSet<String> allFields = new TreeSet<>();
+    public Set<String> getAllVisibleFields() {
+        Set<String> allFields = new TreeSet<>();
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFieldNames());
         }
-        TreeSet<String> toberemoved = new TreeSet<>();
+        Set<String> toberemoved = new TreeSet<>();
         for (String field : allFields) {
             if (field.startsWith("__")) {
                 toberemoved.add(field);
@@ -149,13 +149,8 @@ public class BibDatabase {
         Set<String> keySet = entries.keySet();
         for (String entryID : keySet) {
             BibEntry entry = getEntryById(entryID);
-            if ((entry != null) && (entry.getCiteKey() != null)) {
-                String citeKey = entry.getCiteKey();
-                if (citeKey != null) {
-                    if (keyHash == citeKey.hashCode()) {
-                        back = entry;
-                    }
-                }
+            if ((entry != null) && (entry.getCiteKey() != null) && (keyHash == entry.getCiteKey().hashCode())) {
+                back = entry;
             }
         }
         return back;
@@ -193,22 +188,18 @@ public class BibDatabase {
     }
 
     /**
-     * Removes the entry with the given string.
-     * <p>
-     * Returns null if not found.
+     * Removes the given entry.
      */
-    public synchronized BibEntry removeEntry(String id) {
-        BibEntry oldValue = entries.remove(id);
-
+    public synchronized void removeEntry(BibEntry oldValue) {
         if (oldValue == null) {
-            return null;
+            return;
         }
+
+        entries.remove(oldValue.getId());
 
         removeKeyFromSet(oldValue.getCiteKey());
         oldValue.removePropertyChangeListener(listener);
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, oldValue));
-
-        return oldValue;
     }
 
     public synchronized boolean setCiteKeyForEntry(String id, String key) {
@@ -217,10 +208,10 @@ public class BibDatabase {
         }
         BibEntry entry = getEntryById(id);
         String oldKey = entry.getCiteKey();
-        if (key != null) {
-            entry.setField(BibEntry.KEY_FIELD, key);
-        } else {
+        if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
+        } else {
+            entry.setField(BibEntry.KEY_FIELD, key);
         }
         return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
     }
@@ -368,10 +359,9 @@ public class BibDatabase {
      * care not to follow a circular reference pattern.
      * If the string is undefined, returns null.
      */
-    private String resolveString(String label, HashSet<String> usedIds) {
+    private String resolveString(String label, Set<String> usedIds) {
         for (BibtexString string : bibtexStrings.values()) {
-            //Util.pr(label+" : "+string.getName());
-            if (string.getName().toLowerCase().equals(label.toLowerCase())) {
+            if (string.getName().equalsIgnoreCase(label)) {
                 // First check if this string label has been resolved
                 // earlier in this recursion. If so, we have a
                 // circular reference, and have to stop to avoid
@@ -406,19 +396,19 @@ public class BibDatabase {
         }
     }
 
-    private String resolveContent(String res, HashSet<String> usedIds) {
+    private String resolveContent(String res, Set<String> usedIds) {
         if (res.matches(".*#[^#]+#.*")) {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;
             int next;
-            while ((next = res.indexOf("#", piv)) >= 0) {
+            while ((next = res.indexOf('#', piv)) >= 0) {
 
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0) {
                     newRes.append(res.substring(piv, next));
                 }
-                int stringEnd = res.indexOf("#", next + 1);
+                int stringEnd = res.indexOf('#', next + 1);
                 if (stringEnd >= 0) {
                     // We found the boundaries of the string ref,
                     // now resolve that one.
@@ -505,10 +495,10 @@ public class BibDatabase {
     // keep track of all the keys to warn if there are duplicates
     //========================================================
     private boolean addKeyToSet(String key) {
-        boolean exists = false;
         if ((key == null) || key.isEmpty()) {
             return false;//don't put empty key
         }
+        boolean exists = false;
         if (allKeys.containsKey(key)) {
             // warning
             exists = true;
@@ -568,7 +558,7 @@ public class BibDatabase {
      * @return The resolved field value or null if not found.
      */
     public static String getResolvedField(String field, BibEntry bibtex, BibDatabase database) {
-        if (field.equals("bibtextype")) {
+        if ("bibtextype".equals(field)) {
             return bibtex.getType().getName();
         }
 

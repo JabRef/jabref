@@ -768,16 +768,6 @@ public class MainTable extends JTable {
     }
 
     /**
-     * Get the first comparator set up for the given column.
-     * @param index The column number.
-     * @return The Comparator, or null if none is set.
-     */
-    public Comparator<BibEntry> getComparatorForColumn(int index) {
-        List<Comparator> l = comparatorChooser.getComparatorsForColumn(index);
-        return l.isEmpty() ? null : l.get(0);
-    }
-
-    /**
      * Find out which column is set as sort column.
      * @param number The position in the sort hierarchy (primary, secondary, etc.)
      * @return The sort column number.

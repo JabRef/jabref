@@ -56,13 +56,13 @@ class LayoutEntry {
         type = si.i;
         classPrefix = classPrefix_;
 
-        if (si.i == LayoutHelper.IS_LAYOUT_TEXT) {
+        if (type == LayoutHelper.IS_LAYOUT_TEXT) {
             text = si.s;
-        } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
+        } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
             text = si.s.trim();
-        } else if ((si.i == LayoutHelper.IS_FIELD_START) || (si.i == LayoutHelper.IS_FIELD_END)) {
+        } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_FIELD_END)) {
             // Do nothing
-        } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+        } else if (type == LayoutHelper.IS_OPTION_FIELD) {
             Vector<String> v = new Vector<>();
             WSITools.tokenize(v, si.s, "\n");
 
@@ -90,38 +90,29 @@ class LayoutEntry {
 
     public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) {
         classPrefix = classPrefix_;
-        String blockStart;
-        String blockEnd;
-        StringInt si;
         Vector<StringInt> blockEntries = null;
         Vector<LayoutEntry> tmpEntries = new Vector<>();
         LayoutEntry le;
-        si = parsedEntries.get(0);
-        blockStart = si.s;
-        si = parsedEntries.get(parsedEntries.size() - 1);
-        blockEnd = si.s;
+        String blockStart = parsedEntries.get(0).s;
+        String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
 
         if (!blockStart.equals(blockEnd)) {
             LOGGER.warn("Field start and end entry must be equal.");
         }
 
         type = layoutType;
-        text = si.s;
-
-        for (int i = 1; i < (parsedEntries.size() - 1); i++) {
-            si = parsedEntries.get(i);
-
-            // System.out.println("PARSED-ENTRY: "+si.s+"="+si.i);
-            if ((si.i == LayoutHelper.IS_LAYOUT_TEXT) || (si.i == LayoutHelper.IS_SIMPLE_FIELD)) {
+        text = blockEnd;
+        for (StringInt parsedEntry : parsedEntries.subList(1, parsedEntries.size() - 1)) {
+            if ((parsedEntry.i == LayoutHelper.IS_LAYOUT_TEXT) || (parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD)) {
                 // Do nothing
-            } else if ((si.i == LayoutHelper.IS_FIELD_START)
-                    || (si.i == LayoutHelper.IS_GROUP_START)) {
+            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_START)
+                    || (parsedEntry.i == LayoutHelper.IS_GROUP_START)) {
                 blockEntries = new Vector<>();
-                blockStart = si.s;
-            } else if ((si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_END)) {
-                if (blockStart.equals(si.s)) {
-                    blockEntries.add(si);
-                    if (si.i == LayoutHelper.IS_GROUP_END) {
+                blockStart = parsedEntry.s;
+            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
+                if (blockStart.equals(parsedEntry.s)) {
+                    blockEntries.add(parsedEntry);
+                    if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
                     } else {
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
@@ -131,18 +122,14 @@ class LayoutEntry {
                 } else {
                     LOGGER.warn("Nested field entries are not implemented !!!");
                 }
-            } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+            } else if (parsedEntry.i == LayoutHelper.IS_OPTION_FIELD) {
                 // Do nothing
             }
 
-            // else if (si.i == LayoutHelper.IS_OPTION_FIELD_PARAM)
-            // {
-            // }
             if (blockEntries == null) {
-                // System.out.println("BLOCK ADD: "+si.s+"="+si.i);
-                tmpEntries.add(new LayoutEntry(si, classPrefix));
+                tmpEntries.add(new LayoutEntry(parsedEntry, classPrefix));
             } else {
-                blockEntries.add(si);
+                blockEntries.add(parsedEntry);
             }
         }
 

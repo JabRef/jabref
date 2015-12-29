@@ -8,7 +8,6 @@ import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.SearchQueryLocalizer;
 import net.sf.jabref.model.entry.BibEntry;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,8 +17,6 @@ class GlobalSearchWorker extends AbstractWorker {
     private final JabRefFrame frame;
     private final SearchQuery searchQuery;
     private final SearchResultsDialog dialog;
-
-    private final List<BibEntry> matchedEntries = new LinkedList<>();
 
     public GlobalSearchWorker(JabRefFrame frame, SearchQuery query) {
         this.frame = Objects.requireNonNull(frame);
