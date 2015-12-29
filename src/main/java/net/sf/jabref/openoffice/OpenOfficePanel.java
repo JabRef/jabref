@@ -33,6 +33,10 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
@@ -51,6 +56,8 @@ import java.util.Map;
  * between JabRef and OpenOffice.
  */
 public class OpenOfficePanel extends AbstractWorker implements PushToApplication {
+
+    private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
     public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
     public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
@@ -91,7 +98,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private final JButton help = new HelpAction(GUIGlobals.helpDiag, "OpenOfficeIntegration.html").getIconButton();
     private final JButton test = new JButton("Test");
     private JRadioButton inPar;
-    private JRadioButton inText;
     private JPanel settings;
     private String styleFile;
     private OOBibBase ooBase;
@@ -164,7 +170,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     public void init(JabRefFrame jrFrame, SidePaneManager spManager) {
         frame = jrFrame;
         this.manager = spManager;
-        comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), Localization.lang("OpenOffice"));
+        comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), Localization.lang("OpenOffice"), this);
         try {
             initPanel();
             spManager.register(getName(), comp);
@@ -243,7 +249,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                     try {
                         readStyleFile();
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        LOGGER.warn("Could not read style file", ex);
                     }
                 }
             }
@@ -628,7 +634,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     // The methods addFile and associated final Class[] parameters were gratefully copied from
     // anthony_miguel @ http://forum.java.sun.com/thread.jsp?forum=32&thread=300557&tstart=0&trange=15
-    private static final Class<?>[] parameters = new Class[] {URL.class};
+    private static final Class<?>[] CLASS_PARAMETERS = new Class[] {URL.class};
 
 
     private static void addURL(URL[] u) throws IOException {
@@ -636,13 +642,13 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         Class<URLClassLoader> sysclass = URLClassLoader.class;
 
         try {
-            Method method = sysclass.getDeclaredMethod("addURL", parameters);
+            Method method = sysclass.getDeclaredMethod("addURL", CLASS_PARAMETERS);
             method.setAccessible(true);
             for (URL anU : u) {
                 method.invoke(sysloader, anU);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            LOGGER.error("Could not add URL to system classloader", t);
             throw new IOException("Error, could not add URL to system classloader");
         }
     }
@@ -844,15 +850,14 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 //wrapper.loadBstFile(new File("/home/usr/share/texmf-tetex/bibtex/bst/base/plain.bst"));
                 wrapper.loadBstFile(new File("/home/usr/share/texmf-tetex/bibtex/bst/ams/amsalpha.bst"));
                 Map<String, String> result = wrapper.processEntries(el, database);
-                for (String key : result.keySet()) {
-                    System.out.println("Key: " + key);
-                    System.out.println("Entry: " + result.get(key));
-                    ooBase.insertMarkedUpTextAtViewCursor(result.get(key), "Default");
+                for (Entry<String, String> entry : result.entrySet()) {
+                    LOGGER.debug("Key: " + entry.getKey() + " Entry: " + entry.getValue());
+                    ooBase.insertMarkedUpTextAtViewCursor(entry.getValue(), "Default");
                 }
                 //System.out.println(result);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Could not insert entry", ex);
         }
     }
 
@@ -904,7 +909,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 Globals.prefs.clear(JabRefPreferences.OO_PATH);
                 Globals.prefs.clear(JabRefPreferences.OO_EXECUTABLE_PATH);
                 Globals.prefs.clear(JabRefPreferences.OO_JARS_PATH);
-                Globals.prefs.clear(JabRefPreferences.OO_JARS_PATH);
                 frame.output(Localization.lang("Cleared connection settings."));
             }
         });
@@ -945,7 +949,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             } catch (UndefinedParagraphFormatException ex) {
                 reportUndefinedParagraphFormat(ex);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.warn("Could not insert entry", ex);
             }
         }
     }
@@ -972,16 +976,16 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     @Override
     public JPanel getSettingsPanel() {
-        return null;
-        /*if (settings == null)
+        if (settings == null) {
             initSettingsPanel();
-        return settings;*/
+        }
+        return settings;
     }
 
     private void initSettingsPanel() {
         boolean inParen = Globals.prefs.getBoolean(JabRefPreferences.OO_IN_PAR_CITATION);
         inPar = new JRadioButton(Localization.lang("Use in-parenthesis citation"), inParen);
-        inText = new JRadioButton(Localization.lang("Use in-text citation"), !inParen);
+        JRadioButton inText = new JRadioButton(Localization.lang("Use in-text citation"), !inParen);
         ButtonGroup bg = new ButtonGroup();
         bg.add(inPar);
         bg.add(inText);
@@ -1028,13 +1032,15 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     class OOPanel extends SidePaneComponent {
 
-        public OOPanel(SidePaneManager sidePaneManager, Icon url, String s) {
+        private final OpenOfficePanel panel;
+        public OOPanel(SidePaneManager sidePaneManager, Icon url, String s, OpenOfficePanel panel) {
             super(sidePaneManager, url, s);
+            this.panel = panel;
         }
 
         @Override
         public String getName() {
-            return this.getName();
+            return panel.getName();
         }
 
         @Override

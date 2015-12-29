@@ -943,7 +943,7 @@ class OOBibBase {
      * @return The list of bibtex keys encoded in the name.
      */
     public List<String> parseRefMarkName(String name) {
-        ArrayList<String> keys = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
         Matcher m = citePattern.matcher(name);
         if (m.find()) {
             String[] keystring = m.group(2).split(",");
@@ -1030,14 +1030,12 @@ class OOBibBase {
         // If we don't have numbered entries, we need to sort the entries before adding them:
         if (!style.isSortByPosition()) {
             Map<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-            for (BibEntry entry : entries.keySet()) {
-                newMap.put(entry, entries.get(entry));
-            }
+            newMap.putAll(entries);
             entries = newMap;
         }
         int number = 1;
-        for (BibEntry entry : entries.keySet()) {
-            if (entry instanceof UndefinedBibtexEntry) {
+        for (Map.Entry<BibEntry, BibDatabase> entry : entries.entrySet()) {
+            if (entry.getKey() instanceof UndefinedBibtexEntry) {
                 continue;
             }
             OOUtil.insertParagraphBreak(text, cursor);
@@ -1047,14 +1045,14 @@ class OOBibBase {
                         style.getNumCitationMarker(new int[] {number++}, minGroupingCount, true),
                         false, false, false, false, false, false);
             }
-            Layout layout = style.getReferenceFormat(entry.getType().getName());
+            Layout layout = style.getReferenceFormat(entry.getKey().getType().getName());
             try {
                 layout.setPostFormatter(OOUtil.POSTFORMATTER);
             } catch (NoSuchMethodError ignore) {
                 // Ignored
             }
-            OOUtil.insertFullReferenceAtCurrentLocation(text, cursor, layout, parFormat, entry,
-                    entries.get(entry), uniquefiers.get(entry.getCiteKey()));
+            OOUtil.insertFullReferenceAtCurrentLocation(text, cursor, layout, parFormat, entry.getKey(),
+                    entry.getValue(), uniquefiers.get(entry.getKey().getCiteKey()));
         }
 
     }

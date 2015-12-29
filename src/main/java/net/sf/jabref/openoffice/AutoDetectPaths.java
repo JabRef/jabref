@@ -20,6 +20,10 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.worker.AbstractWorker;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -36,6 +40,8 @@ import net.sf.jabref.logic.util.OS;
  * Tools for automatically detecting jar and executable paths to OpenOffice and/or LibreOffice.
  */
 public class AutoDetectPaths extends AbstractWorker {
+
+    private static final Log LOGGER = LogFactory.getLog(AutoDetectPaths.class);
 
     private boolean foundPaths;
     private boolean fileSearchCancelled;
@@ -57,7 +63,7 @@ public class AutoDetectPaths extends AbstractWorker {
             update();
             return foundPaths;
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.warn("Problem when auto-detecting paths", e);
             return false;
         }
     }
@@ -86,12 +92,12 @@ public class AutoDetectPaths extends AbstractWorker {
 
         if (OS.WINDOWS) {
             List<File> progFiles = findProgramFilesDir();
-            if (fileSearchCancelled) {
-                return false;
-            }
             File sOffice = null;
             List<File> sofficeFiles = new ArrayList<>();
             for (File dir : progFiles) {
+                if (fileSearchCancelled) {
+                    return false;
+                }
                 sOffice = findFileDir(dir, "soffice.exe");
                 if (sOffice != null) {
                     sofficeFiles.add(sOffice);
@@ -153,20 +159,8 @@ public class AutoDetectPaths extends AbstractWorker {
             } else {
                 sOffice = sofficeFiles.get(0);
             }
-            Globals.prefs.put(JabRefPreferences.OO_EXECUTABLE_PATH, new File(sOffice, "soffice.exe").getPath());
-            File jurt = findFileDir(sOffice.getParentFile(), "jurt.jar");
-            if (fileSearchCancelled) {
-                return false;
-            }
-            if (jurt != null) {
-                Globals.prefs.put(JabRefPreferences.OO_JARS_PATH, jurt.getPath());
-                return true;
-            } else {
-                return false;
-            }
-
-        }
-        else if (OS.OS_X) {
+            return setupPreferencesForOO(sOffice.getParentFile(), sOffice, "soffice.exe");
+        } else if (OS.OS_X) {
             File rootDir = new File("/Applications");
             File[] files = rootDir.listFiles();
             if (files != null) {
@@ -181,23 +175,12 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            if (sOffice != null) {
-                Globals.prefs.put(JabRefPreferences.OO_EXECUTABLE_PATH, new File(sOffice, "soffice.bin").getPath());
-                File jurt = findFileDir(rootDir, "jurt.jar");
-                if (fileSearchCancelled) {
-                    return false;
-                }
-                if (jurt != null) {
-                    Globals.prefs.put(JabRefPreferences.OO_JARS_PATH, jurt.getPath());
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
+            if (sOffice == null) {
                 return false;
+            } else {
+                return setupPreferencesForOO(rootDir, sOffice, "soffice.bin");
             }
-        }
-        else {
+        } else {
             // Linux:
             String usrRoot = "/usr/lib";
             File inUsr = findFileDir(new File(usrRoot), "soffice");
@@ -219,63 +202,55 @@ public class AutoDetectPaths extends AbstractWorker {
                 return false;
             }
             if ((inUsr != null) && (inOpt == null)) {
-                return setupPreferencesForOO(usrRoot, inUsr);
-            }
-            else if ((inOpt != null) && (inUsr == null)) {
-                Globals.prefs.put(JabRefPreferences.OO_EXECUTABLE_PATH, new File(inOpt, "soffice.bin").getPath());
-                File jurt = findFileDir(new File("/opt"), "jurt.jar");
-                if (jurt != null) {
-                    Globals.prefs.put(JabRefPreferences.OO_JARS_PATH, jurt.getPath());
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            else if (inOpt != null) { // Found both
-                JRadioButton optRB = new JRadioButton(inOpt.getPath(), true);
-                JRadioButton usrRB = new JRadioButton(inUsr.getPath(), false);
-                ButtonGroup bg = new ButtonGroup();
-                bg.add(optRB);
-                bg.add(usrRB);
-                FormBuilder b = FormBuilder.create()
-                        .layout(new FormLayout("left:pref", "pref, 2dlu, pref, 2dlu, pref "));
-                b.add(Localization
-                        .lang("Found more than one OpenOffice/LibreOffice executable. Please choose which one to connect to:"))
-                        .xy(1, 1);
-                b.add(optRB).xy(1, 3);
-                b.add(usrRB).xy(1, 5);
-                int answer = JOptionPane.showConfirmDialog(null, b.getPanel(),
-                        Localization.lang("Choose OpenOffice/LibreOffice executable"),
-                        JOptionPane.OK_CANCEL_OPTION);
-                if (answer == JOptionPane.CANCEL_OPTION) {
-                    return false;
-                } else {
+                return setupPreferencesForOO(usrRoot, inUsr, "soffice.bin");
+            } else if (inOpt != null) {
+                if (inUsr == null) {
+                    return setupPreferencesForOO("/opt", inOpt, "soffice.bin");
+                } else { // Found both
+                    JRadioButton optRB = new JRadioButton(inOpt.getPath(), true);
+                    JRadioButton usrRB = new JRadioButton(inUsr.getPath(), false);
+                    ButtonGroup bg = new ButtonGroup();
+                    bg.add(optRB);
+                    bg.add(usrRB);
+                    FormBuilder b = FormBuilder.create()
+                            .layout(new FormLayout("left:pref", "pref, 2dlu, pref, 2dlu, pref "));
+                    b.add(Localization
+                            .lang("Found more than one OpenOffice/LibreOffice executable. Please choose which one to connect to:"))
+                            .xy(1, 1);
+                    b.add(optRB).xy(1, 3);
+                    b.add(usrRB).xy(1, 5);
+                    int answer = JOptionPane.showConfirmDialog(null, b.getPanel(),
+                            Localization.lang("Choose OpenOffice/LibreOffice executable"),
+                            JOptionPane.OK_CANCEL_OPTION);
+                    if (answer == JOptionPane.CANCEL_OPTION) {
+                        return false;
+                    }
                     if (optRB.isSelected()) {
-                        return setupPreferencesForOO("/opt", inOpt);
+                        return setupPreferencesForOO("/opt", inOpt, "soffice.bin");
+                    } else {
+                        return setupPreferencesForOO(usrRoot, inUsr, "soffice.bin");
                     }
-                    else {
-                        return setupPreferencesForOO(usrRoot, inUsr);
-                    }
-
                 }
-            } else {
-                return false;
             }
         }
-
+        return false;
     }
 
-    private boolean setupPreferencesForOO(String usrRoot, File inUsr) {
-        Globals.prefs.put(JabRefPreferences.OO_EXECUTABLE_PATH, new File(inUsr, "soffice.bin").getPath());
-        File jurt = findFileDir(new File(usrRoot), "jurt.jar");
+    private boolean setupPreferencesForOO(String usrRoot, File inUsr, String sofficeName) {
+        return setupPreferencesForOO(new File(usrRoot), inUsr, sofficeName);
+    }
+
+    private boolean setupPreferencesForOO(File rootDir, File inUsr, String sofficeName) {
+        Globals.prefs.put(JabRefPreferences.OO_EXECUTABLE_PATH, new File(inUsr, sofficeName).getPath());
+        File jurt = findFileDir(rootDir, "jurt.jar");
         if (fileSearchCancelled) {
             return false;
         }
-        if (jurt != null) {
+        if (jurt == null) {
+            return false;
+        } else {
             Globals.prefs.put(JabRefPreferences.OO_JARS_PATH, jurt.getPath());
             return true;
-        } else {
-            return false;
         }
     }
 
