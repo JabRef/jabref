@@ -165,7 +165,8 @@ public class AutoDetectPaths extends AbstractWorker {
             File[] files = rootDir.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    if (file.isDirectory() && "OpenOffice.org.app".equals(file.getName())) {
+                    if (file.isDirectory() && ("OpenOffice.org.app".equals(file.getName())
+                            || "LibreOffice.app".equals(file.getName()))) {
                         rootDir = file;
                         break;
                     }
