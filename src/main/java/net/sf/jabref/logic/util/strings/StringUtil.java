@@ -38,11 +38,10 @@ public class StringUtil {
 
     public static String shaveString(String toShave) {
         if ((toShave == null) || (toShave.isEmpty())) {
-            return toShave;
+            return "";
         }
         toShave = toShave.trim();
-        if (((toShave.charAt(0) == '{') && toShave.endsWith("}"))
-                || ((toShave.charAt(0) == '"') && toShave.endsWith("\""))) {
+        if (isInCurlyBrackets(toShave) || isInCitationMarks(toShave)) {
             return toShave.substring(1, toShave.length() - 1);
         }
         return toShave;
@@ -94,13 +93,10 @@ public class StringUtil {
      * @return
      */
     public static String stripBrackets(String toStrip) {
-        if (toStrip.isEmpty()) {
-            return "";
+        if (isInSquareBrackets(toStrip)) {
+            return toStrip.substring(1, toStrip.length() - 1);
         }
-
-        int beginIndex = (toStrip.charAt(0) == '[') ? 1 : 0;
-        int endIndex = toStrip.endsWith("]") ? toStrip.length() - 1 : toStrip.length();
-        return toStrip.substring(beginIndex, endIndex);
+        return toStrip;
     }
 
     /**
@@ -505,4 +501,29 @@ public class StringUtil {
     public static String unifyLineBreaksToConfiguredLineBreaks(String s) {
         return LINE_BREAKS.matcher(s).replaceAll(Globals.NEWLINE);
     }
+
+    public static boolean isInCurlyBrackets(String toCheck) {
+        if ((toCheck == null) || toCheck.isEmpty()) {
+            return false; // In case of null or empty string
+        } else {
+            return (toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}');
+        }
+    }
+
+    public static boolean isInSquareBrackets(String toCheck) {
+        if ((toCheck == null) || toCheck.isEmpty()) {
+            return false; // In case of null or empty string
+        } else {
+            return (toCheck.charAt(0) == '[') && (toCheck.charAt(toCheck.length() - 1) == ']');
+        }
+    }
+
+    public static boolean isInCitationMarks(String toCheck) {
+        if ((toCheck == null) || (toCheck.length() <= 1)) {
+            return false; // In case of null, empty string, or a single citation mark
+        } else {
+            return (toCheck.charAt(0) == '"') && (toCheck.charAt(toCheck.length() - 1) == '"');
+        }
+    }
+
 }

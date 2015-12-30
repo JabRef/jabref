@@ -107,10 +107,6 @@ public class UnitFormatter implements Formatter {
 
 
     private static String format(String text, String[] listOfWords) {
-        if (text == null) {
-            return null;
-        }
-
         Arrays.sort(listOfWords, new StringLengthComparator()); // LengthComparator from CaseKeeper.java
 
         // Replace the hyphen in 12-bit etc with a non-breaking hyphen, will also avoid bad casing of 12-Bit
@@ -133,8 +129,8 @@ public class UnitFormatter implements Formatter {
 
     @Override
     public String format(String text) {
-        if (text == null) {
-            return null;
+        if ((text == null) || text.isEmpty()) {
+            return text;
         }
         return format(text, UnitFormatter.unitCombinations);
     }

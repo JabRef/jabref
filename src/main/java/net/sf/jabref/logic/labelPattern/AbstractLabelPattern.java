@@ -61,7 +61,21 @@ public abstract class AbstractLabelPattern {
      * @param key a <code>String</code>
      * @return the list of Strings for the given key. First entry: the complete key
      */
-    public abstract List<String> getValue(String key);
+    public List<String> getValue(String key) {
+        List<String> result = data.get(key);
+        //  Test to see if we found anything
+        if (result == null) {
+            // check default value
+            result = getDefaultValue();
+            if (result == null) {
+                // we are the "last" to ask
+                // we don't have anything left
+                return getLastLevelLabelPattern(key);
+            }
+        }
+        return result;
+
+    }
 
     /**
      * Checks whether this pattern is customized or the default value.
@@ -91,4 +105,6 @@ public abstract class AbstractLabelPattern {
     public Set<String> getAllKeys() {
         return data.keySet();
     }
+
+    public abstract List<String> getLastLevelLabelPattern(String key);
 }

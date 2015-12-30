@@ -64,7 +64,7 @@ class Cookie {
                 if (uriDomain.equals(value)) {
                     this.domain = value;
                 } else {
-                    if (!value.isEmpty() && (value.charAt(0) != '.')) {
+                    if (!value.startsWith(".")) {
                         value = '.' + value;
                     }
                     uriDomain = uriDomain.substring(uriDomain.indexOf('.'));
@@ -112,15 +112,12 @@ class Cookie {
             return false;
         }
 
-        String uriPath = uri.getPath();
-        if (uriPath == null) {
-            uriPath = "/";
-        }
+        String uriPath = Optional.ofNullable(uri.getPath()).orElse("/");
 
         return uriPath.startsWith(this.path);
     }
 
-    public boolean equals(Cookie cookie) {
+    public boolean equalNameAndDomain(Cookie cookie) {
         return ((domain.equals(cookie.domain)) && (name.equals(cookie.name)));
     }
 

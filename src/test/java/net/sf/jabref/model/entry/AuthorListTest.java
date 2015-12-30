@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.model.entry;
 
 import net.sf.jabref.model.entry.AuthorList;
 import org.junit.Assert;

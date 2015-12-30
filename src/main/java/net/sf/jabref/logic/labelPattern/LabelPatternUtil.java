@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.formatter.casechanger.Word;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -173,11 +174,7 @@ public class LabelPatternUtil {
      * @return True if the author or editor is an institution.
      */
     private static boolean isInstitution(String author) {
-        if (author.isEmpty()) {
-            return false; // In case of empty author
-        } else {
-            return (author.charAt(0) == '{') && (author.charAt(author.length() - 1) == '}');
-        }
+        return StringUtil.isInCurlyBrackets(author);
     }
 
     /**

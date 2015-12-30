@@ -20,20 +20,8 @@ import java.util.List;
 public class GlobalLabelPattern extends AbstractLabelPattern {
 
     @Override
-    public List<String> getValue(String key) {
-        List<String> result = data.get(key);
-        //  Test to see if we found anything
-        if (result == null) {
-            // check default value
-            result = getDefaultValue();
-            if (result == null) {
-                // we are the "last" to ask
-                // we don't have anything left
-                // return the global default pattern
-                return LabelPatternUtil.DEFAULT_LABELPATTERN;
-            }
-        }
-        return result;
+    public List<String> getLastLevelLabelPattern(String key) {
+        return LabelPatternUtil.DEFAULT_LABELPATTERN;
     }
 
 }

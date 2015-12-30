@@ -22,18 +22,8 @@ import net.sf.jabref.Globals;
 public class DatabaseLabelPattern extends AbstractLabelPattern {
 
     @Override
-    public List<String> getValue(String key) {
-        List<String> result = data.get(key);
-        //  Test to see if we found anything
-        if (result == null) {
-            // check default value
-            result = getDefaultValue();
-            if (result == null) {
-                // no default value, ask global label pattern
-                result = Globals.prefs.getKeyPattern().getValue(key);
-            }
-        }
-        return result;
+    public List<String> getLastLevelLabelPattern(String key) {
+        return Globals.prefs.getKeyPattern().getValue(key);
     }
 
 }
