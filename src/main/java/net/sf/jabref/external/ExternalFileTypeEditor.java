@@ -23,6 +23,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -44,7 +45,7 @@ import net.sf.jabref.logic.l10n.Localization;
 public class ExternalFileTypeEditor extends JDialog {
     private JFrame frame;
     private JDialog dialog;
-    private ArrayList<ExternalFileType> fileTypes;
+    private List<ExternalFileType> fileTypes;
     private JTable table;
     private ExternalFileTypeEntryEditor entryEditor;
     private FileTypeTableModel tableModel;

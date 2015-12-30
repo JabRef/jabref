@@ -53,7 +53,6 @@ public class ExternalFileTypeEntryEditor {
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));
     private final JRadioButton other = new JRadioButton("");
-    final String emptyMessage = "<" + Localization.lang("Use default viewer") + ">";
     private final String editFileTitle = Localization.lang("Edit file type");
     private final String newFileTitle = Localization.lang("Add new file type");
 
@@ -83,7 +82,7 @@ public class ExternalFileTypeEntryEditor {
         builder.layout(new FormLayout
                 ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p"));
         builder.add(Localization.lang("Icon")).xy(1, 1);
-        builder.add(icon).xy(3,  1);
+        builder.add(icon).xy(3, 1);
         builder.add(Localization.lang("Name")).xy(1, 3);
         builder.add(name).xy(3, 3);
         builder.add(Localization.lang("Extension")).xy(1, 5);
@@ -94,10 +93,10 @@ public class ExternalFileTypeEntryEditor {
         builder.add(Localization.lang("Application")).xy(1, 9);
         JButton browseBut = new JButton(Localization.lang("Browse"));
         if (OS.WINDOWS) {
-            builder.add(useDefault).xy(3,9);
+            builder.add(useDefault).xy(3, 9);
             builder.appendRows("2dlu, p");
             JPanel p1 = new JPanel();
-            builder.add(p1).xy(1,11);
+            builder.add(p1).xy(1, 11);
             JPanel p2 = new JPanel();
             application.setPreferredSize(new Dimension(300, application.getPreferredSize().height));
             BorderLayout bl = new BorderLayout();
@@ -117,23 +116,13 @@ public class ExternalFileTypeEntryEditor {
         bb.addButton(cancel);
         bb.addGlue();
 
-        ok.addActionListener(new ActionListener() {
+        ok.addActionListener(e -> {
+            okPressed = true;
+            storeSettings(ExternalFileTypeEntryEditor.this.entry);
+            diag.dispose();
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                okPressed = true;
-                storeSettings(ExternalFileTypeEntryEditor.this.entry);
-                diag.dispose();
-
-            }
         });
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                diag.dispose();
-            }
-        });
+        cancel.addActionListener(e -> diag.dispose());
 
         if (OS.WINDOWS) {
             application.getDocument().addDocumentListener(new DocumentListener() {
@@ -183,10 +172,8 @@ public class ExternalFileTypeEntryEditor {
 
         if (dParent != null) {
             diag.setLocationRelativeTo(dParent);
-        }
-        else {
+        } else {
             diag.setLocationRelativeTo(fParent);
-        //Util.placeDialog(diag, parent);
         }
 
         setValues(entry);
@@ -194,7 +181,7 @@ public class ExternalFileTypeEntryEditor {
 
     public void setEntry(ExternalFileType entry) {
         this.entry = entry;
-        if(entry.getName().isEmpty()) {
+        if (entry.getName().isEmpty()) {
             diag.setTitle(newFileTitle);
         } else {
             diag.setTitle(editFileTitle);
@@ -267,7 +254,7 @@ public class ExternalFileTypeEntryEditor {
                 // Nothing in the field. Go to the last file dir used:
                 initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
-            String chosen = FileDialogs.getNewFile(/*parent*/null, initial, Globals.NONE,
+            String chosen = FileDialogs.getNewFile(null, initial, Globals.NONE,
                     JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);

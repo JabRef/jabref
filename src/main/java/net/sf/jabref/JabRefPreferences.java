@@ -62,6 +62,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 
 public final class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
+    private static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
 
     /**
      * HashMap that contains all preferences which are set by default
@@ -1403,13 +1404,13 @@ public final class JabRefPreferences {
         // First get a list of the default file types as a starting point:
         List<ExternalFileType> types = getDefaultExternalFileTypes();
         // If no changes have been stored, simply use the defaults:
-        if (prefs.get("externalFileTypes", null) == null) {
+        if (prefs.get(EXTERNAL_FILE_TYPES, null) == null) {
             externalFileTypes.clear();
             externalFileTypes.addAll(types);
             return;
         }
         // Read the prefs information for file types:
-        String[][] vals = StringUtil.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
+        String[][] vals = StringUtil.decodeStringDoubleArray(prefs.get(EXTERNAL_FILE_TYPES, ""));
         for (String[] val : vals) {
             if ((val.length == 2) && val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG)) {
                 // This entry indicates that a default entry type should be removed:
@@ -1426,7 +1427,7 @@ public final class JabRefPreferences {
                 }
             } else {
                 // A new or modified entry type. Construct it from the string array:
-                ExternalFileType type = new ExternalFileType(val);
+                ExternalFileType type = ExternalFileType.buildFromArgs(val);
                 // Check if there is a default type with the same name. If so, this is a
                 // modification of that type, so remove the default one:
                 ExternalFileType toRemove = null;
