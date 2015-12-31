@@ -36,10 +36,6 @@ public class LatexFieldFormatter {
     // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
     public static final String BIBTEX_STRING = "__string";
 
-    public static LatexFieldFormatter buildIgnoreHashes() {
-        return new LatexFieldFormatter(true);
-    }
-
 
     private StringBuilder stringBuilder;
 
@@ -66,6 +62,10 @@ public class LatexFieldFormatter {
         doNotResolveStringsFors = Globals.prefs.getStringArray(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
 
         parser = new FieldContentParser();
+    }
+
+    public static LatexFieldFormatter buildIgnoreHashes() {
+        return new LatexFieldFormatter(true);
     }
 
     /**
@@ -137,13 +137,13 @@ public class LatexFieldFormatter {
             } else {
                 pos2 = content.indexOf('#', pos1 + 1);
                 if (pos2 == -1) {
-                    if (!neverFailOnHashes) {
+                    if (neverFailOnHashes) {
+                        pos1 = content.length(); // just write out the rest of the text, and throw no exception
+                    } else {
                         throw new IllegalArgumentException(
                                 "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
                                         + "In JabRef, use pairs of # characters to indicate a string.\n"
                                         + "Note that the entry causing the problem has been selected.");
-                    } else {
-                        pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     }
                 }
             }
@@ -203,8 +203,8 @@ public class LatexFieldFormatter {
         return stringBuilder.toString();
     }
 
-    private void writeText(String text, int start_pos,
-                           int end_pos) {
+    private void writeText(String text, int startPos,
+                           int endPos) {
 
         stringBuilder.append(valueDelimiterStartOfValue);
         boolean escape = false;
@@ -214,7 +214,7 @@ public class LatexFieldFormatter {
         int nestedEnvironments = 0;
         StringBuilder commandName = new StringBuilder();
         char c;
-        for (int i = start_pos; i < end_pos; i++) {
+        for (int i = startPos; i < endPos; i++) {
             c = text.charAt(i);
 
             // Track whether we are in a LaTeX command of some sort.
@@ -277,11 +277,9 @@ public class LatexFieldFormatter {
         stringBuilder.append(valueDelimiterEndOfValue);
     }
 
-    private void writeStringLabel(String text, int start_pos, int end_pos,
+    private void writeStringLabel(String text, int startPos, int endPos,
                                   boolean first, boolean last) {
-        //sb.append(Util.wrap((first ? "" : " # ") + text.substring(start_pos, end_pos)
-        //		     + (last ? "" : " # "), GUIGlobals.LINE_LENGTH));
-        putIn((first ? "" : " # ") + text.substring(start_pos, end_pos)
+        putIn((first ? "" : " # ") + text.substring(startPos, endPos)
                 + (last ? "" : " # "));
     }
 

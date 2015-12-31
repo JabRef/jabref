@@ -47,7 +47,7 @@ class RtfSelection implements Transferable {
     }
 
     @Override
-    public java.awt.datatransfer.DataFlavor[] getTransferDataFlavors() {
+    public DataFlavor[] getTransferDataFlavors() {
         //System.out.println("..");
         return supportedFlavors;
     }

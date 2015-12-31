@@ -51,6 +51,9 @@ public class XMLChars implements LayoutFormatter {
 
     private static final Map<String, String> ASCII_TO_XML_CHARS = new HashMap<>();
 
+    private boolean[] forceReplace;
+
+
     static {
         ASCII_TO_XML_CHARS.put("<", "&lt;");
         ASCII_TO_XML_CHARS.put("\"", "&quot;");
@@ -76,8 +79,6 @@ public class XMLChars implements LayoutFormatter {
         return s.replaceAll("&|\\\\&", "&#x0026;").replaceAll("--", "&#x2013;");
     }
 
-
-    private boolean[] forceReplace;
 
 
     private String restFormat(String toFormat) {

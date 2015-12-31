@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author     wegnerj
  */
-public class WSITools
+public final class WSITools
 {
 
     private static final Log LOGGER = LogFactory.getLog(WSITools.class);

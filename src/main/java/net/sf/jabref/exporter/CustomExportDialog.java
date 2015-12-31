@@ -43,17 +43,19 @@ class CustomExportDialog extends JDialog {
     private final JTextField name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
-    private boolean ok_pressed;
+    private boolean okPressed;
     private final JabRefFrame parent;
 
-    public CustomExportDialog(JabRefFrame parent_, String name_, String layoutFile_, String extension_) {
+
+    public CustomExportDialog(final JabRefFrame parent_, final String name_, final String layoutFile_,
+            final String extension_) {
         this(parent_);
         name.setText(name_);
         layoutFile.setText(layoutFile_);
         extension.setText(extension_);
     }
 
-    public CustomExportDialog(JabRefFrame parent_) {
+    public CustomExportDialog(final JabRefFrame parent_) {
         super(parent_, Localization.lang("Edit custom export"), true);
         parent = parent_;
         ActionListener okListener = new ActionListener() {
@@ -76,7 +78,7 @@ class CustomExportDialog extends JDialog {
 
                 // Handling of : and ; must also be done.
 
-                ok_pressed = true;
+                okPressed = true;
                 dispose();
             }
         };
@@ -193,7 +195,7 @@ class CustomExportDialog extends JDialog {
     }
 
     public boolean okPressed() {
-        return ok_pressed;
+        return okPressed;
     }
 
     public String layoutFile() {

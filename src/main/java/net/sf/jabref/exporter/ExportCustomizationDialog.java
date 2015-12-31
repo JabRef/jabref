@@ -50,10 +50,10 @@ public class ExportCustomizationDialog extends JDialog {
 
     private final JabRefFrame frame;
 
-    private JTable table;
+    private final JTable table;
 
 
-    public ExportCustomizationDialog(JabRefFrame frame_) throws HeadlessException {
+    public ExportCustomizationDialog(final JabRefFrame frame_) throws HeadlessException {
 
         super(frame_, Localization.lang("Manage custom exports"), false);
         frame = frame_;

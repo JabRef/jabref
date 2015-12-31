@@ -49,7 +49,7 @@ import net.sf.jabref.model.entry.AuthorList;
 public class CreateDocBookAuthors implements LayoutFormatter
 {
 
-    private static final XMLChars xc = new XMLChars();
+    private static final XMLChars XML_CHARS = new XMLChars();
 
 
     @Override
@@ -101,19 +101,19 @@ public class CreateDocBookAuthors implements LayoutFormatter
             AuthorList.Author a = al.getAuthor(i);
             if ((a.getFirst() != null) && !a.getFirst().isEmpty()) {
                 sb.append("<firstname>");
-                sb.append(CreateDocBookAuthors.xc.format(a.getFirst()));
+                sb.append(CreateDocBookAuthors.XML_CHARS.format(a.getFirst()));
                 sb.append("</firstname>");
             }
             if ((a.getVon() != null) && !a.getVon().isEmpty()) {
                 sb.append("<othername>");
-                sb.append(CreateDocBookAuthors.xc.format(a.getVon()));
+                sb.append(CreateDocBookAuthors.XML_CHARS.format(a.getVon()));
                 sb.append("</othername>");
             }
             if ((a.getLast() != null) && !a.getLast().isEmpty()) {
                 sb.append("<surname>");
-                sb.append(CreateDocBookAuthors.xc.format(a.getLast()));
+                sb.append(CreateDocBookAuthors.XML_CHARS.format(a.getLast()));
                 if ((a.getJr() != null) && !a.getJr().isEmpty()) {
-                    sb.append(' ').append(CreateDocBookAuthors.xc.format(a.getJr()));
+                    sb.append(' ').append(CreateDocBookAuthors.XML_CHARS.format(a.getJr()));
                 }
                 sb.append("</surname>");
             }

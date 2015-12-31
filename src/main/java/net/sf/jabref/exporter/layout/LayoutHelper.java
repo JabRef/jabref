@@ -80,7 +80,7 @@ public class LayoutHelper {
         LayoutHelper.currentGroup = newGroup;
     }
 
-    private String getBracketedField(int _field) throws IOException {
+    private String getBracketedField(final int _field) throws IOException {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
@@ -115,10 +115,8 @@ public class LayoutHelper {
                     buffer = new StringBuffer(100);
                 }
 
-                if (start) {
-                    if (c != '}') {
-                        buffer.append((char) c);
-                    }
+                if (start && (c != '}')) {
+                    buffer.append((char) c);
                 }
             }
         }
@@ -147,10 +145,10 @@ public class LayoutHelper {
 
                 if (buffer != null) {
                     //myStrings.add(buffer.toString());
-                    if (option != null) {
-                        tmp = buffer.toString() + '\n' + option;
-                    } else {
+                    if (option == null) {
                         tmp = buffer.toString();
+                    } else {
+                        tmp = buffer.toString() + '\n' + option;
                     }
 
                     parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
@@ -176,10 +174,10 @@ public class LayoutHelper {
                         // if empty, the parameter is set to " " (whitespace to avoid that the tokenizer that
                         // splits the string later on ignores the empty parameter)
                         String parameter = buffer == null ? " " : buffer.toString();
-                        if (option != null) {
-                            tmp = parameter + '\n' + option;
-                        } else {
+                        if (option == null) {
                             tmp = parameter;
+                        } else {
+                            tmp = parameter + '\n' + option;
                         }
 
                         parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
@@ -293,7 +291,7 @@ public class LayoutHelper {
                 unread(c);
 
                 //System.out.println("\n#" + (char) c);
-                name = buffer != null ? buffer.toString() : "";
+                name = buffer == null ? "" : buffer.toString();
 
                 try {
                     firstLetter = name.charAt(0);

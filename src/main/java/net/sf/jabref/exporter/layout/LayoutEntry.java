@@ -47,12 +47,12 @@ class LayoutEntry {
 
     private final String classPrefix;
 
-    private ArrayList<String> invalidFormatter;
+    private List<String> invalidFormatter;
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
 
-    public LayoutEntry(StringInt si, String classPrefix_) {
+    public LayoutEntry(StringInt si, final String classPrefix_) {
         type = si.i;
         classPrefix = classPrefix_;
 
@@ -88,7 +88,7 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) {
+    public LayoutEntry(Vector<StringInt> parsedEntries, final String classPrefix_, int layoutType) {
         classPrefix = classPrefix_;
         Vector<StringInt> blockEntries = null;
         Vector<LayoutEntry> tmpEntries = new Vector<>();
@@ -342,14 +342,12 @@ class LayoutEntry {
             return field;
         } else if (type == LayoutHelper.IS_ENCODING_NAME) {
             return encoding.displayName();
-        }
-        else if (type == LayoutHelper.IS_FILENAME) {
+        } else if (type == LayoutHelper.IS_FILENAME) {
             File f = Globals.prefs.databaseFile;
-            return f != null ? f.getName() : "";
-        }
-        else if (type == LayoutHelper.IS_FILEPATH) {
+            return f == null ? "" : f.getName();
+        } else if (type == LayoutHelper.IS_FILEPATH) {
             File f = Globals.prefs.databaseFile;
-            return f != null ? f.getPath() : "";
+            return f == null ? "" : f.getPath();
         }
         return "";
     }
@@ -411,10 +409,8 @@ class LayoutEntry {
                 LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, classPrefix);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
-                if (f instanceof ParamLayoutFormatter) {
-                    if (strings.length >= 2) {
+                if ((f instanceof ParamLayoutFormatter) && (strings.length >= 2)) {
                         ((ParamLayoutFormatter) f).setArgument(strings[1]);
-                    }
                 }
                 results.add(f);
                 continue;
@@ -445,7 +441,7 @@ class LayoutEntry {
         return invalidFormatter != null;
     }
 
-    public ArrayList<String> getInvalidFormatters() {
+    public List<String> getInvalidFormatters() {
         return invalidFormatter;
     }
 

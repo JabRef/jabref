@@ -20,7 +20,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.util.strings.LatexToUnicodeCharMap;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This formatter converts LaTeX character sequences their equivalent unicode characters,
@@ -28,7 +28,7 @@ import java.util.HashMap;
  */
 public class FormatChars implements LayoutFormatter {
 
-    private static final HashMap<String, String> CHARS = new LatexToUnicodeCharMap();
+    private static final Map<String, String> CHARS = new LatexToUnicodeCharMap();
 
     @Override
     public String format(String field) {
@@ -52,10 +52,10 @@ public class FormatChars implements LayoutFormatter {
                     /* Close Command */
                     String command = currentCommand.toString();
                     Object result = FormatChars.CHARS.get(command);
-                    if (result != null) {
-                        sb.append((String) result);
-                    } else {
+                    if (result == null) {
                         sb.append(command);
+                    } else {
+                        sb.append((String) result);
                     }
                 }
                 escaped = true;
@@ -109,10 +109,10 @@ public class FormatChars implements LayoutFormatter {
                              * then keep
                              * the text of the parameter intact.
                              */
-                            if (result != null) {
-                                sb.append((String) result);
-                            } else {
+                            if (result == null) {
                                 sb.append(command);
+                            } else {
+                                sb.append((String) result);
                             }
 
                         }
@@ -142,10 +142,10 @@ public class FormatChars implements LayoutFormatter {
                             // If found, then use translated version. If not, then keep
                             // the
                             // text of the parameter intact.
-                            if (result != null) {
-                                sb.append((String) result);
-                            } else {
+                            if (result == null) {
                                 sb.append(argument);
+                            } else {
+                                sb.append((String) result);
                             }
                         }
                     } else if (c == '}') {
@@ -153,18 +153,18 @@ public class FormatChars implements LayoutFormatter {
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
                         Object result = FormatChars.CHARS.get(command);
-                        if (result != null) {
-                            sb.append((String) result);
-                        } else {
+                        if (result == null) {
                             // If the command is unknown, just print it:
                             sb.append(command);
+                        } else {
+                            sb.append((String) result);
                         }
                     } else {
                         Object result = FormatChars.CHARS.get(command);
-                        if (result != null) {
-                            sb.append((String) result);
-                        } else {
+                        if (result == null) {
                             sb.append(command);
+                        } else {
+                            sb.append((String) result);
                         }
                         sb.append(' ');
                     }
