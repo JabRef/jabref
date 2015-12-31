@@ -26,7 +26,7 @@ import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
-public class PostgreSQLExporter extends DBExporter {
+final public class PostgreSQLExporter extends DBExporter {
 
     private static PostgreSQLExporter instance;
 

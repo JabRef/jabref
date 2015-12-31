@@ -32,7 +32,7 @@ import net.sf.jabref.sql.SQLUtil;
  *         Jan 20th	Extends DBExporter to provide features specific for PostgreSQL
  *         Created after a refactory on SQLUtil.
  */
-public class PostgreSQLImporter extends DBImporter {
+final public class PostgreSQLImporter extends DBImporter {
 
     private static PostgreSQLImporter instance;
 

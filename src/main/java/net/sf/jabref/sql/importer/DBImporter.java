@@ -50,7 +50,7 @@ public abstract class DBImporter extends DBImporterExporter {
 
     private static final Log LOGGER = LogFactory.getLog(DBImporter.class);
 
-    private final ArrayList<String> columnsNotConsideredForEntries = new ArrayList<>(
+    private final List<String> columnsNotConsideredForEntries = new ArrayList<>(
             Arrays.asList("cite_key", "entry_types_id", "database_id", "jabref_eid", "entries_id"));
 
 
@@ -78,8 +78,8 @@ public abstract class DBImporter extends DBImporterExporter {
      * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
      * @throws Exception
      */
-    public ArrayList<Object[]> performImport(DBStrings dbs, List<String> listOfDBs) throws Exception {
-        ArrayList<Object[]> result = new ArrayList<>();
+    public List<Object[]> performImport(DBStrings dbs, List<String> listOfDBs) throws Exception {
+        List<Object[]> result = new ArrayList<>();
         try (Connection conn = this.connectToDB(dbs)) {
 
             Iterator<String> itLista = listOfDBs.iterator();
@@ -107,7 +107,7 @@ public abstract class DBImporter extends DBImporterExporter {
 
                     List<String> colNames = this.readColumnNames(conn).stream().filter(column -> !columnsNotConsideredForEntries.contains(column)).collect(Collectors.toList());
 
-                    String database_id = rsDatabase.getString("database_id");
+                    final String database_id = rsDatabase.getString("database_id");
                     // Read the entries and create BibEntry instances:
                     HashMap<String, BibEntry> entries = new HashMap<>();
                     try (Statement entryStatement = SQLUtil.queryAllFromTable(conn,
@@ -174,9 +174,9 @@ public abstract class DBImporter extends DBImporterExporter {
                 "SELECT label FROM group_types WHERE group_types_id='" + groupId + "';");
     }
 
-    private void importGroupsTree(MetaData metaData, HashMap<String, BibEntry> entries, Connection conn,
-                                  String database_id) throws SQLException {
-        HashMap<String, GroupTreeNode> groups = new HashMap<>();
+    private void importGroupsTree(MetaData metaData, Map<String, BibEntry> entries, Connection conn,
+            final String database_id) throws SQLException {
+        Map<String, GroupTreeNode> groups = new HashMap<>();
         LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<>();
         GroupTreeNode rootNode = new GroupTreeNode(new AllEntriesGroup());
 

@@ -25,15 +25,15 @@ import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
 /**
- * 
+ *
  * @author ifsteinm.
- * 
+ *
  *         Jan 20th Extends DBExporter to provide features specific for MySQL
  *         Created after a refactory on SQLUtil
- * 
+ *
  */
 
-public class MySQLExporter extends DBExporter {
+final public class MySQLExporter extends DBExporter {
 
     private static MySQLExporter instance;
 
@@ -42,7 +42,7 @@ public class MySQLExporter extends DBExporter {
     }
 
     /**
-     * 
+     *
      * @return The singleton instance of the MySQLExporter
      */
     public static MySQLExporter getInstance() {
@@ -70,7 +70,7 @@ public class MySQLExporter extends DBExporter {
     /**
      * Generates SQLnecessary to create all tables in a MySQL database, and
      * writes it to appropriate output.
-     * 
+     *
      * @param out
      *            The output (PrintStream or Connection) object to which the DML
      *            should be written.
