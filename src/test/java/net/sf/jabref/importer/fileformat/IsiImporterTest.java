@@ -290,7 +290,7 @@ public class IsiImporterTest {
     @Test
     public void testGetIsCustomImporter() {
         IsiImporter importer = new IsiImporter();
-        Assert.assertEquals(false, importer.getIsCustomImporter());
+        Assert.assertEquals(false, importer.isCustomImporter());
     }
 
     @Test

@@ -16,6 +16,7 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -32,7 +33,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 class BibTeXMLHandler extends DefaultHandler {
 
-    private ArrayList<BibEntry> bibitems;
+    private List<BibEntry> bibitems;
 
     private BibEntry b; // the entry being read
 
@@ -44,7 +45,7 @@ class BibTeXMLHandler extends DefaultHandler {
         super();
     }
 
-    public ArrayList<BibEntry> getItems() {
+    public List<BibEntry> getItems() {
         return bibitems;
     }
 

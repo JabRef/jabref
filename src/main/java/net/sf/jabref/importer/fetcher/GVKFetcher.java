@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,7 +36,7 @@ public class GVKFetcher implements EntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(GVKFetcher.class);
 
-    HashMap<String, String> searchKeys = new HashMap<>();
+    private final Map<String, String> searchKeys = new HashMap<>();
 
 
     public GVKFetcher() {
@@ -77,7 +78,6 @@ public class GVKFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
-        String gvkQuery = "";
 
         query = query.trim();
 
@@ -97,6 +97,7 @@ public class GVKFetcher implements EntryFetcher {
             }
         }
 
+        String gvkQuery = "";
         if (searchKeys.containsKey(qterms[0])) {
             gvkQuery = processComplexQuery(qterms);
         } else {
@@ -115,7 +116,7 @@ public class GVKFetcher implements EntryFetcher {
             dialog.addEntry(entry);
         }
 
-        if (bibs.size() == 0) {
+        if (bibs.isEmpty()) {
             frame.showMessage(Localization.lang("No references found"));
         }
 
@@ -128,10 +129,10 @@ public class GVKFetcher implements EntryFetcher {
 
         for (int x = 0; x < s.length; x++) {
             if (searchKeys.containsKey(s[x])) {
-                if (!(x == 0)) {
-                    result = result.concat("%20and%20" + searchKeys.get(s[x]));
-                } else {
+                if (x == 0) {
                     result = searchKeys.get(s[x]);
+                } else {
+                    result = result.concat("%20and%20" + searchKeys.get(s[x]));
                 }
                 lastWasKey = true;
             } else {

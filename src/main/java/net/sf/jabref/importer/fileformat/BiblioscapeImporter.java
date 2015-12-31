@@ -264,15 +264,13 @@ public class BiblioscapeImporter extends ImportFormat {
 
                 // concatenate pages
                 if ((pages[0] != null) || (pages[1] != null)) {
-                    hm.put("pages",
-                            (pages[0] != null ? pages[0] : "")
-                            + (pages[1] != null ? "--" + pages[1] : ""));
+                    hm.put("pages", (pages[0] == null ? "" : pages[0]) + (pages[1] == null ? "" : "--" + pages[1]));
                 }
 
                 // concatenate address and country
                 if (address != null) {
                     hm.put("address", address
-                            + (country != null ? ", " + country : ""));
+ + (country == null ? "" : ", " + country));
                 }
 
                 if (!comments.isEmpty()) { // set comment if present

@@ -25,6 +25,8 @@ import net.sf.jabref.model.entry.BibEntry;
 class DBLPHelper {
 
     private final DBLPQueryCleaner cleaner = new DBLPQueryCleaner();
+    private static final String START_PATTERN = "<pre class=\"verbatim select-on-click\">";
+    private static final String END_PATTERN = "</pre>";
 
 
     /*
@@ -70,15 +72,13 @@ class DBLPHelper {
      */
     public List<BibEntry> getBibTexFromPage(final String page) {
         final List<BibEntry> bibtexList = new ArrayList<>();
-        final String startPattern = "<pre class=\"verbatim select-on-click\">";
-        final String endPattern = "</pre>";
 
         String tmpStr = page;
-        int startIdx = tmpStr.indexOf(startPattern);
-        int endIdx = tmpStr.indexOf(endPattern);
+        int startIdx = tmpStr.indexOf(START_PATTERN);
+        int endIdx = tmpStr.indexOf(END_PATTERN);
 
         // this entry exists for sure
-        String entry1 = tmpStr.substring(startIdx + startPattern.length(),
+        String entry1 = tmpStr.substring(startIdx + START_PATTERN.length(),
                 endIdx);
         entry1 = cleanEntry(entry1);
         bibtexList.add(BibtexParser.singleFromString(entry1));
@@ -86,12 +86,12 @@ class DBLPHelper {
 
         // let's see whether there is another entry (crossref)
         tmpStr = tmpStr
-                .substring(endIdx + endPattern.length(), tmpStr.length());
-        startIdx = tmpStr.indexOf(startPattern);
+                .substring(endIdx + END_PATTERN.length(), tmpStr.length());
+        startIdx = tmpStr.indexOf(START_PATTERN);
         if (startIdx != -1) {
-            endIdx = tmpStr.indexOf(endPattern);
+            endIdx = tmpStr.indexOf(END_PATTERN);
             // this entry exists for sure
-            String entry2 = tmpStr.substring(startIdx + startPattern.length(),
+            String entry2 = tmpStr.substring(startIdx + START_PATTERN.length(),
                     endIdx);
             entry2 = cleanEntry(entry2);
             bibtexList.add(BibtexParser.singleFromString(entry2));

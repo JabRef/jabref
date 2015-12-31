@@ -70,8 +70,8 @@ public class ImportFormatReader {
                 ImportFormat imFo = importer.getInstance();
                 formats.add(imFo);
             } catch (Exception e) {
-                System.err.println("Could not instantiate " + importer.getName() + " importer, will ignore it. Please check if the class is still available.");
-                e.printStackTrace();
+                LOGGER.error("Could not instantiate " + importer.getName()
+                        + " importer, will ignore it. Please check if the class is still available.", e);
             }
         }
     }
@@ -151,7 +151,7 @@ public class ImportFormatReader {
     public SortedSet<ImportFormat> getCustomImportFormats() {
         SortedSet<ImportFormat> result = new TreeSet<>();
         for (ImportFormat format : formats) {
-            if (format.getIsCustomImporter()) {
+            if (format.isCustomImporter()) {
                 result.add(format);
             }
         }
@@ -168,7 +168,7 @@ public class ImportFormatReader {
     public SortedSet<ImportFormat> getBuiltInInputFormats() {
         SortedSet<ImportFormat> result = new TreeSet<>();
         for (ImportFormat format : formats) {
-            if (!format.getIsCustomImporter()) {
+            if (!format.isCustomImporter()) {
                 result.add(format);
             }
         }
@@ -204,12 +204,12 @@ public class ImportFormatReader {
             sb.append(imFo.getFormatName());
 
             for (int j = 0; j < pad; j++) {
-                sb.append(" ");
+                sb.append(' ');
             }
 
             sb.append(" : ");
             sb.append(imFo.getCLIId());
-            sb.append("\n");
+            sb.append('\n');
         }
 
         return sb.toString(); //.substring(0, res.length()-1);
@@ -250,7 +250,7 @@ public class ImportFormatReader {
                     sb.append(ImportFormatReader.expandAll(names[0]));
                 }
                 for (int j = 1; j < names.length; j++) {
-                    sb.append(" ");
+                    sb.append(' ');
                     sb.append(names[j]);
                 }
             }
@@ -297,19 +297,6 @@ public class ImportFormatReader {
             sb.append(c);
         }
         return sb.toString().trim();
-    }
-
-    static File checkAndCreateFile(String filename) {
-        File f = new File(filename);
-
-        if (!f.exists() && !f.canRead() && !f.isFile()) {
-
-            LOGGER.info("Error " + filename + " is not a valid file and|or is not readable.");
-            return null;
-
-        } else {
-            return f;
-        }
     }
 
     //==================================================

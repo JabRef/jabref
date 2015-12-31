@@ -120,11 +120,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             public void actionPerformed(ActionEvent actionEvent) {
                 activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
                 Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
-                if (activeFetcher.getHelpPage() != null) {
+                if (activeFetcher.getHelpPage() == null) {
+                    helpBut.setEnabled(false);
+                } else {
                     help.setHelpFile(activeFetcher.getHelpPage());
                     helpBut.setEnabled(true);
-                } else {
-                    helpBut.setEnabled(false);
                 }
                 optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex()));
                 optPanel.removeAll();

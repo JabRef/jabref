@@ -44,6 +44,16 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
     private boolean stopFetching;
 
+    private static final String BASE_PATTERN = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER
+            + "\" content=\"(.*)\" />";
+    private static final Pattern TITLE_PATTERN = Pattern
+            .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_title"));
+    private static final Pattern AUTHOR_PATTERN = Pattern
+            .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_authors"));
+    private static final Pattern YEAR_PATTERN = Pattern
+            .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
+    private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
+
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
@@ -132,12 +142,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
 
-    private static final String basePattern = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER + "\" content=\"(.*)\" />";
-    private static final Pattern titlePattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_title"));
-    private static final Pattern authorPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_authors"));
-    private static final Pattern yearPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
-    private static final Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
-
 
     private static BibEntry getSingleCitation(String urlString) throws IOException {
 
@@ -145,26 +149,26 @@ public class CiteSeerXFetcher implements EntryFetcher {
         String cont = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
 
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
-        Matcher m = CiteSeerXFetcher.titlePattern.matcher(cont);
+        Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);
         if (m.find()) {
             BibEntry entry = new BibEntry(IdGenerator.next());
             entry.setField("title", m.group(1));
 
             // Find authors:
-            m = CiteSeerXFetcher.authorPattern.matcher(cont);
+            m = CiteSeerXFetcher.AUTHOR_PATTERN.matcher(cont);
             if (m.find()) {
                 String authors = m.group(1);
                 entry.setField("author", new AuthorsFormatter().format(authors));
             }
 
             // Find year:
-            m = CiteSeerXFetcher.yearPattern.matcher(cont);
+            m = CiteSeerXFetcher.YEAR_PATTERN.matcher(cont);
             if (m.find()) {
                 entry.setField("year", m.group(1));
             }
 
             // Find abstract:
-            m = CiteSeerXFetcher.abstractPattern.matcher(cont);
+            m = CiteSeerXFetcher.ABSTRACT_PATTERN.matcher(cont);
             if (m.find()) {
                 entry.setField("abstract", m.group(1));
             }

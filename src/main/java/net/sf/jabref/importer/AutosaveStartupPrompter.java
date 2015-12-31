@@ -94,12 +94,11 @@ public class AutosaveStartupPrompter implements Runnable {
                         fileToLoad = file;
                     } else {
                         String message;
-                        if (pr != null) {
+                        if (pr == null) {
+                            message = Localization.lang("Error opening file '%0'.", file.getName());
+                        } else {
                             message = "<html>" + pr.getErrorMessage() + "<p>" +
                                     Localization.lang("Error opening file '%0'.", file.getName()) + "</html>";
-                        }
-                        else {
-                            message = Localization.lang("Error opening file '%0'.", file.getName());
                         }
                         JOptionPane.showMessageDialog(frame,
                                 message, Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
@@ -109,17 +108,10 @@ public class AutosaveStartupPrompter implements Runnable {
                 }
             }
 
-            if ((pr != null) && !pr.isInvalid()) {
-                if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-                    ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
-                }
+            if ((pr != null) && !pr.isInvalid()
+                    && Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
+                ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
             }
         }
-
-        /*for (int i = 0; i < loaded.size(); i++) {
-            ParserResult pr = loaded.get(i);
-
-        }*/
-
     }
 }

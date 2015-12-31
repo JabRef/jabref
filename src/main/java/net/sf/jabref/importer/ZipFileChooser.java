@@ -62,6 +62,132 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 class ZipFileChooser extends JDialog {
 
+    /** table of Zip entries */
+    private final JTable table;
+    /** this */
+    private final ZipFileChooser zipFileChooser;
+    /** import customization dialog, owner of this dialog */
+    private final ImportCustomizationDialog importCustomizationDialog;
+
+
+
+    /*
+     *  (non-Javadoc)
+     * @see java.awt.Component#getSize()
+     */
+    @Override
+    public Dimension getSize() {
+        return new Dimension(400, 300);
+    }
+
+    /**
+     * Entries that can be selected with this dialog.
+     *
+     * @param zipFile  Zip-File
+     * @return  entries that can be selected
+     */
+    private static ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
+        List<ZipEntry> entries = new ArrayList<>();
+        Enumeration<? extends ZipEntry> e = zipFile.entries();
+        while (e.hasMoreElements()) {
+            ZipEntry entry = e.nextElement();
+            if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                entries.add(entry);
+            }
+        }
+        return entries.toArray(new ZipEntry[entries.size()]);
+    }
+
+    /**
+     * New Zip file chooser.
+     *
+     * @param owner  Owner of the file chooser
+     * @param zipFile  Zip-Fle to choose from, must be readable
+     * @throws HeadlessException
+     */
+    public ZipFileChooser(ImportCustomizationDialog owner, ZipFile zipFile) throws HeadlessException {
+        super(owner, Localization.lang("Select file from ZIP-archive"), false);
+
+        this.importCustomizationDialog = owner;
+        this.zipFileChooser = this;
+
+        // cancel: no entry is selected
+        JButton cancelButton = new JButton(Localization.lang("Cancel"));
+        cancelButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+
+        // ok: get selected class and check if it is instantiable as an importer
+        JButton okButton = new JButton(Localization.lang("OK"));
+        okButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();
+                if (row == -1) {
+                    JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Please select an importer."));
+                } else {
+                    ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
+                    ZipEntry tempZipEntry = model.getZipEntry(row);
+                    CustomImportList.Importer importer = new CustomImportList.Importer();
+                    importer.setBasePath(model.getZipFile().getName());
+                    String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replaceAll("/", ".");
+                    importer.setClassName(className);
+                    try {
+                        ImportFormat importFormat = importer.getInstance();
+                        importer.setName(importFormat.getFormatName());
+                        importer.setCliId(importFormat.getCLIId());
+                        importCustomizationDialog.addOrReplaceImporter(importer);
+                        dispose();
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
+                    }
+                }
+            }
+        });
+
+        ZipFileChooserTableModel tableModel = new ZipFileChooserTableModel(zipFile, getSelectableZipEntries(zipFile));
+        table = new JTable(tableModel);
+        TableColumnModel cm = table.getColumnModel();
+        cm.getColumn(0).setPreferredWidth(200);
+        cm.getColumn(1).setPreferredWidth(150);
+        cm.getColumn(2).setPreferredWidth(100);
+        JScrollPane sp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setPreferredScrollableViewportSize(new Dimension(500, 150));
+        if (table.getRowCount() > 0) {
+            table.setRowSelectionInterval(0, 0);
+        }
+
+        // Key bindings:
+        JPanel mainPanel = new JPanel();
+        //ActionMap am = mainPanel.getActionMap();
+        //InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        //im.put(Globals.getKeyPrefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        //am.put("close", closeAction);
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(sp, BorderLayout.CENTER);
+
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.add(okButton);
+        optionsPanel.add(cancelButton);
+        optionsPanel.add(Box.createHorizontalStrut(5));
+
+        getContentPane().add(mainPanel, BorderLayout.CENTER);
+        getContentPane().add(optionsPanel, BorderLayout.SOUTH);
+        this.setSize(getSize());
+        pack();
+        PositionWindow.placeDialog(this, owner);
+        new FocusRequester(table);
+    }
+
+
     /**
      * Table model for the ZIP archive contents.
      *
@@ -77,13 +203,10 @@ class ZipFileChooser extends JDialog {
      *   size (uncompressed) {@link Long}
      * </li></ol></p>
      */
-    static class ZipFileChooserTableModel extends AbstractTableModel {
+    private static class ZipFileChooserTableModel extends AbstractTableModel {
 
-        private final String[] columnNames = new String[] {
-                Localization.lang("Name"),
-                Localization.lang("Last modified"),
-                Localization.lang("Size")
-        };
+        private final String[] columnNames = new String[] {Localization.lang("Name"),
+                Localization.lang("Last modified"), Localization.lang("Size")};
         private final ZipEntry[] rows;
         private final ZipFile zipFile;
 
@@ -159,128 +282,4 @@ class ZipFileChooser extends JDialog {
         }
     }
 
-
-    /** table of Zip entries */
-    private final JTable table;
-    /** this */
-    private final ZipFileChooser zipFileChooser;
-    /** import customization dialog, owner of this dialog */
-    private final ImportCustomizationDialog importCustomizationDialog;
-
-
-    /*
-     *  (non-Javadoc)
-     * @see java.awt.Component#getSize()
-     */
-    @Override
-    public Dimension getSize() {
-        return new Dimension(400, 300);
-    }
-
-    /**
-     * Entries that can be selected with this dialog.
-     *
-     * @param zipFile  Zip-File
-     * @return  entries that can be selected
-     */
-    private static ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
-        List<ZipEntry> entries = new ArrayList<>();
-        Enumeration<? extends ZipEntry> e = zipFile.entries();
-        while (e.hasMoreElements()) {
-            ZipEntry entry = e.nextElement();
-            if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                entries.add(entry);
-            }
-        }
-        return entries.toArray(new ZipEntry[entries.size()]);
-    }
-
-    /**
-     * New Zip file chooser.
-     *
-     * @param owner  Owner of the file chooser
-     * @param zipFile  Zip-Fle to choose from, must be readable
-     * @throws HeadlessException
-     */
-    public ZipFileChooser(ImportCustomizationDialog owner, ZipFile zipFile) throws HeadlessException {
-        super(owner, Localization.lang("Select file from ZIP-archive"), false);
-
-        this.importCustomizationDialog = owner;
-        this.zipFileChooser = this;
-
-        // cancel: no entry is selected
-        JButton cancelButton = new JButton(Localization.lang("Cancel"));
-        cancelButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-
-        // ok: get selected class and check if it is instantiable as an importer
-        JButton okButton = new JButton(Localization.lang("OK"));
-        okButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();
-                if (row != -1) {
-                    ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
-                    ZipEntry tempZipEntry = model.getZipEntry(row);
-                    CustomImportList.Importer importer = new CustomImportList.Importer();
-                    importer.setBasePath(model.getZipFile().getName());
-                    String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replaceAll("/", ".");
-                    importer.setClassName(className);
-                    try {
-                        ImportFormat importFormat = importer.getInstance();
-                        importer.setName(importFormat.getFormatName());
-                        importer.setCliId(importFormat.getCLIId());
-                        importCustomizationDialog.addOrReplaceImporter(importer);
-                        dispose();
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
-                        JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Please select an importer."));
-                }
-            }
-        });
-
-        ZipFileChooserTableModel tableModel = new ZipFileChooserTableModel(zipFile, getSelectableZipEntries(zipFile));
-        table = new JTable(tableModel);
-        TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(200);
-        cm.getColumn(1).setPreferredWidth(150);
-        cm.getColumn(2).setPreferredWidth(100);
-        JScrollPane sp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.setPreferredScrollableViewportSize(new Dimension(500, 150));
-        if (table.getRowCount() > 0) {
-            table.setRowSelectionInterval(0, 0);
-        }
-
-        // Key bindings:
-        JPanel mainPanel = new JPanel();
-        //ActionMap am = mainPanel.getActionMap();
-        //InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        //im.put(Globals.getKeyPrefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
-        //am.put("close", closeAction);
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.add(sp, BorderLayout.CENTER);
-
-        JPanel optionsPanel = new JPanel();
-        optionsPanel.add(okButton);
-        optionsPanel.add(cancelButton);
-        optionsPanel.add(Box.createHorizontalStrut(5));
-
-        getContentPane().add(mainPanel, BorderLayout.CENTER);
-        getContentPane().add(optionsPanel, BorderLayout.SOUTH);
-        this.setSize(getSize());
-        pack();
-        PositionWindow.placeDialog(this, owner);
-        new FocusRequester(table);
-    }
 }

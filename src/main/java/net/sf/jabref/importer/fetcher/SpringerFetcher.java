@@ -79,7 +79,7 @@ public class SpringerFetcher implements EntryFetcher {
                         try {
                             numberToFetch = Integer.parseInt(strCount.trim());
                             break;
-                        } catch (RuntimeException ex) {
+                        } catch (NumberFormatException ex) {
                             status.showMessage(Localization.lang("Please enter a valid number"));
                         }
                     }

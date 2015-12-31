@@ -52,7 +52,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 public class ImportCustomizationDialog extends JDialog {
     private final JabRefFrame frame;
 
-    private JTable customImporterTable;
+    private final JTable customImporterTable;
     private final JabRefPreferences prefs = Globals.prefs;
     private final ImportCustomizationDialog importCustomizationDialog;
 
@@ -83,7 +83,7 @@ public class ImportCustomizationDialog extends JDialog {
         String className = null;
         // remove leading basepath from path
         while (!path.equals(basePath)) {
-            className = path.getName() + (className != null ? "." + className : "");
+            className = path.getName() + (className == null ? "" : "." + className);
             path = path.getParentFile();
         }
         int lastDot = className.lastIndexOf('.');
@@ -110,7 +110,7 @@ public class ImportCustomizationDialog extends JDialog {
      * @param frame_
      * @throws HeadlessException
      */
-    public ImportCustomizationDialog(JabRefFrame frame_) throws HeadlessException {
+    public ImportCustomizationDialog(final JabRefFrame frame_) throws HeadlessException {
         super(frame_, Localization.lang("Manage custom imports"), false);
         this.importCustomizationDialog = this;
         frame = frame_;
@@ -182,7 +182,9 @@ public class ImportCustomizationDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = customImporterTable.getSelectedRow();
-                if (row != -1) {
+                if (row == -1) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
+                } else {
                     CustomImportList.Importer importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
                     try {
                         ImportFormat importFormat = importer.getInstance();
@@ -191,8 +193,6 @@ public class ImportCustomizationDialog extends JDialog {
                         exc.printStackTrace();
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
                     }
-                } else {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
                 }
             }
         });
@@ -203,14 +203,14 @@ public class ImportCustomizationDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = customImporterTable.getSelectedRow();
-                if (row != -1) {
+                if (row == -1) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
+                } else {
                     customImporterTable.removeRowSelectionInterval(row, row);
                     prefs.customImports.remove(((ImportTableModel) customImporterTable.getModel()).getImporter(row));
                     Globals.importFormatReader.resetImportFormats();
                     customImporterTable.revalidate();
                     customImporterTable.repaint();
-                } else {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
                 }
             }
         });

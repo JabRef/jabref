@@ -57,7 +57,9 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private static final Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     private static final Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
-    private final HashMap<String, String> entryLinks = new HashMap<>();
+    private static final Pattern INPUT_PATTERN = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
+
+    private final Map<String, String> entryLinks = new HashMap<>();
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
@@ -95,7 +97,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Error fetching from Google Scholar", e);
             status.showMessage(Localization.lang("Error fetching from Google Scholar"));
             return false;
         }
@@ -104,7 +106,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     @Override
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector) {
         int toDownload = 0;
-        int downloaded = 0;
         for (Map.Entry<String, Boolean> selEntry : selection.entrySet()) {
             boolean isSelected = selEntry.getValue();
             if (isSelected) {
@@ -114,6 +115,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         if (toDownload == 0) {
             return;
         }
+
+        int downloaded = 0;
 
         for (Map.Entry<String, Boolean> selEntry : selection.entrySet()) {
             if (stopFetching) {
@@ -168,7 +171,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             //save("setting.html", ud.getStringContent());
             String settingsPage = new URLDownload(new URL(GoogleScholarFetcher.URL_SETTING)).downloadToString();
             // Get the form items and their values from the page:
-            HashMap<String, String> formItems = GoogleScholarFetcher.getFormElements(settingsPage);
+            Map<String, String> formItems = GoogleScholarFetcher.getFormElements(settingsPage);
             // Override the important ones:
             formItems.put("scis", "yes");
             formItems.put("scisf", "4");
@@ -309,11 +312,9 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
 
-    private static final Pattern inputPattern = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
 
-
-    private static HashMap<String, String> getFormElements(String page) {
-        Matcher m = GoogleScholarFetcher.inputPattern.matcher(page);
+    private static Map<String, String> getFormElements(String page) {
+        Matcher m = GoogleScholarFetcher.INPUT_PATTERN.matcher(page);
         HashMap<String, String> items = new HashMap<>();
         while (m.find()) {
             String name = m.group(2);

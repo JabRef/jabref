@@ -76,7 +76,6 @@ public class FreeCiteImporter extends ImportFormat {
         } catch (UnsupportedEncodingException e) {
             // e.printStackTrace();
         }
-        String data = "citation=" + urlencodedCitation;
 
         // Send the request
         URL url;
@@ -96,6 +95,7 @@ public class FreeCiteImporter extends ImportFormat {
             conn.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
+            String data = "citation=" + urlencodedCitation;
             // write parameters
             writer.write(data);
             writer.flush();
@@ -198,11 +198,11 @@ public class FreeCiteImporter extends ImportFormat {
 
                     if (noteSB.length() > 0) {
                         String note = e.getField("note");
-                        if (note != null) {
+                        if (note == null) {
+                            note = noteSB.toString();
+                        } else {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
                             note = note.concat(Globals.NEWLINE).concat(noteSB.toString());
-                        } else {
-                            note = noteSB.toString();
                         }
                         e.setField("note", note);
                     }

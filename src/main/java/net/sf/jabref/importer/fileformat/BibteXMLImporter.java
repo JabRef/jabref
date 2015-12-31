@@ -86,7 +86,7 @@ public class BibteXMLImporter extends ImportFormat {
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        ArrayList<BibEntry> bibItems = new ArrayList<>();
+        List<BibEntry> bibItems = new ArrayList<>();
 
         // Obtain a factory object for creating SAX parsers
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -110,7 +110,7 @@ public class BibteXMLImporter extends ImportFormat {
         } catch (org.xml.sax.SAXException e2) {
             LOGGER.error("Error during XML parsing", e2);
             status.showMessage(e2.getLocalizedMessage());
-        } catch (java.io.IOException e3) {
+        } catch (IOException e3) {
             LOGGER.error("Error during file import", e3);
             status.showMessage(e3.getLocalizedMessage());
         }

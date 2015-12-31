@@ -62,10 +62,10 @@ public class ImportFormats {
             fc.addChoosableFileFilter(filter);
         }
 
-        if (defaultFilter != null) {
-            fc.setFileFilter(defaultFilter);
-        } else {
+        if (defaultFilter == null) {
             fc.setFileFilter(fc.getAcceptAllFileFilter());
+        } else {
+            fc.setFileFilter(defaultFilter);
         }
         return fc;
     }
@@ -125,10 +125,10 @@ public class ImportFormats {
 
                     // Make sure we remember which filter was used, to set the default
                     // for next time:
-                    if (format != null) {
-                        Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, format.getFormatName());
-                    } else {
+                    if (format == null) {
                         Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, "__all");
+                    } else {
+                        Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, format.getFormatName());
                     }
                     Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent());
                 } catch (Exception ex) {
