@@ -84,10 +84,10 @@ public class FreeCiteImporter extends ImportFormat {
             url = new URL("http://freecite.library.brown.edu/citations/create");
             conn = url.openConnection();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.warn("Bad URL", e);
             return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not download", e);
             return null;
         }
         try {
@@ -188,7 +188,7 @@ public class FreeCiteImporter extends ImportFormat {
                             } else {
                                 // all other tags are stored as note
                                 noteSB.append(ln);
-                                noteSB.append(":");
+                                noteSB.append(':');
                                 noteSB.append(parser.getElementText());
                                 noteSB.append(Globals.NEWLINE);
                             }
@@ -220,7 +220,7 @@ public class FreeCiteImporter extends ImportFormat {
             }
             parser.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Could not parse", ex);
             return null;
         }
 

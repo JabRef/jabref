@@ -23,6 +23,10 @@ import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -54,6 +58,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
             .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
     private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
+    private static final Log LOGGER = LogFactory.getLog(CiteSeerXFetcher.class);
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
@@ -65,9 +70,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
                     break;
                 }
                 BibEntry entry = getSingleCitation(citation);
-                //BibEntry entry = BibsonomyScraper.getEntry(citation);
-
-                //dialog.setProgress(++i, citations.size());
                 if (entry != null) {
                     inspector.addEntry(entry);
                 }
@@ -75,7 +77,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not download", e);
             return false;
         }
     }

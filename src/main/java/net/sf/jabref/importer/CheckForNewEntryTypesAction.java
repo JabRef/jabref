@@ -47,7 +47,8 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
     @Override
     public void performAction(BasePanel panel, ParserResult pr) {
 
-        StringBuilder sb = new StringBuilder(Localization.lang("Custom entry types found in file") + ": ");
+        StringBuilder sb = new StringBuilder();
+        sb.append(Localization.lang("Custom entry types found in file")).append(": ");
         Object[] types = pr.getEntryTypes().keySet().toArray();
         Arrays.sort(types);
         for (Object type : types) {

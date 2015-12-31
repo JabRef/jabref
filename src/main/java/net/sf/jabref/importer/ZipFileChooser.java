@@ -50,6 +50,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fileformat.ImportFormat;
@@ -69,6 +72,7 @@ class ZipFileChooser extends JDialog {
     /** import customization dialog, owner of this dialog */
     private final ImportCustomizationDialog importCustomizationDialog;
 
+    private static final Log LOGGER = LogFactory.getLog(ZipFileChooser.class);
 
 
     /*
@@ -133,7 +137,7 @@ class ZipFileChooser extends JDialog {
                 } else {
                     ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
                     ZipEntry tempZipEntry = model.getZipEntry(row);
-                    CustomImportList.Importer importer = new CustomImportList.Importer();
+                    CustomImporter importer = new CustomImporter();
                     importer.setBasePath(model.getZipFile().getName());
                     String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replaceAll("/", ".");
                     importer.setClassName(className);
@@ -144,7 +148,7 @@ class ZipFileChooser extends JDialog {
                         importCustomizationDialog.addOrReplaceImporter(importer);
                         dispose();
                     } catch (Exception exc) {
-                        exc.printStackTrace();
+                        LOGGER.warn("Could not instantiate importer: " + importer.getName(), exc);
                         JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
                     }
                 }

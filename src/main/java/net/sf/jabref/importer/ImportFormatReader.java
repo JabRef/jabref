@@ -65,7 +65,7 @@ public class ImportFormatReader {
         /**
          * Get custom import formats
          */
-        for (CustomImportList.Importer importer : Globals.prefs.customImports) {
+        for (CustomImporter importer : Globals.prefs.customImports) {
             try {
                 ImportFormat imFo = importer.getInstance();
                 formats.add(imFo);
