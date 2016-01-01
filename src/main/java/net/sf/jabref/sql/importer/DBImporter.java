@@ -78,19 +78,20 @@ public abstract class DBImporter extends DBImporterExporter {
      * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
      * @throws Exception
      */
-    public List<Object[]> performImport(DBStrings dbs, List<String> listOfDBs) throws Exception {
-        List<Object[]> result = new ArrayList<>();
+    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs) throws Exception {
+        List<DBImporterResult> result = new ArrayList<>();
         try (Connection conn = this.connectToDB(dbs)) {
 
             Iterator<String> itLista = listOfDBs.iterator();
-            String jabrefDBs = "(";
+            StringBuffer jabrefDBsb = new StringBuffer();
+            jabrefDBsb.append('(');
             while (itLista.hasNext()) {
-                jabrefDBs += '\'' + itLista.next() + "',";
+                jabrefDBsb.append('\'').append(itLista.next()).append("',");
             }
-            jabrefDBs = jabrefDBs.substring(0, jabrefDBs.length() - 1) + ')';
+            jabrefDBsb.deleteCharAt(jabrefDBsb.length() - 1).append(')');
 
             try (Statement statement = SQLUtil.queryAllFromTable(conn,
-                    "jabref_database WHERE database_name IN " + jabrefDBs)) {
+                    "jabref_database WHERE database_name IN " + jabrefDBsb.toString())) {
                 ResultSet rsDatabase = statement.getResultSet();
                 while (rsDatabase.next()) {
                     BibDatabase database = new BibDatabase();
@@ -151,14 +152,12 @@ public abstract class DBImporter extends DBImporterExporter {
                     metaData.initializeNewDatabase();
                     // Read the groups tree:
                     importGroupsTree(metaData, entries, conn, database_id);
-                    result.add(new Object[]{database, metaData, rsDatabase.getString("database_name")});
+                    result.add(new DBImporterResult(database, metaData, rsDatabase.getString("database_name")));
                 }
-
-                rsDatabase.close();
             }
-            conn.close();
-            return result;
         }
+
+        return result;
     }
 
     /**
