@@ -9,20 +9,16 @@ import java.util.*;
 public class EntryTypes {
 
     private static final TreeMap<String, EntryType> ALL_TYPES = new TreeMap<>();
-    private static final TreeMap<String, EntryType> STANDARD_TYPES;
+    private static TreeMap<String, EntryType> STANDARD_TYPES;
 
 
     static {
-        // Put the standard entry types into the type map.
-        Globals.prefs = JabRefPreferences.getInstance();
-        if (!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-            initBibtexEntryTypes();
-        } else {
-            initBibLatexEntryTypes();
-        }
-        // We need a record of the standard types, in case the user wants
-        // to remove a customized version. Therefore we clone the map.
-        STANDARD_TYPES = new TreeMap<>(ALL_TYPES);
+        resetTypeInformation();
+    }
+
+
+    private EntryTypes() {
+        // this class must be used statically
     }
 
     private static void initBibLatexEntryTypes() {
@@ -40,6 +36,23 @@ public class EntryTypes {
         for (EntryType type : IEEETranEntryTypes.ALL) {
             ALL_TYPES.put(type.getName().toLowerCase(), type);
         }
+    }
+
+    /**
+     * Required when switching biblatex mode
+     */
+    public static void resetTypeInformation() {
+        ALL_TYPES.clear();
+        // Put the standard entry types into the type map.
+        Globals.prefs = JabRefPreferences.getInstance();
+        if (!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+            initBibtexEntryTypes();
+        } else {
+            initBibLatexEntryTypes();
+        }
+        // We need a record of the standard types, in case the user wants
+        // to remove a customized version. Therefore we clone the map.
+        STANDARD_TYPES = new TreeMap<>(ALL_TYPES);
     }
 
     /**

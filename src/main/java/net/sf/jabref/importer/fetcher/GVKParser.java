@@ -12,6 +12,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibEntry;
@@ -348,9 +350,13 @@ public class GVKParser {
         } else if (mak.isEmpty()) {
             entryType = "misc";
         } else if (mak.startsWith("O")) {
-            entryType = "misc";
-            // FIXME: online only available in Biblatex
-            //entryType = "online";
+            if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+                // online only available in Biblatex mode
+                // See https://github.com/JabRef/jabref/issues/447 for a discussion
+                entryType = "online";
+            } else {
+                entryType = "misc";
+            }
         }
 
         /*

@@ -2,6 +2,7 @@ package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -14,7 +15,7 @@ public class EditModeAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        if(isBiblatexMode()) {
+        if (isBiblatexMode()) {
             // to BibteX
             Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, false);
         } else {
@@ -28,6 +29,8 @@ public class EditModeAction extends AbstractAction {
                     Localization.lang("You have toggled the %0 mode.", getMode()).concat(" ")
                             .concat("You must restart JabRef for this change to come into effect."),
                     Localization.lang("%0 mode", getMode()), JOptionPane.WARNING_MESSAGE);
+        // a first step towards file-based toggling is resetting the type information on each mode change:
+        EntryTypes.resetTypeInformation();
     }
 
     private boolean isBiblatexMode() {

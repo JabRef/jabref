@@ -3,8 +3,8 @@ package net.sf.jabref.bibtex;
 import static org.junit.Assert.*;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import net.sf.jabref.Globals;
@@ -22,6 +22,7 @@ public class EntryTypesTestBibLatex {
         Globals.prefs = JabRefPreferences.getInstance();
         backup = Globals.prefs;
         Globals.prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, true);
+        EntryTypes.resetTypeInformation();
     }
 
     @After
@@ -30,25 +31,24 @@ public class EntryTypesTestBibLatex {
     }
 
     @Test
-    @Ignore
     public void testBibLatexMode() {
         // BibLatex mode
-        EntryTypes biblatexentrytypes = new EntryTypes();
-        assertEquals(BibLatexEntryTypes.ARTICLE, biblatexentrytypes.getType("article"));
-        assertNull(biblatexentrytypes.getType("aaaaarticle"));
-        assertNull(biblatexentrytypes.getStandardType("aaaaarticle"));
-        assertEquals(34, biblatexentrytypes.getAllValues().size());
-        assertEquals(34, biblatexentrytypes.getAllTypes().size());
+        Assert.assertTrue(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE));
+        assertEquals(BibLatexEntryTypes.ARTICLE, EntryTypes.getType("article"));
+        assertNull(EntryTypes.getType("aaaaarticle"));
+        assertNull(EntryTypes.getStandardType("aaaaarticle"));
+        assertEquals(34, EntryTypes.getAllValues().size());
+        assertEquals(34, EntryTypes.getAllTypes().size());
 
-        biblatexentrytypes.removeType("article");
+        EntryTypes.removeType("article");
         // Should not be possible to remove a standard type
-        assertEquals(BibLatexEntryTypes.ARTICLE, biblatexentrytypes.getType("article"));
+        assertEquals(BibLatexEntryTypes.ARTICLE, EntryTypes.getType("article"));
     }
 
     @Test
     public void defaultType() {
-        EntryTypes types = new EntryTypes();
-        assertEquals(BibLatexEntryTypes.MISC, types.getTypeOrDefault("unknowntype"));
+        Assert.assertTrue(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE));
+        assertEquals(BibLatexEntryTypes.MISC, EntryTypes.getTypeOrDefault("unknowntype"));
     }
 
     @Test
