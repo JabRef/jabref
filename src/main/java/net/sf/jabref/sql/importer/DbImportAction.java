@@ -19,7 +19,7 @@ import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -55,7 +55,7 @@ public class DbImportAction extends AbstractWorker {
     private boolean connectToDB;
     private final JabRefFrame frame;
     private DBStrings dbs;
-    private ArrayList<Object[]> databases;
+    private List<Object[]> databases;
 
 
     public DbImportAction(JabRefFrame frame) {
@@ -97,8 +97,9 @@ public class DbImportAction extends AbstractWorker {
         // panel.metaData().getDBStrings();
 
         // get DBStrings from user if necessary
-        if (!dbs.isConfigValid()) {
-
+        if (dbs.isConfigValid()) {
+            connectToDB = true;
+        } else {
             // init DB strings if necessary
             if (!dbs.isInitialized()) {
                 dbs.initialize();
@@ -116,11 +117,6 @@ public class DbImportAction extends AbstractWorker {
                 dbs = dbd.getDBStrings();
                 dbd.dispose();
             }
-
-        } else {
-
-            connectToDB = true;
-
         }
 
     }
@@ -149,7 +145,11 @@ public class DbImportAction extends AbstractWorker {
                         matrix.add(v);
                     }
 
-                    if (!matrix.isEmpty()) {
+                    if (matrix.isEmpty()) {
+                        JOptionPane.showMessageDialog(frame,
+                                Localization.lang("There are no available databases to be imported"),
+                                Localization.lang("Import from SQL database"), JOptionPane.INFORMATION_MESSAGE);
+                    } else {
                         DBImportExportDialog dialogo = new DBImportExportDialog(frame, matrix,
                                 DBImportExportDialog.DialogType.IMPORTER);
                         if (dialogo.removeAction) {
@@ -168,10 +168,6 @@ public class DbImportAction extends AbstractWorker {
                         } else {
                             frame.output(Localization.lang("Importing cancelled"));
                         }
-                    } else {
-                        JOptionPane.showMessageDialog(frame,
-                                Localization.lang("There are no available databases to be imported"),
-                                Localization.lang("Import from SQL database"), JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             } catch (Exception ex) {

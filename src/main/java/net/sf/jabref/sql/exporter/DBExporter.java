@@ -60,8 +60,8 @@ import net.sf.jabref.sql.SQLUtil;
 public abstract class DBExporter extends DBImporterExporter {
 
     private final String fieldStr = SQLUtil.getFieldStr();
-    DBStrings dbStrings;
-    private final ArrayList<String> dbNames = new ArrayList<>();
+    protected DBStrings dbStrings;
+    private final List<String> dbNames = new ArrayList<>();
 
     private static final Log LOGGER = LogFactory.getLog(DBExporter.class);
 
@@ -79,7 +79,7 @@ public abstract class DBExporter extends DBImporterExporter {
         List<BibEntry> entries = FileActions.getSortedEntries(database, metaData, keySet, false);
         GroupTreeNode gtn = metaData.getGroups();
 
-        int database_id = getDatabaseIDByName(metaData, out, dbName);
+        final int database_id = getDatabaseIDByName(metaData, out, dbName);
         removeAllRecordsForAGivenDB(out, database_id);
         populateEntryTypesTable(out);
         populateEntriesTable(database_id, entries, out);
@@ -98,18 +98,21 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param entries     The BibtexEntries to export
      * @param out         The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private void populateEntriesTable(int database_id, List<BibEntry> entries, Object out) throws SQLException {
-        StringBuilder query = new StringBuilder();
+    private void populateEntriesTable(final int database_id, List<BibEntry> entries, Object out) throws SQLException {
+        StringBuilder query = new StringBuilder(75);
         String val;
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, " + fieldStr
                 + ", database_id) VALUES (";
         for (BibEntry entry : entries) {
-            query.append(insert).append('\'').append(entry.getId()).append('\'').append(", (SELECT entry_types_id FROM entry_types WHERE label='")
+            query.append(insert).append('\'').append(entry.getId())
+                    .append("', (SELECT entry_types_id FROM entry_types WHERE label='")
                     .append(entry.getType().getName().toLowerCase()).append("'), '").append(entry.getCiteKey()).append('\'');
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 query.append(", ");
                 val = entry.getField(SQLUtil.getAllFields().get(i));
-                if (val != null) {
+                if (val == null) {
+                    query.append("NULL");
+                } else {
                     /**
                      * The condition below is there since PostgreSQL automatically escapes the backslashes, so the entry
                      * would double the number of slashes after storing/retrieving.
@@ -121,8 +124,6 @@ public abstract class DBExporter extends DBImporterExporter {
                         val = val.replace("`", "\\`");
                     }
                     query.append('\'').append(val).append('\'');
-                } else {
-                    query.append("NULL");
                 }
             }
             query.append(", '").append(database_id).append("');");
@@ -140,7 +141,8 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param database_id Id of jabref database to which the group is part of
      */
 
-    private int populateEntryGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out, int database_id)
+    private int populateEntryGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out,
+            final int database_id)
             throws SQLException {
         // if this group contains entries...
         if (cursor.getGroup() instanceof ExplicitGroup) {
@@ -187,9 +189,9 @@ public abstract class DBExporter extends DBImporterExporter {
      */
 
     private void populateEntryTypesTable(Object out) throws SQLException {
-        ArrayList<String> fieldRequirement = new ArrayList<>();
+        List<String> fieldRequirement = new ArrayList<>();
 
-        ArrayList<String> existentTypes = new ArrayList<>();
+        List<String> existentTypes = new ArrayList<>();
         if (out instanceof Connection) {
             try (Statement sm = (Statement) SQLUtil.processQueryWithResults(out, "SELECT label FROM entry_types");
                  ResultSet rs = sm.getResultSet()) {
@@ -210,14 +212,7 @@ public abstract class DBExporter extends DBImporterExporter {
             List<String> utiFields = Collections.singletonList("search");
             fieldRequirement = SQLUtil.setFieldRequirement(SQLUtil.getAllFields(), reqFields, optFields, utiFields,
                     fieldRequirement);
-            if (!existentTypes.contains(val.getName().toLowerCase())) {
-                querySB.append("INSERT INTO entry_types (label, ").append(fieldStr).append(") VALUES (");
-                querySB.append('\'').append(val.getName().toLowerCase()).append('\'');
-                for (String aFieldRequirement : fieldRequirement) {
-                    querySB.append(", '").append(aFieldRequirement).append('\'');
-                }
-                querySB.append(");");
-            } else {
+            if (existentTypes.contains(val.getName().toLowerCase())) {
                 String[] update = fieldStr.split(",");
                 querySB.append("UPDATE entry_types SET \n");
                 for (int i = 0; i < fieldRequirement.size(); i++) {
@@ -225,6 +220,13 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
                 querySB.delete(querySB.lastIndexOf(","), querySB.length());
                 querySB.append(" WHERE label='").append(val.getName().toLowerCase()).append("';");
+            } else {
+                querySB.append("INSERT INTO entry_types (label, ").append(fieldStr).append(") VALUES ('")
+                        .append(val.getName().toLowerCase()).append('\'');
+                for (String aFieldRequirement : fieldRequirement) {
+                    querySB.append(", '").append(aFieldRequirement).append('\'');
+                }
+                querySB.append(");");
             }
             SQLUtil.processQuery(out, querySB.toString());
         }
@@ -239,24 +241,25 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param out         The output (PrintStream or Connection) object to which the DML should be written.
      * @param database_id Id of jabref database to which the groups/entries are part of
      */
-    private int populateGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out, int database_id)
+    private int populateGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out,
+            final int database_id)
             throws SQLException {
 
         AbstractGroup group = cursor.getGroup();
         String searchField = null;
         String searchExpr = null;
         String caseSens = null;
-        String reg_exp = null;
+        String regExp = null;
         GroupHierarchyType hierContext = group.getHierarchicalContext();
         if (group instanceof KeywordGroup) {
             searchField = ((KeywordGroup) group).getSearchField();
             searchExpr = ((KeywordGroup) group).getSearchExpression();
             caseSens = ((KeywordGroup) group).isCaseSensitive() ? "1" : "0";
-            reg_exp = ((KeywordGroup) group).isRegExp() ? "1" : "0";
+            regExp = ((KeywordGroup) group).isRegExp() ? "1" : "0";
         } else if (group instanceof SearchGroup) {
             searchExpr = ((SearchGroup) group).getSearchExpression();
             caseSens = ((SearchGroup) group).isCaseSensitive() ? "1" : "0";
-            reg_exp = ((SearchGroup) group).isRegExp() ? "1" : "0";
+            regExp = ((SearchGroup) group).isRegExp() ? "1" : "0";
         }
         // Protect all quotes in the group descriptions:
         if (searchField != null) {
@@ -272,7 +275,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 + group.getTypeId() + "')" + ", " + (searchField != null ? '\'' + searchField + '\'' : "NULL") + ", "
                 + (searchExpr != null ? '\'' + searchExpr + '\'' : "NULL") + ", "
                 + (caseSens != null ? '\'' + caseSens + '\'' : "NULL") + ", "
-                + (reg_exp != null ? '\'' + reg_exp + '\'' : "NULL") + ", " + hierContext.ordinal() + ", '"
+                + (regExp != null ? '\'' + regExp + '\'' : "NULL") + ", " + hierContext.ordinal() + ", '"
                 + database_id + "');");
         // recurse on child nodes (depth-first traversal)
         try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
@@ -333,7 +336,8 @@ public abstract class DBExporter extends DBImporterExporter {
      *                    using getDatabaseIDByPath(metaData, out)
      * @throws SQLException
      */
-    private static void populateStringTable(BibDatabase database, Object out, int database_id) throws SQLException {
+    private static void populateStringTable(BibDatabase database, Object out, final int database_id)
+            throws SQLException {
         String insert = "INSERT INTO strings (label, content, database_id) VALUES (";
 
         if (database.getPreamble() != null) {
@@ -379,12 +383,9 @@ public abstract class DBExporter extends DBImporterExporter {
                                      String file, Charset encoding) throws Exception {
         // open output file
         File outfile = new File(file);
-        if (outfile.exists()) {
-            if (!outfile.delete()) {
-                LOGGER.warn("Cannot delete/overwrite file.");
-                return;
-            }
-
+        if (outfile.exists() && !outfile.delete()) {
+            LOGGER.warn("Cannot delete/overwrite file.");
+            return;
         }
         try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outfile));
              PrintStream fout = new PrintStream(writer)) {
@@ -428,10 +429,8 @@ public abstract class DBExporter extends DBImporterExporter {
                 exportDatabaseToDBMS(database, metaData, keySet, databaseStrings, frame);
             }
         } catch (SQLException ex) {
-            if (conn != null) {
-                if (!conn.getAutoCommit()) {
-                    conn.rollback();
-                }
+            if ((conn != null) && !conn.getAutoCommit()) {
+                conn.rollback();
             }
             throw ex;
         } finally {
@@ -450,15 +449,15 @@ public abstract class DBExporter extends DBImporterExporter {
                 if ((dialogo.selectedInt == 0) && (!dialogo.removeAction)) {
                     dbName = JOptionPane.showInputDialog(dialogo.getDiag(), "Please enter the desired name:",
                             "SQL Export", JOptionPane.INFORMATION_MESSAGE);
-                    if (dbName != null) {
+                    if (dbName == null) {
+                        getDBName(matrix, databaseStrings, frame,
+                                new DBImportExportDialog(frame, matrix, DBImportExportDialog.DialogType.EXPORTER));
+                    } else {
                         while (!isValidDBName(dbNames, dbName)) {
                             dbName = JOptionPane.showInputDialog(dialogo.getDiag(),
                                     "You have entered an invalid or already existent DB name.\n Please enter the desired name:",
                                     "SQL Export", JOptionPane.ERROR_MESSAGE);
                         }
-                    } else {
-                        getDBName(matrix, databaseStrings, frame,
-                                new DBImportExportDialog(frame, matrix, DBImportExportDialog.DialogType.EXPORTER));
                     }
                 }
             }
@@ -489,7 +488,7 @@ public abstract class DBExporter extends DBImporterExporter {
         }
     }
 
-    private boolean isValidDBName(ArrayList<String> databaseNames, String desiredName) {
+    private boolean isValidDBName(List<String> databaseNames, String desiredName) {
         return (desiredName.trim().length() > 1) && !databaseNames.contains(desiredName);
     }
 
