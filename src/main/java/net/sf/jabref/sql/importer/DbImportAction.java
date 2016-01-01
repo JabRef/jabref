@@ -159,8 +159,8 @@ public class DbImportAction extends AbstractWorker {
                         } else if (dialogo.moreThanOne) {
                             databases = importer.performImport(dbs, dialogo.listOfDBs);
                             for (DBImporterResult res : databases) {
-                                database = res.database;
-                                metaData = res.metaData;
+                                database = res.getDatabase();
+                                metaData = res.getMetaData();
                                 dbs.isConfigValid(true);
                             }
                             frame.output(Localization.lang("%0 databases will be imported",
@@ -189,12 +189,12 @@ public class DbImportAction extends AbstractWorker {
             return;
         }
         for (DBImporterResult res : databases) {
-            database = res.database;
-            metaData = res.metaData;
+            database = res.getDatabase();
+            metaData = res.getMetaData();
             if (database != null) {
                 BasePanel pan = frame.addTab(database, null, metaData, Globals.prefs.getDefaultEncoding(), true);
                 pan.metaData().setDBStrings(dbs);
-                frame.setTabTitle(pan, res.name + "(Imported)", "Imported DB");
+                frame.setTabTitle(pan, res.getName() + "(Imported)", "Imported DB");
                 pan.markBaseChanged();
             }
         }

@@ -21,14 +21,26 @@ import net.sf.jabref.model.database.BibDatabase;
 
 public class DBImporterResult {
 
-    public final BibDatabase database;
-    public final MetaData metaData;
-    public final String name;
+    private final BibDatabase database;
+    private final MetaData metaData;
+    private final String name;
 
     public DBImporterResult(final BibDatabase database, final MetaData metaData, final String name) {
         this.database = database;
         this.metaData = metaData;
         this.name = name;
+    }
+
+    public MetaData getMetaData() {
+        return metaData;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public BibDatabase getDatabase() {
+        return database;
     }
 
 }
