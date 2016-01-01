@@ -1,11 +1,16 @@
 machine:
   java:
+    # We switch to OpenJDK8 at dependencies/pre
     version: oraclejdk8
 
 dependencies:
   pre:
     - scripts/prepare-install4j.sh
     - install4j6/bin/install4jc --verbose --license=$INSTALL4J_KEY
+    # Switch to OpenJDK8 as described at https://discuss.circleci.com/t/using-openjdk-8/
+    - sudo update-alternatives --set java /usr/lib/jvm/jdk1.8.0/bin/java
+    - sudo update-alternatives --set javac /usr/lib/jvm/java-8-openjdk-amd64/bin/javac
+    - echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64' >> ~/.circlerc
   override:
     # We do this to decrease build time by using CircleCI's cache. See https://discuss.circleci.com/t/effective-caching-for-gradle/540 for a longer motivation.
     - TERM=dumb ./gradlew getdeps
