@@ -55,7 +55,7 @@ public class DbImportAction extends AbstractWorker {
     private boolean connectToDB;
     private final JabRefFrame frame;
     private DBStrings dbs;
-    private List<Object[]> databases;
+    private List<DBImporterResult> databases;
 
 
     public DbImportAction(JabRefFrame frame) {
@@ -158,9 +158,9 @@ public class DbImportAction extends AbstractWorker {
                             performImport();
                         } else if (dialogo.moreThanOne) {
                             databases = importer.performImport(dbs, dialogo.listOfDBs);
-                            for (Object[] res : databases) {
-                                database = (BibDatabase) res[0];
-                                metaData = (MetaData) res[1];
+                            for (DBImporterResult res : databases) {
+                                database = res.getDatabase();
+                                metaData = res.getMetaData();
                                 dbs.isConfigValid(true);
                             }
                             frame.output(Localization.lang("%0 databases will be imported",
@@ -188,13 +188,13 @@ public class DbImportAction extends AbstractWorker {
         if (databases == null) {
             return;
         }
-        for (Object[] res : databases) {
-            database = (BibDatabase) res[0];
-            metaData = (MetaData) res[1];
+        for (DBImporterResult res : databases) {
+            database = res.getDatabase();
+            metaData = res.getMetaData();
             if (database != null) {
                 BasePanel pan = frame.addTab(database, null, metaData, Globals.prefs.getDefaultEncoding(), true);
                 pan.metaData().setDBStrings(dbs);
-                frame.setTabTitle(pan, res[2] + "(Imported)", "Imported DB");
+                frame.setTabTitle(pan, res.getName() + "(Imported)", "Imported DB");
                 pan.markBaseChanged();
             }
         }
