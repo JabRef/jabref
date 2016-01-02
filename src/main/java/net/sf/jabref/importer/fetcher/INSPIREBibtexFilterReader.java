@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.FilterReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -42,6 +43,7 @@ class INSPIREBibtexFilterReader extends FilterReader {
     private int pos;
     private boolean pre;
 
+    private static final Pattern PATTERN = Pattern.compile("@Article\\{.*,");
 
     INSPIREBibtexFilterReader(final Reader _in) {
         super(_in);
@@ -71,16 +73,14 @@ class INSPIREBibtexFilterReader extends FilterReader {
         return l;
     }
 
-    private String fixBibkey(final String _in) {
-        if (_in == null) {
+    private String fixBibkey(final String preliminaryLine) {
+        if (preliminaryLine == null) {
             return null;
         }
-        //System.out.println(in);
-        if (_in.matches("@Article\\{.*,")) {
-            //System.out.println(in.replace(' ','_'));
-            return _in.replace(' ', '_');
+        if (PATTERN.matcher(preliminaryLine).find()) {
+            return preliminaryLine.replace(' ', '_');
         } else {
-            return _in;
+            return preliminaryLine;
         }
     }
 

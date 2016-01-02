@@ -269,8 +269,7 @@ public class BiblioscapeImporter extends ImportFormat {
 
                 // concatenate address and country
                 if (address != null) {
-                    hm.put("address", address
- + (country == null ? "" : ", " + country));
+                    hm.put("address", address + (country == null ? "" : ", " + country));
                 }
 
                 if (!comments.isEmpty()) { // set comment if present

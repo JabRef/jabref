@@ -198,7 +198,7 @@ class ZipFileChooser extends JDialog {
      * <p>Contains one row for each entry.
      * Does not contain rows for directory entries.</p>
      *
-     * <p>The columns contain information about ZIIP file entries:
+     * <p>The columns contain information about ZIP file entries:
      * <ol><li>
      *   name {@link String}
      * </li><li>
