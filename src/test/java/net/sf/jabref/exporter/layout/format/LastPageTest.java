@@ -36,4 +36,10 @@ public class LastPageTest {
         LayoutFormatter a = new LastPage();
         Assert.assertEquals("350", a.format("345--350"));
     }
+
+    @Test
+    public void testFinalCoverageCase() {
+        LayoutFormatter a = new LastPage();
+        Assert.assertEquals("", a.format("--"));
+    }
 }

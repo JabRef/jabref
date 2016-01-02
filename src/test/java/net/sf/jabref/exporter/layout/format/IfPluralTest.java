@@ -11,7 +11,7 @@ public class IfPluralTest {
     public void testStandardUsageOneEditor() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
-        Assert.assertEquals("Eds.", a.format("Bob Bruce and Jolly Jumper"));
+        Assert.assertEquals("Ed.", a.format("Bob Bruce"));
     }
 
     @Test
@@ -33,6 +33,12 @@ public class IfPluralTest {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
         Assert.assertEquals("", a.format(""));
+    }
+
+    @Test
+    public void testNoArgumentSet() {
+        ParamLayoutFormatter a = new IfPlural();
+        Assert.assertEquals("", a.format("Bob Bruce and Jolly Jumper"));
     }
 
     @Test

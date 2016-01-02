@@ -28,10 +28,10 @@ public class DOICheckTest {
         // Works even when having a / at the front
         Assert.assertEquals("http://doi.org/10.1145/354401.354407", lf.format("/10.1145/354401.354407"));
 
-        // Obviously a wrong doi, will not work.
+        // Obviously a wrong doi, will not change anything.
         Assert.assertEquals("10", lf.format("10"));
 
-        // Obviously a wrong doi, will not work.
+        // Obviously a wrong doi, will not change anything.
         Assert.assertEquals("1", lf.format("1"));
     }
 

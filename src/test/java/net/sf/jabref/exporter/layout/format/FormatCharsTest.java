@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Jabref-Team
+ * Copyright (C) 2015 Jabref-Team
  *
  * All programs in this directory and subdirectories are published under the GNU
  * General Public License as described below.
@@ -22,22 +22,30 @@
  * http://www.gnu.org/copyleft/gpl.ja.html
  *
  */
+
 package net.sf.jabref.exporter.layout.format;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
-public class AuthorFirstFirstTest {
 
-    /**
-     * Test method for
-     * {@link net.sf.jabref.exporter.layout.format.AuthorFirstFirst#format(java.lang.String)}.
-     */
+public class FormatCharsTest {
+
     @Test
-    public void testFormat() {
-        Assert.assertEquals("John von Neumann and John Smith and Peter Black Brown, Jr",
-                new AuthorFirstFirst()
-                        .format("von Neumann,,John and John Smith and Black Brown, Jr, Peter"));
+    public void testPlainFormat() {
+        assertEquals("aaa", new FormatChars().format("aaa"));
+    }
+
+    @Test
+    public void testFormatUmlaut() {
+        assertEquals("ä", new FormatChars().format("{\\\"{a}}"));
+        assertEquals("Ä", new FormatChars().format("{\\\"{A}}"));
+    }
+
+    @Test
+    public void testFormatStripLatexCommands() {
+        assertEquals("-", new FormatChars().format("\\mbox{-}"));
     }
 
 }
