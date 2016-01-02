@@ -4,12 +4,10 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.util.Util;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -17,32 +15,6 @@ import java.util.regex.Pattern;
 
 public class FileFinder {
 
-    /**
-     * Searches the given directory and subdirectories for a pdf file with name
-     * as given + ".pdf"
-     */
-    public static String findPdf(String key, String extension, String directory, FilenameFilter off) {
-        // String filename = key + "."+extension;
-
-        /*
-         * Simon Fischer's patch for replacing a regexp in keys before
-         * converting to filename:
-         *
-         * String regex = Globals.prefs.get("basenamePatternRegex"); if ((regex !=
-         * null) && (regex.trim().length() > 0)) { String replacement =
-         * Globals.prefs.get("basenamePatternReplacement"); key =
-         * key.replaceAll(regex, replacement); }
-         */
-        if (!directory.endsWith(System.getProperty("file.separator"))) {
-            directory += System.getProperty("file.separator");
-        }
-        String found = FileFinder.findInDir(key, directory, off, 0);
-        if (found != null) {
-            return found.substring(directory.length());
-        } else {
-            return null;
-        }
-    }
 
     public static Set<File> findFiles(Collection<String> extensions, Collection<File> directories) {
         Set<File> result = new HashSet<>();
@@ -106,23 +78,6 @@ public class FileFinder {
         regularExpression = regularExpression.replaceAll("\\[extension\\]", extension);
 
         return FileFinder.findFile(entry, null, directories, regularExpression, true);
-    }
-
-    /**
-     * Convenience menthod for findPDF. Searches for a file of the given type.
-     * @param entry The BibEntry to search for a link for.
-     * @param fileType The file type to search for.
-     * @return The link to the file found, or null if not found.
-     */
-    public static String findFile(BibEntry entry, ExternalFileType fileType, List<String> extraDirs) {
-
-        List<String> dirs = new ArrayList<>();
-        dirs.addAll(extraDirs);
-        if (Globals.prefs.hasKey(fileType.getExtension() + Globals.DIR_SUFFIX)) {
-            dirs.add(Globals.prefs.get(fileType.getExtension() + Globals.DIR_SUFFIX));
-        }
-        String[] directories = dirs.toArray(new String[dirs.size()]);
-        return FileFinder.findPdf(entry, fileType.getExtension(), directories);
     }
 
     /**
@@ -368,32 +323,5 @@ public class FileFinder {
         } catch (IOException e) {
             return null;
         }
-    }
-
-    private static String findInDir(String key, String dir, FilenameFilter off, int count) {
-        if (count > 20) {
-            return null; // Make sure an infinite loop doesn't occur.
-        }
-        File f = new File(dir);
-        File[] all = f.listFiles();
-        if (all == null) {
-            return null; // An error occured. We may not have permission to list the files.
-        }
-
-        for (File curFile : all) {
-            if (curFile.isFile()) {
-                String name = curFile.getName();
-                if (name.startsWith(key + '.') && off.accept(f, name)) {
-                    return curFile.getPath();
-                }
-
-            } else if (curFile.isDirectory()) {
-                String found = FileFinder.findInDir(key, curFile.getPath(), off, count + 1);
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
     }
 }

@@ -55,10 +55,7 @@ public class CookieHandlerImpl extends CookieHandler {
                 // New one will replace
                 for (Iterator<Cookie> i = cache.iterator(); i.hasNext(); ) {
                     Cookie existingCookie = i.next();
-                    if ((cookie.domain.equals(existingCookie.domain))
-                                    &&
-                                    (cookie.getName().equals(
-                                            existingCookie.getName()))) {
+                    if (cookie.equalNameAndDomain(existingCookie)) {
                         i.remove();
                         break;
                     }

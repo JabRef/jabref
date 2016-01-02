@@ -99,7 +99,7 @@ public class BibEntryWriter {
 
     private void writeKeyField(BibEntry entry, Writer out) throws IOException {
         String keyField = StringUtil.shaveString(entry.getCiteKey());
-        out.write((keyField == null ? "" : keyField) + ',' + Globals.NEWLINE);
+        out.write(keyField + ',' + Globals.NEWLINE);
     }
 
     /**

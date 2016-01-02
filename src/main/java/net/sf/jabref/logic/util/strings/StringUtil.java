@@ -38,11 +38,10 @@ public class StringUtil {
 
     public static String shaveString(String toShave) {
         if ((toShave == null) || (toShave.isEmpty())) {
-            return toShave;
+            return "";
         }
         toShave = toShave.trim();
-        if ((toShave.startsWith("{") && toShave.endsWith("}"))
-                || (toShave.startsWith("\"") && toShave.endsWith("\""))) {
+        if (isInCurlyBrackets(toShave) || isInCitationMarks(toShave)) {
             return toShave.substring(1, toShave.length() - 1);
         }
         return toShave;
@@ -94,9 +93,10 @@ public class StringUtil {
      * @return
      */
     public static String stripBrackets(String toStrip) {
-        int beginIndex = toStrip.startsWith("[") ? 1 : 0;
-        int endIndex = toStrip.endsWith("]") ? toStrip.length() - 1 : toStrip.length();
-        return toStrip.substring(beginIndex, endIndex);
+        if (isInSquareBrackets(toStrip)) {
+            return toStrip.substring(1, toStrip.length() - 1);
+        }
+        return toStrip;
     }
 
     /**
@@ -112,7 +112,7 @@ public class StringUtil {
             return orgName;
         }
 
-        int hiddenChar = orgName.indexOf(".", 1); // hidden files Linux/Unix (?)
+        int hiddenChar = orgName.indexOf('.', 1); // hidden files Linux/Unix (?)
         if (hiddenChar < 1) {
             orgName = orgName + "." + defaultExtension;
         }
@@ -174,7 +174,10 @@ public class StringUtil {
         addWrappedLine(result, CharMatcher.WHITESPACE.trimTrailingFrom(lines[0]), wrapAmount); // See
         for (int i = 1; i < lines.length; i++) {
 
-            if (!(lines[i].trim().isEmpty())) {
+            if (lines[i].trim().isEmpty()) {
+                result.append(Globals.NEWLINE);
+                result.append('\t');
+            } else {
                 result.append(Globals.NEWLINE);
                 result.append('\t');
                 result.append(Globals.NEWLINE);
@@ -182,9 +185,6 @@ public class StringUtil {
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
                 String line = CharMatcher.WHITESPACE.trimTrailingFrom(lines[i]);
                 addWrappedLine(result, line, wrapAmount);
-            } else {
-                result.append(Globals.NEWLINE);
-                result.append('\t');
             }
         }
         return result.toString();
@@ -216,7 +216,7 @@ public class StringUtil {
     public static String quoteForHTML(String toQuote) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < toQuote.length(); ++i) {
-            result.append("&#").append((int) toQuote.charAt(i)).append(";");
+            result.append("&#").append((int) toQuote.charAt(i)).append(';');
         }
         return result.toString();
     }
@@ -237,11 +237,11 @@ public class StringUtil {
         boolean isSpecial;
         for (int i = 0; i < toQuote.length(); ++i) {
             c = toQuote.charAt(i);
-            if (specials != null) {
-                isSpecial = (c == quoteChar) || (specials.indexOf(c) >= 0);
-            } else {
-                isSpecial = (c == quoteChar);
-            }
+
+            isSpecial = (c == quoteChar);
+            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
+            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
+
             if (isSpecial) {
                 result.append(quoteChar);
             }
@@ -268,10 +268,11 @@ public class StringUtil {
                     result.append(c);
                 }
                 quoted = false;
-            } else if (c != quoteChar) {
-                result.append(c);
-            } else { // quote char
+            } else if (c == quoteChar) {
+                // quote char
                 quoted = true;
+            } else {
+                result.append(c);
             }
         }
         return result.toString();
@@ -500,4 +501,29 @@ public class StringUtil {
     public static String unifyLineBreaksToConfiguredLineBreaks(String s) {
         return LINE_BREAKS.matcher(s).replaceAll(Globals.NEWLINE);
     }
+
+    public static boolean isInCurlyBrackets(String toCheck) {
+        if ((toCheck == null) || toCheck.isEmpty()) {
+            return false; // In case of null or empty string
+        } else {
+            return (toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}');
+        }
+    }
+
+    public static boolean isInSquareBrackets(String toCheck) {
+        if ((toCheck == null) || toCheck.isEmpty()) {
+            return false; // In case of null or empty string
+        } else {
+            return (toCheck.charAt(0) == '[') && (toCheck.charAt(toCheck.length() - 1) == ']');
+        }
+    }
+
+    public static boolean isInCitationMarks(String toCheck) {
+        if ((toCheck == null) || (toCheck.length() <= 1)) {
+            return false; // In case of null, empty string, or a single citation mark
+        } else {
+            return (toCheck.charAt(0) == '"') && (toCheck.charAt(toCheck.length() - 1) == '"');
+        }
+    }
+
 }

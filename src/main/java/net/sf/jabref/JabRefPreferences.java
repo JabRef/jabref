@@ -1117,15 +1117,13 @@ public final class JabRefPreferences {
             LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
         }
 
-        Enumeration<String> allKeys = pattern.getAllKeys();
-        while (allKeys.hasMoreElements()) {
-            String key = allKeys.nextElement();
+        Set<String> allKeys = pattern.getAllKeys();
+        for (String key : allKeys) {
             if (!pattern.isDefaultValue(key)) {
-                ArrayList<String> value = pattern.getValue(key);
                 // no default value
                 // the first entry in the array is the full pattern
                 // see net.sf.jabref.logic.labelPattern.LabelPatternUtil.split(String)
-                pre.put(key, value.get(0));
+                pre.put(key, pattern.getValue(key).get(0));
             }
         }
     }

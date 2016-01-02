@@ -260,10 +260,7 @@ public class Util {
         Matcher m = net.sf.jabref.util.Util.squareBracketsPattern.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            String replacement = net.sf.jabref.util.Util.getFieldAndFormat(m.group(), entry, database);
-            if (replacement == null) {
-                replacement = "";
-            }
+            String replacement = Optional.ofNullable(getFieldAndFormat(m.group(), entry, database)).orElse("");
             m.appendReplacement(s, replacement);
         }
         m.appendTail(s);

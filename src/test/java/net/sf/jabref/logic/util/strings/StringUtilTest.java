@@ -64,7 +64,7 @@ public class StringUtilTest {
     @Test
     public void testShaveString() {
 
-        assertEquals(null, StringUtil.shaveString(null));
+        assertEquals("", StringUtil.shaveString(null));
         assertEquals("", StringUtil.shaveString(""));
         assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
         assertEquals("a", StringUtil.shaveString("  {a}    "));
@@ -94,20 +94,12 @@ public class StringUtilTest {
     public void testStripBrackets() {
         assertEquals("foo", StringUtil.stripBrackets("[foo]"));
         assertEquals("[foo]", StringUtil.stripBrackets("[[foo]]"));
-        assertEquals("foo", StringUtil.stripBrackets("foo]"));
-        assertEquals("foo", StringUtil.stripBrackets("[foo"));
         assertEquals("", StringUtil.stripBrackets(""));
+        assertEquals("[foo", StringUtil.stripBrackets("[foo"));
+        assertEquals("]", StringUtil.stripBrackets("]"));
         assertEquals("", StringUtil.stripBrackets("[]"));
-        assertEquals("", StringUtil.stripBrackets("["));
-        assertEquals("", StringUtil.stripBrackets("]"));
         assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
-
-        try {
-            StringUtil.stripBrackets(null);
-            fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
+        assertEquals(null, StringUtil.stripBrackets(null));
     }
 
     @Test
@@ -186,4 +178,35 @@ public class StringUtilTest {
         assertEquals("1", StringUtil.booleanToBinaryString(true));
     }
 
+    @Test
+    public void testIsInCurlyBrackets() {
+        assertFalse(StringUtil.isInCurlyBrackets(""));
+        assertFalse(StringUtil.isInCurlyBrackets(null));
+        assertTrue(StringUtil.isInCurlyBrackets("{}"));
+        assertTrue(StringUtil.isInCurlyBrackets("{a}"));
+        assertFalse(StringUtil.isInCurlyBrackets("{"));
+        assertFalse(StringUtil.isInCurlyBrackets("}"));
+        assertFalse(StringUtil.isInCurlyBrackets("a{}a"));
+    }
+
+    @Test
+    public void testIsInSquareBrackets() {
+        assertFalse(StringUtil.isInSquareBrackets(""));
+        assertFalse(StringUtil.isInSquareBrackets(null));
+        assertTrue(StringUtil.isInSquareBrackets("[]"));
+        assertTrue(StringUtil.isInSquareBrackets("[a]"));
+        assertFalse(StringUtil.isInSquareBrackets("["));
+        assertFalse(StringUtil.isInSquareBrackets("]"));
+        assertFalse(StringUtil.isInSquareBrackets("a[]a"));
+    }
+
+    @Test
+    public void testIsInCitationMarks() {
+        assertFalse(StringUtil.isInCitationMarks(""));
+        assertFalse(StringUtil.isInCitationMarks(null));
+        assertTrue(StringUtil.isInCitationMarks("\"\""));
+        assertTrue(StringUtil.isInCitationMarks("\"a\""));
+        assertFalse(StringUtil.isInCitationMarks("\""));
+        assertFalse(StringUtil.isInCitationMarks("a\"\"a"));
+    }
 }

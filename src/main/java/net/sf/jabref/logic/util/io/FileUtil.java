@@ -33,6 +33,8 @@ import java.util.regex.Pattern;
 public class FileUtil {
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
+    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+
 
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
@@ -233,10 +235,10 @@ public class FileUtil {
         }
 
         if (!file.exists() && (dir != null)) {
-            if (dir.endsWith(System.getProperty("file.separator"))) {
+            if (dir.endsWith(FILE_SEPARATOR)) {
                 name = dir + name;
             } else {
-                name = dir + System.getProperty("file.separator") + name;
+                name = dir + FILE_SEPARATOR + name;
             }
 
             // System.out.println("expanded to: "+name);
@@ -314,8 +316,8 @@ public class FileUtil {
             longName = fileName.toString();
         }
 
-        if (!dir.endsWith(System.getProperty("file.separator"))) {
-            dir = dir.concat(System.getProperty("file.separator"));
+        if (!dir.endsWith(FILE_SEPARATOR)) {
+            dir = dir.concat(FILE_SEPARATOR);
         }
 
         if (longName.startsWith(dir)) {
