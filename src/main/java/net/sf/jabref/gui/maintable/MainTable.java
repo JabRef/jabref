@@ -238,13 +238,11 @@ public class MainTable extends JTable {
      * Adds a sorting rule that floats group hits to the top, and causes non-hits to be grayed out:
      */
     public void showFloatGrouping() {
-        if(!isFloatGroupingActive) {
             isFloatGroupingActive = true;
 
             groupMatcher = GroupMatcher.INSTANCE;
             groupComparator = new HitOrMissComparator(groupMatcher);
             refreshSorting();
-        }
     }
 
     /**

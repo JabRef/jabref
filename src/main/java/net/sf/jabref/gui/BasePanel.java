@@ -2026,10 +2026,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         public void start() {
-            if (!isActive) {
                 list.setMatcher(active);
                 isActive = true;
-            }
         }
 
         public void stop() {
