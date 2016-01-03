@@ -21,6 +21,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - ACM fetcher works again, fixes #545
 - Use default file icon for custom external file types, fixes #598
 - Fixed #608: Export works again
+- Table now updates when switching groups, fixes #417
 
 ### Removed
 
