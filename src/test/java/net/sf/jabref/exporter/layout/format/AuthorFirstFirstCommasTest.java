@@ -31,7 +31,7 @@ public class AuthorFirstFirstCommasTest {
 
     /**
      * Test method for
-     * {@link net.sf.jabref.exporter.layout.format.AuthorLF_FF#format(java.lang.String)}.
+     * {@link net.sf.jabref.exporter.layout.format.AuthorFirstFirstCommas#format(java.lang.String)}.
      */
     @Test
     public void testFormat() {

@@ -31,7 +31,7 @@ public class AuthorLF_FFAbbrTest {
 
     /**
      * Test method for
-     * {@link net.sf.jabref.exporter.layout.format.AuthorLF_FF#format(java.lang.String)}.
+     * {@link net.sf.jabref.exporter.layout.format.AuthorLF_FFAbbr#format(java.lang.String)}.
      */
     @Test
     public void testFormat() {

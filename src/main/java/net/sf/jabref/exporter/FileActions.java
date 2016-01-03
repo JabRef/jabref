@@ -522,12 +522,8 @@ public class FileActions {
             keySet = database.getKeySet();
         }
 
-        if (keySet != null) {
-            Iterator<String> i = keySet.iterator();
-
-            while (i.hasNext()) {
-                sorter.add(database.getEntryById(i.next()));
-            }
+        for (String id : keySet) {
+            sorter.add(database.getEntryById(id));
         }
 
         Collections.sort(sorter, comparatorStack);

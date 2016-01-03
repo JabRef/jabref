@@ -31,7 +31,7 @@ public class AuthorNatBibTest {
 
     /**
      * Test method for
-     * {@link net.sf.jabref.exporter.layout.format.AuthorLF_FF#format(java.lang.String)}.
+     * {@link net.sf.jabref.exporter.layout.format.AuthorNatBib#format(java.lang.String)}.
      */
     @Test
     public void testFormatThreeAuthors() {
