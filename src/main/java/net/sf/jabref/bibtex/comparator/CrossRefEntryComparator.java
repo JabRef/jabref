@@ -37,18 +37,18 @@ public class CrossRefEntryComparator implements Comparator<BibEntry> {
         Object f1 = e1.getField(CrossRefEntryComparator.CROSS_REF_FIELD);
         Object f2 = e2.getField(CrossRefEntryComparator.CROSS_REF_FIELD);
 
-        if (f1 == null && f2 == null)
+        if ((f1 == null) && (f2 == null))
          {
             return 0; // secComparator.compare(e1, e2);
         }
-        if (f1 != null && f2 != null)
+        if ((f1 != null) && (f2 != null))
          {
             return 0; // secComparator.compare(e1, e2);
         }
-        if (f1 != null) {
-            return -1;
-        } else {
+        if (f1 == null) {
             return 1;
+        } else {
+            return -1;
         }
     }
 

@@ -117,7 +117,9 @@ public class BibEntryWriter {
         String field = entry.getField(name);
         // only write field if is is not empty or if empty fields should be included
         // the first condition mirrors mirror behavior of com.jgoodies.common.base.Strings.isNotBlank(str)
-        if (!Strings.nullToEmpty(field).trim().isEmpty()) {
+        if (Strings.nullToEmpty(field).trim().isEmpty()) {
+            return false;
+        } else {
             if (prependWhiteSpace) {
                 out.write(',' + Globals.NEWLINE);
             }
@@ -130,8 +132,6 @@ public class BibEntryWriter {
                 throw new IOException("Error in field '" + name + "': " + ex.getMessage());
             }
             return true;
-        } else {
-            return false;
         }
     }
 
@@ -163,7 +163,7 @@ public class BibEntryWriter {
         StringBuilder suffixSB = new StringBuilder();
 
         for (int i = (intendation - field.length()); i > 0; i--) {
-            suffixSB.append(" ");
+            suffixSB.append(' ');
         }
 
         String suffix = suffixSB.toString();
