@@ -54,11 +54,7 @@ public class CustomImporter implements Comparable<CustomImporter> {
     }
 
     public CustomImporter(String[] data) {
-        super();
-        this.name = data[0];
-        this.cliId = data[1];
-        this.className = data[2];
-        this.basePath = data[3];
+        this(data[0], data[1], data[2], data[3]);
     }
 
     public CustomImporter(String name, String cliId, String className, String basePath) {
