@@ -67,17 +67,22 @@ public class PreferencesDialog extends JDialog {
 
     private final JabRefFrame frame;
 
+    private final JList<String> chooser;
+
+    private final JabRefPreferences prefs;
+
+    private final JButton importPrefs = new JButton(Localization.lang("Import preferences"));
+    private final JButton exportPrefs = new JButton(Localization.lang("Export preferences"));
+
     private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
+
+
 
     public PreferencesDialog(JabRefFrame parent, JabRef jabRef) {
         super(parent, Localization.lang("JabRef preferences"), false);
-        final JabRefPreferences prefs = JabRefPreferences.getInstance();
+        prefs = JabRefPreferences.getInstance();
         frame = parent;
 
-        final JList<String> chooser;
-
-        JButton importPrefs = new JButton(Localization.lang("Import preferences"));
-        JButton exportPrefs = new JButton(Localization.lang("Export preferences"));
 
         main = new JPanel();
         JPanel upper = new JPanel();

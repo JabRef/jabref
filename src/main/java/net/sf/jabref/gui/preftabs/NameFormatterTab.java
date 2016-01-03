@@ -45,6 +45,15 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
 
 
+    private boolean tableChanged;
+
+    private final JTable table;
+
+    private int rowCount = -1;
+
+    private final Vector<TableRow> tableRows = new Vector<>(10);
+
+
     public static Map<String, String> getNameFormatters() {
 
         Map<String, String> result = new HashMap<>();
@@ -69,15 +78,6 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         return result;
     }
-
-
-    private boolean tableChanged;
-
-    private final JTable table;
-
-    private int rowCount = -1;
-
-    private final Vector<TableRow> tableRows = new Vector<>(10);
 
 
     static class TableRow {
@@ -130,10 +130,10 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 if (tr == null) {
                     return "";
                 }
-                switch (column) {
-                case 0:
+                // Only two columns
+                if (column == 0) {
                     return tr.name;
-                default: // Only two columns
+                } else {
                     return tr.format;
                 }
             }

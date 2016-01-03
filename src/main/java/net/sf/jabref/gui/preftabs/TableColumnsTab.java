@@ -60,21 +60,21 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private final JCheckBox arxivColumn;
 
     private final JCheckBox extraFileColumns;
-    private JList<String> listOfFileColumns;
+    private final JList<String> listOfFileColumns;
 
     private final JRadioButton preferUrl;
     private final JRadioButton preferDoi;
 
     /*** begin: special fields ***/
     private final JCheckBox specialFieldsEnabled;
-    private JCheckBox rankingColumn;
-    private JCheckBox qualityColumn;
-    private JCheckBox priorityColumn;
-    private JCheckBox relevanceColumn;
-    private JCheckBox printedColumn;
-    private JCheckBox readStatusColumn;
-    private JRadioButton syncKeywords;
-    private JRadioButton writeSpecialFields;
+    private final JCheckBox rankingColumn;
+    private final JCheckBox qualityColumn;
+    private final JCheckBox priorityColumn;
+    private final JCheckBox relevanceColumn;
+    private final JCheckBox printedColumn;
+    private final JCheckBox readStatusColumn;
+    private final JRadioButton syncKeywords;
+    private final JRadioButton writeSpecialFields;
     private boolean oldSpecialFieldsEnabled;
     private boolean oldRankingColumn;
     private boolean oldQualityColumn;
@@ -147,10 +147,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     return "";
                 }
                 TableRow tr = (TableRow) rowContent;
-                switch (column) {
-                case 0:
+                // Only two columns
+                if (column == 0) {
                     return tr.name;
-                default: // Only two columns
+                } else {
                     return tr.length > 0 ? Integer.toString(tr.length) : "";
                 }
             }
@@ -192,7 +192,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 if (col == 0) {
                     rowContent.name = value.toString();
                     if ("".equals(getValueAt(row, 1))) {
-                        setValueAt("" + GUIGlobals.DEFAULT_FIELD_LENGTH, row, 1);
+                        setValueAt(String.valueOf(GUIGlobals.DEFAULT_FIELD_LENGTH), row, 1);
                     }
                 }
                 else {
@@ -646,12 +646,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 try {
                     String name = panel.mainTable.getColumnName(i).toLowerCase();
                     int width = colMod.getColumn(i).getWidth();
-                    if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).toLowerCase().equals(name)) {
+                    if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).equalsIgnoreCase(name)) {
                         colSetup.setValueAt(String.valueOf(width), i, 1);
                     } else { // Doesn't match; search for a matching col in our table
                         for (int j = 0; j < colSetup.getRowCount(); j++) {
-                            if ((j < tableRows.size()) &&
-                                    ((String) colSetup.getValueAt(j, 0)).toLowerCase().equals(name)) {
+                            if ((j < tableRows.size()) && ((String) colSetup.getValueAt(j, 0)).equalsIgnoreCase(name)) {
                                 colSetup.setValueAt(String.valueOf(width), j, 1);
                                 break;
                             }
