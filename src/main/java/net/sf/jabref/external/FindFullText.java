@@ -41,10 +41,8 @@ public class FindFullText {
             try {
                 Optional<URL> result = finder.findFullText(entry);
 
-                if (result.isPresent()) {
-                    if(MimeTypeDetector.isPdfContentType(result.get().toString())) {
-                        return result;
-                    }
+                if (result.isPresent() && MimeTypeDetector.isPdfContentType(result.get().toString())) {
+                    return result;
                 }
             } catch (IOException e) {
                 LOGGER.debug("Failed to find fulltext PDF at given URL", e);

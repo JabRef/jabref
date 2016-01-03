@@ -83,8 +83,8 @@ public class SynchronizeFileField extends AbstractWorker {
             goOn = false;
             return;
         }
-        autoSet = !optDiag.autoSetNone.isSelected();
-        checkExisting = optDiag.checkLinks.isSelected();
+        autoSet = !optDiag.isAutoSetNone();
+        checkExisting = optDiag.isCheckLinks();
 
         panel.output(Localization.lang("Synchronizing %0 links...", Globals.FILE_FIELD.toUpperCase()));
     }
@@ -183,7 +183,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 j--; // Step back in the iteration, because we removed an entry.
                                 removeAllBroken = true; // Notify for further cases.
                                 break;
-                            case 4:
+                            default:
                                 // Cancel
                                 break mainLoop;
                             }
@@ -271,13 +271,12 @@ public class SynchronizeFileField extends AbstractWorker {
 
     static class OptionsDialog extends JDialog {
 
-        final JRadioButton autoSetUnset;
-        final JRadioButton autoSetAll;
-        final JRadioButton autoSetNone;
-        final JCheckBox checkLinks;
-        final JButton ok = new JButton(Localization.lang("OK"));
-        final JButton cancel = new JButton(Localization.lang("Cancel"));
-        JLabel description;
+        private final JRadioButton autoSetUnset;
+        private final JRadioButton autoSetAll;
+        private final JRadioButton autoSetNone;
+        private final JCheckBox checkLinks;
+        private final JButton ok = new JButton(Localization.lang("OK"));
+        private final JButton cancel = new JButton(Localization.lang("Cancel"));
         private boolean canceled = true;
         private final MetaData metaData;
 
@@ -321,7 +320,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
             FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
             FormBuilder builder = FormBuilder.create().layout(layout);
-            description = new JLabel("<HTML>" + Localization.lang(
+            JLabel description = new JLabel("<HTML>" + Localization.lang(
                     "Attempt to autoset %0 links for your entries. Autoset works if "
                             + "a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.",
                     fn) + "</HTML>");
@@ -376,6 +375,14 @@ public class SynchronizeFileField extends AbstractWorker {
             new FocusRequester(ok);
             super.setVisible(visible);
 
+        }
+
+        public boolean isAutoSetNone() {
+            return autoSetNone.isSelected();
+        }
+
+        public boolean isCheckLinks() {
+            return checkLinks.isSelected();
         }
 
         public boolean canceled() {

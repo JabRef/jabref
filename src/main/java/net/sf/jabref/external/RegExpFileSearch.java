@@ -137,7 +137,6 @@ public class RegExpFileSearch {
      */
     private static List<File> findFile(BibEntry entry, String directory, String file, String extensionRegExp) {
 
-        List<File> res;
         File root;
         if (directory == null) {
             root = new File(".");
@@ -147,7 +146,7 @@ public class RegExpFileSearch {
         if (!root.exists()) {
             return null;
         }
-        res = RegExpFileSearch.findFile(entry, root, file, extensionRegExp);
+        List<File> res = RegExpFileSearch.findFile(entry, root, file, extensionRegExp);
 
         if (!res.isEmpty()) {
             for (int i = 0; i < res.size(); i++) {

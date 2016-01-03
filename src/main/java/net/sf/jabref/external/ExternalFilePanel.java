@@ -63,7 +63,8 @@ import net.sf.jabref.logic.xmp.XMPUtil;
  *
  */
 public class ExternalFilePanel extends JPanel {
-    private EntryEditor entryEditor;
+
+    private final EntryEditor entryEditor;
 
     private final JabRefFrame frame;
 
@@ -81,7 +82,6 @@ public class ExternalFilePanel extends JPanel {
     public ExternalFilePanel(final String fieldName, final MetaData metaData, final BibEntry entry, final FieldEditor editor, final OpenFileFilter off) {
         this(null, metaData, null, fieldName, off, editor);
         this.entry = entry;
-        this.entryEditor = null;
     }
 
     public ExternalFilePanel(final JabRefFrame frame, final MetaData metaData,

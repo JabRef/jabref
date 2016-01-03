@@ -105,7 +105,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
                 result.append(citeKey);
                 first = false;
             } else {
-                result.append(",").append(citeKey);
+                result.append(',').append(citeKey);
             }
         }
         return result.toString();
