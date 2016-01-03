@@ -263,10 +263,10 @@ public class IsiImporter extends ImportFormat {
 
                     value = value.replaceAll("EOLEOL", " ");
                     String existingKeywords = hm.get("keywords");
-                    if ((existingKeywords != null) && !existingKeywords.contains(value)) {
-                        existingKeywords += ", " + value;
-                    } else {
+                    if ((existingKeywords == null) || existingKeywords.contains(value)) {
                         existingKeywords = value;
+                    } else {
+                        existingKeywords += ", " + value;
                     }
                     hm.put("keywords", existingKeywords);
 
@@ -340,7 +340,7 @@ public class IsiImporter extends ImportFormat {
             // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<>();
+            List<Object> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> field : hm.entrySet()) {
                 String content = field.getValue();
                 if ((content == null) || content.trim().isEmpty()) {

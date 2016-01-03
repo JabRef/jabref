@@ -65,11 +65,11 @@ public class BiblioscapeImporter extends ImportFormat {
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        ArrayList<BibEntry> bibItems = new ArrayList<>();
+        List<BibEntry> bibItems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
-        HashMap<String, String> hm = new HashMap<>();
-        HashMap<String, StringBuffer> lines = new HashMap<>();
+        Map<String, String> hm = new HashMap<>();
+        Map<String, StringBuffer> lines = new HashMap<>();
         StringBuffer previousLine = null;
         while ((line = in.readLine()) != null) {
             if (line.isEmpty())

@@ -112,7 +112,7 @@ public class MedlineImporter extends ImportFormat {
         parserFactory.setNamespaceAware(true);
 
         // Now create a SAXParser object
-        ArrayList<BibEntry> bibItems = null;
+        List<BibEntry> bibItems = null;
         try {
             SAXParser parser = parserFactory.newSAXParser(); // May throw
             // exceptions
