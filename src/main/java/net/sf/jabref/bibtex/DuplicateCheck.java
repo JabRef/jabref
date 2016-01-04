@@ -21,6 +21,7 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.logging.Log;
@@ -37,28 +38,28 @@ public class DuplicateCheck {
      * Integer values for indicating result of duplicate check (for entries):
      *
      */
-    static final int NOT_EQUAL = 0;
-    static final int EQUAL = 1;
-    static final int EMPTY_IN_ONE = 2;
-    static final int EMPTY_IN_TWO = 3;
-    static final int EMPTY_IN_BOTH = 4;
+    private static final int NOT_EQUAL = 0;
+    private static final int EQUAL = 1;
+    private static final int EMPTY_IN_ONE = 2;
+    private static final int EMPTY_IN_TWO = 3;
+    private static final int EMPTY_IN_BOTH = 4;
 
     public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
     // Non-required fields are investigated only if the required fields give a value within
     // the doubt range of the threshold:
-    private static final double doubtRange = 0.05;
+    private static final double DOUBT_RANGE = 0.05;
 
-    private static final double reqWeight = 3; // Weighting of all required fields
+    private static final double REQUIRED_WEIGHT = 3; // Weighting of all required fields
 
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
-    private static final HashMap<String, Double> fieldWeights = new HashMap<>();
+    private static final Map<String, Double> FIELD_WEIGHTS = new HashMap<>();
 
 
     static {
-        DuplicateCheck.fieldWeights.put("author", 2.5);
-        DuplicateCheck.fieldWeights.put("editor", 2.5);
-        DuplicateCheck.fieldWeights.put("title", 3.);
-        DuplicateCheck.fieldWeights.put("journal", 2.);
+        DuplicateCheck.FIELD_WEIGHTS.put("author", 2.5);
+        DuplicateCheck.FIELD_WEIGHTS.put("editor", 2.5);
+        DuplicateCheck.FIELD_WEIGHTS.put("title", 3.);
+        DuplicateCheck.FIELD_WEIGHTS.put("journal", 2.);
     }
 
 
@@ -86,7 +87,7 @@ public class DuplicateCheck {
             req = DuplicateCheck.compareFieldSet(fields, one, two);
         }
 
-        if (Math.abs(req[0] - DuplicateCheck.duplicateThreshold) > DuplicateCheck.doubtRange) {
+        if (Math.abs(req[0] - DuplicateCheck.duplicateThreshold) > DuplicateCheck.DOUBT_RANGE) {
             // Far from the threshold value, so we base our decision on the req. fields only
             return req[0] >= DuplicateCheck.duplicateThreshold;
         }
@@ -95,7 +96,7 @@ public class DuplicateCheck {
         fields = optionalFields.toArray(new String[optionalFields.size()]);
         if (fields != null) {
             double[] opt = DuplicateCheck.compareFieldSet(fields, one, two);
-            double totValue = ((DuplicateCheck.reqWeight * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.reqWeight) + opt[1]);
+            double totValue = ((DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1]);
             return totValue >= DuplicateCheck.duplicateThreshold;
         }
         return req[0] >= DuplicateCheck.duplicateThreshold;
@@ -106,8 +107,8 @@ public class DuplicateCheck {
         double totWeights = 0.;
         for (String field : fields) {
             double weight;
-            if (DuplicateCheck.fieldWeights.containsKey(field)) {
-                weight = DuplicateCheck.fieldWeights.get(field);
+            if (DuplicateCheck.FIELD_WEIGHTS.containsKey(field)) {
+                weight = DuplicateCheck.FIELD_WEIGHTS.get(field);
             } else {
                 weight = 1.0;
             }
@@ -228,7 +229,7 @@ public class DuplicateCheck {
      *                 harmonize their length. If false, use interpolation to harmonize the strings.
      * @return a value in the interval [0, 1] indicating the degree of match.
      */
-    static double correlateByWords(String s1, String s2) {
+    public static double correlateByWords(String s1, String s2) {
         String[] w1 = s1.split("\\s");
         String[] w2 = s2.split("\\s");
         int n = Math.min(w1.length, w2.length);

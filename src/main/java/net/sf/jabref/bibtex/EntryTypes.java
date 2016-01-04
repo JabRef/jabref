@@ -8,17 +8,17 @@ import java.util.*;
 
 public class EntryTypes {
 
-    private static final TreeMap<String, EntryType> ALL_TYPES = new TreeMap<>();
-    private static final TreeMap<String, EntryType> STANDARD_TYPES;
+    private static final Map<String, EntryType> ALL_TYPES = new TreeMap<>();
+    private static final Map<String, EntryType> STANDARD_TYPES;
 
 
     static {
         // Put the standard entry types into the type map.
         Globals.prefs = JabRefPreferences.getInstance();
-        if (!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-            initBibtexEntryTypes();
-        } else {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
             initBibLatexEntryTypes();
+        } else {
+            initBibtexEntryTypes();
         }
         // We need a record of the standard types, in case the user wants
         // to remove a customized version. Therefore we clone the map.
