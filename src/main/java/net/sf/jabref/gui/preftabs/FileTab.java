@@ -159,7 +159,7 @@ class FileTab extends JPanel implements PrefsTab {
         openLast.setSelected(prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
         backup.setSelected(prefs.getBoolean(JabRefPreferences.BACKUP));
 
-        String newline = prefs.get(net.sf.jabref.JabRefPreferences.NEWLINE);
+        String newline = prefs.get(JabRefPreferences.NEWLINE);
         if ("\r".equals(newline)) {
             newlineSeparator.setSelectedIndex(0);
         } else if ("\n".equals(newline)) {
@@ -196,7 +196,7 @@ class FileTab extends JPanel implements PrefsTab {
         default:
             newline = "\r\n";
         }
-        prefs.put(net.sf.jabref.JabRefPreferences.NEWLINE, newline);
+        prefs.put(JabRefPreferences.NEWLINE, newline);
         // we also have to change Globals variable as globals is not a getter, but a constant
         Globals.NEWLINE = newline;
 

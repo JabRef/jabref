@@ -52,7 +52,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JTextField remoteServerPort;
     private String oldLnf = "";
     private boolean oldUseDef;
-    private int oldPort = -1;
 
     private final JCheckBox useConvertToEquation;
     private final JCheckBox useCaseKeeperOnSearch;
@@ -178,8 +177,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         className.setSelectedItem(oldLnf);
         className.setEnabled(!oldUseDef);
         useRemoteServer.setSelected(remotePreferences.useRemoteServer());
-        oldPort = remotePreferences.getPort();
-        remoteServerPort.setText(String.valueOf(oldPort));
+        remoteServerPort.setText(String.valueOf(remotePreferences.getPort()));
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV));
         useConvertToEquation.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
         useCaseKeeperOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
@@ -209,19 +207,18 @@ class AdvancedTab extends JPanel implements PrefsTab {
     }
 
     public void storeRemoteSettings() {
-        Optional<Integer> newPort = getPortAsInt();
-        if (newPort.isPresent()) {
-            if (remotePreferences.isDifferentPort(newPort.get())) {
-                remotePreferences.setPort(newPort.get());
+        getPortAsInt().ifPresent(newPort -> {
+            if (remotePreferences.isDifferentPort(newPort)) {
+                remotePreferences.setPort(newPort);
 
                 if (remotePreferences.useRemoteServer()) {
                     JOptionPane.showMessageDialog(null,
                             Localization.lang("Remote server port").concat(" ")
-                                    .concat("You must restart JabRef for this change to come into effect."),
+                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
                             Localization.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
                 }
             }
-        }
+        });
 
         remotePreferences.setUseRemoteServer(useRemoteServer.isSelected());
         if (remotePreferences.useRemoteServer()) {

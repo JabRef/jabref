@@ -45,15 +45,16 @@ class FileSortTab extends JPanel implements PrefsTab {
     private final JRadioButton saveInOriginalOrder;
     private final JRadioButton saveInTableOrder;
     private final JRadioButton saveInSpecifiedOrder;
-    private JCheckBox savePriDesc;
-    private JCheckBox saveSecDesc;
-    private JCheckBox saveTerDesc;
-    private JTextField savePriField;
-    private JTextField saveSecField;
-    private JTextField saveTerField;
-    private JComboBox<String> savePriSort;
-    private JComboBox<String> saveSecSort;
-    private JComboBox<String> saveTerSort;
+
+    private final JCheckBox savePriDesc;
+    private final JCheckBox saveSecDesc;
+    private final JCheckBox saveTerDesc;
+    private final JTextField savePriField;
+    private final JTextField saveSecField;
+    private final JTextField saveTerField;
+    private final JComboBox<String> savePriSort;
+    private final JComboBox<String> saveSecSort;
+    private final JComboBox<String> saveTerSort;
 
     private final JRadioButton exportInOriginalOrder;
     private final JRadioButton exportInTableOrder;

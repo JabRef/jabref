@@ -192,11 +192,11 @@ public class NetworkTab extends JPanel implements PrefsTab {
             validSetting = true;
         }
         if (!validSetting) {
-            if (!validAuthenticationSetting) {
-                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both username and password"),
+            if (validAuthenticationSetting) {
+                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both hostname and port"),
                         Localization.lang("Invalid setting"), JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both hostname and port"),
+                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both username and password"),
                         Localization.lang("Invalid setting"), JOptionPane.ERROR_MESSAGE);
             }
         }
