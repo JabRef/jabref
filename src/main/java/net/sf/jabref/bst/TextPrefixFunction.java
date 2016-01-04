@@ -51,14 +51,15 @@ public class TextPrefixFunction implements BstFunction {
         if (stack.size() < 2) {
             throw new VMException("Not enough operands on stack for operation text.prefix$");
         }
-        Object o1 = stack.pop();
-        Object o2 = stack.pop();
 
+        Object o1 = stack.pop();
         if (!(o1 instanceof Integer)) {
             vm.warn("An integer is needed as first parameter to text.prefix$");
             stack.push("");
             return;
         }
+
+        Object o2 = stack.pop();
         if (!(o2 instanceof String)) {
             vm.warn("A string is needed as second parameter to text.prefix$");
             stack.push("");

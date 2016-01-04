@@ -16,7 +16,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 public class TestVM {
@@ -376,14 +378,14 @@ public class TestVM {
         VM vm = new VM("" + "ENTRY  { title }  { }  { label }"
                 + "FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } SORT");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(TestVM.bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"));
         v.add(TestVM.bibtexString2BibtexEntry("@article{b, author=\"BBB\"}"));
         v.add(TestVM.bibtexString2BibtexEntry("@article{d, author=\"DDD\"}"));
         v.add(TestVM.bibtexString2BibtexEntry("@article{c, author=\"CCC\"}"));
         vm.run(v);
 
-        Vector<BstEntry> v2 = vm.getEntries();
+        List<BstEntry> v2 = vm.getEntries();
         Assert.assertEquals("a", v2.get(0).getBibtexEntry().getCiteKey());
         Assert.assertEquals("b", v2.get(1).getBibtexEntry().getCiteKey());
         Assert.assertEquals("c", v2.get(2).getBibtexEntry().getCiteKey());
