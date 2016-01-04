@@ -71,8 +71,7 @@ class MetaDataChange extends Change {
     public JComponent description() {
         StringBuilder sb = new StringBuilder("<html>" + Localization.lang("Changes have been made to the following metadata elements") + ":<p>");
         for (MetaDataChangeUnit unit : changes) {
-            sb.append("<br>&nbsp;&nbsp;");
-            sb.append(unit.key);
+            sb.append("<br>&nbsp;&nbsp;").append(unit.key);
         }
         sb.append("</html>");
         tp.setText(sb.toString());
@@ -82,18 +81,18 @@ class MetaDataChange extends Change {
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         for (MetaDataChangeUnit unit : changes) {
-            switch (unit.type) {
+            switch (unit.getType()) {
             case ADD:
-                md.putData(unit.key, unit.value);
-                mdSecondary.putData(unit.key, unit.value);
+                md.putData(unit.getKey(), unit.getValue());
+                mdSecondary.putData(unit.getKey(), unit.getValue());
                 break;
             case REMOVE:
-                md.remove(unit.key);
-                mdSecondary.remove(unit.key);
+                md.remove(unit.getKey());
+                mdSecondary.remove(unit.getKey());
                 break;
             case MODIFY:
-                md.putData(unit.key, unit.value);
-                mdSecondary.putData(unit.key, unit.value);
+                md.putData(unit.getKey(), unit.getValue());
+                mdSecondary.putData(unit.getKey(), unit.getValue());
                 break;
             }
         }
@@ -112,6 +111,18 @@ class MetaDataChange extends Change {
             this.type = type;
             this.key = key;
             this.value = value;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public Vector<String> getValue() {
+            return value;
         }
     }
 }

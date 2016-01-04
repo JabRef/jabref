@@ -107,7 +107,7 @@ public class FileUpdateMonitor implements Runnable {
         if (o == null) {
             return;
         }
-        ((Entry) o).timeStamp--;
+        ((Entry) o).decreaseTimeStamp();
     }
 
     /**
@@ -140,7 +140,7 @@ public class FileUpdateMonitor implements Runnable {
         if (o == null) {
             throw new IllegalArgumentException("Entry not found");
         }
-        return ((Entry) o).tmpFile;
+        return ((Entry) o).getTmpFile();
     }
 
 
@@ -173,7 +173,7 @@ public class FileUpdateMonitor implements Runnable {
          * @throws IOException if the file does no longer exist.
          * @return boolean true if the file has changed.
          */
-        private boolean hasBeenUpdated() throws IOException {
+        public boolean hasBeenUpdated() throws IOException {
             long modified = file.lastModified();
             if (modified == 0L) {
                 throw new IOException("File deleted");
@@ -182,7 +182,7 @@ public class FileUpdateMonitor implements Runnable {
             return (timeStamp != modified) || (fileSize != fileSizeNow);
         }
 
-        private void updateTimeStamp() {
+        public void updateTimeStamp() {
             timeStamp = file.lastModified();
             if (timeStamp == 0L) {
                 notifyFileRemoved();
@@ -192,7 +192,7 @@ public class FileUpdateMonitor implements Runnable {
             copy();
         }
 
-        private boolean copy() {
+        public boolean copy() {
 
             boolean res = false;
             try {
@@ -206,7 +206,7 @@ public class FileUpdateMonitor implements Runnable {
         /**
          * Call the listener method to signal that the file has changed.
          */
-        private void notifyListener() {
+        public void notifyListener() {
             // Update time stamp.
             timeStamp = file.lastModified();
             fileSize = file.length();
@@ -216,8 +216,16 @@ public class FileUpdateMonitor implements Runnable {
         /**
          * Call the listener method to signal that the file has been removed.
          */
-        private void notifyFileRemoved() {
+        public void notifyFileRemoved() {
             listener.fileRemoved();
+        }
+
+        public File getTmpFile() {
+            return tmpFile;
+        }
+
+        public void decreaseTimeStamp() {
+            timeStamp--;
         }
     }
 

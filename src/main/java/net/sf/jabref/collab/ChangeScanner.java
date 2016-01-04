@@ -307,8 +307,7 @@ public class ChangeScanner implements Runnable {
                     //System.out.println("Possible match for entry:");
                     //System.out.println("----------------------------------------------");
 
-                }
-                else {
+                } else {
                     EntryDeleteChange ec = new EntryDeleteChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1));
                     changes.add(ec);
                     /*NamedCompound ce = new NamedCompound("Removed entry");
