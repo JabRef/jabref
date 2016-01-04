@@ -65,7 +65,7 @@ public class ChangeScanner implements Runnable {
 
     private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
 
-    private final double MATCH_THRESHOLD = 0.4;
+    private static final double MATCH_THRESHOLD = 0.4;
 
     /**
      * We create an ArrayList to hold the changes we find. These will be added in the form

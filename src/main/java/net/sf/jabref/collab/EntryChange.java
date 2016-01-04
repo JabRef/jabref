@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.collab;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.TreeSet;
 
@@ -85,8 +86,7 @@ class EntryChange extends Change {
         boolean allAccepted = true;
 
         Enumeration<Change> e = children();
-        while (e.hasMoreElements()) {
-            Change c = e.nextElement();
+        for (Change c : Collections.list(e)) {
             if (c.isAcceptable() && c.isAccepted()) {
                 c.makeChange(panel, secondary, undoEdit);
             } else {
