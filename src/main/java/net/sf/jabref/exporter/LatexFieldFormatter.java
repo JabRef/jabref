@@ -203,8 +203,7 @@ public class LatexFieldFormatter {
         return stringBuilder.toString();
     }
 
-    private void writeText(String text, int startPos,
-                           int endPos) {
+    private void writeText(String text, int startPos, int endPos) {
 
         stringBuilder.append(valueDelimiterStartOfValue);
         boolean escape = false;
@@ -224,40 +223,32 @@ public class LatexFieldFormatter {
                     commandName.append(c);
                 }
             } else if (Character.isWhitespace(c) && (inCommand || inCommandOption)) {
-                //System.out.println("whitespace here");
+                // Whitespace
             } else if (inCommandName) {
                 // This means the command name is ended.
                 // Perhaps the beginning of an argument:
                 if (c == '[') {
                     inCommandOption = true;
-                }
-                // Or the end of an argument:
-                else if (inCommandOption && (c == ']')) {
+                } else if (inCommandOption && (c == ']')) {
+                    // Or the end of an argument:
                     inCommandOption = false;
                 } else if (!inCommandOption && (c == '{')) {
-                    //System.out.println("Read command: '"+commandName.toString()+"'");
                     inCommandName = false;
                     inCommand = true;
-                }
-                // Or simply the end of this command altogether:
-                else {
-                    //System.out.println("I think I read command: '"+commandName.toString()+"'");
-
+                } else {
+                    // Or simply the end of this command altogether:
                     commandName.delete(0, commandName.length());
                     inCommandName = false;
                 }
             }
             // If we are in a command body, see if it has ended:
             if (inCommand && (c == '}')) {
-                //System.out.println("nestedEnvironments = " + nestedEnvironments);
-                //System.out.println("Done with command: '"+commandName.toString()+"'");
                 if ("begin".equals(commandName.toString())) {
                     nestedEnvironments++;
                 }
                 if ((nestedEnvironments > 0) && "end".equals(commandName.toString())) {
                     nestedEnvironments--;
                 }
-                //System.out.println("nestedEnvironments = " + nestedEnvironments);
 
                 commandName.delete(0, commandName.length());
                 inCommand = false;
@@ -265,9 +256,8 @@ public class LatexFieldFormatter {
 
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
-            if ((c == '&') && !escape &&
-                    !(inCommand && "url".equals(commandName.toString())) &&
-                    (nestedEnvironments == 0)) {
+            if ((c == '&') && !escape && !(inCommand && "url".equals(commandName.toString()))
+                    && (nestedEnvironments == 0)) {
                 stringBuilder.append("\\&");
             } else {
                 stringBuilder.append(c);

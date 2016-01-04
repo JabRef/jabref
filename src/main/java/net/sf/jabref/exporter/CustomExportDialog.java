@@ -44,20 +44,18 @@ class CustomExportDialog extends JDialog {
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
     private boolean okPressed;
-    private final JabRefFrame parent;
 
 
-    public CustomExportDialog(final JabRefFrame parent_, final String name_, final String layoutFile_,
-            final String extension_) {
-        this(parent_);
-        name.setText(name_);
-        layoutFile.setText(layoutFile_);
-        extension.setText(extension_);
+    public CustomExportDialog(final JabRefFrame parent, final String exporterName, final String layoutFileName,
+            final String extensionName) {
+        this(parent);
+        name.setText(exporterName);
+        layoutFile.setText(layoutFileName);
+        extension.setText(extensionName);
     }
 
-    public CustomExportDialog(final JabRefFrame parent_) {
-        super(parent_, Localization.lang("Edit custom export"), true);
-        parent = parent_;
+    public CustomExportDialog(final JabRefFrame parent) {
+        super(parent, Localization.lang("Edit custom export"), true);
         ActionListener okListener = new ActionListener() {
 
             @Override

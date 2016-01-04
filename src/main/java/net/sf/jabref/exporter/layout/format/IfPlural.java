@@ -41,8 +41,7 @@ public class IfPlural extends AbstractParamLayoutFormatter {
     public void setArgument(String arg) {
         String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
 
-        if (parts.length < 2)
-         {
+        if (parts.length < 2) {
             return; // TODO: too few arguments. Print an error message here?
         }
         pluralText = parts[0];
@@ -52,8 +51,7 @@ public class IfPlural extends AbstractParamLayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        if ((fieldText == null) || fieldText.isEmpty() || (pluralText == null))
-         {
+        if ((fieldText == null) || fieldText.isEmpty() || (pluralText == null)) {
             return ""; // TODO: argument missing or invalid. Print an error message here?
         }
         if (fieldText.matches(".*\\sand\\s.*")) {
@@ -61,7 +59,6 @@ public class IfPlural extends AbstractParamLayoutFormatter {
         } else {
             return singularText;
         }
-
     }
 
 }

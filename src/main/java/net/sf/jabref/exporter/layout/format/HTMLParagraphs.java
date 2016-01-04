@@ -43,7 +43,7 @@ public class HTMLParagraphs implements LayoutFormatter {
         }
 
         Matcher m = HTMLParagraphs.beforeNewLines.matcher(fieldText);
-        StringBuffer s = new StringBuffer(19); // At least 19 characters are appended later
+        StringBuffer s = new StringBuffer();
         while (m.find()) {
             String middle = m.group(1).trim();
             if (!middle.isEmpty()) {

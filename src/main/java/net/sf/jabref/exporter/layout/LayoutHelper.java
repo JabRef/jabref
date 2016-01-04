@@ -80,7 +80,7 @@ public class LayoutHelper {
         LayoutHelper.currentGroup = newGroup;
     }
 
-    private String getBracketedField(final int _field) throws IOException {
+    private String getBracketedField(final int field) throws IOException {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
@@ -92,7 +92,7 @@ public class LayoutHelper {
                 _eof = true;
 
                 if (buffer != null) {
-                    parsedEntries.add(new StringInt(buffer.toString(), _field));
+                    parsedEntries.add(new StringInt(buffer.toString(), field));
                 }
 
                 return null;
@@ -101,10 +101,8 @@ public class LayoutHelper {
             if ((c == '{') || (c == '}')) {
                 if (c == '}') {
                     if (buffer != null) {
-                        //myStrings.add(buffer.toString());
-                        parsedEntries.add(new StringInt(buffer.toString(), _field));
+                        parsedEntries.add(new StringInt(buffer.toString(), field));
 
-                        //System.out.println("\nbracketed: " + buffer.toString());
                         return null;
                     }
                 } else {
@@ -236,7 +234,7 @@ public class LayoutHelper {
 
                 /*
                  * CO 2006-11-11: Added check for null, otherwise a Layout that
-                 * finishs with a curly brace throws a NPE
+                 * finishes with a curly brace throws a NPE
                  */
                 if (buffer != null) {
                     parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));
