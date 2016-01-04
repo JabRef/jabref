@@ -59,13 +59,13 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void update() {
         if (result.isPresent()) {
-            String bibtexKey = entry.getCiteKey();
             String[] dirs = basePanel.metaData().getFileDirectory(Globals.FILE_FIELD);
             if (dirs.length == 0) {
                 // FIXME: Localization
                 JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            String bibtexKey = entry.getCiteKey();
             // TODO: this needs its own thread as it blocks the UI!
             DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.metaData(), bibtexKey);
             try {

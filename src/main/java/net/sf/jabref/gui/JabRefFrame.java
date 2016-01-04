@@ -912,7 +912,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         setProgressBarVisible(false);
 
-        pushExternalButton = new PushToApplicationButton(this, PushToApplications.applications);
+        pushExternalButton = new PushToApplicationButton(this, PushToApplications.APPLICATIONS);
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);

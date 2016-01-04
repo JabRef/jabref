@@ -146,41 +146,44 @@ public class WriteXMPAction extends AbstractWorker {
                 }
             }
 
-            optDiag.progressArea.append(entry.getCiteKey() + "\n");
+            optDiag.getProgressArea().append(entry.getCiteKey() + "\n");
 
             if (files.isEmpty()) {
                 skipped++;
-                optDiag.progressArea.append("  " + Localization.lang("Skipped - No PDF linked") + ".\n");
+                optDiag.getProgressArea().append("  " + Localization.lang("Skipped - No PDF linked") + ".\n");
             } else {
                 for (File file : files) {
                     if (!file.exists()) {
                         skipped++;
-                        optDiag.progressArea.append("  " + Localization.lang("Skipped - PDF does not exist")
+                        optDiag.getProgressArea()
+                                .append("  " + Localization.lang("Skipped - PDF does not exist")
                                 + ":\n");
-                        optDiag.progressArea.append("    " + file.getPath() + "\n");
+                        optDiag.getProgressArea().append("    " + file.getPath() + "\n");
 
                     } else {
                         try {
                             XMPUtil.writeXMP(file, entry, database);
-                            optDiag.progressArea.append("  " + Localization.lang("OK") + ".\n");
+                            optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n");
                             entriesChanged++;
                         } catch (Exception e) {
-                            optDiag.progressArea.append("  " + Localization.lang("Error while writing") + " '"
+                            optDiag.getProgressArea().append(
+                                    "  " + Localization.lang("Error while writing") + " '"
                                     + file.getPath() + "':\n");
-                            optDiag.progressArea.append("    " + e.getLocalizedMessage() + "\n");
+                            optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
                             errors++;
                         }
                     }
                 }
             }
 
-            if (optDiag.canceled) {
-                optDiag.progressArea.append("\n"
+            if (optDiag.isCanceled()) {
+                optDiag.getProgressArea().append("\n"
                         + Localization.lang("Operation canceled.") +"\n");
                 break;
             }
         }
-        optDiag.progressArea.append("\n"
+        optDiag.getProgressArea()
+                .append("\n"
                 + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
                 .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
         optDiag.done();
@@ -198,13 +201,14 @@ public class WriteXMPAction extends AbstractWorker {
 
 
     class OptionsDialog extends JDialog {
-        final JButton okButton = new JButton(Localization.lang("OK"));
-        final JButton cancelButton = new JButton(
+
+        private final JButton okButton = new JButton(Localization.lang("OK"));
+        private final JButton cancelButton = new JButton(
                 Localization.lang("Cancel"));
 
-        boolean canceled;
+        private boolean canceled;
 
-        final JTextArea progressArea;
+        private final JTextArea progressArea;
 
 
         public OptionsDialog(JFrame parent) {
@@ -286,6 +290,14 @@ public class WriteXMPAction extends AbstractWorker {
             new FocusRequester(okButton);
 
             optDiag.setVisible(true);
+        }
+
+        public boolean isCanceled() {
+            return canceled;
+        }
+
+        public JTextArea getProgressArea() {
+            return progressArea;
         }
     }
 }

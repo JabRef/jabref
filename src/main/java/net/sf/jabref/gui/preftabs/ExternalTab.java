@@ -176,7 +176,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         JPanel butpan = new JPanel();
         butpan.setLayout(new GridLayout(3, 3));
-        for(PushToApplication pushToApplication : PushToApplications.applications) {
+        for(PushToApplication pushToApplication : PushToApplications.APPLICATIONS) {
             addSettingsButton(pushToApplication, butpan);
         }
         builder.append(new JPanel());

@@ -25,6 +25,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -64,7 +65,7 @@ public class PushToApplicationButton implements ActionListener {
     private JButton menuButton;
     private int selected;
     private JPopupMenu popup;
-    private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<>();
+    private final Map<PushToApplication, PushToApplicationAction> actions = new HashMap<>();
     private final Dimension buttonDim = new Dimension(23, 23);
     private static final Icon ARROW_ICON = IconTheme.JabRefIcon.DOWN.getSmallIcon();
     private final MenuAction mAction = new MenuAction();
@@ -189,12 +190,12 @@ public class PushToApplicationButton implements ActionListener {
 
     static class BooleanHolder {
 
+        public boolean value;
+
+
         public BooleanHolder(boolean value) {
             this.value = value;
         }
-
-
-        public boolean value;
     }
 
 

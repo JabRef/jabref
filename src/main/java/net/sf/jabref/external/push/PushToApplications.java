@@ -22,21 +22,21 @@ import java.util.List;
 import net.sf.jabref.openoffice.OpenOfficePanel;
 
 public class PushToApplications {
-    public static final List<PushToApplication> applications;
+    public static final List<PushToApplication> APPLICATIONS;
 
     /**
      * Set up the current available choices:
      */
     static {
-        applications = new ArrayList<>();
+        APPLICATIONS = new ArrayList<>();
 
-        PushToApplications.applications.add(new PushToEmacs());
-        PushToApplications.applications.add(new PushToLatexEditor());
-        PushToApplications.applications.add(new PushToLyx());
-        PushToApplications.applications.add(OpenOfficePanel.getInstance());
-        PushToApplications.applications.add(new PushToTexmaker());
-        PushToApplications.applications.add(new PushToTeXstudio());
-        PushToApplications.applications.add(new PushToVim());
-        PushToApplications.applications.add(new PushToWinEdt());
+        PushToApplications.APPLICATIONS.add(new PushToEmacs());
+        PushToApplications.APPLICATIONS.add(new PushToLatexEditor());
+        PushToApplications.APPLICATIONS.add(new PushToLyx());
+        PushToApplications.APPLICATIONS.add(OpenOfficePanel.getInstance());
+        PushToApplications.APPLICATIONS.add(new PushToTexmaker());
+        PushToApplications.APPLICATIONS.add(new PushToTeXstudio());
+        PushToApplications.APPLICATIONS.add(new PushToVim());
+        PushToApplications.APPLICATIONS.add(new PushToWinEdt());
     }
 }
