@@ -21,6 +21,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
 import java.util.Enumeration;
 
 /**
@@ -52,8 +53,7 @@ class PreventDraggingJTableHeader extends JTableHeader implements TableCellRende
     private void setupTableHeaderIcons() {
 
         Enumeration<TableColumn> columns = columnModel.getColumns();
-        while(columns.hasMoreElements()) {
-            TableColumn column = columns.nextElement();
+        for (TableColumn column : Collections.list(columns)) {
             column.setHeaderRenderer(this);
             MainTableColumn mainTableColumn = tableFormat.getTableColumn(column.getModelIndex());
             column.setHeaderValue(mainTableColumn.getHeaderLabel());

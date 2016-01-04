@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,6 +16,7 @@
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -69,9 +70,7 @@ public class AddToGroupAction extends AbstractAction {
         if (m_move) {
             // collect warnings for removal
             Enumeration<GroupTreeNode> e = ((GroupTreeNode) mNode.getRoot()).preorderEnumeration();
-            GroupTreeNode node;
-            while (e.hasMoreElements()) {
-                node = e.nextElement();
+            for (GroupTreeNode node : Collections.list(e)) {
                 if (!node.getGroup().supportsRemove()) {
                     continue;
                 }

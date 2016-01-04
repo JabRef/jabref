@@ -25,6 +25,7 @@ import java.net.Authenticator;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -562,8 +563,7 @@ public class JabRef {
             UIDefaults defaults = UIManager.getDefaults();
             Enumeration<Object> keys = defaults.keys();
             Double zoomLevel = null;
-            while (keys.hasMoreElements()) {
-                Object key = keys.nextElement();
+            for (Object key : Collections.list(keys)) {
                 if ((key instanceof String) && ((String) key).endsWith(".font")) {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
                     if (zoomLevel == null) {

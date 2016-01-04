@@ -25,6 +25,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.Enumeration;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.BibDatabase;
@@ -103,8 +104,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
                 NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                 Enumeration<Change> enumer = root.children();
                 boolean anyDisabled = false;
-                while (enumer.hasMoreElements()) {
-                    Change c = enumer.nextElement();
+                for (Change c : Collections.list(enumer)) {
                     boolean allAccepted = false;
                     if (c.isAcceptable() && c.isAccepted()) {
                         allAccepted = c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);
