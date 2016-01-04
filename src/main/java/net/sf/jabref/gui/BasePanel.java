@@ -1961,8 +1961,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         baseChanged = true;
 
         // Put an asterix behind the filename to indicate the database has changed.
-        frame.setTabTitle(this, getTabTitle(), getDatabaseFile().getAbsolutePath());
         frame.setWindowTitle();
+        frame.updateAllTabTitles();
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
