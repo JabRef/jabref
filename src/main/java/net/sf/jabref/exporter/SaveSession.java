@@ -103,7 +103,7 @@ public class SaveSession {
             try {
                 FileUtil.copyFile(file, backupFile, true);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOGGER.error("Problem copying file", ex);
                 throw SaveException.BACKUP_CREATION;
             }
         }

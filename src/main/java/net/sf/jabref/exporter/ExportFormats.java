@@ -42,7 +42,7 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 public class ExportFormats {
 
-    private static final Map<String, IExportFormat> exportFormats = new TreeMap<>();
+    private static final Map<String, IExportFormat> EXPORT_FORMATS = new TreeMap<>();
 
     // Global variable that is used for counting output entries when exporting:
     public static int entryNumber;
@@ -50,7 +50,7 @@ public class ExportFormats {
 
     public static void initAllExports() {
 
-        ExportFormats.exportFormats.clear();
+        ExportFormats.EXPORT_FORMATS.clear();
 
         // Initialize Build-In Export Formats
         ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML"), "html", "html", null, ".html"));
@@ -73,7 +73,7 @@ public class ExportFormats {
         ExportFormats.putFormat(new ExportFormat(Localization.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
                 "openoffice", ".csv"));
         ExportFormat ef = new ExportFormat(Localization.lang("RIS"), "ris", "ris", "ris", ".ris");
-        ef.encoding = StandardCharsets.UTF_8;
+        ef.setEncoding(StandardCharsets.UTF_8);
         ExportFormats.putFormat(ef);
         ExportFormats.putFormat(new ExportFormat(Localization.lang("MIS Quarterly"), "misq", "misq", "misq",".rtf"));
 
@@ -85,7 +85,7 @@ public class ExportFormats {
         ExportFormats.putFormat(new ModsExportFormat());
 
         // Now add custom export formats
-        TreeMap<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats();
+        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats();
         for (IExportFormat format : customFormats.values()) {
             ExportFormats.putFormat(format);
         }
@@ -106,7 +106,7 @@ public class ExportFormats {
         StringBuilder sb = new StringBuilder();
         int lastBreak = -firstLineSubtr;
 
-        for (String name : ExportFormats.exportFormats.keySet()) {
+        for (String name : ExportFormats.EXPORT_FORMATS.keySet()) {
             if (((sb.length() + 2 + name.length()) - lastBreak) > maxLineLength) {
                 sb.append(",\n");
                 lastBreak = sb.length();
@@ -126,7 +126,7 @@ public class ExportFormats {
      */
     public static Map<String, IExportFormat> getExportFormats() {
         // It is perhaps overly paranoid to make a defensive copy in this case:
-        return Collections.unmodifiableMap(ExportFormats.exportFormats);
+        return Collections.unmodifiableMap(ExportFormats.EXPORT_FORMATS);
     }
 
     /**
@@ -138,7 +138,7 @@ public class ExportFormats {
      *         registered.
      */
     public static IExportFormat getExportFormat(String consoleName) {
-        return ExportFormats.exportFormats.get(consoleName);
+        return ExportFormats.EXPORT_FORMATS.get(consoleName);
     }
 
     /**
@@ -275,7 +275,7 @@ public class ExportFormats {
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
         TreeSet<FileFilter> filters = new TreeSet<>();
-        for (Map.Entry<String, IExportFormat> e : ExportFormats.exportFormats.entrySet()) {
+        for (Map.Entry<String, IExportFormat> e : ExportFormats.EXPORT_FORMATS.entrySet()) {
             String formatName = e.getKey();
             IExportFormat format = e.getValue();
             filters.add(format.getFileFilter());
@@ -294,7 +294,7 @@ public class ExportFormats {
     }
 
     private static void putFormat(IExportFormat format) {
-        ExportFormats.exportFormats.put(format.getConsoleName(), format);
+        ExportFormats.EXPORT_FORMATS.put(format.getConsoleName(), format);
     }
 
 }

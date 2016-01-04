@@ -17,20 +17,21 @@ package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.exporter.layout.StringInt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Transform a LaTeX-String to RTF.
- * 
+ *
  * This method will:
- * 
+ *
  *   1.) Remove LaTeX-Command sequences.
- *   
+ *
  *   2.) Replace LaTeX-Special chars with RTF aquivalents.
- *   
+ *
  *   3.) Replace emph and textit and textbf with their RTF replacements.
- *   
+ *
  *   4.) Take special care to save all unicode characters correctly.
  *
  *   5.) Replace --- by \emdash and -- by \endash.
@@ -39,7 +40,7 @@ public class RTFChars implements LayoutFormatter {
 
     // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);
-    
+
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 
 
@@ -54,7 +55,7 @@ public class RTFChars implements LayoutFormatter {
 
             char c = field.charAt(i);
 
-            if (escaped && c == '\\') {
+            if (escaped && (c == '\\')) {
                 sb.append('\\');
                 escaped = false;
             }
@@ -63,21 +64,19 @@ public class RTFChars implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuffer();
-            } else if (!incommand && (c == '{' || c == '}')) {
+            } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c)
                     || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
-                if (!incommand) {
-                    sb.append(c);
-                } else {
+                if (incommand) {
                     // Else we are in a command, and should not keep the letter.
                     currentCommand.append(c);
-                    testCharCom: if (currentCommand.length() == 1
+                    testCharCom: if ((currentCommand.length() == 1)
                             && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= field.length() - 1) {
+                        if (i >= (field.length() - 1)) {
                             break testCharCom;
                         }
 
@@ -86,7 +85,7 @@ public class RTFChars implements LayoutFormatter {
                         c = field.charAt(i);
                         String combody;
                         if (c == '{') {
-                            IntAndString part = getPart(field, i, true);
+                            StringInt part = getPart(field, i, true);
                             i += part.i;
                             combody = part.s;
                         } else {
@@ -103,23 +102,23 @@ public class RTFChars implements LayoutFormatter {
                         escaped = false;
 
                     }
-
+                } else {
+                    sb.append(c);
                 }
 
             } else {
                 // if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
-                testContent: if (!incommand || !Character.isWhitespace(c) && c != '{'
-           && c != '}') {
+                testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{') && (c != '}'))) {
                     sb.append(c);
                 } else {
                     assert incommand;
 
                     // First test for braces that may be part of a LaTeX command:
-                    if (c == '{' && currentCommand.length() == 0) {
+                    if ((c == '{') && (currentCommand.length() == 0)) {
                         // We have seen something like \{, which is probably the start
                         // of a command like \{aa}. Swallow the brace.
                         continue;
-                    } else if (c == '}' && currentCommand.length() > 0) {
+                    } else if ((c == '}') && (currentCommand.length() > 0)) {
                         // Seems to be the end of a command like \{aa}. Look it up:
                         String command = currentCommand.toString();
                         String result = RTF_CHARS.get(command);
@@ -133,20 +132,20 @@ public class RTFChars implements LayoutFormatter {
 
                     // Then look for italics etc.,
                     // but first check if we are already at the end of the string.
-                    if (i >= field.length() - 1) {
+                    if (i >= (field.length() - 1)) {
                         break testContent;
                     }
 
-                    if ((c == '{' || c == ' ') && currentCommand.length() > 0) {
+                    if (((c == '{') || (c == ' ')) && (currentCommand.length() > 0)) {
                         String command = currentCommand.toString();
                         // Then test if we are dealing with a italics or bold
                         // command. If so, handle.
                         if ("em".equals(command) || "emph".equals(command) || "textit".equals(command)) {
-                            IntAndString part = getPart(field, i, c == '{');
+                            StringInt part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\i ").append(part.s).append('}');
                         } else if ("textbf".equals(command)) {
-                            IntAndString part = getPart(field, i, c == '{');
+                            StringInt part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\b ").append(part.s).append('}');
                         } else {
@@ -183,14 +182,14 @@ public class RTFChars implements LayoutFormatter {
     /**
      * @param text the text to extract the part from
      * @param i the position to start
-     * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy) 
+     * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
      * @return a tuple of number of added characters and the extracted part
      */
-    private IntAndString getPart(String text, int i, boolean commandNestedInBraces) {
+    private StringInt getPart(String text, int i, boolean commandNestedInBraces) {
         char c;
         int count = 0;
         StringBuilder part = new StringBuilder();
-        loop: while (count >= 0 && i < text.length()) {
+        loop: while ((count >= 0) && (i < text.length())) {
             i++;
             c = text.charAt(i);
             switch (c) {
@@ -206,25 +205,13 @@ public class RTFChars implements LayoutFormatter {
                     break loop;
                 }
                 break;
+            default:
+                break;
             }
             part.append(c);
         }
         String res = part.toString();
         // the wrong "}" at the end is removed by "format(res)"
-        return new IntAndString(part.length(), format(res));
-    }
-
-
-    private static class IntAndString {
-
-        public final int i;
-
-        final String s;
-
-
-        public IntAndString(int i, String s) {
-            this.i = i;
-            this.s = s;
-        }
+        return new StringInt(format(res), part.length());
     }
 }

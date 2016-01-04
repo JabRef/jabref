@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Jabref-Team
+ * Copyright (C) 2015 Jabref-Team
  *
  * All programs in this directory and subdirectories are published under the GNU
  * General Public License as described below.
@@ -27,16 +27,16 @@ package net.sf.jabref.exporter.layout.format;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AuthorFirstFirstTest {
+public class AuthorFirstFirstCommasTest {
 
     /**
      * Test method for
-     * {@link net.sf.jabref.exporter.layout.format.AuthorFirstFirst#format(java.lang.String)}.
+     * {@link net.sf.jabref.exporter.layout.format.AuthorFirstFirstCommas#format(java.lang.String)}.
      */
     @Test
     public void testFormat() {
-        Assert.assertEquals("John von Neumann and John Smith and Peter Black Brown, Jr",
-                new AuthorFirstFirst()
+        Assert.assertEquals("John von Neumann, John Smith and Peter Black Brown, Jr",
+                new AuthorFirstFirstCommas()
                         .format("von Neumann,,John and John Smith and Black Brown, Jr, Peter"));
     }
 

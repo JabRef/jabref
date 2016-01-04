@@ -36,7 +36,7 @@ public class Layout {
 
     private final LayoutEntry[] layoutEntries;
 
-    private final ArrayList<String> missingFormatters = new ArrayList<>();
+    private final List<String> missingFormatters = new ArrayList<>();
 
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 

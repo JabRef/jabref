@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -31,7 +32,7 @@ public class VerifyingWriter extends OutputStreamWriter {
 
     private final CharsetEncoder encoder;
     private boolean couldEncodeAll = true;
-    private final TreeSet<Character> problemCharacters = new TreeSet<>();
+    private final Set<Character> problemCharacters = new TreeSet<>();
 
 
     public VerifyingWriter(OutputStream out, Charset encoding) {

@@ -16,6 +16,7 @@
 package net.sf.jabref.exporter;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -40,7 +41,7 @@ public class CustomExportList {
 
     private final EventList<String[]> list;
     private final SortedList<String[]> sorted;
-    private final TreeMap<String, ExportFormat> formats = new TreeMap<>();
+    private final Map<String, ExportFormat> formats = new TreeMap<>();
 
     private static final Log LOGGER = LogFactory.getLog(CustomExportList.class);
 
@@ -50,7 +51,7 @@ public class CustomExportList {
         sorted = new SortedList<>(list, comp);
     }
 
-    public TreeMap<String, ExportFormat> getCustomExportFormats() {
+    public Map<String, ExportFormat> getCustomExportFormats() {
         formats.clear();
         readPrefs();
         return formats;

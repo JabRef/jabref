@@ -1,4 +1,4 @@
-package net.sf.jabref.export.layout.format;
+package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.RemoveBrackets;
