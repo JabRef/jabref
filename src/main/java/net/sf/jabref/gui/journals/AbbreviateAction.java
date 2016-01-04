@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.gui.journals;
 
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -30,11 +30,13 @@ public class AbbreviateAction extends AbstractWorker {
     private final BasePanel panel;
     private String message = "";
     private final boolean iso;
+    private final JournalAbbreviationLoader abbreviationLoader;
 
 
-    public AbbreviateAction(BasePanel panel, boolean iso) {
+    public AbbreviateAction(BasePanel panel, boolean iso, JournalAbbreviationLoader abbreviationLoader) {
         this.panel = panel;
         this.iso = iso;
+        this.abbreviationLoader = abbreviationLoader;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class AbbreviateAction extends AbstractWorker {
             return;
         }
 
-        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(Abbreviations.journalAbbrev, iso);
+        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(abbreviationLoader.getRepository(), iso);
 
         NamedCompound ce = new NamedCompound("Abbreviate journal names");
         int count = 0;

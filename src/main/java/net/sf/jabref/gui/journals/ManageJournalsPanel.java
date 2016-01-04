@@ -41,7 +41,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 
@@ -174,9 +174,9 @@ class ManageJournalsPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
-                abbr.readJournalListFromResource(Abbreviations.JOURNALS_FILE_BUILTIN);
-                JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Abbreviations.journalAbbrev));
+                JournalAbbreviationLoader abbreviationLoader = frame.getJournalAbbreviationLoader();
+                JTable table = new JTable(JournalAbbreviationsUtil
+                        .getTableModel(abbreviationLoader.getRepository().getAbbreviations()));
                 JScrollPane pane = new JScrollPane(table);
                 JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                         JOptionPane.INFORMATION_MESSAGE);
@@ -324,17 +324,17 @@ class ManageJournalsPanel extends JPanel {
     }
 
     private void setupUserTable() {
-        JournalAbbreviationRepository userAbbr = new JournalAbbreviationRepository();
+        List<Abbreviation> userAbbreviations = new ArrayList<>();
         String filename = personalFile.getText();
-        if (!"".equals(filename) && new File(filename).exists()) {
+        if ((!filename.isEmpty()) && new File(filename).exists()) {
             try {
-                userAbbr.readJournalListFromFile(new File(filename));
+                userAbbreviations = JournalAbbreviationLoader.readJournalListFromFile(new File(filename));
             } catch (FileNotFoundException e) {
                 LOGGER.warn("Problem reading abbreviation file", e);
             }
         }
 
-        tableModel.setJournals(userAbbr.getAbbreviations());
+        tableModel.setJournals(userAbbreviations);
         userTable = new JTable(tableModel);
         userTable.addMouseListener(tableModel.getMouseListener());
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
@@ -404,8 +404,6 @@ class ManageJournalsPanel extends JPanel {
             }
         }
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
-
-        Abbreviations.initializeJournalNames(Globals.prefs);
 
         // Update the autocompleter for the "journal" field in all base panels,
         // so added journal names are available:
@@ -492,9 +490,9 @@ class ManageJournalsPanel extends JPanel {
 
         }
 
-        public void setJournals(SortedSet<Abbreviation> journals) {
+        public void setJournals(List<Abbreviation> abbreviations) {
             this.journals = new ArrayList<>();
-            for (Abbreviation abbreviation : journals) {
+            for (Abbreviation abbreviation : abbreviations) {
                 this.journals.add(new JournalEntry(abbreviation.getName(), abbreviation.getIsoAbbreviation()));
             }
             fireTableDataChanged();
@@ -638,9 +636,10 @@ class ManageJournalsPanel extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
-                        abbr.readJournalListFromFile(new File(tf.getText()));
+                        List<Abbreviation> abbreviations = JournalAbbreviationLoader
+                                .readJournalListFromFile(new File(tf.getText()));
 
-                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbr));
+                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbreviations));
                         JScrollPane pane = new JScrollPane(table);
                         JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                                 JOptionPane.INFORMATION_MESSAGE);

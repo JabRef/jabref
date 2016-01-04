@@ -16,8 +16,11 @@
 package net.sf.jabref.gui.journals;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
+
+import java.util.Objects;
+
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
@@ -29,10 +32,12 @@ public class UnabbreviateAction extends AbstractWorker {
 
     private final BasePanel panel;
     private String message = "";
+    private final JournalAbbreviationLoader abbreviationLoader;
 
 
-    public UnabbreviateAction(BasePanel panel) {
+    public UnabbreviateAction(BasePanel panel, JournalAbbreviationLoader abbreviationLoader) {
         this.panel = panel;
+        this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
     }
 
     @Override
@@ -47,7 +52,7 @@ public class UnabbreviateAction extends AbstractWorker {
             return;
         }
 
-        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Abbreviations.journalAbbrev);
+        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(abbreviationLoader.getRepository());
 
         NamedCompound ce = new NamedCompound("Unabbreviate journal names");
         int count = 0;

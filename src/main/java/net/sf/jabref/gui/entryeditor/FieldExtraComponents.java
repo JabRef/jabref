@@ -46,7 +46,8 @@ import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -92,8 +93,10 @@ public class FieldExtraComponents {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 String text = editor.getText();
-                if (Abbreviations.journalAbbrev.isKnownName(text)) {
-                    String s = Abbreviations.toggleAbbreviation(text);
+                JournalAbbreviationLoader abbreviationLoader = frame.getJournalAbbreviationLoader();
+                JournalAbbreviationRepository abbreviationRepository = abbreviationLoader.getRepository();
+                if (abbreviationRepository.isKnownName(text)) {
+                    String s = abbreviationRepository.getNextAbbreviation(text).orElse(text);
 
                     if (s != null) {
                         editor.setText(s);
