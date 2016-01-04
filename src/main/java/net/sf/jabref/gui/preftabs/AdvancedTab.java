@@ -207,17 +207,18 @@ class AdvancedTab extends JPanel implements PrefsTab {
     }
 
     public void storeRemoteSettings() {
-        Optional<Integer> newPort = getPortAsInt();
-        if (newPort.isPresent() && remotePreferences.isDifferentPort(newPort.get())) {
-            remotePreferences.setPort(newPort.get());
+        getPortAsInt().ifPresent(newPort -> {
+            if (remotePreferences.isDifferentPort(newPort)) {
+                remotePreferences.setPort(newPort);
 
-            if (remotePreferences.useRemoteServer()) {
-                JOptionPane.showMessageDialog(null,
-                        Localization.lang("Remote server port").concat(" ")
-                                .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                        Localization.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
+                if (remotePreferences.useRemoteServer()) {
+                    JOptionPane.showMessageDialog(null,
+                            Localization.lang("Remote server port").concat(" ")
+                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                            Localization.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
+                }
             }
-        }
+        });
 
         remotePreferences.setUseRemoteServer(useRemoteServer.isSelected());
         if (remotePreferences.useRemoteServer()) {

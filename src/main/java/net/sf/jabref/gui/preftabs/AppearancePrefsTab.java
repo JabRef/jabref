@@ -20,8 +20,6 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Optional;
-
 import javax.swing.*;
 
 import org.apache.commons.logging.Log;
@@ -126,8 +124,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                Optional<Font> f = new FontSelectorDialog(null, GUIGlobals.CURRENTFONT).getSelectedFont();
-                f.ifPresent(x -> font = x);
+                new FontSelectorDialog(null, GUIGlobals.CURRENTFONT).getSelectedFont().ifPresent(x -> font = x);
             }
         });
 

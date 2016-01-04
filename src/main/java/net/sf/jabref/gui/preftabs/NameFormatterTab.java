@@ -18,10 +18,10 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
@@ -51,7 +51,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     private int rowCount = -1;
 
-    private final Vector<TableRow> tableRows = new Vector<>(10);
+    private final List<TableRow> tableRows = new ArrayList<>(10);
 
 
     public static Map<String, String> getNameFormatters() {
@@ -82,9 +82,9 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     static class TableRow {
 
-        String name;
+        private String name;
 
-        String format;
+        private String format;
 
 
         public TableRow() {
@@ -97,6 +97,22 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         public TableRow(String name, String format) {
             this.name = name;
+            this.format = format;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getFormat() {
+            return format;
+        }
+
+        public void setFormat(String format) {
             this.format = format;
         }
     }
@@ -126,15 +142,15 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 if (row >= tableRows.size()) {
                     return "";
                 }
-                TableRow tr = tableRows.elementAt(row);
+                TableRow tr = tableRows.get(row);
                 if (tr == null) {
                     return "";
                 }
                 // Only two columns
                 if (column == 0) {
-                    return tr.name;
+                    return tr.getName();
                 } else {
-                    return tr.format;
+                    return tr.getFormat();
                 }
             }
 
@@ -163,12 +179,12 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                     tableRows.add(new TableRow());
                 }
 
-                TableRow rowContent = tableRows.elementAt(row);
+                TableRow rowContent = tableRows.get(row);
 
                 if (col == 0) {
-                    rowContent.name = value.toString();
+                    rowContent.setName(value.toString());
                 } else {
-                    rowContent.format = value.toString();
+                    rowContent.setFormat(value.toString());
                 }
             }
         };
@@ -324,8 +340,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             // First we remove all rows with empty names.
             int i = 0;
             while (i < tableRows.size()) {
-                if (tableRows.elementAt(i).name.isEmpty()) {
-                    tableRows.removeElementAt(i);
+                if (tableRows.get(i).getName().isEmpty()) {
+                    tableRows.remove(i);
                 } else {
                     i++;
                 }
@@ -335,9 +351,9 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             String[] formats = new String[tableRows.size()];
 
             for (i = 0; i < tableRows.size(); i++) {
-                TableRow tr = tableRows.elementAt(i);
-                names[i] = tr.name;
-                formats[i] = tr.format;
+                TableRow tr = tableRows.get(i);
+                names[i] = tr.getName();
+                formats[i] = tr.getFormat();
             }
 
             // Finally, we store the new preferences.

@@ -431,9 +431,9 @@ public class FontSelectorDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent evt) {
-            if (evt.getSource() == ok) {
+            if (ok.equals(evt.getSource())) {
                 ok();
-            } else if (evt.getSource() == cancel) {
+            } else if (cancel.equals(evt.getSource())) {
                 cancel();
             }
         }
@@ -445,19 +445,17 @@ public class FontSelectorDialog extends JDialog {
         public void valueChanged(ListSelectionEvent evt)
         {
             Object source = evt.getSource();
-            if (source == familyList) {
+            if (familyList.equals(source)) {
                 String family = familyList.getSelectedValue();
                 if (family != null) {
                     familyField.setText(family);
                 }
-            }
-            else if (source == sizeList) {
+            } else if (sizeList.equals(source)) {
                 String size = sizeList.getSelectedValue();
                 if (size != null) {
                     sizeField.setText(size);
                 }
-            }
-            else if (source == styleList) {
+            } else if (styleList.equals(source)) {
                 String style = styleList.getSelectedValue();
                 if (style != null) {
                     styleField.setText(style);
@@ -466,10 +464,4 @@ public class FontSelectorDialog extends JDialog {
             updatePreview();
         }
     }
-    /*public static void main(String args[])
-        {
-            Font font = new FontSelectorDialog(null,new Font("Times",Font.PLAIN,12)).getSelectedFont();
-
-        }
-     */
 }
