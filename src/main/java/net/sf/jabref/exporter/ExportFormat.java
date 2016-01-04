@@ -300,8 +300,8 @@ public class ExportFormat implements IExportFormat {
                 }
                 LOGGER.warn(sb);
             }
+            finalizeSaveSession(ss);
         }
-        finalizeSaveSession(ss);
 
     }
 

@@ -20,6 +20,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Reference list generation works for OpenOffice/LibreOffice again, fixes #593
 - ACM fetcher works again, fixes #545
 - Use default file icon for custom external file types, fixes #598
+- Fixed #608: Export works again
 
 ### Removed
 
