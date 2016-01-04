@@ -136,7 +136,9 @@ public final class EntryFromFileCreatorManager {
         CompoundEdit ce = new CompoundEdit();
         for (File f : files) {
             EntryFromFileCreator creator = getEntryCreator(f);
-            if (creator != null) {
+            if (creator == null) {
+                importGUIMessages.add("Problem importing " + f.getPath() + ": Unknown filetype.");
+            } else {
                 BibEntry entry = creator.createEntry(f,
                         generateKeywordsFromPathToFile);
                 if (entry == null) {
@@ -168,9 +170,6 @@ public final class EntryFromFileCreatorManager {
                         }
                     }
                 }
-            } else {
-                importGUIMessages.add("Problem importing " + f.getPath()
-                + ": Unknown filetype.");
             }
 
             if (changeListener != null) {

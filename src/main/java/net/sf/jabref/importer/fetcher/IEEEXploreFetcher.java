@@ -62,8 +62,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final String DIALOG_TITLE = Localization.lang("Search %0", "IEEEXplore");
     private static final int MAX_FETCH = 100;
 
-    private static final Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
-    private static final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
+    private static final Pattern PUBLICATION_PATTERN = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
+    private static final Pattern PROCEEDINGS_PATTERN = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
@@ -161,7 +161,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             return true;
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.warn("Bad URL", e);
         } catch (ConnectException e) {
             status.showMessage(Localization.lang("Connection to IEEEXplore failed"), DIALOG_TITLE,
                     JOptionPane.ERROR_MESSAGE);
@@ -206,14 +206,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private String createBibtexQueryURL(JSONObject searchResultsJson) {
 
         //buffer to use for building the URL for fetching the bibtex data from IEEEXplore
-        StringBuffer bibtexQueryURLStringBuf = new StringBuffer();
+        StringBuffer bibtexQueryURLStringBuf = new StringBuffer(45);
         bibtexQueryURLStringBuf.append(URL_BIBTEX_START);
 
         //loop over each record and create a comma-separate list of article numbers which will be used to download the raw Bibtex
         JSONArray recordsJsonArray = searchResultsJson.getJSONArray("records");
         for (int n = 0; n < recordsJsonArray.length(); n++) {
             if (!recordsJsonArray.getJSONObject(n).isNull("articleNumber")) {
-                bibtexQueryURLStringBuf.append(recordsJsonArray.getJSONObject(n).getString("articleNumber") + ",");
+                bibtexQueryURLStringBuf.append(recordsJsonArray.getJSONObject(n).getString("articleNumber"))
+                        .append(',');
             }
         }
         //delete the last comma
@@ -409,7 +410,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.replaceAll(" on", " ").replace("  ", " ");
             }
 
-            Matcher m1 = publicationPattern.matcher(fullName);
+            Matcher m1 = PUBLICATION_PATTERN.matcher(fullName);
             String abrvPattern = ".*[^,] '?\\d+\\)?";
             if (m1.find()) {
                 String prefix = m1.group(2).trim();
@@ -425,11 +426,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         abrv = parts[1];
                     }
                 }
-                if (!prefix.matches(abrvPattern)) {
+                if (prefix.matches(abrvPattern)) {
+                    fullName = postfix + " " + prefix;
+                } else {
                     fullName = prefix + " " + postfix + " " + abrv;
                     fullName = fullName.trim();
-                } else {
-                    fullName = postfix + " " + prefix;
                 }
             }
             if ("Article".equals(type.getName())) {
@@ -441,7 +442,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 }
             }
             if ("Inproceedings".equals(type.getName())) {
-                Matcher m2 = proceedingPattern.matcher(fullName);
+                Matcher m2 = PROCEEDINGS_PATTERN.matcher(fullName);
                 if (m2.find()) {
                     String prefix = m2.group(2);
                     String postfix = m2.group(1).replaceAll("\\.$", "");

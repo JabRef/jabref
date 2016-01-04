@@ -23,6 +23,9 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.gui.*;
@@ -54,6 +57,8 @@ public class AppendDatabaseAction implements BaseAction {
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final List<File> filesToOpen = new ArrayList<>();
+
+    private static final Log LOGGER = LogFactory.getLog(AppendDatabaseAction.class);
 
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
@@ -111,7 +116,7 @@ public class AppendDatabaseAction implements BaseAction {
                         importGroups, importSelectorWords);
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (Throwable ex) {
-                ex.printStackTrace();
+                LOGGER.warn("Could not open database", ex);
                 JOptionPane.showMessageDialog
                 (panel, ex.getMessage(),
  Localization.lang("Open database"),

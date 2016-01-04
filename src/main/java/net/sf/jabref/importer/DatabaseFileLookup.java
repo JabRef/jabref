@@ -18,6 +18,7 @@ package net.sf.jabref.importer;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.Globals;
@@ -44,7 +45,7 @@ class DatabaseFileLookup {
 
     private static final String KEY_FILE_FIELD = "file";
 
-    private final HashMap<File, Boolean> fileToFound = new HashMap<>();
+    private final Map<File, Boolean> fileToFound = new HashMap<>();
 
     private final Collection<BibEntry> entries;
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.FilterReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -36,16 +37,17 @@ import java.io.Reader;
  */
 class INSPIREBibtexFilterReader extends FilterReader {
 
-    private final BufferedReader in;
+    private final BufferedReader inReader;
 
     private String line;
     private int pos;
     private boolean pre;
 
+    private static final Pattern PATTERN = Pattern.compile("@Article\\{.*,");
 
-    INSPIREBibtexFilterReader(Reader _in) {
+    INSPIREBibtexFilterReader(final Reader _in) {
         super(_in);
-        in = new BufferedReader(_in);
+        inReader = new BufferedReader(_in);
         pos = -1;
         pre = false;
     }
@@ -53,13 +55,13 @@ class INSPIREBibtexFilterReader extends FilterReader {
     private String readpreLine() throws IOException {
         String l;
         do {
-            l = in.readLine();
+            l = inReader.readLine();
             if (l == null) {
                 return null;
             }
             if (l.contains("<pre>")) {
                 pre = true;
-                l = in.readLine();
+                l = inReader.readLine();
             }
             if (l == null) {
                 return null;
@@ -71,16 +73,14 @@ class INSPIREBibtexFilterReader extends FilterReader {
         return l;
     }
 
-    private String fixBibkey(String in) {
-        if (in == null) {
+    private String fixBibkey(final String preliminaryLine) {
+        if (preliminaryLine == null) {
             return null;
         }
-        //System.out.println(in);
-        if (in.matches("@Article\\{.*,")) {
-            //System.out.println(in.replace(' ','_'));
-            return in.replace(' ', '_');
+        if (PATTERN.matcher(preliminaryLine).find()) {
+            return preliminaryLine.replace(' ', '_');
         } else {
-            return in;
+            return preliminaryLine;
         }
     }
 

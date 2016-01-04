@@ -83,6 +83,10 @@ public class OAI2Fetcher implements EntryFetcher {
 
     private OutputPrinter status;
 
+    private long waitTime = -1;
+
+    private Date lastCall;
+
 
     /**
      * some archives - like ArXiv.org - might expect of you to wait some time
@@ -91,10 +95,6 @@ public class OAI2Fetcher implements EntryFetcher {
         return waitTime > 0;
     }
 
-
-    private long waitTime = -1;
-
-    private Date lastCall;
 
 
     /**
@@ -230,17 +230,16 @@ public class OAI2Fetcher implements EntryFetcher {
             inputStream.close();
             return be;
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url)
- + "\n\n" + e,
+            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
-            status.showMessage(Localization.lang("An SAXException occurred while parsing '%0':", url)
- + "\n\n" + e.getMessage(),
+            status.showMessage(
+                    Localization.lang("An SAXException occurred while parsing '%0':", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            status.showMessage(Localization.lang("An Error occurred while fetching from OAI2 source (%0):", url)
-                    + "\n\n" + e.getMessage()
- + "\n\n" + Localization
+            status.showMessage(
+                    Localization.lang("An Error occurred while fetching from OAI2 source (%0):", url) + "\n\n"
+                            + e.getMessage() + "\n\n" + Localization
                                     .lang("Note: A full text search is currently not supported for %0", getTitle()),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         }

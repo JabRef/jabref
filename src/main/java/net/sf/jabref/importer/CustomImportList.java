@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2005 Andreas Rudert, based on CustomExportList by ??
+ Copyright (C) 2005-2015 Andreas Rudert, Oscar Gustafsson based on CustomExportList by ??
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -27,12 +27,10 @@
 */
 package net.sf.jabref.importer;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.TreeSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -44,110 +42,11 @@ import net.sf.jabref.importer.fileformat.ImportFormat;
  * <p>The collection can be stored and retrieved from Preferences. It is sorted by the default
  * order of {@link ImportFormat}.</p>
  */
-public class CustomImportList extends TreeSet<CustomImportList.Importer> {
-
-    /**
-     * Object with data for a custom importer.
-     *
-     * <p>Is also responsible for instantiating the class loader.</p>
-     */
-    public static class Importer implements Comparable<Importer> {
-
-        private String name;
-        private String cliId;
-        private String className;
-        private String basePath;
-
-
-        public Importer() {
-            super();
-        }
-
-        public Importer(String[] data) {
-            super();
-            this.name = data[0];
-            this.cliId = data[1];
-            this.className = data[2];
-            this.basePath = data[3];
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getClidId() {
-            return this.cliId;
-        }
-
-        public void setCliId(String cliId) {
-            this.cliId = cliId;
-        }
-
-        public String getClassName() {
-            return this.className;
-        }
-
-        public void setClassName(String className) {
-            this.className = className;
-        }
-
-        public void setBasePath(String basePath) {
-            this.basePath = basePath;
-        }
-
-        public String getBasePath() {
-            return basePath;
-        }
-
-        public File getFileFromBasePath() {
-            return new File(basePath);
-        }
-
-        public URL getBasePathUrl() throws MalformedURLException {
-            return getFileFromBasePath().toURI().toURL();
-        }
-
-        public String[] getAsStringArray() {
-            return new String[] {name, cliId, className, basePath};
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return (o != null) && (o instanceof Importer) && this.getName().equals(((Importer) o).getName());
-        }
-
-        @Override
-        public int hashCode() {
-            return name.hashCode();
-        }
-
-        @Override
-        public int compareTo(Importer o) {
-            return this.getName().compareTo(o.getName());
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
-        }
-
-        public ImportFormat getInstance() throws IOException, MalformedURLException, ClassNotFoundException,
-                InstantiationException, IllegalAccessException {
-            try (URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()})) {
-                Class<?> clazz = Class.forName(className, true, cl);
-                ImportFormat importFormat = (ImportFormat) clazz.newInstance();
-                importFormat.setIsCustomImporter(true);
-                return importFormat;
-            }
-        }
-    }
-
+public class CustomImportList extends TreeSet<CustomImporter> {
 
     private final JabRefPreferences prefs;
+
+    private static final Log LOGGER = LogFactory.getLog(CustomImportList.class);
 
 
     public CustomImportList(JabRefPreferences prefs) {
@@ -161,16 +60,15 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
         String[] s;
         while ((s = prefs.getStringArray(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i)) != null) {
             try {
-                super.add(new Importer(s));
+                super.add(new CustomImporter(s));
             } catch (Exception e) {
-                System.err.println("Warning! Could not load " + s[0] + " from preferences. Will ignore.");
-                // Globals.prefs.remove(JabRefPreferences.CUSTOM_IMPORT_FORMAT+i);
+                LOGGER.warn("Could not load " + s[0] + " from preferences. Will ignore.", e);
             }
             i++;
         }
     }
 
-    private void addImporter(Importer customImporter) {
+    private void addImporter(CustomImporter customImporter) {
         super.add(customImporter);
     }
 
@@ -183,7 +81,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
      * @param customImporter new (version of an) importer
      * @return  if the importer was contained
      */
-    public boolean replaceImporter(Importer customImporter) {
+    public boolean replaceImporter(CustomImporter customImporter) {
         boolean wasContained = this.remove(customImporter);
         this.addImporter(customImporter);
         return wasContained;
@@ -191,7 +89,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
     public void store() {
         purgeAll();
-        Importer[] importers = this.toArray(new Importer[this.size()]);
+        CustomImporter[] importers = this.toArray(new CustomImporter[this.size()]);
         for (int i = 0; i < importers.length; i++) {
             Globals.prefs.putStringArray(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i, importers[i].getAsStringArray());
         }
@@ -202,5 +100,4 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
             Globals.prefs.remove(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i);
         }
     }
-
 }

@@ -143,7 +143,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * 
      * @return  wether this is a custom importer
      */
-    public final boolean getIsCustomImporter() {
+    public final boolean isCustomImporter() {
         return this.isCustomImporter;
     }
 
@@ -164,7 +164,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
     public boolean equals(Object o) {
         return o != null
                 && o instanceof ImportFormat
-                && ((ImportFormat) o).getIsCustomImporter() == getIsCustomImporter()
+                && ((ImportFormat) o).isCustomImporter() == isCustomImporter()
                 && ((ImportFormat) o).getFormatName().equals(getFormatName());
     }
 
@@ -184,10 +184,10 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
     @Override
     public int compareTo(ImportFormat importer) {
         int result;
-        if (getIsCustomImporter() == importer.getIsCustomImporter()) {
+        if (isCustomImporter() == importer.isCustomImporter()) {
             result = getFormatName().compareTo(importer.getFormatName());
         } else {
-            result = getIsCustomImporter() ? 1 : -1;
+            result = isCustomImporter() ? 1 : -1;
         }
         return result;
     }

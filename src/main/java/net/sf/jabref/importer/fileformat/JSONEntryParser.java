@@ -140,10 +140,8 @@ public class JSONEntryParser {
             for (int i = 0; i < links.length(); i++) {
                 if (links.getJSONObject(i).has("type")) {
                     String type = links.getJSONObject(i).getString("type");
-                    if ("fulltext".equals(type)) {
-                        if (links.getJSONObject(i).has("url")) {
-                            entry.setField("url", links.getJSONObject(i).getString("url"));
-                        }
+                    if ("fulltext".equals(type) && links.getJSONObject(i).has("url")) {
+                        entry.setField("url", links.getJSONObject(i).getString("url"));
                     }
                 }
             }
@@ -223,10 +221,10 @@ public class JSONEntryParser {
         // URL
         if (springerJsonEntry.has("url")) {
             JSONArray urlarray = springerJsonEntry.optJSONArray("url");
-            if (urlarray != null) {
-                entry.setField("url", urlarray.getJSONObject(0).optString("value"));
-            } else {
+            if (urlarray == null) {
                 entry.setField("url", springerJsonEntry.optString("url"));
+            } else {
+                entry.setField("url", urlarray.getJSONObject(0).optString("value"));
             }
         }
 

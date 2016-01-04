@@ -44,6 +44,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
 
     final ExternalFileType externalFileType;
 
+    private static final int MIN_PATH_TOKEN_LENGTH = 4;
 
     /**
      * Constructor. <br>
@@ -130,7 +131,6 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
      * @return
      */
     private static String extractPathesToKeyWordsfield(String absolutePath) {
-        final int MIN_PATH_TOKEN_LENGTH = 4;
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(absolutePath, String.valueOf(File.separatorChar));
         while (st.hasMoreTokens()) {
@@ -142,7 +142,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
             if (token.length() >= MIN_PATH_TOKEN_LENGTH) {
                 if (sb.length() > 0) {
                     // TODO: find Jabref constant for delimter
-                    sb.append(",");
+                    sb.append(',');
                 }
                 sb.append(token);
             }

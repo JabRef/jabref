@@ -28,6 +28,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,10 +110,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibEntry entry = getSingleCitation(cit);
-                if (entry != null) {
-                    dialog.addEntry(entry);
-                }
+                getSingleCitation(cit).ifPresent(entry -> dialog.addEntry(entry));
                 dialog.setProgress(++i, citations.size());
             }
 
@@ -234,7 +232,7 @@ public class JSTORFetcher2 implements EntryFetcher {
         }
     }
 
-    private static BibEntry getSingleCitation(String cit) {
+    private static Optional<BibEntry> getSingleCitation(String cit) {
         return BibsonomyScraper.getEntry(JSTORFetcher2.SINGLE_CIT_ENC + cit);
     }
 }

@@ -111,10 +111,10 @@ public class GVKParser {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
-                if (author != null) {
-                    author = author.concat(" and ");
-                } else {
+                if (author == null) {
                     author = "";
+                } else {
+                    author = author.concat(" and ");
                 }
                 author = author.concat(vorname + " " + nachname);
             }
@@ -123,10 +123,10 @@ public class GVKParser {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
-                if (author != null) {
-                    author = author.concat(" and ");
-                } else {
+                if (author == null) {
                     author = "";
+                } else {
+                    author = author.concat(" and ");
                 }
                 author = author.concat(vorname + " " + nachname);
             }
@@ -136,10 +136,10 @@ public class GVKParser {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
-                if (editor != null) {
-                    editor = editor.concat(" and ");
-                } else {
+                if (editor == null) {
                     editor = "";
+                } else {
+                    editor = editor.concat(" and ");
                 }
                 editor = editor.concat(vorname + " " + nachname);
             }
@@ -214,8 +214,8 @@ public class GVKParser {
 
             //isbn
             if ("004A".equals(tag)) {
-                String isbn_10 = getSubfield("0", datafield);
-                String isbn_13 = getSubfield("A", datafield);
+                final String isbn_10 = getSubfield("0", datafield);
+                final String isbn_13 = getSubfield("A", datafield);
 
                 if (isbn_10 != null) {
                     isbn = isbn_10;
@@ -453,8 +453,6 @@ public class GVKParser {
     }
 
     private Element getChild(String name, Element e) {
-        Element result = null;
-
         NodeList children = e.getChildNodes();
 
         int j = children.getLength();
@@ -467,7 +465,7 @@ public class GVKParser {
                 }
             }
         }
-        return result;
+        return null;
     }
 
     private List<Element> getChildren(String name, Element e) {

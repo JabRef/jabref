@@ -26,6 +26,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
@@ -42,6 +45,9 @@ import net.sf.jabref.logic.l10n.Localization;
  * To change this template use File | Settings | File Templates.
  */
 public class ImportFormats {
+
+    private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
+
 
     private static JFileChooser createImportFileChooser(String currentDir) {
 
@@ -62,10 +68,10 @@ public class ImportFormats {
             fc.addChoosableFileFilter(filter);
         }
 
-        if (defaultFilter != null) {
-            fc.setFileFilter(defaultFilter);
-        } else {
+        if (defaultFilter == null) {
             fc.setFileFilter(fc.getAcceptAllFileFilter());
+        } else {
+            fc.setFileFilter(defaultFilter);
         }
         return fc;
     }
@@ -125,14 +131,14 @@ public class ImportFormats {
 
                     // Make sure we remember which filter was used, to set the default
                     // for next time:
-                    if (format != null) {
-                        Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, format.getFormatName());
-                    } else {
+                    if (format == null) {
                         Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, "__all");
+                    } else {
+                        Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, format.getFormatName());
                     }
                     Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent());
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Problem with import format", ex);
                 }
 
             }

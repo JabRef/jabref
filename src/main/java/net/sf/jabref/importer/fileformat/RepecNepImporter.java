@@ -156,7 +156,7 @@ public class RepecNepImporter extends ImportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(RepecNepImporter.class);
 
-    private static final Collection<String> recognizedFields = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
+    private static final Collection<String> RECOGNIZED_FIELDS = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
 
     private int line;
     private String lastLine = "";
@@ -215,13 +215,14 @@ public class RepecNepImporter extends ImportFormat {
         // NEP message usually contain the String 'NEP: New Economics Papers'
         // or, they are from nep.repec.org
         BufferedReader inBR = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String startOfMessage = "";
+        StringBuffer startOfMessage = new StringBuffer();
         String tmpLine = inBR.readLine();
         for (int i = 0; (i < 25) && (tmpLine != null); i++) {
-            startOfMessage += tmpLine;
+            startOfMessage.append(tmpLine);
             tmpLine = inBR.readLine();
         }
-        return startOfMessage.contains("NEP: New Economics Papers") || startOfMessage.contains("nep.repec.org");
+        return startOfMessage.toString().contains("NEP: New Economics Papers")
+                || startOfMessage.toString().contains("nep.repec.org");
     }
 
     private boolean startsWithKeyword(Collection<String> keywords) {
@@ -254,13 +255,13 @@ public class RepecNepImporter extends ImportFormat {
      * @return  result
      */
     private String readMultipleLines() throws IOException {
-        String result = this.lastLine.trim();
+        StringBuffer result = new StringBuffer(this.lastLine.trim());
         readLine();
-        while ((this.lastLine != null) && !"".equals(this.lastLine.trim()) && !startsWithKeyword(RepecNepImporter.recognizedFields) && !isStartOfWorkingPaper()) {
-            result += this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim();
+        while ((this.lastLine != null) && !"".equals(this.lastLine.trim()) && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) && !isStartOfWorkingPaper()) {
+            result.append(this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim());
             readLine();
         }
-        return result;
+        return result.toString();
     }
 
     /**
@@ -285,7 +286,7 @@ public class RepecNepImporter extends ImportFormat {
         // read authors and institutions
         String authors = "";
         String institutions = "";
-        while ((this.lastLine != null) && !"".equals(this.lastLine) && !startsWithKeyword(RepecNepImporter.recognizedFields)) {
+        while ((this.lastLine != null) && !"".equals(this.lastLine) && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
 
             // read single author
             String author;
@@ -308,10 +309,10 @@ public class RepecNepImporter extends ImportFormat {
             }
 
             if (author != null) {
-                authors += !"".equals(authors) ? " and " + author : author;
+                authors += "".equals(authors) ? author : " and " + author;
             }
             if (institution != null) {
-                institutions += !"".equals(institutions) ? " and " + institution : institution;
+                institutions += "".equals(institutions) ? institution : " and " + institution;
             }
         }
 
@@ -351,7 +352,7 @@ public class RepecNepImporter extends ImportFormat {
         }
 
         // read other fields
-        while ((this.lastLine != null) && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.recognizedFields) || "".equals(this.lastLine))) {
+        while ((this.lastLine != null) && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) || "".equals(this.lastLine))) {
 
             // if multiple lines for a field are allowed and field consists of multiple lines, join them
             String keyword = "".equals(this.lastLine) ? "" : this.lastLine.substring(0, this.lastLine.indexOf(':')).trim();
@@ -362,12 +363,7 @@ public class RepecNepImporter extends ImportFormat {
             if ("Keywords".equals(keyword)) {
                 String content = readMultipleLines();
                 String[] keywords = content.split("[,;]");
-                String keywordStr = "";
-                for (String keyword1 : keywords) {
-                    keywordStr += " '" + keyword1.trim() + "'";
-                }
-                be.setField("keywords", keywordStr.trim());
-
+                be.addKeywords(Arrays.asList(keywords));
                 // parse JEL field
             } else if ("JEL".equals(keyword)) {
                 be.setField("jel", readMultipleLines());
@@ -387,7 +383,7 @@ public class RepecNepImporter extends ImportFormat {
                 }
 
                 Calendar cal = new GregorianCalendar();
-                cal.setTime(date != null ? date : new Date());
+                cal.setTime(date == null ? new Date() : date);
                 be.setField("year", String.valueOf(cal.get(Calendar.YEAR)));
                 if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
                     be.setField("month", String.valueOf(cal.get(Calendar.MONTH)));
@@ -446,14 +442,14 @@ public class RepecNepImporter extends ImportFormat {
                     be.setType(EntryTypes.getType("techreport"));
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be);
-                    if (startsWithKeyword(RepecNepImporter.recognizedFields)) {
+                    if (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
                         parseAdditionalFields(be, false);
                     } else {
                         readLine(); // skip empty line
                         parseAuthors(be);
                         readLine(); // skip empty line
                     }
-                    if (!startsWithKeyword(RepecNepImporter.recognizedFields)) {
+                    if (!startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
                         parseAbstract(be);
                     }
                     parseAdditionalFields(be, true);

@@ -25,6 +25,9 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
@@ -36,6 +39,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 public class DiVAtoBibTeXFetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(DiVAtoBibTeXFetcher.class);
 
     private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s";
     private final CaseKeeper caseKeeper = new CaseKeeper();
@@ -56,7 +61,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             // this should never happen
             status.setStatus(Localization.lang("Error"));
-            e.printStackTrace();
+            LOGGER.warn("Encoding issues", e);
             return false;
         }
 
@@ -67,7 +72,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.warn("Bad URL", e);
             return false;
         }
 
@@ -80,7 +85,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                     Localization.lang("Get BibTeX entry from DiVA"), JOptionPane.INFORMATION_MESSAGE);
             return false;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Communication problems", e);
             return false;
         }
 

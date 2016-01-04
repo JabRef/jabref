@@ -100,7 +100,7 @@ public class InspecImporter extends ImportFormat {
             }
         }
         String[] entries = sb.toString().split("__::__");
-        String Type = "";
+        String type = "";
         HashMap<String, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.indexOf("Record") != 0) {
@@ -125,17 +125,17 @@ public class InspecImporter extends ImportFormat {
                 } else if ("ID".equals(f3)) {
                     h.put("keywords", frest);
                 } else if ("SO".equals(f3)) {
-                    int m = frest.indexOf(".");
+                    int m = frest.indexOf('.');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
                         h.put("journal", jr.replaceAll("-", " "));
                         frest = frest.substring(m);
-                        m = frest.indexOf(";");
+                        m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m);
                             h.put("year", yr);
                             frest = frest.substring(m);
-                            m = frest.indexOf(":");
+                            m = frest.indexOf(':');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
                                 h.put("pages", pg);
@@ -147,15 +147,15 @@ public class InspecImporter extends ImportFormat {
                 } else if ("RT".equals(f3)) {
                     frest = frest.trim();
                     if ("Journal-Paper".equals(frest)) {
-                        Type = "article";
+                        type = "article";
                     } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
-                        Type = "inproceedings";
+                        type = "inproceedings";
                     } else {
-                        Type = frest.replaceAll(" ", "");
+                        type = frest.replaceAll(" ", "");
                     }
                 }
             }
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes.getTypeOrDefault(Type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes.getTypeOrDefault(type)); // id assumes an existing database so don't
             // create one here
             b.setField(h);
 

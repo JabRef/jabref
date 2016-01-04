@@ -40,6 +40,9 @@ import net.sf.jabref.util.Util;
  */
 public class EndnoteImporter extends ImportFormat {
 
+    private static final String ENDOFRECORD = "__EOREOR__";
+
+
     /**
      * Return the name of this import format.
      */
@@ -85,7 +88,6 @@ public class EndnoteImporter extends ImportFormat {
         ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String ENDOFRECORD = "__EOREOR__";
 
         String str;
         boolean first = true;
@@ -102,23 +104,23 @@ public class EndnoteImporter extends ImportFormat {
             } else {
                 sb.append(str);
             }
-            sb.append("\n");
+            sb.append('\n');
         }
 
         String[] entries = sb.toString().split(ENDOFRECORD);
         HashMap<String, String> hm = new HashMap<>();
         String author;
-        String Type;
+        String type;
         String editor;
         String artnum;
         for (String entry : entries) {
             hm.clear();
             author = "";
-            Type = "";
+            type = "";
             editor = "";
             artnum = "";
 
-            boolean IsEditedBook = false;
+            boolean isEditedBook = false;
             String[] fields = entry.trim().substring(1).split("\n%");
             //String lastPrefix = "";
             for (String field : fields) {
@@ -160,25 +162,25 @@ public class EndnoteImporter extends ImportFormat {
                     hm.put("title", val);
                 } else if ("0".equals(prefix)) {
                     if (val.indexOf("Journal") == 0) {
-                        Type = "article";
+                        type = "article";
                     } else if (val.indexOf("Book Section") == 0) {
-                        Type = "incollection";
+                        type = "incollection";
                     } else if (val.indexOf("Book") == 0) {
-                        Type = "book";
+                        type = "book";
                     } else if (val.indexOf("Edited Book") == 0) {
-                        Type = "book";
-                        IsEditedBook = true;
+                        type = "book";
+                        isEditedBook = true;
                     } else if (val.indexOf("Conference") == 0) {
-                        Type = "inproceedings";
+                        type = "inproceedings";
                     } else if (val.indexOf("Report") == 0) {
-                        Type = "techreport";
+                        type = "techreport";
                     } else if (val.indexOf("Review") == 0) {
-                        Type = "article";
+                        type = "article";
                     } else if (val.indexOf("Thesis") == 0) {
-                        Type = "phdthesis";
+                        type = "phdthesis";
                     }
                     else {
-                        Type = "misc"; //
+                        type = "misc"; //
                     }
                 } else if ("7".equals(prefix)) {
                     hm.put("edition", val);
@@ -197,9 +199,9 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("B".equals(prefix)) {
                     // This prefix stands for "journal" in a journal entry, and
                     // "series" in a book entry.
-                    if ("article".equals(Type)) {
+                    if ("article".equals(type)) {
                         hm.put("journal", val);
-                    } else if ("book".equals(Type) || "inbook".equals(Type)) {
+                    } else if ("book".equals(type) || "inbook".equals(type)) {
                         hm.put(
                                 "series", val);
                     } else {
@@ -207,7 +209,7 @@ public class EndnoteImporter extends ImportFormat {
                         hm.put("booktitle", val);
                     }
                 } else if ("I".equals(prefix)) {
-                    if ("phdthesis".equals(Type)) {
+                    if ("phdthesis".equals(type)) {
                         hm.put("school", val);
                     } else {
                         hm.put("publisher", val);
@@ -243,10 +245,10 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("9".equals(prefix)) {
                     //Util.pr(val);
                     if (val.indexOf("Ph.D.") == 0) {
-                        Type = "phdthesis";
+                        type = "phdthesis";
                     }
                     if (val.indexOf("Masters") == 0) {
-                        Type = "mastersthesis";
+                        type = "mastersthesis";
                     }
                 } else if ("F".equals(prefix)) {
                     hm.put(BibEntry.KEY_FIELD, Util
@@ -256,7 +258,7 @@ public class EndnoteImporter extends ImportFormat {
 
             // For Edited Book, EndNote puts the editors in the author field.
             // We want them in the editor field so that bibtex knows it's an edited book
-            if (IsEditedBook && "".equals(editor)) {
+            if (isEditedBook && "".equals(editor)) {
                 editor = author;
                 author = "";
             }
@@ -274,7 +276,7 @@ public class EndnoteImporter extends ImportFormat {
             }
 
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getTypeOrDefault(Type)); // id assumes an existing database so don't
+                    .getTypeOrDefault(type)); // id assumes an existing database so don't
             // create one here
             b.setField(hm);
             //if (hm.isEmpty())
@@ -302,7 +304,7 @@ public class EndnoteImporter extends ImportFormat {
             return AuthorList.fixAuthor_lastNameFirst(s);
         }
         // Look for the comma at the end:
-        index = s.lastIndexOf(",");
+        index = s.lastIndexOf(',');
         if (index == (s.length() - 1)) {
             String mod = s.substring(0, s.length() - 1).replaceAll(", ", " and ");
             return AuthorList.fixAuthor_lastNameFirst(mod);

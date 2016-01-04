@@ -36,6 +36,9 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
  */
 public class CopacImporter extends ImportFormat {
 
+    private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
+
+
     /**
      * Return the name of this import format.
      */
@@ -55,8 +58,6 @@ public class CopacImporter extends ImportFormat {
     }
 
 
-    private static final Pattern copacPattern = Pattern.compile("^\\s*TI- ");
-
 
     /**
      * Check whether the source is in the correct format for this importer.
@@ -69,7 +70,7 @@ public class CopacImporter extends ImportFormat {
         String str;
 
         while ((str = in.readLine()) != null) {
-            if (CopacImporter.copacPattern.matcher(str).find()) {
+            if (CopacImporter.COPAC_PATTERN.matcher(str).find()) {
                 return true;
             }
         }
@@ -104,7 +105,7 @@ public class CopacImporter extends ImportFormat {
             String code = str.substring(0, 4);
 
             if ("    ".equals(code)) {
-                sb.append(" ").append(str.trim());
+                sb.append(' ').append(str.trim());
             } else {
 
                 // begining of a new item
@@ -171,10 +172,10 @@ public class CopacImporter extends ImportFormat {
 
     private static void setOrAppend(BibEntry b, String field, String value, String separator) {
         String o = b.getField(field);
-        if (o != null) {
-            b.setField(field, o + separator + value);
-        } else {
+        if (o == null) {
             b.setField(field, value);
+        } else {
+            b.setField(field, o + separator + value);
         }
     }
 }
