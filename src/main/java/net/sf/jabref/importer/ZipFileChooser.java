@@ -33,6 +33,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -93,8 +94,7 @@ class ZipFileChooser extends JDialog {
     private static ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
         List<ZipEntry> entries = new ArrayList<>();
         Enumeration<? extends ZipEntry> e = zipFile.entries();
-        while (e.hasMoreElements()) {
-            ZipEntry entry = e.nextElement();
+        for (ZipEntry entry : Collections.list(e)) {
             if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
                 entries.add(entry);
             }

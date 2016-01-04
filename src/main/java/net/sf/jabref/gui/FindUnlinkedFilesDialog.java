@@ -711,10 +711,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private List<File> getFileListFromNode(CheckableTreeNode node) {
         List<File> filesList = new ArrayList<>();
-        Enumeration<CheckableTreeNode> childs = node.depthFirstEnumeration();
+        Enumeration<CheckableTreeNode> children = node.depthFirstEnumeration();
         ArrayList<CheckableTreeNode> nodesToRemove = new ArrayList<>();
-        while (childs.hasMoreElements()) {
-            CheckableTreeNode child = childs.nextElement();
+        for (CheckableTreeNode child : Collections.list(children)) {
             if (child.isLeaf() && child.getSelected()) {
                 File nodeFile = ((FileNodeWrapper) child.getUserObject()).file;
                 if ((nodeFile != null) && nodeFile.isFile()) {
@@ -723,6 +722,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 }
             }
         }
+
 
         // remove imported files from tree
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
@@ -1144,8 +1144,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         public void setSelected(boolean bSelected) {
             isSelected = bSelected;
             Enumeration<CheckableTreeNode> tmpChildren = this.children();
-            while (tmpChildren.hasMoreElements()) {
-                CheckableTreeNode child = tmpChildren.nextElement();
+            for (CheckableTreeNode child : Collections.list(tmpChildren)) {
                 child.setSelected(bSelected);
             }
 

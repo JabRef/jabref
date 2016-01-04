@@ -83,8 +83,7 @@ public class DatabaseFileLookupTest {
          * Select all nodes manually.
          */
         Enumeration<CheckableTreeNode> enumeration = treeNode.breadthFirstEnumeration();
-        while (enumeration.hasMoreElements()) {
-            CheckableTreeNode nextElement = enumeration.nextElement();
+        for (CheckableTreeNode nextElement : Collections.list(enumeration)) {
             nextElement.setSelected(true);
         }
 
