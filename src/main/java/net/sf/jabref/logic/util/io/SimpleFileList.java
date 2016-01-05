@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.io.SimpleFileListEntry;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -77,19 +77,19 @@ public class SimpleFileList {
     }
 
     private SimpleFileListEntry decodeEntry(final SimpleFileListEntry entry) {
-        final Boolean validName = Globals.prefs.isExternalFileTypeName(entry.getTypeName());
+        final Boolean validName = ExternalFileTypes.getInstance().isExternalFileTypeName(entry.getTypeName());
         String typeName = entry.getTypeName();
 
         if (!validName) {
             // No file type was recognized. Try to find a usable file type based
             // on mime type:
-            typeName = Globals.prefs.getExternalFileTypeNameByMimeType(entry.getTypeName());
+            typeName = ExternalFileTypes.getInstance().getExternalFileTypeNameByMimeType(entry.getTypeName());
             if (typeName == null) {
                 // No type could be found from mime type on the extension:
                 String typeGuess = null;
                 final Optional<String> extension = FileUtil.getFileExtension(entry.getLink());
                 if (extension.isPresent()) {
-                    typeGuess = Globals.prefs.getExternalFileTypeNameByExt(extension.get());
+                    typeGuess = ExternalFileTypes.getInstance().getExternalFileTypeNameByExt(extension.get());
                 }
                 if (typeGuess != null) {
                     typeName = typeGuess;

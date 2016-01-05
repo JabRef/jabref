@@ -211,11 +211,12 @@ public class SynchronizeFileField extends AbstractWorker {
                                 if (editor.okPressed()) {
                                     // Get the old list of types, add this one, and update the list in prefs:
                                     List<ExternalFileType> fileTypes = new ArrayList<>();
-                                    ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
+                                    ExternalFileType[] oldTypes = ExternalFileTypes.getInstance()
+                                            .getExternalFileTypeSelection();
                                     Collections.addAll(fileTypes, oldTypes);
                                     fileTypes.add(newType);
                                     Collections.sort(fileTypes);
-                                    Globals.prefs.setExternalFileTypes(fileTypes);
+                                    ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
                                     panel.mainTable.repaint();
                                 }
                             } else {

@@ -5,8 +5,8 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
@@ -61,8 +61,7 @@ public class DatabaseFileLookupTest {
     @Ignore
     public void testInsertTestData() throws Exception {
         entry1 = new BibEntry();
-        JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
-        ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt("PDF");
+        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("PDF");
         FileListEntry fileListEntry = new FileListEntry("", ImportDataTest.FILE_IN_DATABASE.getAbsolutePath(), fileType);
 
         FileListTableModel model = new FileListTableModel();

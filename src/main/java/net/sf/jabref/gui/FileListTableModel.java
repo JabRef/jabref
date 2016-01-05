@@ -25,8 +25,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.io.SimpleFileListEntry;
@@ -172,19 +172,19 @@ public class FileListTableModel extends AbstractTableModel {
     }
 
     private FileListEntry decodeEntry(SimpleFileListEntry entry, boolean deduceUnknownType) {
-        ExternalFileType type = Globals.prefs.getExternalFileTypeByName(entry.getTypeName());
+        ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.getTypeName());
 
         if (deduceUnknownType && (type instanceof UnknownExternalFileType)) {
             // No file type was recognized. Try to find a usable file type based
             // on mime type:
-            type = Globals.prefs.getExternalFileTypeByMimeType(entry.getTypeName());
+            type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.getTypeName());
             if (type == null) {
                 // No type could be found from mime type on the extension:
                 //System.out.println("Not found by mime: '"+getElementIfAvailable(contents, 2));
                 ExternalFileType typeGuess = null;
                 Optional<String> extension = FileUtil.getFileExtension(entry.getLink());
                 if (extension.isPresent()) {
-                    typeGuess = Globals.prefs.getExternalFileTypeByExt(extension.get());
+                    typeGuess = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                 }
                 if (typeGuess != null) {
                     type = typeGuess;

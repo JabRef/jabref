@@ -73,6 +73,7 @@ import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.RegExpFileSearch;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.groups.structure.AbstractGroup;
@@ -373,7 +374,7 @@ public class Util {
                 if (!o.trim().isEmpty()) {
                     File f = new File(o);
                     SimpleFileListEntry flEntry = new SimpleFileListEntry(f.getName(), o,
-                            Globals.prefs.getExternalFileTypeNameByExt(field));
+                            ExternalFileTypes.getInstance().getExternalFileTypeNameByExt(field));
                     fileList.addEntry(flEntry);
 
                     entry.clearField(field);
@@ -813,7 +814,7 @@ public class Util {
      * @return the thread performing the autosetting
      */
     public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
-        final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+        final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         if (diag != null) {
             final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length - 1);
             final JLabel label = new JLabel(Localization.lang("Searching for files"));
@@ -885,7 +886,7 @@ public class Util {
                             ExternalFileType type;
                             Optional<String> extension = FileUtil.getFileExtension(f);
                             if (extension.isPresent()) {
-                                type = Globals.prefs.getExternalFileTypeByExt(extension.get());
+                                type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                             } else {
                                 type = new UnknownExternalFileType("");
                             }

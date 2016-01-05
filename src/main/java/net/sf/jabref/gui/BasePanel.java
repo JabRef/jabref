@@ -2558,7 +2558,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // see if we can fall back to a filename based on the bibtex key
             final Collection<BibEntry> entries = Collections.singleton(entry);
 
-            final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+            final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
             if (basePanel.metaData.getFileDirectory(Globals.FILE_FIELD).length > 0) {
                 final String[] mdDirs = basePanel.metaData.getFileDirectory(Globals.FILE_FIELD);
@@ -2585,7 +2585,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     final String filepath = res.get(0).getPath();
                     final Optional<String> extension = FileUtil.getFileExtension(filepath);
                     if (extension.isPresent()) {
-                        ExternalFileType type = Globals.prefs.getExternalFileTypeByExt(extension.get());
+                        ExternalFileType type = ExternalFileTypes.getInstance()
+                                .getExternalFileTypeByExt(extension.get());
                         if (type != null) {
                             try {
                                 JabRefDesktop.openExternalFileAnyFormat(basePanel.metaData, filepath, type);

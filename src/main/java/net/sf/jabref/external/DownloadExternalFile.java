@@ -143,7 +143,7 @@ public class DownloadExternalFile {
         ExternalFileType suggestedType = null;
         if (mimeType != null) {
             LOGGER.debug("MIME Type suggested: " + mimeType);
-            suggestedType = Globals.prefs.getExternalFileTypeByMimeType(mimeType);
+            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix;
@@ -152,7 +152,7 @@ public class DownloadExternalFile {
         } else {
             // If we didn't find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
-            suggestedType = Globals.prefs.getExternalFileTypeByExt(suffix);
+            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix);
         }
 
         String suggestedName = getSuggestedFileName(suffix);
@@ -318,7 +318,7 @@ public class DownloadExternalFile {
         } else {
             suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
+        if (ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix) != null) {
             return suffix;
         } else {
             // If the suffix doesn't seem to give any reasonable file type, try

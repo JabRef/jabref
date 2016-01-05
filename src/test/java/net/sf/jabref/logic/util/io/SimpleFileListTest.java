@@ -2,7 +2,7 @@ package net.sf.jabref.logic.util.io;
 
 import static org.junit.Assert.*;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.jabref.Globals;
@@ -10,10 +10,9 @@ import net.sf.jabref.JabRefPreferences;
 
 public class SimpleFileListTest {
 
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        Globals.prefs.updateExternalFileTypes();
     }
 
     @Test

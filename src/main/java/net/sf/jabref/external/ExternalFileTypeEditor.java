@@ -75,7 +75,7 @@ public class ExternalFileTypeEditor extends JDialog {
      */
     private void setValues() {
         fileTypes.clear();
-        ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+        ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         for (ExternalFileType type : types) {
 
             fileTypes.add(type.copy());
@@ -87,7 +87,7 @@ public class ExternalFileTypeEditor extends JDialog {
      * Store the list of external entry types to Preferences.
      */
     private void storeSettings() {
-        Globals.prefs.setExternalFileTypes(fileTypes);
+        ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
     }
 
     private void init() {
@@ -117,7 +117,7 @@ public class ExternalFileTypeEditor extends JDialog {
                         Globals.lang("Reset file type definitions"), JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);*/
                 //if (reply == JOptionPane.YES_OPTION) {
-                java.util.List<ExternalFileType> list = Globals.prefs.getDefaultExternalFileTypes();
+                java.util.List<ExternalFileType> list = ExternalFileTypes.getInstance().getDefaultExternalFileTypes();
                 fileTypes.clear();
                 fileTypes.addAll(list);
                 Collections.sort(fileTypes);

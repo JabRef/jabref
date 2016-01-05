@@ -67,6 +67,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -184,7 +185,7 @@ class StyleSelectDialog {
                 if (i == -1) {
                     return;
                 }
-                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("jstyle");
+                ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
                 String link = tableModel.getElementAt(i).getFile().getPath();
                 try {
                     if (type == null) {
