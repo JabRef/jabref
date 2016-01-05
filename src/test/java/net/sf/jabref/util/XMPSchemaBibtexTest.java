@@ -3,10 +3,13 @@ package net.sf.jabref.util;
 import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.BibtexTestData;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,6 +25,11 @@ import java.util.List;
 import java.util.Map;
 
 public class XMPSchemaBibtexTest {
+
+    @Before
+    public void setUp() throws Exception {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
         Assert.assertEquals(e.getCiteKey(), x.getCiteKey());

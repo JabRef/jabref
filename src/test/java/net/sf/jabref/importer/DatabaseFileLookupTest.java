@@ -5,6 +5,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListEntry;
@@ -36,6 +37,8 @@ public class DatabaseFileLookupTest {
 
     @Before
     public void setUp() throws Exception {
+        Globals.prefs = JabRefPreferences.getInstance();
+
         try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
             ParserResult result = BibtexParser.parse(fr);
             database = result.getDatabase();
