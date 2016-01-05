@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -29,9 +28,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.Layout;
 
-import com.sun.star.beans.Property;
 import com.sun.star.beans.XPropertySet;
-import com.sun.star.frame.XDesktop;
 import com.sun.star.text.ControlCharacter;
 import com.sun.star.text.XParagraphCursor;
 import com.sun.star.text.XText;
@@ -269,16 +266,7 @@ class OOUtil {
         return props.getPropertyValue(property);
     }
 
-    public static void listProperties(Object o) throws Exception {
-        XPropertySet props = UnoRuntime.queryInterface(
-                XPropertySet.class, o);
-        Property[] pr = props.getPropertySetInfo().getProperties();
-        for (Property property1 : pr) {
-            System.out.println(property1.Name + " : " + props.getPropertyValue(property1.Name));
-        }
-    }
-
-    public static XTextDocument selectComponent(JFrame parent, XDesktop xDesktop, List<XTextDocument> list) throws Exception {
+    public static XTextDocument selectComponent(List<XTextDocument> list) throws Exception {
         String[] values = new String[list.size()];
         int ii = 0;
         for (XTextDocument doc : list) {
@@ -288,7 +276,7 @@ class OOUtil {
         JList<String> sel = new JList<>(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sel.setSelectedIndex(0);
-        int ans = JOptionPane.showConfirmDialog(parent, new JScrollPane(sel), Localization.lang("Select document"),
+        int ans = JOptionPane.showConfirmDialog(null, new JScrollPane(sel), Localization.lang("Select document"),
                 JOptionPane.OK_CANCEL_OPTION);
         if (ans == JOptionPane.OK_OPTION) {
             return list.get(sel.getSelectedIndex());

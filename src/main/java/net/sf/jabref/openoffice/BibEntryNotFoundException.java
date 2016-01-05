@@ -22,12 +22,12 @@ package net.sf.jabref.openoffice;
  * Time: 10:37:23
  * To change this template use File | Settings | File Templates.
  */
-class BibtexEntryNotFoundException extends Exception {
+class BibEntryNotFoundException extends Exception {
 
     private final String bibtexKey;
 
 
-    public BibtexEntryNotFoundException(String bibtexKey, String message) {
+    public BibEntryNotFoundException(String bibtexKey, String message) {
         super(message);
 
         this.bibtexKey = bibtexKey;

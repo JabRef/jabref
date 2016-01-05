@@ -280,13 +280,9 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         int index = line.indexOf('=');
         if ((index > 0) && (index < (line.length() - 1))) {
             String formatString = line.substring(index + 1);
-            //System.out.println("'"+line.substring(0, index)+"' : '"+formatString+"'");
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             String type = line.substring(0, index);
             try {
-                /*typeS = new Short(Short.parseShort(type));
-                OOBibFormatParser parser = new OOBibFormatParser(new StringReader(formatString));
-                PropertyValue[][] layout = parser.parse();*/
                 Layout layout = new LayoutHelper(new StringReader(formatString)).
                         getLayoutFromText(Globals.FORMATTER_PACKAGE);
                 if (setDefault) {
@@ -442,9 +438,9 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      *                      entries.
      * @return The formatted citation.
      */
-    public String getCitationMarker(BibEntry entry, BibDatabase database, boolean inParenthesis,
-                                    String uniquefier, int unlimAuthors) {
-        return getCitationMarker(new BibEntry[]{entry}, database, inParenthesis, new String[]{uniquefier},
+    public String getCitationMarker(BibEntry entry, BibDatabase database, boolean inParenthesis, String uniquefier,
+            int unlimAuthors) {
+        return getCitationMarker(new BibEntry[] {entry}, database, inParenthesis, new String[] {uniquefier},
                 new int[]{unlimAuthors});
     }
 
@@ -475,44 +471,36 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                     int maxAuthors = (Integer) citProperties.get("MaxAuthors");
                     if (piv == -1) {
                         piv = i;
-                        tmpMarker = getAuthorYearParenthesisMarker(new BibEntry[]{entries[i]}, database,
-                                authorField,
-                                (String) citProperties.get("YearField"),
-                                maxAuthors,
+                        tmpMarker = getAuthorYearParenthesisMarker(new BibEntry[] {entries[i]}, database, authorField,
+                                (String) citProperties.get("YearField"), maxAuthors,
                                 (String) citProperties.get("AuthorSeparator"),
                                 (String) citProperties.get("AuthorLastSeparator"),
-                                (String) citProperties.get("EtAlString"),
-                                (String) citProperties.get("YearSeparator"),
-                                (String) citProperties.get("BracketBefore"),
-                                (String) citProperties.get("BracketAfter"),
+                                (String) citProperties.get("EtAlString"), (String) citProperties.get("YearSeparator"),
+                                (String) citProperties.get("BracketBefore"), (String) citProperties.get("BracketAfter"),
                                 (String) citProperties.get("CitationSeparator"), null, unlimAuthors);
                         //System.out.println("piv="+piv+" tmpMarker='"+tmpMarker+"'");
                     } else {
                         // See if this entry can go into a group with the previous one:
-                        String thisMarker = getAuthorYearParenthesisMarker(new BibEntry[]{entries[i]}, database,
-                                authorField,
-                                (String) citProperties.get("YearField"),
-                                maxAuthors,
+                        String thisMarker = getAuthorYearParenthesisMarker(new BibEntry[] {entries[i]}, database,
+                                authorField, (String) citProperties.get("YearField"), maxAuthors,
                                 (String) citProperties.get("AuthorSeparator"),
                                 (String) citProperties.get("AuthorLastSeparator"),
-                                (String) citProperties.get("EtAlString"),
-                                (String) citProperties.get("YearSeparator"),
-                                (String) citProperties.get("BracketBefore"),
-                                (String) citProperties.get("BracketAfter"),
+                                (String) citProperties.get("EtAlString"), (String) citProperties.get("YearSeparator"),
+                                (String) citProperties.get("BracketBefore"), (String) citProperties.get("BracketAfter"),
                                 (String) citProperties.get("CitationSeparator"), null, unlimAuthors);
 
-                        String author = getCitationMarkerField(entries[i], database,
-                                authorField);
+                        String author = getCitationMarkerField(entries[i], database, authorField);
                         AuthorList al = AuthorList.getAuthorList(author);
                         //System.out.println("i="+i+" thisMarker='"+thisMarker+"'");
                         int prevALim = i > 0 ? unlimAuthors[i - 1] : unlimAuthors[0];
-                        if (!thisMarker.equals(tmpMarker) ||
-                                ((al.size() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
+                        if (!thisMarker.equals(tmpMarker)
+                                || ((al.size() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
                             // No match. Update piv to exclude the previous entry. But first check if the
                             // previous entry was part of a group:
                             if ((piv > -1) && (i > (piv + 1))) {
                                 // Do the grouping:
-                                group(entries, uniquefiers, piv, i - 1, (String) citProperties.get("UniquefierSeparator"));
+                                group(entries, uniquefiers, piv, i - 1,
+                                        (String) citProperties.get("UniquefierSeparator"));
                             }
                             tmpMarker = thisMarker;
                             piv = i;
@@ -533,7 +521,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             // Finished with the loop. See if the last entries form a group:
             if (piv >= 0) {
                 // Do the grouping:
-                group(entries, uniquefiers, piv, uniquefiers.length - 1, (String) citProperties.get("UniquefierSeparator"));
+                group(entries, uniquefiers, piv, uniquefiers.length - 1,
+                        (String) citProperties.get("UniquefierSeparator"));
             }
         }
 
@@ -567,7 +556,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                     (String) citProperties.get("BracketBefore"),
                     (String) citProperties.get("BracketAfter"),
                     (String) citProperties.get("CitationSeparator"),
-                    uniquefiers, unlimAuthors);
+ uniquefiers, unlimAuthors);
         }
     }
 

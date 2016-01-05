@@ -19,8 +19,6 @@ package net.sf.jabref.external.push;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.openoffice.OpenOfficePanel;
-
 public class PushToApplications {
     public static final List<PushToApplication> APPLICATIONS;
 
@@ -33,7 +31,6 @@ public class PushToApplications {
         PushToApplications.APPLICATIONS.add(new PushToEmacs());
         PushToApplications.APPLICATIONS.add(new PushToLatexEditor());
         PushToApplications.APPLICATIONS.add(new PushToLyx());
-        PushToApplications.APPLICATIONS.add(OpenOfficePanel.getInstance());
         PushToApplications.APPLICATIONS.add(new PushToTexmaker());
         PushToApplications.APPLICATIONS.add(new PushToTeXstudio());
         PushToApplications.APPLICATIONS.add(new PushToVim());
