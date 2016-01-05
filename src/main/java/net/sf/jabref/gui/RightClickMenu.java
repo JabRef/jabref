@@ -147,7 +147,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder")) {
             {
-                if (!isFieldSetForSelectedEntry("file")) {
+                if (!isFieldSetForSelectedEntry(Globals.FILE_FIELD)) {
                     this.setEnabled(false);
                 }
             }
@@ -155,7 +155,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.OPEN_EXTERNAL_FILE, Localization.lang("Open file"), getFileIconForSelectedEntry()) {
             {
-                if(!isFieldSetForSelectedEntry("file")) {
+                if (!isFieldSetForSelectedEntry(Globals.FILE_FIELD)) {
                     this.setEnabled(false);
                 }
             }

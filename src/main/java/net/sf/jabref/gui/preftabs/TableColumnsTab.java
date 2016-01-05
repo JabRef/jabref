@@ -33,6 +33,7 @@ import javax.swing.table.TableModel;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
@@ -279,7 +280,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 listOfFileColumns.setEnabled(extraFileColumns.isSelected());
             }
         });
-        ExternalFileType[] fileTypes = Globals.prefs.getExternalFileTypeSelection();
+        ExternalFileType[] fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         String[] fileTypeNames = new String[fileTypes.length];
         for (int i = 0; i < fileTypes.length; i++) {
             fileTypeNames[i] = fileTypes[i].getName();

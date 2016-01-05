@@ -18,10 +18,10 @@ package net.sf.jabref.exporter.layout.format;
 import java.io.File;
 
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.SimpleFileList;
+import net.sf.jabref.logic.util.io.SimpleFileListEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.ParamLayoutFormatter;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import java.io.IOException;
 
 /**
@@ -35,24 +35,23 @@ public class FileLink implements ParamLayoutFormatter {
 
     @Override
     public String format(String field) {
-        FileListTableModel tableModel = new FileListTableModel();
         if (field == null) {
             return "";
         }
 
-        tableModel.setContent(field);
+        SimpleFileList fileList = new SimpleFileList(field);
+
         String link = null;
         if (fileType == null) {
             // No file type specified. Simply take the first link.
-            if (tableModel.getRowCount() > 0) {
-                link = tableModel.getEntry(0).getLink();
+            if (!(fileList.isEmpty())) {
+                link = fileList.getEntry(0).getLink();
             }
         }
         else {
             // A file type is specified:
-            for (int i = 0; i < tableModel.getRowCount(); i++) {
-                FileListEntry flEntry = tableModel.getEntry(i);
-                if (flEntry.getType().getName().toLowerCase().equals(fileType)) {
+            for (SimpleFileListEntry flEntry : fileList.getEntryList()) {
+                if (flEntry.getTypeName().equalsIgnoreCase(fileType)) {
                     link = flEntry.getLink();
                     break;
                 }

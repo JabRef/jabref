@@ -38,11 +38,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.TransferableFileLinkSelection;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.importer.ImportMenuItem;
@@ -358,7 +358,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 continue;
             }
 
-            fileType = Globals.prefs.getExternalFileTypeByExt(extension.orElse(""));
+            fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.orElse(""));
             /*
              * This is a linkable file. If the user dropped it on an entry, we
              * should offer options for autolinking to this files:

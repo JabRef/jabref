@@ -48,9 +48,10 @@ import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.SimpleFileList;
+import net.sf.jabref.logic.util.io.SimpleFileListEntry;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.util.strings.UnicodeToReadableCharMap;
 import org.apache.commons.logging.Log;
@@ -72,6 +73,7 @@ import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.RegExpFileSearch;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.groups.structure.AbstractGroup;
@@ -362,29 +364,26 @@ public class Util {
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static void upgradePdfPsToFile(BibEntry entry, String[] fields, NamedCompound ce) {
-        FileListTableModel tableModel = new FileListTableModel();
         // If there are already links in the file field, keep those on top:
         String oldFileContent = entry.getField(Globals.FILE_FIELD);
-        if (oldFileContent != null) {
-            tableModel.setContent(oldFileContent);
-        }
-        int oldRowCount = tableModel.getRowCount();
+        SimpleFileList fileList = new SimpleFileList(oldFileContent);
+        int oldItemCount = fileList.size();
         for (String field : fields) {
             String o = entry.getField(field);
             if (o != null) {
                 if (!o.trim().isEmpty()) {
                     File f = new File(o);
-                    FileListEntry flEntry = new FileListEntry(f.getName(), o,
-                            Globals.prefs.getExternalFileTypeByExt(field));
-                    tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                    SimpleFileListEntry flEntry = new SimpleFileListEntry(f.getName(), o,
+                            ExternalFileTypes.getInstance().getExternalFileTypeNameByExt(field));
+                    fileList.addEntry(flEntry);
 
                     entry.clearField(field);
                     ce.addEdit(new UndoableFieldChange(entry, field, o, null));
                 }
             }
         }
-        if (tableModel.getRowCount() != oldRowCount) {
-            String newValue = tableModel.getStringRepresentation();
+        if (fileList.size() != oldItemCount) {
+            String newValue = fileList.getStringRepresentation();
             entry.setField(Globals.FILE_FIELD, newValue);
             ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
         }
@@ -473,37 +472,6 @@ public class Util {
         }
         ce.end();
         return ce;
-    }
-
-    /**
-     * Optimized method for converting a String into an Integer
-     *
-     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
-     *
-     * @param str the String holding an Integer value
-     * @throws NumberFormatException if str cannot be parsed to an int
-     * @return the int value of str
-     */
-    public static int intValueOf(String str) {
-        int ival = 0;
-        int idx = 0;
-        int end;
-        boolean sign = false;
-        char ch;
-
-        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
-            throw new NumberFormatException(str);
-        }
-
-        for (;; ival *= 10) {
-            ival += '0' - ch;
-            if (++idx == end) {
-                return sign ? ival : -ival;
-            }
-            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
-                throw new NumberFormatException(str);
-            }
-        }
     }
 
     /**
@@ -846,7 +814,7 @@ public class Util {
      * @return the thread performing the autosetting
      */
     public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
-        final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+        final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         if (diag != null) {
             final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length - 1);
             final JLabel label = new JLabel(Localization.lang("Searching for files"));
@@ -883,7 +851,7 @@ public class Util {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
                 } else {
-                    result = net.sf.jabref.util.Util.findAssociatedFiles(entries, extensions, dirs);
+                    result = net.sf.jabref.logic.util.io.FileUtil.findAssociatedFiles(entries, extensions, dirs);
                 }
 
                 boolean foundAny = false;
@@ -918,7 +886,7 @@ public class Util {
                             ExternalFileType type;
                             Optional<String> extension = FileUtil.getFileExtension(f);
                             if (extension.isPresent()) {
-                                type = Globals.prefs.getExternalFileTypeByExt(extension.get());
+                                type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                             } else {
                                 type = new UnknownExternalFileType("");
                             }
@@ -998,78 +966,6 @@ public class Util {
         entries.add(entry);
 
         return net.sf.jabref.util.Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
-    }
-
-    /**
-     * Returns the list of linked files. The files have the absolute filename
-     *
-     * @param bes list of BibTeX entries
-     * @param fileDirs list of directories to try for expansion
-     *
-     * @return list of files. May be empty
-     */
-    public static List<File> getListOfLinkedFiles(BibEntry[] bes, String[] fileDirs) {
-        ArrayList<File> res = new ArrayList<>();
-        for (BibEntry entry : bes) {
-            FileListTableModel tm = new FileListTableModel();
-            tm.setContent(entry.getField("file"));
-            for (int i = 0; i < tm.getRowCount(); i++) {
-                FileListEntry flEntry = tm.getEntry(i);
-
-                File f = FileUtil.expandFilename(flEntry.getLink(), fileDirs);
-                if (f != null) {
-                    res.add(f);
-                }
-            }
-        }
-        return res;
-    }
-
-    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibEntry, List<File>> result = new HashMap<>();
-
-        // First scan directories
-        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
-
-        // Initialize Result-Set
-        for (BibEntry entry : entries) {
-            result.put(entry, new ArrayList<>());
-        }
-
-        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
-        // Now look for keys
-        nextFile: for (File file : filesWithExtension) {
-
-            String name = file.getName();
-            int dot = name.lastIndexOf('.');
-            // First, look for exact matches:
-            for (BibEntry entry : entries) {
-                String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && !citeKey.isEmpty()) {
-                    if (dot > 0) {
-                        if (name.substring(0, dot).equals(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
-                    }
-                }
-            }
-            // If we get here, we didn't find any exact matches. If non-exact
-            // matches are allowed, try to find one:
-            if (!exactOnly) {
-                for (BibEntry entry : entries) {
-                    String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && !citeKey.isEmpty()) {
-                        if (name.startsWith(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
-                    }
-                }
-            }
-        }
-
-        return result;
     }
 
     /**

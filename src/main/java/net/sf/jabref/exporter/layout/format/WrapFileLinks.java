@@ -16,9 +16,9 @@
 package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.SimpleFileList;
+import net.sf.jabref.logic.util.io.SimpleFileListEntry;
 import net.sf.jabref.exporter.layout.AbstractParamLayoutFormatter;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.Globals;
 
 import java.util.*;
@@ -112,18 +112,16 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     public String format(String field) {
         StringBuilder sb = new StringBuilder();
 
-        // Build the table model containing the links:
-        FileListTableModel tableModel = new FileListTableModel();
         if (field == null) {
             return "";
         }
-        tableModel.setContent(field);
+        // Build the list containing the links:
+        SimpleFileList fileList = new SimpleFileList(field);
 
         int piv = 1; // counter for relevant iterations
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            FileListEntry flEntry = tableModel.getEntry(i);
+        for (SimpleFileListEntry flEntry : fileList.getEntryList()) {
             // Use this entry if we don't discriminate on types, or if the type fits:
-            if ((fileType == null) || flEntry.getType().getName().toLowerCase().equals(fileType)) {
+            if ((fileType == null) || flEntry.getTypeName().equalsIgnoreCase(fileType)) {
 
                 for (FormatEntry entry : format) {
                     switch (entry.getType()) {
@@ -134,10 +132,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         sb.append(piv);
                         break;
                     case FILE_PATH:
-                        if (flEntry.getLink() == null) {
-                            break;
-                        }
-
                         String[] dirs;
                         // We need to resolve the file directory from the database's metadata,
                         // but that is not available from a formatter. Therefore, as an
@@ -169,9 +163,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
                         break;
                     case RELATIVE_FILE_PATH:
-                        if (flEntry.getLink() == null) {
-                            break;
-                        }
 
                         /*
                          * Stumbled over this while investigating
@@ -182,16 +173,11 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
                         break;
                     case FILE_EXTENSION:
-                        if (flEntry.getLink() == null) {
-                            break;
-                        }
-                        int index = flEntry.getLink().lastIndexOf('.');
-                        if ((index >= 0) && (index < (flEntry.getLink().length() - 1))) {
-                            sb.append(replaceStrings(flEntry.getLink().substring(index + 1)));
-                        }
+                        FileUtil.getFileExtension(flEntry.getLink())
+                                .ifPresent(extension -> sb.append(replaceStrings(extension)));
                         break;
                     case FILE_TYPE:
-                        sb.append(replaceStrings(flEntry.getType().getName()));
+                        sb.append(replaceStrings(flEntry.getTypeName()));
                         break;
                     case FILE_DESCRIPTION:
                         sb.append(replaceStrings(flEntry.getDescription()));

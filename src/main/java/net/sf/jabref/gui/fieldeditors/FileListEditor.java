@@ -277,7 +277,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         if (row >= 0) {
             FileListEntry entry = tableModel.getEntry(row);
             try {
-                ExternalFileType type = Globals.prefs.getExternalFileTypeByName(entry.getType().getName());
+                ExternalFileType type = ExternalFileTypes.getInstance()
+                        .getExternalFileTypeByName(entry.getType().getName());
                 JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(),
                         type != null ? type : entry.getType());
             } catch (IOException e) {

@@ -176,7 +176,7 @@ public class DroppedFileHandler {
     }
 
     public void linkPdfToEntry(String fileName, MainTable entryTable, BibEntry entry) {
-        ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
+        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         // Show dialog
@@ -213,7 +213,7 @@ public class DroppedFileHandler {
     }
 
     public void importXmp(List<BibEntry> xmpEntriesInFile, String fileName) {
-        ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
+        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         boolean isSingle = xmpEntriesInFile.size() == 1;

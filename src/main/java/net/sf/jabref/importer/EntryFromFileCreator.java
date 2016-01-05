@@ -24,8 +24,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
@@ -151,8 +151,8 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     }
 
     private void addFileInfo(BibEntry entry, File file) {
-        JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
-        ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt(externalFileType.getFieldName());
+        ExternalFileType fileType = ExternalFileTypes.getInstance()
+                .getExternalFileTypeByExt(externalFileType.getFieldName());
 
         String[] possibleFilePaths = JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
         File shortenedFileName = FileUtil.shortenFileName(file, possibleFilePaths);
@@ -161,7 +161,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         FileListTableModel model = new FileListTableModel();
         model.addEntry(0, fileListEntry);
 
-        entry.setField("file", model.getStringRepresentation());
+        entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
     }
 
     void appendToField(BibEntry entry, String field, String value) {

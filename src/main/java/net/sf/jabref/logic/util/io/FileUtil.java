@@ -16,8 +16,11 @@
 package net.sf.jabref.logic.util.io;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -328,4 +331,125 @@ public class FileUtil {
             return fileName;
         }
     }
+
+    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
+        HashMap<BibEntry, List<File>> result = new HashMap<>();
+
+        // First scan directories
+        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
+
+        // Initialize Result-Set
+        for (BibEntry entry : entries) {
+            result.put(entry, new ArrayList<>());
+        }
+
+        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
+        // Now look for keys
+        nextFile: for (File file : filesWithExtension) {
+
+            String name = file.getName();
+            int dot = name.lastIndexOf('.');
+            // First, look for exact matches:
+            for (BibEntry entry : entries) {
+                String citeKey = entry.getCiteKey();
+                if ((citeKey != null) && !citeKey.isEmpty()) {
+                    if (dot > 0) {
+                        if (name.substring(0, dot).equals(citeKey)) {
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
+            // If we get here, we didn't find any exact matches. If non-exact
+            // matches are allowed, try to find one:
+            if (!exactOnly) {
+                for (BibEntry entry : entries) {
+                    String citeKey = entry.getCiteKey();
+                    if ((citeKey != null) && !citeKey.isEmpty()) {
+                        if (name.startsWith(citeKey)) {
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static List<SimpleFileListEntry> decodeFileField(String value) {
+        if (value == null) {
+            value = "";
+        }
+        List<SimpleFileListEntry> newList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        List<String> thisEntry = new ArrayList<>();
+        boolean inXmlChar = false;
+        boolean escaped = false;
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (!escaped && (c == '\\')) {
+                escaped = true;
+                continue;
+            }
+            // Check if we are entering an XML special character construct such
+            // as "&#44;", because we need to know in order to ignore the semicolon.
+            else if (!escaped && (c == '&') && !inXmlChar) {
+                sb.append(c);
+                if ((value.length() > (i + 1)) && (value.charAt(i + 1) == '#')) {
+                    inXmlChar = true;
+                }
+            }
+            // Check if we are exiting an XML special character construct:
+            else if (!escaped && inXmlChar && (c == ';')) {
+                sb.append(c);
+                inXmlChar = false;
+            } else if (!escaped && (c == ':')) {
+                thisEntry.add(sb.toString());
+                sb = new StringBuilder();
+            } else if (!escaped && (c == ';') && !inXmlChar) {
+                thisEntry.add(sb.toString());
+                newList.add(new SimpleFileListEntry(thisEntry));
+                sb = new StringBuilder();
+                thisEntry = new ArrayList<>();
+            } else {
+                sb.append(c);
+            }
+            escaped = false;
+        }
+        if (sb.length() > 0) {
+            thisEntry.add(sb.toString());
+        }
+        if (!thisEntry.isEmpty()) {
+            newList.add(new SimpleFileListEntry(thisEntry));
+        }
+
+        return newList;
+    }
+
+    /**
+     * Returns the list of linked files. The files have the absolute filename
+     *
+     * @param bes list of BibTeX entries
+     * @param fileDirs list of directories to try for expansion
+     *
+     * @return list of files. May be empty
+     */
+    public static List<File> getListOfLinkedFiles(BibEntry[] bes, String[] fileDirs) {
+        ArrayList<File> result = new ArrayList<>();
+        for (BibEntry entry : bes) {
+            List<SimpleFileListEntry> fileList = decodeFileField(entry.getField(Globals.FILE_FIELD));
+            for (SimpleFileListEntry file : fileList) {
+                File f = expandFilename(file.getLink(), fileDirs);
+                if (f != null) {
+                    result.add(f);
+                }
+            }
+        }
+
+        return result;
+    }
+
 }

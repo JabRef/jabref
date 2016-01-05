@@ -910,7 +910,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     @Override
                     public void run() {
                         final BibEntry[] bes = mainTable.getSelectedEntries();
-                        final List<File> files = Util.getListOfLinkedFiles(bes,
+                        final List<File> files = FileUtil.getListOfLinkedFiles(bes,
                                 metaData().getFileDirectory(Globals.FILE_FIELD));
                         for (final File f : files) {
                             try {
@@ -944,7 +944,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         // Look for web links in the "file" field as a fallback:
                         FileListEntry entry = null;
                         FileListTableModel tm = new FileListTableModel();
-                        tm.setContent(bes[0].getField("file"));
+                        tm.setContent(bes[0].getField(Globals.FILE_FIELD));
                         for (int i = 0; i < tm.getRowCount(); i++) {
                             FileListEntry flEntry = tm.getEntry(i);
                             if (URL_FIELD.equals(flEntry.getType().getName().toLowerCase())
@@ -2558,7 +2558,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // see if we can fall back to a filename based on the bibtex key
             final Collection<BibEntry> entries = Collections.singleton(entry);
 
-            final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+            final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
             if (basePanel.metaData.getFileDirectory(Globals.FILE_FIELD).length > 0) {
                 final String[] mdDirs = basePanel.metaData.getFileDirectory(Globals.FILE_FIELD);
@@ -2577,7 +2577,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                 result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
             } else {
-                result = Util.findAssociatedFiles(entries, extensions, dirs);
+                result = FileUtil.findAssociatedFiles(entries, extensions, dirs);
             }
             if (result.get(entry) != null) {
                 final List<File> res = result.get(entry);
@@ -2585,7 +2585,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     final String filepath = res.get(0).getPath();
                     final Optional<String> extension = FileUtil.getFileExtension(filepath);
                     if (extension.isPresent()) {
-                        ExternalFileType type = Globals.prefs.getExternalFileTypeByExt(extension.get());
+                        ExternalFileType type = ExternalFileTypes.getInstance()
+                                .getExternalFileTypeByExt(extension.get());
                         if (type != null) {
                             try {
                                 JabRefDesktop.openExternalFileAnyFormat(basePanel.metaData, filepath, type);

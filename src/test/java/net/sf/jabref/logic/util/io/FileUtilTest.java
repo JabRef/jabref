@@ -83,4 +83,65 @@ public class FileUtilTest {
         List<String> result = FileUtil.uniquePathSubstrings(paths);
         assertEquals(uniqPath, result);
     }
+
+    @Test
+    public void testDecodeFileFieldSingleString() {
+        assertEquals("test.pdf", FileUtil.decodeFileField("test.pdf").get(0).getLink());
+        assertEquals("", FileUtil.decodeFileField("test.pdf").get(0).getDescription());
+        assertEquals("", FileUtil.decodeFileField("test.pdf").get(0).getTypeName());
+    }
+
+    @Test
+    public void testDecodeFileFieldSingleItem() {
+        List<SimpleFileListEntry> fileList = FileUtil.decodeFileField("paper:test.pdf:PDF");
+        assertEquals("paper", fileList.get(0).getDescription());
+        assertEquals("test.pdf", fileList.get(0).getLink());
+        assertEquals("PDF", fileList.get(0).getTypeName());
+    }
+
+    @Test
+    public void testDecodeFileFieldSingleItemNoTypeName() {
+        List<SimpleFileListEntry> fileList = FileUtil.decodeFileField("paper:test.pdf");
+        assertEquals("paper", fileList.get(0).getDescription());
+        assertEquals("test.pdf", fileList.get(0).getLink());
+        assertEquals("", fileList.get(0).getTypeName());
+    }
+
+    @Test
+    public void testDecodeFileFieldMultipleItems() {
+        List<SimpleFileListEntry> fileList = FileUtil.decodeFileField("paper:test.pdf:PDF;presentation:test.ppt:PPT");
+        assertEquals("paper", fileList.get(0).getDescription());
+        assertEquals("test.pdf", fileList.get(0).getLink());
+        assertEquals("PDF", fileList.get(0).getTypeName());
+        assertEquals("presentation", fileList.get(1).getDescription());
+        assertEquals("test.ppt", fileList.get(1).getLink());
+        assertEquals("PPT", fileList.get(1).getTypeName());
+    }
+
+    @Test
+    public void testDecodeFileFieldEscaping() {
+        List<SimpleFileListEntry> fileList = FileUtil.decodeFileField("paper:c\\:\\\\test.pdf:PDF");
+        assertEquals("paper", fileList.get(0).getDescription());
+        assertEquals("c:\\test.pdf", fileList.get(0).getLink());
+        assertEquals("PDF", fileList.get(0).getTypeName());
+    }
+
+    @Test
+    public void testDecodeFileFieldXMLCharacter() {
+        List<SimpleFileListEntry> fileList = FileUtil.decodeFileField("pap&#44;er:c\\:\\\\test.pdf:PDF");
+        assertEquals("pap&#44;er", fileList.get(0).getDescription());
+        assertEquals("c:\\test.pdf", fileList.get(0).getLink());
+        assertEquals("PDF", fileList.get(0).getTypeName());
+    }
+
+    @Test
+    public void testDecodeFileFieldEmptyString() {
+        assertTrue(FileUtil.decodeFileField("").isEmpty());
+    }
+
+    @Test
+    public void testDecodeFileFieldNullString() {
+        assertTrue(FileUtil.decodeFileField(null).isEmpty());
+    }
+
 }

@@ -19,15 +19,15 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.SimpleFileListEntry;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 
 /**
  * Search class for files. <br>
@@ -119,16 +119,13 @@ class DatabaseFileLookup {
             return false;
         }
 
-        FileListTableModel model = new FileListTableModel();
+        String fileField = anEntry.getField(Globals.FILE_FIELD);
+        List<SimpleFileListEntry> fileList = FileUtil.decodeFileField(fileField);
 
-        String fileField = anEntry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
-        model.setContent(fileField);
+        for (SimpleFileListEntry fileInfo : fileList) {
+            String link = fileInfo.getLink();
 
-        for (int i = 0; i < model.getRowCount(); i++) {
-            FileListEntry flEntry = model.getEntry(i);
-            String link = flEntry.getLink();
-
-            if (link == null) {
+            if ((link == null)) {
                 break;
             }
 

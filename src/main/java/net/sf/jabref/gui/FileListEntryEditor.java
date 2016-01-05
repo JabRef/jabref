@@ -40,6 +40,7 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -227,7 +228,7 @@ public class FileListEntryEditor {
 
             // Check if this looks like a remote link:
             if (FileListEntryEditor.remoteLinkPattern.matcher(link.getText()).matches()) {
-                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("html");
+                ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
                 if (type != null) {
                     types.setSelectedItem(type);
                     return;
@@ -236,7 +237,7 @@ public class FileListEntryEditor {
 
             // Try to guess the file type:
             String theLink = link.getText().trim();
-            ExternalFileType type = Globals.prefs.getExternalFileTypeForName(theLink);
+            ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeForName(theLink);
             if (type != null) {
                 types.setSelectedItem(type);
             }
@@ -293,7 +294,7 @@ public class FileListEntryEditor {
         link.setText(entry.getLink());
         //if (link.getText().length() > 0)
         //    checkExtension();
-        types.setModel(new DefaultComboBoxModel<>(Globals.prefs.getExternalFileTypeSelection()));
+        types.setModel(new DefaultComboBoxModel<>(ExternalFileTypes.getInstance().getExternalFileTypeSelection()));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
         if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType)) {
