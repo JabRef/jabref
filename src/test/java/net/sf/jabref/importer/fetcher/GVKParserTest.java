@@ -9,13 +9,21 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class GVKParserTest {
+
+    @Before
+    public void setUp() throws Exception {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     private void doTest(String xmlName, int expectedSize, List<String> resourceNames)
             throws ParserConfigurationException, SAXException, IOException {

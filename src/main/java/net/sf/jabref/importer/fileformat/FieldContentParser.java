@@ -37,7 +37,10 @@ public class FieldContentParser {
         multiLineFields.add("abstract");
         multiLineFields.add("review");
         // the file field should not be formatted, therefore we treat it as a multi line field
-        multiLineFields.addAll(Arrays.asList(Globals.prefs.getStringArray(JabRefPreferences.NON_WRAPPABLE_FIELDS)));
+        String[] nonWrappableFields = Globals.prefs.getStringArray(JabRefPreferences.NON_WRAPPABLE_FIELDS);
+        if (nonWrappableFields != null) {
+            multiLineFields.addAll(Arrays.asList(nonWrappableFields));
+        }
     }
 
     /**
