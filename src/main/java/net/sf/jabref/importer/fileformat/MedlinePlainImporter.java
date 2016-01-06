@@ -100,7 +100,7 @@ public class MedlinePlainImporter extends ImportFormat {
 
         for (String entry1 : entries) {
 
-            if (entry1.trim().isEmpty()) {
+            if (entry1.trim().isEmpty() || !entry1.contains("-")) {
                 continue;
             }
 
@@ -113,16 +113,14 @@ public class MedlinePlainImporter extends ImportFormat {
             String[] fields = entry1.split("\n");
 
             for (int j = 0; j < fields.length; j++) {
-                if ("".equals(fields[j])) {
-                    continue;
-                }
 
                 StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
 
                 while (!done && (j < (fields.length - 1))) {
                     if (fields[j + 1].length() <= 4) {
-                        System.out.println("aaa");
+                        j++;
+                        continue;
                     }
                     if (fields[j + 1].charAt(4) != '-') {
                         if ((current.length() > 0)
@@ -141,7 +139,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 String val = entry.substring(entry.indexOf('-') + 1).trim();
                 if ("PT".equals(lab)) {
                     val = val.toLowerCase();
-                    if ("BOOK".equals(val)) {
+                    if ("book".equals(val)) {
                         type = "book";
                     } else if ("journal article".equals(val)
                             || "classical article".equals(val)
@@ -152,7 +150,7 @@ public class MedlinePlainImporter extends ImportFormat {
                         type = "article";
                     } else if ("clinical conference".equals(val)
                             || "consensus development conference".equals(val)
-                            || "consensus development conference, NIH".equals(val)) {
+                            || "consensus development conference, nih".equals(val)) {
                         type = "conference";
                     } else if ("technical report".equals(val)) {
                         type = "techreport";
@@ -269,7 +267,8 @@ public class MedlinePlainImporter extends ImportFormat {
             ArrayList<Object> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> key : hm.entrySet()) {
                 String content = key.getValue();
-                if ((content == null) || content.trim().isEmpty()) {
+                // content can never be null so only check if content is empty
+                if (content.trim().isEmpty()) {
                     toRemove.add(key.getKey());
                 }
             }

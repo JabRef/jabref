@@ -88,6 +88,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed #473: Import/export to external database works again
 - Fixed #526: OpenOffice/LibreOffice connection works again on Linux/OSX
 - Fixed #533: Preview parsed incorrectly when regular expression was enabled
+- Fixed: MedlinePlain Importer made more resistant for malformed entries
 - Fixed #564: Cite command changes are immediately reflected in the push-to-application actions, and not only after restart
 
 ### Removed
