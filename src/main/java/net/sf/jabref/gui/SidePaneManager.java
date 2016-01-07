@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -197,14 +199,9 @@ public class SidePaneManager {
         }
 
         // Split the map into a pair of parallel String lists suitable for storage
-        List<String> tmpComponentNames = new ArrayList<>();
-        List<String> componentPositions = new ArrayList<>();
-
-        // Might be done in a better way? One can directly put the keySet in tmpComponentNames, but is it more efficient in total? Ordering?
-        for (Map.Entry<String, Integer> component : preferredPositions.entrySet()) {
-            tmpComponentNames.add(component.getKey());
-            componentPositions.add(component.getValue().toString());
-        }
+        List<String> tmpComponentNames = new ArrayList<>(preferredPositions.keySet());
+        List<String> componentPositions = preferredPositions.values().stream().map(Object::toString)
+                .collect(Collectors.toList());
 
         Globals.prefs.putStringList(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, tmpComponentNames);
         Globals.prefs.putStringList(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, componentPositions);

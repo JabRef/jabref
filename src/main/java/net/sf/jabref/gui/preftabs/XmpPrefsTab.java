@@ -20,6 +20,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -250,14 +251,13 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
             // First we remove all rows with empty names.
             for (int i = tableRows.size() - 1; i >= 0; i--) {
-                if ("".equals(tableRows.elementAt(i))) {
+                if ((tableRows.elementAt(i) == null) || tableRows.elementAt(i).toString().isEmpty()) {
                     tableRows.removeElementAt(i);
                 }
             }
-
             // Finally, we store the new preferences.
-            JabRefPreferences.getInstance().putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS,
-                    tableRows.toArray(new String[tableRows.size()]));
+            JabRefPreferences.getInstance().putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS,
+                    tableRows.stream().map(Object::toString).collect(Collectors.toList()));
         }
 
         JabRefPreferences.getInstance().putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, privacyFilterCheckBox.isSelected());

@@ -221,7 +221,7 @@ public class XMPUtilTest {
         prefs = JabRefPreferences.getInstance();
 
         use = prefs.getBoolean("useXmpPrivacyFilter");
-        privacyFilters = prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS);
+        privacyFilters = prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
 
         // The code assumes privacy filters to be off
         prefs.putBoolean("useXmpPrivacyFilter", false);
@@ -232,7 +232,7 @@ public class XMPUtilTest {
 
     boolean use;
 
-    String[] privacyFilters;
+    List<String> privacyFilters;
 
 
     /**
@@ -243,7 +243,7 @@ public class XMPUtilTest {
         pdfFile.delete();
 
         prefs.putBoolean("useXmpPrivacyFilter", use);
-        prefs.putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS, privacyFilters);
+        prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, privacyFilters);
     }
 
     /**
@@ -309,7 +309,7 @@ public class XMPUtilTest {
             BibEntry e = t1BibtexEntry();
 
             prefs.putBoolean("useXmpPrivacyFilter", true);
-            prefs.putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS, new String[] {"author", "title", "note"});
+            prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, Arrays.asList("author", "title", "note"));
 
             XMPUtil.writeXMP(pdfFile, e, null);
 
@@ -324,8 +324,8 @@ public class XMPUtilTest {
         }
         // First set:
         prefs.putBoolean("useXmpPrivacyFilter", true);
-        prefs.putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS,
-                new String[] {"author;title;note;booktitle;year;owner;timestamp"});
+        prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS,
+                Arrays.asList("author;title;note;booktitle;year;owner;timestamp"));
 
         BibEntry e = t1BibtexEntry();
 

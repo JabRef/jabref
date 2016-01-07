@@ -370,7 +370,7 @@ public class MainTable extends JTable {
     private void setWidths() {
         // Setting column widths:
         int ncWidth = Globals.prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
-        String[] widthsFromPreferences = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
+        List<String> widthsFromPreferences = Globals.prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         TableColumnModel cm = getColumnModel();
         cm.getColumn(0).setPreferredWidth(ncWidth);
         for (int i = 1; i < cm.getColumnCount(); i++) {
@@ -384,13 +384,13 @@ public class MainTable extends JTable {
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
                 cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
             } else {
-                String[] allColumns = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
+                List<String> allColumns = Globals.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
                 // find index of current mainTableColumn in allColumns
-                for (int j = 0; j < allColumns.length; j++) {
-                    if (allColumns[j].equalsIgnoreCase(mainTableColumn.getDisplayName())) {
+                for (int j = 0; j < allColumns.size(); j++) {
+                    if (allColumns.get(j).equalsIgnoreCase(mainTableColumn.getDisplayName())) {
                         try {
                             // set preferred width by using found index j in the width array
-                            cm.getColumn(i).setPreferredWidth(Integer.parseInt(widthsFromPreferences[j]));
+                            cm.getColumn(i).setPreferredWidth(Integer.parseInt(widthsFromPreferences.get(j)));
                         } catch (NumberFormatException e) {
                             LOGGER.info("Exception while setting column widths. Choosing default.", e);
                             cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);

@@ -68,7 +68,8 @@ public class FileHistoryTest {
         fh.removeItem("cc");
         fh.removeItem("aa");
         fh.storeHistory();
-        assertArrayEquals(new String[] {"ii", "hh", "gg"}, prefs.getStringArray(JabRefPreferences.RECENT_FILES));
+        assertArrayEquals(new String[] {"ii", "hh", "gg"},
+                prefs.getStringList(JabRefPreferences.RECENT_FILES).toArray(new String[0]));
     }
 
 }

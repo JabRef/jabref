@@ -393,7 +393,7 @@ class ManageJournalsPanel extends JPanel {
         }
 
         // Store the list of external files set up:
-        ArrayList<String> extFiles = new ArrayList<>();
+        List<String> extFiles = new ArrayList<>();
         for (ExternalFileEntry efe : externals) {
             if (!"".equals(efe.getValue())) {
                 extFiles.add(efe.getValue());

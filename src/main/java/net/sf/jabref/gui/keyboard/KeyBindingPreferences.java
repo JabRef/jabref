@@ -6,9 +6,9 @@ import net.sf.jabref.logic.util.OS;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
-import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,12 +80,8 @@ public class KeyBindingPreferences {
     public void setNewKeyBindings(SortedMap<KeyBinding, String> newBindings) {
         if (!newBindings.equals(keyBindingRepository.getKeyBindings())) {
             // This confirms that the bindings have actually changed.
-            List<String> bindNames = new ArrayList<>(newBindings.size());
-            List<String> bindings = new ArrayList<>(newBindings.size());
-            for (Map.Entry<KeyBinding, String> keyBinding : newBindings.entrySet()) {
-                bindNames.add(keyBinding.getKey().getKey());
-                bindings.add(keyBinding.getValue());
-            }
+            List<String> bindNames = newBindings.keySet().stream().map(KeyBinding::getKey).collect(Collectors.toList());
+            List<String> bindings = new ArrayList<>(newBindings.values());
             prefs.putStringList(JabRefPreferences.BIND_NAMES, bindNames);
             prefs.putStringList(JabRefPreferences.BINDINGS, bindings);
             keyBindingRepository.overwriteBindings(newBindings);

@@ -936,29 +936,6 @@ public final class JabRefPreferences {
     }
 
     /**
-     * Puts a string array into the Preferences, by linking its elements with ';' into a single string. Escape
-     * characters make the process transparent even if strings contain ';'.
-     */
-    public void putStringArray(String key, String[] value) {
-        if (value == null) {
-            remove(key);
-            return;
-        }
-
-        if (value.length > 0) {
-            StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < (value.length - 1); i++) {
-                linked.append(makeEscape(value[i]));
-                linked.append(';');
-            }
-            linked.append(makeEscape(value[value.length - 1]));
-            put(key, linked.toString());
-        } else {
-            put(key, "");
-        }
-    }
-
-    /**
      * Puts a list of strings into the Preferences, by linking its elements with ';' into a single string. Escape
      * characters make the process transparent even if strings contain ';'.
      */
@@ -981,32 +958,6 @@ public final class JabRefPreferences {
         }
     }
 
-    /**
-     * Returns a String[] containing the chosen columns.
-     */
-    public String[] getStringArray(String key) {
-        String names = get(key);
-        if (names == null) {
-            return null;
-        }
-
-        StringReader rd = new StringReader(names);
-        Vector<String> arr = new Vector<>();
-        String rs;
-        try {
-            while ((rs = getNextUnit(rd)) != null) {
-                arr.add(rs);
-            }
-        } catch (IOException ignored) {
-            // Ignored
-        }
-        String[] res = new String[arr.size()];
-        for (int i = 0; i < res.length; i++) {
-            res[i] = arr.elementAt(i);
-        }
-
-        return res;
-    }
 
     /**
      * Returns a List of Strings containing the chosen columns.
