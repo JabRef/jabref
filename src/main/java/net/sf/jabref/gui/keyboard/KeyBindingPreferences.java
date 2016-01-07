@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
+import java.util.ArrayList;
 import java.util.List;
 
 public class KeyBindingPreferences {
@@ -79,16 +80,14 @@ public class KeyBindingPreferences {
     public void setNewKeyBindings(SortedMap<KeyBinding, String> newBindings) {
         if (!newBindings.equals(keyBindingRepository.getKeyBindings())) {
             // This confirms that the bindings have actually changed.
-            String[] bindNames = new String[newBindings.size()];
-            String[] bindings = new String[newBindings.size()];
-            int index = 0;
+            List<String> bindNames = new ArrayList<>(newBindings.size());
+            List<String> bindings = new ArrayList<>(newBindings.size());
             for (Map.Entry<KeyBinding, String> keyBinding : newBindings.entrySet()) {
-                bindNames[index] = keyBinding.getKey().getKey();
-                bindings[index] = keyBinding.getValue();
-                index++;
+                bindNames.add(keyBinding.getKey().getKey());
+                bindings.add(keyBinding.getValue());
             }
-            prefs.putStringArray(JabRefPreferences.BIND_NAMES, bindNames);
-            prefs.putStringArray(JabRefPreferences.BINDINGS, bindings);
+            prefs.putStringList(JabRefPreferences.BIND_NAMES, bindNames);
+            prefs.putStringList(JabRefPreferences.BINDINGS, bindings);
             keyBindingRepository.overwriteBindings(newBindings);
         }
     }

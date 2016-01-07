@@ -959,6 +959,29 @@ public final class JabRefPreferences {
     }
 
     /**
+     * Puts a list of strings into the Preferences, by linking its elements with ';' into a single string. Escape
+     * characters make the process transparent even if strings contain ';'.
+     */
+    public void putStringList(String key, List<String> value) {
+        if ((value == null)) {
+            remove(key);
+            return;
+        }
+
+        if (value.isEmpty()) {
+            put(key, "");
+        } else {
+            StringBuilder linked = new StringBuilder();
+            for (int i = 0; i < (value.size() - 1); i++) {
+                linked.append(makeEscape(value.get(i)));
+                linked.append(';');
+            }
+            linked.append(makeEscape(value.get(value.size() - 1)));
+            put(key, linked.toString());
+        }
+    }
+
+    /**
      * Returns a String[] containing the chosen columns.
      */
     public String[] getStringArray(String key) {
@@ -1216,9 +1239,9 @@ public final class JabRefPreferences {
         put(JabRefPreferences.CUSTOM_TYPE_NAME + nr, tp.getName());
         put(JabRefPreferences.CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());
         List<String> optionalFields = tp.getOptionalFields();
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, optionalFields.toArray(new String[optionalFields.size()]));
+        putStringList(JabRefPreferences.CUSTOM_TYPE_OPT + nr, optionalFields);
         List<String> primaryOptionalFields = tp.getPrimaryOptionalFields();
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, primaryOptionalFields.toArray(new String[primaryOptionalFields.size()]));
+        putStringList(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, primaryOptionalFields);
     }
 
     /**

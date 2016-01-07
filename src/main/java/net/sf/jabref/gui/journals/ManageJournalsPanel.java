@@ -399,12 +399,7 @@ class ManageJournalsPanel extends JPanel {
                 extFiles.add(efe.getValue());
             }
         }
-        if (extFiles.isEmpty()) {
-            Globals.prefs.put(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, "");
-        } else {
-            String[] list = extFiles.toArray(new String[extFiles.size()]);
-            Globals.prefs.putStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, list);
-        }
+        Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
         Abbreviations.initializeJournalNames(Globals.prefs);
 

@@ -794,11 +794,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (filenames.isEmpty()) {
                 prefs.remove(JabRefPreferences.LAST_EDITED);
             } else {
-                String[] names = new String[filenames.size()];
-                for (int i = 0; i < filenames.size(); i++) {
-                    names[i] = filenames.elementAt(i);
-                }
-                prefs.putStringArray(JabRefPreferences.LAST_EDITED, names);
+                prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
                 File focusedDatabase = getCurrentBasePanel().getDatabaseFile();
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
@@ -1917,11 +1913,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (filenames.isEmpty()) {
                 output(Localization.lang("Not saved (empty session)") + '.');
             } else {
-                String[] names = new String[filenames.size()];
-                for (int i = 0; i < filenames.size(); i++) {
-                    names[i] = filenames.elementAt(i);
-                }
-                prefs.putStringArray(JabRefPreferences.SAVED_SESSION, names);
+                prefs.putStringList(JabRefPreferences.SAVED_SESSION, filenames);
                 output(Localization.lang("Saved session") + '.');
             }
 

@@ -27,6 +27,7 @@
 */
 package net.sf.jabref.importer;
 
+import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
@@ -57,12 +58,12 @@ public class CustomImportList extends TreeSet<CustomImporter> {
 
     private void readPrefs() {
         int i = 0;
-        String[] s;
-        while ((s = prefs.getStringArray(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i)) != null) {
+        List<String> s;
+        while (!((s = prefs.getStringList(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i)).isEmpty())) {
             try {
                 super.add(new CustomImporter(s));
             } catch (Exception e) {
-                LOGGER.warn("Could not load " + s[0] + " from preferences. Will ignore.", e);
+                LOGGER.warn("Could not load " + s.get(0) + " from preferences. Will ignore.", e);
             }
             i++;
         }
@@ -91,7 +92,7 @@ public class CustomImportList extends TreeSet<CustomImporter> {
         purgeAll();
         CustomImporter[] importers = this.toArray(new CustomImporter[this.size()]);
         for (int i = 0; i < importers.length; i++) {
-            Globals.prefs.putStringArray(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i, importers[i].getAsStringArray());
+            Globals.prefs.putStringList(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i, importers[i].getAsStringList());
         }
     }
 

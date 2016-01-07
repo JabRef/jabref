@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.gui;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -22,8 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -197,17 +196,18 @@ public class SidePaneManager {
             index++;
         }
 
-        // Split the map into a pair of parallel String arrays suitable for storage
-        Set<String> var = preferredPositions.keySet();
-        String[] tmpComponentNames = var.toArray(new String[var.size()]);
-        String[] componentPositions = new String[preferredPositions.size()];
+        // Split the map into a pair of parallel String lists suitable for storage
+        List<String> tmpComponentNames = new ArrayList<>();
+        List<String> componentPositions = new ArrayList<>();
 
-        for (int i = 0; i < tmpComponentNames.length; ++i) {
-            componentPositions[i] = preferredPositions.get(tmpComponentNames[i]).toString();
+        // Might be done in a better way? One can directly put the keySet in tmpComponentNames, but is it more efficient in total? Ordering?
+        for (Map.Entry<String, Integer> component : preferredPositions.entrySet()) {
+            tmpComponentNames.add(component.getKey());
+            componentPositions.add(component.getValue().toString());
         }
 
-        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, tmpComponentNames);
-        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, componentPositions);
+        Globals.prefs.putStringList(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, tmpComponentNames);
+        Globals.prefs.putStringList(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, componentPositions);
     }
 
 

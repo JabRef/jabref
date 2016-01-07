@@ -332,19 +332,19 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                     i++;
                 }
             }
-            // Then we make arrays
-            String[] names = new String[tableRows.size()];
-            String[] formats = new String[tableRows.size()];
+            // Then we make lists
 
-            for (i = 0; i < tableRows.size(); i++) {
-                TableRow tr = tableRows.get(i);
-                names[i] = tr.getName();
-                formats[i] = tr.getFormat();
+            List<String> names = new ArrayList<>(tableRows.size());
+            List<String> formats = new ArrayList<>(tableRows.size());
+
+            for (TableRow tr : tableRows) {
+                names.add(tr.getName());
+                formats.add(tr.getFormat());
             }
 
             // Finally, we store the new preferences.
-            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, names);
-            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
+            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATER_KEY, names);
+            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
         }
     }
 

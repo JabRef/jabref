@@ -65,8 +65,7 @@ public class FileHistory {
 
     public void storeHistory() {
         if (!history.isEmpty()) {
-            String[] names = history.toArray(new String[history.size()]);
-            prefs.putStringArray(JabRefPreferences.RECENT_FILES, names);
+            prefs.putStringList(JabRefPreferences.RECENT_FILES, history);
         }
     }
 
