@@ -1,0 +1,69 @@
+PMID- 20481061
+OWN - NLM
+STAT- MEDLINE
+DA  - 20100520
+DCOM- 20100526
+LR  - 20150731
+IS  - 0955-2359 (Print)
+IS  - 0955-2359 (Linking)
+VI  - 20
+IP  - 4
+DP  - 2009
+TI  - From danger and motherhood to health and beauty: health advice for the factory
+      girl in early twentieth-century Britain.
+PG  - 454-81
+AB  - A survey of government reports and the archives and journals of other agencies
+     
+     
+      interested in industrial health in early twentieth-century Britain has led us to 
+      conclude that, in addition to apprehension about the potentially harmful impact
+      of industrial work on the reproductive health of women, there was a great deal of
+      interest in the health of young, unmarried girls in the workplace, particularly
+      the factory. Adopting a broader time frame, we suggest that the First World War, 
+      with its emphasis on the reproductive health of women, was an anomalous
+      experience in a broader trend which stressed the growing acceptability of women's
+      work within industry. Concern with girls' health and welfare embraced hygiene,
+      diet, exercise, recreation, fashion and beauty within and outside of the 
+      workplace, as well as the impact of the boredom and monotony associated with
+      industrial work. The health problems of young women workers tended to be
+      associated with behaviour and environment rather than biology, as were anxieties 
+      about the impact of work on morals, habits and character. Efforts to ensure that 
+      young female factory workers would be equipped to take their place as citizens
+      and parents, we argue, often dovetailed rather than diverged with the 'boy
+      labour' question.
+FAU - Long, Vicky
+AU  - Long V
+AD  - Centre for the History of Science, Technology and Medicine, University of
+      Manchester. Vicky.Long@manchester.ac.uk
+FAU - Marland, Hilary
+AU  - Marland H
+LA  - eng
+GR  - /076053/Z/04/Z/Wellcome Trust/United Kingdom
+GR  - 076053/Wellcome Trust/United Kingdom
+PT  - Historical Article
+PT  - Journal Article
+PT  - Research Support, Non-U.S. Gov't
+PL  - England
+TA  - 20 Century Br Hist
+JT  - 20 century British history
+JID - 9015384
+SB  - QIS
+MH  - Attitude to Health
+MH  - Employment/psychology
+MH  - Female
+MH  - Gender Identity
+MH  - Great Britain
+MH  - History, 20th Century
+MH  - Humans
+MH  - Occupational Health/*history
+MH  - Reproductive Medicine/*history
+MH  - Women, Working/*history/psychology
+PMC - PMC4513071
+MID - EMS54115
+OID - NLM: EMS54115
+OID - NLM: PMC4513071
+EDAT- 2009/01/01 00:00
+MHDA- 2010/05/27 06:00
+CRDT- 2010/05/21 06:00
+PST - ppublish
+SO  - 20 Century Br Hist. 2009;20(4):454-81.
