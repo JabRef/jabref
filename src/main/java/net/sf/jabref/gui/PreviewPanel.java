@@ -89,6 +89,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private final CloseAction closeAction;
 
+    private final CopyAction copyAction;
+
     private Optional<Pattern> highlightPattern = Optional.empty();
 
     /**
@@ -170,6 +172,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         this.closeAction = new CloseAction();
         this.printAction = new PrintAction();
+        this.copyAction = new CopyAction();
 
         this.panel = Optional.ofNullable(panel);
 
@@ -221,6 +224,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     private JPopupMenu createPopupMenu() {
         JPopupMenu menu = new JPopupMenu();
         menu.add(this.printAction);
+        menu.add(this.copyAction);
         this.panel.ifPresent(p -> menu.add(p.frame().switchPreview));
         return menu;
     }
@@ -238,6 +242,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         actionMap.put("close", this.closeAction);
 
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), "copy");
+        actionMap.put("copy", this.copyAction);
+
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW), "print");
         actionMap.put("print", this.printAction);
 
@@ -245,6 +252,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         // Add actions (and thus buttons)
         toolBar.add(this.closeAction);
+        toolBar.addSeparator();
+        toolBar.add(this.copyAction);
         toolBar.addSeparator();
         toolBar.add(this.printAction);
 
@@ -282,7 +291,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
                         JabRefDesktop.openExternalViewer(PreviewPanel.this.metaData,
                                 address, "url");
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.warn("Could not open external viewer", e);
                     }
                 }
             }
@@ -419,6 +428,23 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
             panel.ifPresent(BasePanel::hideBottomComponent);
         }
 
+
+    }
+
+    class CopyAction extends AbstractAction {
+
+        public CopyAction() {
+            super(Localization.lang("Copy preview"), IconTheme.JabRefIcon.COPY.getSmallIcon());
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Copy preview"));
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            previewPane.selectAll();
+            previewPane.copy();
+            previewPane.select(0, -1);
+        }
 
     }
 
