@@ -18,7 +18,6 @@ package net.sf.jabref.openoffice;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.LayoutHelper;
@@ -290,7 +289,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             String type = line.substring(0, index);
             try {
                 Layout layout = new LayoutHelper(new StringReader(formatString)).
-                        getLayoutFromText(Globals.FORMATTER_PACKAGE);
+getLayoutFromText();
                 if (setDefault) {
                     defaultBibLayout = layout;
                 } else {

@@ -29,7 +29,6 @@ package net.sf.jabref.exporter.layout.format;
 
 import java.util.Objects;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 

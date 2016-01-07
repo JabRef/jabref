@@ -39,7 +39,7 @@ public class Layout {
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
 
-    public Layout(List<StringInt> parsedEntries, String classPrefix) {
+    public Layout(List<StringInt> parsedEntries) {
         List<LayoutEntry> tmpEntries = new ArrayList<>(parsedEntries.size());
 
         List<StringInt> blockEntries = null;
@@ -57,7 +57,7 @@ public class Layout {
                 if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(parsedEntry.s)) {
                         blockEntries.add(parsedEntry);
-                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_FIELD_START);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
@@ -73,7 +73,7 @@ public class Layout {
                 if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(parsedEntry.s)) {
                         blockEntries.add(parsedEntry);
-                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_GROUP_START);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
@@ -86,7 +86,7 @@ public class Layout {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, classPrefix));
+                tmpEntries.add(new LayoutEntry(parsedEntry));
             } else {
                 blockEntries.add(parsedEntry);
             }

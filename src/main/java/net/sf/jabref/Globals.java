@@ -52,7 +52,6 @@ public class Globals {
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String NONE = "_non__";
-    public static final String FORMATTER_PACKAGE = "net.sf.jabref.exporter.layout.format.";
 
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required

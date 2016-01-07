@@ -82,7 +82,7 @@ public class LayoutEntryTest {
 
     public String layout(String layoutFile, BibEntry entry, Optional<Pattern> highlightPattern) throws Exception {
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+        Layout layout = new LayoutHelper(sr).getLayoutFromText();
 
         return layout.doLayout(entry, null, highlightPattern);
     }

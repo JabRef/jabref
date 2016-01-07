@@ -59,7 +59,7 @@ public class LayoutHelper {
         _in = new PushbackReader(in);
     }
 
-    public Layout getLayoutFromText(String classPrefix) throws IOException {
+    public Layout getLayoutFromText() throws IOException {
         parse();
 
         for (StringInt parsedEntry : parsedEntries) {
@@ -70,7 +70,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(parsedEntries, classPrefix);
+        return new Layout(parsedEntries);
     }
 
     public static String getCurrentGroup() {
