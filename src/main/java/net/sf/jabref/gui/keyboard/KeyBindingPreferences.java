@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
+import java.util.List;
 
 public class KeyBindingPreferences {
 
@@ -94,19 +95,18 @@ public class KeyBindingPreferences {
 
     private void restoreKeyBindings() {
         // First read the bindings, and their names.
-        String[] bindNames = prefs.getStringArray(JabRefPreferences.BIND_NAMES);
-        String[] bindings = prefs.getStringArray(JabRefPreferences.BINDINGS);
+        List<String> bindNames = prefs.getStringList(JabRefPreferences.BIND_NAMES);
+        List<String> bindings = prefs.getStringList(JabRefPreferences.BINDINGS);
 
         // Then set up the key bindings HashMap.
-        if ((bindNames == null) || (bindings == null)
-                || (bindNames.length != bindings.length)) {
+        if ((bindNames.isEmpty()) || (bindings.isEmpty()) || (bindNames.size() != bindings.size())) {
             // Nothing defined in Preferences, or something is wrong.
             keyBindingRepository = new KeyBindingRepository();
             return;
         }
 
-        for (int i = 0; i < bindNames.length; i++) {
-            keyBindingRepository.put(bindNames[i], bindings[i]);
+        for (int i = 0; i < bindNames.size(); i++) {
+            keyBindingRepository.put(bindNames.get(i), bindings.get(i));
         }
     }
 

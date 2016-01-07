@@ -306,22 +306,16 @@ class ManageJournalsPanel extends JPanel {
     }
 
     private void setupExternals() {
-        String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if ((externalFiles == null) || (externalFiles.length == 0)) {
+        List<String> externalFiles = Globals.prefs.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
+        if (externalFiles.isEmpty()) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
         } else {
             for (String externalFile : externalFiles) {
                 ExternalFileEntry efe = new ExternalFileEntry(externalFile);
                 externals.add(efe);
-
             }
-
         }
-
-        //efe = new ExternalFileEntry();
-        //externals.add(efe);
-
     }
 
     private void setupUserTable() {

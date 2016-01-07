@@ -597,8 +597,7 @@ public class XMPUtil {
         boolean useXmpPrivacyFilter =
                 prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
         // Fields for which not to write XMP data later on:
-        TreeSet<String> filters = new TreeSet<>(
-                Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
+        Set<String> filters = new TreeSet<>(prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS));
 
         // Set all the values including key and entryType
 
@@ -987,8 +986,7 @@ public class XMPUtil {
         boolean useXmpPrivacyFilter =
                 prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
         // Fields for which not to write XMP data later on:
-        TreeSet<String> filters = new TreeSet<>(
-                Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
+        Set<String> filters = new TreeSet<>(prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS));
 
         // Set all the values including key and entryType
         Set<String> fields = entry.getFieldNames();

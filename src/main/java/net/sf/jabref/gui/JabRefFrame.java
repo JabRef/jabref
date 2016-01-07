@@ -1963,7 +1963,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             }
                         }
                     }
-                    String[] names = prefs.getStringArray(JabRefPreferences.SAVED_SESSION);
+                    List<String> names = prefs.getStringList(JabRefPreferences.SAVED_SESSION);
                     ArrayList<File> filesToOpen = new ArrayList<>();
                     for (String name : names) {
                         filesToOpen.add(new File(name));

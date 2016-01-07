@@ -986,6 +986,28 @@ public final class JabRefPreferences {
     }
 
     /**
+     * Returns a List of Strings containing the chosen columns.
+     */
+    public List<String> getStringList(String key) {
+        String names = get(key);
+        if (names == null) {
+            return new ArrayList<>();
+        }
+
+        StringReader rd = new StringReader(names);
+        List<String> res = new ArrayList<>();
+        String rs;
+        try {
+            while ((rs = getNextUnit(rd)) != null) {
+                res.add(rs);
+            }
+        } catch (IOException ignored) {
+            // Ignored
+        }
+        return res;
+    }
+
+    /**
      * Looks up a color definition in preferences, and returns the Color object.
      *
      * @param key The key for this setting.
@@ -1208,15 +1230,14 @@ public final class JabRefPreferences {
         if (name == null) {
             return null;
         }
-        String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
-        String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
-        String[] priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
-        if (priOpt == null) {
-            return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(opt));
+        List<String> req = getStringList(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
+        List<String> opt = getStringList(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
+        List<String> priOpt = getStringList(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
+        if (priOpt.isEmpty()) {
+            return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt);
         }
-        List<String> secondary = EntryUtil.getRemainder(Arrays.asList(opt), Arrays.asList(priOpt));
-        String[] secOpt = secondary.toArray(new String[secondary.size()]);
-        return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(priOpt), Arrays.asList(secOpt));
+        List<String> secondary = EntryUtil.getRemainder(opt, priOpt);
+        return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secondary);
 
     }
 

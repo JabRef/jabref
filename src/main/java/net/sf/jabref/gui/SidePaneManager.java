@@ -171,14 +171,15 @@ public class SidePaneManager {
     private static Map<String, Integer> getPreferredPositions() {
         Map<String, Integer> preferredPositions = new HashMap<>();
 
-        String[] componentNames = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES);
-        String[] componentPositions = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
+        List<String> componentNames = Globals.prefs.getStringList(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES);
+        List<String> componentPositions = Globals.prefs
+                .getStringList(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
 
-        for (int i = 0; i < componentNames.length; ++i) {
+        for (int i = 0; i < componentNames.size(); ++i) {
             try {
-                preferredPositions.put(componentNames[i], Integer.parseInt(componentPositions[i]));
+                preferredPositions.put(componentNames.get(i), Integer.parseInt(componentPositions.get(i)));
             } catch (NumberFormatException e) {
-                LOGGER.info("Invalid number format for side pane component '" + componentNames[i] + "'.", e);
+                LOGGER.info("Invalid number format for side pane component '" + componentNames.get(i) + "'.", e);
             }
         }
 

@@ -96,7 +96,7 @@ public class CustomImportList extends TreeSet<CustomImporter> {
     }
 
     private void purgeAll() {
-        for (int i = 0; Globals.prefs.getStringArray(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i) != null; i++) {
+        for (int i = 0; !(Globals.prefs.getStringList(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i).isEmpty()); i++) {
             Globals.prefs.remove(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i);
         }
     }

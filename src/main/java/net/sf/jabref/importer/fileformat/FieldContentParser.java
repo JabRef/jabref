@@ -20,7 +20,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,10 +36,8 @@ public class FieldContentParser {
         multiLineFields.add("abstract");
         multiLineFields.add("review");
         // the file field should not be formatted, therefore we treat it as a multi line field
-        String[] nonWrappableFields = Globals.prefs.getStringArray(JabRefPreferences.NON_WRAPPABLE_FIELDS);
-        if (nonWrappableFields != null) {
-            multiLineFields.addAll(Arrays.asList(nonWrappableFields));
-        }
+        List<String> nonWrappableFields = Globals.prefs.getStringList(JabRefPreferences.NON_WRAPPABLE_FIELDS);
+        multiLineFields.addAll(nonWrappableFields);
     }
 
     /**

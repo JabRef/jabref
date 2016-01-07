@@ -126,7 +126,7 @@ public class CustomExportList {
 
     private void purge(int from) {
         int i = from;
-        while (Globals.prefs.getStringArray(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i) != null) {
+        while (!Globals.prefs.getStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
             Globals.prefs.remove(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
             i++;
         }

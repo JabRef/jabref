@@ -58,21 +58,14 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         Map<String, String> result = new HashMap<>();
 
-        String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
-        String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
+        List<String> names = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATER_KEY);
+        List<String> formats = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATTER_VALUE);
 
-        if (names == null) {
-            names = new String[] {};
-        }
-        if (formats == null) {
-            formats = new String[] {};
-        }
-
-        for (int i = 0; i < names.length; i++) {
-            if (i < formats.length) {
-                result.put(names[i], formats[i]);
+        for (int i = 0; i < names.size(); i++) {
+            if (i < formats.size()) {
+                result.put(names.get(i), formats.get(i));
             } else {
-                result.put(names[i], NameFormatter.DEFAULT_FORMAT);
+                result.put(names.get(i), NameFormatter.DEFAULT_FORMAT);
             }
         }
 
@@ -233,21 +226,14 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         tableRows.clear();
-        String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
-        String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
+        List<String> names = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATER_KEY);
+        List<String> formats = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATTER_VALUE);
 
-        if (names == null) {
-            names = new String[] {};
-        }
-        if (formats == null) {
-            formats = new String[] {};
-        }
-
-        for (int i = 0; i < names.length; i++) {
-            if (i < formats.length) {
-                tableRows.add(new TableRow(names[i], formats[i]));
+        for (int i = 0; i < names.size(); i++) {
+            if (i < formats.size()) {
+                tableRows.add(new TableRow(names.get(i), formats.get(i)));
             } else {
-                tableRows.add(new TableRow(names[i]));
+                tableRows.add(new TableRow(names.get(i)));
             }
         }
         rowCount = tableRows.size() + 5;
