@@ -14,6 +14,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Changed
 - All import/open database warnings are now shown in a scrolling text area
+- Add an integrity check to ensure that a url has a correct protocol, implements #358
 
 ### Fixed
 - Changes in customized entry types are now directly reflected in the table when clicking "Apply" or "OK"
