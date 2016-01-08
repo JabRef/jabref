@@ -47,7 +47,6 @@ import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
@@ -512,9 +511,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final NewEntryAction newEntryAction = new NewEntryAction(this, Globals.getKeyPrefs().getKey(KeyBinding.NEW_ENTRY));
     private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
 
-    private final JournalAbbreviationLoader abbreviationLoader;
-
-
     private List<NewEntryAction> getNewEntryActions() {
         // only Bibtex
         List<NewEntryAction> actions = new ArrayList<>();
@@ -529,9 +525,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return actions;
     }
 
-    public JabRefFrame(JabRef jabRef, JournalAbbreviationLoader abbreviationLoader) {
+    public JabRefFrame(JabRef jabRef) {
         this.jabRef = jabRef;
-        this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
         init();
         updateEnabledState();
 
@@ -2218,10 +2213,5 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 }
             }
         }
-    }
-
-
-    public JournalAbbreviationLoader getJournalAbbreviationLoader() {
-        return abbreviationLoader;
     }
 }

@@ -64,9 +64,9 @@ public class DuplicateResolverDialog extends JDialog {
         init(one, two, type);
     }
 
-    public DuplicateResolverDialog(ImportInspectionDialog frame, BibEntry one, BibEntry two, int type) {
-        super(frame, Localization.lang("Possible duplicate entries"), true);
-        this.frame = frame.frame;
+    public DuplicateResolverDialog(ImportInspectionDialog dialog, BibEntry one, BibEntry two, int type) {
+        super(dialog, Localization.lang("Possible duplicate entries"), true);
+        this.frame = dialog.frame;
         init(one, two, type);
     }
 

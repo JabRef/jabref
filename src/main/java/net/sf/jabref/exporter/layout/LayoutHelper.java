@@ -19,7 +19,10 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.List;
+
+import net.sf.jabref.Globals;
 
 /**
  * Helper class to get a Layout object.
@@ -45,18 +48,14 @@ public class LayoutHelper {
 
     private static String currentGroup;
 
-    private final PushbackReader _in;
+    private final PushbackReader in;
     private final List<StringInt> parsedEntries = new ArrayList<>();
 
     private boolean endOfFile;
 
 
     public LayoutHelper(Reader in) {
-        if (in == null) {
-            throw new NullPointerException();
-        }
-
-        _in = new PushbackReader(in);
+        this.in = new PushbackReader(Objects.requireNonNull(in));
     }
 
     public Layout getLayoutFromText() throws IOException {
@@ -70,7 +69,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(parsedEntries);
+        return new Layout(parsedEntries, Globals.journalAbbreviationLoader.getRepository());
     }
 
     public static String getCurrentGroup() {
@@ -386,7 +385,7 @@ public class LayoutHelper {
     }
 
     private int read() throws IOException {
-        return _in.read();
+        return in.read();
     }
 
     private void skipWhitespace() throws IOException {
@@ -412,6 +411,6 @@ public class LayoutHelper {
     }
 
     private void unread(int c) throws IOException {
-        _in.unread(c);
+        in.unread(c);
     }
 }

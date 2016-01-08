@@ -70,9 +70,6 @@ public class JabRef {
 
     private JabRefCLI cli;
 
-    private JournalAbbreviationLoader abbreviationLoader;
-
-
     public void start(String[] args) {
         JabRefPreferences preferences = JabRefPreferences.getInstance();
 
@@ -96,7 +93,7 @@ public class JabRef {
         ExportFormats.initAllExports();
 
         // Read list(s) of journal names and abbreviations
-        abbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
@@ -495,7 +492,7 @@ public class JabRef {
         String[] split = fetchCommand.split(":");
         String engine = split[0];
 
-        EntryFetchers fetchers = new EntryFetchers(abbreviationLoader);
+        EntryFetchers fetchers = new EntryFetchers(Globals.journalAbbreviationLoader);
         EntryFetcher fetcher = null;
         for (EntryFetcher e : fetchers.getEntryFetchers()) {
             if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replaceAll("Fetcher", ""))) {
@@ -658,7 +655,7 @@ public class JabRef {
                 Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
 
         LOGGER.debug("Initializing frame");
-        JabRef.jrf = new JabRefFrame(this, abbreviationLoader);
+        JabRef.jrf = new JabRefFrame(this);
 
         // Add all loaded databases to the frame:
 

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -39,7 +40,7 @@ public class Layout {
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
 
-    public Layout(List<StringInt> parsedEntries) {
+    public Layout(List<StringInt> parsedEntries, JournalAbbreviationRepository repository) {
         List<LayoutEntry> tmpEntries = new ArrayList<>(parsedEntries.size());
 
         List<StringInt> blockEntries = null;
@@ -57,7 +58,7 @@ public class Layout {
                 if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(parsedEntry.s)) {
                         blockEntries.add(parsedEntry);
-                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_FIELD_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_FIELD_START, repository);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
@@ -73,7 +74,7 @@ public class Layout {
                 if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(parsedEntry.s)) {
                         blockEntries.add(parsedEntry);
-                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_GROUP_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_GROUP_START, repository);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
@@ -86,7 +87,7 @@ public class Layout {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry));
+                tmpEntries.add(new LayoutEntry(parsedEntry, repository));
             } else {
                 blockEntries.add(parsedEntry);
             }

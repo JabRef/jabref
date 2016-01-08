@@ -21,6 +21,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.LayoutHelper;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 import java.io.*;
 import java.util.*;
@@ -82,11 +83,12 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     //private Pattern quoted = Pattern.compile("\".*^\\\\\"");
     private static final Pattern quoted = Pattern.compile("\".*\"");
+    private final JournalAbbreviationRepository repository;
 
     private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
-
-    public OOBibStyle(File styleFile) throws IOException {
+    public OOBibStyle(File styleFile, JournalAbbreviationRepository repository) throws IOException {
+        this.repository = Objects.requireNonNull(repository);
         setDefaultProperties();
         try (Reader in = new FileReader(styleFile)) {
             initialize(in);
@@ -95,7 +97,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         OOBibStyle.styleFileModificationTime = styleFile.lastModified();
     }
 
-    public OOBibStyle(Reader in) throws IOException {
+    public OOBibStyle(Reader in, JournalAbbreviationRepository repository) throws IOException {
+        this.repository = Objects.requireNonNull(repository);
         setDefaultProperties();
         initialize(in);
     }
@@ -288,8 +291,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             String type = line.substring(0, index);
             try {
-                Layout layout = new LayoutHelper(new StringReader(formatString)).
-getLayoutFromText();
+                Layout layout = new LayoutHelper(new StringReader(formatString)).getLayoutFromText();
                 if (setDefault) {
                     defaultBibLayout = layout;
                 } else {

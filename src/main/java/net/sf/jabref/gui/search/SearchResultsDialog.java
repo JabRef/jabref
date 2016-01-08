@@ -121,8 +121,9 @@ public class SearchResultsDialog {
         diag = new JDialog(frame, title, false);
 
         int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
-        preview = new PreviewPanel(null, new MetaData(),
-                activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
+        String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs
+                .get(JabRefPreferences.PREVIEW_1);
+        preview = new PreviewPanel(null, new MetaData(), layoutFile);
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,

@@ -511,15 +511,15 @@ public class OpenOfficePanel extends AbstractWorker {
         if (useDefaultAuthoryearStyle) {
             URL defPath = JabRef.class.getResource(DEFAULT_AUTHORYEAR_STYLE_PATH);
             Reader r = new InputStreamReader(defPath.openStream());
-            style = new OOBibStyle(r);
+            style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
         }
         else if (useDefaultNumericalStyle) {
             URL defPath = JabRef.class.getResource(DEFAULT_NUMERICAL_STYLE_PATH);
             Reader r = new InputStreamReader(defPath.openStream());
-            style = new OOBibStyle(r);
+            style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
         }
         else {
-            style = new OOBibStyle(new File(styleFile));
+            style = new OOBibStyle(new File(styleFile), Globals.journalAbbreviationLoader.getRepository());
         }
     }
 

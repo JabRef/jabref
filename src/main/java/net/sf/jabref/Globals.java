@@ -22,6 +22,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.logic.error.StreamEavesdropper;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
 import org.apache.commons.logging.Log;
@@ -56,6 +57,12 @@ public class Globals {
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required
     public static JabRefPreferences prefs;
+
+    /**
+     * This field is initialized upon startup.
+     * Only GUI code is allowed to access it, logic code should use dependency injection.
+     */
+    public static JournalAbbreviationLoader journalAbbreviationLoader;
 
     private static KeyBindingPreferences keyPrefs;
     public static KeyBindingPreferences getKeyPrefs() {

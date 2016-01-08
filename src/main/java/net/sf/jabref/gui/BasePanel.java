@@ -1131,10 +1131,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.WRITE_XMP, new WriteXMPAction(this));
 
-        actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true, frame.getJournalAbbreviationLoader()));
-        actions.put(Actions.ABBREVIATE_MEDLINE,
-                new AbbreviateAction(this, false, frame.getJournalAbbreviationLoader()));
-        actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this, frame.getJournalAbbreviationLoader()));
+        actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
+        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
+        actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
         actions.put(Actions.AUTO_SET_FILE, new SynchronizeFileField(this));
 
         actions.put(Actions.BACK, (BaseAction) BasePanel.this::back);
@@ -1643,12 +1642,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
             autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(), autoCompletePreferences,
-                    frame.getJournalAbbreviationLoader());
+                    Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
-            autoCompleters = new ContentAutoCompleters(autoCompletePreferences, frame.getJournalAbbreviationLoader());
+            autoCompleters = new ContentAutoCompleters(autoCompletePreferences, Globals.journalAbbreviationLoader);
         }
 
         // restore floating search result
