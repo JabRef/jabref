@@ -32,11 +32,11 @@ package net.sf.jabref.gui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -279,13 +279,13 @@ public class BibtexFields {
      * add a field descriptor for the new field.
      */
     public static void setNumericFieldsFromPrefs() {
-        String[] numFields = Globals.prefs.getStringArray(JabRefPreferences.NUMERIC_FIELDS);
-        if (numFields == null) {
+        List<String> numFields = Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS);
+        if (numFields.isEmpty()) {
             return;
         }
         // Build a Set of field names for the fields that should be sorted numerically:
-        HashSet<String> nF = new HashSet<>();
-        Collections.addAll(nF, numFields);
+        Set<String> nF = new HashSet<>();
+        nF.addAll(numFields);
         // Look through all registered fields, and activate numeric sorting if necessary:
         for (String fieldName : BibtexFields.RUNTIME.fieldSet.keySet()) {
             BibtexSingleField field = BibtexFields.RUNTIME.fieldSet.get(fieldName);

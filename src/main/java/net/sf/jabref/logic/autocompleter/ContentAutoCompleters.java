@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.autocompleter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Vector;
@@ -23,7 +24,7 @@ public class ContentAutoCompleters extends AutoCompleters {
         this(preferences);
 
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
-        String[] completeFields = preferences.getCompleteNames();
+        List<String> completeFields = preferences.getCompleteNames();
         for (String field : completeFields) {
             AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(field);
             put(field, autoCompleter);

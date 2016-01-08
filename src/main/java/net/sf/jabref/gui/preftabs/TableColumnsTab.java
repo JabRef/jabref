@@ -388,7 +388,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         extraFileColumns.setSelected(prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS));
         if (extraFileColumns.isSelected()) {
-            String[] desiredColumns = prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
+            List<String> desiredColumns = prefs.getStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             int listSize = listOfFileColumns.getModel().getSize();
             int[] indicesToSelect = new int[listSize];
             for (int i = 0; i < listSize; i++) {
@@ -440,13 +440,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         /*** end: special fields ***/
 
         tableRows.clear();
-        String[] names = prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
-        String[] lengths = prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
-        for (int i = 0; i < names.length; i++) {
-            if (i < lengths.length) {
-                tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
+        List<String> names = prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<String> lengths = prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
+        for (int i = 0; i < names.size(); i++) {
+            if (i < lengths.size()) {
+                tableRows.add(new TableRow(names.get(i), Integer.parseInt(lengths.get(i))));
             } else {
-                tableRows.add(new TableRow(names[i]));
+                tableRows.add(new TableRow(names.get(i)));
             }
         }
         rowCount = tableRows.size() + 5;
@@ -697,15 +697,14 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         prefs.putBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS, extraFileColumns.isSelected());
         if (extraFileColumns.isSelected() && !listOfFileColumns.isSelectionEmpty()) {
-            String[] selections = new String[listOfFileColumns.getSelectedIndices().length];
-            for (int i = 0; i < selections.length; i++) {
-                selections[i] = listOfFileColumns.getModel().getElementAt(
-                        listOfFileColumns.getSelectedIndices()[i]);
+            int numberSelected = listOfFileColumns.getSelectedIndices().length;
+            List<String> selections = new ArrayList<>(numberSelected);
+            for (int i = 0; i < numberSelected; i++) {
+                selections.add(listOfFileColumns.getModel().getElementAt(listOfFileColumns.getSelectedIndices()[i]));
             }
-            prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
-        }
-        else {
-            prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, new String[]{});
+            prefs.putStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
+        } else {
+            prefs.putStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS, new ArrayList<>());
         }
 
         /*** begin: special fields ***/
@@ -774,21 +773,20 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 }
             }
             // Then we make arrays
-            String[] names = new String[tableRows.size()];
-            String[] widths = new String[tableRows.size()];
-            int[] nWidths = new int[tableRows.size()];
+            List<String> names = new ArrayList<>(tableRows.size());
+            List<String> widths = new ArrayList<>(tableRows.size());
+            List<Integer> nWidths = new ArrayList<>(tableRows.size());
 
             prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
-            for (i = 0; i < tableRows.size(); i++) {
-                TableRow tr = tableRows.get(i);
-                names[i] = tr.getName().toLowerCase();
-                nWidths[i] = tr.getLength();
-                widths[i] = String.valueOf(tr.getLength());
+            for (TableRow tr : tableRows) {
+                names.add(tr.getName().toLowerCase());
+                nWidths.add(tr.getLength());
+                widths.add(String.valueOf(tr.getLength()));
             }
 
             // Finally, we store the new preferences.
-            prefs.putStringArray(JabRefPreferences.COLUMN_NAMES, names);
-            prefs.putStringArray(JabRefPreferences.COLUMN_WIDTHS, widths);
+            prefs.putStringList(JabRefPreferences.COLUMN_NAMES, names);
+            prefs.putStringList(JabRefPreferences.COLUMN_WIDTHS, widths);
         }
 
     }

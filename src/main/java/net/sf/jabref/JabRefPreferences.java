@@ -936,52 +936,48 @@ public final class JabRefPreferences {
     }
 
     /**
-     * Puts a string array into the Preferences, by linking its elements with ';' into a single string. Escape
+     * Puts a list of strings into the Preferences, by linking its elements with ';' into a single string. Escape
      * characters make the process transparent even if strings contain ';'.
      */
-    public void putStringArray(String key, String[] value) {
-        if (value == null) {
+    public void putStringList(String key, List<String> value) {
+        if ((value == null)) {
             remove(key);
             return;
         }
 
-        if (value.length > 0) {
+        if (value.isEmpty()) {
+            put(key, "");
+        } else {
             StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < (value.length - 1); i++) {
-                linked.append(makeEscape(value[i]));
+            for (int i = 0; i < (value.size() - 1); i++) {
+                linked.append(makeEscape(value.get(i)));
                 linked.append(';');
             }
-            linked.append(makeEscape(value[value.length - 1]));
+            linked.append(makeEscape(value.get(value.size() - 1)));
             put(key, linked.toString());
-        } else {
-            put(key, "");
         }
     }
 
+
     /**
-     * Returns a String[] containing the chosen columns.
+     * Returns a List of Strings containing the chosen columns.
      */
-    public String[] getStringArray(String key) {
+    public List<String> getStringList(String key) {
         String names = get(key);
         if (names == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         StringReader rd = new StringReader(names);
-        Vector<String> arr = new Vector<>();
+        List<String> res = new ArrayList<>();
         String rs;
         try {
             while ((rs = getNextUnit(rd)) != null) {
-                arr.add(rs);
+                res.add(rs);
             }
         } catch (IOException ignored) {
             // Ignored
         }
-        String[] res = new String[arr.size()];
-        for (int i = 0; i < res.length; i++) {
-            res[i] = arr.elementAt(i);
-        }
-
         return res;
     }
 
@@ -1194,9 +1190,9 @@ public final class JabRefPreferences {
         put(JabRefPreferences.CUSTOM_TYPE_NAME + nr, tp.getName());
         put(JabRefPreferences.CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());
         List<String> optionalFields = tp.getOptionalFields();
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, optionalFields.toArray(new String[optionalFields.size()]));
+        putStringList(JabRefPreferences.CUSTOM_TYPE_OPT + nr, optionalFields);
         List<String> primaryOptionalFields = tp.getPrimaryOptionalFields();
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, primaryOptionalFields.toArray(new String[primaryOptionalFields.size()]));
+        putStringList(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, primaryOptionalFields);
     }
 
     /**
@@ -1208,15 +1204,14 @@ public final class JabRefPreferences {
         if (name == null) {
             return null;
         }
-        String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
-        String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
-        String[] priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
-        if (priOpt == null) {
-            return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(opt));
+        List<String> req = getStringList(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
+        List<String> opt = getStringList(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
+        List<String> priOpt = getStringList(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
+        if (priOpt.isEmpty()) {
+            return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt);
         }
-        List<String> secondary = EntryUtil.getRemainder(Arrays.asList(opt), Arrays.asList(priOpt));
-        String[] secOpt = secondary.toArray(new String[secondary.size()]);
-        return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(priOpt), Arrays.asList(secOpt));
+        List<String> secondary = EntryUtil.getRemainder(opt, priOpt);
+        return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secondary);
 
     }
 

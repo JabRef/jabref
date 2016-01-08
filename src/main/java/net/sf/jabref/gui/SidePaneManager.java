@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.gui;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -171,14 +172,15 @@ public class SidePaneManager {
     private static Map<String, Integer> getPreferredPositions() {
         Map<String, Integer> preferredPositions = new HashMap<>();
 
-        String[] componentNames = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES);
-        String[] componentPositions = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
+        List<String> componentNames = Globals.prefs.getStringList(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES);
+        List<String> componentPositions = Globals.prefs
+                .getStringList(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
 
-        for (int i = 0; i < componentNames.length; ++i) {
+        for (int i = 0; i < componentNames.size(); ++i) {
             try {
-                preferredPositions.put(componentNames[i], Integer.parseInt(componentPositions[i]));
+                preferredPositions.put(componentNames.get(i), Integer.parseInt(componentPositions.get(i)));
             } catch (NumberFormatException e) {
-                LOGGER.info("Invalid number format for side pane component '" + componentNames[i] + "'.", e);
+                LOGGER.info("Invalid number format for side pane component '" + componentNames.get(i) + "'.", e);
             }
         }
 
@@ -196,17 +198,13 @@ public class SidePaneManager {
             index++;
         }
 
-        // Split the map into a pair of parallel String arrays suitable for storage
-        Set<String> var = preferredPositions.keySet();
-        String[] tmpComponentNames = var.toArray(new String[var.size()]);
-        String[] componentPositions = new String[preferredPositions.size()];
+        // Split the map into a pair of parallel String lists suitable for storage
+        List<String> tmpComponentNames = new ArrayList<>(preferredPositions.keySet());
+        List<String> componentPositions = preferredPositions.values().stream().map(Object::toString)
+                .collect(Collectors.toList());
 
-        for (int i = 0; i < tmpComponentNames.length; ++i) {
-            componentPositions[i] = preferredPositions.get(tmpComponentNames[i]).toString();
-        }
-
-        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, tmpComponentNames);
-        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, componentPositions);
+        Globals.prefs.putStringList(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, tmpComponentNames);
+        Globals.prefs.putStringList(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, componentPositions);
     }
 
 

@@ -21,6 +21,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -44,7 +45,7 @@ public class LatexFieldFormatter {
     private final boolean resolveStringsAllFields;
     private final char valueDelimiterStartOfValue;
     private final char valueDelimiterEndOfValue;
-    private final String[] doNotResolveStringsFors;
+    private final List<String> doNotResolveStringsFors;
 
     private final FieldContentParser parser;
 
@@ -59,7 +60,7 @@ public class LatexFieldFormatter {
         this.resolveStringsAllFields = Globals.prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS);
         valueDelimiterStartOfValue = Globals.prefs.getValueDelimiters(0);
         valueDelimiterEndOfValue = Globals.prefs.getValueDelimiters(1);
-        doNotResolveStringsFors = Globals.prefs.getStringArray(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
+        doNotResolveStringsFors = Globals.prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
 
         parser = new FieldContentParser();
     }
@@ -174,9 +175,7 @@ public class LatexFieldFormatter {
         boolean resolveStrings = true;
         if (resolveStringsAllFields) {
             // Resolve strings for all fields except some:
-
-            String[] exceptions = doNotResolveStringsFors;
-            for (String exception : exceptions) {
+            for (String exception : doNotResolveStringsFors) {
                 if (exception.equals(fieldName)) {
                     resolveStrings = false;
                     break;

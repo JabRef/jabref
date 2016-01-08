@@ -124,7 +124,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
         }
 
         if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
-            String[] desiredColumns = Globals.prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
+            List<String> desiredColumns = Globals.prefs.getStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             for (String desiredColumn : desiredColumns) {
                 tableColumns.add(SpecialMainTableColumns.createFileIconColumn(desiredColumn));
             }
@@ -132,7 +132,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
 
         // Add 'normal' bibtex fields as configured in the preferences
         // Read table columns from prefs:
-        String[] colSettings = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
+        List<String> colSettings = Globals.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
 
         for (String columnName : colSettings) {
             // stored column name will be used as columnName

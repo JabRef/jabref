@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -86,8 +87,8 @@ public class AutoCompletePreferences {
         preferences.putBoolean(PREF_FIRST_LAST, value);
     }
 
-    public String[] getCompleteNames() {
-        return preferences.getStringArray(PREF_COMPLETE_FIELDS);
+    public List<String> getCompleteNames() {
+        return preferences.getStringList(PREF_COMPLETE_FIELDS);
     }
 
     public String getCompleteNamesAsString() {

@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.List;
 
 import net.sf.jabref.importer.fileformat.ImportFormat;
 
@@ -53,8 +55,8 @@ public class CustomImporter implements Comparable<CustomImporter> {
         super();
     }
 
-    public CustomImporter(String[] data) {
-        this(data[0], data[1], data[2], data[3]);
+    public CustomImporter(List<String> data) {
+        this(data.get(0), data.get(1), data.get(2), data.get(3));
     }
 
     public CustomImporter(String name, String cliId, String className, String basePath) {
@@ -105,8 +107,8 @@ public class CustomImporter implements Comparable<CustomImporter> {
         return getFileFromBasePath().toURI().toURL();
     }
 
-    public String[] getAsStringArray() {
-        return new String[] {name, cliId, className, basePath};
+    public List<String> getAsStringList() {
+        return Arrays.asList(name, cliId, className, basePath);
     }
 
     @Override
