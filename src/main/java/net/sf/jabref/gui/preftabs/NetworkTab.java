@@ -24,77 +24,66 @@ import javax.swing.JPasswordField;
 import javax.swing.JLabel;
 import java.awt.Color;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.ProxyPreferences;
+import net.sf.jabref.logic.ProxyRegisterer;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class NetworkTab extends JPanel implements PrefsTab {
 
-    private final JCheckBox useProxy;
-    private final JTextField defProxyHostname;
-    private final JTextField defProxyPort;
-    private final JCheckBox useProxyAuthentication;
-    private final JTextField defProxyUsername;
-    private final JPasswordField defProxyPassword;
-    private final JLabel lblPasswordWarning;
-    private final JabRefPreferences prefs;
-    private int oldProxyConfigHash;
-    private boolean oldUseProxy, oldUseProxyAuth;
+    private final JCheckBox useProxyCheckBox;
+    private final JTextField hostnameTextField;
+    private final JTextField portTextField;
+    private final JCheckBox useAuthenticationCheckBox;
+    private final JTextField usernameTextField;
+    private final JPasswordField passwordTextField;
+    private final JLabel passwordWarningLabel;
+    private final JabRefPreferences preferences;
+    private ProxyPreferences oldProxyPreferences;
 
-
-    public NetworkTab(JabRefPreferences prefs) {
-        this.prefs = prefs;
+    public NetworkTab(JabRefPreferences preferences) {
+        this.preferences = preferences;
 
         setLayout(new BorderLayout());
 
-        useProxy = new JCheckBox(Localization.lang("Use custom proxy configuration"));
+        useProxyCheckBox = new JCheckBox(Localization.lang("Use custom proxy configuration"));
 
-        defProxyHostname = new JTextField();
-        defProxyHostname.setEnabled(false);
-        defProxyPort = new JTextField();
-        defProxyPort.setEnabled(false);
+        hostnameTextField = new JTextField();
+        hostnameTextField.setEnabled(false);
+        portTextField = new JTextField();
+        portTextField.setEnabled(false);
 
-        useProxyAuthentication = new JCheckBox(Localization.lang("Proxy requires authentication"));
-        useProxyAuthentication.setEnabled(false);
+        useAuthenticationCheckBox = new JCheckBox(Localization.lang("Proxy requires authentication"));
+        useAuthenticationCheckBox.setEnabled(false);
 
-        defProxyUsername = new JTextField();
-        defProxyUsername.setEnabled(false);
-        defProxyPassword = new JPasswordField();
-        defProxyPassword.setEnabled(false);
-        lblPasswordWarning = new JLabel(Localization.lang("Attention: Password is stored in plain text!"));
-        lblPasswordWarning.setEnabled(false);
-        lblPasswordWarning.setForeground(Color.RED);
+        usernameTextField = new JTextField();
+        usernameTextField.setEnabled(false);
+        passwordTextField = new JPasswordField();
+        passwordTextField.setEnabled(false);
+        passwordWarningLabel = new JLabel(Localization.lang("Attention: Password is stored in plain text!"));
+        passwordWarningLabel.setEnabled(false);
+        passwordWarningLabel.setForeground(Color.RED);
 
-        Insets marg = new Insets(0, 12, 3, 0);
-        useProxy.setMargin(marg);
-        defProxyPort.setMargin(marg);
-        useProxyAuthentication.setMargin(marg);
+        Insets margin = new Insets(0, 12, 3, 0);
+        useProxyCheckBox.setMargin(margin);
+        portTextField.setMargin(margin);
+        useAuthenticationCheckBox.setMargin(margin);
 
-        // We need a listener on useProxy to enable and disable the
-        // proxy related settings;
-        useProxy.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                defProxyHostname.setEnabled(useProxy.isSelected());
-                defProxyPort.setEnabled(useProxy.isSelected());
-                useProxyAuthentication.setEnabled(useProxy.isSelected());
-            }
+        // Listener on useProxyCheckBox to enable and disable the proxy related settings;
+        useProxyCheckBox.addChangeListener(event -> {
+            hostnameTextField.setEnabled(useProxyCheckBox.isSelected());
+            portTextField.setEnabled(useProxyCheckBox.isSelected());
+            useAuthenticationCheckBox.setEnabled(useProxyCheckBox.isSelected());
         });
 
-        useProxyAuthentication.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                defProxyUsername.setEnabled(useProxy.isSelected() && useProxyAuthentication.isSelected());
-                defProxyPassword.setEnabled(useProxy.isSelected() && useProxyAuthentication.isSelected());
-                lblPasswordWarning.setEnabled(useProxy.isSelected() && useProxyAuthentication.isSelected());
-            }
+        useAuthenticationCheckBox.addChangeListener(event -> {
+            usernameTextField.setEnabled(useProxyCheckBox.isSelected() && useAuthenticationCheckBox.isSelected());
+            passwordTextField.setEnabled(useProxyCheckBox.isSelected() && useAuthenticationCheckBox.isSelected());
+            passwordWarningLabel.setEnabled(useProxyCheckBox.isSelected() && useAuthenticationCheckBox.isSelected());
         });
 
         FormLayout layout = new FormLayout("8dlu, left:pref, 4dlu, left:pref, 4dlu, fill:150dlu",
@@ -102,70 +91,59 @@ public class NetworkTab extends JPanel implements PrefsTab {
         FormBuilder builder = FormBuilder.create().layout(layout);
 
         builder.addSeparator(Localization.lang("Network")).xyw(1, 1, 6);
-        builder.add(useProxy).xyw(2, 3, 5);
+        builder.add(useProxyCheckBox).xyw(2, 3, 5);
         builder.add(Localization.lang("Host") + ':').xy(2, 5);
-        builder.add(defProxyHostname).xyw(4, 5, 3);
+        builder.add(hostnameTextField).xyw(4, 5, 3);
         builder.add(Localization.lang("Port") + ':').xy(2, 7);
-        builder.add(defProxyPort).xyw(4, 7, 3);
-        builder.add(useProxyAuthentication).xyw(4, 9, 3);
+        builder.add(portTextField).xyw(4, 7, 3);
+        builder.add(useAuthenticationCheckBox).xyw(4, 9, 3);
         builder.add(Localization.lang("Username:")).xy(4, 11);
-        builder.add(defProxyUsername).xy(6, 11);
+        builder.add(usernameTextField).xy(6, 11);
         builder.add(Localization.lang("Password:")).xy(4, 13);
-        builder.add(defProxyPassword).xy(6, 13);
-        builder.add(lblPasswordWarning).xy(6, 14);
+        builder.add(passwordTextField).xy(6, 13);
+        builder.add(passwordWarningLabel).xy(6, 14);
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
-
-    }
-
-    private int getProxyConfigHash() {
-        String sb = prefs.get(JabRefPreferences.PROXY_USERNAME) + ':' +
-                prefs.get(JabRefPreferences.PROXY_PASSWORD) +
-                '@' + prefs.get(JabRefPreferences.PROXY_HOSTNAME) + ':' +
-                prefs.get(JabRefPreferences.PROXY_PORT);
-        return sb.hashCode();
     }
 
     @Override
     public void setValues() {
-        useProxy.setSelected(prefs.getBoolean(JabRefPreferences.USE_PROXY));
-        defProxyHostname.setText(prefs.get(JabRefPreferences.PROXY_HOSTNAME));
-        defProxyPort.setText(prefs.get(JabRefPreferences.PROXY_PORT));
+        ProxyPreferences proxyPreferences = ProxyPreferences.loadFromPreferences(preferences);
+        useProxyCheckBox.setSelected(proxyPreferences.isUseProxy());
+        hostnameTextField.setText(proxyPreferences.getHostname());
+        portTextField.setText(proxyPreferences.getPort());
 
-        useProxyAuthentication.setSelected(prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION));
-        defProxyUsername.setText(prefs.get(JabRefPreferences.PROXY_USERNAME));
-        defProxyPassword.setText(prefs.get(JabRefPreferences.PROXY_PASSWORD));
+        useAuthenticationCheckBox.setSelected(proxyPreferences.isUseAuthentication());
+        usernameTextField.setText(proxyPreferences.getUsername());
+        passwordTextField.setText(proxyPreferences.getPassword());
 
-        oldUseProxy = prefs.getBoolean(JabRefPreferences.USE_PROXY);
-        oldUseProxyAuth = prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION);
-        oldProxyConfigHash = getProxyConfigHash();
-
+        oldProxyPreferences = proxyPreferences;
     }
 
     @Override
     public void storeSettings() {
-        prefs.putBoolean(JabRefPreferences.USE_PROXY, useProxy.isSelected());
-        prefs.put(JabRefPreferences.PROXY_HOSTNAME, defProxyHostname.getText().trim());
-        prefs.put(JabRefPreferences.PROXY_PORT, defProxyPort.getText().trim());
-        prefs.putBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION, useProxyAuthentication.isSelected());
-        prefs.put(JabRefPreferences.PROXY_USERNAME, defProxyUsername.getText().trim());
-        prefs.put(JabRefPreferences.PROXY_PASSWORD, new String(defProxyPassword.getPassword()));
-        if ((oldUseProxy != useProxy.isSelected()) || (oldUseProxyAuth != useProxyAuthentication.isSelected())
-                || (getProxyConfigHash() != oldProxyConfigHash)) {
-            JOptionPane.showMessageDialog(null, Localization.lang("You have changed the proxy settings.").concat(" ")
-                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                    Localization.lang("Changed proxy settings"), JOptionPane.WARNING_MESSAGE);
+        Boolean useProxy = useProxyCheckBox.isSelected();
+        String hostname = hostnameTextField.getText().trim();
+        String port = portTextField.getText().trim();
+        Boolean useAuthentication = useAuthenticationCheckBox.isSelected();
+        String username = usernameTextField.getText().trim();
+        String password = new String(passwordTextField.getPassword());
+        ProxyPreferences proxyPreferences = new ProxyPreferences(useProxy, hostname, port, useAuthentication, username,
+                password);
+        if (!proxyPreferences.equals(oldProxyPreferences)) {
+            ProxyRegisterer.register(proxyPreferences);
         }
+        proxyPreferences.storeInPreferences(preferences);
     }
 
     @Override
     public boolean validateSettings() {
         boolean validSetting, validAuthenticationSetting = false;
-        if (useProxy.isSelected()) {
-            String host = defProxyHostname.getText();
-            String port = defProxyPort.getText();
+        if (useProxyCheckBox.isSelected()) {
+            String host = hostnameTextField.getText();
+            String port = portTextField.getText();
             if ((host == null) || host.trim().isEmpty() || (port == null) || port.trim().isEmpty()) {
                 validSetting = false;
             } else {
@@ -177,9 +155,9 @@ public class NetworkTab extends JPanel implements PrefsTab {
                     validSetting = false;
                 }
             }
-            if (useProxyAuthentication.isSelected()) {
-                String userName = defProxyUsername.getText();
-                char[] password = defProxyPassword.getPassword();
+            if (useAuthenticationCheckBox.isSelected()) {
+                String userName = usernameTextField.getText();
+                char[] password = passwordTextField.getPassword();
                 // no empty proxy passwords currently supported (they make no sense in this case anyway)
                 if ((userName == null) || userName.trim().isEmpty() || (password == null) || (password.length == 0)) {
                     validAuthenticationSetting = false;
