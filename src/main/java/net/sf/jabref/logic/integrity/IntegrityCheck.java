@@ -88,7 +88,7 @@ public class IntegrityCheck {
         @Override
         public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
             if(!value.contains("://")) {
-                collector.add(new IntegrityMessage(Localization.lang("should contain a protocol") + ": http[s]://, file:// or ftp://", entry, fieldName));
+                collector.add(new IntegrityMessage(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...", entry, fieldName));
             }
         }
     }
