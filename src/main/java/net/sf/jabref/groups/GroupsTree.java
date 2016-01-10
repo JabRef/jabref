@@ -24,6 +24,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
 import java.awt.event.InputEvent;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -287,11 +288,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
                 // warn if assignment has undesired side effects (modifies a
                 // field != keywords)
-                if (!Util.warnAssignmentSideEffects(
-                        new AbstractGroup[] {group},
-                        selection.getSelection(), groupSelector
-                                .getActiveBasePanel().getDatabase(),
-                        groupSelector.frame))
+                if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {group}, groupSelector.frame))
                  {
                     return; // user aborted operation
                 }
@@ -301,7 +298,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // edit has to be stored:
                 groupSelector.getActiveBasePanel().storeCurrentEdit();
 
-                AbstractUndoableEdit undo = group.add(selection.getSelection());
+                AbstractUndoableEdit undo = group.add(Arrays.asList(selection.getSelection()));
                 if (undo instanceof UndoableChangeAssignment) {
                     ((UndoableChangeAssignment) undo).setEditedNode(target);
                 }

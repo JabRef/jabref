@@ -42,6 +42,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -486,10 +487,8 @@ class GroupDialog extends JDialog {
             }
         }
         if (!vec.isEmpty()) {
-            BibEntry[] entries = new BibEntry[vec.size()];
-            vec.toArray(entries);
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mResultingGroup},
-                    entries, m_basePanel.getDatabase(), this)) {
+            ArrayList<BibEntry> entries = new ArrayList<>(vec);
+            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mResultingGroup}, this)) {
                 return;
             }
             // the undo information for a conversion to an ExplicitGroup is

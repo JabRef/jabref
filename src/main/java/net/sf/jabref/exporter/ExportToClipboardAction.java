@@ -68,7 +68,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         if (panel == null) {
             return;
         }
-        if (panel.getSelectedEntries().length == 0) {
+        if (panel.getSelectedEntries().size() == 0) {
             message = Localization.lang("No entries selected.");
             getCallBack().update();
             return;
@@ -111,8 +111,8 @@ public class ExportToClipboardAction extends AbstractWorker {
             // file, and read the contents afterwards:
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
-            BibEntry[] bes = panel.getSelectedEntries();
-            HashSet<String> entries = new HashSet<>(bes.length);
+            List<BibEntry> bes = panel.getSelectedEntries();
+            HashSet<String> entries = new HashSet<>(bes.size());
             for (BibEntry be : bes) {
                 entries.add(be.getId());
             }
@@ -135,7 +135,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             RtfSelection rs = new RtfSelection(sb.toString());
             Toolkit.getDefaultToolkit().getSystemClipboard()
                     .setContents(rs, owner);
-            message = Localization.lang("Entries exported to clipboard") + ": " + bes.length;
+            message = Localization.lang("Entries exported to clipboard") + ": " + bes.size();
 
         } catch (Exception e) {
             LOGGER.error("Error exporting to clipboard", e); //To change body of catch statement use File | Settings | File Templates.

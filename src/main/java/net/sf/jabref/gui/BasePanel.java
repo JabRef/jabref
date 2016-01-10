@@ -1350,7 +1350,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void databaseChanged(final DatabaseChangeEvent e) {
             if ((e.getType() == ChangeType.ADDED_ENTRY) && Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)
                     && frame.groupToggle.isSelected()) {
-                final BibEntry[] entries = {e.getEntry()};
+                final List<BibEntry> entries = Collections.singletonList(e.getEntry());
                 final TreePath[] selection = frame.groupSelector.getGroupsTree().getSelectionPaths();
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
@@ -2342,8 +2342,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      *
      * @return An array containing the selected entries. Is never null.
      */
-    public BibEntry[] getSelectedEntries() {
-        return mainTable.getSelectedEntries();
+    public List<BibEntry> getSelectedEntries() {
+        return Arrays.asList(mainTable.getSelectedEntries());
     }
 
     public BibDatabaseContext getBibDatabaseContext() {

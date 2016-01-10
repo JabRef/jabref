@@ -737,8 +737,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             for (GroupTreeNode node : groups) {
                                 if (node.getGroup().supportsAdd()) {
                                     // Add the entry:
-                                    AbstractUndoableEdit undo = node.getGroup().add(
-                                            new BibEntry[] {entry});
+                                    AbstractUndoableEdit undo = node.getGroup().add(Collections.singletonList(entry));
                                     if (undo instanceof UndoableChangeAssignment) {
                                         ((UndoableChangeAssignment) undo).setEditedNode(node);
                                     }

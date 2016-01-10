@@ -52,10 +52,7 @@ public class RemoveFromGroupAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent evt) {
         // warn if assignment has undesired side effects (modifies a field != keywords)
-        if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()},
-                mPanel.getSelectedEntries(),
-                mPanel.getDatabase(),
-                mPanel.frame()))
+        if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()}, mPanel.frame()))
          {
             return; // user aborted operation
         }

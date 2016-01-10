@@ -431,7 +431,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         auto.setEnabled(false);
 
         Collection<BibEntry> entries = new ArrayList<>();
-        entries.addAll(Arrays.asList(frame.getCurrentBasePanel().getSelectedEntries()));
+        entries.addAll(frame.getCurrentBasePanel().getSelectedEntries());
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
