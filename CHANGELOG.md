@@ -8,7 +8,7 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`,
 to [sourceforge bugs](https://sourceforge.net/p/jabref/bugs/) by using `bug NUM`, and
-to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by using `feature NUM`.
+to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by using `feature request NUM`.
 
 ## [Unreleased]
 
@@ -68,7 +68,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implements #470: Show editor (as an alternative to author) and booktitle (as an alternative to journal) in the main table by default
 - Restore focus to last focused tab on start
 - Add ability to format/cleanup the date field
-- Add support for proxy authentication via VM args and GUI settings, this implements Feature Request #388
+- Add support for proxy authentication via VM args and GUI settings, this implements [feature request 388](https://sourceforge.net/p/jabref/feature-requests/388/)
 - Move Bibtex and Biblatex mode switcher to File menu
 - Display active edit mode (BibTeX or Biblatex) at window title
 - Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
@@ -136,8 +136,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
    - A summary of the search result is shown in textual form in the search bar
    - The search text field changes its color based on the search result (red if nothing is found, green if at least one entry is found)
    - Autocompletion suggestions are shown in a popup
-   - Search options are available via a drop-down list, this implements Feature Request #853
-   - "Clear search" button also clears search field, this implements Feature Request #601
+   - Search options are available via a drop-down list, this implements [feature request 853](https://sourceforge.net/p/jabref/feature-requests/853/)
+   - "Clear search" button also clears search field, this implements [feature request 601](https://sourceforge.net/p/jabref/feature-requests/601/)
    - Every search is done automatically (live) as soon as the search text is changed
    - Search is local by default. To do a global search, one has to do a local search and then this search can be done globally as well, opening a new window. 
    - The local search results can be shown in a new window. 
@@ -157,7 +157,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - List of authors is now auto generated `scripts/generate-authors.sh` and inserted into L10N About.html
  - Streamline logging API: Replace usages of java.util.logging with commons.logging
  - Remove support for custom icon themes. The user has to use the default one.
- - Solved feature request #767: New subdatabase based on AUX file (biblatex)
+ - Solved [feature request 767](https://sourceforge.net/p/jabref/feature-requests/767/): New subdatabase based on AUX file (biblatex)
  - Feature: DOItoBibTeX fetcher now also handles HTTP URLs
  - Feature: "Normalize to BibTeX name format" also removes newlines
  - Tweak of preference defaults
