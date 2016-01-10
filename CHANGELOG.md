@@ -45,9 +45,9 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Fixed
 - Changes in customized entry types are now directly reflected in the table when clicking "Apply" or "OK"
-- Reference list generation works for OpenOffice/LibreOffice again, fixes #593
-- ACM fetcher works again, fixes #545
-- Use default file icon for custom external file types, fixes #598
+- Fixed #593: Reference list generation works for OpenOffice/LibreOffice again
+- Fixed #545: ACM fetcher works again
+- Fixed #598: Use default file icon for custom external file types
 - Fixed #608: Export works again
 - Fixed #417: Table now updates when switching groups
 - Fixed #534: No OpenOffice setup panel in preferences
