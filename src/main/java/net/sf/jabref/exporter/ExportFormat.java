@@ -15,20 +15,23 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
+import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -117,8 +120,6 @@ public class ExportFormat implements IExportFormat {
      * This method should return a reader from which the given layout file can
      * be read.
      * <p>
-     * This standard implementation of this method will use the
-     * {@link FileActions#getReader(String)} method.
      * <p>
      * Subclasses of ExportFormat are free to override and provide their own
      * implementation.
@@ -135,7 +136,28 @@ public class ExportFormat implements IExportFormat {
         } else {
             dir = LAYOUT_PREFIX + (directory == null ? "" : directory + '/');
         }
-        return FileActions.getReader(dir + filename);
+
+        // Attempt to get a Reader for the file path given, either by
+        // loading it as a resource (from within jar), or as a normal file. If
+        // unsuccessful (e.g. file not found), an IOException is thrown.
+        String name = dir + filename;
+        Reader reader;
+        // Try loading as a resource first. This works for files inside the jar:
+        URL reso = Globals.class.getResource(name);
+
+        // If that didn't work, try loading as a normal file URL:
+        try {
+            if (reso == null) {
+                File f = new File(name);
+                reader = new FileReader(f);
+            } else {
+                reader = new InputStreamReader(reso.openStream());
+            }
+        } catch (FileNotFoundException ex) {
+            throw new IOException("Cannot find layout file: '" + name + "'.");
+        }
+
+        return reader;
     }
 
     /**
@@ -160,7 +182,7 @@ public class ExportFormat implements IExportFormat {
         SaveSession ss = null;
         if (this.encoding != null) {
             try {
-                ss = getSaveSession(this.encoding, outFile);
+                ss = new SaveSession(this.encoding, false);
             } catch (IOException ex) {
                 // Perhaps the overriding encoding doesn't work?
                 // We will fall back on the default encoding.
@@ -168,7 +190,7 @@ public class ExportFormat implements IExportFormat {
             }
         }
         if (ss == null) {
-            ss = getSaveSession(encoding, outFile);
+            ss = new SaveSession(encoding, false);
         }
 
         try (VerifyingWriter ps = ss.getWriter()) {
@@ -202,7 +224,11 @@ public class ExportFormat implements IExportFormat {
              * be non-null, and be used to choose entries. Otherwise, it will be
              * null, and be ignored.
              */
-            List<BibEntry> sorted = FileActions.getSortedEntries(database, metaData, entryIds, false);
+            Defaults defaults = new Defaults(
+                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+            SavePreferences savePrefs = new SavePreferences(Globals.prefs, false);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(
+                    new BibDatabaseContext(database, metaData, defaults), entryIds, savePrefs);
 
             // Load default layout
             Layout defLayout;
@@ -262,8 +288,8 @@ public class ExportFormat implements IExportFormat {
             }
 
             // Write footer
-            if ((endLayout != null) && (encoding != null)) {
-                ps.write(endLayout.doLayout(database, encoding));
+            if ((endLayout != null) && (this.encoding != null)) {
+                ps.write(endLayout.doLayout(database, this.encoding));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
 
@@ -280,7 +306,7 @@ public class ExportFormat implements IExportFormat {
                 }
                 LOGGER.warn(sb);
             }
-            finalizeSaveSession(ss);
+            finalizeSaveSession(ss, outFile);
         }
 
     }
@@ -326,10 +352,6 @@ public class ExportFormat implements IExportFormat {
         return formatters;
     }
 
-    public SaveSession getSaveSession(final Charset enc, final File outFile) throws IOException {
-        return new SaveSession(outFile, enc, false);
-    }
-
     /**
      * @see net.sf.jabref.exporter.IExportFormat#getFileFilter()
      */
@@ -341,13 +363,13 @@ public class ExportFormat implements IExportFormat {
         return fileFilter;
     }
 
-    public void finalizeSaveSession(final SaveSession ss) throws SaveException, IOException {
+    public void finalizeSaveSession(final SaveSession ss, File file) throws SaveException, IOException {
         ss.getWriter().flush();
         ss.getWriter().close();
 
         if (!ss.getWriter().couldEncodeAll()) {
             LOGGER.warn("Could not encode...");
         }
-        ss.commit();
+        ss.commit(file);
     }
 }

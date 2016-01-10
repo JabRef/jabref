@@ -26,7 +26,6 @@ import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.exporter.*;
-import net.sf.jabref.exporter.FileActions.DatabaseSaveType;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.*;
@@ -82,7 +81,9 @@ import javax.swing.*;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import java.awt.*;
+
+import java.awt.BorderLayout;
+import java.awt.Toolkit;
 import java.awt.datatransfer.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -93,7 +94,6 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
-import java.util.List;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
@@ -292,9 +292,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.SAVE_AS, (BaseAction) saveAction::saveAs);
 
-        actions.put(Actions.SAVE_SELECTED_AS, new SaveSelectedAction(FileActions.DatabaseSaveType.DEFAULT));
+        actions.put(Actions.SAVE_SELECTED_AS, new SaveSelectedAction(SavePreferences.DatabaseSaveType.ALL));
 
-        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, new SaveSelectedAction(FileActions.DatabaseSaveType.PLAIN_BIBTEX));
+        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
 
         // The action for copying selected entries.
         actions.put(Actions.COPY, (BaseAction) () -> {
@@ -600,7 +600,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Run first, in EDT:
             @Override
             public void init() {
-                entries = new ArrayList<>(Arrays.asList(getSelectedEntries()));
+                entries = getSelectedEntries();
                 numSelected = entries.size();
 
                 if (entries.isEmpty()) { // None selected. Inform the user to select entries first.
@@ -888,8 +888,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void action() {
                 JabRefExecutorService.INSTANCE.execute(() -> {
-                    final BibEntry[] bes = mainTable.getSelectedEntries();
-                    final List<File> files = FileUtil.getListOfLinkedFiles(Arrays.asList(bes),
+                    final List<BibEntry> bes = Arrays.asList(mainTable.getSelectedEntries());
+                    final List<File> files = FileUtil.getListOfLinkedFiles(bes,
                             bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD));
                     for (final File f : files) {
                         try {
@@ -1192,18 +1192,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    private boolean saveDatabase(File file, boolean selectedOnly, Charset enc, FileActions.DatabaseSaveType saveType)
+    private boolean saveDatabase(File file, boolean selectedOnly, Charset enc, SavePreferences.DatabaseSaveType saveType)
             throws SaveException {
         SaveSession session;
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save database");
         try {
+            SavePreferences prefs = new SavePreferences(Globals.prefs);
+            prefs.setEncoding(enc);
+            prefs.setSaveType(saveType);
+            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
             if (selectedOnly) {
-                session = FileActions.savePartOfDatabase(bibDatabaseContext,
-                        file, Globals.prefs, mainTable.getSelectedEntries(), enc, saveType);
+                session = databaseWriter.savePartOfDatabase(bibDatabaseContext, prefs,
+                        Arrays.asList(mainTable.getSelectedEntries()));
             } else {
-                session = FileActions.saveDatabase(bibDatabaseContext,
-                        file, Globals.prefs, false, false, enc, false);
+                session = databaseWriter.saveDatabase(bibDatabaseContext, prefs);
             }
 
         } catch (UnsupportedCharsetException ex2) {
@@ -1266,7 +1269,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         if (commit) {
-            session.commit();
+            session.commit(file);
             this.encoding = enc; // Make sure to remember which encoding we used.
         } else {
             session.cancel();
@@ -2484,9 +2487,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private class SaveSelectedAction implements BaseAction {
 
-        private final DatabaseSaveType saveType;
+        private final SavePreferences.DatabaseSaveType saveType;
 
-        public SaveSelectedAction(DatabaseSaveType saveType) {
+        public SaveSelectedAction(SavePreferences.DatabaseSaveType saveType) {
             this.saveType = saveType;
         }
 

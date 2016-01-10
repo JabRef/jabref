@@ -309,11 +309,13 @@ public class JabRef {
                         if (!pr.isInvalid()) {
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + data[0]);
+                                SavePreferences prefs = new SavePreferences(Globals.prefs);
                                 Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
-                                SaveSession session = FileActions.saveDatabase(
-                                        new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults),
-                                        new File(data[0]), Globals.prefs, false, false,
-                                        Globals.prefs.getDefaultEncoding(), false);
+                                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                                SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults),
+                                        prefs);
+
+
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
@@ -323,7 +325,7 @@ public class JabRef {
                                             + " "
                                             + session.getWriter().getProblemCharacters());
                                 }
-                                session.commit();
+                                session.commit(new File(data[0]));
                             } catch (SaveException ex) {
                                 System.err.println(Localization.lang("Could not save file.") + "\n"
                                         + ex.getLocalizedMessage());
@@ -399,10 +401,14 @@ public class JabRef {
 
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + subName);
-                                Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
-                                SaveSession session = FileActions.saveDatabase(new BibDatabaseContext(newBase, defaults),
-                                        new File(subName), Globals.prefs, false, false,
-                                        Globals.prefs.getDefaultEncoding(), false);
+                                SavePreferences prefs = new SavePreferences(Globals.prefs);
+                                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                                Defaults defaults = new Defaults(BibDatabaseMode
+                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                                SaveSession session = databaseWriter.saveDatabase(
+                                        new BibDatabaseContext(newBase, defaults), prefs, false, false);
+
+
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
@@ -412,7 +418,7 @@ public class JabRef {
                                             + " "
                                             + session.getWriter().getProblemCharacters());
                                 }
-                                session.commit();
+                                session.commit(new File(subName));
                             } catch (SaveException ex) {
                                 System.err.println(Localization.lang("Could not save file.") + "\n"
                                         + ex.getLocalizedMessage());

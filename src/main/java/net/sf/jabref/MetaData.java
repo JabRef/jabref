@@ -24,7 +24,6 @@ import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.sql.DBStrings;
-import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class MetaData implements Iterable<String> {
 
@@ -258,55 +257,6 @@ public class MetaData implements Iterable<String> {
     public void setGroups(GroupTreeNode root) {
         groupsRoot = root;
         groupTreeValid = true;
-    }
-
-    /**
-     * Writes all data to the specified writer, using each object's toString()
-     * method.
-     */
-    public void writeMetaData(Writer out) throws IOException {
-        // write all meta data except groups
-        SortedSet<String> sortedKeys = new TreeSet<>(metaData.keySet());
-
-        for (String key : sortedKeys) {
-
-            StringBuffer sb = new StringBuffer();
-            sb.append(Globals.NEWLINE).append(Globals.NEWLINE);
-            List<String> orderedData = metaData.get(key);
-            sb.append("@comment{").append(META_FLAG).append(key).append(':');
-            for (String data : orderedData) {
-                sb.append(StringUtil.quote(data, ";", '\\')).append(';');
-            }
-            sb.append('}');
-
-            out.write(sb.toString());
-        }
-        // write groups if present. skip this if only the root node exists
-        // (which is always the AllEntriesGroup).
-        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
-            StringBuffer sb = new StringBuffer();
-            // write version first
-            sb.append(Globals.NEWLINE).append(Globals.NEWLINE);
-            sb.append("@comment{").append(META_FLAG).append("groupsversion:");
-            sb.append(VersionHandling.CURRENT_VERSION).append(";}");
-
-            out.write(sb.toString());
-
-            // now write actual groups
-            sb = new StringBuffer();
-            sb.append(Globals.NEWLINE).append(Globals.NEWLINE);
-            sb.append("@comment{").append(META_FLAG).append("groupstree:");
-            sb.append(Globals.NEWLINE);
-            // GroupsTreeNode.toString() uses "\n" for separation
-            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
-            while (tok.hasMoreTokens()) {
-                StringBuffer s = new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\')).append(';');
-                sb.append(s);
-                sb.append(Globals.NEWLINE);
-            }
-            sb.append('}');
-            out.write(sb.toString());
-        }
     }
 
     /**
