@@ -10,6 +10,33 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 to [sourceforge bugs](https://sourceforge.net/p/jabref/bugs/) by using `bug NUM`, and
 to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by using `feature NUM`.
 
+## [Unreleased]
+
+### Changed
+
+### Fixed
+
+### Removed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## [3.2] - 2016-01-10
 
 ### Changed
@@ -213,6 +240,7 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
+[Unreleased]: https://github.com/JabRef/jabref/compare/v3.2...HEAD
 [3.2]: https://github.com/JabRef/jabref/compare/v3.1...v3.2
 [3.1]: https://github.com/JabRef/jabref/compare/v3.0...v3.1
 [3.0]: https://github.com/JabRef/jabref/compare/v2.11.1...v3.0

@@ -1,4 +1,4 @@
-# JabRef Version 3.2
+# JabRef Development Version
 
 [![CircleCI](https://img.shields.io/circleci/project/JabRef/jabref/master.svg)](https://circleci.com/gh/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
@@ -8,6 +8,11 @@
 [![Download JabRef](https://img.shields.io/sourceforge/dw/jabref.svg)](http://sourceforge.net/projects/jabref/files/)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/pr)](http://www.issuestats.com/github/jabref/jabref)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/issue)](http://www.issuestats.com/github/jabref/jabref)
+
+This version is a development version. Features may not work as expected.
+
+The branch of this README file is `master`.
+The intention of this branch is to incorporate fixes and improvements as soon as possible and to move [JabRef] forward to modern technologies such as [Java8] and JavaFX.
 
 Development builds are available at [builds.jabref.org](http://builds.jabref.org/master/), the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
 
@@ -123,3 +128,6 @@ See [external libraries](external-libraries.txt) for details.
   [BibTeX]: https://www.ctan.org/pkg/bibtex
   [Biblatex]: https://www.ctan.org/pkg/biblatex
   [install4j]: https://www.ej-technologies.com/products/install4j/overview.html
+  [JabRef]: http://www.jabref.org
+  [Java8]: http://docs.oracle.com/javase/8/docs/technotes/guides/language/enhancements.html#javase8
+  [JavaFX]: http://docs.oracle.com/javase/8/javafx/get-started-tutorial/jfx-overview.htm
