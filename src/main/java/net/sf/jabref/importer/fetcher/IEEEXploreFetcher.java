@@ -146,7 +146,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //parse the page into Bibtex entries
             Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage);
             if (parsedBibtexCollection == null) {
-                status.showMessage(Localization.lang("Error occured parsing Bibtex returned from IEEEXplore"),
+                status.showMessage(Localization.lang("Error occured parsing BibTeX returned from IEEEXplore"),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
