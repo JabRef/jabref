@@ -39,8 +39,8 @@ gradle.taskGraph.whenReady { taskGraph ->
 }
 
 group = "net.sf.jabref"
-version = "3.2dev"
-project.ext.threeDotVersion = "3.1.0.1"
+version = "3.2"
+project.ext.threeDotVersion = "3.2.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
