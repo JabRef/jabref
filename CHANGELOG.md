@@ -41,20 +41,20 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Changed
 - All import/open database warnings are now shown in a scrolling text area
-- Add an integrity check to ensure that a url has a correct protocol, implements #358
+- Add an integrity check to ensure that a url has a correct protocol, implements [#358](https://github.com/JabRef/jabref/issues/358)
 
 ### Fixed
 - Changes in customized entry types are now directly reflected in the table when clicking "Apply" or "OK"
-- Fixed #593: Reference list generation works for OpenOffice/LibreOffice again
-- Fixed #545: ACM fetcher works again
-- Fixed #598: Use default file icon for custom external file types
-- Fixed #608: Export works again
-- Fixed #417: Table now updates when switching groups
-- Fixed #534: No OpenOffice setup panel in preferences
-- Fixed #545: ACM fetcher works again
-- Fixed #593: Reference list generation works for OpenOffice/LibreOffice again
-- Fixed #598: Use default file icon for custom external file types
-- Fixed #607: OpenOffice/LibreOffice works on OSX again
+- Fixed [#593](https://github.com/JabRef/jabref/issues/593): Reference list generation works for OpenOffice/LibreOffice again
+- Fixed [#545](https://github.com/JabRef/jabref/issues/545): ACM fetcher works again
+- Fixed [#598](https://github.com/JabRef/jabref/issues/598): Use default file icon for custom external file types
+- Fixed [#608](https://github.com/JabRef/jabref/issues/608): Export works again
+- Fixed [#417](https://github.com/JabRef/jabref/issues/417): Table now updates when switching groups
+- Fixed [#534](https://github.com/JabRef/jabref/issues/534): No OpenOffice setup panel in preferences
+- Fixed [#545](https://github.com/JabRef/jabref/issues/545): ACM fetcher works again
+- Fixed [#593](https://github.com/JabRef/jabref/issues/593): Reference list generation works for OpenOffice/LibreOffice again
+- Fixed [#598](https://github.com/JabRef/jabref/issues/598): Use default file icon for custom external file types
+- Fixed [#607](https://github.com/JabRef/jabref/issues/607): OpenOffice/LibreOffice works on OSX again
 
 ### Removed
 - OpenOffice/LibreOffice is removed from the push-to-application button and only accessed through the side panel
@@ -65,50 +65,50 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Changed
 - Added new DoiResolution fetcher that tries to download full text PDF from DOI link
 - Add options to close other/all databases in tab right-click menu
-- Implements #470: Show editor (as an alternative to author) and booktitle (as an alternative to journal) in the main table by default
+- Implements [#470](https://github.com/JabRef/jabref/issues/470): Show editor (as an alternative to author) and booktitle (as an alternative to journal) in the main table by default
 - Restore focus to last focused tab on start
 - Add ability to format/cleanup the date field
 - Add support for proxy authentication via VM args and GUI settings, this implements [feature request 388](https://sourceforge.net/p/jabref/feature-requests/388/)
 - Move Bibtex and Biblatex mode switcher to File menu
 - Display active edit mode (BibTeX or Biblatex) at window title
-- Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
-- Icons are shown as Header for icon columns in the entry table (#315)
-- Tooltips are shown for header columns and contents which are too wide to be displayed in the entry table (#384)
+- Implements [#444](https://github.com/JabRef/jabref/issues/444): The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field.
+- Icons are shown as Header for icon columns in the entry table ([#315](https://github.com/JabRef/jabref/issues/315))
+- Tooltips are shown for header columns and contents which are too wide to be displayed in the entry table ([#384](https://github.com/JabRef/jabref/issues/384))
 - Default order in entry table:  # | all file based icons (file, URL/DOI, ...) | all bibtex field based icons (bibtexkey, entrytype, author, title, ...) | all activated special field icons (ranking, quality, ...)
 - Write all field keys in lower case. No more camel casing of field names. E.g., `title` is written instead of `Title`, `howpublished` instead of `HowPublished`, and `doi` instead of `DOI`. The configuration option `Use camel case for field names (e.g., "HowPublished" instead of "howpublished")` is gone.
 - All field saving options are removed. There is no more customization of field sorting. '=' is now appended to the field key instead of its value. The intendation is aligned for an entry and not for the entire database. Entry names are written in title case format.
 - Entries are only reformatted if they were changed during a session. There is no more mandatory reformatting of the entire database on save.
-- Implements #565: Highlighting matches works now also for regular expressions in preview panel and entry editor
+- Implements [#565](https://github.com/JabRef/jabref/issues/565): Highlighting matches works now also for regular expressions in preview panel and entry editor
 - IEEEXplore search now downloads the full Bibtex record instead of parsing the fields from the HTML webpage result (fixes [bug 1146](https://sourceforge.net/p/jabref/bugs/1146/) and [bug 1267](https://sourceforge.net/p/jabref/bugs/1267/))
 - Christmas color theme (red and green)
 
 ### Fixed
 - Fixed [bug 482](https://sourceforge.net/p/jabref/bugs/482/) partly: escaped brackets are now parsed properly when opening a bib file
-- Fixed #479: Import works again
-- Fixed #434: Revert to old 'JabRef' installation folder name instead of 'jabref'
-- Fixed #435: Retrieve non open access ScienceDirect PDFs via HTTP DOM
+- Fixed [#479](https://github.com/JabRef/jabref/issues/479): Import works again
+- Fixed [#434](https://github.com/JabRef/jabref/issues/434): Revert to old 'JabRef' installation folder name instead of 'jabref'
+- Fixed [#435](https://github.com/JabRef/jabref/issues/435): Retrieve non open access ScienceDirect PDFs via HTTP DOM
 - Fixed: Cleanup process aborts if linked file does not exists
-- Fixed #420: Reenable preference changes
-- Fixed #414: Rework BibLatex entry types with correct required and optional fields
-- Fixed #413: Help links in released jar version are not working
-- Fixes #412: Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete.
-- Fixed #437: The toolbar after the search field is now correctly wrapped when using a small window size for JabRef
-- Fixed #438: Cut, Copy and Paste are now translated correctly in the menu
-- Fixed #443/#445: Fixed sorting and moving special field columns
-- Fixed #498: non-working legacy PDF/PS column removed
-- Fixed #473: Import/export to external database works again
-- Fixed #526: OpenOffice/LibreOffice connection works again on Linux/OSX
-- Fixed #533: Preview parsed incorrectly when regular expression was enabled
+- Fixed [#420](https://github.com/JabRef/jabref/issues/420): Reenable preference changes
+- Fixed [#414](https://github.com/JabRef/jabref/issues/414): Rework BibLatex entry types with correct required and optional fields
+- Fixed [#413](https://github.com/JabRef/jabref/issues/413): Help links in released jar version are not working
+- Fixes [#412](https://github.com/JabRef/jabref/issues/412): Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete.
+- Fixed [#437](https://github.com/JabRef/jabref/issues/437): The toolbar after the search field is now correctly wrapped when using a small window size for JabRef
+- Fixed [#438](https://github.com/JabRef/jabref/issues/438): Cut, Copy and Paste are now translated correctly in the menu
+- Fixed [#443](https://github.com/JabRef/jabref/issues/443)/[#445](https://github.com/JabRef/jabref/issues/445): Fixed sorting and moving special field columns
+- Fixed [#498](https://github.com/JabRef/jabref/issues/498): non-working legacy PDF/PS column removed
+- Fixed [#473](https://github.com/JabRef/jabref/issues/473): Import/export to external database works again
+- Fixed [#526](https://github.com/JabRef/jabref/issues/526): OpenOffice/LibreOffice connection works again on Linux/OSX
+- Fixed [#533](https://github.com/JabRef/jabref/issues/533): Preview parsed incorrectly when regular expression was enabled
 - Fixed: MedlinePlain Importer made more resistant for malformed entries
-- Fixed #564: Cite command changes are immediately reflected in the push-to-application actions, and not only after restart
+- Fixed [#564](https://github.com/JabRef/jabref/issues/564): Cite command changes are immediately reflected in the push-to-application actions, and not only after restart
 
 ### Removed
 - Removed BioMail format importer
 - Removed file history size preference (never available from the UI)
 - Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
 - Removed ScifinderImporter because it's hardly ever used, and we could not get resource files to test against
-- Removed option "Show one letter heading for icon columns" which is obsolete with the fix of #315/384
-- Removed table column "PDF/PS" which refers to legacy fields "ps" resp. "pdf" which are no longer supported (see also fix #498)
+- Removed option "Show one letter heading for icon columns" which is obsolete with the fix of [#315](https://github.com/JabRef/jabref/issues/315)/[#384](https://github.com/JabRef/jabref/issues/384)
+- Removed table column "PDF/PS" which refers to legacy fields "ps" resp. "pdf" which are no longer supported (see also fix [#498](https://github.com/JabRef/jabref/issues/498))
 - Removed the ability to export references on the CLI interface based on year ranges
 
 
@@ -145,11 +145,11 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
  - Added more characters to HTML/Unicode converter
  - Feature: Push citations to Texmaker ([bug 318](https://sourceforge.net/p/jabref/bugs/318/), [bug 582](https://sourceforge.net/p/jabref/bugs/582/))
  - Case changers improved to honor words (not yet more than single words) within {}
- - Feature: Added converters from HTML and Unicode to LaTeX on right click in text fields (#191)
+ - Feature: Added converters from HTML and Unicode to LaTeX on right click in text fields ([#191](https://github.com/JabRef/jabref/issues/191))
  - Feature: Add an option to the FileList context menu to delete an associated file from the file system
  - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"
  - The default language is now automatically set to the system's locale.
- - Use correct encoding names (#155) and replace old encoding names in bibtex files. This changes the file header.
+ - Use correct encoding names ([#155](https://github.com/JabRef/jabref/issues/155)) and replace old encoding names in bibtex files. This changes the file header.
  - No longer write JabRef version to BibTex file header.
  - No longer add blank lines inside a bibtex entry
  - Feature: When pasting a Google search URL, meta data will be automatically stripped before insertion.
@@ -181,20 +181,20 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Fixed
  - Fixed the bug that the file encoding was not correctly determined from the first (or second) line
- - Fixed #325: Deactivating AutoCompletion crashes EntryEditor
+ - Fixed [#325](https://github.com/JabRef/jabref/issues/325): Deactivating AutoCompletion crashes EntryEditor
  - Fixed bug when having added and then removed a personal journal list, an exception is always shown on startup
  - Fixed a bug in the IEEEXploreFetcher
  - Fixed [bug 1282](https://sourceforge.net/p/jabref/bugs/1282/) related to backslashes duplication.
  - Fixed [bug 1285](https://sourceforge.net/p/jabref/bugs/1285/): Editing position is not lost on saving
  - Fixed [bug 1297](https://sourceforge.net/p/jabref/bugs/1297/): No console message on closing
- - Fixed #194: JabRef starts again on Win XP and Win Vista
+ - Fixed [#194](https://github.com/JabRef/jabref/issues/194): JabRef starts again on Win XP and Win Vista
  - Fixed: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
- - Fixed #173: Personal journal abbreviation list is not loaded twice
+ - Fixed [#173](https://github.com/JabRef/jabref/issues/173): Personal journal abbreviation list is not loaded twice
  - Bugfix: Preview of external journal abbreviation list now displays the correct list
- - Fixed #223: Window is displayed in visible area even when having multiple screens
+ - Fixed [#223](https://github.com/JabRef/jabref/issues/223): Window is displayed in visible area even when having multiple screens
  - Localization tweaks: "can not" -> "cannot" and "file name" -> "filename"
  - Fixed: When reconfiguring the BibTeX key generator, changes are applied instantly without requiring a restart of JabRef
- - Fixed #250: No hard line breaks after 70 chars in serialized JabRef meta data
+ - Fixed [#250](https://github.com/JabRef/jabref/issues/250): No hard line breaks after 70 chars in serialized JabRef meta data
  - Fixed [bug 1296](https://sourceforge.net/p/jabref/bugs/1296/): External links in the help open in the standard browser
  - Fixed behavior of opening files: If an existing database is opened, it is focused now instead of opening it twice.
 
@@ -228,13 +228,13 @@ Since much functionality has changed during development, a release of this versi
 ## [dev_2.11] - unreleased
 
 ### Fixed
- - Fix #345: Remove history from help file
+ - Fix [#345](https://github.com/JabRef/jabref/issues/345): Remove history from help file
 
 ## [2.11.1] - 2015-11-16
 
 ### Fixed
- - Backports from 2.80: Fixed #250: No hard line breaks after 70 chars in serialized JabRef meta data
- - Backports from 2.80: Fixed #325: Deactivating AutoCompletion crashes EntryEditor
+ - Backports from 2.80: Fixed [#250](https://github.com/JabRef/jabref/issues/250): No hard line breaks after 70 chars in serialized JabRef meta data
+ - Backports from 2.80: Fixed [#325](https://github.com/JabRef/jabref/issues/325): Deactivating AutoCompletion crashes EntryEditor
 
 ## 2.11 - 2015-11-11
 
