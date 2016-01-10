@@ -308,6 +308,7 @@ if (hasProperty('dev')) {
 // has to be defined AFTER 'dev' things to have the correct project.version
 task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     projectFile = file('jabref.install4j')
+    release = project.version
     variables = [
         versionFourDots: project.ext.threeDotVersion,
         buildFileName: jar.archiveName,
