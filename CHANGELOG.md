@@ -22,7 +22,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - MS Office 2007 export is working again
 
 ### Removed
-
+- Fixed #627: The pdf field is removed from the export formats, use the file field
 
 
 
