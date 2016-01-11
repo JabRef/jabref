@@ -1027,4 +1027,23 @@ public class BibtexParserTest {
         BibEntry e = c.iterator().next();
         Assert.assertEquals("ups  sala", e.getField("file"));
     }
+
+    /**
+     * Test for #650
+     */
+    @Test
+    public void parseHandlesAccentsCorrectly() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author = {H\'{e}lne Fiaux}}"));
+        Assert.assertFalse(result.hasWarnings());
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, e.getType());
+        Assert.assertEquals("test", e.getCiteKey());
+        Assert.assertEquals("H\'{e}lne Fiaux", e.getField("author"));
+    }
+
 }
