@@ -42,6 +42,7 @@ import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
+import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
@@ -1326,5 +1327,27 @@ public class JabRefPreferences {
         storage.put(CLEANUP_UNICODE, preset.isConvertUnicodeToLatex());
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
+    }
+
+    public SaveOrderConfig retriveExportOrderConfig() {
+        SaveOrderConfig config = new SaveOrderConfig();
+        config.sortCriteria[0].field = get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD);
+        config.sortCriteria[0].descending = getBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING);
+        config.sortCriteria[1].field = get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD);
+        config.sortCriteria[1].descending = getBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING);
+        config.sortCriteria[2].field = get(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD);
+        config.sortCriteria[2].descending = getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING);
+
+        return config;
+    }
+
+    public void storeExportOrderConfig(SaveOrderConfig config) {
+        prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, config.sortCriteria[0].descending);
+        prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, config.sortCriteria[1].descending);
+        prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, config.sortCriteria[2].descending);
+
+        prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, config.sortCriteria[0].field);
+        prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, config.sortCriteria[1].field);
+        prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, config.sortCriteria[2].field);
     }
 }
