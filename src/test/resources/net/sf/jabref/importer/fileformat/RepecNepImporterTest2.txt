@@ -1,0 +1,68 @@
+From ernad at nep.repec.org  Wed Nov  2 03:26:25 2005
+From: ernad at nep.repec.org (Laszlo A. Koczy)
+Date: Wed Nov  2 03:26:27 2005
+Subject: [nep-gth] 2005-10-29, 16 papers
+Message-ID: <E1EXEsz-0001H7-PM@snefru.openlib.org>
+
+
+----------------------------------------------------------------------------
+NEP: New Economics Papers
+Game Theory
+----------------------------------------------------------------------------
+
+Edited by: L?szl? ?. K?czy 
+           http://ideas.repec.org/e/pko27.html
+           Universiteit Maastricht
+Date:      2005-10-29-100-347-9922
+Papers:	   16
+
+This document is in the public domain, feel free to circulate it.
+
+   +++++++++++++++++++++++++++++++++++++++++++++++++++
+   + Note: Access to full contents may be restricted +
+   +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+ 
+In this issue we have:
+----------------------------------------------------------------------------
+
+1. Weak Monotonicity and Bayes-Nash Incentive Compatibility
+     M?ller,Rudolf; Perea,Andr?s; Wolf,Sascha
+     Date: 2005-10-29-100-23423
+ 
+----------------------------------------------------------------------------
+
+1. Weak Monotonicity and Bayes-Nash Incentive Compatibility
+  
+    M?ller,Rudolf
+    Perea,Andr?s
+    Wolf,Sascha 
+
+An allocation rule is called Bayes-Nash incentive compatible, if 
+there exists a payment rule, such that truthful reports of 
+agents? types form a Bayes-Nash equilibrium in the 
+directrevelation mechanism consisting of the allocation rule and 
+the payment rule. This paperprovides characterizations of Bayes-
+Nash incentive compatible allocation rules in socialchoice 
+settings where agents have one-dimensional or multi-dimensional 
+types, quasi-linearutility functions and interdependent 
+valuations. The characterizations are derived byconstructing 
+complete directed graphs on agents? type spaces with cost of 
+manipulationas lengths of edges. Weak monotonicity of the 
+allocation rule corresponds to the conditionthat all 2-cycles in 
+these graphs have non-negative length.For one-dimensional types 
+and agents? valuation functions satisfying non-
+decreasingexpected differences, we show that weak monotonicity of 
+the allocation rule is a necessaryand sufficient condition for 
+the rule to be Bayes-Nash incentive compatibile. In the casewhere 
+types are multi-dimensional and the valuation for each outcome is 
+a linear functionin the agent?s type, we show that weak 
+monotonicity of the allocation rule together withan integrability 
+condition is a necessary and sufficient condition for Bayes-Nash 
+incentivecompatibility.
+ 
+Keywords: mathematical economics;
+Date:     2005-08-31
+URL:      http://d.repec.org/n?u=RePEc:dgr:umamet:2005039&r=gth
+
+
