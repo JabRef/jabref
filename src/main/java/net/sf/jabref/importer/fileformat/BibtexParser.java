@@ -795,7 +795,7 @@ public class BibtexParser {
                     // return what we
                     // have found, as the key and try to restore the rest in fixKey().
                     return token + fixKey();
-                } else if (character == ',') {
+                } else if (character == ',' || character == '}') {
                     unread(character);
                     return token.toString();
                 } else if (character == '=') {
