@@ -62,7 +62,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<PostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
-
     static {
         // Add the action for checking for new custom entry types loaded from
         // the bib file:
@@ -104,13 +103,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         openFiles(filesToOpen, true);
     }
 
-
     class OpenItSwingHelper implements Runnable {
 
         private final BasePanel basePanel;
         private final boolean raisePanel;
         private final File file;
-
 
         OpenItSwingHelper(BasePanel basePanel, File file, boolean raisePanel) {
             this.basePanel = basePanel;
@@ -124,7 +121,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         }
     }
-
 
     /**
      * Opens the given file. If null or 404, nothing happens
@@ -450,10 +446,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // Except if there is already a @ symbol signalising the starting of a BibEntry
                     Integer atSymbolIndex = line.indexOf("@");
                     String encoding;
-                    if(atSymbolIndex > 0)
+                    if (atSymbolIndex > 0) {
                         encoding = line.substring(Globals.encPrefix.length(), atSymbolIndex);
-                    else
+                    } else {
                         encoding = line.substring(Globals.encPrefix.length());
+                    }
 
                     return Optional.of(Charset.forName(encoding));
                 } else {
