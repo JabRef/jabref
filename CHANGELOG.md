@@ -14,7 +14,6 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Changed
 - OvidImporter now also imports fields: doi, issn, language and keywords
-- All import/open database warnings are now shown in a scrolling text area
 - Implemented [#647](https://github.com/JabRef/jabref/issues/647): The preview can now be copied
 
 ### Fixed
