@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- OvidImporter now also imports fields: doi, issn, language and keywords
 
 ### Fixed
 - Make BibTex parser more robust against missing newlines
