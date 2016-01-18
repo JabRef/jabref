@@ -139,15 +139,15 @@ public class OvidImporter extends ImportFormat {
 
                     h.put("author", content);
 
-                } else if (fieldName.indexOf("Title") == 0) {
+                } else if (fieldName.startsWith("Title")) {
                     content = content.replaceAll("\\[.+\\]", "").trim();
                     if (content.endsWith(".")) {
                         content = content.substring(0, content.length() - 1);
                     }
                     h.put("title", content);
-                } else if (fieldName.indexOf("Chapter Title") == 0) {
+                } else if (fieldName.startsWith("Chapter Title")) {
                     h.put("chaptertitle", content);
-                } else if (fieldName.indexOf("Source") == 0) {
+                } else if (fieldName.startsWith("Source")) {
                     Matcher matcher;
                     if ((matcher = OvidImporter.ovid_src_pat.matcher(content)).find()) {
                         h.put("journal", matcher.group(1));
@@ -199,6 +199,15 @@ public class OvidImporter extends ImportFormat {
                     } else if (content.contains("Conference Paper")) {
                         h.put("entrytype", "inproceedings");
                     }
+                } else if (fieldName.startsWith("Language")) {
+                    h.put("language", content);
+                } else if (fieldName.startsWith("Author Keywords")) {
+                    content = content.replaceAll(";", ",").replaceAll("  ", " ");
+                    h.put("keywords", content);
+                } else if (fieldName.startsWith("ISSN")) {
+                    h.put("issn", content);
+                } else if (fieldName.startsWith("DOI Number")) {
+                    h.put("doi", content);
                 }
             }
 
