@@ -119,6 +119,20 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseRecognizesEntryOnlyWithKey() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@article{test}"));
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, e.getType());
+        Assert.assertEquals("test", e.getCiteKey());
+    }
+
+    @Test
     public void parseRecognizesEntryWithWhitespaceAtBegining() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader(" @article{test,author={Ed von Test}}"));
@@ -344,23 +358,23 @@ public class BibtexParserTest {
     @Test
     public void parseRecognizesHeaderButIgnoresEncoding() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(
-                    "This file was created with JabRef 2.1 beta 2."
-                            + "\n"
-                            + "Encoding: Cp1252"
-                            + "\n"
-                            + ""
-                            + "\n"
-                            + "@INPROCEEDINGS{CroAnnHow05,"
-                            + "\n"
-                            + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},"
-                            + "\n"
-                            + "  title = {Effective work practices for floss development: A model and propositions},"
-                            + "\n"
-                            + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
-                            + "\n" + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n"
-                            + "  timestamp = {2006.05.29}," + "\n"
-                            + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"
-                ));
+                "This file was created with JabRef 2.1 beta 2."
+                        + "\n"
+                        + "Encoding: Cp1252"
+                        + "\n"
+                        + ""
+                        + "\n"
+                        + "@INPROCEEDINGS{CroAnnHow05,"
+                        + "\n"
+                        + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},"
+                        + "\n"
+                        + "  title = {Effective work practices for floss development: A model and propositions},"
+                        + "\n"
+                        + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
+                        + "\n" + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n"
+                        + "  timestamp = {2006.05.29}," + "\n"
+                        + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"
+        ));
         Assert.assertNull(result.getEncoding());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
@@ -383,17 +397,17 @@ public class BibtexParserTest {
     @Test
     public void parseRecognizesFormatedEntry() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(
-                    "@INPROCEEDINGS{CroAnnHow05,"
-                            + "\n"
-                            + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},"
-                            + "\n"
-                            + "  title = {Effective work practices for floss development: A model and propositions},"
-                            + "\n"
-                            + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
-                            + "\n" + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n"
-                            + "  timestamp = {2006.05.29}," + "\n"
-                            + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"
-                ));
+                "@INPROCEEDINGS{CroAnnHow05,"
+                        + "\n"
+                        + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},"
+                        + "\n"
+                        + "  title = {Effective work practices for floss development: A model and propositions},"
+                        + "\n"
+                        + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
+                        + "\n" + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n"
+                        + "  timestamp = {2006.05.29}," + "\n"
+                        + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"
+        ));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
 
@@ -409,7 +423,7 @@ public class BibtexParserTest {
         Assert.assertEquals("oezbek", e.getField("owner"));
         Assert.assertEquals("2006.05.29", e.getField("timestamp"));
         Assert.assertEquals("http://james.howison.name/publications.html", e.getField("url"));
-     }
+    }
 
     @Test
     public void parseRecognizesFieldValuesInQuotationMarks() throws IOException {
@@ -496,15 +510,15 @@ public class BibtexParserTest {
     @Test
     public void parseReturnsEmptyListIfNoEntryRecognized() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(
-                    "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},"
-                            + "\n"
-                            + "  title = {Effective work practices for floss development: A model and propositions},"
-                            + "\n"
-                            + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
-                            + "\n" + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n"
-                            + "  timestamp = {2006.05.29}," + "\n"
-                            + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"
-                ));
+                "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},"
+                        + "\n"
+                        + "  title = {Effective work practices for floss development: A model and propositions},"
+                        + "\n"
+                        + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
+                        + "\n" + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n"
+                        + "  timestamp = {2006.05.29}," + "\n"
+                        + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"
+        ));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(0, c.size());
     }
@@ -1046,4 +1060,37 @@ public class BibtexParserTest {
         Assert.assertEquals("H\'{e}lne Fiaux", e.getField("author"));
     }
 
+    /**
+     * Test for #669
+     */
+    @Test
+    public void parsePreambleAndEntryWithoutNewLine() throws IOException {
+
+        ParserResult result = BibtexParser.parse(
+                new StringReader("@preamble{some text and \\latex}@article{test,author = {H\'{e}lne Fiaux}}"));
+        Assert.assertFalse(result.hasWarnings());
+
+        Assert.assertEquals("some text and \\latex", result.getDatabase().getPreamble());
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, e.getType());
+        Assert.assertEquals("test", e.getCiteKey());
+        Assert.assertEquals("H\'{e}lne Fiaux", e.getField("author"));
+    }
+
+    /**
+     * Test for #669
+     */
+    @Test
+    public void parseFileHeaderAndPreambleWithoutNewLine() throws IOException {
+
+        ParserResult result = BibtexParser.parse(
+                new StringReader("% Encoding: US-ASCII@preamble{some text and \\latex}"));
+        Assert.assertFalse(result.hasWarnings());
+
+        Assert.assertEquals("some text and \\latex", result.getDatabase().getPreamble());
+    }
 }

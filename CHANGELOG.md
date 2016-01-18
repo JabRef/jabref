@@ -15,6 +15,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Changed
 
 ### Fixed
+- Make BibTex parser more robust against missing newlines
+- Fix bug that prevented the import of BibTex entries having only a key as content
 
 ### Removed
 
