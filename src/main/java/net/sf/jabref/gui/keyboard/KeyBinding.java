@@ -18,6 +18,7 @@ public enum KeyBinding {
     COPY_CITE_BIBTEX_KEY("Copy \\cite{BibTeX key}", Localization.lang("Copy \\cite{BibTeX key}"), "ctrl K"),
     COPY_BIBTEX_KEY("Copy BibTeX key", Localization.lang("Copy BibTeX key"), "ctrl shift K"),
     COPY_BIBTEX_KEY_AND_TITLE("Copy BibTeX key and title", Localization.lang("Copy BibTeX key and title"), "ctrl shift alt K"),
+    COPY_PREVIEW("Copy preview", Localization.lang("Copy preview"), "ctrl shift C"),
     CUT("Cut", Localization.lang("Cut"), "ctrl X"),
     DECREASE_TABLE_FONT_SIZE("Decrease table font size", Localization.lang("Decrease table font size"), "ctrl MINUS"),
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE"),
