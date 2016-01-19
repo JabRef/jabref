@@ -19,7 +19,6 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Fixed
 - Make BibTex parser more robust against missing newlines
 - Fix bug that prevented the import of BibTex entries having only a key as content
-- MS Office 2007 export is working again
 - Fixed [#666](https://github.com/JabRef/jabref/issues/666): MS Office 2007 export is working again
 
 ### Removed
