@@ -31,6 +31,9 @@ public class MetaData implements Iterable<String> {
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
     static final String DATABASE_TYPE = "DATABASE_TYPE";
+    public static final String GROUPSVERSION = "groupsversion";
+    public static final String GROUPSTREE = "groupstree";
+    public static final String GROUPS = "groups";
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
@@ -69,16 +72,16 @@ public class MetaData implements Iterable<String> {
                 } catch (IOException ex) {
                     System.err.println("Weird error while parsing meta data.");
                 }
-                if ("groupsversion".equals(entry.getKey())) {
+                if (GROUPSVERSION.equals(entry.getKey())) {
                     if (!orderedData.isEmpty()) {
                         groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
                     }
-                } else if ("groupstree".equals(entry.getKey())) {
+                } else if (GROUPSTREE.equals(entry.getKey())) {
                     groupsTreePresent = true;
                     treeGroupsData = orderedData; // save for later user
                     // actual import operation is handled later because "groupsversion"
                     // tag might not yet have been read
-                } else if ("groups".equals(entry.getKey())) {
+                } else if (GROUPS.equals(entry.getKey())) {
                     flatGroupsData = orderedData;
                 } else {
                     putData(entry.getKey(), orderedData);

@@ -46,8 +46,9 @@ public class BibDatabaseWriter {
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     private static final Log LOGGER = LogFactory.getLog(BibDatabaseWriter.class);
+    private BibEntry exceptionCause;
 
-    private static List<Comparator<BibEntry>> getSaveComparators(SavePreferences prefs, MetaData metaData) {
+    private static List<Comparator<BibEntry>> getSaveComparators(SavePreferences preferences, MetaData metaData) {
 
         /* three options:
          * 1. original order
@@ -57,7 +58,7 @@ public class BibDatabaseWriter {
 
         List<Comparator<BibEntry>> comparators = new ArrayList<>();
 
-        if (shouldSaveInOriginalOrder(prefs, metaData)) {
+        if (shouldSaveInOriginalOrder(preferences, metaData)) {
             // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be sorted based on their creation order,
             // utilizing the fact that IDs used for entries are increasing, sortable numbers.
@@ -65,7 +66,7 @@ public class BibDatabaseWriter {
             comparators.add(new CrossRefEntryComparator());
             comparators.add(new IdComparator());
         } else {
-            if (prefs.isSaveOperation()) {
+            if (preferences.isSaveOperation()) {
                 List<String> storedSaveOrderConfig = metaData.getData(
                         net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
 
@@ -74,21 +75,21 @@ public class BibDatabaseWriter {
                     SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
                     assert!saveOrderConfig.saveInOriginalOrder;
                     assert saveOrderConfig.saveInSpecifiedOrder;
-                    prefs.pri = saveOrderConfig.sortCriteria[0].field;
-                    prefs.sec = saveOrderConfig.sortCriteria[1].field;
-                    prefs.ter = saveOrderConfig.sortCriteria[2].field;
-                    prefs.priD = saveOrderConfig.sortCriteria[0].descending;
-                    prefs.secD = saveOrderConfig.sortCriteria[1].descending;
-                    prefs.terD = saveOrderConfig.sortCriteria[2].descending;
+                    preferences.pri = saveOrderConfig.sortCriteria[0].field;
+                    preferences.sec = saveOrderConfig.sortCriteria[1].field;
+                    preferences.ter = saveOrderConfig.sortCriteria[2].field;
+                    preferences.priD = saveOrderConfig.sortCriteria[0].descending;
+                    preferences.secD = saveOrderConfig.sortCriteria[1].descending;
+                    preferences.terD = saveOrderConfig.sortCriteria[2].descending;
                 }
             }
 
-            if (prefs.isSaveOperation()) {
+            if (preferences.isSaveOperation()) {
                 comparators.add(new CrossRefEntryComparator());
             }
-            comparators.add(new FieldComparator(prefs.pri, prefs.priD));
-            comparators.add(new FieldComparator(prefs.sec, prefs.secD));
-            comparators.add(new FieldComparator(prefs.ter, prefs.terD));
+            comparators.add(new FieldComparator(preferences.pri, preferences.priD));
+            comparators.add(new FieldComparator(preferences.sec, preferences.secD));
+            comparators.add(new FieldComparator(preferences.ter, preferences.terD));
             comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
         }
 
@@ -102,7 +103,7 @@ public class BibDatabaseWriter {
      * global preference of saving in standard order.
      */
     public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, Set<String> keySet,
-            SavePreferences prefs) {
+            SavePreferences preferences) {
 
         //if no meta data are present, simply return in original order
         if (bibDatabaseContext.getMetaData() == null) {
@@ -111,7 +112,7 @@ public class BibDatabaseWriter {
             return result;
         }
 
-        List<Comparator<BibEntry>> comparators = BibDatabaseWriter.getSaveComparators(prefs,
+        List<Comparator<BibEntry>> comparators = BibDatabaseWriter.getSaveComparators(preferences,
                 bibDatabaseContext.getMetaData());
         FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
 
@@ -127,9 +128,9 @@ public class BibDatabaseWriter {
         return sorted;
     }
 
-    private static boolean shouldSaveInOriginalOrder(SavePreferences prefs, MetaData metaData) {
+    private static boolean shouldSaveInOriginalOrder(SavePreferences preferences, MetaData metaData) {
         boolean inOriginalOrder;
-        if (prefs.isSaveOperation()) {
+        if (preferences.isSaveOperation()) {
             List<String> storedSaveOrderConfig = metaData.getData(
                     net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             if (storedSaveOrderConfig == null) {
@@ -146,102 +147,37 @@ public class BibDatabaseWriter {
 
     private BibtexString.Type previousStringType;
 
-    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences prefs)
+    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences)
             throws SaveException {
-        return saveDatabase(bibDatabaseContext, prefs, false, false);
+        return saveDatabase(bibDatabaseContext, preferences, false, false);
     }
 
     /**
      * Saves the database to file. Two boolean values indicate whether only
-     * entries with a nonzero Globals.SEARCH value and only entries with a
-     * nonzero Globals.GROUPSEARCH value should be saved. This can be used to
+     * entries which are marked as search / group hit should be saved. This can be used to
      * let the user save only the results of a search. False and false means all
      * entries are saved.
      */
-    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences prefs, boolean checkSearch,
-            boolean checkGroup) throws SaveException {
-        return savePartOfDatabase(bibDatabaseContext, bibDatabaseContext.getDatabase().getEntries(), prefs, checkSearch,
-                checkGroup);
+    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences,
+            boolean checkSearch, boolean checkGroup) throws SaveException {
+        return savePartOfDatabase(bibDatabaseContext, bibDatabaseContext.getDatabase().getEntries(), preferences,
+                checkSearch, checkGroup);
     }
 
     public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
-            SavePreferences prefs, boolean checkSearch, boolean checkGroup)
-                    throws SaveException {
+            SavePreferences preferences, boolean checkSearch, boolean checkGroup) throws SaveException {
 
         SaveSession session;
         try {
-            session = new SaveSession(prefs.getEncoding(), prefs.getMakeBackup());
+            session = new SaveSession(preferences.getEncoding(), preferences.getMakeBackup());
         } catch (IOException e) {
             throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
 
-        // Map to collect entry type definitions that we must save along with entries using them.
-        Map<String, EntryType> typesToWrite = new TreeMap<>();
-
-        BibEntry exceptionCause = null;
+        exceptionCause = null;
         // Get our data stream. This stream writes only to a temporary file until committed.
         try (VerifyingWriter writer = session.getWriter()) {
-
-            if (prefs.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
-                // Write signature.
-                writeBibFileHeader(writer, prefs.getEncoding());
-            }
-
-            // Write preamble if there is one.
-            writePreamble(writer, bibDatabaseContext.getDatabase().getPreamble());
-
-            // Write strings if there are any.
-            writeStrings(writer, bibDatabaseContext.getDatabase());
-
-            // Write database entries.
-            List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext,
-                    entries.stream().map(entry -> entry.getId()).collect(Collectors.toSet()), prefs);
-            sortedEntries = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
-            BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
-            for (BibEntry entry : sortedEntries) {
-                exceptionCause = entry;
-
-                // Check if the entry should be written.
-                boolean write = true;
-
-                if (checkSearch && entry.isSearchHit()) {
-                    write = false;
-                }
-
-                if (checkGroup && entry.isGroupHit()) {
-                    write = false;
-                }
-
-                if (write) {
-                    // Check if we must write the type definition for this
-                    // entry, as well. Our criterion is that all non-standard
-                    // types (*not* all customized standard types) must be written.
-                    if (! EntryTypes.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
-                        // If user-defined entry type, then add it
-                        // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
-                        EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
-                                entryType -> typesToWrite.put(entryType.getName(), entryType));
-                    }
-
-                    bibtexEntryWriter.write(entry, writer, bibDatabaseContext.getMode());
-
-                  //only append newline if the entry has changed
-                    if (!entry.hasChanged()) {
-                        writer.write(Globals.NEWLINE);
-                    }
-                }
-            }
-
-            if (prefs.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
-                // Write meta data.
-                writeMetaData(writer, bibDatabaseContext.getMetaData());
-
-                // Write type definitions, if any:
-                writeTypeDefinitions(writer, typesToWrite);
-            }
-
-            //finally write whatever remains of the file, but at least a concluding newline
-            writeEpilog(writer, bibDatabaseContext.getDatabase());
+            writePartOfDatabase(writer, bibDatabaseContext, entries, preferences, checkSearch, checkGroup);
         } catch (IOException ex) {
             LOGGER.error("Could not write file", ex);
             session.cancel();
@@ -252,14 +188,81 @@ public class BibDatabaseWriter {
 
     }
 
+    public void writePartOfDatabase(Writer writer, BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
+            SavePreferences preferences, boolean checkSearch, boolean checkGroup) throws IOException {
+        // Map to collect entry type definitions that we must save along with entries using them.
+        Map<String, EntryType> typesToWrite = new TreeMap<>();
+
+        if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+            // Write signature.
+            writeBibFileHeader(writer, preferences.getEncoding());
+        }
+
+        // Write preamble if there is one.
+        writePreamble(writer, bibDatabaseContext.getDatabase().getPreamble());
+
+        // Write strings if there are any.
+        writeStrings(writer, bibDatabaseContext.getDatabase());
+
+        // Write database entries.
+        List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext,
+                entries.stream().map(BibEntry::getId).collect(Collectors.toSet()), preferences);
+        sortedEntries = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
+        for (BibEntry entry : sortedEntries) {
+            exceptionCause = entry;
+
+            // Check if the entry should be written.
+            boolean write = true;
+
+            if (checkSearch && entry.isSearchHit()) {
+                write = false;
+            }
+
+            if (checkGroup && entry.isGroupHit()) {
+                write = false;
+            }
+
+            if (write) {
+                // Check if we must write the type definition for this
+                // entry, as well. Our criterion is that all non-standard
+                // types (*not* all customized standard types) must be written.
+                if (!EntryTypes.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
+                    // If user-defined entry type, then add it
+                    // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
+                    EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
+                            entryType -> typesToWrite.put(entryType.getName(), entryType));
+                }
+
+                bibtexEntryWriter.write(entry, writer, bibDatabaseContext.getMode());
+
+                //only append newline if the entry has changed
+                if (!entry.hasChanged()) {
+                    writer.write(Globals.NEWLINE);
+                }
+            }
+        }
+
+        if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+            // Write meta data.
+            writeMetaData(writer, bibDatabaseContext.getMetaData());
+
+            // Write type definitions, if any:
+            writeTypeDefinitions(writer, typesToWrite);
+        }
+
+        //finally write whatever remains of the file, but at least a concluding newline
+        writeEpilogue(writer, bibDatabaseContext.getDatabase());
+    }
+
     /**
      * Saves the database to file, including only the entries included in the
      * supplied input array bes.
      */
-    public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences prefs,
+    public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences,
             Collection<BibEntry> entries) throws SaveException {
 
-        return savePartOfDatabase(bibDatabaseContext, entries, prefs, false, false);
+        return savePartOfDatabase(bibDatabaseContext, entries, preferences, false, false);
     }
 
     private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
@@ -290,7 +293,7 @@ public class BibDatabaseWriter {
         out.write(Globals.encPrefix + encoding);
     }
 
-    private void writeEpilog(VerifyingWriter writer, BibDatabase database) throws IOException {
+    private void writeEpilogue(Writer writer, BibDatabase database) throws IOException {
         if ((database.getEpilog() != null) && !(database.getEpilog().isEmpty())) {
            writer.write(database.getEpilog());
         } else {
@@ -309,17 +312,17 @@ public class BibDatabaseWriter {
         // first write all meta data except groups
         for (String key : metaData) {
 
-            StringBuffer sb = new StringBuffer();
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(Globals.NEWLINE);
+            stringBuilder.append(Globals.NEWLINE);
             List<String> orderedData = metaData.getData(key);
-            sb.append("@comment{").append(MetaData.META_FLAG).append(key).append(":");
+            stringBuilder.append("@comment{").append(MetaData.META_FLAG).append(key).append(":");
             for (int j = 0; j < orderedData.size(); j++) {
-                sb.append(StringUtil.quote(orderedData.get(j), ";", '\\')).append(";");
+                stringBuilder.append(StringUtil.quote(orderedData.get(j), ";", '\\')).append(";");
             }
-            sb.append("}");
+            stringBuilder.append("}");
 
-            out.write(sb.toString());
+            out.write(stringBuilder.toString());
         }
         // write groups if present. skip this if only the root node exists
         // (which is always the AllEntriesGroup).
@@ -329,7 +332,7 @@ public class BibDatabaseWriter {
             // write version first
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
-            sb.append("@comment{").append(MetaData.META_FLAG).append("groupsversion:");
+            sb.append("@comment{").append(MetaData.META_FLAG).append(MetaData.GROUPSVERSION).append(":");
             sb.append("" + VersionHandling.CURRENT_VERSION + ";");
             sb.append("}");
 
@@ -339,12 +342,13 @@ public class BibDatabaseWriter {
             sb = new StringBuffer();
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
-            sb.append("@comment{").append(MetaData.META_FLAG).append("groupstree:");
+            sb.append("@comment{").append(MetaData.META_FLAG).append(MetaData.GROUPSTREE).append(":");
             sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
             StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
             while (tok.hasMoreTokens()) {
-                StringBuffer s = new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
+                StringBuilder s =
+                        new StringBuilder(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
                 sb.append(s);
                 sb.append(Globals.NEWLINE);
             }
@@ -422,14 +426,12 @@ public class BibDatabaseWriter {
      *
      * @param fw       The Writer to send the output to.
      * @param database The database whose strings we should write.
-     * @throws IOException If anthing goes wrong in writing.
+     * @throws IOException If anything goes wrong in writing.
      */
     private void writeStrings(Writer fw, BibDatabase database) throws IOException {
         previousStringType = BibtexString.Type.AUTHOR;
-        List<BibtexString> strings = new ArrayList<>();
-        for (String s : database.getStringKeySet()) {
-            strings.add(database.getString(s));
-        }
+        List<BibtexString> strings = database.getStringKeySet().stream().map(database::getString).collect(
+                Collectors.toList());
         strings.sort(new BibtexStringComparator(true));
         // First, make a Map of all entries:
         HashMap<String, BibtexString> remaining = new HashMap<>();
@@ -448,7 +450,7 @@ public class BibDatabaseWriter {
         }
     }
 
-    private void writeTypeDefinitions(VerifyingWriter writer, Map<String, EntryType> types) throws IOException {
+    private void writeTypeDefinitions(Writer writer, Map<String, EntryType> types) throws IOException {
         if (!types.isEmpty()) {
             for (Map.Entry<String, EntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
                 EntryType type = stringBibtexEntryTypeEntry.getValue();
