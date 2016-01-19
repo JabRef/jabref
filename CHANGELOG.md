@@ -227,18 +227,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 Version 2.80 was intended as intermediate step to JabRef 3.0.
 Since much functionality has changed during development, a release of this version was skipped.
 
-## [dev_2.11] - unreleased
-
-### Fixed
- - Fix [#345](https://github.com/JabRef/jabref/issues/345): Remove history from help file
-
-## [2.11.1] - 2015-11-16
-
-### Fixed
- - Backports from 2.80: Fixed [#250](https://github.com/JabRef/jabref/issues/250): No hard line breaks after 70 chars in serialized JabRef meta data
- - Backports from 2.80: Fixed [#325](https://github.com/JabRef/jabref/issues/325): Deactivating AutoCompletion crashes EntryEditor
-
-## 2.11 - 2015-11-11
+## 2.11
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
