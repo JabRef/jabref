@@ -19,9 +19,10 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Fixed
 - Make BibTex parser more robust against missing newlines
 - Fix bug that prevented the import of BibTex entries having only a key as content
+- Fixed [#666](https://github.com/JabRef/jabref/issues/666): MS Office 2007 export is working again
 
 ### Removed
-
+- Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
 
 
 
@@ -49,9 +50,6 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Fixed
 - Changes in customized entry types are now directly reflected in the table when clicking "Apply" or "OK"
-- Fixed [#593](https://github.com/JabRef/jabref/issues/593): Reference list generation works for OpenOffice/LibreOffice again
-- Fixed [#545](https://github.com/JabRef/jabref/issues/545): ACM fetcher works again
-- Fixed [#598](https://github.com/JabRef/jabref/issues/598): Use default file icon for custom external file types
 - Fixed [#608](https://github.com/JabRef/jabref/issues/608): Export works again
 - Fixed [#417](https://github.com/JabRef/jabref/issues/417): Table now updates when switching groups
 - Fixed [#534](https://github.com/JabRef/jabref/issues/534): No OpenOffice setup panel in preferences

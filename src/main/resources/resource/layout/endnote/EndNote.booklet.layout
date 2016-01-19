@@ -26,7 +26,6 @@
 %*
 %L
 %M
-\format[ResolvePDF,WrapContent(%1 ,)]{\pdf}
 \format[FileLink(pdf),WrapContent(%1 ,)]{\file}
 %2 \comment
 %3 booklet

@@ -61,13 +61,9 @@ class MSBibExportFormat extends ExportFormat {
             } catch (Exception e) {
                 throw new Error(e);
             }
-        }
-        try {
             finalizeSaveSession(ss);
-        } catch (SaveException ex) {
+        } catch (Exception ex) {
             throw new IOException(ex.getMessage());
-        } catch (Exception e) {
-            throw new IOException(e.getMessage());
         }
     }
 }

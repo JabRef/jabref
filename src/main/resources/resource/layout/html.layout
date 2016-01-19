@@ -29,12 +29,6 @@
 		</div>
 		\end{file}
 
-		\begin{pdf}
-		<div class="bibtex_pdf">
-			<a href="\format[ResolvePDF]{\pdf}">pdf</a>
-		</div>
-		\end{pdf}
-
 		\begin{url}
 		<div class="bibtex_url">
 			<a href="\url">url</a>

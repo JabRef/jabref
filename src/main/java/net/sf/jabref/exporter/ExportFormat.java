@@ -201,7 +201,7 @@ public class ExportFormat implements IExportFormat {
             // Set a global field, so all layouts have access to the custom name formatters:
             Globals.prefs.customExportNameFormatters = readFormatterFile(lfFileName);
 
-            ArrayList<String> missingFormatters = new ArrayList<>(1);
+            List<String> missingFormatters = new ArrayList<>(1);
 
             // Print header
             try (Reader reader = getReader(lfFileName + ".begin.layout")) {
@@ -235,7 +235,9 @@ public class ExportFormat implements IExportFormat {
             }
             if (defLayout != null) {
                 missingFormatters.addAll(defLayout.getMissingFormatters());
-                LOGGER.warn(defLayout.getMissingFormatters());
+                if (!missingFormatters.isEmpty()) {
+                    LOGGER.warn(missingFormatters);
+                }
             }
             HashMap<String, Layout> layouts = new HashMap<>();
             Layout layout;

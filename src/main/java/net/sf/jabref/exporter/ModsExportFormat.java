@@ -45,25 +45,21 @@ class ModsExportFormat extends ExportFormat {
  final String file,
             final Charset encoding, Set<String> keySet) throws IOException {
         SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
-        VerifyingWriter ps = ss.getWriter();
-        MODSDatabase md = new MODSDatabase(database, keySet);
+        try (VerifyingWriter ps = ss.getWriter()) {
+            MODSDatabase md = new MODSDatabase(database, keySet);
 
-        try {
-            DOMSource source = new DOMSource(md.getDOMrepresentation());
-            StreamResult result = new StreamResult(ps);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
-            trans.setOutputProperty(OutputKeys.INDENT, "yes");
-            trans.transform(source, result);
-        } catch (Exception e) {
-            throw new Error(e);
-        }
-
-        try {
+            try {
+                DOMSource source = new DOMSource(md.getDOMrepresentation());
+                StreamResult result = new StreamResult(ps);
+                Transformer trans = TransformerFactory.newInstance().newTransformer();
+                trans.setOutputProperty(OutputKeys.INDENT, "yes");
+                trans.transform(source, result);
+            } catch (Exception e) {
+                throw new Error(e);
+            }
             finalizeSaveSession(ss);
-        } catch (SaveException ex) {
+        } catch (Exception ex) {
             throw new IOException(ex.getMessage());
-        } catch (Exception e) {
-            throw new IOException(e.getMessage());
         }
     }
 }
