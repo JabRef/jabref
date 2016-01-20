@@ -15,9 +15,9 @@
 */
 package net.sf.jabref.logic.search.rules;
 
+import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.search.SearchBaseVisitor;
-import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.search.SearchLexer;
 import net.sf.jabref.search.SearchParser;
 import org.antlr.v4.runtime.*;
@@ -26,9 +26,13 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The search query must be specified in an expression that is acceptable by the Search.g4 grammar.
@@ -36,7 +40,6 @@ import java.util.regex.Pattern;
 public class GrammarBasedSearchRule implements SearchRule {
 
     private static final Log LOGGER = LogFactory.getLog(GrammarBasedSearchRule.class);
-
 
     public static class ThrowingErrorListener extends BaseErrorListener {
 
@@ -82,7 +85,7 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     private void init(String query) throws ParseCancellationException {
-        if(Objects.equals(this.query, query)) {
+        if (Objects.equals(this.query, query)) {
             return;
         }
 
@@ -140,45 +143,42 @@ public class GrammarBasedSearchRule implements SearchRule {
         public Comparator(String field, String value, ComparisonOperator operator, boolean caseSensitive, boolean regex) {
             this.operator = operator;
 
-            this.fieldPattern = Pattern.compile(regex ? field : "\\Q" + field + "\\E", caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
-            this.valuePattern = Pattern.compile(regex ? value : "\\Q" + value + "\\E", caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
+            int option = caseSensitive ? 0 : Pattern.CASE_INSENSITIVE;
+            this.fieldPattern = Pattern.compile(regex ? field : "\\Q" + field + "\\E", option);
+            this.valuePattern = Pattern.compile(regex ? value : "\\Q" + value + "\\E", option);
         }
 
         public boolean compare(BibEntry entry) {
-            // specification of fields to search is done in the search expression itself
-            String[] searchKeys = entry.getFieldNames().toArray(new String[entry.getFieldNames().size()]);
+            // specification of fieldsKeys to search is done in the search expression itself
+            Set<String> fieldsKeys = entry.getFieldNames();
 
-            boolean noSuchField = true;
-            // this loop iterates over all regular keys, then over pseudo keys like "type"
-            for (int i = 0; i < (searchKeys.length + 1); i++) {
-                String content;
-                if ((i - searchKeys.length) == 0) {
-                    // PSEUDOFIELD_TYPE
-                    if (!fieldPattern.matcher("entrytype").matches()) {
-                        continue;
-                    }
-                    content = entry.getType().getName();
-                } else {
-                    String searchKey = searchKeys[i];
-                    if (!fieldPattern.matcher(searchKey).matches()) {
-                        continue;
-                    }
-                    content = entry.getField(searchKey);
-                }
-                noSuchField = false;
-                if (content == null) {
+            // special case for searching for entrytype=phdthesis
+            if (fieldPattern.matcher("entrytype").matches()) {
+                return matchFieldValue(entry.getType().getName());
+            }
+
+            List<String> matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());
+
+            for (String field : matchedFieldKeys) {
+                String fieldValue = entry.getField(field);
+                if (fieldValue == null) {
                     continue; // paranoia
                 }
 
-                if(matchInField(content)) {
+                if (matchFieldValue(fieldValue)) {
                     return true;
                 }
             }
 
-            return noSuchField && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
+            // special case of asdf!=whatever and entry does not contain asdf
+            return matchedFieldKeys.isEmpty() && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
         }
 
-        public boolean matchInField(String content) {
+        private Predicate<String> matchFieldKey() {
+            return s -> fieldPattern.matcher(s).matches();
+        }
+
+        public boolean matchFieldValue(String content) {
             Matcher matcher = valuePattern.matcher(content);
             if (operator == ComparisonOperator.CONTAINS) {
                 return matcher.find();
@@ -192,7 +192,6 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
 
     }
-
 
     /**
      * Search results in boolean. It may be later on converted to an int.
@@ -214,13 +213,21 @@ public class GrammarBasedSearchRule implements SearchRule {
             return new Comparator(field, value, operator, caseSensitive, regex).compare(entry);
         }
 
-        @Override public Boolean visitStart(SearchParser.StartContext ctx) {
+        @Override
+        public Boolean visitStart(SearchParser.StartContext ctx) {
             return visit(ctx.expression());
         }
 
         @Override
         public Boolean visitComparison(SearchParser.ComparisonContext ctx) {
-            return comparison(ctx.left.getText(), ComparisonOperator.build(ctx.operator.getText()), ctx.right.getText());
+            // remove possible enclosing " symbols
+            String right = ctx.right.getText();
+            if(right.startsWith("\"") && right.endsWith("\"")) {
+                right = right.substring(1, right.length() - 2);
+            }
+
+            return comparison(ctx.left.getText(), ComparisonOperator.build(ctx.operator.getText()), right);
+
         }
 
         @Override
@@ -241,7 +248,6 @@ public class GrammarBasedSearchRule implements SearchRule {
                 return visit(ctx.left) || visit(ctx.right); // or
             }
         }
-
     }
 
 }

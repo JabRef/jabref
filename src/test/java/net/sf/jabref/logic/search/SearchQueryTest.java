@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.search;
 
+import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -24,6 +25,14 @@ public class SearchQueryTest {
         assertFalse(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
         assertFalse(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", true, false).isGrammarBasedSearch());
+    }
+
+    @Test
+    public void testGrammarSearch() {
+        BibEntry entry = new BibEntry();
+        entry.addKeyword("one two");
+        SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", false, false);
+        assertTrue(searchQuery.isMatch(entry));
     }
 
 }
