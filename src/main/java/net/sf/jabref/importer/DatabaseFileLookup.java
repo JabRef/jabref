@@ -45,7 +45,7 @@ class DatabaseFileLookup {
 
     private static final String KEY_FILE_FIELD = "file";
 
-    private final Map<File, Boolean> fileToFound = new HashMap<>();
+    private final Map<File, Boolean> cache = new HashMap<>();
 
     private final Collection<BibEntry> entries;
 
@@ -68,7 +68,7 @@ class DatabaseFileLookup {
     }
 
     /**
-     * Returns whether the File <code>aFile</code> is present in the database
+     * Returns whether the File <code>file</code> is present in the database
      * as an attached File to an {@link BibEntry}. <br>
      * <br>
      * To do this, the field specified by the key <b>file</b> will be searched
@@ -76,52 +76,52 @@ class DatabaseFileLookup {
      * <br>
      * For the matching, the absolute file paths will be used.
      *
-     * @param aFile
+     * @param file
      *            A {@link File} Object.
      * @return <code>true</code>, if the file Object is stored in at least one
      *         entry in the database, otherwise <code>false</code>.
      */
-    public boolean lookupDatabase(File aFile) {
-        if (fileToFound.containsKey(aFile)) {
-            return fileToFound.get(aFile);
+    public boolean lookupDatabase(File file) {
+        if (cache.containsKey(file)) {
+            return cache.get(file);
         } else {
-            Boolean res = false;
+            boolean res = false;
             for (BibEntry entry : entries) {
-                if (lookupEntry(aFile, entry)) {
+                if (lookupEntry(file, entry)) {
                     res = true;
                     break;
                 }
             }
-            fileToFound.put(aFile, res);
-            //System.out.println(aFile);
+            cache.put(file, res);
+
             return res;
         }
     }
 
     /**
-     * Searches the specified {@link BibEntry} <code>anEntry</code> for the
-     * appearance of the specified {@link File} <code>aFile</code>. <br>
+     * Searches the specified {@link BibEntry} <code>entry</code> for the
+     * appearance of the specified {@link File} <code>file</code>. <br>
      * <br>
      * Therefore the <i>file</i>-field of the bibtex-entry will be searched for
      * the absolute filepath of the searched file. <br>
      * <br>
      *
-     * @param aFile
+     * @param file
      *            A file that is searched in an bibtex-entry.
-     * @param anEntry
+     * @param entry
      *            A bibtex-entry, in which the file is searched.
      * @return <code>true</code>, if the bibtex entry stores the file in its
      *         <i>file</i>-field, otherwise <code>false</code>.
      */
-    private boolean lookupEntry(File aFile, BibEntry anEntry) {
+    private boolean lookupEntry(File file, BibEntry entry) {
 
-        if ((aFile == null) || (anEntry == null)) {
+        if ((file == null) || (entry == null)) {
             return false;
         }
 
         FileListTableModel model = new FileListTableModel();
 
-        String fileField = anEntry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
+        String fileField = entry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
         model.setContent(fileField);
 
         for (int i = 0; i < model.getRowCount(); i++) {
@@ -133,7 +133,7 @@ class DatabaseFileLookup {
             }
 
             File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
-            if (Objects.equals(expandedFilename, aFile)) {
+            if (Objects.equals(expandedFilename, file)) {
                 return true;
             }
         }

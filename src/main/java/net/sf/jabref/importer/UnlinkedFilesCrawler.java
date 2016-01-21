@@ -2,6 +2,7 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -23,31 +24,17 @@ public class UnlinkedFilesCrawler {
     /**
      * File filter, that accepts directories only.
      */
-    private final FileFilter directoryFilter = new FileFilter() {
+    private final static FileFilter DIRECTORY_FILTER = pathname -> pathname != null && pathname.isDirectory();
 
-        @Override
-        public boolean accept(File pathname) {
-            if (pathname == null) {
-                return false;
-            }
-            return pathname.isDirectory();
-        }
-    };
     private final BibDatabase database;
 
-
-    /**
-     * CONSTRUCTOR
-     *
-     * @param database
-     */
     public UnlinkedFilesCrawler(BibDatabase database) {
         this.database = database;
     }
 
     public CheckableTreeNode searchDirectory(File directory, FileFilter aFileFilter) {
         UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(aFileFilter, database);
-        return searchDirectory(directory, ff, new int[] {1}, null);
+        return searchDirectory(directory, ff, new AtomicBoolean(true), null);
     }
 
     /**
@@ -67,9 +54,9 @@ public class UnlinkedFilesCrawler {
      * the recursion running. When the states value changes, the method will
      * resolve its recursion and return what it has saved so far.
      */
-    public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, int[] state, ChangeListener changeListener) {
+    public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, AtomicBoolean state, ChangeListener changeListener) {
         /* Cancellation of the search from outside! */
-        if ((state == null) || (state.length < 1) || (state[0] != 1)) {
+        if ((state == null) || !state.get()) {
             return null;
         }
         /* Return null if the directory is not valid. */
@@ -82,7 +69,7 @@ public class UnlinkedFilesCrawler {
 
         int filesCount = 0;
 
-        File[] subDirectories = directory.listFiles(directoryFilter);
+        File[] subDirectories = directory.listFiles(DIRECTORY_FILTER);
         for (File subDirectory : subDirectories) {
             CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
             if ((subRoot != null) && (subRoot.getChildCount() > 0)) {

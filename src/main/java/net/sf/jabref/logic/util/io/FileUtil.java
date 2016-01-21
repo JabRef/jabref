@@ -226,14 +226,11 @@ public class FileUtil {
      * null if the file does not exist.
      */
     public static File expandFilename(String name, String dir) {
-
-        File file;
         if ((name == null) || name.isEmpty()) {
             return null;
-        } else {
-            file = new File(name);
         }
 
+        File file = new File(name);
         if (!file.exists() && (dir != null)) {
             if (dir.endsWith(FILE_SEPARATOR)) {
                 name = dir + name;
@@ -241,27 +238,17 @@ public class FileUtil {
                 name = dir + FILE_SEPARATOR + name;
             }
 
-            // System.out.println("expanded to: "+name);
-            // if (name.startsWith("ftp"))
-
             file = new File(name);
 
             if (file.exists()) {
                 return file;
             }
-            // Ok, try to fix / and \ problems:
+            // fix / and \ problems:
             if (OS.WINDOWS) {
-                // workaround for catching Java bug in regexp replacer
-                // and, why, why, why ... I don't get it - wegner 2006/01/22
-                try {
-                    name = name.replaceAll("/", "\\\\");
-                } catch (StringIndexOutOfBoundsException exc) {
-                    LOGGER.error("An internal Java error was caused by the entry " + "\"" + name + "\"", exc);
-                }
+                name = name.replaceAll("/", "\\\\");
             } else {
                 name = name.replaceAll("\\\\", "/");
             }
-            // System.out.println("expandFilename: "+name);
             file = new File(name);
             if (!file.exists()) {
                 file = null;

@@ -24,17 +24,13 @@ public class UnlinkedPDFFileFilter implements FileFilter {
     private final DatabaseFileLookup lookup;
     private final FileFilter fileFilter;
 
-
-    public UnlinkedPDFFileFilter(FileFilter aFileFilter, BibDatabase database) {
-        this.fileFilter = aFileFilter;
+    public UnlinkedPDFFileFilter(FileFilter fileFilter, BibDatabase database) {
+        this.fileFilter = fileFilter;
         this.lookup = new DatabaseFileLookup(database);
     }
 
     @Override
     public boolean accept(File pathname) {
-        if (fileFilter.accept(pathname)) {
-            return !lookup.lookupDatabase(pathname);
-        }
-        return false;
+        return fileFilter.accept(pathname) && !lookup.lookupDatabase(pathname);
     }
 }
