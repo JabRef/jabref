@@ -20,7 +20,9 @@ public class LastFocusedTabPreferencesTest {
 
     @AfterClass
     public static void restorePreferenceLastFocus() {
-        JabRefPreferences.getInstance().put(JabRefPreferences.LAST_FOCUSED, previousValue);
+        if (previousValue != null) {
+            JabRefPreferences.getInstance().put(JabRefPreferences.LAST_FOCUSED, previousValue);
+        }
     }
 
     @Test
