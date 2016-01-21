@@ -23,6 +23,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#670](https://github.com/JabRef/jabref/issues/670): Expressions using enclosed quotes (keywords="one two") did not work.
 - Fixed [#667](https://github.com/JabRef/jabref/issues/667): URL field is not sanitized anymore upon opening in browser.
 - Fixed [#687](https://github.com/JabRef/jabref/issues/687): Fixed NPE when closing JabRef with new unsaved database.
+- Fixed [#680](https://github.com/JabRef/jabref/issues/680): Synchronize Files key binding works again.
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field

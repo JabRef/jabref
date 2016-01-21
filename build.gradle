@@ -166,8 +166,8 @@ processResources {
     filesMatching("help/**/About.html") {
         expand ("version": project.version,
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "),
-                "developers": new File('DEVELOPERS').readLines().findAll {!it.startsWith("#")}.join(", "),
+                "authors": new File('AUTHORS').readLines("UTF-8").findAll {!it.startsWith("#")}.join(", "),
+                "developers": new File('DEVELOPERS').readLines("UTF-8").findAll {!it.startsWith("#")}.join(", "),
                 "licenseInformation": licenseInformation)
     }
 

@@ -285,13 +285,9 @@ public class SynchronizeFileField extends AbstractWorker {
             super(parent, Localization.lang("Synchronize %0 links", Globals.FILE_FIELD.toUpperCase()), true);
             this.metaData = metaData;
             final String fn = Localization.lang("file");
-            ok.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    canceled = false;
-                    dispose();
-                }
+            ok.addActionListener(e -> {
+                canceled = false;
+                dispose();
             });
 
             Action closeAction = new AbstractAction() {
@@ -318,7 +314,7 @@ public class SynchronizeFileField extends AbstractWorker {
             bg.add(autoSetNone);
             bg.add(autoSetAll);
 
-            FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+            FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
             FormBuilder builder = FormBuilder.create().layout(layout);
             JLabel description = new JLabel("<HTML>" + Localization.lang(
                     "Attempt to autoset %0 links for your entries. Autoset works if "
