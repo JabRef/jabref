@@ -71,8 +71,6 @@ public class JabRefDesktop {
         } else if ("eprint".equals(fieldName)) {
             fieldName = "url";
 
-            link = URLUtil.sanitizeUrl(link);
-
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
                 link = Util.ARXIV_LOOKUP_PREFIX + link;
@@ -427,7 +425,6 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openBrowser(String url) throws IOException {
-        url = URLUtil.sanitizeUrl(url);
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
     }

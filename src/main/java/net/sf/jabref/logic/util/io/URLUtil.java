@@ -79,44 +79,4 @@ public class URLUtil {
         }
     }
 
-    /**
-     * Make sure an URL is "portable", in that it doesn't contain bad characters that break the open command in some
-     * OSes. A call to this method will also remove \\url{} enclosings.
-     *
-     * It does:
-     * - trim whitespace
-     * - remove Latex \\url{} tags
-     *
-     * @param link the URL to sanitize.
-     * @return the sanitized URL
-     */
-    public static String sanitizeUrl(String link) {
-        // remove whitespace
-        link = link.trim();
-
-        // Remove \\url{}
-        if (link.startsWith("\\url{") && link.endsWith("}")) {
-            link = link.substring(5, link.length() - 1);
-        }
-
-        // FIXME: everything below is really flawed atm
-        link = link.replaceAll("\\+", "%2B");
-
-        try {
-            link = URLDecoder.decode(link, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException ignored) {
-            // Ignored
-        }
-
-        /**
-         * Fix for: [ 1574773 ] sanitizeUrl() breaks ftp:// and file:///
-         *
-         * http://sourceforge.net/tracker/index.php?func=detail&aid=1574773&group_id=92314&atid=600306
-         */
-        try {
-            return new URI(null, link, null).toASCIIString();
-        } catch (URISyntaxException e) {
-            return link;
-        }
-    }
 }
