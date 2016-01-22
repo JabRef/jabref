@@ -54,7 +54,6 @@ class DatabaseFileLookup {
         for (BibEntry entry : database.getEntries()) {
             fileCache.addAll(parseFileField(entry));
         }
-
     }
 
     /**
@@ -88,9 +87,8 @@ class DatabaseFileLookup {
         model.setContent(fileField);
 
         List<File> fileLinks = new ArrayList<>();
-        for (int i = 0; i < model.getRowCount(); i++) {
-            FileListEntry flEntry = model.getEntry(i);
-            String link = flEntry.getLink();
+        for (FileListEntry e : model.parseFileField(fileField)) {
+            String link = e.getLink();
 
             if (link == null) {
                 break;

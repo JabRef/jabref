@@ -17,6 +17,7 @@ package net.sf.jabref.gui;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.JLabel;
@@ -126,15 +127,18 @@ public class FileListTableModel extends AbstractTableModel {
         setContent(value, false, false);
     }
 
-    private FileListEntry setContent(String value, boolean firstOnly, boolean deduceUnknownTypes) {
+    public List<FileListEntry> parseFileField(String value) {
         if (value == null) {
             value = "";
         }
-        ArrayList<FileListEntry> newList = new ArrayList<>();
+
+        ArrayList<FileListEntry> files = new ArrayList<>();
+        ArrayList<String> entry = new ArrayList<>();
+
         StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<>();
         boolean inXmlChar = false;
         boolean escaped = false;
+
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
             if (!escaped && (c == '\\')) {
@@ -155,17 +159,74 @@ public class FileListTableModel extends AbstractTableModel {
                 inXmlChar = false;
             }
             else if (!escaped && (c == ':')) {
-                thisEntry.add(sb.toString());
+                entry.add(sb.toString());
                 sb = new StringBuilder();
             }
             else if (!escaped && (c == ';') && !inXmlChar) {
-                thisEntry.add(sb.toString());
+                entry.add(sb.toString());
+                sb = new StringBuilder();
+
+                files.add(decodeEntry(entry, true));
+                entry.clear();
+            } else {
+                sb.append(c);
+            }
+            escaped = false;
+        }
+        if (sb.length() > 0) {
+            entry.add(sb.toString());
+        }
+
+        if (!entry.isEmpty()) {
+            files.add(decodeEntry(entry, true));
+        }
+
+        return files;
+    }
+
+    public FileListEntry setContent(String value, boolean firstOnly, boolean deduceUnknownTypes) {
+        if (value == null) {
+            value = "";
+        }
+
+        ArrayList<FileListEntry> files = new ArrayList<>();
+        ArrayList<String> entry = new ArrayList<>();
+
+        StringBuilder sb = new StringBuilder();
+        boolean inXmlChar = false;
+        boolean escaped = false;
+
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (!escaped && (c == '\\')) {
+                escaped = true;
+                continue;
+            }
+            // Check if we are entering an XML special character construct such
+            // as "&#44;", because we need to know in order to ignore the semicolon.
+            else if (!escaped && (c == '&') && !inXmlChar) {
+                sb.append(c);
+                if ((value.length() > (i + 1)) && (value.charAt(i + 1) == '#')) {
+                    inXmlChar = true;
+                }
+            }
+            // Check if we are exiting an XML special character construct:
+            else if (!escaped && inXmlChar && (c == ';')) {
+                sb.append(c);
+                inXmlChar = false;
+            }
+            else if (!escaped && (c == ':')) {
+                entry.add(sb.toString());
+                sb = new StringBuilder();
+            }
+            else if (!escaped && (c == ';') && !inXmlChar) {
+                entry.add(sb.toString());
                 sb = new StringBuilder();
                 if (firstOnly) {
-                    return decodeEntry(thisEntry, deduceUnknownTypes);
+                    return decodeEntry(entry, deduceUnknownTypes);
                 } else {
-                    newList.add(decodeEntry(thisEntry, deduceUnknownTypes));
-                    thisEntry.clear();
+                    files.add(decodeEntry(entry, deduceUnknownTypes));
+                    entry.clear();
                 }
             } else {
                 sb.append(c);
@@ -173,19 +234,20 @@ public class FileListTableModel extends AbstractTableModel {
             escaped = false;
         }
         if (sb.length() > 0) {
-            thisEntry.add(sb.toString());
+            entry.add(sb.toString());
         }
-        if (!thisEntry.isEmpty()) {
+
+        if (!entry.isEmpty()) {
             if (firstOnly) {
-                return decodeEntry(thisEntry, deduceUnknownTypes);
+                return decodeEntry(entry, deduceUnknownTypes);
             } else {
-                newList.add(decodeEntry(thisEntry, deduceUnknownTypes));
+                files.add(decodeEntry(entry, deduceUnknownTypes));
             }
         }
 
         synchronized (list) {
             list.clear();
-            list.addAll(newList);
+            list.addAll(files);
         }
         fireTableChanged(new TableModelEvent(this));
         return null;
