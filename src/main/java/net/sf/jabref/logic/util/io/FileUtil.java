@@ -34,7 +34,8 @@ public class FileUtil {
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     private static final String FILE_SEPARATOR = System.getProperty("file.separator");
-
+    private static final Pattern SLASH = Pattern.compile("/");
+    private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
@@ -181,14 +182,14 @@ public class FileUtil {
     public static File expandFilename(final MetaData metaData, String name) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        String[] dir = metaData.getFileDirectory(extension.orElse(null));
+        String[] directories = metaData.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
         String[] fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
         // Include the directory of the bib file:
         ArrayList<String> al = new ArrayList<>();
-        for (String aDir : dir) {
-            if (!al.contains(aDir)) {
-                al.add(aDir);
+        for (String dir : directories) {
+            if (!al.contains(dir)) {
+                al.add(dir);
             }
         }
         for (String aFileDir : fileDir) {
@@ -207,11 +208,10 @@ public class FileUtil {
      * Will look in each of the given dirs starting from the beginning and
      * returning the first found file to match if any.
      */
-    public static File expandFilename(String name, String[] dir) {
-
-        for (String aDir : dir) {
-            if (aDir != null) {
-                File result = expandFilename(name, aDir);
+    public static File expandFilename(String name, String[] directories) {
+        for (String dir : directories) {
+            if (dir != null) {
+                File result = expandFilename(name, dir);
                 if (result != null) {
                     return result;
                 }
@@ -226,11 +226,13 @@ public class FileUtil {
      * null if the file does not exist.
      */
     public static File expandFilename(String name, String dir) {
+
         if ((name == null) || name.isEmpty()) {
             return null;
         }
 
         File file = new File(name);
+
         if (!file.exists() && (dir != null)) {
             if (dir.endsWith(FILE_SEPARATOR)) {
                 name = dir + name;
@@ -238,18 +240,15 @@ public class FileUtil {
                 name = dir + FILE_SEPARATOR + name;
             }
 
-            file = new File(name);
-
-            if (file.exists()) {
-                return file;
-            }
             // fix / and \ problems:
             if (OS.WINDOWS) {
-                name = name.replaceAll("/", "\\\\");
+                name = SLASH.matcher(name).replaceAll("\\\\");
             } else {
-                name = name.replaceAll("\\\\", "/");
+                name = BACKSLASH.matcher(name).replaceAll("/");
             }
+
             file = new File(name);
+
             if (!file.exists()) {
                 file = null;
             }

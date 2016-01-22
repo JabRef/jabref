@@ -81,17 +81,16 @@ class DatabaseFileLookup {
     private List<File> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        FileListTableModel model = new FileListTableModel();
-
         String fileField = entry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
-        model.setContent(fileField);
+        List<FileListEntry> entries = new FileListTableModel().parseFileField(fileField);
 
         List<File> fileLinks = new ArrayList<>();
-        for (FileListEntry e : model.parseFileField(fileField)) {
+        for (FileListEntry e : entries) {
             String link = e.getLink();
 
-            if (link == null) {
-                break;
+            // Do not query external file links (huge performance leak)
+            if(link == null || link.contains("//")) {
+                continue;
             }
 
             File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);

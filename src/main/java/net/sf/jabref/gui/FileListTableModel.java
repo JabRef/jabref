@@ -184,7 +184,7 @@ public class FileListTableModel extends AbstractTableModel {
         return files;
     }
 
-    public FileListEntry setContent(String value, boolean firstOnly, boolean deduceUnknownTypes) {
+    private FileListEntry setContent(String value, boolean firstOnly, boolean deduceUnknownTypes) {
         if (value == null) {
             value = "";
         }
