@@ -255,10 +255,10 @@ public class KeywordGroup extends AbstractGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
-        String content = entry.getField(searchField);
-        if (content == null) {
+        if (!entry.hasField(searchField)) {
             return false;
         }
+        String content = entry.getField(searchField);
         if (regExp) {
             return pattern.matcher(content).find();
         }
@@ -300,10 +300,10 @@ public class KeywordGroup extends AbstractGroup {
      * possible if the search expression is not a regExp.
      */
     private void removeMatches(BibEntry entry) {
-        String content = entry.getField(searchField);
-        if (content == null) {
+        if (!entry.hasField(searchField)) {
             return; // nothing to modify
         }
+        String content = entry.getField(searchField);
         StringBuffer sbOrig = new StringBuffer(content);
         StringBuffer sbLower = new StringBuffer(content.toLowerCase());
         StringBuffer haystack = caseSensitive ? sbOrig : sbLower;

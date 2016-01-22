@@ -632,19 +632,6 @@ class MSBibEntry {
         return result;
     }
 
-    /* construct a MSBib date object */
-    protected String getDate(BibEntry bibtex) {
-        StringBuffer result = new StringBuffer();
-        if (bibtex.hasField("year")) {
-            result.append(bibtex.getField("year"));
-        }
-        if (bibtex.hasField("month")) {
-            result.append('-').append(bibtex.getField("month"));
-        }
-
-        return result.toString();
-    }
-
     private String getMSBibSourceType(BibEntry bibtex) {
         String bibtexType = bibtex.getType().getName();
 

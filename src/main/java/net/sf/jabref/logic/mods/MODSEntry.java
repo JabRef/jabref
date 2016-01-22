@@ -127,7 +127,7 @@ class MODSEntry {
             host.title = bibtex.getField("booktitle");
             host.publisher = bibtex.getField("publisher");
             host.number = bibtex.getField("number");
-            if (bibtex.hasField("pages")) {
+            if (bibtex.hasField("volume")) {
                 host.volume = bibtex.getField("volume");
             }
             host.issuance = "continuing";
@@ -172,14 +172,9 @@ class MODSEntry {
 
     /* construct a MODS date object */
     private static String getDate(BibEntry bibtex) {
-        StringBuffer result = new StringBuffer();
-        if (bibtex.hasField("year")) {
-            result.append(bibtex.getField("year"));
-        }
-        if (bibtex.hasField("month")) {
-            result.append('-').append(bibtex.getField("month"));
-        }
-
+        StringBuilder result = new StringBuilder();
+        bibtex.getFieldOptional("year").ifPresent(year -> result.append(year));
+        bibtex.getFieldOptional("month").ifPresent(month -> result.append('-').append(month));
         return result.toString();
     }
 

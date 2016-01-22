@@ -33,10 +33,10 @@ public class RenamePdfCleanup implements Cleaner {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         //Extract the path
-        String oldValue = entry.getField(Globals.FILE_FIELD);
-        if (oldValue == null) {
+        if (!entry.hasField(Globals.FILE_FIELD)) {
             return new ArrayList<>();
         }
+        String oldValue = entry.getField(Globals.FILE_FIELD);
         FileListTableModel flModel = new FileListTableModel();
         flModel.setContent(oldValue);
         if (flModel.getRowCount() == 0) {

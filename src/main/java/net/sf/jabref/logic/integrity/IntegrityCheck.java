@@ -42,38 +42,22 @@ public class IntegrityCheck {
             return result;
         }
 
-        Object data = entry.getField("author");
-        if (data != null) {
-            AUTHOR_NAME_CHECKER.check(data.toString(), "author", entry, result);
-        }
+        entry.getFieldOptional("author").ifPresent(data -> AUTHOR_NAME_CHECKER.check(data, "author", entry, result));
 
-        data = entry.getField("editor");
-        if (data != null) {
-            AUTHOR_NAME_CHECKER.check(data.toString(), "editor", entry, result);
-        }
+        entry.getFieldOptional("editor").ifPresent(data -> AUTHOR_NAME_CHECKER.check(data, "editor", entry, result));
 
-        data = entry.getField("title");
-        if (data != null) {
+        entry.getFieldOptional("title").ifPresent(data -> {
             if(!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-                TITLE_CHECKER.check(data.toString(), "title", entry, result);
+                TITLE_CHECKER.check(data, "title", entry, result);
             }
-            BRACKET_CHECKER.check(data.toString(), "title", entry, result);
-        }
+            BRACKET_CHECKER.check(data, "title", entry, result);
+        });
 
-        data = entry.getField("year");
-        if (data != null) {
-            YEAR_CHECKER.check(data.toString(), "year", entry, result);
-        }
+        entry.getFieldOptional("year").ifPresent(data -> YEAR_CHECKER.check(data, "year", entry, result));
 
-        data = entry.getField("pages");
-        if (data != null) {
-            PAGES_CHECKER.check(data.toString(), "pages", entry, result);
-        }
+        entry.getFieldOptional("pages").ifPresent(data -> PAGES_CHECKER.check(data.toString(), "pages", entry, result));
 
-        data = entry.getField("url");
-        if (data != null) {
-            URL_CHECKER.check(data.toString(), "url", entry, result);
-        }
+        entry.getFieldOptional("url").ifPresent(data -> URL_CHECKER.check(data, "url", entry, result));
 
         return result;
     }

@@ -268,19 +268,20 @@ public class AuxSubGenerator {
                 // Check if the entry we just found references another entry which
                 // we don't already have in our list of entries to include. If so,
                 // pull in that entry as well:
-                String crossref = entry.getField("crossref");
-                if ((crossref != null) && !mySet.contains(crossref)) {
-                    BibEntry refEntry = db.getEntryByKey(crossref);
-                    /**
-                     * [ 1717849 ] Patch for aux import by Kai Eckert
-                     */
-                    if (refEntry == null) {
-                        notFoundList.add(crossref);
-                    } else {
-                        insertEntry(auxDB, refEntry);
-                        crossreferencedEntriesCount++;
+                entry.getFieldOptional("crossref").ifPresent(crossref -> {
+                    if (!mySet.contains(crossref)) {
+                        BibEntry refEntry = db.getEntryByKey(crossref);
+                        /**
+                         * [ 1717849 ] Patch for aux import by Kai Eckert
+                         */
+                        if (refEntry == null) {
+                            notFoundList.add(crossref);
+                        } else {
+                            insertEntry(auxDB, refEntry);
+                            crossreferencedEntriesCount++;
+                        }
                     }
-                }
+                });
 
             }
         }

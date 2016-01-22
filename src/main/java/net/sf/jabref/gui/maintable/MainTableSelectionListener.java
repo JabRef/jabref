@@ -293,10 +293,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     // check for all field names whether a link is present
                     // (is relevant for combinations such as "url/doi")
                     for(String fieldName : fieldNames) {
-                        String link = entry.getField(fieldName);
-                        if (link == null) {
+                        if (!entry.hasField(fieldName)) {
                             continue; // There is no content for this field continue with the next one
                         }
+                        String link = entry.getField(fieldName);
 
                         // See if this is a simple file link field, or if it is a file-list
                         // field that can specify a list of links:
@@ -423,8 +423,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 } else {
                     SpecialField specialField = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(column.getColumnName());
                     if (specialField == null) {
-                        String content = entry.getField(field);
-                        if (content != null) {
+                        if (entry.hasField(field)) {
+                            String content = entry.getField(field);
                             menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content,
                                     GUIGlobals.getTableIcon(field).getIcon(), panel.metaData(), field));
                             showDefaultPopup = false;

@@ -257,8 +257,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up title
-        String title = entry.getField("title");
-        if (title != null) {
+        if (entry.hasField("title")) {
+            String title = entry.getField("title");
             // USe the alt-text and replace image links
             title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
             // Try to sort out most of the /spl / conversions
@@ -297,8 +297,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up author
-        String author = entry.getField("author");
-        if (author != null) {
+        if (entry.hasField("author")) {
+            String author = entry.getField("author");
             author = author.replaceAll("\\s+", " ");
 
             //reorder the "Jr." "Sr." etc to the correct ordering

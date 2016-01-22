@@ -185,9 +185,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 BibEntry entry = downloadEntryBibTeX(selentry.getKey(), fetchAbstract);
                 if (entry != null) {
                     // Convert from HTML and optionally add curly brackets around key words to keep the case
-                    String title = entry.getField("title");
-
-                    if (title != null) {
+                    entry.getFieldOptional("title").ifPresent(title -> {
                         title = title.replaceAll("\\\\&", "&").replaceAll("\\\\#", "#");
                         title = convertHTMLChars(title);
 
@@ -201,13 +199,11 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                             title = caseKeeper.format(title);
                         }
                         entry.setField("title", title);
-                    }
+                    });
 
-                    String abstr = entry.getField("abstract");
-                    if (abstr != null) {
-                        abstr = convertHTMLChars(abstr);
-                        entry.setField("abstract", abstr);
-                    }
+                    entry.getFieldOptional("abstract").ifPresent(abstr -> {
+                        entry.setField("abstract", convertHTMLChars(abstr));
+                    });
                     inspector.addEntry(entry);
                 }
             }

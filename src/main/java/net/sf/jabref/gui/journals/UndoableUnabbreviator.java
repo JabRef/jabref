@@ -26,10 +26,10 @@ public class UndoableUnabbreviator {
      * @return true if the entry was changed, false otherwise.
      */
     public boolean unabbreviate(BibDatabase database, BibEntry entry, String fieldName, CompoundEdit ce) {
-        String text = entry.getField(fieldName);
-        if (text == null) {
+        if (!entry.hasField(fieldName)) {
             return false;
         }
+        String text = entry.getField(fieldName);
         String origText = text;
         if (database != null) {
             text = database.resolveForStrings(text);

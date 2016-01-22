@@ -671,8 +671,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
                 this.setFont(usedFont);
                 this.setIcon(okIcon);
                 this.setToolTipText(Localization.lang("Filled"));
-            }
-            else {
+            } else {
                 this.setIcon(needIcon);
                 this.setToolTipText(Localization.lang("Field is missing"));
             }

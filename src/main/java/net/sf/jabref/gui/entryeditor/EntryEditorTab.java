@@ -271,8 +271,7 @@ class EntryEditorTab {
         try {
             updating = true;
             for (FieldEditor editor : editors.values()) {
-                Object content = entry.getField(editor.getFieldName());
-                String toSet = content == null ? "" : content.toString();
+                String toSet = entry.getFieldOptional(editor.getFieldName()).orElse("");
                 if (!toSet.equals(editor.getText())) {
                     editor.setText(toSet);
                 }
