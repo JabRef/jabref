@@ -141,9 +141,9 @@ public class BibEntry {
             // sets off a change in database sorting etc.
             this.type = type;
             changed = true;
-            firePropertyChangedEvent(TYPE_HEADER, oldType != null ? oldType.getName() : null, type.getName());
+            firePropertyChangedEvent(TYPE_HEADER, oldType == null ? null : oldType.getName(), type.getName());
         } catch (PropertyVetoException pve) {
-            pve.printStackTrace();
+            LOGGER.warn(pve);
         }
 
     }
@@ -222,7 +222,7 @@ public class BibEntry {
         }
 
         // Finally, handle dates
-        if (name.equals("date")) {
+        if ("date".equals(name)) {
             String year = getField("year");
             MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
             if (year != null) {
@@ -233,7 +233,7 @@ public class BibEntry {
                 }
             }
         }
-        if (name.equals("year") || name.equals("month")) {
+        if ("year".equals(name) || "month".equals(name)) {
             String date = getField("date");
             if (date == null) {
                 return null;
@@ -266,10 +266,10 @@ public class BibEntry {
                 Date parsedDate = df.parse(date);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(parsedDate);
-                if (name.equals("year")) {
+                if ("year".equals(name)) {
                     return Integer.toString(calendar.get(Calendar.YEAR));
                 }
-                if (name.equals("month")) {
+                if ("month".equals(name)) {
                     return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0
                 }
             } catch (ParseException e) {
@@ -280,7 +280,7 @@ public class BibEntry {
                     Date parsedDate = df.parse(date);
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(parsedDate);
-                    if (name.equals("year")) {
+                    if ("year".equals(name)) {
                         return Integer.toString(calendar.get(Calendar.YEAR));
                     }
                 } catch (ParseException e2) {
@@ -385,7 +385,7 @@ public class BibEntry {
      *                  argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    boolean allFieldsPresent(String[] allFields, BibDatabase database) {
+    boolean allFieldsPresent(List<String> allFields, BibDatabase database) {
         final String orSeparator = "/";
 
         for (String field : allFields) {
@@ -404,10 +404,6 @@ public class BibEntry {
             }
         }
         return true;
-    }
-
-    boolean allFieldsPresent(List<String> allFields, BibDatabase database) {
-        return allFieldsPresent(allFields.toArray(new String[allFields.size()]), database);
     }
 
     private boolean atLeastOnePresent(String[] fieldsToCheck, BibDatabase database) {
@@ -545,10 +541,10 @@ public class BibEntry {
         // Set Keyword Field
         String oldValue = this.getField("keywords");
         String newValue;
-        if (!keywords.isEmpty()) {
-            newValue = String.join(", ", keywords);
-        } else {
+        if (keywords.isEmpty()) {
             newValue = null;
+        } else {
+            newValue = String.join(", ", keywords);
         }
         if ((oldValue == null) && (newValue == null)) {
             return;
@@ -566,12 +562,12 @@ public class BibEntry {
     public void addKeyword(String keyword) {
         Objects.requireNonNull(keyword, "keyword must not be empty");
 
-        List<String> keywords = this.getSeparatedKeywords();
-        Boolean duplicate = false;
-
         if (keyword.isEmpty()) {
             return;
         }
+
+        List<String> keywords = this.getSeparatedKeywords();
+        Boolean duplicate = false;
 
         for (String key : keywords) {
             if (keyword.equalsIgnoreCase(key)) {
