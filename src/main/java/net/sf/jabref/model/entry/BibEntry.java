@@ -179,6 +179,13 @@ public class BibEntry {
         return fields.get(normalizeFieldName(name));
     }
 
+    /**
+     * Returns true if the entry has the given field, or false if it is not set.
+     */
+    public boolean hasField(String name) {
+        return fields.containsKey(normalizeFieldName(name));
+    }
+
     private String normalizeFieldName(String fieldName) {
         Objects.requireNonNull(fieldName, "field name must not be null");
 

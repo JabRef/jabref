@@ -203,7 +203,7 @@ class EntryEditorTab {
         String text = fieldEditor.getText().trim();
 
         if (text.isEmpty()) {
-            return getEntry().getField(fieldEditor.getFieldName()) != null;
+            return getEntry().hasField(fieldEditor.getFieldName());
         } else {
             Object entryValue = getEntry().getField(fieldEditor.getFieldName());
             return (entryValue == null) || !entryValue.toString().equals(text);

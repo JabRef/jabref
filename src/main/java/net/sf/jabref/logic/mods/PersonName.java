@@ -59,7 +59,7 @@ public class PersonName {
         //            XMLChars xmlChars = new XMLChars();
         //            authorMod = xmlChars.format(authorMod).replace("&#44;", ",");
 
-        int endOfLastName = authorMod.indexOf(",");
+        int endOfLastName = authorMod.indexOf(',');
 
         // Tokenize just the firstName and middleNames as we have the surname
         // before the comma.
@@ -79,7 +79,7 @@ public class PersonName {
         else {
             givenName = names.get(0);
             middleName = "";
-            for (int i = 1; i < amountOfNames - 1; i++) {
+            for (int i = 1; i < (amountOfNames - 1); i++) {
                 middleName += ' ' + names.get(i);
             }
             middleName = middleName.trim();
@@ -88,14 +88,14 @@ public class PersonName {
     }
 
     public String getGivenNames() {
-        String result = "";
+        StringBuffer result = new StringBuffer();
         if (givenName != null) {
-            result += givenName;
+            result.append(givenName);
         }
         if (middleName != null) {
-            result += ' ' + middleName;
+            result.append(' ').append(middleName);
         }
-        return result;
+        return result.toString();
     }
 
     public String getSurname()
@@ -123,25 +123,25 @@ public class PersonName {
         return middleName;
     }
 
-    public void setMiddlename(String _middleName)
+    public void setMiddlename(String middleName)
     {
-        middleName = _middleName;
+        this.middleName = middleName;
     }
 
     public String getFullname()
     {
-        String fullName = "";
-        if (givenName != null && !givenName.isEmpty()) {
-            fullName += givenName + ' ';
+        StringBuffer fullName = new StringBuffer();
+        if ((givenName != null) && !givenName.isEmpty()) {
+            fullName.append(givenName).append(' ');
         }
-        if (middleName != null && !middleName.isEmpty()) {
-            fullName += middleName + ' ';
+        if ((middleName != null) && !middleName.isEmpty()) {
+            fullName.append(middleName).append(' ');
         }
-        if (surname != null && !surname.isEmpty()) {
-            fullName += surname;
+        if ((surname != null) && !surname.isEmpty()) {
+            fullName.append(surname);
         }
 
-        return fullName.trim();
+        return fullName.toString().trim();
     }
 
     @Override

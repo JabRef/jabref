@@ -165,7 +165,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     private boolean linksFound(BibDatabase database, String[] fields) {
         for (BibEntry entry : database.getEntries()) {
             for (String field : fields) {
-                if (entry.getField(field) != null) {
+                if (entry.hasField(field)) {
                     return true;
                 }
             }

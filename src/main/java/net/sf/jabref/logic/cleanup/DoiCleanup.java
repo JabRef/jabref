@@ -29,7 +29,7 @@ public class DoiCleanup implements Cleaner {
         ArrayList<FieldChange> changes = new ArrayList<>();
 
         // First check if the Doi Field is empty
-        if (entry.getField("doi") != null) {
+        if (entry.hasField("doi")) {
             String doiFieldValue = entry.getField("doi");
 
             Optional<DOI> doi = DOI.build(doiFieldValue);

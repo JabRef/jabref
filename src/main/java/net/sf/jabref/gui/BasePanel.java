@@ -935,7 +935,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String field = DOI_FIELD;
                 if ((bes != null) && (bes.length == 1)) {
                     Object link = bes[0].getField(DOI_FIELD);
-                    if (bes[0].getField(URL_FIELD) != null) {
+                    if (bes[0].hasField(URL_FIELD)) {
                         link = bes[0].getField(URL_FIELD);
                         field = URL_FIELD;
                     }

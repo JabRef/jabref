@@ -110,7 +110,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
             appendToField(newEntry.get(), "keywords", extractPathesToKeyWordsfield(f.getAbsolutePath()));
         }
 
-        if (newEntry.get().getField("title") == null) {
+        if (!newEntry.get().hasField("title")) {
             newEntry.get().setField("title", f.getName());
         }
 

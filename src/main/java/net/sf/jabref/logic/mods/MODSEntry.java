@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -66,7 +66,7 @@ class MODSEntry {
 
     private static final String BIBTEX = "bibtex_";
 
-    private final boolean CHARFORMAT = false;
+    private static final boolean CHARFORMAT = false;
 
     private static final Log LOGGER = LogFactory.getLog(MODSEntry.class);
 
@@ -89,7 +89,7 @@ class MODSEntry {
     }
 
     private void populateFromBibtex(BibEntry bibtex) {
-        if (bibtex.getField("title") != null) {
+        if (bibtex.hasField("title")) {
             if (CHARFORMAT) {
                 title = chars.format(bibtex.getField("title"));
             } else {
@@ -97,7 +97,7 @@ class MODSEntry {
             }
         }
 
-        if (bibtex.getField("publisher") != null) {
+        if (bibtex.hasField("publisher")) {
             if (CHARFORMAT) {
                 publisher = chars.format(bibtex.getField("publisher"));
             } else {
@@ -105,10 +105,10 @@ class MODSEntry {
             }
         }
 
-        if (bibtex.getField("bibtexkey") != null) {
+        if (bibtex.hasField("bibtexkey")) {
             id = bibtex.getField("bibtexkey");
         }
-        if (bibtex.getField("place") != null) {
+        if (bibtex.hasField("place")) {
             if (CHARFORMAT) {
                 place = chars.format(bibtex.getField("place"));
             } else {
@@ -118,7 +118,7 @@ class MODSEntry {
 
         date = getDate(bibtex);
         genre = getMODSgenre(bibtex);
-        if (bibtex.getField("author") != null) {
+        if (bibtex.hasField("author")) {
             authors = getAuthors(bibtex.getField("author"));
         }
         if ((bibtex.getType() == BibtexEntryTypes.ARTICLE) || (bibtex.getType() == BibtexEntryTypes.INPROCEEDINGS)) {
@@ -127,11 +127,11 @@ class MODSEntry {
             host.title = bibtex.getField("booktitle");
             host.publisher = bibtex.getField("publisher");
             host.number = bibtex.getField("number");
-            if (bibtex.getField("pages") != null) {
+            if (bibtex.hasField("pages")) {
                 host.volume = bibtex.getField("volume");
             }
             host.issuance = "continuing";
-            if (bibtex.getField("pages") != null) {
+            if (bibtex.hasField("pages")) {
                 host.pages = new PageNumbers(bibtex.getField("pages"));
             }
         }
@@ -144,23 +144,14 @@ class MODSEntry {
 
         for (String field : e.getFieldNames()) {
             String value = e.getField(field);
-            field = MODSEntry.BIBTEX + field;
-            extensionFields.put(field, value);
+            extensionFields.put(MODSEntry.BIBTEX + field, value);
         }
     }
 
     private List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new LinkedList<>();
 
-        if (!authors.contains(" and ")) {
-            if (CHARFORMAT) {
-                result.add(new PersonName(chars.format(authors)));
-            } else {
-                result.add(new PersonName(authors));
-            }
-        }
-        else
-        {
+        if (authors.contains(" and ")) {
             String[] names = authors.split(" and ");
             for (String name : names) {
                 if (CHARFORMAT) {
@@ -169,21 +160,27 @@ class MODSEntry {
                     result.add(new PersonName(name));
                 }
             }
+        } else {
+            if (CHARFORMAT) {
+                result.add(new PersonName(chars.format(authors)));
+            } else {
+                result.add(new PersonName(authors));
+            }
         }
         return result;
     }
 
     /* construct a MODS date object */
     private static String getDate(BibEntry bibtex) {
-        String result = "";
-        if (bibtex.getField("year") != null) {
-            result += bibtex.getField("year");
+        StringBuffer result = new StringBuffer();
+        if (bibtex.hasField("year")) {
+            result.append(bibtex.getField("year"));
         }
-        if (bibtex.getField("month") != null) {
-            result += '-' + bibtex.getField("month");
+        if (bibtex.hasField("month")) {
+            result.append('-').append(bibtex.getField("month"));
         }
 
-        return result;
+        return result.toString();
     }
 
     // must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
@@ -201,8 +198,7 @@ class MODSEntry {
             DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
             result = getDOMrepresentation(d.newDocument());
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new Error(e);
         }
         return result;
@@ -327,12 +323,13 @@ class MODSEntry {
      * @return The in String, stripped of non-valid characters.
      */
     private static String stripNonValidXMLCharacters(String in) {
-        StringBuffer out = new StringBuffer(); // Used to hold the output.
-        char current; // Used to reference the current character.
-
         if (com.google.common.base.Strings.isNullOrEmpty(in)) {
             return ""; // vacancy test.
         }
+
+        StringBuffer out = new StringBuffer(); // Used to hold the output.
+        char current; // Used to reference the current character.
+
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
             if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))

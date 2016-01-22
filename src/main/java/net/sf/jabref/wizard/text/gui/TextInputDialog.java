@@ -666,7 +666,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
              */
             String s = value.toString();
             //        setIcon((s.length > 10) ? longIcon : shortIcon);
-            if (entry.getField(s) != null) {
+            if (entry.hasField(s)) {
                 this.setForeground(Color.gray);
                 this.setFont(usedFont);
                 this.setIcon(okIcon);
