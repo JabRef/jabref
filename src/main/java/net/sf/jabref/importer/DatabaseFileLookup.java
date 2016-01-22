@@ -40,10 +40,7 @@ class DatabaseFileLookup {
 
     private final Set<File> fileCache = new HashSet<>();
 
-    private final Collection<BibEntry> entries;
-
     private final String[] possibleFilePaths;
-
 
     /**
      * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
@@ -52,9 +49,12 @@ class DatabaseFileLookup {
      */
     public DatabaseFileLookup(BibDatabase database) {
         Objects.requireNonNull(database);
+        possibleFilePaths = Optional.ofNullable(JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD)).orElse(new String[]{});
 
-        entries = database.getEntries();
-        possibleFilePaths = JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
+        for (BibEntry entry : database.getEntries()) {
+            fileCache.addAll(parseFileField(entry));
+        }
+
     }
 
     /**
@@ -72,18 +72,10 @@ class DatabaseFileLookup {
      *         entry in the database, otherwise <code>false</code>.
      */
     public boolean lookupDatabase(File file) {
-        populateCache();
-
         if (fileCache.contains(file)) {
             return true;
         } else {
             return false;
-        }
-    }
-
-    private void populateCache() {
-        for (BibEntry entry : entries) {
-            fileCache.addAll(parseFileField(entry));
         }
     }
 
