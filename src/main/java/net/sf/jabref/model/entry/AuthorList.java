@@ -1251,7 +1251,6 @@ public class AuthorList {
          */
         public String getFirstLast(boolean abbr) {
             StringBuffer res = new StringBuffer();
-            getLastOnly();
             if (abbr) {
                 res.append(firstAbbr == null ? "" : firstAbbr + ' ').append(getLastOnly());
             } else {
