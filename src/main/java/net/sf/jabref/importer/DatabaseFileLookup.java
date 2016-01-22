@@ -16,10 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibDatabase;
@@ -34,18 +31,14 @@ import net.sf.jabref.gui.FileListTableModel;
  * <br>
  * This class provides some functionality to search in a {@link BibDatabase} for
  * files. <br>
- * <br>
- *
- *
+
  * @author Nosh&Dan
- * @version 09.11.2008 | 21:21:41
- *
  */
 class DatabaseFileLookup {
 
     private static final String KEY_FILE_FIELD = "file";
 
-    private final Map<File, Boolean> cache = new HashMap<>();
+    private final Set<File> fileCache = new HashSet<>();
 
     private final Collection<BibEntry> entries;
 
@@ -53,17 +46,14 @@ class DatabaseFileLookup {
 
 
     /**
-     * Creates an instance by passing a {@link BibDatabase} which will be
-     * used for the searches.
+     * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
      *
-     * @param aDatabase
-     *            A {@link BibDatabase}.
+     * @param database A {@link BibDatabase}.
      */
-    public DatabaseFileLookup(BibDatabase aDatabase) {
-        if (aDatabase == null) {
-            throw new IllegalArgumentException("Passing a 'null' BibDatabase.");
-        }
-        entries = aDatabase.getEntries();
+    public DatabaseFileLookup(BibDatabase database) {
+        Objects.requireNonNull(database);
+
+        entries = database.getEntries();
         possibleFilePaths = JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
     }
 
@@ -82,48 +72,30 @@ class DatabaseFileLookup {
      *         entry in the database, otherwise <code>false</code>.
      */
     public boolean lookupDatabase(File file) {
-        if (cache.containsKey(file)) {
-            return cache.get(file);
-        } else {
-            boolean res = false;
-            for (BibEntry entry : entries) {
-                if (lookupEntry(file, entry)) {
-                    res = true;
-                    break;
-                }
-            }
-            cache.put(file, res);
+        populateCache();
 
-            return res;
+        if (fileCache.contains(file)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
-    /**
-     * Searches the specified {@link BibEntry} <code>entry</code> for the
-     * appearance of the specified {@link File} <code>file</code>. <br>
-     * <br>
-     * Therefore the <i>file</i>-field of the bibtex-entry will be searched for
-     * the absolute filepath of the searched file. <br>
-     * <br>
-     *
-     * @param file
-     *            A file that is searched in an bibtex-entry.
-     * @param entry
-     *            A bibtex-entry, in which the file is searched.
-     * @return <code>true</code>, if the bibtex entry stores the file in its
-     *         <i>file</i>-field, otherwise <code>false</code>.
-     */
-    private boolean lookupEntry(File file, BibEntry entry) {
-
-        if ((file == null) || (entry == null)) {
-            return false;
+    private void populateCache() {
+        for (BibEntry entry : entries) {
+            fileCache.addAll(parseFileField(entry));
         }
+    }
+
+    private List<File> parseFileField(BibEntry entry) {
+        Objects.requireNonNull(entry);
 
         FileListTableModel model = new FileListTableModel();
 
         String fileField = entry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
         model.setContent(fileField);
 
+        List<File> fileLinks = new ArrayList<>();
         for (int i = 0; i < model.getRowCount(); i++) {
             FileListEntry flEntry = model.getEntry(i);
             String link = flEntry.getLink();
@@ -133,11 +105,9 @@ class DatabaseFileLookup {
             }
 
             File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
-            if (Objects.equals(expandedFilename, file)) {
-                return true;
-            }
+            fileLinks.add(expandedFilename);
         }
 
-        return false;
+        return fileLinks;
     }
 }

@@ -12,15 +12,9 @@ import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.FileNodeWrapper;
 
 /**
- * Util class for searching files on the file system which are not linked to a
- * provided {@link BibDatabase}.
- *
- * @author Nosh&Dan
- * @version 09.11.2008 | 19:55:20
- *
+ * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
  */
 public class UnlinkedFilesCrawler {
-
     /**
      * File filter, that accepts directories only.
      */
@@ -32,8 +26,8 @@ public class UnlinkedFilesCrawler {
         this.database = database;
     }
 
-    public CheckableTreeNode searchDirectory(File directory, FileFilter aFileFilter) {
-        UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(aFileFilter, database);
+    public CheckableTreeNode searchDirectory(File directory, FileFilter filter) {
+        UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(filter, database);
         return searchDirectory(directory, ff, new AtomicBoolean(true), null);
     }
 
@@ -59,7 +53,7 @@ public class UnlinkedFilesCrawler {
         if ((state == null) || !state.get()) {
             return null;
         }
-        /* Return null if the directory is not valid. */
+        // Return null if the directory is not valid.
         if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
             return null;
         }
