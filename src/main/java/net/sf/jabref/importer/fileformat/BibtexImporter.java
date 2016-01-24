@@ -26,7 +26,10 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
- * Imported requried to support --importToOpen someEntry.bib
+ * This importer exists only to enable `--importToOpen someEntry.bib`
+ *
+ * It is NOT intended to import a bib file. This is done via the option action, which treats the metadata fields
+ * The metadata is not required to be read here, as this class is NOT called at --import
  */
 public class BibtexImporter extends ImportFormat {
 
