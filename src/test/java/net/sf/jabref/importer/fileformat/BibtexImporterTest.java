@@ -14,7 +14,14 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-
+/**
+ * This class tests the BibtexImporter.
+ * That importer is only used for --importToOpen, which is currently untested
+ *
+ * TODO:
+ *   1. Add test for --importToOpen
+ *   2. Move these tests to the code opening a bibtex file
+ */
 public class BibtexImporterTest {
 
     private BibtexImporter importer;
