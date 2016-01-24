@@ -117,6 +117,8 @@ public class JabRefCLI {
         return cl.getOptionValue("exportMatches");
     }
 
+    public boolean getGenerateBibtexKeys() { return cl.hasOption("generateBibtexKeys"); }
+
     private Options getOptions() {
         Options options = new Options();
 
@@ -191,6 +193,11 @@ public class JabRefCLI {
                 hasArg().
                 argName("FILE").
                 build());
+
+        options.addOption(Option.builder("g").
+                longOpt("generateBibtexKeys").
+                desc(Localization.lang("Regenerate all keys for the entries in a bibtex file"))
+                .build());
 
         return options;
     }

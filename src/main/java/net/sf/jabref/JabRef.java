@@ -42,6 +42,7 @@ import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
@@ -323,6 +324,16 @@ public class JabRef {
             } else {
                 System.err.println(Localization.lang("The output option depends on a valid input option."));
             } //end if(loaded.size > 0)
+        }
+
+        if(cli.getGenerateBibtexKeys()) {
+            for(ParserResult parserResult: loaded) {
+                BibDatabase database = parserResult.getDatabase();
+
+                for(BibEntry entry: database.getEntries()) {
+                    LabelPatternUtil.makeLabel(parserResult.getMetaData(), database, entry);
+                }
+            }
         }
 
         if (cli.isFileExport()) {
