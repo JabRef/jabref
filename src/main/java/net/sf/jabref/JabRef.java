@@ -50,6 +50,7 @@ import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
@@ -326,7 +327,7 @@ public class JabRef {
             } //end if(loaded.size > 0)
         }
 
-        if (cli.getGenerateBibtexKeys()) {
+        if (cli.isGenerateBibtexKeys()) {
             for (ParserResult parserResult : loaded) {
                 BibDatabase database = parserResult.getDatabase();
 
@@ -339,6 +340,19 @@ public class JabRef {
                     }
                 } else {
                     LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate bibtex keys"));
+                }
+            }
+        }
+
+        if(cli.isAutomaticallySetFileLinks()) {
+            for(ParserResult parserResult: loaded) {
+                BibDatabase database = parserResult.getDatabase();
+
+                MetaData metaData = parserResult.getMetaData();
+
+                if( metaData != null){
+                    LOGGER.info(Localization.lang("Automatically setting file links"));
+                    Util.autoSetLinks(database.getEntries(), null, null, null, metaData, null, null);
                 }
             }
         }
