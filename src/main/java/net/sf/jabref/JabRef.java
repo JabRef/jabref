@@ -328,33 +328,11 @@ public class JabRef {
         }
 
         if (cli.isGenerateBibtexKeys()) {
-            for (ParserResult parserResult : loaded) {
-                BibDatabase database = parserResult.getDatabase();
-
-                MetaData metaData = parserResult.getMetaData();
-                if (metaData != null) {
-                    LOGGER.info(Localization.lang("Regenerating bibtex keys according to metadata"));
-                    for (BibEntry entry : database.getEntries()) {
-                        // try to make a new label
-                        LabelPatternUtil.makeLabel(metaData, database, entry);
-                    }
-                } else {
-                    LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate bibtex keys"));
-                }
-            }
+            regenerateBibtexKeys(loaded);
         }
 
         if(cli.isAutomaticallySetFileLinks()) {
-            for(ParserResult parserResult: loaded) {
-                BibDatabase database = parserResult.getDatabase();
-
-                MetaData metaData = parserResult.getMetaData();
-
-                if( metaData != null){
-                    LOGGER.info(Localization.lang("Automatically setting file links"));
-                    Util.autoSetLinks(database.getEntries(), null, null, null, metaData, null, null);
-                }
-            }
+            automaticallySetFileLinks(loaded);
         }
 
         if (cli.isFileExport()) {
@@ -497,6 +475,36 @@ public class JabRef {
         }
 
         return Optional.of(loaded);
+    }
+
+    private void automaticallySetFileLinks(Vector<ParserResult> loaded) {
+        for(ParserResult parserResult: loaded) {
+            BibDatabase database = parserResult.getDatabase();
+
+            MetaData metaData = parserResult.getMetaData();
+
+            if( metaData != null){
+                LOGGER.info(Localization.lang("Automatically setting file links"));
+                Util.autoSetLinks(database.getEntries(), null, null, null, metaData, null, null);
+            }
+        }
+    }
+
+    private void regenerateBibtexKeys(Vector<ParserResult> loaded) {
+        for (ParserResult parserResult : loaded) {
+            BibDatabase database = parserResult.getDatabase();
+
+            MetaData metaData = parserResult.getMetaData();
+            if (metaData != null) {
+                LOGGER.info(Localization.lang("Regenerating bibtex keys according to metadata"));
+                for (BibEntry entry : database.getEntries()) {
+                    // try to make a new label
+                    LabelPatternUtil.makeLabel(metaData, database, entry);
+                }
+            } else {
+                LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate bibtex keys"));
+            }
+        }
     }
 
     /**
