@@ -32,7 +32,7 @@ import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.bibtex.DuplicateCheck;
+import net.sf.jabref.model.DuplicateCheck;
 
 public class DBLPFetcher implements EntryFetcher {
 

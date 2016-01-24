@@ -41,7 +41,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.bibtex.DuplicateCheck;
+import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.EntrySorter;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.logic.l10n.Localization;

@@ -58,13 +58,6 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Christoph Arbeit
- * Date: 08.09.2010
- * Time: 14:49:08
- * To change this template use File | Settings | File Templates.
- */
 public class PdfImporter {
 
     private final JabRefFrame frame;
@@ -138,7 +131,7 @@ public class PdfImporter {
         // other files: variable noPdfFiles
         List<String> files = new ArrayList<>(Arrays.asList(fileNames));
         List<String> noPdfFiles = new ArrayList<>();
-        PdfFileFilter pdfFilter = new PdfFileFilter();
+        PdfFileFilter pdfFilter = PdfFileFilter.INSTANCE;
         for (String file : files) {
             if (!pdfFilter.accept(file)) {
                 noPdfFiles.add(file);
