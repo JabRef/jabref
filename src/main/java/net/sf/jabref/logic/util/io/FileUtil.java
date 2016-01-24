@@ -83,23 +83,23 @@ public class FileUtil {
         List<String> pathSubstrings = Arrays.asList(arr);
 
         // compute shortest folder substrings
-        while(!stackList.stream().allMatch(Vector::isEmpty)) {
-            for(int i = 0; i < stackList.size(); i++) {
+        while (!stackList.stream().allMatch(Vector::isEmpty)) {
+            for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
-                if(tempString.isEmpty() && !stackList.get(i).isEmpty()) {
+                if (tempString.isEmpty() && !stackList.get(i).isEmpty()) {
                     pathSubstrings.set(i, stackList.get(i).pop());
                 } else {
-                    if(!stackList.get(i).isEmpty()) {
+                    if (!stackList.get(i).isEmpty()) {
                         pathSubstrings.set(i, stackList.get(i).pop() + File.separator + tempString);
                     }
                 }
             }
 
-            for(int i = 0; i < stackList.size(); i++) {
+            for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
-                if(Collections.frequency(pathSubstrings, tempString) == 1) {
+                if (Collections.frequency(pathSubstrings, tempString) == 1) {
                     stackList.get(i).clear();
                 }
             }
@@ -232,28 +232,29 @@ public class FileUtil {
         }
 
         File file = new File(name);
-
-        if (!file.exists() && (dir != null)) {
-            if (dir.endsWith(FILE_SEPARATOR)) {
-                name = dir + name;
-            } else {
-                name = dir + FILE_SEPARATOR + name;
-            }
-
-            // fix / and \ problems:
-            if (OS.WINDOWS) {
-                name = SLASH.matcher(name).replaceAll("\\\\");
-            } else {
-                name = BACKSLASH.matcher(name).replaceAll("/");
-            }
-
-            file = new File(name);
-
-            if (!file.exists()) {
-                file = null;
-            }
+        if (file.exists() || dir == null) {
+            return file;
         }
-        return file;
+
+        if (dir.endsWith(FILE_SEPARATOR)) {
+            name = dir + name;
+        } else {
+            name = dir + FILE_SEPARATOR + name;
+        }
+
+        // fix / and \ problems:
+        if (OS.WINDOWS) {
+            name = SLASH.matcher(name).replaceAll("\\\\");
+        } else {
+            name = BACKSLASH.matcher(name).replaceAll("/");
+        }
+
+        File fileInDir = new File(name);
+        if (fileInDir.exists()) {
+            return fileInDir;
+        } else {
+            return null;
+        }
     }
 
     /**

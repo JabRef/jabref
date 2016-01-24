@@ -25,6 +25,7 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.model.entry.FileField;
 
 /**
  * Search class for files. <br>
@@ -71,25 +72,21 @@ class DatabaseFileLookup {
      *         entry in the database, otherwise <code>false</code>.
      */
     public boolean lookupDatabase(File file) {
-        if (fileCache.contains(file)) {
-            return true;
-        } else {
-            return false;
-        }
+        return fileCache.contains(file);
     }
 
     private List<File> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
         String fileField = entry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
-        List<FileListEntry> entries = new FileListTableModel().parseFileField(fileField);
+        List<FileField.ParsedFileField> entries = FileField.parse(fileField);
 
         List<File> fileLinks = new ArrayList<>();
-        for (FileListEntry e : entries) {
-            String link = e.getLink();
+        for (FileField.ParsedFileField field : entries) {
+            String link = field.link;
 
             // Do not query external file links (huge performance leak)
-            if(link == null || link.contains("//")) {
+            if(link.contains("//")) {
                 continue;
             }
 
