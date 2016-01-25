@@ -716,6 +716,7 @@ public class BibtexParser {
 
                 parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
                         String.valueOf(line)));
+                break;
 
             case '\n':
 
