@@ -24,7 +24,7 @@ import net.sf.jabref.JabRefPreferences;
 public class FileHistory {
 
     private final JabRefPreferences prefs;
-    private final LinkedList<String> history = new LinkedList<>();
+    private final List<String> history = new LinkedList<>();
 
     private final static int HISTORY_SIZE = 8;
 
@@ -49,9 +49,9 @@ public class FileHistory {
 
     public void newFile(String filename) {
         history.remove(filename);
-        history.addFirst(filename);
+        ((LinkedList<String>) history).addFirst(filename);
         while (history.size() > HISTORY_SIZE) {
-            history.removeLast();
+            ((LinkedList<String>) history).removeLast();
         }
     }
 

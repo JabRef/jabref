@@ -236,7 +236,7 @@ public class XMPUtil {
         }
 
         // Return null if no values were found
-        return !entry.getFieldNames().isEmpty() ? entry : null;
+        return entry.getFieldNames().isEmpty() ? null : entry;
     }
 
     /**
@@ -267,10 +267,10 @@ public class XMPUtil {
             Iterator<String> it = contributors.iterator();
             StringBuffer sb = null;
             while (it.hasNext()) {
-                if (sb != null) {
-                    sb.append(" and ");
-                } else {
+                if (sb == null) {
                     sb = new StringBuffer();
+                } else {
+                    sb.append(" and ");
                 }
                 sb.append(it.next());
             }
@@ -287,10 +287,10 @@ public class XMPUtil {
             Iterator<String> it = creators.iterator();
             StringBuffer sb = null;
             while (it.hasNext()) {
-                if (sb != null) {
-                    sb.append(" and ");
-                } else {
+                if (sb == null) {
                     sb = new StringBuffer();
+                } else {
+                    sb.append(" and ");
                 }
                 sb.append(it.next());
             }
@@ -343,10 +343,10 @@ public class XMPUtil {
             Iterator<String> it = dcSchema.getPublishers().iterator();
             StringBuffer sb = null;
             while (it.hasNext()) {
-                if (sb != null) {
-                    sb.append(" and ");
-                } else {
+                if (sb == null) {
                     sb = new StringBuffer();
+                } else {
+                    sb.append(" and ");
                 }
                 sb.append(it.next());
             }
@@ -398,10 +398,10 @@ public class XMPUtil {
             Iterator<String> it = subjects.iterator();
             StringBuffer sb = null;
             while (it.hasNext()) {
-                if (sb != null) {
-                    sb.append(',');
-                } else {
+                if (sb == null) {
                     sb = new StringBuffer();
+                } else {
+                    sb.append(',');
                 }
                 sb.append(it.next());
             }
@@ -432,7 +432,7 @@ public class XMPUtil {
             }
         }
 
-        return !entry.getFieldNames().isEmpty() ? entry : null;
+        return entry.getFieldNames().isEmpty() ? null : entry;
     }
 
     /**
@@ -929,10 +929,10 @@ public class XMPUtil {
         PDMetadata metaRaw = catalog.getMetadata();
 
         XMPMetadata meta;
-        if (metaRaw != null) {
-            meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
-        } else {
+        if (metaRaw == null) {
             meta = new XMPMetadata();
+        } else {
+            meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
         }
 
         // Remove all current Dublin-Core schemas
@@ -1077,11 +1077,10 @@ public class XMPUtil {
             PDMetadata metaRaw = catalog.getMetadata();
 
             XMPMetadata meta;
-            if (metaRaw != null) {
-                meta = new XMPMetadata(XMLUtil.parse(metaRaw
-                        .createInputStream()));
-            } else {
+            if (metaRaw == null) {
                 meta = new XMPMetadata();
+            } else {
+                meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
             }
             meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE,
                     XMPSchemaBibtex.class);

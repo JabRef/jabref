@@ -42,7 +42,6 @@ import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
-import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -154,9 +153,9 @@ public class Util {
         return net.sf.jabref.util.Util.replaceSpecialCharacters(newKey.toString());
     }
 
-    public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
+    public static List<String[]> parseMethodsCalls(String calls) throws RuntimeException {
 
-        ArrayList<String[]> result = new ArrayList<>();
+        List<String[]> result = new ArrayList<>();
 
         char[] c = calls.toCharArray();
 
@@ -242,7 +241,7 @@ public class Util {
     private static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
 
     public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database) {
-        Matcher m = net.sf.jabref.util.Util.squareBracketsPattern.matcher(bracketString);
+        Matcher m = Util.squareBracketsPattern.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
             String replacement = Optional.ofNullable(getFieldAndFormat(m.group(), entry, database)).orElse("");
@@ -261,10 +260,6 @@ public class Util {
      */
     public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner, boolean overwriteTimestamp, boolean markEntries) {
 
-        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-
-        String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
         boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER);
         boolean globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
 
@@ -272,6 +267,10 @@ public class Util {
         if (!(globalSetOwner || globalSetTimeStamp || markEntries)) {
             return;
         }
+
+        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
+        String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
+        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
@@ -388,7 +387,7 @@ public class Util {
     public static OpenFileFilter getFileFilterForField(String fieldName) {
         String s = BibtexFields.getFieldExtras(fieldName);
         final String ext = "." + fieldName.toLowerCase();
-        final OpenFileFilter off;
+        OpenFileFilter off;
         if (BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(s)) {
             off = new OpenFileFilter(new String[]{ext, ext + ".gz", ext + ".bz2"});
         } else {
@@ -418,10 +417,10 @@ public class Util {
             if (!overwriteValues && (oldVal != null) && !oldVal.isEmpty()) {
                 continue;
             }
-            if (text != null) {
-                entry.setField(field, text);
-            } else {
+            if (text == null) {
                 entry.clearField(field);
+            } else {
+                entry.setField(field, text);
             }
             ce.addEdit(new UndoableFieldChange(entry, field, oldVal, text));
         }
@@ -464,40 +463,6 @@ public class Util {
     }
 
     /**
-<<<<<<< HEAD
-=======
-     * Optimized method for converting a String into an Integer
-     * <p>
-     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
-     *
-     * @param str the String holding an Integer value
-     * @return the int value of str
-     * @throws NumberFormatException if str cannot be parsed to an int
-     */
-    public static int intValueOf(String str) {
-        int ival = 0;
-        int idx = 0;
-        int end;
-        boolean sign = false;
-        char ch;
-
-        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
-            throw new NumberFormatException(str);
-        }
-
-        for (; ; ival *= 10) {
-            ival += '0' - ch;
-            if (++idx == end) {
-                return sign ? ival : -ival;
-            }
-            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
-                throw new NumberFormatException(str);
-            }
-        }
-    }
-
-    /**
->>>>>>> origin/master
      * Run an AbstractWorker's methods using Spin features to put each method on the correct thread.
      *
      * @param worker The worker to run.
@@ -653,10 +618,10 @@ public class Util {
         source.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
 
         InputStreamReader in;
-        if (encoding != null) {
-            in = new InputStreamReader(source.getInputStream(), encoding);
-        } else {
+        if (encoding == null) {
             in = new InputStreamReader(source.getInputStream());
+        } else {
+            in = new InputStreamReader(source.getInputStream(), encoding);
         }
 
         StringBuilder sb = new StringBuilder();
@@ -752,7 +717,7 @@ public class Util {
      * otherwise (this indicates that the user has aborted the assignment).
      */
     public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibEntry[] entries, BibDatabase db, Component parent) {
-        Vector<String> affectedFields = new Vector<>();
+        List<String> affectedFields = new ArrayList<>();
         for (AbstractGroup group : groups) {
             if (group instanceof KeywordGroup) {
                 KeywordGroup kg = (KeywordGroup) group;
@@ -774,8 +739,8 @@ public class Util {
 
         // show a warning, then return
         StringBuffer message = new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
-        for (int i = 0; i < affectedFields.size(); ++i) {
-            message.append(affectedFields.elementAt(i)).append("\n");
+        for (String affectedField : affectedFields) {
+            message.append(affectedField).append('\n');
         }
         message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
         int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -916,7 +881,7 @@ public class Util {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
                 } else {
-                    result = net.sf.jabref.logic.util.io.FileUtil.findAssociatedFiles(entries, extensions, dirs);
+                    result = FileUtil.findAssociatedFiles(entries, extensions, dirs);
                 }
 
                 boolean foundAny = false;

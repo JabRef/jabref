@@ -23,6 +23,7 @@ import java.awt.event.KeyListener;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
@@ -89,7 +90,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private boolean cancelled;
 
-    private final TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<>();
+    private final Set<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<>();
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
@@ -325,7 +326,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 //   check if something is added
                 //   if yes, add all keywords of that special fields to the keywords to be removed
 
-                HashSet<String> clone;
+                Set<String> clone;
 
                 // Priority
                 clone = createClone(keywordsToAdd);
@@ -379,7 +380,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             // we "intercept" with a treeset
             // pro: no duplicates
             // possible con: alphabetical sorting of the keywords
-            TreeSet<String> keywords = new TreeSet<>();
+            Set<String> keywords = new TreeSet<>();
             keywords.addAll(separatedKeywords);
 
             // update keywords
@@ -405,7 +406,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         bp.markBaseChanged();
     }
 
-    private static HashSet<String> createClone(HashSet<String> keywordsToAdd) {
+    private static Set<String> createClone(Set<String> keywordsToAdd) {
         return new HashSet<>(keywordsToAdd);
     }
 
