@@ -61,7 +61,7 @@ import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.bibtex.DuplicateCheck;
+import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.EntryUtil;

@@ -141,9 +141,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
         if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
-            String title = entry.getField("title");
-            if (title != null) {
-
+            entry.getFieldOptional("title").ifPresent(title -> {
                 // Unit formatting
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitFormatter.format(title);
@@ -154,7 +152,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);
-            }
+            });
         }
         return entry;
     }

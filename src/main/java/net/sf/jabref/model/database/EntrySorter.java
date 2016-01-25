@@ -21,7 +21,7 @@ import java.util.*;
 
 public class EntrySorter implements DatabaseChangeListener {
 
-    private final ArrayList<BibEntry> set;
+    private final List<BibEntry> set;
     private final Comparator<BibEntry> comp;
     private String[] idArray;
     private BibEntry[] entryArray;

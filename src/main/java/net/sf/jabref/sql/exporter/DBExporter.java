@@ -100,7 +100,6 @@ public abstract class DBExporter extends DBImporterExporter {
      */
     private void populateEntriesTable(final int database_id, List<BibEntry> entries, Object out) throws SQLException {
         StringBuilder query = new StringBuilder(75);
-        String val;
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, " + fieldStr
                 + ", database_id) VALUES (";
         for (BibEntry entry : entries) {
@@ -109,10 +108,8 @@ public abstract class DBExporter extends DBImporterExporter {
                     .append(entry.getType().getName().toLowerCase()).append("'), '").append(entry.getCiteKey()).append('\'');
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 query.append(", ");
-                val = entry.getField(SQLUtil.getAllFields().get(i));
-                if (val == null) {
-                    query.append("NULL");
-                } else {
+                if (entry.hasField(SQLUtil.getAllFields().get(i))) {
+                    String val = entry.getField(SQLUtil.getAllFields().get(i));
                     /**
                      * The condition below is there since PostgreSQL automatically escapes the backslashes, so the entry
                      * would double the number of slashes after storing/retrieving.
@@ -124,6 +121,8 @@ public abstract class DBExporter extends DBImporterExporter {
                         val = val.replace("`", "\\`");
                     }
                     query.append('\'').append(val).append('\'');
+                } else {
+                    query.append("NULL");
                 }
             }
             query.append(", '").append(database_id).append("');");

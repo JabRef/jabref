@@ -507,7 +507,7 @@ public class BibtexParser {
             content = StringUtil.removeBracesAroundCapitals(content);
         }
         if (!content.isEmpty()) {
-            if (entry.getField(key) == null) {
+            if (!entry.hasField(key)) {
                 entry.setField(key, content);
             } else {
                 // The following hack enables the parser to deal with multiple
@@ -795,7 +795,7 @@ public class BibtexParser {
                     // return what we
                     // have found, as the key and try to restore the rest in fixKey().
                     return token + fixKey();
-                } else if (character == ',' || character == '}') {
+                } else if ((character == ',') || (character == '}')) {
                     unread(character);
                     return token.toString();
                 } else if (character == '=') {

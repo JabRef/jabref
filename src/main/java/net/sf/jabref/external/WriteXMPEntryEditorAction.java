@@ -73,10 +73,9 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
         // Then check the "file" field:
         dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
-        String field = entry.getField(Globals.FILE_FIELD);
-        if (field != null) {
+        if (entry.hasField(Globals.FILE_FIELD)) {
             FileListTableModel tm = new FileListTableModel();
-            tm.setContent(field);
+            tm.setContent(entry.getField(Globals.FILE_FIELD));
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
                 if ((flEntry.getType() != null) && "pdf".equals(flEntry.getType().getName().toLowerCase())) {

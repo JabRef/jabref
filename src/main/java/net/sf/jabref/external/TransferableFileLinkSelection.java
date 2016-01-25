@@ -38,11 +38,8 @@ public class TransferableFileLinkSelection implements Transferable {
 
 
     public TransferableFileLinkSelection(BasePanel panel, BibEntry[] selection) {
-        String s = selection[0].getField(Globals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
-        if (s != null) {
-            tm.setContent(s);
-        }
+        selection[0].getFieldOptional(Globals.FILE_FIELD).ifPresent(file -> tm.setContent(file));
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
             String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);

@@ -2,6 +2,7 @@ package net.sf.jabref.bibtex;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
