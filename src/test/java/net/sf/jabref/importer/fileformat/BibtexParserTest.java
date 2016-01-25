@@ -750,7 +750,6 @@ public class BibtexParserTest {
     }
 
     @Test
-    @Ignore
     public void parseRecognizesPreambleWithWhitespace() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader("@preamble {some text and \\latex}"));

@@ -169,18 +169,20 @@ public class BibtexParser {
             EntryType type = EntryTypes.getType(entryType);
             boolean isEntry = type != null;
 
+            String trimmedEntryType = entryType.toLowerCase().trim();
+
             // The entry type name was not recognized. This can mean
             // that it is a string, preamble, or comment. If so,
             // parse and set accordingly. If not, assume it is an entry
             // with an unknown type.
             if (!isEntry) {
-                if ("preamble".equals(entryType.toLowerCase())) {
+                if ("preamble".equals(trimmedEntryType)) {
                     database.setPreamble(parsePreamble());
                     // the preamble is saved verbatim anyways, so the text read so far can be dropped
                     dumpTextReadSoFarToString();
-                } else if ("string".equals(entryType.toLowerCase())) {
+                } else if ("string".equals(trimmedEntryType)) {
                     parseBibtexString();
-                } else if ("comment".equals(entryType.toLowerCase())) {
+                } else if ("comment".equals(trimmedEntryType)) {
                     parseJabRefComment(meta);
                 } else {
                     // The entry type was not recognized. This may mean that
@@ -455,6 +457,7 @@ public class BibtexParser {
     }
 
     private String parsePreamble() throws IOException {
+        skipWhitespace();
         return parseBracketedText().toString();
     }
 
