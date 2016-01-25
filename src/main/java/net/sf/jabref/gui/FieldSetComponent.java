@@ -15,10 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -188,7 +185,10 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
         // Make sure it is visible:
         JViewport viewport = sp.getViewport();
-        viewport.scrollRectToVisible(list.getCellBounds(idx, idx));
+        Rectangle rectangle = list.getCellBounds(idx, idx);
+        if(rectangle != null) {
+            viewport.scrollRectToVisible(rectangle);
+        }
 
     }
 
