@@ -16,8 +16,12 @@
 package net.sf.jabref.logic.util.io;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.entry.BibEntry;
+
+import net.sf.jabref.model.entry.FileField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -315,4 +319,78 @@ public class FileUtil {
             return fileName;
         }
     }
+
+    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
+        HashMap<BibEntry, List<File>> result = new HashMap<>();
+
+        // First scan directories
+        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
+
+        // Initialize Result-Set
+        for (BibEntry entry : entries) {
+            result.put(entry, new ArrayList<>());
+        }
+
+        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
+        // Now look for keys
+        nextFile: for (File file : filesWithExtension) {
+
+            String name = file.getName();
+            int dot = name.lastIndexOf('.');
+            // First, look for exact matches:
+            for (BibEntry entry : entries) {
+                String citeKey = entry.getCiteKey();
+                if ((citeKey != null) && !citeKey.isEmpty()) {
+                    if (dot > 0) {
+                        if (name.substring(0, dot).equals(citeKey)) {
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
+            // If we get here, we didn't find any exact matches. If non-exact
+            // matches are allowed, try to find one:
+            if (!exactOnly) {
+                for (BibEntry entry : entries) {
+                    String citeKey = entry.getCiteKey();
+                    if ((citeKey != null) && !citeKey.isEmpty()) {
+                        if (name.startsWith(citeKey)) {
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns the list of linked files. The files have the absolute filename
+     *
+     * @param bes list of BibTeX entries
+     * @param fileDirs list of directories to try for expansion
+     *
+     * @return list of files. May be empty
+     */
+    public static List<File> getListOfLinkedFiles(List<BibEntry> bes, List<String> fileDirs) {
+        Objects.requireNonNull(bes);
+        Objects.requireNonNull(fileDirs);
+
+        List<File> result = new ArrayList<>();
+        for (BibEntry entry : bes) {
+            List<FileField.ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
+            for (FileField.ParsedFileField file : fileList) {
+                File f = expandFilename(file.link, fileDirs.toArray(new String[fileDirs.size()]));
+                if (f != null) {
+                    result.add(f);
+                }
+            }
+        }
+
+        return result;
+    }
+
 }

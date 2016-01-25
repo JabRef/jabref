@@ -345,8 +345,8 @@ public class SearchResultsDialog {
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null,
-                                p.metaData(), fl.getType())).actionPerformed(null);
+                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
+                                p.metaData(), fl.type)).actionPerformed(null);
                     }
                     break;
                 case URL_COL:
@@ -386,13 +386,13 @@ public class SearchResultsDialog {
                 // If there are one or more links, open the first one:
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
-                    String description = flEntry.getDescription();
+                    String description = flEntry.description;
                     if ((description == null) || (description.trim().isEmpty())) {
-                        description = flEntry.getLink();
+                        description = flEntry.link;
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
-                            flEntry.getLink(), flEntry.getType().getIcon(), p.metaData(),
-                            flEntry.getType()));
+                            flEntry.link, flEntry.type.getIcon(), p.metaData(),
+                            flEntry.type));
                     count++;
                 }
 
@@ -464,7 +464,7 @@ public class SearchResultsDialog {
                         tmpModel.setContent((String) o);
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            fileLabel.setIcon(tmpModel.getEntry(0).getType().getIcon());
+                            fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
                         }
                         return fileLabel;
                     } else {

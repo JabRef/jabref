@@ -138,7 +138,7 @@ public class SynchronizeFileField extends AbstractWorker {
                     for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // See if the link looks like an URL:
-                        boolean httpLink = flEntry.getLink().toLowerCase().startsWith("http");
+                        boolean httpLink = flEntry.link.toLowerCase().startsWith("http");
                         if (httpLink)
                         {
                             continue; // Don't check the remote file.
@@ -149,13 +149,13 @@ public class SynchronizeFileField extends AbstractWorker {
                         boolean deleted = false;
 
                         // Get an absolute path representation:
-                        File file = FileUtil.expandFilename(flEntry.getLink(), dirsS);
+                        File file = FileUtil.expandFilename(flEntry.link, dirsS);
                         if ((file == null) || !file.exists()) {
                             int answer;
                             if (!removeAllBroken) {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
                                         Localization.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                flEntry.getLink(), aSel.getCiteKey()),
+                                                flEntry.link, aSel.getCiteKey()),
                                         Localization.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
@@ -190,14 +190,14 @@ public class SynchronizeFileField extends AbstractWorker {
                         }
 
                         // Unless we deleted this link, see if its file type is recognized:
-                        if (!deleted && (flEntry.getType() instanceof UnknownExternalFileType)) {
+                        if (!deleted && (flEntry.type instanceof UnknownExternalFileType)) {
                             String[] options = new String[] {
-                                    Localization.lang("Define '%0'", flEntry.getType().getName()),
+                                    Localization.lang("Define '%0'", flEntry.type.getName()),
                                     Localization.lang("Change file type"),
                                     Localization.lang("Cancel")};
                             String defOption = options[0];
                             int answer = JOptionPane.showOptionDialog(panel.frame(), Localization.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
-                                    flEntry.getType().getName()),
+                                    flEntry.type.getName()),
                                     Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE, null, options, defOption
                                     );
@@ -205,17 +205,18 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User doesn't want to handle this unknown link type.
                             } else if (answer == JOptionPane.YES_OPTION) {
                                 // User wants to define the new file type. Show the dialog:
-                                ExternalFileType newType = new ExternalFileType(flEntry.getType().getName(), "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
+                                ExternalFileType newType = new ExternalFileType(flEntry.type.getName(), "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
                                 ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(panel.frame(), newType);
                                 editor.setVisible(true);
                                 if (editor.okPressed()) {
                                     // Get the old list of types, add this one, and update the list in prefs:
                                     List<ExternalFileType> fileTypes = new ArrayList<>();
-                                    ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
+                                    ExternalFileType[] oldTypes = ExternalFileTypes.getInstance()
+                                            .getExternalFileTypeSelection();
                                     Collections.addAll(fileTypes, oldTypes);
                                     fileTypes.add(newType);
                                     Collections.sort(fileTypes);
-                                    Globals.prefs.setExternalFileTypes(fileTypes);
+                                    ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
                                     panel.mainTable.repaint();
                                 }
                             } else {

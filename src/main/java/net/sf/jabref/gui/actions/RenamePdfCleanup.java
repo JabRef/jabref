@@ -45,7 +45,7 @@ public class RenamePdfCleanup implements Cleaner {
         boolean changed = false;
 
         for (int i = 0; i < flModel.getRowCount(); i++) {
-            String realOldFilename = flModel.getEntry(i).getLink();
+            String realOldFilename = flModel.getEntry(i).link;
 
             if (onlyRelativePaths && (new File(realOldFilename).isAbsolute())) {
                 continue;
@@ -55,7 +55,7 @@ public class RenamePdfCleanup implements Cleaner {
             //String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
 
             //Add extension to newFilename
-            newFilename = newFilename + "." + flModel.getEntry(i).getType().getExtension();
+            newFilename = newFilename + "." + flModel.getEntry(i).type.getExtension();
 
             //get new Filename with path
             //Create new Path based on old Path and new filename
@@ -80,8 +80,8 @@ public class RenamePdfCleanup implements Cleaner {
                 changed = true;
 
                 //Change the path for this entry
-                String description = flModel.getEntry(i).getDescription();
-                ExternalFileType type = flModel.getEntry(i).getType();
+                String description = flModel.getEntry(i).description;
+                ExternalFileType type = flModel.getEntry(i).type;
                 flModel.removeEntry(i);
 
                 // we cannot use "newPath" to generate a FileListEntry as newPath is absolute, but we want to keep relative paths whenever possible

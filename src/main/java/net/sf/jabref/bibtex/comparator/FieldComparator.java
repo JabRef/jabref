@@ -17,11 +17,11 @@ package net.sf.jabref.bibtex.comparator;
 
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.maintable.MainTableFormat;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.YearUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 import java.text.Collator;
 import java.text.ParseException;
@@ -144,13 +144,13 @@ public class FieldComparator implements Comparator<BibEntry> {
             Integer i1 = null;
             Integer i2 = null;
             try {
-                i1 = Util.intValueOf((String) f1);
+                i1 = StringUtil.intValueOf((String) f1);
             } catch (NumberFormatException ex) {
                 // Parsing failed.
             }
 
             try {
-                i2 = Util.intValueOf((String) f2);
+                i2 = StringUtil.intValueOf((String) f2);
             } catch (NumberFormatException ex) {
                 // Parsing failed.
             }

@@ -35,11 +35,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.EntryContainer;
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 
 class FileListEditorTransferHandler extends TransferHandler {
@@ -124,7 +124,7 @@ class FileListEditorTransferHandler extends TransferHandler {
                             Optional<String> extension = FileUtil.getFileExtension(name);
                             ExternalFileType fileType = null;
                             if (extension.isPresent()) {
-                                fileType = Globals.prefs.getExternalFileTypeByExt(extension.get());
+                                fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                             }
                             if (fileType != null) {
                                 if (droppedFileHandler == null) {

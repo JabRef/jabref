@@ -24,8 +24,7 @@ public class AttachFileAction implements BaseAction {
 
     @Override
     public void action() {
-        if (panel.getSelectedEntries().length != 1)
-         {
+        if (panel.getSelectedEntries().length != 1) {
             return; // TODO: display error message?
         }
         BibEntry entry = panel.getSelectedEntries()[0];

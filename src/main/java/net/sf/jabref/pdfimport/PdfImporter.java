@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryTypeDialog;
 import net.sf.jabref.gui.FileListEntry;
@@ -221,7 +222,7 @@ public class PdfImporter {
                     File toLink = new File(fileName);
                     tm.addEntry(0, new FileListEntry(toLink.getName(),
                             FileUtil.shortenFileName(toLink, dirsS).getPath(),
-                            Globals.prefs.getExternalFileTypeByName("pdf")));
+                                    ExternalFileTypes.getInstance().getExternalFileTypeByName("pdf")));
                     entry.setField(Globals.FILE_FIELD, tm.getStringRepresentation());
                     res.add(entry);
                     break;

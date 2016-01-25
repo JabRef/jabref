@@ -28,12 +28,11 @@ public class FileEntryCleaner implements Cleaner {
         boolean changed = false;
         for (int i = 0; i < flModel.getRowCount(); i++) {
             FileListEntry flEntry = flModel.getEntry(i);
-            String link = flEntry.getLink();
-            String description = flEntry.getDescription();
+            String link = flEntry.link;
+            String description = flEntry.description;
             if ("".equals(link) && (!"".equals(description))) {
-                // link and description seem to be switched, quickly fix that
-                flEntry.setLink(flEntry.getDescription());
-                flEntry.setDescription("");
+                flModel.setEntry(i, flEntry.switchLinkAndDescription());
+
                 changed = true;
             }
         }

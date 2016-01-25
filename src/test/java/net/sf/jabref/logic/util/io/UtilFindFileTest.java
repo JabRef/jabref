@@ -2,7 +2,6 @@ package net.sf.jabref.logic.util.io;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.testutils.AssertUtil;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.FileBasedTestCase;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -85,7 +84,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
         Collection<File> dirs = Arrays.asList(new File(root.getAbsoluteFile() + "/pdfs/"),
                 new File(root.getAbsoluteFile() + "/graphicsDir/"));
 
-        Map<BibEntry, List<File>> results = Util.findAssociatedFiles(entries, extensions, dirs);
+        Map<BibEntry, List<File>> results = FileUtil.findAssociatedFiles(entries, extensions, dirs);
 
         Assert.assertEquals(2, results.get(entry).size());
         Assert.assertTrue(

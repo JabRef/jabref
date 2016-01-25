@@ -3,6 +3,7 @@ package net.sf.jabref.gui.desktop;
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
@@ -90,7 +91,7 @@ public class JabRefDesktop {
         } else if ("ps".equals(fieldName)) {
             try {
                 if (OS.OS_X) {
-                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
+                    ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("ps");
                     String viewer = type != null ? type.getOpenWith() : Globals.prefs.get(JabRefPreferences.PSVIEWER);
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
@@ -102,7 +103,7 @@ public class JabRefDesktop {
                      * cmdArray[0] + " " + cmdArray[1]);
                      */
                 } else {
-                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
+                    ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("ps");
                     String viewer = type != null ? type.getOpenWith() : "xdg-open";
                     String[] cmdArray = new String[2];
                     cmdArray[0] = viewer;
@@ -115,7 +116,7 @@ public class JabRefDesktop {
         } else if ("pdf".equals(fieldName)) {
             try {
                 if (OS.OS_X) {
-                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
+                    ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
                     String viewer = type != null ? type.getOpenWith() : Globals.prefs.get(JabRefPreferences.PSVIEWER);
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
@@ -133,7 +134,7 @@ public class JabRefDesktop {
                      * Process child = Runtime.getRuntime().exec(cmd);
                      */
                 } else {
-                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
+                    ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
                     String viewer = type != null ? type.getOpenWith() : Globals.prefs.get(JabRefPreferences.PSVIEWER);
                     String[] cmdArray = new String[2];
                     cmdArray[0] = viewer;
@@ -278,8 +279,6 @@ public class JabRefDesktop {
             System.out.println("Downloading to '" + temp.getPath() + "'");
             new URLDownload(new URL(link)).downloadToFile(temp);
             System.out.println("Done");
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -321,11 +320,11 @@ public class JabRefDesktop {
             if (editor.okPressed()) {
                 // Get the old list of types, add this one, and update the list in prefs:
                 List<ExternalFileType> fileTypes = new ArrayList<>();
-                ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
+                ExternalFileType[] oldTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
                 Collections.addAll(fileTypes, oldTypes);
                 fileTypes.add(newType);
                 Collections.sort(fileTypes);
-                Globals.prefs.setExternalFileTypes(fileTypes);
+                ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
                 // Finally, open the file:
                 return openExternalFileAnyFormat(metaData, link, newType);
             } else {
@@ -344,7 +343,7 @@ public class JabRefDesktop {
             // Then find which one we are looking at:
             for (int i = 0; i < tModel.getRowCount(); i++) {
                 FileListEntry iEntry = tModel.getEntry(i);
-                if (iEntry.getLink().equals(link)) {
+                if (iEntry.link.equals(link)) {
                     flEntry = iEntry;
                     break;
                 }
@@ -365,7 +364,7 @@ public class JabRefDesktop {
                 frame.getCurrentBasePanel().undoManager.addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
-                return openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
+                return openExternalFileAnyFormat(metaData, flEntry.link, flEntry.type);
             } else {
                 // Cancelled:
                 frame.output(cancelMessage);
@@ -425,7 +424,7 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openBrowser(String url) throws IOException {
-        ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
+        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
     }
 }

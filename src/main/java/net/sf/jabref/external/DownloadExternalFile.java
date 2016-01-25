@@ -143,7 +143,7 @@ public class DownloadExternalFile {
         ExternalFileType suggestedType = null;
         if (mimeType != null) {
             LOGGER.debug("MIME Type suggested: " + mimeType);
-            suggestedType = Globals.prefs.getExternalFileTypeByMimeType(mimeType);
+            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix;
@@ -152,7 +152,7 @@ public class DownloadExternalFile {
         } else {
             // If we didn't find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
-            suggestedType = Globals.prefs.getExternalFileTypeByExt(suffix);
+            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix);
         }
 
         String suggestedName = getSuggestedFileName(suffix);
@@ -173,8 +173,7 @@ public class DownloadExternalFile {
 
             @Override
             public boolean confirmClose(FileListEntry entry) {
-                File f = directory != null ? expandFilename(directory, entry.getLink())
-                        : new File(entry.getLink());
+                File f = directory != null ? expandFilename(directory, entry.link) : new File(entry.link);
                 if (f.isDirectory()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
                             Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
@@ -196,8 +195,7 @@ public class DownloadExternalFile {
         }
         // Editor closed. Go on:
         if (editor.okPressed()) {
-            File toFile = directory != null ? expandFilename(directory, entry.getLink())
-                    : new File(entry.getLink());
+            File toFile = directory != null ? expandFilename(directory, entry.link) : new File(entry.link);
             String dirPrefix;
             if (directory != null) {
                 if (!directory.endsWith(System.getProperty("file.separator"))) {
@@ -218,9 +216,9 @@ public class DownloadExternalFile {
 
                 // If the local file is in or below the main file directory, change the
                 // path to relative:
-                if ((directory != null) && entry.getLink().startsWith(directory) &&
-                        (entry.getLink().length() > dirPrefix.length())) {
-                    entry.setLink(entry.getLink().substring(dirPrefix.length()));
+                if ((directory != null) && entry.link.startsWith(directory) &&
+                        (entry.link.length() > dirPrefix.length())) {
+                    entry = new FileListEntry(entry.description, entry.link.substring(dirPrefix.length()), entry.type);
                 }
 
                 callback.downloadComplete(entry);
@@ -318,7 +316,7 @@ public class DownloadExternalFile {
         } else {
             suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
+        if (ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix) != null) {
             return suffix;
         } else {
             // If the suffix doesn't seem to give any reasonable file type, try

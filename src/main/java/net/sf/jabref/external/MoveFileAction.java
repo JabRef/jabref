@@ -15,19 +15,21 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.CheckBoxMessage;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
-
-import javax.swing.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +64,7 @@ public class MoveFileAction extends AbstractAction {
         }
         FileListEntry flEntry = editor.getTableModel().getEntry(selected);
         // Check if the current file exists:
-        String ln = flEntry.getLink();
+        String ln = flEntry.link;
         boolean httpLink = ln.toLowerCase().startsWith("http");
         if (httpLink) {
             // TODO: notify that this operation cannot be done on remote links
@@ -90,8 +92,8 @@ public class MoveFileAction extends AbstractAction {
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
             String extension = null;
-            if (flEntry.getType() != null) {
-                extension = "." + flEntry.getType().getExtension();
+            if (flEntry.type != null) {
+                extension = "." + flEntry.type.getExtension();
             }
 
             File newFile = null;
@@ -102,7 +104,7 @@ public class MoveFileAction extends AbstractAction {
                 if (toFileDir) {
                     // Determine which name to suggest:
                     String suggName = Util.getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry()).concat(".")
-                            .concat(flEntry.getType().getExtension());
+                            .concat(flEntry.type.getExtension());
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),
                             Globals.prefs.getBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR));
@@ -126,8 +128,7 @@ public class MoveFileAction extends AbstractAction {
                     if (cbm.isSelected()) {
                         // Rename:
                         sb.append(suggName);
-                    }
-                    else {
+                    } else {
                         // Do not rename:
                         sb.append(file.getName());
                     }
@@ -165,13 +166,17 @@ public class MoveFileAction extends AbstractAction {
                         if (newFile.getCanonicalPath().startsWith(canPath)) {
                             if ((newFile.getCanonicalPath().length() > canPath.length()) &&
                                     (newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar)) {
-                                flEntry.setLink(newFile.getCanonicalPath().substring(1 + canPath.length()));
+
+                                String newLink = newFile.getCanonicalPath().substring(1 + canPath.length());
+                                editor.getTableModel().setEntry(selected, new FileListEntry(flEntry.description, newLink, flEntry.type));
                             } else {
-                                flEntry.setLink(newFile.getCanonicalPath().substring(canPath.length()));
+                                String newLink = newFile.getCanonicalPath().substring(canPath.length());
+                                editor.getTableModel().setEntry(selected, new FileListEntry(flEntry.description, newLink, flEntry.type));
                             }
 
                         } else {
-                            flEntry.setLink(newFile.getCanonicalPath());
+                            String newLink = newFile.getCanonicalPath();
+                            editor.getTableModel().setEntry(selected, new FileListEntry(flEntry.description, newLink, flEntry.type));
                         }
                         eEditor.updateField(editor);
                         //JOptionPane.showMessageDialog(frame, Globals.lang("File moved"),
@@ -193,7 +198,7 @@ public class MoveFileAction extends AbstractAction {
         } else {
 
             // File doesn't exist, so we can't move it.
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not find file '%0'.", flEntry.getLink()),
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not find file '%0'.", flEntry.link),
                     Localization.lang("File not found"), JOptionPane.ERROR_MESSAGE);
 
         }

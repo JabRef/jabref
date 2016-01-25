@@ -37,12 +37,12 @@ public class RelativePathsCleanup implements Cleaner {
         boolean changed = false;
         for (int i = 0; i < flModel.getRowCount(); i++) {
             FileListEntry flEntry = flModel.getEntry(i);
-            String oldFileName = flEntry.getLink();
+            String oldFileName = flEntry.link;
             String newFileName = FileUtil
                     .shortenFileName(new File(oldFileName), paths)
                     .toString();
             if (!oldFileName.equals(newFileName)) {
-                flEntry.setLink(newFileName);
+                flModel.setEntry(i, new FileListEntry(flEntry.description, newFileName, flEntry.type));
                 changed = true;
             }
         }

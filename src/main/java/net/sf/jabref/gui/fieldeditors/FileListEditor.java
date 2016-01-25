@@ -226,7 +226,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 if (row >= 0) {
                     FileListEntry entry = tableModel.getEntry(row);
                     try {
-                        JabRefDesktop.openFolderAndSelectFile(entry.getLink());
+                        JabRefDesktop.openFolderAndSelectFile(entry.link);
                     } catch (IOException ex) {
                         LOGGER.debug("Cannot open folder", ex);
                     }
@@ -255,7 +255,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
-                File file = FileUtil.expandFilename(metaData, entry.getLink());
+                File file = FileUtil.expandFilename(metaData, entry.link);
 
                 // transactional delete and unlink
                 try {
@@ -277,9 +277,10 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         if (row >= 0) {
             FileListEntry entry = tableModel.getEntry(row);
             try {
-                ExternalFileType type = Globals.prefs.getExternalFileTypeByName(entry.getType().getName());
-                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(),
-                        type != null ? type : entry.getType());
+                ExternalFileType type = ExternalFileTypes.getInstance()
+                        .getExternalFileTypeByName(entry.type.getName());
+                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.link,
+                        type != null ? type : entry.type);
             } catch (IOException e) {
                 LOGGER.warn("Cannot open selected file.", e);
             }

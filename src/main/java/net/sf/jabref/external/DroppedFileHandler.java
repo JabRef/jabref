@@ -176,7 +176,7 @@ public class DroppedFileHandler {
     }
 
     public void linkPdfToEntry(String fileName, MainTable entryTable, BibEntry entry) {
-        ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
+        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         // Show dialog
@@ -213,7 +213,7 @@ public class DroppedFileHandler {
     }
 
     public void importXmp(List<BibEntry> xmpEntriesInFile, String fileName) {
-        ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
+        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         boolean isSingle = xmpEntriesInFile.size() == 1;
@@ -459,8 +459,8 @@ public class DroppedFileHandler {
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
                 // Find the absolute filename for this existing link:
-                String absName = !new File(flEntry.getLink()).isAbsolute() && (dirs.length > 0) ?
-                        FileUtil.expandFilename(flEntry.getLink(), dirs).getAbsolutePath() : flEntry.getLink();
+                String absName = !new File(flEntry.link).isAbsolute() && (dirs.length > 0) ?
+                        FileUtil.expandFilename(flEntry.link, dirs).getAbsolutePath() : flEntry.link;
                 System.out.println("absName: " + absName);
                 // If the filenames are equal, we don't need to link, so we simply return:
                 if (absFilename.equals(absName)) {

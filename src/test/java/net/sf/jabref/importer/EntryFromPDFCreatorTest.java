@@ -1,8 +1,8 @@
 package net.sf.jabref.importer;
 
-import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-
+import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -20,8 +20,7 @@ public class EntryFromPDFCreatorTest {
 
     @Before
     public void setUp() throws Exception {
-        // externalFileTypes are needed for the EntryFromPDFCreator
-        JabRefPreferences.getInstance().updateExternalFileTypes();
+        Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @Test
