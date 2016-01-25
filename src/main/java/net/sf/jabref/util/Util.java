@@ -563,8 +563,9 @@ public class Util {
      * @param ce indicates the undo named compound. May be null
      */
     public static void updateNonDisplayableField(BibEntry be, String field, String newValue, NamedCompound ce) {
+        boolean changed = be.hasChanged();
         net.sf.jabref.util.Util.updateField(be, field, newValue, ce, false);
-        be.setChanged(false);
+        be.setChanged(changed);
     }
 
     /**
