@@ -215,8 +215,8 @@ class EntryEditorTab {
         if (text.isEmpty()) {
             return getEntry().hasField(fieldEditor.getFieldName());
         } else {
-            Object entryValue = getEntry().getField(fieldEditor.getFieldName());
-            return (entryValue == null) || !entryValue.toString().equals(text);
+            String entryValue = getEntry().getField(fieldEditor.getFieldName());
+            return (entryValue == null) || !entryValue.equals(text);
         }
     }
 

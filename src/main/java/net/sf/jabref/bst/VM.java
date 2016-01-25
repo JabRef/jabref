@@ -1067,9 +1067,9 @@ public class VM implements Warn {
         for (BstEntry e : entries) {
 
             for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
-                Object fieldValue = e.getBibtexEntry().getField(mEntry.getKey());
+                String fieldValue = e.getBibtexEntry().getField(mEntry.getKey());
 
-                mEntry.setValue((fieldValue == null ? null : fieldValue.toString()));
+                mEntry.setValue(fieldValue);
             }
         }
 

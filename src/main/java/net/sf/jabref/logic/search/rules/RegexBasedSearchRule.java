@@ -84,9 +84,8 @@ public class RegexBasedSearchRule implements SearchRule {
         boolean[] matchFound = new boolean[words.size()];
 
         for (String field : bibEntry.getFieldNames()) {
-            Object fieldContentAsObject = bibEntry.getField(field);
-            if (fieldContentAsObject != null) {
-                String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString());
+            if (bibEntry.hasField(field)) {
+                String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(bibEntry.getField(field));
                 if (!caseSensitive) {
                     fieldContent = fieldContent.toLowerCase();
                 }
