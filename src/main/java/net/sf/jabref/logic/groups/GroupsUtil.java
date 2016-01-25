@@ -16,9 +16,8 @@ public class GroupsUtil {
 
         for (String s : db.getKeySet()) {
             BibEntry be = db.getEntryById(s);
-            Object o = be.getField(field);
-            if (o != null) {
-                String fieldValue = o.toString().trim();
+            if (be.hasField(field)) {
+                String fieldValue = be.getField(field).trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
                 while (tok.hasMoreTokens()) {
                     res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));

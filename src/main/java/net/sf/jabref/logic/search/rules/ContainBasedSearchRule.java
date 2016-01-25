@@ -58,9 +58,8 @@ public class ContainBasedSearchRule implements SearchRule {
         boolean[] matchFound = new boolean[words.size()];
 
         for (String field : bibEntry.getFieldNames()) {
-            Object fieldContentAsObject = bibEntry.getField(field);
-            if (fieldContentAsObject != null) {
-                String fieldContent = ContainBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString());
+            if (bibEntry.hasField(field)) {
+                String fieldContent = ContainBasedSearchRule.REMOVE_LATEX_COMMANDS.format(bibEntry.getField(field));
                 if (!caseSensitive) {
                     fieldContent = fieldContent.toLowerCase();
                 }

@@ -498,13 +498,9 @@ public class BibEntry {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField("author"), getField("title"), getField("year")};
+        String[] s = new String[] {getFieldOptional("author").orElse("N/A"), getFieldOptional("title").orElse("N/A"),
+                getFieldOptional("year").orElse("N/A")};
 
-        for (int i = 0; i < s.length; ++i) {
-            if (s[i] == null) {
-                s[i] = "N/A";
-            }
-        }
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
             return text;
@@ -519,17 +515,14 @@ public class BibEntry {
      * @return will return the publication date of the entry or null if no year was found.
      */
     public String getPublicationDate() {
-
-        Object o = getField("year");
-        if (o == null) {
+        if (!hasField("year")) {
             return null;
         }
 
-        String year = YearUtil.toFourDigitYear(o.toString());
+        String year = YearUtil.toFourDigitYear(getField("year"));
 
-        o = getField("month");
-        if (o != null) {
-            MonthUtil.Month month = MonthUtil.getMonth(o.toString());
+        if (hasField("month")) {
+            MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
             if (month.isValid()) {
                 return year + "-" + month.twoDigitNumber;
             }

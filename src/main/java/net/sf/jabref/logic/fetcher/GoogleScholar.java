@@ -29,13 +29,12 @@ public class GoogleScholar implements FullTextFinder {
         Optional<URL> pdfLink = Optional.empty();
 
         // Search in title
-        String entryTitle = entry.getField("title");
-
-        if (entryTitle == null) {
+        if (!entry.hasField("title")) {
             return pdfLink;
         }
 
-        String url = String.format(SEARCH_URL, URLEncoder.encode(entryTitle, StandardCharsets.UTF_8.name()));
+        String url = String.format(SEARCH_URL,
+                URLEncoder.encode(entry.getField("title"), StandardCharsets.UTF_8.name()));
 
         Document doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler

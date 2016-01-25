@@ -347,8 +347,8 @@ public class BibDatabase {
             entry = (BibEntry) entry.clone();
         }
 
-        for (Object field : entry.getFieldNames()) {
-            entry.setField(field.toString(), this.resolveForStrings(entry.getField(field.toString())));
+        for (String field : entry.getFieldNames()) {
+            entry.setField(field, this.resolveForStrings(entry.getField(field)));
         }
         return entry;
     }
@@ -570,9 +570,8 @@ public class BibDatabase {
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
         if ((o == null) && (database != null) && database.followCrossrefs && !field.equals(BibEntry.KEY_FIELD)) {
-            Object crossRef = bibtex.getField("crossref");
-            if (crossRef != null) {
-                BibEntry referred = database.getEntryByKey((String) crossRef);
+            if (bibtex.hasField("crossref")) {
+                BibEntry referred = database.getEntryByKey(bibtex.getField("crossref"));
                 if (referred != null) {
                     // Ok, we found the referred entry. Get the field value from that
                     // entry. If it is unset there, too, stop looking:
