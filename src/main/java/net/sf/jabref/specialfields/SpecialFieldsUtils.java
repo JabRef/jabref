@@ -146,7 +146,7 @@ public class SpecialFieldsUtils {
                 break;
             }
         }
-        Util.updateField(be, c.getFieldName(), newValue, nc);
+        Util.updateNonDisplayableField(be, c.getFieldName(), newValue, nc);
     }
 
     /**

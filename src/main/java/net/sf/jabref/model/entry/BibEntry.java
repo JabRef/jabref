@@ -551,6 +551,10 @@ public class BibEntry {
         return changed;
     }
 
+    public void setChanged(boolean changed) {
+        this.changed = changed;
+    }
+
     public void putKeywords(List<String> keywords) {
         Objects.requireNonNull(keywords);
         // Set Keyword Field
