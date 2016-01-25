@@ -28,6 +28,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#680](https://github.com/JabRef/jabref/issues/680): Synchronize Files key binding works again.
 - Fixed [#212](https://github.com/JabRef/jabref/issues/212): Added command line option -g for autogenerating bibtex keys
 - Fixed [#213](https://github.com/JabRef/jabref/issues/212): Added command line option -asfl for autosetting file links
+- Fixed [#671](https://github.com/JabRef/jabref/issues/671): Remember working directory of last import
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field

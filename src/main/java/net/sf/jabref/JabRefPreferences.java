@@ -523,6 +523,7 @@ public final class JabRefPreferences {
         defaults.put(NUMBER_COL_WIDTH, GUIGlobals.NUMBER_COL_LENGTH);
         defaults.put(WORKING_DIRECTORY, USER_HOME);
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
+        // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(FILE_WORKING_DIRECTORY, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
