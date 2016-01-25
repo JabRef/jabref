@@ -72,11 +72,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.EditorKit;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -94,6 +96,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
+import net.sf.jabref.wizard.text.TextAnalyzer;
+import net.sf.jabref.wizard.text.TextAnalyzer.Substring;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -101,6 +105,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private final JButton okButton = new JButton();
     private final JButton cancelButton = new JButton();
     private final JButton insertButton = new JButton();
+    private final JButton autoButton = new JButton();
     private final JButton parseWithFreeCiteButton = new JButton();
     private final JPanel panel1 = new JPanel();
     private final JPanel buttons = new JPanel();
@@ -225,6 +230,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
         toolBar.addSeparator();
         toolBar.add(pasteAction);
         toolBar.add(new LoadAction());
+        toolBar.addSeparator();
+        toolBar.add(new AutoAction());
 
         JPanel leftPanel = new JPanel(new BorderLayout());
 
@@ -551,6 +558,39 @@ public class TextInputDialog extends JDialog implements ActionListener {
         }
     }
 
+    class AutoAction extends BasicAction {
+
+        public AutoAction() {
+            super("Auto", "Analyze text automatically",
+                    IconTheme.JabRefIcon.AUTO_GROUP.getIcon());
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                TextAnalyzer ta = new TextAnalyzer(doc.getText(0, doc.getLength()));
+                BibEntry tmpEntry = ta.getEntry();
+                TreeSet<Substring> ts = ta.getSubstrings();
+                for (String fieldName : tmpEntry.getFieldNames()) {
+                    entry.setField(fieldName, tmpEntry.getField(fieldName));
+                    Substring s = null;
+                    for (Substring ss : ts) {
+                        if (fieldName.equals(ss.name())) {
+                            s = ss;
+                        }
+                    }
+                    if (s != null) {
+                        doc.setCharacterAttributes(s.begin(), s.end() - s.begin(), doc.getStyle("marked"), true);
+                    }
+                }
+            } catch (BadLocationException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            updateSourceView();
+        }
+
+    }
     class LoadAction extends BasicAction {
         public LoadAction() {
             super(Localization.lang("Open"),
