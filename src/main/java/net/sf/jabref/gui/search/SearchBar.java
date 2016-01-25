@@ -111,7 +111,8 @@ public class SearchBar extends JPanel {
         this.searchField = initSearchField();
         this.add(searchField);
 
-        JButton clearSearchButton = new JButton(Localization.lang("Clear"));
+        JButton clearSearchButton = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
+        clearSearchButton.setToolTipText(Localization.lang("Clear"));
         clearSearchButton.addActionListener((l) -> endSearch());
         this.add(clearSearchButton);
 

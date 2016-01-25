@@ -879,14 +879,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
 
                         final BibEntry entry = bes[0];
-                        final String file = entry.getField(Globals.FILE_FIELD);
-                        if (file == null) {
+                        if (!entry.hasField(Globals.FILE_FIELD)) {
                             // no bibtex field
                             new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
                             return;
                         }
                         FileListTableModel tableModel = new FileListTableModel();
-                        tableModel.setContent(file);
+                        tableModel.setContent(entry.getField(Globals.FILE_FIELD));
                         if (tableModel.getRowCount() == 0) {
                             // content in bibtex field is not readable
                             new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
