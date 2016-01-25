@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -34,22 +34,19 @@ public class CrossRefEntryComparator implements Comparator<BibEntry> {
     public int compare(BibEntry e1, BibEntry e2)
             throws ClassCastException {
 
-        Object f1 = e1.getField(CrossRefEntryComparator.CROSS_REF_FIELD);
-        Object f2 = e2.getField(CrossRefEntryComparator.CROSS_REF_FIELD);
+        Boolean b1 = e1.hasField(CrossRefEntryComparator.CROSS_REF_FIELD);
+        Boolean b2 = e2.hasField(CrossRefEntryComparator.CROSS_REF_FIELD);
 
-        if ((f1 == null) && (f2 == null))
-         {
+        if ((!b1) && (!b2)) {
             return 0; // secComparator.compare(e1, e2);
         }
-        if ((f1 != null) && (f2 != null))
-         {
+        if (b1 && b2) {
             return 0; // secComparator.compare(e1, e2);
         }
-        if (f1 == null) {
+        if (!b1) {
             return 1;
         } else {
             return -1;
         }
     }
-
 }

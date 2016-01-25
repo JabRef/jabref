@@ -39,16 +39,14 @@ public class GroupsUtil {
      */
     public static Set<String> findAllWordsInField(BibDatabase db, String field, String remove) {
         Set<String> res = new TreeSet<>();
-        StringTokenizer tok;
         for (String s : db.getKeySet()) {
             BibEntry be = db.getEntryById(s);
-            Object o = be.getField(field);
-            if (o != null) {
-                tok = new StringTokenizer(o.toString(), remove, false);
+            be.getFieldOptional(field).ifPresent(o -> {
+                StringTokenizer tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
                     res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
-            }
+            });
         }
         return res;
     }

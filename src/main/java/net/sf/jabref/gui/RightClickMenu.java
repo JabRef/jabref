@@ -366,9 +366,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private Icon getFileIconForSelectedEntry() {
         if (panel.mainTable.getSelectedRowCount() == 1) {
             BibEntry entry = panel.mainTable.getSelected().get(0);
-            String file = entry.getField(Globals.FILE_FIELD);
-            if(file!=null) {
-                return FileListTableModel.getFirstLabel(file).getIcon();
+            if(entry.hasField(Globals.FILE_FIELD)) {
+                return FileListTableModel.getFirstLabel(entry.getField(Globals.FILE_FIELD)).getIcon();
             }
         }
         return IconTheme.JabRefIcon.FILE.getSmallIcon();
