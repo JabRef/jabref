@@ -590,9 +590,6 @@ public class JabRef {
         // Set up custom or default icon theme:
         // This is now done at processArguments
 
-        // TODO: remove temporary registering of external file types?
-        Globals.prefs.updateExternalFileTypes();
-
         // This property is set to make the Mac OSX Java VM move the menu bar to
         // the top of the screen, where Mac users expect it to be.
         System.setProperty("apple.laf.useScreenMenuBar", "true");

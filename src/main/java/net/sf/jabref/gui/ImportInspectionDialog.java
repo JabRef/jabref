@@ -960,7 +960,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null, panel.metaData(), fl.getType()))
+                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null, panel.metaData(), fl.type))
                                 .actionPerformed(null);
                     }
                 } else { // Must be URL_COL
@@ -1015,12 +1015,12 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // If there are one or more links, open the first one:
             for (int i = 0; i < fileList.getRowCount(); i++) {
                 FileListEntry flEntry = fileList.getEntry(i);
-                String description = flEntry.getDescription();
+                String description = flEntry.description;
                 if ((description == null) || (description.trim().isEmpty())) {
-                    description = flEntry.getLink();
+                    description = flEntry.link;
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry
-                        .getLink(), flEntry.getType().getIcon(), panel.metaData(), flEntry.getType()));
+                        .link, flEntry.type.getIcon(), panel.metaData(), flEntry.type));
                 count++;
             }
             if (count == 0) {
@@ -1494,7 +1494,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         model.setContent((String) o);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
                         if (model.getRowCount() > 0) {
-                            fileLabel.setIcon(model.getEntry(0).getType().getIcon());
+                            fileLabel.setIcon(model.getEntry(0).type.getIcon());
                         }
                         return fileLabel;
                     }

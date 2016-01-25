@@ -85,10 +85,10 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     // We try to check the extension for the file:
                     String name = file.getName();
                     int pos = name.indexOf('.');
-                    String extension = pos >= 0 && pos < name.length() - 1 ? name.substring(pos + 1)
+                    String extension = (pos >= 0) && (pos < (name.length() - 1)) ? name.substring(pos + 1)
                             .trim().toLowerCase() : null;
                     // Now we know the extension, check if it is one we know about:
-                    type = Globals.prefs.getExternalFileTypeByExt(extension);
+                    type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
                     fileType = type;
                 }
             }
@@ -105,7 +105,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             // link with. We check if the file type is set, and if the file type has a non-empty
             // application link. If that link is referred by the error message, we can assume
             // that the problem is in the open-with-application setting:
-            if (fileType != null && fileType.getOpenWith() != null
+            if ((fileType != null) && (fileType.getOpenWith() != null)
                     && !fileType.getOpenWith().isEmpty() &&
                     e1.getMessage().contains(fileType.getOpenWith())) {
 

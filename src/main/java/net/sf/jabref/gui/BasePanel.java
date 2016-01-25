@@ -893,8 +893,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             return;
                         }
                         FileListEntry flEntry = tableModel.getEntry(0);
-                        ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.getLink(),
-                                flEntry.getType().getIcon(), metaData(), flEntry.getType());
+                        ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
+                                flEntry.type.getIcon(), metaData(), flEntry.type);
                         item.openLink();
                     }
                 });
@@ -905,19 +905,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void action() {
-                JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        final BibEntry[] bes = mainTable.getSelectedEntries();
-                        final List<File> files = Util.getListOfLinkedFiles(bes,
-                                metaData().getFileDirectory(Globals.FILE_FIELD));
-                        for (final File f : files) {
-                            try {
-                                JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
-                            } catch (IOException e) {
-                                LOGGER.info("Could not open folder", e);
-                            }
+                JabRefExecutorService.INSTANCE.execute(() -> {
+                    final BibEntry[] bes = mainTable.getSelectedEntries();
+                    final List<File> files = FileUtil.getListOfLinkedFiles(Arrays.asList(bes),
+                            Arrays.asList(metaData().getFileDirectory(Globals.FILE_FIELD)));
+                    for (final File f : files) {
+                        try {
+                            JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
+                        } catch (IOException e) {
+                            LOGGER.info("Could not open folder", e);
                         }
                     }
                 });
@@ -944,11 +940,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         // Look for web links in the "file" field as a fallback:
                         FileListEntry entry = null;
                         FileListTableModel tm = new FileListTableModel();
-                        tm.setContent(bes[0].getField("file"));
+                        tm.setContent(bes[0].getField(Globals.FILE_FIELD));
                         for (int i = 0; i < tm.getRowCount(); i++) {
                             FileListEntry flEntry = tm.getEntry(i);
-                            if (URL_FIELD.equals(flEntry.getType().getName().toLowerCase())
-                                    || PS_FIELD.equals(flEntry.getType().getName().toLowerCase())) {
+                            if (URL_FIELD.equals(flEntry.type.getName().toLowerCase())
+                                    || PS_FIELD.equals(flEntry.type.getName().toLowerCase())) {
                                 entry = flEntry;
                                 break;
                             }
@@ -957,7 +953,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             output(Localization.lang("No url defined") + '.');
                         } else {
                             try {
-                                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(), entry.getType());
+                                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.link, entry.type);
                                 output(Localization.lang("External viewer called") + '.');
                             } catch (IOException e) {
                                 output(Localization.lang("Could not open link"));
@@ -2558,7 +2554,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // see if we can fall back to a filename based on the bibtex key
             final Collection<BibEntry> entries = Collections.singleton(entry);
 
-            final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+            final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
             if (basePanel.metaData.getFileDirectory(Globals.FILE_FIELD).length > 0) {
                 final String[] mdDirs = basePanel.metaData.getFileDirectory(Globals.FILE_FIELD);
@@ -2577,7 +2573,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                 result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
             } else {
-                result = Util.findAssociatedFiles(entries, extensions, dirs);
+                result = FileUtil.findAssociatedFiles(entries, extensions, dirs);
             }
             if (result.get(entry) != null) {
                 final List<File> res = result.get(entry);
@@ -2585,7 +2581,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     final String filepath = res.get(0).getPath();
                     final Optional<String> extension = FileUtil.getFileExtension(filepath);
                     if (extension.isPresent()) {
-                        ExternalFileType type = Globals.prefs.getExternalFileTypeByExt(extension.get());
+                        ExternalFileType type = ExternalFileTypes.getInstance()
+                                .getExternalFileTypeByExt(extension.get());
                         if (type != null) {
                             try {
                                 JabRefDesktop.openExternalFileAnyFormat(basePanel.metaData, filepath, type);

@@ -2,6 +2,7 @@ package net.sf.jabref.logic.util.strings;
 
 import static org.junit.Assert.*;
 
+import net.sf.jabref.model.entry.FileField;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -157,10 +158,10 @@ public class StringUtilTest {
 
     @Test
     public void testEncodeStringArray() {
-        assertEquals(encStringArray1, StringUtil.encodeStringArray(stringArray1));
-        assertEquals(encStringArray2, StringUtil.encodeStringArray(stringArray2));
-        assertEquals(encStringArray2null, StringUtil.encodeStringArray(stringArray2null));
-        assertEquals(encStringArray3, StringUtil.encodeStringArray(stringArray3));
+        assertEquals(encStringArray1, FileField.encodeStringArray(stringArray1));
+        assertEquals(encStringArray2, FileField.encodeStringArray(stringArray2));
+        assertEquals(encStringArray2null, FileField.encodeStringArray(stringArray2null));
+        assertEquals(encStringArray3, FileField.encodeStringArray(stringArray3));
     }
 
     @Test
@@ -208,5 +209,37 @@ public class StringUtilTest {
         assertTrue(StringUtil.isInCitationMarks("\"a\""));
         assertFalse(StringUtil.isInCitationMarks("\""));
         assertFalse(StringUtil.isInCitationMarks("a\"\"a"));
+    }
+
+    @Test
+    public void testIntValueOfSingleDigit() {
+        assertEquals(1, StringUtil.intValueOf("1"));
+        assertEquals(2, StringUtil.intValueOf("2"));
+        assertEquals(8, StringUtil.intValueOf("8"));
+    }
+
+    @Test
+    public void testIntValueOfLongString() {
+        assertEquals(1234567890, StringUtil.intValueOf("1234567890"));
+    }
+
+    @Test
+    public void testIntValueOfStartWithZeros() {
+        assertEquals(1234, StringUtil.intValueOf("001234"));
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testIntValueOfExceptionIfStringContainsLetter() {
+            StringUtil.intValueOf("12A2");
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testIntValueOfExceptionIfStringNull() {
+            StringUtil.intValueOf(null);
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testIntValueOfExceptionfIfStringEmpty() {
+            StringUtil.intValueOf("");
     }
 }

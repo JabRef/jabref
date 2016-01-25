@@ -30,6 +30,7 @@ import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
@@ -226,7 +227,7 @@ public class GUIGlobals {
         label.setToolTipText(Localization.lang("Open file"));
         GUIGlobals.tableIcons.put(Globals.FILE_FIELD, label);
 
-        for (ExternalFileType fileType : Globals.prefs.getExternalFileTypeSelection()) {
+        for (ExternalFileType fileType : ExternalFileTypes.getInstance().getExternalFileTypeSelection()) {
             label = new JLabel(fileType.getIcon());
             label.setToolTipText(Localization.lang("Open %0 file", fileType.getName()));
             GUIGlobals.tableIcons.put(fileType.getName(), label);

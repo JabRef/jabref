@@ -15,21 +15,17 @@
 */
 package net.sf.jabref.gui;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.FileField;
 
 /**
@@ -63,12 +59,11 @@ public class FileListTableModel extends AbstractTableModel {
             FileListEntry entry = list.get(rowIndex);
             switch (columnIndex) {
             case 0:
-                return entry.getDescription();
+                return entry.description;
             case 1:
-                return entry.getLink();
+                return entry.link;
             default:
-                return entry.getType() != null ?
-                        entry.getType().getName() : "";
+                return entry.type != null ? entry.type.getName() : "";
             }
         }
     }
@@ -76,6 +71,13 @@ public class FileListTableModel extends AbstractTableModel {
     public FileListEntry getEntry(int index) {
         synchronized (list) {
             return list.get(index);
+        }
+    }
+
+    public void setEntry(int index, FileListEntry entry) {
+        synchronized (list) {
+            list.set(index, entry);
+            fireTableRowsUpdated(index, index);
         }
     }
 
@@ -97,13 +99,7 @@ public class FileListTableModel extends AbstractTableModel {
         synchronized (list) {
             list.add(index, entry);
             if (!SwingUtilities.isEventDispatchThread()) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        fireTableRowsInserted(index, index);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> fireTableRowsInserted(index, index));
             } else {
                 fireTableRowsInserted(index, index);
             }
@@ -169,24 +165,24 @@ public class FileListTableModel extends AbstractTableModel {
     public static JLabel getFirstLabel(String content) {
         FileListTableModel tm = new FileListTableModel();
         FileListEntry entry = tm.setContent(content, true, true);
-        if ((entry == null) || (entry.getType() == null)) {
+        if ((entry == null) || (entry.type == null)) {
             return null;
         }
-        return entry.getType().getIconLabel();
+        return entry.type.getIconLabel();
     }
 
     private FileListEntry decodeEntry(FileField.ParsedFileField entry, boolean deduceUnknownType) {
-        ExternalFileType type = Globals.prefs.getExternalFileTypeByName(entry.fileType);
+        ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.fileType);
 
         if (deduceUnknownType && (type instanceof UnknownExternalFileType)) {
             // No file type was recognized. Try to find a usable file type based
             // on mime type:
-            type = Globals.prefs.getExternalFileTypeByMimeType(entry.fileType);
+            type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.fileType);
             if (type == null) {
                 // No type could be found from mime type on the extension:
                 Optional<String> extension = FileUtil.getFileExtension(entry.link);
                 if (extension.isPresent()) {
-                    ExternalFileType typeGuess = Globals.prefs.getExternalFileTypeByExt(extension.get());
+                    ExternalFileType typeGuess = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
 
                     if (typeGuess != null) {
                         type = typeGuess;
@@ -210,7 +206,7 @@ public class FileListTableModel extends AbstractTableModel {
             array[i] = entry.getStringArrayRepresentation();
             i++;
         }
-        return StringUtil.encodeStringArray(array);
+        return FileField.encodeStringArray(array);
     }
 
     /**
@@ -219,23 +215,13 @@ public class FileListTableModel extends AbstractTableModel {
      * @return Tooltip representation.
      */
     public String getToolTipHTMLRepresentation() {
-        StringBuilder sb = new StringBuilder("<html>");
-        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry entry = iterator.next();
-            sb.append(entry.getDescription()).append(" (").append(entry.getLink()).append(')');
-            if (iterator.hasNext()) {
-                sb.append("<br>");
-            }
-        }
-        return sb.append("</html>").toString();
-    }
+        StringJoiner sb = new StringJoiner("<br>", "<html>", "</html>");
 
-    public void print() {
-        System.out.println("----");
-        for (FileListEntry fileListEntry : list) {
-            System.out.println(fileListEntry);
+        for(FileListEntry entry : list) {
+            sb.add(String.format("%s (%s)", entry.description, entry.link));
         }
-        System.out.println("----");
+
+        return sb.toString();
     }
 
 }

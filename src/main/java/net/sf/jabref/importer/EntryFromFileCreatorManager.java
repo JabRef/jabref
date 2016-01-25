@@ -25,8 +25,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.undo.CompoundEdit;
 
-import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.model.entry.EntryType;
@@ -55,7 +55,7 @@ public final class EntryFromFileCreatorManager {
 
         // add a creator for each ExternalFileType if there is no specialised
         // creator existing.
-        ExternalFileType[] fileTypes = JabRefPreferences.getInstance().getExternalFileTypeSelection();
+        ExternalFileType[] fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
 
         for (ExternalFileType exFileType : fileTypes) {
             if (!hasSpecialisedCreatorForExternalFileType(exFileType)) {

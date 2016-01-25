@@ -310,7 +310,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             // If there are one or more links of the correct type, open the first one:
                             if (modelColumn.isFileFilter()) {
                                 for (int i = 0; i < fileList.getRowCount(); i++) {
-                                    if (fileList.getEntry(i).getType().toString().equals(modelColumn.getColumnName())) {
+                                    if (fileList.getEntry(i).type.toString().equals(modelColumn.getColumnName())) {
                                         flEntry = fileList.getEntry(i);
                                         break;
                                     }
@@ -321,8 +321,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
-                                        flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
-                                        flEntry.getType());
+                                        flEntry.link, flEntry.type.getIcon(), panel.metaData(),
+                                        flEntry.type);
                                 boolean success = item.openLink();
                                 if (!success) {
                                     panel.output(Localization.lang("Unable to open link."));
@@ -408,16 +408,16 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     fileList.setContent(fileFieldContent);
                     for (int i = 0; i < fileList.getRowCount(); i++) {
                         FileListEntry flEntry = fileList.getEntry(i);
-                        if(column.isFileFilter() && !flEntry.getType().toString().equals(column.getColumnName())) {
+                        if(column.isFileFilter() && !flEntry.type.toString().equals(column.getColumnName())) {
                             continue;
                         }
-                        String description = flEntry.getDescription();
+                        String description = flEntry.description;
                         if ((description == null) || (description.trim().isEmpty())) {
-                            description = flEntry.getLink();
+                            description = flEntry.link;
                         }
                         menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
-                                flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
-                                flEntry.getType()));
+                                flEntry.link, flEntry.type.getIcon(), panel.metaData(),
+                                flEntry.type));
                         showDefaultPopup = false;
                     }
                 } else {

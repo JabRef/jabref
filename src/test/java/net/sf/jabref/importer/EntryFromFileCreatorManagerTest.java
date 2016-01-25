@@ -15,11 +15,14 @@
  */
 package net.sf.jabref.importer;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,6 +35,12 @@ import java.util.List;
  * @version 11.11.2008 | 21:51:54
  */
 public class EntryFromFileCreatorManagerTest {
+
+    // Needed to initialize ExternalFileTypes
+    @Before
+    public void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     @Test
     public void testGetCreator() throws Exception {

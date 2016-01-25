@@ -40,6 +40,7 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -92,9 +93,8 @@ public class FileListEntryEditor {
                 // If necessary, ask the external confirm object whether we are ready to close.
                 if (externalConfirm != null) {
                     // Construct an updated FileListEntry:
-                    FileListEntry testEntry = new FileListEntry("", "", null);
-                    storeSettings(testEntry);
-                    if (!externalConfirm.confirmClose(testEntry)) {
+                    storeSettings(entry);
+                    if (!externalConfirm.confirmClose(entry)) {
                         return;
                     }
                 }
@@ -203,13 +203,7 @@ public class FileListEntryEditor {
             public void windowActivated(WindowEvent event) {
                 if (openBrowseWhenShown && !dontOpenBrowseUntilDisposed) {
                     dontOpenBrowseUntilDisposed = true;
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            browse.actionPerformed(new ActionEvent(browseBut, 0, ""));
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> browse.actionPerformed(new ActionEvent(browseBut, 0, "")));
                 }
             }
 
@@ -222,12 +216,11 @@ public class FileListEntryEditor {
     }
 
     private void checkExtension() {
-        if ((types.getSelectedIndex() == -1) &&
-                (!link.getText().trim().isEmpty())) {
+        if ((types.getSelectedIndex() == -1) && (!link.getText().trim().isEmpty())) {
 
             // Check if this looks like a remote link:
             if (FileListEntryEditor.remoteLinkPattern.matcher(link.getText()).matches()) {
-                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("html");
+                ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
                 if (type != null) {
                     types.setSelectedItem(type);
                     return;
@@ -236,7 +229,7 @@ public class FileListEntryEditor {
 
             // Try to guess the file type:
             String theLink = link.getText().trim();
-            ExternalFileType type = Globals.prefs.getExternalFileTypeForName(theLink);
+            ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeForName(theLink);
             if (type != null) {
                 types.setSelectedItem(type);
             }
@@ -289,55 +282,57 @@ public class FileListEntryEditor {
     }
 
     private void setValues(FileListEntry entry) {
-        description.setText(entry.getDescription());
-        link.setText(entry.getLink());
+        description.setText(entry.description);
+        link.setText(entry.link);
         //if (link.getText().length() > 0)
         //    checkExtension();
-        types.setModel(new DefaultComboBoxModel<>(Globals.prefs.getExternalFileTypeSelection()));
+        types.setModel(new DefaultComboBoxModel<>(ExternalFileTypes.getInstance().getExternalFileTypeSelection()));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
-        if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType)) {
-            types.setSelectedItem(entry.getType());
-        } else if ((entry.getLink() != null) && (!entry.getLink().isEmpty())) {
+        if ((entry.type != null) && !(entry.type instanceof UnknownExternalFileType)) {
+            types.setSelectedItem(entry.type);
+        } else if ((entry.link != null) && (!entry.link.isEmpty())) {
             checkExtension();
         }
-
     }
 
     private void storeSettings(FileListEntry entry) {
-        entry.setDescription(description.getText().trim());
+        String description = this.description.getText().trim();
+        String link = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
             String[] dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
             if (dirs.length == 0) {
-                entry.setLink(link.getText().trim());
+                link = this.link.getText().trim();
             } else {
                 boolean found = false;
                 for (String dir : dirs) {
                     String canPath = (new File(dir)).getCanonicalPath();
-                    File fl = new File(link.getText().trim());
+                    File fl = new File(this.link.getText().trim());
                     if (fl.isAbsolute()) {
                         String flPath = fl.getCanonicalPath();
                         if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
                             String relFileName = fl.getCanonicalPath().substring(canPath.length() + 1);
-                            entry.setLink(relFileName);
+                            link = relFileName;
                             found = true;
                             break;
                         }
                     }
                 }
                 if (!found) {
-                    entry.setLink(link.getText().trim());
+                    link = this.link.getText().trim();
                 }
             }
-        } catch (java.io.IOException ex)
-        {
-            ex.printStackTrace();
+        } catch (IOException ex) {
             // Don't think this should happen, but set the file link directly as a fallback:
-            entry.setLink(link.getText().trim());
+            link = this.link.getText().trim();
         }
 
-        entry.setType((ExternalFileType) types.getSelectedItem());
+        ExternalFileType type = (ExternalFileType) types.getSelectedItem();
+
+        entry.description = description;
+        entry.type = type;
+        entry.link = link;
     }
 
     public boolean okPressed() {

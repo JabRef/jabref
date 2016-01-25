@@ -283,41 +283,6 @@ public class StringUtil {
     }
 
     /**
-     * Encodes a two-dimensional String array into a single string, using ':' and
-     * ';' as separators. The characters ':' and ';' are escaped with '\'.
-     * @param values The String array.
-     * @return The encoded String.
-     */
-    public static String encodeStringArray(String[][] values) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < values.length; i++) {
-            sb.append(encodeStringArray(values[i]));
-            if (i < (values.length - 1)) {
-                sb.append(';');
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Encodes a String array into a single string, using ':' as separator.
-     * The characters ':' and ';' are escaped with '\'.
-     * @param entry The String array.
-     * @return The encoded String.
-     */
-    private static String encodeStringArray(String[] entry) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < entry.length; i++) {
-            sb.append(encodeString(entry[i]));
-            if (i < (entry.length - 1)) {
-                sb.append(':');
-            }
-
-        }
-        return sb.toString();
-    }
-
-    /**
      * Decodes an encoded double String array back into array form. The array
      * is assumed to be square, and delimited by the characters ';' (first dim) and
      * ':' (second dim).
@@ -363,21 +328,6 @@ public class StringUtil {
             }
         }
         return res;
-    }
-
-    private static String encodeString(String s) {
-        if (s == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if ((c == ';') || (c == ':') || (c == '\\')) {
-                sb.append('\\');
-            }
-            sb.append(c);
-        }
-        return sb.toString();
     }
 
     /**
@@ -526,4 +476,34 @@ public class StringUtil {
         }
     }
 
+    /**
+     * Optimized method for converting a String into an Integer
+     *
+     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+     *
+     * @param str the String holding an Integer value
+     * @throws NumberFormatException if str cannot be parsed to an int
+     * @return the int value of str
+     */
+    public static int intValueOf(String str) {
+        int ival = 0;
+        int idx = 0;
+        int end;
+        boolean sign = false;
+        char ch;
+    
+        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+            throw new NumberFormatException(str);
+        }
+    
+        for (;; ival *= 10) {
+            ival += '0' - ch;
+            if (++idx == end) {
+                return sign ? ival : -ival;
+            }
+            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
+                throw new NumberFormatException(str);
+            }
+        }
+    }
 }
