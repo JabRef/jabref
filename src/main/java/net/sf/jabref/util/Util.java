@@ -885,7 +885,7 @@ public class Util {
             public void run() {
                 // determine directories to search in
                 ArrayList<File> dirs = new ArrayList<>();
-                String[] dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
+                List<String> dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
                 for (String dirs1 : dirsS) {
                     dirs.add(new File(dirs1));
                 }
@@ -1020,81 +1020,6 @@ public class Util {
     }
 
     /**
-<<<<<<< HEAD
-=======
-     * Returns the list of linked files. The files have the absolute filename
-     *
-     * @param bes      list of BibTeX entries
-     * @param fileDirs list of directories to try for expansion
-     * @return list of files. May be empty
-     */
-    public static List<File> getListOfLinkedFiles(BibEntry[] bes, String[] fileDirs) {
-        ArrayList<File> res = new ArrayList<>();
-        for (BibEntry entry : bes) {
-            FileListTableModel tm = new FileListTableModel();
-            tm.setContent(entry.getField("file"));
-            for (int i = 0; i < tm.getRowCount(); i++) {
-                FileListEntry flEntry = tm.getEntry(i);
-
-                File f = FileUtil.expandFilename(flEntry.link, fileDirs);
-                if (f != null) {
-                    res.add(f);
-                }
-            }
-        }
-        return res;
-    }
-
-    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibEntry, List<File>> result = new HashMap<>();
-
-        // First scan directories
-        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
-
-        // Initialize Result-Set
-        for (BibEntry entry : entries) {
-            result.put(entry, new ArrayList<>());
-        }
-
-        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
-        // Now look for keys
-        nextFile:
-        for (File file : filesWithExtension) {
-
-            String name = file.getName();
-            int dot = name.lastIndexOf('.');
-            // First, look for exact matches:
-            for (BibEntry entry : entries) {
-                String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && !citeKey.isEmpty()) {
-                    if (dot > 0) {
-                        if (name.substring(0, dot).equals(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
-                    }
-                }
-            }
-            // If we get here, we didn't find any exact matches. If non-exact
-            // matches are allowed, try to find one:
-            if (!exactOnly) {
-                for (BibEntry entry : entries) {
-                    String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && !citeKey.isEmpty()) {
-                        if (name.startsWith(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
->>>>>>> origin/master
      * Accepts a string like [author:lower] or [title:abbr] or [auth], whereas the first part signifies the bibtex-field
      * to get, or the key generator field marker to use, while the others are the modifiers that will be applied.
      *

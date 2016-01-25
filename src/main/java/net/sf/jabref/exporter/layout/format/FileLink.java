@@ -24,6 +24,7 @@ import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.FileField.ParsedFileField;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -75,7 +76,7 @@ public class FileLink implements ParamLayoutFormatter {
             dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX)};
         }
 
-        File f = FileUtil.expandFilename(link, dirs);
+        File f = FileUtil.expandFilename(link, Arrays.asList(dirs));
 
         /*
          * Stumbled over this while investigating

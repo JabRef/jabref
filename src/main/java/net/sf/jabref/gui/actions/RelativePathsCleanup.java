@@ -16,10 +16,9 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class RelativePathsCleanup implements Cleaner {
 
-    private final String[] paths;
+    private final List<String> paths;
 
-
-    public RelativePathsCleanup(String[] paths) {
+    public RelativePathsCleanup(List<String> paths) {
         this.paths = paths;
     }
 

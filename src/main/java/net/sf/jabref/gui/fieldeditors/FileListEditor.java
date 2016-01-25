@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -369,9 +370,9 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     private void addEntry() {
-        String[] defaultDirectory = metaData.getFileDirectory(Globals.FILE_FIELD);
-        if(defaultDirectory.length > 0 && defaultDirectory[0] != null) {
-            addEntry(defaultDirectory[0]);
+        List<String> defaultDirectory = metaData.getFileDirectory(Globals.FILE_FIELD);
+        if(defaultDirectory.size() > 0 && defaultDirectory.get(0) != null) {
+            addEntry(defaultDirectory.get(0));
         } else {
             addEntry("");
         }

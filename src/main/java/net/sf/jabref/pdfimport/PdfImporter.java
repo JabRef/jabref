@@ -167,7 +167,7 @@ public class PdfImporter {
         int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
         // Get a list of file directories:
-        String[] dirsS = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirsS = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
 
         List<BibEntry> res = new ArrayList<>();
 

@@ -18,13 +18,13 @@ import net.sf.jabref.util.Util;
 
 public class RenamePdfCleanup implements Cleaner {
 
-    private final String[] paths;
+    private final List<String> paths;
     private final BibDatabase database;
     private final Boolean onlyRelativePaths;
     private int unsuccessfulRenames;
 
 
-    public RenamePdfCleanup(String[] paths, Boolean onlyRelativePaths, BibDatabase database) {
+    public RenamePdfCleanup(List<String> paths, Boolean onlyRelativePaths, BibDatabase database) {
         this.paths = paths;
         this.database = database;
         this.onlyRelativePaths = onlyRelativePaths;

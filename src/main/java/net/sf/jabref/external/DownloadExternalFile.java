@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * This class handles the download of an external file. Typically called when the user clicks
@@ -156,12 +157,12 @@ public class DownloadExternalFile {
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        String[] fDirectory = getFileDirectory();
+        List<String> fDirectory = getFileDirectory();
         final String directory;
-        if (fDirectory.length == 0) {
+        if (fDirectory.size() == 0) {
             directory = null;
         } else {
-            directory = fDirectory[0];
+            directory = fDirectory.get(0);
         }
         final String suggestDir = directory != null ? directory : System.getProperty("user.home");
         File file = new File(new File(suggestDir), suggestedName);
@@ -344,7 +345,7 @@ public class DownloadExternalFile {
 
     }
 
-    private String[] getFileDirectory() {
+    private List<String> getFileDirectory() {
         return metaData.getFileDirectory(Globals.FILE_FIELD);
     }
 
@@ -354,7 +355,6 @@ public class DownloadExternalFile {
      * notification when download is complete.
      */
     public interface DownloadCallback {
-
         void downloadComplete(FileListEntry file);
     }
 }

@@ -129,7 +129,7 @@ public class SynchronizeFileField extends AbstractWorker {
                     tableModel.setContentDontGuessTypes(old);
 
                     // We need to specify which directories to search in for Util.expandFilename:
-                    String[] dirsS = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+                    List<String> dirsS = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
                     ArrayList<File> dirs = new ArrayList<>();
                     for (String dirs1 : dirsS) {
                         dirs.add(new File(dirs1));
@@ -356,8 +356,8 @@ public class SynchronizeFileField extends AbstractWorker {
                 canceled = true;
             }
 
-            String[] dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
-            if (dirs.length == 0) {
+            List<String> dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
+            if (dirs.size() == 0) {
 
                 autoSetNone.setSelected(true);
                 autoSetNone.setEnabled(false);

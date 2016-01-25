@@ -171,7 +171,7 @@ public class MetaData implements Iterable<String> {
      * @param fieldName The field type
      * @return The default directory for this field type.
      */
-    public String[] getFileDirectory(String fieldName) {
+    public List<String> getFileDirectory(String fieldName) {
         List<String> dirs = new ArrayList<>();
 
         String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL);
@@ -218,7 +218,7 @@ public class MetaData implements Iterable<String> {
             }
         }
 
-        return dirs.toArray(new String[dirs.size()]);
+        return dirs;
     }
 
     /**

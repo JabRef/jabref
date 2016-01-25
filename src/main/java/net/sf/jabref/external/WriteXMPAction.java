@@ -123,7 +123,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             // First check the (legacy) "pdf" field:
             String pdf = entry.getField("pdf");
-            String[] dirs = panel.metaData().getFileDirectory("pdf");
+            List<String> dirs = panel.metaData().getFileDirectory("pdf");
             File f = FileUtil.expandFilename(pdf, dirs);
             if (f != null) {
                 files.add(f);
