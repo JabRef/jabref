@@ -103,8 +103,7 @@ public class ImportFormats {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = ImportFormats.createImportFileChooser
-                        (Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY));
+                JFileChooser fc = ImportFormats.createImportFileChooser(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
                 fc.showOpenDialog(frame);
                 File file = fc.getSelectedFile();
                 if (file == null) {
