@@ -15,6 +15,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Changed
 - OvidImporter now also imports fields: doi, issn, language and keywords
 - Implemented [#647](https://github.com/JabRef/jabref/issues/647): The preview can now be copied
+- [#459](https://github.com/JabRef/jabref/issues/459) Open default directory when trying to add files to an entry
 
 ### Fixed
 - Make BibTex parser more robust against missing newlines
@@ -29,6 +30,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
+- Removed configuration option to use database file directory as base directory for attached files and make it default instead.
 
 
 
