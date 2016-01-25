@@ -39,11 +39,10 @@ public class EntryMarker {
      * @param increment whether the given increment should be added to the current one. Currently never used in JabRef
      */
     public static void markEntry(BibEntry be, int markIncrement, boolean increment, NamedCompound ce) {
-        Object o = be.getField(BibtexFields.MARKED);
         int prevMarkLevel;
         String newValue = null;
-        if (o != null) {
-            String s = o.toString();
+        if (be.hasField(BibtexFields.MARKED)) {
+            String s = be.getField(BibtexFields.MARKED);
             int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
             if (index >= 0) {
                 // Already marked 1 for this user.
@@ -70,12 +69,11 @@ public class EntryMarker {
     }
 
     /**
-     * SIDE EFFECT: Unselectes given entry
+     * SIDE EFFECT: Unselects given entry
      */
     public static void unmarkEntry(BibEntry be, boolean onlyMaxLevel, BibDatabase database, NamedCompound ce) {
-        Object o = be.getField(BibtexFields.MARKED);
-        if (o != null) {
-            String s = o.toString();
+        if (be.hasField(BibtexFields.MARKED)) {
+            String s = be.getField(BibtexFields.MARKED);
             if ("0".equals(s)) {
                 if (!onlyMaxLevel) {
                     unmarkOldStyle(be, database, ce);
@@ -150,11 +148,7 @@ public class EntryMarker {
     private static void unmarkOldStyle(BibEntry be, BibDatabase database, NamedCompound ce) {
         TreeSet<Object> owners = new TreeSet<>();
         for (BibEntry entry : database.getEntries()) {
-            Object o = entry.getField(BibtexFields.OWNER);
-            if (o != null) {
-                owners.add(o);
-                // System.out.println("Owner: "+entry.getField(Globals.OWNER));
-            }
+            entry.getFieldOptional(BibtexFields.OWNER).ifPresent(owner -> owners.add(owner));
         }
         owners.remove(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
         StringBuilder sb = new StringBuilder();
@@ -174,11 +168,10 @@ public class EntryMarker {
     }
 
     public static int isMarked(BibEntry be) {
-        Object fieldVal = be.getField(BibtexFields.MARKED);
-        if (fieldVal == null) {
+        if (be.hasField(BibtexFields.MARKED)) {
             return 0;
         }
-        String s = (String) fieldVal;
+        String s = be.getField(BibtexFields.MARKED);
         if ("0".equals(s)) {
             return 1;
         }

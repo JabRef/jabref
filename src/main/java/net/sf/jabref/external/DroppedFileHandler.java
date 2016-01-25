@@ -18,6 +18,7 @@ package net.sf.jabref.external;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -443,11 +444,9 @@ public class DroppedFileHandler {
     private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        String oldValue = entry.getField(Globals.FILE_FIELD);
+        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
-        if (oldValue != null) {
-            tm.setContent(oldValue);
-        }
+        oldValue.ifPresent(tm::setContent);
 
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
@@ -471,8 +470,7 @@ public class DroppedFileHandler {
 
         tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
         String newValue = tm.getStringRepresentation();
-        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD,
-                oldValue, newValue);
+        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue.orElse(null), newValue);
         entry.setField(Globals.FILE_FIELD, newValue);
 
         if (edits == null) {

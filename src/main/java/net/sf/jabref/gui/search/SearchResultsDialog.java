@@ -338,9 +338,9 @@ public class SearchResultsDialog {
                 switch (col) {
                 case FILE_COL:
                     Object o = entry.getField(Globals.FILE_FIELD);
-                    if (o != null) {
+                    if (entry.hasField(Globals.FILE_FIELD)) {
                         FileListTableModel tableModel = new FileListTableModel();
-                        tableModel.setContent((String) o);
+                        tableModel.setContent(entry.getField(Globals.FILE_FIELD));
                         if (tableModel.getRowCount() == 0) {
                             return;
                         }
@@ -350,14 +350,12 @@ public class SearchResultsDialog {
                     }
                     break;
                 case URL_COL:
-                    Object link = entry.getField("url");
-                    try {
-                        if (link != null) {
-                            JabRefDesktop.openExternalViewer(p.metaData(), (String) link, "url");
-                        }
+                    entry.getFieldOptional("url").ifPresent(link -> { try {
+                            JabRefDesktop.openExternalViewer(p.metaData(), link, "url");
                     } catch (IOException ex) {
                         ex.printStackTrace();
-                    }
+                        }
+                    });
                     break;
 
                 }
@@ -380,9 +378,8 @@ public class SearchResultsDialog {
 
             if (col == FILE_COL) {
                 // We use a FileListTableModel to parse the field content:
-                Object o = entry.getField(Globals.FILE_FIELD);
                 FileListTableModel fileList = new FileListTableModel();
-                fileList.setContent((String) o);
+                fileList.setContent(entry.getField(Globals.FILE_FIELD));
                 // If there are one or more links, open the first one:
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
@@ -455,13 +452,11 @@ public class SearchResultsDialog {
         @Override
         public Object getColumnValue(BibEntry entry, int column) {
             if (column < PAD) {
-                Object o;
                 switch (column) {
                 case FILE_COL:
-                    o = entry.getField(Globals.FILE_FIELD);
-                    if (o != null) {
+                    if (entry.hasField(Globals.FILE_FIELD)) {
                         FileListTableModel tmpModel = new FileListTableModel();
-                        tmpModel.setContent((String) o);
+                        tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
                             fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
@@ -471,9 +466,8 @@ public class SearchResultsDialog {
                         return null;
                     }
                 case URL_COL:
-                    o = entry.getField("url");
-                    if (o != null) {
-                        urlLabel.setToolTipText((String) o);
+                    if (entry.hasField("url")) {
+                        urlLabel.setToolTipText(entry.getField("url"));
                         return urlLabel;
                     } else {
                         return null;

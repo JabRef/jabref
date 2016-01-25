@@ -226,11 +226,10 @@ class ReplaceStringDialog extends JDialog {
     }
 
     private int replaceField(BibEntry be, String fieldname, NamedCompound ce) {
-        Object o = be.getField(fieldname);
-        if (o == null) {
+        if (!be.hasField(fieldname)) {
             return 0;
         }
-        String txt = o.toString();
+        String txt = be.getField(fieldname);
         StringBuilder sb = new StringBuilder();
         int ind;
         int piv = 0;
