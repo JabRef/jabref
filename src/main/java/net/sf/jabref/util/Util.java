@@ -833,6 +833,24 @@ public class Util {
     }
 
     /**
+     *  Shortcut method for setting a single entry
+     *
+     * @param entry
+     * @param ce
+     * @param changedEntries
+     * @param singleTableModel
+     * @param metaData
+     * @param callback
+     * @param diag
+     * @return
+     */
+    public static Runnable autoSetLinks(BibEntry entry, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+        List<BibEntry> entries = new ArrayList<>(1);
+        entries.add(entry);
+        return autoSetLinks(entries, ce, changedEntries, singleTableModel, metaData, callback, diag);
+    }
+
+    /**
      * Automatically add links for this set of entries, based on the globally stored list of external file types. The
      * entries are modified, and corresponding UndoEdit elements added to the NamedCompound given as argument.
      * Furthermore, all entries which are modified are added to the Set of entries given as an argument.
