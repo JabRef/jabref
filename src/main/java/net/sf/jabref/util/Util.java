@@ -100,7 +100,7 @@ public class Util {
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is
      * acceptable for bibtex.
-     *
+     * <p>
      * Watch-out that the returned string might be of length 0 afterwards.
      *
      * @param key mayBeNull
@@ -128,10 +128,10 @@ public class Util {
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is
      * acceptable for bibtex.
-     *
+     * <p>
      * Watch-out that the returned string might be of length 0 afterwards.
      *
-     * @param key mayBeNull
+     * @param key             mayBeNull
      * @param enforceLegalKey make sure that the key is legal in all respects
      */
     public static String checkLegalKey(String key, boolean enforceLegalKey) {
@@ -212,7 +212,7 @@ public class Util {
 
                             String param = calls.substring(startParam, i);
 
-                            result.add(new String[] {method, param});
+                            result.add(new String[]{method, param});
                         } else {
                             // Parameter is in format xxx
 
@@ -224,16 +224,16 @@ public class Util {
 
                             String param = calls.substring(startParam, i);
 
-                            result.add(new String[] {method, param});
+                            result.add(new String[]{method, param});
 
                         }
                     } else {
                         // Incorrectly terminated open brace
-                        result.add(new String[] {method});
+                        result.add(new String[]{method});
                     }
                 } else {
                     String method = calls.substring(start, i);
-                    result.add(new String[] {method});
+                    result.add(new String[]{method});
                 }
             }
             i++;
@@ -245,7 +245,7 @@ public class Util {
 
     /**
      * Takes a string that contains bracketed expression and expands each of these using getFieldAndFormat.
-     *
+     * <p>
      * Unknown Bracket expressions are silently dropped.
      *
      * @param bracketString
@@ -303,8 +303,8 @@ public class Util {
      * Sets empty or non-existing owner fields of a bibtex entry to a specified default value. Timestamp field is also
      * set. Preferences are checked to see if these options are enabled.
      *
-     * @param entry The entry to set fields for.
-     * @param overwriteOwner Indicates whether owner should be set if it is already set.
+     * @param entry              The entry to set fields for.
+     * @param overwriteOwner     Indicates whether owner should be set if it is already set.
      * @param overwriteTimestamp Indicates whether timestamp should be set if it is already set.
      */
     public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
@@ -339,7 +339,7 @@ public class Util {
      * GUIGlobals.FILE_FIELD.
      *
      * @param database The database to modify.
-     * @param fields The fields to find links in.
+     * @param fields   The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static NamedCompound upgradePdfPsToFile(BibDatabase database, String[] fields) {
@@ -357,8 +357,8 @@ public class Util {
      * TODO: Move this to cleanup class. Collect file links from the given set of fields, and add them to the list
      * contained in the field GUIGlobals.FILE_FIELD.
      *
-     * @param entries The entries to modify.
-     * @param fields The fields to find links in.
+     * @param entry The entry to modify.
+     * @param fields  The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static void upgradePdfPsToFile(BibEntry entry, String[] fields, NamedCompound ce) {
@@ -402,9 +402,9 @@ public class Util {
         final String ext = "." + fieldName.toLowerCase();
         final OpenFileFilter off;
         if (BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(s)) {
-            off = new OpenFileFilter(new String[] {ext, ext + ".gz", ext + ".bz2"});
+            off = new OpenFileFilter(new String[]{ext, ext + ".gz", ext + ".bz2"});
         } else {
-            off = new OpenFileFilter(new String[] {ext});
+            off = new OpenFileFilter(new String[]{ext});
         }
         return off;
     }
@@ -413,9 +413,9 @@ public class Util {
      * Set a given field to a given value for all entries in a Collection. This method DOES NOT update any UndoManager,
      * but returns a relevant CompoundEdit that should be registered by the caller.
      *
-     * @param entries The entries to set the field for.
-     * @param field The name of the field to set.
-     * @param text The value to set. This value can be null, indicating that the field should be cleared.
+     * @param entries         The entries to set the field for.
+     * @param field           The name of the field to set.
+     * @param text            The value to set. This value can be null, indicating that the field should be cleared.
      * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
      * @return A CompoundEdit for the entire operation.
      */
@@ -444,11 +444,11 @@ public class Util {
     /**
      * Move contents from one field to another for a Collection of entries.
      *
-     * @param entries The entries to do this operation for.
-     * @param field The field to move contents from.
-     * @param newField The field to move contents into.
+     * @param entries         The entries to do this operation for.
+     * @param field           The field to move contents from.
+     * @param newField        The field to move contents into.
      * @param overwriteValues If true, overwrites any existing values in the new field. If false, makes no change for
-     *            entries with existing value in the new field.
+     *                        entries with existing value in the new field.
      * @return A CompoundEdit for the entire operation.
      */
     public static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField, boolean overwriteValues) {
@@ -477,12 +477,12 @@ public class Util {
 
     /**
      * Optimized method for converting a String into an Integer
-     *
+     * <p>
      * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
      *
      * @param str the String holding an Integer value
-     * @throws NumberFormatException if str cannot be parsed to an int
      * @return the int value of str
+     * @throws NumberFormatException if str cannot be parsed to an int
      */
     public static int intValueOf(String str) {
         int ival = 0;
@@ -495,7 +495,7 @@ public class Util {
             throw new NumberFormatException(str);
         }
 
-        for (;; ival *= 10) {
+        for (; ; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
                 return sign ? ival : -ival;
@@ -536,7 +536,7 @@ public class Util {
      * Determines filename provided by an entry in a database
      *
      * @param database the database, where the entry is located
-     * @param entry the entry to which the file should be linked to
+     * @param entry    the entry to which the file should be linked to
      * @return a suggested fileName
      */
     public static String getLinkedFileName(BibDatabase database, BibEntry entry) {
@@ -590,7 +590,7 @@ public class Util {
     /**
      * Binds ESC-Key to cancel button
      *
-     * @param rootPane the pane to bind the action to. Typically, this variable is retrieved by this.getRootPane();
+     * @param rootPane     the pane to bind the action to. Typically, this variable is retrieved by this.getRootPane();
      * @param cancelAction the action to bind
      */
     // TODO: move to GUI
@@ -634,6 +634,7 @@ public class Util {
     public static String getResultsWithEncoding(URL source, Charset encoding) throws IOException {
         return net.sf.jabref.util.Util.getResultsWithEncoding(source.openConnection(), encoding);
     }
+
     /**
      * Download the URL using specified encoding and return contents as a String.
      *
@@ -720,7 +721,7 @@ public class Util {
      * @throws IOException
      */
     public String getResultsFromFile(File f) throws IOException {
-        try(InputStream in = new BufferedInputStream(new FileInputStream(f))) {
+        try (InputStream in = new BufferedInputStream(new FileInputStream(f))) {
             StringBuilder sb = new StringBuilder();
             byte[] buffer = new byte[256];
             while (true) {
@@ -744,7 +745,7 @@ public class Util {
      *
      * @param parent The Component used as a parent when displaying a confirmation dialog.
      * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
-     *         otherwise (this indicates that the user has aborted the assignment).
+     * otherwise (this indicates that the user has aborted the assignment).
      */
     public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibEntry[] entries, BibDatabase db, Component parent) {
         Vector<String> affectedFields = new Vector<>();
@@ -821,28 +822,38 @@ public class Util {
     }
 
     /**
+     * Shortcut method if links are set without using the GUI
+     *
+     * @param entries  the entries for which links should be set
+     * @param metaData the meta data for the BibDatabase for which links are set
+     */
+    public static void autoSetLinks(Collection<BibEntry> entries, MetaData metaData) {
+        autoSetLinks(entries, null, null, null, metaData, null, null);
+    }
+
+    /**
      * Automatically add links for this set of entries, based on the globally stored list of external file types. The
      * entries are modified, and corresponding UndoEdit elements added to the NamedCompound given as argument.
      * Furthermore, all entries which are modified are added to the Set of entries given as an argument.
-     *
+     * <p>
      * The entries' bibtex keys must have been set - entries lacking key are ignored. The operation is done in a new
      * thread, which is returned for the caller to wait for if needed.
      *
-     * @param entries A collection of BibEntry objects to find links for.
-     * @param ce A NamedCompound to add UndoEdit elements to.
-     * @param changedEntries MODIFIED, optional. A Set of BibEntry objects to which all modified entries is added.
-     *            This is used for status output and debugging
+     * @param entries          A collection of BibEntry objects to find links for.
+     * @param ce               A NamedCompound to add UndoEdit elements to.
+     * @param changedEntries   MODIFIED, optional. A Set of BibEntry objects to which all modified entries is added.
+     *                         This is used for status output and debugging
      * @param singleTableModel UGLY HACK. The table model to insert links into. Already existing links are not
-     *            duplicated or removed. This parameter has to be null if entries.count() != 1. The hack has been
-     *            introduced as a bibtexentry does not (yet) support the function getListTableModel() and the
-     *            FileListEntryEditor editor holds an instance of that table model and does not reconstruct it after the
-     *            search has succeeded.
-     * @param metaData The MetaData providing the relevant file directory, if any.
-     * @param callback An ActionListener that is notified (on the event dispatch thread) when the search is finished.
-     *            The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
-     *            parameter can be null, which means that no callback will be notified.
-     * @param diag An instantiated modal JDialog which will be used to display the progress of the autosetting. This
-     *            parameter can be null, which means that no progress update will be shown.
+     *                         duplicated or removed. This parameter has to be null if entries.count() != 1. The hack has been
+     *                         introduced as a bibtexentry does not (yet) support the function getListTableModel() and the
+     *                         FileListEntryEditor editor holds an instance of that table model and does not reconstruct it after the
+     *                         search has succeeded.
+     * @param metaData         The MetaData providing the relevant file directory, if any.
+     * @param callback         An ActionListener that is notified (on the event dispatch thread) when the search is finished.
+     *                         The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
+     *                         parameter can be null, which means that no callback will be notified.
+     * @param diag             An instantiated modal JDialog which will be used to display the progress of the autosetting. This
+     *                         parameter can be null, which means that no progress update will be shown.
      * @return the thread performing the autosetting
      */
     public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
@@ -980,17 +991,17 @@ public class Util {
      * Automatically add links for this entry to the table model given as an argument, based on the globally stored list
      * of external file types. The entry itself is not modified. The entry's bibtex key must have been set.
      *
-     * @param entry The BibEntry to find links for.
+     * @param entry            The BibEntry to find links for.
      * @param singleTableModel The table model to insert links into. Already existing links are not duplicated or
-     *            removed.
-     * @param metaData The MetaData providing the relevant file directory, if any.
-     * @param callback An ActionListener that is notified (on the event dispatch thread) when the search is finished.
-     *            The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
-     *            parameter can be null, which means that no callback will be notified. The passed ActionEvent is
-     *            constructed with (this, id, ""), where id is 1 if something has been done and 0 if nothing has been
-     *            done.
-     * @param diag An instantiated modal JDialog which will be used to display the progress of the autosetting. This
-     *            parameter can be null, which means that no progress update will be shown.
+     *                         removed.
+     * @param metaData         The MetaData providing the relevant file directory, if any.
+     * @param callback         An ActionListener that is notified (on the event dispatch thread) when the search is finished.
+     *                         The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
+     *                         parameter can be null, which means that no callback will be notified. The passed ActionEvent is
+     *                         constructed with (this, id, ""), where id is 1 if something has been done and 0 if nothing has been
+     *                         done.
+     * @param diag             An instantiated modal JDialog which will be used to display the progress of the autosetting. This
+     *                         parameter can be null, which means that no progress update will be shown.
      * @return the runnable able to perform the autosetting
      */
     public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
@@ -1003,9 +1014,8 @@ public class Util {
     /**
      * Returns the list of linked files. The files have the absolute filename
      *
-     * @param bes list of BibTeX entries
+     * @param bes      list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
-     *
      * @return list of files. May be empty
      */
     public static List<File> getListOfLinkedFiles(BibEntry[] bes, String[] fileDirs) {
@@ -1038,7 +1048,8 @@ public class Util {
 
         boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
         // Now look for keys
-        nextFile: for (File file : filesWithExtension) {
+        nextFile:
+        for (File file : filesWithExtension) {
 
             String name = file.getName();
             int dot = name.lastIndexOf('.');

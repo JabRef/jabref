@@ -485,7 +485,7 @@ public class JabRef {
 
             if( metaData != null){
                 LOGGER.info(Localization.lang("Automatically setting file links"));
-                Util.autoSetLinks(database.getEntries(), null, null, null, metaData, null, null);
+                Util.autoSetLinks(database.getEntries(), metaData);
             }
         }
     }
