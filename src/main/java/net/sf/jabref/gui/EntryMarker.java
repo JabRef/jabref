@@ -168,7 +168,7 @@ public class EntryMarker {
     }
 
     public static int isMarked(BibEntry be) {
-        if (be.hasField(BibtexFields.MARKED)) {
+        if (!be.hasField(BibtexFields.MARKED)) {
             return 0;
         }
         String s = be.getField(BibtexFields.MARKED);
