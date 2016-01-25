@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" packages="net.sf.jabref">
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+        <GuiAppender name="GuiLogger">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </GuiAppender>
+    </Appenders>
+    <Loggers>
+        <Logger name="net.sf.jabref" level="INFO">
+            <AppenderRef ref="GuiLogger"/>
+        </Logger>
+        <Root level="INFO">
+            <AppenderRef ref="CONSOLE"/>
+        </Root>
+    </Loggers>
+</Configuration>
