@@ -124,13 +124,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private final JTabbedPane tabbed = new JTabbedPane(); // JTabbedPane.RIGHT);
 
-    final JabRefFrame frame;
+    private final JabRefFrame frame;
 
-    final BasePanel panel;
+    private final BasePanel panel;
 
     private final EntryEditor ths = this;
 
-    private final HashSet<FieldContentSelector> contentSelectors = new HashSet<>();
+    private final Set<FieldContentSelector> contentSelectors = new HashSet<>();
 
     private boolean updateSource = true; // This can be set to false to stop the source
     private boolean movingToDifferentEntry; // Indicates that we are about to go to the next or previous entry
@@ -176,7 +176,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         helpAction = new HelpAction(this.frame.helpDiag, GUIGlobals.entryEditorHelp, IconTheme.JabRefIcon.HELP.getIcon());
         closeAction = new CloseAction();
-        generateKeyAction = new GenerateKeyAction(this.frame);
+        generateKeyAction = new GenerateKeyAction();
         storeFieldAction = new StoreFieldAction();
         writeXmp = new WriteXMPEntryEditorAction(panel, this);
 
@@ -749,12 +749,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             for (String field : entry.getFieldNames()) {
-                if (BibtexFields.isDisplayableField(field)) {
-                    if (!newEntry.hasField(field)) {
-                        compound.addEdit(new UndoableFieldChange(entry, field, entry.getField(field), null));
-                        entry.clearField(field);
-                        anyChanged = true;
-                    }
+                if (BibtexFields.isDisplayableField(field) && !newEntry.hasField(field)) {
+                    compound.addEdit(new UndoableFieldChange(entry, field, entry.getField(field), null));
+                    entry.clearField(field);
+                    anyChanged = true;
                 }
             }
 
@@ -797,12 +795,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             lastSourceStringAccepted = source.getText();
-            if (!changedType) {
+            if (changedType) {
+                panel.updateEntryEditorIfShowing();
+            } else {
                 updateAllFields();
                 lastSourceAccepted = true;
                 updateSource = true;
-            } else {
-                panel.updateEntryEditorIfShowing();
             }
             // TODO: does updating work properly after source stored?
             panel.markBaseChanged();
@@ -889,7 +887,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      */
     @Override
     public void vetoableChange(PropertyChangeEvent e) {
-        String newValue = e.getNewValue() != null ? e.getNewValue().toString() : "";
+        String newValue = e.getNewValue() == null ? "" : e.getNewValue().toString();
         setField(e.getPropertyName(), newValue);
     }
 
@@ -1082,14 +1080,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 boolean isDuplicate = panel.getDatabase().setCiteKeyForEntry(entry.getId(), newValue);
 
-                if (newValue != null) {
+                if (newValue == null) {
+                    warnEmptyBibtexkey();
+                } else {
                     if (isDuplicate) {
                         warnDuplicateBibtexkey();
                     } else {
                         panel.output(Localization.lang("BibTeX key is unique."));
                     }
-                } else { // key is null/empty
-                    warnEmptyBibtexkey();
                 }
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
@@ -1141,10 +1139,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                         String oldValue = entry.getField(fieldEditor.getFieldName());
 
-                        if (toSet != null) {
-                            entry.setField(fieldEditor.getFieldName(), toSet);
-                        } else {
+                        if (toSet == null) {
                             entry.clearField(fieldEditor.getFieldName());
+                        } else {
+                            entry.setField(fieldEditor.getFieldName(), toSet);
                         }
 
                         fieldEditor.setValidBackgroundColor();
@@ -1285,11 +1283,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class GenerateKeyAction extends AbstractAction {
-        final JabRefFrame parent;
 
-        public GenerateKeyAction(JabRefFrame parentFrame) {
+        public GenerateKeyAction() {
             super(Localization.lang("Generate BibTeX key"), IconTheme.JabRefIcon.MAKE_KEY.getIcon());
-            parent = parentFrame;
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Generate BibTeX key"));
 
@@ -1420,9 +1416,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class ChangeTypeAction extends AbstractAction {
 
-        final EntryType changeType;
+        private final EntryType changeType;
 
-        final BasePanel changeTypePanel;
+        private final BasePanel changeTypePanel;
 
 
         public ChangeTypeAction(EntryType type, BasePanel bp) {

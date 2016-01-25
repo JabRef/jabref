@@ -44,13 +44,12 @@ class LargeHTMLEditorKit extends HTMLEditorKit {
         public View create(Element elem) {
             AttributeSet attrs = elem.getAttributes();
             Object elementName = attrs.getAttribute(AbstractDocument.ElementNameAttribute);
-            Object o = elementName != null ? null : attrs.getAttribute(StyleConstants.NameAttribute);
+            Object o = elementName == null ? attrs.getAttribute(StyleConstants.NameAttribute) : null;
             if (o instanceof HTML.Tag) {
                 HTML.Tag kind = (HTML.Tag) o;
                 if (kind == HTML.Tag.HTML) {
                     return new HTMLBlockView(elem);
-                }
-                else if (kind == HTML.Tag.IMPLIED) {
+                } else if (kind == HTML.Tag.IMPLIED) {
                     String ws = (String) elem.getAttributes().getAttribute(CSS.Attribute.WHITE_SPACE);
                     if ("pre".equals(ws)) {
                         return super.create(elem);

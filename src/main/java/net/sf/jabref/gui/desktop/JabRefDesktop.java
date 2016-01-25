@@ -12,7 +12,6 @@ import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.util.io.URLUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
@@ -20,7 +19,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -159,7 +157,7 @@ public class JabRefDesktop {
      *            The filename.
      * @throws IOException
      */
-    static void openFileOnWindows(String link) throws IOException {
+    private static void openFileOnWindows(String link) throws IOException {
         // escape & and spaces
         Runtime.getRuntime().exec("cmd.exe /c start " + link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \""));
     }
@@ -171,7 +169,7 @@ public class JabRefDesktop {
      * @param application Link to the app that opens the file.
      * @throws IOException
      */
-    static void openFileWithApplicationOnWindows(String link, String application) throws IOException {
+    private static void openFileWithApplicationOnWindows(String link, String application) throws IOException {
         link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
 
         Runtime.getRuntime().exec(application + " " + link);
@@ -236,7 +234,8 @@ public class JabRefDesktop {
 
     }
 
-    static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath) throws IOException {
+    private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath)
+            throws IOException {
         // For URLs, other solutions are
         //  * https://github.com/rajing/browserlauncher2, but it is not available in maven
         //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282

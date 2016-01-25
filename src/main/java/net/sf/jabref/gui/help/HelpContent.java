@@ -43,12 +43,12 @@ class HelpContent extends JTextPane {
     private final JabRefPreferences prefs;
 
 
-    public HelpContent(JabRefPreferences prefs_) {
+    public HelpContent(JabRefPreferences prefs) {
         super();
         pane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.setDoubleBuffered(true);
-        prefs = prefs_;
+        this.prefs = prefs;
         history = new Stack<>();
         forw = new Stack<>();
         setEditorKitForContentType("text/html", new MyEditorKit());
@@ -109,11 +109,11 @@ class HelpContent extends JTextPane {
         String file;
         String anchorName = null;
 
-        if (indexOf != -1) {
+        if (indexOf == -1) {
+            file = filename;
+        } else {
             file = filename.substring(0, indexOf);
             anchorName = filename.substring(indexOf + 1);
-        } else {
-            file = filename;
         }
 
         String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
@@ -163,16 +163,16 @@ class HelpContent extends JTextPane {
     private void setPageOnly(URL baseUrl, String anchorName) {
         try {
             URL url;
-            if(anchorName!=null) {
-                url = new URL(baseUrl +"#"+anchorName);
-            } else {
+            if (anchorName == null) {
                 url = baseUrl;
+            } else {
+                url = new URL(baseUrl +"#"+anchorName);
             }
             super.setPage(url);
             // if anchor is present - scroll to it
             String stringUrl = url.toString();
             if (stringUrl.contains("#")) {
-                scrollToReference(stringUrl.substring(stringUrl.indexOf("#")));
+                scrollToReference(stringUrl.substring(stringUrl.indexOf('#')));
             }
         } catch (IOException ex) {
             if (baseUrl == null) {

@@ -43,7 +43,7 @@ public class FileListEntry {
     }
 
     private String getTypeName() {
-        return this.type != null ? this.type.getName() : "";
+        return this.type == null ? "" : this.type.getName();
     }
 
     @Override

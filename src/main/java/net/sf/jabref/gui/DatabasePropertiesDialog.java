@@ -295,7 +295,7 @@ public class DatabasePropertiesDialog extends JDialog {
     private void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
-        Vector<String> storedSaveOrderConfig = metaData.getData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
+        List<String> storedSaveOrderConfig = metaData.getData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
         boolean selected;
         if (storedSaveOrderConfig == null) {
             saveAsConfiguredGlobally.setSelected(true);

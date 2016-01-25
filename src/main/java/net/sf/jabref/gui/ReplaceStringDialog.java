@@ -45,14 +45,14 @@ class ReplaceStringDialog extends JDialog {
     private final JCheckBox selOnly = new JCheckBox(Localization.lang("Limit to selected entries"), false);
     private final JRadioButton allFi = new JRadioButton(Localization.lang("All fields"), true);
     private final JRadioButton field = new JRadioButton(Localization.lang("Limit to fields") + ":", false);
-    private boolean ok_pressed;
+    private boolean okPressed;
     private String[] flds;
     private String s1;
     private String s2;
 
 
-    public ReplaceStringDialog(JabRefFrame parent_) {
-        super(parent_, Localization.lang("Replace string"), true);
+    public ReplaceStringDialog(JabRefFrame parent) {
+        super(parent, Localization.lang("Replace string"), true);
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(allFi);
@@ -66,7 +66,7 @@ class ReplaceStringDialog extends JDialog {
                 if ("".equals(s1)) {
                     return;
                 }
-                ok_pressed = true;
+                okPressed = true;
                 flds = fields.getText().toLowerCase().split(";");
                 dispose();
             }
@@ -185,11 +185,11 @@ class ReplaceStringDialog extends JDialog {
         pack();
         //setSize(400, 170);
 
-        PositionWindow.placeDialog(this, parent_);
+        PositionWindow.placeDialog(this, parent);
     }
 
     public boolean okPressed() {
-        return ok_pressed;
+        return okPressed;
     }
 
     private boolean allFields() {

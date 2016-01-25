@@ -92,13 +92,13 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     }
 
     public void showPage(String url, Class<?> resourceOwner) {
-        if (!isVisible()) {
+        if (isVisible()) {
+            back.setEnabled(true);
+        } else {
             PositionWindow.placeDialog(this, frame);
             content.reset();
             back.setEnabled(false);
             setVisible(true);
-        } else {
-            back.setEnabled(true);
         }
         forward.setEnabled(false);
         content.setPage(url, resourceOwner);

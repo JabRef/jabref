@@ -509,10 +509,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Bibtex
             for (EntryType type : BibtexEntryTypes.ALL) {
                 KeyStroke keyStroke = ChangeEntryTypeMenu.entryShortCuts.get(type.getName());
-                if(keyStroke != null) {
-                    actions.add(new NewEntryAction(this, type.getName(), keyStroke));
-                } else {
+                if (keyStroke == null) {
                     actions.add(new NewEntryAction(this, type.getName()));
+                } else {
+                    actions.add(new NewEntryAction(this, type.getName(), keyStroke));
                 }
             }
             // ieeetran
@@ -693,11 +693,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         String changeFlag = panel.isModified() ? "*" : "";
 
-        if (panel.getDatabaseFile() != null) {
+        if (panel.getDatabaseFile() == null) {
+            setTitle(GUIGlobals.frameTitle + " - " + GUIGlobals.untitledTitle + changeFlag + mode);
+        } else {
             String databaseFile = panel.getDatabaseFile().getPath();
             setTitle(GUIGlobals.frameTitle + " - " + databaseFile + changeFlag + mode);
-        } else {
-            setTitle(GUIGlobals.frameTitle + " - " + GUIGlobals.untitledTitle + changeFlag + mode);
         }
     }
 
@@ -770,7 +770,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      *
      * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
-    private void tearDownJabRef(Vector<String> filenames) {
+    private void tearDownJabRef(List<String> filenames) {
         JabRefExecutorService.INSTANCE.shutdownEverything();
 
         dispose();
@@ -840,17 +840,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Ask here if the user really wants to close, if the base
         // has not been saved since last save.
         boolean close = true;
-        Vector<String> filenames = new Vector<>();
+        List<String> filenames = new ArrayList<>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (getBasePanelAt(i).isModified()) {
                     tabbedPane.setSelectedIndex(i);
                     String filename;
 
-                    if (getBasePanelAt(i).getDatabaseFile() != null) {
-                        filename = getBasePanelAt(i).getDatabaseFile().getAbsolutePath();
-                    } else {
+                    if (getBasePanelAt(i).getDatabaseFile() == null) {
                         filename = GUIGlobals.untitledTitle;
+                    } else {
+                        filename = getBasePanelAt(i).getDatabaseFile().getAbsolutePath();
                     }
                     int answer = showSaveDialog(filename);
 
@@ -1637,7 +1637,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
         // add tab
         tabbedPane.add(bp.getTabTitle(), bp);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file != null ? file.getAbsolutePath() : null);
+        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file == null ? null : file.getAbsolutePath());
         // update all tab titles
         updateAllTabTitles();
 
@@ -1885,7 +1885,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Here we store the names of all current files. If
             // there is no current file, we remove any
             // previously stored filename.
-            Vector<String> filenames = new Vector<>();
+            List<String> filenames = new ArrayList<>();
             if (tabbedPane.getTabCount() > 0) {
                 for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                     if (tabbedPane.getTitleAt(i).equals(GUIGlobals.untitledTitle)) {
@@ -1923,7 +1923,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public class LoadSessionAction extends MnemonicAwareAction {
 
-        volatile boolean running;
+        private volatile boolean running;
 
         public LoadSessionAction() {
             super();
@@ -2239,10 +2239,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         boolean close = false;
         String filename;
 
-        if (panel.getDatabaseFile() != null) {
-            filename = panel.getDatabaseFile().getAbsolutePath();
-        } else {
+        if (panel.getDatabaseFile() == null) {
             filename = GUIGlobals.untitledTitle;
+        } else {
+            filename = panel.getDatabaseFile().getAbsolutePath();
         }
 
         int answer = showSaveDialog(filename);

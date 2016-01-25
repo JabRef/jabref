@@ -43,15 +43,14 @@ class SimpleUrlDragDrop implements DropTargetListener {
     private final EntryEditor.StoreFieldAction storeFieldAction;
 
 
-    public SimpleUrlDragDrop(FieldEditor _editor,
-            EntryEditor.StoreFieldAction _storeFieldAction) {
-        editor = _editor;
-        storeFieldAction = _storeFieldAction;
+    public SimpleUrlDragDrop(FieldEditor editor, EntryEditor.StoreFieldAction storeFieldAction) {
+        this.editor = editor;
+        this.storeFieldAction = storeFieldAction;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#dragEnter(java.awt.dnd.DropTargetDragEvent)
      */
     @Override
@@ -60,7 +59,7 @@ class SimpleUrlDragDrop implements DropTargetListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#dragOver(java.awt.dnd.DropTargetDragEvent)
      */
     @Override
@@ -69,7 +68,7 @@ class SimpleUrlDragDrop implements DropTargetListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#dropActionChanged(java.awt.dnd.DropTargetDragEvent)
      */
     @Override
@@ -78,7 +77,7 @@ class SimpleUrlDragDrop implements DropTargetListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#dragExit(java.awt.dnd.DropTargetEvent)
      */
     @Override
@@ -87,7 +86,7 @@ class SimpleUrlDragDrop implements DropTargetListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#drop(java.awt.dnd.DropTargetDropEvent)
      */
     @Override

@@ -57,9 +57,9 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Localization.lang("Float marked entries"),
             Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
-    public RightClickMenu(BasePanel panel_, MetaData metaData_) {
-        panel = panel_;
-        metaData = metaData_;
+    public RightClickMenu(BasePanel panel, MetaData metaData) {
+        this.panel = panel;
+        this.metaData = metaData;
         JMenu typeMenu = ChangeEntryTypeMenu.getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
         boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
@@ -247,7 +247,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (bes == null) {
             return null;
         }
-        JMenu groupMenu = new JMenu();
         GroupTreeNode groups = metaData.getGroups();
         if (groups == null) {
             groupAddMenu.setEnabled(false);
@@ -256,6 +255,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             return null;
         }
 
+        JMenu groupMenu = new JMenu();
         insertNodes(groupMenu, metaData.getGroups(), bes, add, move);
 
         return groupMenu;
@@ -333,11 +333,11 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         AbstractAction action = add ? new AddToGroupAction(node, move,
                 panel) : new RemoveFromGroupAction(node, panel);
         AbstractGroup group = node.getGroup();
-        if (!move) {
+        if (move) {
+            action.setEnabled(group.supportsAdd());
+        } else {
             action.setEnabled(add ? group.supportsAdd() && !group.containsAll(selection)
                     : group.supportsRemove() && group.containsAny(selection));
-        } else {
-            action.setEnabled(group.supportsAdd());
         }
         return action;
     }

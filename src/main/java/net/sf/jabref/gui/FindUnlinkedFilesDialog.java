@@ -166,7 +166,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private ComponentListener dialogPositionListener;
 
-    private AtomicBoolean threadState = new AtomicBoolean();
+    private final AtomicBoolean threadState = new AtomicBoolean();
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
     private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
@@ -677,7 +677,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         Enumeration<CheckableTreeNode> children = node.depthFirstEnumeration();
         ArrayList<CheckableTreeNode> nodesToRemove = new ArrayList<>();
         for (CheckableTreeNode child : Collections.list(children)) {
-            if (child.isLeaf() && child.getSelected()) {
+            if (child.isLeaf() && child.isSelected()) {
                 File nodeFile = ((FileNodeWrapper) child.getUserObject()).file;
                 if ((nodeFile != null) && nodeFile.isFile()) {
                     filesList.add(nodeFile);
@@ -1113,7 +1113,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         }
 
-        public boolean getSelected() {
+        public boolean isSelected() {
             return isSelected;
         }
 
@@ -1121,7 +1121,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private static class CheckboxTreeCellRenderer extends DefaultTreeCellRenderer {
 
-        final FileSystemView fsv = FileSystemView.getFileSystemView();
+        private final FileSystemView fsv = FileSystemView.getFileSystemView();
 
 
         @Override
@@ -1136,7 +1136,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             JPanel newPanel = new JPanel();
 
             JCheckBox checkbox = node.getCheckbox();
-            checkbox.setSelected(node.getSelected());
+            checkbox.setSelected(node.isSelected());
 
             try {
                 setIcon(fsv.getSystemIcon(userObject.file));

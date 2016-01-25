@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,8 +20,6 @@ import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
-
 import net.sf.jabref.*;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.help.HelpAction;
@@ -47,8 +45,6 @@ public class GenFieldsCustomizer extends JDialog {
     private final JButton ok = new JButton();
     private final JButton cancel = new JButton();
     private JButton helpBut = new JButton();
-    TitledBorder titledBorder1;
-    TitledBorder titledBorder2;
     private final JLabel jLabel1 = new JLabel();
     private final JPanel jPanel3 = new JPanel();
     private final JPanel jPanel4 = new JPanel();

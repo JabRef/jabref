@@ -165,15 +165,15 @@ public class FileDialogs {
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, selectedFile.getPath());
         }
 
-        if (!multipleSelection) {
-            return selectedFile.getAbsolutePath();
-        } else {
+        if (multipleSelection) {
             File[] files = fc.getSelectedFiles();
             String[] filenames = new String[files.length];
             for (int i = 0; i < files.length; i++) {
                 filenames[i] = files[i].getAbsolutePath();
             }
             return filenames;
+        } else {
+            return selectedFile.getAbsolutePath();
         }
     }
 
@@ -193,13 +193,13 @@ public class FileDialogs {
 
         fc.setVisible(true);
 
-        if (fc.getFile() != null) {
+        if (fc.getFile() == null) {
+            return null;
+        } else {
             if (updateWorkingDirectory) {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fc.getDirectory() + fc.getFile());
             }
             return fc.getDirectory() + fc.getFile();
-        } else {
-            return null;
         }
     }
 }

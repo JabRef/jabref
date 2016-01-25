@@ -148,7 +148,7 @@ class FileListEditorTransferHandler extends TransferHandler {
         StringBuilder logMessage = new StringBuilder("Cannot transfer input:");
         DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
-            logMessage.append(" ").append(inflav);
+            logMessage.append(' ').append(inflav);
         }
         LOGGER.warn(logMessage.toString());
 

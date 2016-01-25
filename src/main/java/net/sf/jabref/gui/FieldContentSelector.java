@@ -21,8 +21,7 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
-
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -224,7 +223,7 @@ public class FieldContentSelector extends JComponent {
 
         // TODO: CO - What for?
         comboBox.addItem("");
-        Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
+        List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
         if (items != null) {
             for (String item : items) {
                 comboBox.addItem(item);

@@ -35,7 +35,7 @@ class PreambleEditor extends JDialog {
     private final BibDatabase base;
     private final BasePanel panel;
 
-    private FieldEditor ed;
+    private final FieldEditor ed;
 
 
     public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase base, JabRefPreferences prefs) {
@@ -76,7 +76,7 @@ class PreambleEditor extends JDialog {
 
         String content = base.getPreamble();
 
-        ed = new TextArea(Localization.lang("Preamble"), content != null ? content : "");
+        ed = new TextArea(Localization.lang("Preamble"), content == null ? "" : content);
         //ed.addUndoableEditListener(panel.undoListener);
         setupJTextComponent((TextArea) ed);
 
@@ -161,13 +161,12 @@ class PreambleEditor extends JDialog {
                 panel.undoManager.addEdit(new UndoablePreambleChange
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
-                if ((toSet != null) && !toSet.isEmpty()) {
-                    ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
-                    ed.setValidBackgroundColor();
-                } else {
+                if ((toSet == null) || toSet.isEmpty()) {
                     ed.setLabelColor(GUIGlobals.nullFieldColor);
-                    ed.setValidBackgroundColor();
+                } else {
+                    ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
                 }
+                ed.setValidBackgroundColor();
                 if (ed.getTextComponent().hasFocus()) {
                     ed.setActiveBackgroundColor();
                 }

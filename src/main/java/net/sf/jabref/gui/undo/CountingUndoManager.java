@@ -25,7 +25,7 @@ public class CountingUndoManager extends UndoManager {
 
     private int unchangedPoint;
     private int current;
-    private BasePanel panel;
+    private final BasePanel panel;
 
 
     public CountingUndoManager(BasePanel basePanel) {
@@ -58,6 +58,6 @@ public class CountingUndoManager extends UndoManager {
     }
 
     public boolean hasChanged() {
-        return !(current == unchangedPoint);
+        return (current != unchangedPoint);
     }
 }

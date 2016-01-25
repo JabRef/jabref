@@ -283,8 +283,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             try {
                 ExternalFileType type = ExternalFileTypes.getInstance()
                         .getExternalFileTypeByName(entry.type.getName());
-                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.link,
-                        type != null ? type : entry.type);
+                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.link, type == null ? entry.type : type);
             } catch (IOException e) {
                 LOGGER.warn("Cannot open selected file.", e);
             }
@@ -371,10 +370,10 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     private void addEntry() {
         List<String> defaultDirectory = metaData.getFileDirectory(Globals.FILE_FIELD);
-        if(defaultDirectory.size() > 0 && defaultDirectory.get(0) != null) {
-            addEntry(defaultDirectory.get(0));
-        } else {
+        if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
             addEntry("");
+        } else {
+            addEntry(defaultDirectory.get(0));
         }
     }
 

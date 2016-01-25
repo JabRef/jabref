@@ -34,7 +34,7 @@ import net.sf.jabref.model.entry.FileField;
  */
 public class FileListTableModel extends AbstractTableModel {
 
-    private final ArrayList<FileListEntry> list = new ArrayList<>();
+    private final List<FileListEntry> list = new ArrayList<>();
 
     @Override
     public int getRowCount() {
@@ -63,7 +63,7 @@ public class FileListTableModel extends AbstractTableModel {
             case 1:
                 return entry.link;
             default:
-                return entry.type != null ? entry.type.getName() : "";
+                return entry.type == null ? "" : entry.type.getName();
             }
         }
     }
@@ -98,10 +98,10 @@ public class FileListTableModel extends AbstractTableModel {
     public void addEntry(final int index, final FileListEntry entry) {
         synchronized (list) {
             list.add(index, entry);
-            if (!SwingUtilities.isEventDispatchThread()) {
-                SwingUtilities.invokeLater(() -> fireTableRowsInserted(index, index));
-            } else {
+            if (SwingUtilities.isEventDispatchThread()) {
                 fireTableRowsInserted(index, index);
+            } else {
+                SwingUtilities.invokeLater(() -> fireTableRowsInserted(index, index));
             }
         }
 

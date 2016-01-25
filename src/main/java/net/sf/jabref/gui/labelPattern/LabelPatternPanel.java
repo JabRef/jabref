@@ -24,6 +24,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -57,7 +58,7 @@ public class LabelPatternPanel extends JPanel {
     protected final JTextField defaultPat = new JTextField();
 
     // one field for each type
-    private final HashMap<String, JTextField> textFields = new HashMap<>();
+    private final Map<String, JTextField> textFields = new HashMap<>();
 
 
     public LabelPatternPanel(HelpDialog helpDiag) {

@@ -7,8 +7,9 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 public class ChangeTypeAction extends AbstractAction {
-    final EntryType type;
-    final BasePanel panel;
+
+    private final EntryType type;
+    private final BasePanel panel;
 
     public ChangeTypeAction(EntryType type, BasePanel bp) {
         super(type.getName());

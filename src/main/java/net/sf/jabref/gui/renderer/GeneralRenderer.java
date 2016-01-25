@@ -97,10 +97,10 @@ public class GeneralRenderer extends DefaultTableCellRenderer {
             // this is plain text
             setIcon(null);
             setToolTipText(null);
-            if (value != null) {
-                setText(value.toString());
-            } else {
+            if (value == null) {
                 setText(null);
+            } else {
+                setText(value.toString());
             }
         }
     }
