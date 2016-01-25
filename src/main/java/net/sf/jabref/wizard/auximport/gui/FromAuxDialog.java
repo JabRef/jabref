@@ -1,5 +1,7 @@
 /*
  Copyright (C) 2004 R. Nagel
+ Copyright (C) 2016 JabRef Contributors
+
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -38,6 +40,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -56,12 +59,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.maintable.MainTable;
@@ -93,25 +98,30 @@ public class FromAuxDialog extends JDialog {
 
     private final AuxSubGenerator auxParser;
 
+    private static final Log LOGGER = LogFactory.getLog(FromAuxDialog.class);
+
+    private final JabRefFrame parent;
+
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal,
             JTabbedPane viewedDBs) {
         super(frame, title, modal);
 
         parentTabbedPane = viewedDBs;
+        parent = frame;
 
         auxParser = new AuxSubGenerator(null);
 
         try {
-            jbInit(frame);
+            jbInit();
             pack();
             setSize(600, 500);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Problem creating dialog", ex);
         }
     }
 
-    private void jbInit(JabRefFrame parent) {
+    private void jbInit() {
         JPanel panel1 = new JPanel();
 
         panel1.setLayout(new BorderLayout());
@@ -132,7 +142,7 @@ public class FromAuxDialog extends JDialog {
         parseButton.setText(Localization.lang("Parse"));
         parseButton.addActionListener(new FromAuxDialog_parse_actionAdapter(this));
 
-        initPanels(parent);
+        initPanels();
 
         // insert the buttons
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -178,7 +188,7 @@ public class FromAuxDialog extends JDialog {
 
     }
 
-    private void initPanels(JabRefFrame parent) {
+    private void initPanels() {
         // collect the names of all open databases
         int len = parentTabbedPane.getTabCount();
         int toSelect = -1;
@@ -237,8 +247,8 @@ public class FromAuxDialog extends JDialog {
 
     private void select_actionPerformed() {
         BibDatabase db = getGenerateDB();
-        MainTable mainTable = JabRef.jrf.getCurrentBasePanel().mainTable;
-        BibDatabase database = JabRef.jrf.getCurrentBasePanel().getDatabase();
+        MainTable mainTable = parent.getCurrentBasePanel().mainTable;
+        BibDatabase database = parent.getCurrentBasePanel().getDatabase();
         mainTable.clearSelection();
         for (BibEntry newEntry : db.getEntries()) {
             // the entries are not the same objects as in the original database
@@ -259,35 +269,18 @@ public class FromAuxDialog extends JDialog {
         BibDatabase refBase = bp.getDatabase();
         String auxName = auxFileField.getText();
 
-        if (auxName != null) {
-            if ((refBase != null) && !auxName.isEmpty()) {
-                auxParser.clear();
-                notFoundList.setListData(auxParser.generate(auxName, refBase));
+        if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {
+            auxParser.clear();
+            List<String> list = auxParser.generate(auxName, refBase);
+            notFoundList.setListData(list.toArray(new String[list.size()]));
+            statusInfos.append(auxParser.getInformation(false));
 
-                statusInfos.append(Localization.lang("keys in database") + " " +
-                        refBase.getEntryCount());
-                statusInfos.append("\n" + Localization.lang("found in aux file") + " " +
-                        auxParser.getFoundKeysInAux());
-                statusInfos.append("\n" + Localization.lang("resolved") + " " +
-                        auxParser.getResolvedKeysCount());
-                statusInfos.append("\n" + Localization.lang("not found") + " " +
-                        auxParser.getNotResolvedKeysCount());
-                statusInfos.append("\n" + Localization.lang("crossreferenced entries included") + " " +
-                        auxParser.getCrossreferencedEntriesCount());
-
-                int nested = auxParser.getNestedAuxCounter();
-                if (nested > 0) {
-                    statusInfos.append("\n" + Localization.lang("nested_aux_files") + " " +
-                            nested);
-                }
-
-                selectInDBButton.setEnabled(true);
-                generateButton.setEnabled(true);
-            }
+            selectInDBButton.setEnabled(true);
+            generateButton.setEnabled(true);
         }
 
         // the generated database contains no entries -> no active generate-button
-        if (auxParser.getGeneratedDatabase().getEntryCount() < 1) {
+        if (auxParser.emptyGeneratedDatabase()) {
             statusInfos.append("\n" + Localization.lang("empty database"));
             generateButton.setEnabled(false);
         }
@@ -333,8 +326,7 @@ public class FromAuxDialog extends JDialog {
 }
 
 // ----------- helper class -------------------
-class FromAuxDialog_generate_actionAdapter
-        implements java.awt.event.ActionListener {
+class FromAuxDialog_generate_actionAdapter implements ActionListener {
 
     private final FromAuxDialog adaptee;
 
@@ -349,8 +341,7 @@ class FromAuxDialog_generate_actionAdapter
     }
 }
 
-class FromAuxDialog_Cancel_actionAdapter
-        implements java.awt.event.ActionListener {
+class FromAuxDialog_Cancel_actionAdapter implements ActionListener {
 
     private final FromAuxDialog adaptee;
 
@@ -365,8 +356,7 @@ class FromAuxDialog_Cancel_actionAdapter
     }
 }
 
-class FromAuxDialog_parse_actionAdapter
-        implements java.awt.event.ActionListener {
+class FromAuxDialog_parse_actionAdapter implements ActionListener {
 
     private final FromAuxDialog adaptee;
 
