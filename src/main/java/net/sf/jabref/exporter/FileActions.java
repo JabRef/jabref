@@ -494,14 +494,15 @@ public class FileActions {
     public static List<BibEntry> getSortedEntries(BibDatabase database, MetaData metaData, Set<String> keySet, boolean isSaveOperation) {
         //if no meta data are present, simply return in original order
         if(metaData == null) {
-            List<BibEntry> result = new LinkedList();
+            List<BibEntry> result = new LinkedList<>();
             result.addAll(database.getEntries());
             return result;
         }
 
         boolean inOriginalOrder;
         if (isSaveOperation) {
-            Vector<String> storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
+            List<String> storedSaveOrderConfig = metaData
+                    .getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             if (storedSaveOrderConfig == null) {
                 inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
             } else {

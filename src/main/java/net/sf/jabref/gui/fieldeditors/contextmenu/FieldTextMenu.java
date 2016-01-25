@@ -55,10 +55,8 @@ public class FieldTextMenu implements MouseListener {
                 // enable/disable copy to clipboard if selected text available
                 String txt = field.getSelectedText();
                 boolean cStat = false;
-                if (txt != null) {
-                    if (!txt.isEmpty()) {
-                        cStat = true;
-                    }
+                if ((txt != null) && !txt.isEmpty()) {
+                    cStat = true;
                 }
                 copyAct.setEnabled(cStat);
                 inputMenu.show(e.getComponent(), e.getX(), e.getY());

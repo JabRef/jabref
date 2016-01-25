@@ -18,9 +18,9 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Vector;
-
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -84,7 +84,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
          *
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
          */
-        Vector<String> fieldNames = new Vector<>(BibtexFields.getAllFieldNames());
+        List<String> fieldNames = new ArrayList<>(BibtexFields.getAllFieldNames());
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);

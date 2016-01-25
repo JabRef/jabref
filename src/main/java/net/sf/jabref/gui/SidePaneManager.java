@@ -45,8 +45,6 @@ public class SidePaneManager {
 
     private final JabRefFrame frame;
 
-    BasePanel panel;
-
     private final SidePane sidep;
 
     private final Map<String, SidePaneComponent> components = new LinkedHashMap<>();
@@ -90,10 +88,10 @@ public class SidePaneManager {
 
     public boolean isComponentVisible(String name) {
         Object o = components.get(name);
-        if (o != null) {
-            return visible.contains(o);
-        } else {
+        if (o == null) {
             return false;
+        } else {
+            return visible.contains(o);
         }
     }
 
@@ -107,19 +105,19 @@ public class SidePaneManager {
 
     public void show(String name) {
         Object o = components.get(name);
-        if (o != null) {
-            show((SidePaneComponent) o);
-        } else {
+        if (o == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
+        } else {
+            show((SidePaneComponent) o);
         }
     }
 
     public void hide(String name) {
         Object o = components.get(name);
-        if (o != null) {
-            hideComponent((SidePaneComponent) o);
-        } else {
+        if (o == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
+        } else {
+            hideComponent((SidePaneComponent) o);
         }
     }
 
@@ -274,7 +272,12 @@ public class SidePaneManager {
 
     public void updateView() {
         sidep.setComponents(visible);
-        if (!visible.isEmpty()) {
+        if (visible.isEmpty()) {
+            if (sidep.isVisible()) {
+                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.contentPane.getDividerLocation());
+            }
+            sidep.setVisible(false);
+        } else {
             boolean wasVisible = sidep.isVisible();
             sidep.setVisible(true);
             if (!wasVisible) {
@@ -285,12 +288,6 @@ public class SidePaneManager {
                     frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
                 }
             }
-        } else {
-            if (sidep.isVisible()) {
-                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.contentPane.getDividerLocation());
-            }
-            sidep.setVisible(false);
-
         }
     }
 }

@@ -68,7 +68,7 @@ public class SearchBar extends JPanel {
     private final JCheckBox regularExp;
     private final JLabel currentResults = new JLabel("");
 
-    AutoCompleteSupport<String> autoCompleteSupport;
+    private AutoCompleteSupport<String> autoCompleteSupport;
     private final JLabel searchIcon;
 
     /**
@@ -318,8 +318,8 @@ public class SearchBar extends JPanel {
 
     public boolean isStillValidQuery(SearchQuery query) {
         return query.query.equals(this.searchField.getText())
-                && query.regularExpression == regularExp.isSelected()
-                && query.caseSensitive == caseSensitive.isSelected();
+                && (query.regularExpression == regularExp.isSelected())
+                && (query.caseSensitive == caseSensitive.isSelected());
     }
 
     private SearchQuery getSearchQuery() {

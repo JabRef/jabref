@@ -41,16 +41,17 @@ import org.jdesktop.swingx.VerticalLayout;
 public class EntryTypeDialog extends JDialog implements ActionListener {
     private EntryType type;
     private static final int COLUMN = 3;
-    private boolean biblatexMode;
+    private final boolean biblatexMode;
 
     private final CancelAction cancelAction = new CancelAction();
 
     static class TypeButton extends JButton implements Comparable<TypeButton> {
         final EntryType type;
 
-        public TypeButton(String label, EntryType _type) {
+
+        public TypeButton(String label, EntryType type) {
             super(label);
-            type = _type;
+            this.type = type;
         }
 
         @Override

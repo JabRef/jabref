@@ -303,7 +303,7 @@ public class FileListEntryEditor {
         // See if we should trim the file link to be relative to the file directory:
         try {
             List<String> dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
-            if (dirs.size() == 0) {
+            if (dirs.isEmpty()) {
                 link = this.link.getText().trim();
             } else {
                 boolean found = false;

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -59,7 +60,7 @@ class EntryEditorTab {
 
     private final EntryEditor parent;
 
-    private final HashMap<String, FieldEditor> editors = new HashMap<>();
+    private final Map<String, FieldEditor> editors = new HashMap<>();
 
     private FieldEditor activeField;
 
@@ -72,16 +73,25 @@ class EntryEditorTab {
 
     private final String tabTitle;
 
+    private final JabRefFrame frame;
+
+    private final BasePanel basePanel;
+
+    private boolean updating;
+
+
     public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
             boolean addKeyField, boolean compressed, String tabTitle) {
-        if (fields != null) {
-            this.fields = fields.toArray(new String[fields.size()]);
-        } else {
+        if (fields == null) {
             this.fields = new String[] {};
+        } else {
+            this.fields = fields.toArray(new String[fields.size()]);
         }
 
         this.parent = parent;
         this.tabTitle = tabTitle;
+        this.frame = frame;
+        this.basePanel = panel;
 
         setupPanel(frame, panel, addKeyField, compressed, tabTitle);
 
@@ -127,7 +137,7 @@ class EntryEditorTab {
             // Create the text area:
             int editorType = BibtexFields.getEditorType(fields[i]);
 
-            final FieldEditor fieldEditor;
+            FieldEditor fieldEditor;
             int defaultHeight;
             int wHeight = (int) (50.0 * BibtexFields.getFieldWeight(fields[i]));
             if (editorType == GUIGlobals.FILE_LIST_EDITOR) {
@@ -161,14 +171,14 @@ class EntryEditorTab {
                 fieldEditor.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
             }
             builder.append(fieldEditor.getLabel());
-            if (!(extra.isPresent())) {
-                builder.append(fieldEditor.getPane(), 3);
-            } else {
+            if (extra.isPresent()) {
                 builder.append(fieldEditor.getPane());
                 JPanel pan = new JPanel();
                 pan.setLayout(new BorderLayout());
                 pan.add(extra.get(), BorderLayout.NORTH);
                 builder.append(pan);
+            } else {
+                builder.append(fieldEditor.getPane(), 3);
             }
             if (((i + 1) % fieldsPerRow) == 0) {
                 builder.nextLine();
@@ -213,13 +223,13 @@ class EntryEditorTab {
     public void markIfModified(FieldEditor fieldEditor) {
         // Only mark as changed if not already is and the field was indeed
         // modified
-        if (!updating && !parent.panel.isModified() && isFieldModified(fieldEditor)) {
+        if (!updating && !basePanel.isModified() && isFieldModified(fieldEditor)) {
             markBaseChanged();
         }
     }
 
     private void markBaseChanged() {
-        parent.panel.markBaseChanged();
+        basePanel.markBaseChanged();
     }
 
     /**
@@ -263,8 +273,6 @@ class EntryEditorTab {
         setEntry(getEntry());
     }
 
-
-    private boolean updating;
 
 
     public void setEntry(BibEntry entry) {
@@ -353,9 +361,9 @@ class EntryEditorTab {
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
         actionMap.put("save", parent.saveDatabaseAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
-        actionMap.put("nexttab", parent.frame.nextTab);
+        actionMap.put("nexttab", this.frame.nextTab);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
-        actionMap.put("prevtab", parent.frame.prevTab);
+        actionMap.put("prevtab", this.frame.prevTab);
     }
 
     /**
@@ -373,27 +381,24 @@ class EntryEditorTab {
         // listeners, so we handle this by only adding the AutoCompleteListener and telling
         // it to call fieldListener afterwards. If no AutoCompleteListener is used, we
         // add the fieldListener normally.
-        if (autoCompleteListener != null) {
+        if (autoCompleteListener == null) {
+            component.addFocusListener(fieldListener);
+        } else {
             component.addKeyListener(autoCompleteListener);
             component.addFocusListener(autoCompleteListener);
             autoCompleteListener.setNextFocusListener(fieldListener);
-        } else {
-            component.addFocusListener(fieldListener);
         }
 
         setupKeyBindings(component.getInputMap(JComponent.WHEN_FOCUSED), component.getActionMap());
 
-        HashSet<AWTKeyStroke> keys = new HashSet<>(component
-                .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        Set<AWTKeyStroke> keys = new HashSet<>(
+                component.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
         keys.clear();
         keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
         component.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-        keys = new HashSet<>(component
-                .getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        keys = new HashSet<>(component.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
         keys.clear();
         keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
         component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
-
     }
-
 }

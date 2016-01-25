@@ -152,17 +152,17 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
         con.gridwidth = 3;
         con.weightx = 1;
-        if (preset != null) {
+        if (preset == null) {
+            input = new JTextField(20);
+            input.addActionListener(this);
+            gbl.setConstraints(input, con);
+            add(input);
+        } else {
             sel = new JComboBox<>(preset.toArray(new String[preset.size()]));
             sel.setEditable(true);
             //sel.addActionListener(this);
             gbl.setConstraints(sel, con);
             add(sel);
-        } else {
-            input = new JTextField(20);
-            input.addActionListener(this);
-            gbl.setConstraints(input, con);
-            add(input);
         }
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 0;
@@ -337,15 +337,12 @@ class FieldSetComponent extends JPanel implements ActionListener {
             } else if ((input != null) && !"".equals(input.getText())) {
                 addField(input.getText());
             }
-        }
-        else if (src == input) {
+        } else if (src == input) {
             addField(input.getText());
-        }
-        else if (src == remove) {
+        } else if (src == remove) {
             // Remove button pressed:
             removeSelected();
-        }
-        else if (src == sel) {
+        } else if (src == sel) {
             if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
                 // These conditions signify arrow key navigation in the dropdown list, so we should
                 // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
@@ -355,11 +352,9 @@ class FieldSetComponent extends JPanel implements ActionListener {
             String s = sel.getSelectedItem().toString();
             addField(s);
             sel.getEditor().selectAll();
-        }
-        else if (src == up) {
+        } else if (src == up) {
             move(-1);
-        }
-        else if (src == down) {
+        } else if (src == down) {
             move(1);
         }
     }

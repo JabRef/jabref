@@ -1,10 +1,11 @@
 package net.sf.jabref.logic.config;
 
+import java.util.List;
 import java.util.Vector;
 
 /**
  * Stores the save order config from MetaData
- * 
+ *
  * Format: <choice>, pair of field + ascending (boolean)
  */
 public class SaveOrderConfig {
@@ -41,7 +42,7 @@ public class SaveOrderConfig {
         sortCriteria[2] = new SortCriterion();
     }
 
-    public SaveOrderConfig(Vector<String> data) {
+    public SaveOrderConfig(List<String> data) {
         if (data == null) {
             throw new NullPointerException();
         }
@@ -49,7 +50,7 @@ public class SaveOrderConfig {
             throw new IllegalArgumentException();
         }
 
-        String choice = data.elementAt(0);
+        String choice = data.get(0);
         if ("original".equals(choice)) {
             setSaveInOriginalOrder();
         } else {
@@ -57,17 +58,17 @@ public class SaveOrderConfig {
         }
 
         if (data.size() >= 3) {
-            sortCriteria[0] = new SortCriterion(data.elementAt(1), data.elementAt(2));
+            sortCriteria[0] = new SortCriterion(data.get(1), data.get(2));
         } else {
             sortCriteria[0] = new SortCriterion();
         }
         if (data.size() >= 5) {
-            sortCriteria[1] = new SortCriterion(data.elementAt(3), data.elementAt(4));
+            sortCriteria[1] = new SortCriterion(data.get(3), data.get(4));
         } else {
             sortCriteria[1] = new SortCriterion();
         }
         if (data.size() >= 7) {
-            sortCriteria[2] = new SortCriterion(data.elementAt(5), data.elementAt(6));
+            sortCriteria[2] = new SortCriterion(data.get(5), data.get(6));
         } else {
             sortCriteria[2] = new SortCriterion();
         }

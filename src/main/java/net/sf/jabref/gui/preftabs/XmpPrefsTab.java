@@ -18,8 +18,8 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
@@ -50,7 +50,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox privacyFilterCheckBox = new JCheckBox(
             Localization.lang("Do not write the following fields to XMP Metadata:"));
 
-    private final Vector<Object> tableRows = new Vector<>(10);
+    private final List<Object> tableRows = new ArrayList<>(10);
 
 
     /**
@@ -76,7 +76,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
                 if (row >= tableRows.size()) {
                     return "";
                 }
-                Object rowContent = tableRows.elementAt(row);
+                Object rowContent = tableRows.get(row);
                 if (rowContent == null) {
                     return "";
                 }
@@ -103,10 +103,10 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
                 tableChanged = true;
 
                 if (tableRows.size() <= row) {
-                    tableRows.setSize(row + 1);
+                    ((ArrayList<Object>) tableRows).ensureCapacity(row + 1);
                 }
 
-                tableRows.setElementAt(value, row);
+                tableRows.set(row, value);
             }
 
         };
@@ -251,8 +251,8 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
             // First we remove all rows with empty names.
             for (int i = tableRows.size() - 1; i >= 0; i--) {
-                if ((tableRows.elementAt(i) == null) || tableRows.elementAt(i).toString().isEmpty()) {
-                    tableRows.removeElementAt(i);
+                if ((tableRows.get(i) == null) || tableRows.get(i).toString().isEmpty()) {
+                    tableRows.remove(i);
                 }
             }
             // Finally, we store the new preferences.

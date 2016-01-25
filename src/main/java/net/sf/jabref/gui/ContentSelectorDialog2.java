@@ -426,13 +426,11 @@ class ContentSelectorDialog2 extends JDialog {
 
         // Have we already created a listmodel for this field?
         wordListModel = wordListModels.get(currentField);
-        if (wordListModel != null) {
-            wordList.setModel(wordListModel);
-        } else {
+        if (wordListModel == null) {
             wordListModel = new DefaultListModel<>();
             wordList.setModel(wordListModel);
             wordListModels.put(currentField, wordListModel);
-            Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + currentField);
+            List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + currentField);
             if (items != null) {
                 TreeSet<String> wordSet = new TreeSet<>(items);
                 int index = 0;
@@ -441,6 +439,8 @@ class ContentSelectorDialog2 extends JDialog {
                     index++;
                 }
             }
+        } else {
+            wordList.setModel(wordListModel);
         }
     }
 

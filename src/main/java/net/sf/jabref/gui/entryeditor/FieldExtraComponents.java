@@ -24,8 +24,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -72,8 +72,8 @@ public class FieldExtraComponents {
      * @param storeFieldAction
      * @return
      */
-    static Optional<JComponent> getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            BibEntry entry, HashSet<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+    public static Optional<JComponent> getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
+            BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
         if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
@@ -154,11 +154,12 @@ public class FieldExtraComponents {
      * @param isZip
      * @return
      */
-    static Optional<JComponent> getBrowseDocExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor fieldEditor,
+    public static Optional<JComponent> getBrowseDocExtraComponent(JabRefFrame frame, BasePanel panel,
+            FieldEditor fieldEditor,
             EntryEditor entryEditor, Boolean isZip) {
 
         final String ext = '.' + fieldEditor.getFieldName().toLowerCase();
-        final OpenFileFilter off;
+        OpenFileFilter off;
         if (isZip) {
             off = new OpenFileFilter(new String[] {ext, ext + ".gz", ext + ".bz2"});
         } else {
@@ -288,7 +289,7 @@ public class FieldExtraComponents {
      * @return
      */
     public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            HashSet<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+            Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.metaData,
                 storeFieldAction, false,
                 "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");

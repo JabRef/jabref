@@ -28,6 +28,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Function for resolving duplicate BibTeX keys.
@@ -35,7 +36,7 @@ import java.util.List;
 public class SearchFixDuplicateLabels extends AbstractWorker {
 
     private final BasePanel panel;
-    private HashMap<String, List<BibEntry>> dupes;
+    private Map<String, List<BibEntry>> dupes;
 
 
     public SearchFixDuplicateLabels(BasePanel panel) {
@@ -55,17 +56,12 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
             // Only handle keys that are actually set:
             if ((key != null) && !key.isEmpty()) {
                 // See whether this entry's key is already known:
-                if (!foundKeys.containsKey(key)) {
-                    // Not already known. Add key and entry to map:
-                    foundKeys.put(key, entry);
-                }
-                else {
+                if (foundKeys.containsKey(key)) {
                     // Already known, so we have found a dupe. See if it was already found as a dupe:
                     if (dupes.containsKey(key)) {
                         // Already in the dupe map. Add this entry as well:
                         dupes.get(key).add(entry);
-                    }
-                    else {
+                    } else {
                         // Construct a list of entries for this key:
                         ArrayList<BibEntry> al = new ArrayList<>();
                         // Add both the first one we found, and the one we found just now:
@@ -74,6 +70,9 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                         // Add the list to the dupe map:
                         dupes.put(key, al);
                     }
+                } else {
+                    // Not already known. Add key and entry to map:
+                    foundKeys.put(key, entry);
                 }
             }
         }

@@ -73,10 +73,10 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
         // Revert the change.
         try {
-            if (oldValue != null) {
-                entry.setField(field, oldValue);
-            } else {
+            if (oldValue == null) {
                 entry.clearField(field);
+            } else {
+                entry.setField(field, oldValue);
             }
 
             // this is the only exception explicitly thrown here
@@ -91,10 +91,10 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
         // Redo the change.
         try {
-            if (newValue != null) {
-                entry.setField(field, newValue);
-            } else {
+            if (newValue == null) {
                 entry.clearField(field);
+            } else {
+                entry.setField(field, newValue);
             }
 
         } catch (IllegalArgumentException ex) {

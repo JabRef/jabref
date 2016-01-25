@@ -34,10 +34,10 @@ public class RankingFieldComparator implements Comparator<BibEntry> {
         String val1 = e1.getField(SpecialFieldsUtils.FIELDNAME_RANKING);
         String val2 = e2.getField(SpecialFieldsUtils.FIELDNAME_RANKING);
         if (val1 == null) {
-            if (val2 != null) {
-                return 1;
-            } else {
+            if (val2 == null) {
                 return 0;
+            } else {
+                return 1;
             }
         } else {
             if (val2 == null) {
@@ -45,10 +45,10 @@ public class RankingFieldComparator implements Comparator<BibEntry> {
             } else {
                 // val1 is not null AND val2 is not null
                 int compareToRes = val1.compareTo(val2);
-                if (compareToRes != 0) {
-                    return compareToRes * -1;
-                } else {
+                if (compareToRes == 0) {
                     return 0;
+                } else {
+                    return compareToRes * -1;
                 }
             }
         }

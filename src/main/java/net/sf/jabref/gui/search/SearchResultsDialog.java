@@ -41,6 +41,9 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.FileListEntry;
@@ -82,6 +85,8 @@ import net.sf.jabref.model.entry.EntryUtil;
  */
 public class SearchResultsDialog {
 
+    private static final Log LOGGER = LogFactory.getLog(SearchResultsDialog.class);
+
     private final JabRefFrame frame;
 
     private JDialog diag;
@@ -99,7 +104,7 @@ public class SearchResultsDialog {
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final EventList<BibEntry> entries = new BasicEventList<>();
 
-    private final HashMap<BibEntry, BasePanel> entryHome = new HashMap<>();
+    private final Map<BibEntry, BasePanel> entryHome = new HashMap<>();
     private DefaultEventTableModel<BibEntry> model;
 
     private SortedList<BibEntry> sortedEntries;
@@ -217,8 +222,7 @@ public class SearchResultsDialog {
      */
     private void setupComparatorChooser(TableComparatorChooser<BibEntry> comparatorChooser) {
         // First column:
-        java.util.List<Comparator> comparators = comparatorChooser
-                .getComparatorsForColumn(0);
+        List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
 
         comparators = comparatorChooser.getComparatorsForColumn(1);
@@ -337,7 +341,6 @@ public class SearchResultsDialog {
                 BasePanel p = entryHome.get(entry);
                 switch (col) {
                 case FILE_COL:
-                    Object o = entry.getField(Globals.FILE_FIELD);
                     if (entry.hasField(Globals.FILE_FIELD)) {
                         FileListTableModel tableModel = new FileListTableModel();
                         tableModel.setContent(entry.getField(Globals.FILE_FIELD));
@@ -353,7 +356,7 @@ public class SearchResultsDialog {
                     entry.getFieldOptional("url").ifPresent(link -> { try {
                             JabRefDesktop.openExternalViewer(p.metaData(), link, "url");
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+                            LOGGER.warn("Could not open viewer", ex);
                         }
                     });
                     break;
