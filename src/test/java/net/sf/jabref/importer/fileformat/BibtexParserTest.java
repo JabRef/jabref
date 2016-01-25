@@ -339,7 +339,6 @@ public class BibtexParserTest {
      * Test for SF Bug #1269
      */
     @Test
-    @Ignore
     public void parseCombinesMultipleKeywordsFields() throws IOException {
 
         ParserResult result = BibtexParser.parse(

@@ -521,6 +521,9 @@ public class BibtexParser {
                 // for users if JabRef didn't accept it.
                 if ("author".equals(key) || "editor".equals(key)) {
                     entry.setField(key, entry.getField(key) + " and " + content);
+                } else if("keywords".equals(key)) {
+                    //multiple keywords fields should be combined to one
+                    entry.setField("keywords", entry.getField("keywords") + ", " + content);
                 }
             }
         }

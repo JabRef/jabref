@@ -93,6 +93,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implements [#565](https://github.com/JabRef/jabref/issues/565): Highlighting matches works now also for regular expressions in preview panel and entry editor
 - IEEEXplore search now downloads the full Bibtex record instead of parsing the fields from the HTML webpage result (fixes [bug 1146](https://sourceforge.net/p/jabref/bugs/1146/) and [bug 1267](https://sourceforge.net/p/jabref/bugs/1267/))
 - Christmas color theme (red and green)
+- Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
+- Added command line switch --debug to show more detailed logging messages
 
 ### Fixed
 - Fixed [bug 482](https://sourceforge.net/p/jabref/bugs/482/) partly: escaped brackets are now parsed properly when opening a bib file
