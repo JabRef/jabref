@@ -58,6 +58,7 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
+import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
@@ -439,7 +440,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction manageJournals = new ManageJournalsAction(this);
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
-    private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.streamEavesdropper, Globals.handler);
+    private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.streamEavesdropper, GuiAppender.cache);
 
     private final AbstractAction dbConnect = new GeneralAction(Actions.DB_CONNECT,
             Localization.menuTitle("Connect to external SQL database"),

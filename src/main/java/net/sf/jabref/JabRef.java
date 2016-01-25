@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.*;
@@ -44,6 +43,7 @@ import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.logging.JabRefLogger;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
@@ -54,7 +54,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.Jdk14Logger;
 
 import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.ExportFormats;
@@ -69,7 +68,6 @@ import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
@@ -111,7 +109,6 @@ public class JabRef {
         }
 
         Globals.startBackgroundTasks();
-        setupLogHandlerForErrorConsole();
         Globals.prefs = prefs;
         Localization.setLanguage(prefs.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
@@ -171,19 +168,12 @@ public class JabRef {
         SwingUtilities.invokeLater(() -> openWindow(loaded.get()));
     }
 
-    private void setupLogHandlerForErrorConsole() {
-        Globals.handler = new CacheableHandler();
-        ((Jdk14Logger) LOGGER).getLogger().addHandler(Globals.handler);
-    }
-
     public Optional<Vector<ParserResult>> processArguments(String[] args, boolean initialStartup) {
 
         cli = new JabRefCLI(args);
 
         if (!cli.isBlank() && cli.isDebugLogging()) {
-            Globals.handler.setLevel(Level.FINE);
-            ((Jdk14Logger) LOGGER).getLogger().setLevel(Level.FINE);
-            LOGGER.debug("Showing debug messages");
+            JabRefLogger.setDebug();
         }
 
         if (initialStartup && cli.isShowVersion()) {

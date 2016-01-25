@@ -17,7 +17,7 @@ package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.logging.CacheableHandler;
+import net.sf.jabref.logic.logging.Cache;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,12 +40,12 @@ public class ErrorConsoleAction extends AbstractAction {
 
     private final JFrame frame;
     private final StreamEavesdropper streamEavesdropper;
-    private final CacheableHandler logHandler;
+    private final Cache cache;
 
-    public ErrorConsoleAction(JFrame frame, StreamEavesdropper streamEavesdropper, CacheableHandler logHandler) {
+    public ErrorConsoleAction(JFrame frame, StreamEavesdropper streamEavesdropper, Cache cache) {
         super(Localization.menuTitle("Show error console"));
         this.streamEavesdropper = streamEavesdropper;
-        this.logHandler = logHandler;
+        this.cache = cache;
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Display all error messages"));
         this.frame = frame;
     }
@@ -58,7 +58,7 @@ public class ErrorConsoleAction extends AbstractAction {
     private void displayErrorConsole(JFrame parent) {
         JTabbedPane tabbed = new JTabbedPane();
 
-        addTextArea(tabbed, Localization.lang("Log"), logHandler.getLog());
+        addTextArea(tabbed, Localization.lang("Log"), cache.get());
         addTextArea(tabbed, Localization.lang("Exceptions"), streamEavesdropper.getErrorMessages(),
                 Localization.lang("No exceptions have occurred."));
         addTextArea(tabbed, Localization.lang("Output"), streamEavesdropper.getOutput());

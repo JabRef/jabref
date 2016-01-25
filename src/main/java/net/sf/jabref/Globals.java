@@ -22,7 +22,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.logic.error.StreamEavesdropper;
-import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
 import org.apache.commons.logging.Log;
@@ -48,8 +47,6 @@ public class Globals {
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
-
-    public static CacheableHandler handler;
 
     public static final String FILETYPE_PREFS_EXT = "_dir";
     public static final String SELECTOR_META_PREFIX = "selector_";
