@@ -126,7 +126,7 @@ public class SpecialMainTableColumns {
 
                 // check for each field whether content is available
                 for (String field : fields) {
-                    if (entry.getField(field) != null) {
+                    if (entry.hasField(field)) {
                         if (iconFound) {
                             return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
                         } else {

@@ -18,10 +18,10 @@ public class UnicodeCleanup implements Cleaner {
         ArrayList<FieldChange> changes = new ArrayList<>();
         final String[] fields = {"title", "author", "abstract"};
         for (String field : fields) {
-            String oldValue = entry.getField(field);
-            if (oldValue == null) {
+            if (!entry.hasField(field)) {
                 break;
             }
+            String oldValue = entry.getField(field);
             final HTMLConverter htmlConverter = new HTMLConverter();
             String newValue = htmlConverter.formatUnicode(oldValue);
             if (!oldValue.equals(newValue)) {

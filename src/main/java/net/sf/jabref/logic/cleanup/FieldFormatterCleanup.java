@@ -38,21 +38,21 @@ public class FieldFormatterCleanup implements Cleaner {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        String oldValue = entry.getField(field);
-        if (oldValue == null) {
+        if (!entry.hasField(field)) {
             // Not set -> nothing to do
             return new ArrayList<>();
         }
+        String oldValue = entry.getField(field);
 
         // Run formatter
         String newValue = formatter.format(oldValue);
 
-        if (!oldValue.equals(newValue)) {
+        if (oldValue.equals(newValue)) {
+            return new ArrayList<>();
+        } else {
             entry.setField(field, newValue);
             FieldChange change = new FieldChange(entry, field, oldValue, newValue);
             return Collections.singletonList(change);
-        } else {
-            return new ArrayList<>();
         }
     }
 }

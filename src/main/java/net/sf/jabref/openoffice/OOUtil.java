@@ -302,11 +302,10 @@ class OOUtil {
             if (field.equals(BibEntry.KEY_FIELD)) {
                 continue;
             }
-            String value = e.getField(field);
             // If the running JabRef version doesn't support post-processing in Layout,
             // preprocess fields instead:
-            if (!OpenOfficePanel.postLayoutSupported && (value != null)) {
-                e.setField(field, OOUtil.POSTFORMATTER.format(value));
+            if (!OpenOfficePanel.postLayoutSupported && (e.hasField(field))) {
+                e.setField(field, OOUtil.POSTFORMATTER.format(e.getField(field)));
             }
         }
         return e;

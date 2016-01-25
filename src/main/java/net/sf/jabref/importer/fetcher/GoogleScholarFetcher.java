@@ -276,7 +276,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     entry.clearField(BibEntry.KEY_FIELD);
                     // If the entry's url field is not set, and we have stored an url for this
                     // entry, set it:
-                    if (entry.getField("url") == null) {
+                    if (!entry.hasField("url")) {
                         String storedUrl = entryLinks.get(link);
                         if (storedUrl != null) {
                             entry.setField("url", storedUrl);

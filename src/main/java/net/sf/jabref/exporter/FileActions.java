@@ -535,8 +535,10 @@ public class FileActions {
      * @return true iff the entry has a nonzero value in its field.
      */
     private static boolean nonZeroField(BibEntry be, String field) {
-        String o = be.getField(field);
-
-        return (o != null) && !"0".equals(o);
+        if (be.hasField(field)) {
+            return !"0".equals(be.getField(field));
+        } else {
+            return false;
+        }
     }
 }

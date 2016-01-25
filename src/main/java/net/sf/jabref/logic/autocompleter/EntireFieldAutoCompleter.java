@@ -53,9 +53,6 @@ class EntireFieldAutoCompleter extends AbstractAutoCompleter {
             return;
         }
 
-        String fieldValue = entry.getField(fieldName);
-        if (fieldValue != null) {
-            addItemToIndex(fieldValue.trim());
-        }
+        entry.getFieldOptional(fieldName).ifPresent(fieldValue -> addItemToIndex(fieldValue.trim()));
     }
 }

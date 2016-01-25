@@ -290,8 +290,8 @@ public class Util {
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (curEntry.getField(BibtexFields.OWNER) == null));
-            boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (curEntry.getField(timeStampField) == null));
+            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(BibtexFields.OWNER)));
+            boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
             net.sf.jabref.util.Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
             if (markEntries) {
                 EntryMarker.markEntry(curEntry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
@@ -311,8 +311,10 @@ public class Util {
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
         String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER) && (overwriteOwner || (entry.getField(BibtexFields.OWNER) == null));
-        boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && (overwriteTimestamp || (entry.getField(timeStampField) == null));
+        boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
+                && (overwriteOwner || (!entry.hasField(BibtexFields.OWNER)));
+        boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
+                && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
         net.sf.jabref.util.Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
@@ -370,8 +372,7 @@ public class Util {
         }
         int oldRowCount = tableModel.getRowCount();
         for (String field : fields) {
-            String o = entry.getField(field);
-            if (o != null) {
+            entry.getFieldOptional(field).ifPresent(o -> {
                 if (!o.trim().isEmpty()) {
                     File f = new File(o);
                     FileListEntry flEntry = new FileListEntry(f.getName(), o,
@@ -381,7 +382,7 @@ public class Util {
                     entry.clearField(field);
                     ce.addEdit(new UndoableFieldChange(entry, field, o, null));
                 }
-            }
+            });
         }
         if (tableModel.getRowCount() != oldRowCount) {
             String newValue = tableModel.getStringRepresentation();

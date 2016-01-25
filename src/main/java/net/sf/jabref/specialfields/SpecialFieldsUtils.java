@@ -155,7 +155,7 @@ public class SpecialFieldsUtils {
      * @param ce indicates the undo named compound. May be null
      */
     public static void syncSpecialFieldsFromKeywords(BibEntry be, NamedCompound ce) {
-        if (be.getField("keywords") == null) {
+        if (!be.hasField("keywords")) {
             return;
         }
         List<String> keywordList = net.sf.jabref.model.entry.EntryUtil

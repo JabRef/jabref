@@ -52,17 +52,16 @@ public class PageNumbers {
     public Element getDOMrepresentation(Document document) {
         Element result = document.createElement("extent");
         result.setAttribute("unit", "page");
-        if (freeform != null) {
-            Node textNode = document.createTextNode(freeform);
-            result.appendChild(textNode);
-        }
-        else {
+        if (freeform == null) {
             Element tmpStart = document.createElement("start");
             Element tmpEnd = document.createElement("end");
             tmpStart.appendChild(document.createTextNode(String.valueOf(this.start)));
             tmpEnd.appendChild(document.createTextNode(String.valueOf(this.end)));
             result.appendChild(tmpStart);
             result.appendChild(tmpEnd);
+        } else {
+            Node textNode = document.createTextNode(freeform);
+            result.appendChild(textNode);
         }
         return result;
     }

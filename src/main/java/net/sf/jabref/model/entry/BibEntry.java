@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -177,6 +178,20 @@ public class BibEntry {
      */
     public String getField(String name) {
         return fields.get(normalizeFieldName(name));
+    }
+
+    /**
+     * Returns the contents of the given field as an Optional.
+     */
+    public Optional<String> getFieldOptional(String name) {
+        return Optional.ofNullable(fields.get(normalizeFieldName(name)));
+    }
+
+    /**
+     * Returns true if the entry has the given field, or false if it is not set.
+     */
+    public boolean hasField(String name) {
+        return fields.containsKey(normalizeFieldName(name));
     }
 
     private String normalizeFieldName(String fieldName) {

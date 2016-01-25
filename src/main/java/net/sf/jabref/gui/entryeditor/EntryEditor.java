@@ -750,9 +750,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             for (String field : entry.getFieldNames()) {
                 if (BibtexFields.isDisplayableField(field)) {
-                    if (newEntry.getField(field) == null) {
-                        compound.addEdit(new UndoableFieldChange(entry, field, entry
-                                .getField(field), null));
+                    if (!newEntry.hasField(field)) {
+                        compound.addEdit(new UndoableFieldChange(entry, field, entry.getField(field), null));
                         entry.clearField(field);
                         anyChanged = true;
                     }
@@ -1123,9 +1122,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // We check if the field has changed, since we don't want to
                 // mark the base as changed unless we have a real change.
                 if (toSet == null) {
-                    set = entry.getField(fieldEditor.getFieldName()) != null;
+                    set = entry.hasField(fieldEditor.getFieldName());
                 } else {
-                    set = !((entry.getField(fieldEditor.getFieldName()) != null)
+                    set = !((entry.hasField(fieldEditor.getFieldName()))
                             && toSet.equals(entry.getField(fieldEditor.getFieldName())));
                 }
 

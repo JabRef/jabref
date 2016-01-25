@@ -212,8 +212,7 @@ class OOCalcDatabase {
     }
 
     private static String getField(BibEntry e, String field) {
-        Object o = e.getField(field);
-        return o == null ? "" : o.toString();
+        return e.getFieldOptional(field).orElse("");
     }
 
     private static void addTableCell(Document doc, Element parent, String content) {

@@ -33,7 +33,7 @@ public class BiblatexCleanup implements Cleaner {
         }
 
         // Dates: create date out of year and month, save it and delete old fields
-        if ((entry.getField("date") == null) || (entry.getField("date").isEmpty())) {
+        if ((!entry.hasField("date")) || (entry.getField("date").isEmpty())) {
             String newDate = entry.getFieldOrAlias("date");
             String oldYear = entry.getField("year");
             String oldMonth = entry.getField("month");
