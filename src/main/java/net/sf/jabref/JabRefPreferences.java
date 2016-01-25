@@ -307,7 +307,6 @@ public final class JabRefPreferences {
     public static final String DB_CONNECT_HOSTNAME = "dbConnectHostname";
     public static final String DB_CONNECT_SERVER_TYPE = "dbConnectServerType";
     public static final String BIB_LOC_AS_PRIMARY_DIR = "bibLocAsPrimaryDir";
-    public static final String BIB_LOCATION_AS_FILE_DIR = "bibLocationAsFileDir";
     public static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
     public static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
     public static final String ALLOW_FILE_AUTO_OPEN_BROWSE = "allowFileAutoOpenBrowse";
@@ -744,7 +743,6 @@ public final class JabRefPreferences {
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
-        defaults.put(BIB_LOCATION_AS_FILE_DIR, Boolean.TRUE);
         defaults.put(BIB_LOC_AS_PRIMARY_DIR, Boolean.FALSE);
         defaults.put(DB_CONNECT_SERVER_TYPE, "MySQL");
         defaults.put(DB_CONNECT_HOSTNAME, "localhost");

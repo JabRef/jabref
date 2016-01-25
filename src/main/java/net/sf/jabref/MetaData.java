@@ -179,7 +179,7 @@ public class MetaData implements Iterable<String> {
         String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL); // USER_SPECIFIC_FILE_DIR_FOR_DB
         List<String> metaData = getData(key);
         if (metaData == null) {
-            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR); // FILE_DIR_FOR_DIR
+            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR); // FILE_DIR_FOR_DB
             metaData = getData(key);
         }
 
@@ -212,13 +212,14 @@ public class MetaData implements Iterable<String> {
             }
         }
 
-        // 4. bib file directory TODO: remove these options?
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && (getFile() != null)) {
+        // 4. bib file directory
+        if (getFile() != null) {
+            String parentDir = getFile().getParent();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
-                fileDirs.add(0, getFile().getParent());
+                fileDirs.add(0, parentDir);
             } else {
-                fileDirs.add(getFile().getParent());
+                fileDirs.add(parentDir);
             }
         }
 
