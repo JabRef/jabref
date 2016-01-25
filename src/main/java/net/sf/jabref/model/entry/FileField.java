@@ -168,6 +168,12 @@ public class FileField {
             entry.add("");
         }
         FileField.ParsedFileField field = new FileField.ParsedFileField(entry.get(0), entry.get(1), entry.get(2));
+        // link is only mandatory field
+        if(field.description.isEmpty() && field.link.isEmpty() && !field.fileType.isEmpty()) {
+            field = new ParsedFileField("", field.fileType, "");
+        } else if(!field.description.isEmpty() && field.link.isEmpty() && field.fileType.isEmpty()) {
+            field = new ParsedFileField("", field.description, "");
+        }
         entry.clear();
         return field;
     }
