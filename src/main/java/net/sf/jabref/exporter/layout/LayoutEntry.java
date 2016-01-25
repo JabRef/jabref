@@ -63,7 +63,7 @@ class LayoutEntry {
         } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_FIELD_END)) {
             // Do nothing
         } else if (type == LayoutHelper.IS_OPTION_FIELD) {
-            Vector<String> v = new Vector<>();
+            List<String> v = new ArrayList<>();
             WSITools.tokenize(v, si.s, "\n");
 
             if (v.size() == 1) {
@@ -88,10 +88,10 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(Vector<StringInt> parsedEntries, final String classPrefix_, int layoutType) {
+    public LayoutEntry(List<StringInt> parsedEntries, final String classPrefix_, int layoutType) {
         classPrefix = classPrefix_;
-        Vector<StringInt> blockEntries = null;
-        Vector<LayoutEntry> tmpEntries = new Vector<>();
+        List<StringInt> blockEntries = null;
+        List<LayoutEntry> tmpEntries = new ArrayList<>();
         LayoutEntry le;
         String blockStart = parsedEntries.get(0).s;
         String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
@@ -107,7 +107,7 @@ class LayoutEntry {
                 // Do nothing
             } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_START)
                     || (parsedEntry.i == LayoutHelper.IS_GROUP_START)) {
-                blockEntries = new Vector<>();
+                blockEntries = new ArrayList<>();
                 blockStart = parsedEntry.s;
             } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
                 if (blockStart.equals(parsedEntry.s)) {
@@ -383,9 +383,9 @@ class LayoutEntry {
      */
     private static LayoutFormatter[] getOptionalLayout(String formatterName, String classPrefix) {
 
-        ArrayList<String[]> formatterStrings = Util.parseMethodsCalls(formatterName);
+        List<String[]> formatterStrings = Util.parseMethodsCalls(formatterName);
 
-        ArrayList<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
+        List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
 
         Map<String, String> userNameFormatter = NameFormatterTab.getNameFormatters();
 

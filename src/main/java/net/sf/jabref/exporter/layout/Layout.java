@@ -16,8 +16,6 @@
 package net.sf.jabref.exporter.layout;
 
 import java.util.Optional;
-import java.util.Vector;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,10 +38,11 @@ public class Layout {
 
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
-    public Layout(Vector<StringInt> parsedEntries, String classPrefix) {
-        Vector<LayoutEntry> tmpEntries = new Vector<>(parsedEntries.size());
 
-        Vector<StringInt> blockEntries = null;
+    public Layout(List<StringInt> parsedEntries, String classPrefix) {
+        List<LayoutEntry> tmpEntries = new ArrayList<>(parsedEntries.size());
+
+        List<StringInt> blockEntries = null;
         LayoutEntry le;
         String blockStart = null;
 
@@ -52,7 +51,7 @@ public class Layout {
             if ((parsedEntry.i == LayoutHelper.IS_LAYOUT_TEXT) || (parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD)) {
                 // Do nothing
             } else if (parsedEntry.i == LayoutHelper.IS_FIELD_START) {
-                blockEntries = new Vector<>();
+                blockEntries = new ArrayList<>();
                 blockStart = parsedEntry.s;
             } else if (parsedEntry.i == LayoutHelper.IS_FIELD_END) {
                 if ((blockStart != null) && (blockEntries != null)) {
@@ -68,7 +67,7 @@ public class Layout {
                     }
                 }
             } else if (parsedEntry.i == LayoutHelper.IS_GROUP_START) {
-                blockEntries = new Vector<>();
+                blockEntries = new ArrayList<>();
                 blockStart = parsedEntry.s;
             } else if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
                 if ((blockStart != null) && (blockEntries != null)) {

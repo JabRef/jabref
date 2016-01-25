@@ -21,8 +21,8 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter
@@ -278,8 +278,8 @@ public class LatexFieldFormatter {
 
     private static void checkBraces(String text) throws IllegalArgumentException {
 
-        Vector<Integer> left = new Vector<>(5, 3);
-        Vector<Integer> right = new Vector<>(5, 3);
+        List<Integer> left = new ArrayList<>(5);
+        List<Integer> right = new ArrayList<>(5);
         int current = -1;
 
         // First we collect all occurrences:
@@ -294,8 +294,7 @@ public class LatexFieldFormatter {
         if (!right.isEmpty() && left.isEmpty()) {
             throw new IllegalArgumentException("'}' character ends string prematurely.");
         }
-        if (!right.isEmpty() && (right.elementAt(0)
-                < left.elementAt(0))) {
+        if (!right.isEmpty() && (right.get(0) < left.get(0))) {
             throw new IllegalArgumentException("'}' character ends string prematurely.");
         }
         if (left.size() != right.size()) {

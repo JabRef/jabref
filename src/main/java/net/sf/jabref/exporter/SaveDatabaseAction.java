@@ -37,7 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
@@ -128,7 +128,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 }
                 else { // User indicated to store anyway.
                        // See if the database has the protected flag set:
-                    Vector<String> pd = panel.metaData().getData(Globals.PROTECTED_FLAG_META);
+                    List<String> pd = panel.metaData().getData(Globals.PROTECTED_FLAG_META);
                     boolean databaseProtectionFlag = (pd != null) && Boolean.parseBoolean(pd.get(0));
                     if (databaseProtectionFlag) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Database is protected. Cannot save until external changes have been reviewed."),

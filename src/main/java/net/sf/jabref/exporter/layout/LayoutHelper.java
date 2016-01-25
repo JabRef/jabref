@@ -18,7 +18,8 @@ package net.sf.jabref.exporter.layout;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper class to get a Layout object.
@@ -45,7 +46,7 @@ public class LayoutHelper {
     private static String currentGroup;
 
     private final PushbackReader _in;
-    private final Vector<StringInt> parsedEntries = new Vector<>();
+    private final List<StringInt> parsedEntries = new ArrayList<>();
 
     private boolean _eof;
 
