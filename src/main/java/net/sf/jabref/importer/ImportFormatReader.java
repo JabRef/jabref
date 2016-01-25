@@ -362,6 +362,18 @@ public class ImportFormatReader {
         int bestResultCount = 0;
         String bestFormatName = null;
 
+        // First, see if it is a BibTeX file:
+        try {
+            ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
+                    Globals.prefs.getDefaultEncoding());
+            if ((pr.getDatabase().getEntryCount() > 0)
+                    || (pr.getDatabase().getStringCount() > 0)) {
+                pr.setFile(new File(filename));
+                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
+            }
+        } catch (Throwable ignore) {
+        }
+
         // Cycle through all importers:
         for (ImportFormat imFo : getImportFormats()) {
 
@@ -391,19 +403,6 @@ public class ImportFormatReader {
             // we found something
             ParserResult parserResult = new ParserResult(bestResult);
             return new UnknownFormatImport(bestFormatName, parserResult);
-        }
-
-        // Finally, if all else fails, see if it is a BibTeX file:
-        try {
-            ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
-                    Globals.prefs.getDefaultEncoding());
-            if ((pr.getDatabase().getEntryCount() > 0)
-                    || (pr.getDatabase().getStringCount() > 0)) {
-                pr.setFile(new File(filename));
-                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
-            }
-        } catch (Throwable ex) {
-            return null;
         }
 
         return null;

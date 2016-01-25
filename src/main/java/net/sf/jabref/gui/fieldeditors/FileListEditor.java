@@ -25,6 +25,9 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -259,7 +262,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 // transactional delete and unlink
                 try {
-                    if(file != null) {
+                    if (file != null) {
                         Files.delete(file.toPath());
                     }
                     removeEntries();
@@ -422,11 +425,12 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void autoSetLinks() {
         auto.setEnabled(false);
 
-        BibEntry entry = entryEditor.getEntry();
+        Collection<BibEntry> entries = new ArrayList<>();
+        entries.addAll(Arrays.asList(frame.getCurrentBasePanel().getSelectedEntries()));
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
+        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entries, null, null, tableModel, metaData, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
@@ -445,6 +449,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 auto.setEnabled(true);
             }
         }, dialog));
+
     }
 
     /**
@@ -524,26 +529,34 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     @Override
-    public void undo() {}
+    public void undo() {
+    }
 
     @Override
-    public void redo() {}
+    public void redo() {
+    }
 
     @Override
-    public void setAutoCompleteListener(AutoCompleteListener listener) {}
+    public void setAutoCompleteListener(AutoCompleteListener listener) {
+    }
 
     @Override
-    public void clearAutoCompleteSuggestion() {}
+    public void clearAutoCompleteSuggestion() {
+    }
 
     @Override
-    public void setActiveBackgroundColor() {}
+    public void setActiveBackgroundColor() {
+    }
 
     @Override
-    public void setValidBackgroundColor() {}
+    public void setValidBackgroundColor() {
+    }
 
     @Override
-    public void setInvalidBackgroundColor() {}
+    public void setInvalidBackgroundColor() {
+    }
 
     @Override
-    public void updateFontColor() {}
+    public void updateFontColor() {
+    }
 }

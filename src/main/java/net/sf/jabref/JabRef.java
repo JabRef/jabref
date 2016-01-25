@@ -42,6 +42,7 @@ import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
@@ -49,6 +50,7 @@ import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
@@ -275,7 +277,7 @@ public class JabRef {
             if (!loaded.isEmpty()) {
                 String[] data = cli.getExportMatches().split(",");
                 String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
-                                                                 //? stands for a blank
+                //? stands for a blank
                 ParserResult pr = loaded.elementAt(loaded.size() - 1);
                 BibDatabase dataBase = pr.getDatabase();
 
@@ -289,18 +291,18 @@ public class JabRef {
 
                     //read in the export format, take default format if no format entered
                     switch (data.length) {
-                    case 3:
-                        formatName = data[2];
-                        break;
-                    case 2:
-                        //default ExportFormat: HTML table (with Abstract & BibTeX)
-                        formatName = "tablerefsabsbib";
-                        break;
-                    default:
-                        System.err.println(
-                                Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
-                                        + JabRefCLI.getExportMatchesSyntax());
-                        return Optional.empty();
+                        case 3:
+                            formatName = data[2];
+                            break;
+                        case 2:
+                            //default ExportFormat: HTML table (with Abstract & BibTeX)
+                            formatName = "tablerefsabsbib";
+                            break;
+                        default:
+                            System.err.println(
+                                    Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
+                                            + JabRefCLI.getExportMatchesSyntax());
+                            return Optional.empty();
                     } //end switch
 
                     //export new database
@@ -317,12 +319,20 @@ public class JabRef {
                                     + ex.getMessage());
                         }
                     }
-                } /*end if newBase != null*/else {
+                } /*end if newBase != null*/ else {
                     System.err.println(Localization.lang("No search matches."));
                 }
             } else {
                 System.err.println(Localization.lang("The output option depends on a valid input option."));
             } //end if(loaded.size > 0)
+        }
+
+        if (cli.isGenerateBibtexKeys()) {
+            regenerateBibtexKeys(loaded);
+        }
+
+        if(cli.isAutomaticallySetFileLinks()) {
+            automaticallySetFileLinks(loaded);
         }
 
         if (cli.isFileExport()) {
@@ -344,8 +354,8 @@ public class JabRef {
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
                                             + Localization.lang(
-                                                    "The chosen encoding '%0' could not encode the following characters:",
-                                                    session.getEncoding().displayName())
+                                            "The chosen encoding '%0' could not encode the following characters:",
+                                            session.getEncoding().displayName())
                                             + " "
                                             + session.getWriter().getProblemCharacters());
                                 }
@@ -432,8 +442,8 @@ public class JabRef {
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
                                             + Localization.lang(
-                                                    "The chosen encoding '%0' could not encode the following characters:",
-                                                    session.getEncoding().displayName())
+                                            "The chosen encoding '%0' could not encode the following characters:",
+                                            session.getEncoding().displayName())
                                             + " "
                                             + session.getWriter().getProblemCharacters());
                                 }
@@ -458,7 +468,7 @@ public class JabRef {
             }
 
             if (usageMsg) {
-                System.out.println(Localization.lang("no base-BibTeX-file specified")+"!");
+                System.out.println(Localization.lang("no base-BibTeX-file specified") + "!");
                 System.out.println(Localization.lang("usage") + " :");
                 System.out.println("jabref --aux infile[.aux],outfile[.bib] base-BibTeX-file");
             }
@@ -467,13 +477,43 @@ public class JabRef {
         return Optional.of(loaded);
     }
 
+    private void automaticallySetFileLinks(Vector<ParserResult> loaded) {
+        for(ParserResult parserResult: loaded) {
+            BibDatabase database = parserResult.getDatabase();
+
+            MetaData metaData = parserResult.getMetaData();
+
+            if( metaData != null){
+                LOGGER.info(Localization.lang("Automatically setting file links"));
+                Util.autoSetLinks(database.getEntries(), metaData);
+            }
+        }
+    }
+
+    private void regenerateBibtexKeys(Vector<ParserResult> loaded) {
+        for (ParserResult parserResult : loaded) {
+            BibDatabase database = parserResult.getDatabase();
+
+            MetaData metaData = parserResult.getMetaData();
+            if (metaData != null) {
+                LOGGER.info(Localization.lang("Regenerating bibtex keys according to metadata"));
+                for (BibEntry entry : database.getEntries()) {
+                    // try to make a new label
+                    LabelPatternUtil.makeLabel(metaData, database, entry);
+                }
+            } else {
+                LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate bibtex keys"));
+            }
+        }
+    }
+
     /**
      * Run an entry fetcher from the command line.
-     *
+     * <p>
      * Note that this only works headlessly if the EntryFetcher does not show any GUI.
      *
      * @param fetchCommand A string containing both the fetcher to use (id of EntryFetcherExtension minus Fetcher) and
-     *            the search query, separated by a :
+     *                     the search query, separated by a :
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
     private Optional<ParserResult> fetch(String fetchCommand) {
@@ -615,7 +655,8 @@ public class JabRef {
                 && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
             // How to handle errors in the databases to open?
             List<String> names = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
-            lastEdLoop: for (String name : names) {
+            lastEdLoop:
+            for (String name : names) {
                 File fileToOpen = new File(name);
 
                 for (int j = 0; j < loaded.size(); j++) {
@@ -657,7 +698,7 @@ public class JabRef {
         List<ParserResult> failed = new ArrayList<>();
         List<ParserResult> toOpenTab = new ArrayList<>();
         if (!loaded.isEmpty()) {
-            for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
+            for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext(); ) {
                 ParserResult pr = i.next();
 
                 if (new LastFocusedTabPreferences(Globals.prefs).hadLastFocus(pr.getFile())) {

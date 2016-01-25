@@ -42,6 +42,7 @@ import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
+import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -198,7 +199,7 @@ public class Util {
 
                             String param = calls.substring(startParam, i);
 
-                            result.add(new String[] {method, param});
+                            result.add(new String[]{method, param});
                         } else {
                             // Parameter is in format xxx
 
@@ -210,16 +211,16 @@ public class Util {
 
                             String param = calls.substring(startParam, i);
 
-                            result.add(new String[] {method, param});
+                            result.add(new String[]{method, param});
 
                         }
                     } else {
                         // Incorrectly terminated open brace
-                        result.add(new String[] {method});
+                        result.add(new String[]{method});
                     }
                 } else {
                     String method = calls.substring(start, i);
-                    result.add(new String[] {method});
+                    result.add(new String[]{method});
                 }
             }
             i++;
@@ -343,7 +344,11 @@ public class Util {
      * TODO: Move this to cleanup class. Collect file links from the given set of fields, and add them to the list
      * contained in the field GUIGlobals.FILE_FIELD.
      *
+<<<<<<< HEAD
      * @param entries The entries to modify.
+=======
+     * @param entry The entry to modify.
+>>>>>>> origin/master
      * @param fields  The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
@@ -385,9 +390,9 @@ public class Util {
         final String ext = "." + fieldName.toLowerCase();
         final OpenFileFilter off;
         if (BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(s)) {
-            off = new OpenFileFilter(new String[] {ext, ext + ".gz", ext + ".bz2"});
+            off = new OpenFileFilter(new String[]{ext, ext + ".gz", ext + ".bz2"});
         } else {
-            off = new OpenFileFilter(new String[] {ext});
+            off = new OpenFileFilter(new String[]{ext});
         }
         return off;
     }
@@ -459,6 +464,40 @@ public class Util {
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Optimized method for converting a String into an Integer
+     * <p>
+     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+     *
+     * @param str the String holding an Integer value
+     * @return the int value of str
+     * @throws NumberFormatException if str cannot be parsed to an int
+     */
+    public static int intValueOf(String str) {
+        int ival = 0;
+        int idx = 0;
+        int end;
+        boolean sign = false;
+        char ch;
+
+        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+            throw new NumberFormatException(str);
+        }
+
+        for (; ; ival *= 10) {
+            ival += '0' - ch;
+            if (++idx == end) {
+                return sign ? ival : -ival;
+            }
+            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
+                throw new NumberFormatException(str);
+            }
+        }
+    }
+
+    /**
+>>>>>>> origin/master
      * Run an AbstractWorker's methods using Spin features to put each method on the correct thread.
      *
      * @param worker The worker to run.
@@ -773,6 +812,34 @@ public class Util {
     }
 
     /**
+     * Shortcut method if links are set without using the GUI
+     *
+     * @param entries  the entries for which links should be set
+     * @param metaData the meta data for the BibDatabase for which links are set
+     */
+    public static void autoSetLinks(Collection<BibEntry> entries, MetaData metaData) {
+        autoSetLinks(entries, null, null, null, metaData, null, null);
+    }
+
+    /**
+     *  Shortcut method for setting a single entry
+     *
+     * @param entry
+     * @param ce
+     * @param changedEntries
+     * @param singleTableModel
+     * @param metaData
+     * @param callback
+     * @param diag
+     * @return
+     */
+    public static Runnable autoSetLinks(BibEntry entry, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+        List<BibEntry> entries = new ArrayList<>(1);
+        entries.add(entry);
+        return autoSetLinks(entries, ce, changedEntries, singleTableModel, metaData, callback, diag);
+    }
+
+    /**
      * Automatically add links for this set of entries, based on the globally stored list of external file types. The
      * entries are modified, and corresponding UndoEdit elements added to the NamedCompound given as argument.
      * Furthermore, all entries which are modified are added to the Set of entries given as an argument.
@@ -953,6 +1020,81 @@ public class Util {
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Returns the list of linked files. The files have the absolute filename
+     *
+     * @param bes      list of BibTeX entries
+     * @param fileDirs list of directories to try for expansion
+     * @return list of files. May be empty
+     */
+    public static List<File> getListOfLinkedFiles(BibEntry[] bes, String[] fileDirs) {
+        ArrayList<File> res = new ArrayList<>();
+        for (BibEntry entry : bes) {
+            FileListTableModel tm = new FileListTableModel();
+            tm.setContent(entry.getField("file"));
+            for (int i = 0; i < tm.getRowCount(); i++) {
+                FileListEntry flEntry = tm.getEntry(i);
+
+                File f = FileUtil.expandFilename(flEntry.link, fileDirs);
+                if (f != null) {
+                    res.add(f);
+                }
+            }
+        }
+        return res;
+    }
+
+    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
+        HashMap<BibEntry, List<File>> result = new HashMap<>();
+
+        // First scan directories
+        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
+
+        // Initialize Result-Set
+        for (BibEntry entry : entries) {
+            result.put(entry, new ArrayList<>());
+        }
+
+        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
+        // Now look for keys
+        nextFile:
+        for (File file : filesWithExtension) {
+
+            String name = file.getName();
+            int dot = name.lastIndexOf('.');
+            // First, look for exact matches:
+            for (BibEntry entry : entries) {
+                String citeKey = entry.getCiteKey();
+                if ((citeKey != null) && !citeKey.isEmpty()) {
+                    if (dot > 0) {
+                        if (name.substring(0, dot).equals(citeKey)) {
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
+            // If we get here, we didn't find any exact matches. If non-exact
+            // matches are allowed, try to find one:
+            if (!exactOnly) {
+                for (BibEntry entry : entries) {
+                    String citeKey = entry.getCiteKey();
+                    if ((citeKey != null) && !citeKey.isEmpty()) {
+                        if (name.startsWith(citeKey)) {
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+>>>>>>> origin/master
      * Accepts a string like [author:lower] or [title:abbr] or [auth], whereas the first part signifies the bibtex-field
      * to get, or the key generator field marker to use, while the others are the modifiers that will be applied.
      *
