@@ -15,11 +15,8 @@
  */
 package net.sf.jabref.gui.actions;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -29,25 +26,24 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.cleanup.Cleaner;
+import net.sf.jabref.logic.cleanup.DoiCleanup;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.cleanup.FormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.entry.EntryConverter;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 public class CleanUpAction extends AbstractWorker {
@@ -69,7 +65,8 @@ public class CleanUpAction extends AbstractWorker {
     private static final String CLEANUP_UNICODE = "CleanUpUnicode";
     private static final String CLEANUP_CONVERTTOBIBLATEX = "CleanUpConvertToBiblatex";
 
-    public static void putDefaults(HashMap<String, Object> defaults) {
+
+    public static void putDefaults(Map<String, Object> defaults) {
         defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_SUPERSCRIPTS, Boolean.TRUE);
         defaults.put(CLEANUP_DOI, Boolean.TRUE);
@@ -109,54 +106,19 @@ public class CleanUpAction extends AbstractWorker {
     private final BasePanel panel;
     private final JabRefFrame frame;
 
-    // global variable to count unsuccessful renames
+    /**
+     * Global variable to count unsuccessful renames
+     */
     private int unsuccessfulRenames;
+
+    private boolean cancelled;
+    private int modifiedEntriesCount;
 
 
     public CleanUpAction(BasePanel panel) {
         this.panel = panel;
         this.frame = panel.frame();
         initOptionsPanel();
-    }
-
-    private static void removeFieldValue(BibtexEntry entry, String fieldName, NamedCompound compound) {
-        String origValue = entry.getField(fieldName);
-        compound.addEdit(new UndoableFieldChange(entry, fieldName, origValue, null));
-        entry.setField(fieldName, null);
-    }
-
-    /**
-     * Converts to BibLatex format
-     */
-    public static void convertToBiblatex(BibtexEntry entry, NamedCompound ce) {
-        for (Map.Entry<String, String> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
-            String oldFieldName = alias.getKey();
-            String newFieldName = alias.getValue();
-            String oldValue = entry.getField(oldFieldName);
-            String newValue = entry.getField(newFieldName);
-            if ((oldValue != null) && (!oldValue.isEmpty()) && (newValue == null)) {
-                // There is content in the old field and no value in the new, so just copy
-                entry.setField(newFieldName, oldValue);
-                ce.addEdit(new UndoableFieldChange(entry, newFieldName, null, oldValue));
-
-                entry.setField(oldFieldName, null);
-                ce.addEdit(new UndoableFieldChange(entry, oldFieldName, oldValue, null));
-            }
-        }
-
-        // Dates: create date out of year and month, save it and delete old fields
-        if ((entry.getField("date") == null) || (entry.getField("date").isEmpty())) {
-            String newDate = entry.getFieldOrAlias("date");
-            String oldYear = entry.getField("year");
-            String oldMonth = entry.getField("month");
-            entry.setField("date", newDate);
-            entry.setField("year", null);
-            entry.setField("month", null);
-
-            ce.addEdit(new UndoableFieldChange(entry, "date", null, newDate));
-            ce.addEdit(new UndoableFieldChange(entry, "year", oldYear, null));
-            ce.addEdit(new UndoableFieldChange(entry, "month", oldMonth, null));
-        }
     }
 
     private void initOptionsPanel() {
@@ -253,11 +215,6 @@ public class CleanUpAction extends AbstractWorker {
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
     }
 
-
-    private boolean cancelled;
-    private int modifiedEntriesCount;
-
-
     @Override
     public void init() {
         cancelled = false;
@@ -313,22 +270,13 @@ public class CleanUpAction extends AbstractWorker {
             }
         }
 
-        // first upgrade the external links
-        // we have to use it separately as the Utils function generates a separate Named Compound
-        if (choiceCleanUpUpgradeExternalLinks) {
-            NamedCompound ce = Util.upgradePdfPsToFile(Arrays.asList(panel.getSelectedEntries()), new String[]{"pdf", "ps"});
-            if (ce.hasEdits()) {
-                panel.undoManager.addEdit(ce);
-                panel.markBaseChanged();
-                panel.updateEntryEditorIfShowing();
-                panel.output(Localization.lang("Upgraded links."));
-            }
-        }
-
-        for (BibtexEntry entry : panel.getSelectedEntries()) {
+        for (BibEntry entry : panel.getSelectedEntries()) {
             // undo granularity is on entry level
             NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
 
+            if (choiceCleanUpUpgradeExternalLinks) {
+                doUpgradePdfPsToFile(entry, ce);
+            }
             if (choiceCleanUpSuperscripts) {
                 doCleanUpSuperscripts(entry, ce);
             }
@@ -368,7 +316,7 @@ public class CleanUpAction extends AbstractWorker {
                 doConvertUnicode(entry, ce);
             }
             if (choiceConvertToBiblatex) {
-                convertToBiblatex(entry, ce);
+                doConvertToBiblatex(entry, ce);
             }
 
             ce.end();
@@ -411,301 +359,108 @@ public class CleanUpAction extends AbstractWorker {
     }
 
     /**
-     * Converts the text in 1st, 2nd, ... to real superscripts by wrapping in \textsuperscript{st}, ...
+     * Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
      */
-    private static void doCleanUpSuperscripts(BibtexEntry entry, NamedCompound ce) {
-        for(String name: entry.getFieldNames()) {
-            String oldValue = entry.getField(name);
-            // run formatter
-            String newValue = BibtexFieldFormatters.SUPERSCRIPTS.format(oldValue);
-            // undo action
-            if(!oldValue.equals(newValue)) {
-                entry.setField(name, newValue);
-                ce.addEdit(new UndoableFieldChange(entry, name, oldValue, newValue));
-            }
-        }
+    private void doUpgradePdfPsToFile(BibEntry entry, NamedCompound ce) {
+        Util.upgradePdfPsToFile(entry, new String[] {"pdf", "ps"}, ce);
     }
 
     /**
-     * Removes the http://... for each DOI
-     * Moves DOIs from URL and NOTE filed to DOI field
-     * @param ce
+     * Converts the text in 1st, 2nd, ... to real superscripts by wrapping in \textsuperscript{st}, ...
      */
-    private static void doCleanUpDOI(BibtexEntry bes, NamedCompound ce) {
-        // fields to check
-        String[] fields = {"note", "url", "ee"};
-
-        // First check if the Doi Field is empty
-        if (bes.getField("doi") != null) {
-            String doiFieldValue = bes.getField("doi");
-
-            Optional<DOI> doi = DOI.build(doiFieldValue);
-
-            if (doi.isPresent()) {
-                String newValue = doi.get().getDOI();
-                if (!doiFieldValue.equals(newValue)) {
-                    ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
-                    bes.setField("doi", newValue);
-                }
-
-                // Doi field seems to contain Doi
-                // -> cleanup note, url, ee field
-                for (String field : fields) {
-                    DOI.build(bes.getField((field))).ifPresent( unused -> removeFieldValue(bes, field, ce));
-                }
-            }
-        } else {
-            // As the Doi field is empty we now check if note, url, or ee field contains a Doi
-            for (String field : fields) {
-                Optional<DOI> doi = DOI.build(bes.getField(field));
-
-                if (doi.isPresent()) {
-                    // update Doi
-                    String oldValue = bes.getField("doi");
-                    String newValue = doi.get().getDOI();
-                    ce.addEdit(new UndoableFieldChange(bes, "doi", oldValue, newValue));
-                    bes.setField("doi", newValue);
-
-                    removeFieldValue(bes, field, ce);
-                }
-            }
-        }
+    private static void doCleanUpSuperscripts(BibEntry entry, NamedCompound ce) {
+        doCleanup(new FormatterCleanup(BibtexFieldFormatters.SUPERSCRIPTS), entry, ce);
     }
 
-    private static void doCleanUpMonth(BibtexEntry entry, NamedCompound ce) {
-        // implementation based on patch 3470076 by Mathias Walter
-        String oldValue = entry.getField("month");
-        if (oldValue == null) {
-            return;
-        }
-        String newValue = oldValue;
-        MonthUtil.Month month = MonthUtil.getMonth(oldValue);
-        if (month.isValid())
-        {
-            newValue = month.bibtexFormat;
-        }
-
-        if (!oldValue.equals(newValue)) {
-            entry.setField("month", newValue);
-            ce.addEdit(new UndoableFieldChange(entry, "month", oldValue, newValue));
-        }
+    /**
+     * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
+     */
+    private static void doCleanUpDOI(BibEntry entry, NamedCompound ce) {
+        doCleanup(new DoiCleanup(), entry, ce);
     }
 
-    private static void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
-        doFieldFormatterCleanup(entry, FieldFormatterCleanup.PAGE_NUMBERS, ce);
+    private static void doCleanUpMonth(BibEntry entry, NamedCompound ce) {
+        doCleanup(FieldFormatterCleanup.MONTH, entry, ce);
     }
 
-    private static void fixWrongFileEntries(BibtexEntry entry, NamedCompound ce) {
-        String oldValue = entry.getField(Globals.FILE_FIELD);
-        if (oldValue == null) {
-            return;
-        }
-        FileListTableModel flModel = new FileListTableModel();
-        flModel.setContent(oldValue);
-        if (flModel.getRowCount() == 0) {
-            return;
-        }
-        boolean changed = false;
-        for (int i = 0; i < flModel.getRowCount(); i++) {
-            FileListEntry flEntry = flModel.getEntry(i);
-            String link = flEntry.getLink();
-            String description = flEntry.getDescription();
-            if ("".equals(link) && (!"".equals(description))) {
-                // link and description seem to be switched, quickly fix that
-                flEntry.setLink(flEntry.getDescription());
-                flEntry.setDescription("");
-                changed = true;
-            }
-        }
-        if (changed) {
-            String newValue = flModel.getStringRepresentation();
-            assert (!oldValue.equals(newValue));
-            entry.setField(Globals.FILE_FIELD, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue));
-        }
+    private static void doCleanUpPageNumbers(BibEntry entry, NamedCompound ce) {
+        doCleanup(FieldFormatterCleanup.PAGE_NUMBERS, entry, ce);
     }
 
-    private void doMakePathsRelative(BibtexEntry entry, NamedCompound ce) {
-        String oldValue = entry.getField(Globals.FILE_FIELD);
-        if (oldValue == null) {
-            return;
-        }
-        FileListTableModel flModel = new FileListTableModel();
-        flModel.setContent(oldValue);
-        if (flModel.getRowCount() == 0) {
-            return;
-        }
-        boolean changed = false;
-        for (int i = 0; i < flModel.getRowCount(); i++) {
-            FileListEntry flEntry = flModel.getEntry(i);
-            String oldFileName = flEntry.getLink();
-            String newFileName = FileUtil.shortenFileName(new File(oldFileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
-            if (!oldFileName.equals(newFileName)) {
-                flEntry.setLink(newFileName);
-                changed = true;
-            }
-        }
-        if (changed) {
-            String newValue = flModel.getStringRepresentation();
-            assert (!oldValue.equals(newValue));
-            entry.setField(Globals.FILE_FIELD, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue));
-        }
+    private static void fixWrongFileEntries(BibEntry entry, NamedCompound ce) {
+        doCleanup(new FileEntryCleaner(), entry, ce);
     }
 
-    private void doRenamePDFs(BibtexEntry entry, NamedCompound ce) {
-        //Extract the path
-        String oldValue = entry.getField(Globals.FILE_FIELD);
-        if (oldValue == null) {
-            return;
-        }
-        FileListTableModel flModel = new FileListTableModel();
-        flModel.setContent(oldValue);
-        if (flModel.getRowCount() == 0) {
-            return;
-        }
-        boolean changed = false;
+    private void doMakePathsRelative(BibEntry entry, NamedCompound ce) {
+        doCleanup(new RelativePathsCleanup(panel.metaData().getFileDirectory(Globals.FILE_FIELD)), entry, ce);
+    }
 
-        for (int i = 0; i < flModel.getRowCount(); i++) {
-            String realOldFilename = flModel.getEntry(i).getLink();
-
-            if (cleanUpRenamePDFonlyRelativePaths.isSelected() && (new File(realOldFilename).isAbsolute())) {
-                continue;
-            }
-
-            String newFilename = Util.getLinkedFileName(panel.database(), entry);
-            //String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
-
-            //Add extension to newFilename
-            newFilename = newFilename + "." + flModel.getEntry(i).getType().getExtension();
-
-            //get new Filename with path
-            //Create new Path based on old Path and new filename
-            File expandedOldFile = FileUtil.expandFilename(realOldFilename, panel.metaData().getFileDirectory(Globals.FILE_FIELD));
-            if (expandedOldFile.getParent() == null) {
-                // something went wrong. Just skip this entry
-                continue;
-            }
-            String newPath = expandedOldFile.getParent().concat(System.getProperty("file.separator")).concat(newFilename);
-
-            if (new File(newPath).exists()) {
-                // we do not overwrite files
-                // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
-                continue;
-            }
-
-            //do rename
-            boolean renameSuccessful = FileUtil.renameFile(expandedOldFile.toString(), newPath);
-
-            if (renameSuccessful) {
-                changed = true;
-
-                //Change the path for this entry
-                String description = flModel.getEntry(i).getDescription();
-                ExternalFileType type = flModel.getEntry(i).getType();
-                flModel.removeEntry(i);
-
-                // we cannot use "newPath" to generate a FileListEntry as newPath is absolute, but we want to keep relative paths whenever possible
-                File parent = (new File(realOldFilename)).getParentFile();
-                String newFileEntryFileName;
-                if (parent == null) {
-                    newFileEntryFileName = newFilename;
-                } else {
-                    newFileEntryFileName = parent.toString().concat(System.getProperty("file.separator")).concat(newFilename);
-                }
-                flModel.addEntry(i, new FileListEntry(description, newFileEntryFileName, type));
-            }
-            else {
-                unsuccessfulRenames++;
-            }
-        }
-
-        if (changed) {
-            String newValue = flModel.getStringRepresentation();
-            assert (!oldValue.equals(newValue));
-            entry.setField(Globals.FILE_FIELD, newValue);
-            //we put an undo of the field content here
-            //the file is not being renamed back, which leads to inconsistencies
-            //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
-            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue));
-        }
+    private void doRenamePDFs(BibEntry entry, NamedCompound ce) {
+        String[] paths = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        BibDatabase database = panel.database();
+        Boolean onlyRelativePaths = cleanUpRenamePDFonlyRelativePaths.isSelected();
+        RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, onlyRelativePaths, database);
+        doCleanup(cleaner, entry, ce);
+        unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
     }
 
     /**
      * Converts HTML code to LaTeX code
      */
-    private static void doConvertHTML(BibtexEntry entry, NamedCompound ce) {
-        final String field = "title";
-        String oldValue = entry.getField(field);
-        if (oldValue == null) {
-            return;
-        }
-        final HTMLConverter htmlConverter = new HTMLConverter();
-        String newValue = htmlConverter.format(oldValue);
-        if (!oldValue.equals(newValue)) {
-            entry.setField(field, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
-        }
+    private static void doConvertHTML(BibEntry entry, NamedCompound ce) {
+        doCleanup(FieldFormatterCleanup.TITLE_HTML, entry, ce);
     }
 
     /**
      * Converts Unicode characters to LaTeX code
      */
-    private static void doConvertUnicode(BibtexEntry entry, NamedCompound ce) {
-        final String[] fields = {"title", "author", "abstract"};
-        for (String field : fields) {
-            String oldValue = entry.getField(field);
-            if (oldValue == null) {
-                return;
-            }
-            final HTMLConverter htmlConverter = new HTMLConverter();
-            String newValue = htmlConverter.formatUnicode(oldValue);
-            if (!oldValue.equals(newValue)) {
-                entry.setField(field, newValue);
-                ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
-            }
-        }
+    private static void doConvertUnicode(BibEntry entry, NamedCompound ce) {
+        doCleanup(new UnicodeCleanup(), entry, ce);
     }
 
     /**
      * Adds curly brackets {} around keywords
      */
-    private static void doConvertCase(BibtexEntry entry, NamedCompound ce) {
-        doFieldFormatterCleanup(entry, FieldFormatterCleanup.TITLE_CASE, ce);
+    private static void doConvertCase(BibEntry entry, NamedCompound ce) {
+        doCleanup(FieldFormatterCleanup.TITLE_CASE, entry, ce);
     }
 
-    private static void doConvertUnits(BibtexEntry entry, NamedCompound ce) {
-        doFieldFormatterCleanup(entry, FieldFormatterCleanup.TITLE_UNITS, ce);
+    private static void doConvertUnits(BibEntry entry, NamedCompound ce) {
+        doCleanup(FieldFormatterCleanup.TITLE_UNITS, entry, ce);
     }
 
-    private static void doConvertLaTeX(BibtexEntry entry, NamedCompound ce) {
-        doFieldFormatterCleanup(entry, FieldFormatterCleanup.TITLE_LATEX, ce);
+    private static void doConvertLaTeX(BibEntry entry, NamedCompound ce) {
+        doCleanup(FieldFormatterCleanup.TITLE_LATEX, entry, ce);
+    }
+
+    /**
+     * Converts to BibLatex format
+     */
+    private static void doConvertToBiblatex(BibEntry entry, NamedCompound ce) {
+        doCleanup(new BiblatexCleanup(), entry, ce);
     }
 
     /**
      * Format dates correctly (yyyy-mm-dd or yyyy-mm)
      */
-    private static void doCleanUpDate(BibtexEntry entry, NamedCompound ce) {
-        doFieldFormatterCleanup(entry, FieldFormatterCleanup.DATES, ce);
+    private static void doCleanUpDate(BibEntry entry, NamedCompound ce) {
+        doCleanup(FieldFormatterCleanup.DATES, entry, ce);
     }
 
     /**
      * Runs the field formatter on the entry and records the change.
      */
-    private static void doFieldFormatterCleanup(BibtexEntry entry, FieldFormatterCleanup cleaner, NamedCompound ce) {
-        String oldValue = entry.getField(cleaner.getField());
-        if (oldValue == null) {
+    private static void doCleanup(Cleaner cleaner, BibEntry entry, NamedCompound ce) {
+        // Run cleaner
+        List<FieldChange> changes = cleaner.cleanup(entry);
+
+        if (changes.isEmpty()) {
             return;
         }
 
-        // run formatter
-        cleaner.cleanup(entry);
-
-        String newValue = entry.getField(cleaner.getField());
-
-        // undo action
-        if (!oldValue.equals(newValue)) {
-            ce.addEdit(new UndoableFieldChange(entry, cleaner.getField(), oldValue, newValue));
+        // Register undo action
+        for (FieldChange change : changes) {
+            ce.addEdit(new UndoableFieldChange(change));
         }
     }
 }

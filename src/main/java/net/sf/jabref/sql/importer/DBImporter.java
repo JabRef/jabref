@@ -19,7 +19,9 @@ package net.sf.jabref.sql.importer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.*;
@@ -29,28 +31,26 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
- *
  * @author ifsteinm.
- *
+ *         <p>
  *         Jan 20th Abstract Class to provide main features to import entries from a DB. To insert a new DB it is
  *         necessary to extend this class and add the DB name the enum available at
  *         net.sf.jabref.sql.DBImporterAndExporterFactory (and to the GUI). This class and its subclasses import
  *         database, entries and related stuff from a DB to bib. Each exported database is imported as a new JabRef
  *         (bib) database, presented on a new tab
- *
  */
 public abstract class DBImporter extends DBImporterExporter {
 
     private static final Log LOGGER = LogFactory.getLog(DBImporter.class);
 
-    private final ArrayList<String> columnsNotConsideredForEntries = new ArrayList<>(
+    private final List<String> columnsNotConsideredForEntries = new ArrayList<>(
             Arrays.asList("cite_key", "entry_types_id", "database_id", "jabref_eid", "entries_id"));
 
 
@@ -64,112 +64,107 @@ public abstract class DBImporter extends DBImporterExporter {
     protected abstract Connection connectToDB(DBStrings dbstrings) throws Exception;
 
     /**
-     *
      * @param conn Connection object to the database
      * @return A ResultSet with column name for the entries table
      * @throws SQLException
      */
-    protected abstract ResultSet readColumnNames(Connection conn) throws SQLException;
+    protected abstract List<String> readColumnNames(Connection conn) throws SQLException;
 
     /**
      * Worker method to perform the import from a database
      *
      * @param dbs The necessary database connection information
      * @return An ArrayList containing pairs of Objects. Each position of the ArrayList stores three Objects: a
-     *         BibtexDatabase, a MetaData and a String with the bib database name stored in the DBMS
+     * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
      * @throws Exception
      */
-    public ArrayList<Object[]> performImport(DBStrings dbs, List<String> listOfDBs) throws Exception {
-        ArrayList<Object[]> result = new ArrayList<>();
+    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs) throws Exception {
+        List<DBImporterResult> result = new ArrayList<>();
         try (Connection conn = this.connectToDB(dbs)) {
 
             Iterator<String> itLista = listOfDBs.iterator();
-            String jabrefDBs = "(";
+            StringBuffer jabrefDBsb = new StringBuffer();
+            jabrefDBsb.append('(');
             while (itLista.hasNext()) {
-                jabrefDBs += '\'' + itLista.next() + "',";
+                jabrefDBsb.append('\'').append(itLista.next()).append("',");
             }
-            jabrefDBs = jabrefDBs.substring(0, jabrefDBs.length() - 1) + ')';
+            jabrefDBsb.deleteCharAt(jabrefDBsb.length() - 1).append(')');
 
-            try (ResultSet rsDatabase = SQLUtil.queryAllFromTable(conn,
-                    "jabref_database WHERE database_name IN " + jabrefDBs)) {
+            try (Statement statement = SQLUtil.queryAllFromTable(conn,
+                    "jabref_database WHERE database_name IN " + jabrefDBsb.toString())) {
+                ResultSet rsDatabase = statement.getResultSet();
                 while (rsDatabase.next()) {
-                    BibtexDatabase database = new BibtexDatabase();
+                    BibDatabase database = new BibDatabase();
                     // Find entry type IDs and their mappings to type names:
                     HashMap<String, EntryType> types = new HashMap<>();
-                    try (ResultSet rsEntryType = SQLUtil.queryAllFromTable(conn, "entry_types")) {
+                    try (Statement entryTypes = SQLUtil.queryAllFromTable(conn, "entry_types")) {
+                        ResultSet rsEntryType = entryTypes.getResultSet();
                         while (rsEntryType.next()) {
                             types.put(rsEntryType.getString("entry_types_id"),
                                     EntryTypes.getType(rsEntryType.getString("label")));
                         }
                         rsEntryType.getStatement().close();
                     }
-                    try (ResultSet rsColumns = this.readColumnNames(conn)) {
-                        ArrayList<String> colNames = new ArrayList<>();
-                        while (rsColumns.next()) {
-                            if (!columnsNotConsideredForEntries.contains(rsColumns.getString(1))) {
-                                colNames.add(rsColumns.getString(1));
-                            }
-                        }
-                        rsColumns.getStatement().close();
 
-                        String database_id = rsDatabase.getString("database_id");
-                        // Read the entries and create BibtexEntry instances:
-                        HashMap<String, BibtexEntry> entries = new HashMap<>();
-                        try (ResultSet rsEntries = SQLUtil.queryAllFromTable(conn,
-                                "entries WHERE database_id= '" + database_id + "';")) {
-                            while (rsEntries.next()) {
-                                String id = rsEntries.getString("entries_id");
-                                BibtexEntry entry = new BibtexEntry(IdGenerator.next(),
-                                        types.get(rsEntries.getString("entry_types_id")));
-                                entry.setField(BibtexEntry.KEY_FIELD, rsEntries.getString("cite_key"));
-                                for (String col : colNames) {
-                                    String value = rsEntries.getString(col);
-                                    if (value != null) {
-                                        col = col.charAt(col.length() - 1) == '_' ? col.substring(0,
-                                                col.length() - 1) : col;
-                                        entry.setField(col, value);
-                                    }
-                                }
-                                entries.put(id, entry);
-                                database.insertEntry(entry);
-                            }
-                            rsEntries.getStatement().close();
-                        }
-                        // Import strings and preamble:
-                        try (ResultSet rsStrings = SQLUtil.queryAllFromTable(conn,
-                                "strings WHERE database_id='" + database_id + '\'')) {
-                            while (rsStrings.next()) {
-                                String label = rsStrings.getString("label");
-                                String content = rsStrings.getString("content");
-                                if ("@PREAMBLE".equals(label)) {
-                                    database.setPreamble(content);
-                                } else {
-                                    BibtexString string = new BibtexString(IdGenerator.next(), label, content);
-                                    database.addString(string);
+                    List<String> colNames = this.readColumnNames(conn).stream().filter(column -> !columnsNotConsideredForEntries.contains(column)).collect(Collectors.toList());
+
+                    final String database_id = rsDatabase.getString("database_id");
+                    // Read the entries and create BibEntry instances:
+                    HashMap<String, BibEntry> entries = new HashMap<>();
+                    try (Statement entryStatement = SQLUtil.queryAllFromTable(conn,
+                            "entries WHERE database_id= '" + database_id + "';")) {
+                        ResultSet rsEntries = entryStatement.getResultSet();
+                        while (rsEntries.next()) {
+                            String id = rsEntries.getString("entries_id");
+                            BibEntry entry = new BibEntry(IdGenerator.next(),
+                                    types.get(rsEntries.getString("entry_types_id")));
+                            entry.setField(BibEntry.KEY_FIELD, rsEntries.getString("cite_key"));
+                            for (String col : colNames) {
+                                String value = rsEntries.getString(col);
+                                if (value != null) {
+                                    col = col.charAt(col.length() - 1) == '_' ? col.substring(0,
+                                            col.length() - 1) : col;
+                                    entry.setField(col, value);
                                 }
                             }
-                            rsStrings.getStatement().close();
+                            entries.put(id, entry);
+                            database.insertEntry(entry);
                         }
-                        MetaData metaData = new MetaData();
-                        metaData.initializeNewDatabase();
-                        // Read the groups tree:
-                        importGroupsTree(metaData, entries, conn, database_id);
-                        result.add(new Object[] {database, metaData, rsDatabase.getString("database_name")});
+                        rsEntries.getStatement().close();
                     }
+                    // Import strings and preamble:
+                    try (Statement stringStatement = SQLUtil.queryAllFromTable(conn,
+                            "strings WHERE database_id='" + database_id + '\'')) {
+                        ResultSet rsStrings = stringStatement.getResultSet();
+                        while (rsStrings.next()) {
+                            String label = rsStrings.getString("label");
+                            String content = rsStrings.getString("content");
+                            if ("@PREAMBLE".equals(label)) {
+                                database.setPreamble(content);
+                            } else {
+                                BibtexString string = new BibtexString(IdGenerator.next(), label, content);
+                                database.addString(string);
+                            }
+                        }
+                        rsStrings.getStatement().close();
+                    }
+                    MetaData metaData = new MetaData();
+                    metaData.initializeNewDatabase();
+                    // Read the groups tree:
+                    importGroupsTree(metaData, entries, conn, database_id);
+                    result.add(new DBImporterResult(database, metaData, rsDatabase.getString("database_name")));
                 }
-                rsDatabase.close();
             }
-            conn.close();
-            return result;
         }
+
+        return result;
     }
 
     /**
      * Look up the group type name from the type ID in the database.
      *
      * @param groupId The database's groups id
-     * @param conn The database connection
-     *
+     * @param conn    The database connection
      * @return The name (JabRef type id) of the group type.
      * @throws SQLException
      */
@@ -178,14 +173,15 @@ public abstract class DBImporter extends DBImporterExporter {
                 "SELECT label FROM group_types WHERE group_types_id='" + groupId + "';");
     }
 
-    private void importGroupsTree(MetaData metaData, HashMap<String, BibtexEntry> entries, Connection conn,
-            String database_id) throws SQLException {
-        HashMap<String, GroupTreeNode> groups = new HashMap<>();
+    private void importGroupsTree(MetaData metaData, Map<String, BibEntry> entries, Connection conn,
+            final String database_id) throws SQLException {
+        Map<String, GroupTreeNode> groups = new HashMap<>();
         LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<>();
         GroupTreeNode rootNode = new GroupTreeNode(new AllEntriesGroup());
 
-        try (ResultSet rsGroups = SQLUtil.queryAllFromTable(conn,
+        try (Statement statement = SQLUtil.queryAllFromTable(conn,
                 "groups WHERE database_id='" + database_id + "' ORDER BY groups_id")) {
+            ResultSet rsGroups = statement.getResultSet();
             while (rsGroups.next()) {
                 AbstractGroup group = null;
                 String typeId = findGroupTypeName(rsGroups.getString("group_types_id"), conn);
@@ -229,7 +225,8 @@ public abstract class DBImporter extends DBImporterExporter {
                     }
                 }
 
-                try (ResultSet rsEntryGroup = SQLUtil.queryAllFromTable(conn, "entry_group")) {
+                try (Statement entryGroup = SQLUtil.queryAllFromTable(conn, "entry_group")) {
+                    ResultSet rsEntryGroup = entryGroup.getResultSet();
                     while (rsEntryGroup.next()) {
                         String entryId = rsEntryGroup.getString("entries_id");
                         String groupId = rsEntryGroup.getString("groups_id");

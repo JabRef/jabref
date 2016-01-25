@@ -17,13 +17,17 @@ package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.net.URLDownload;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Convenience class for getting BibTeX entries from the BibSonomy scraper,
@@ -34,13 +38,14 @@ class BibsonomyScraper {
     private static final String BIBSONOMY_SCRAPER = "http://scraper.bibsonomy.org/service?url=";
     private static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
 
+    private static final Log LOGGER = LogFactory.getLog(BibsonomyScraper.class);
 
     /**
-     * Return a BibtexEntry by looking up the given url from the BibSonomy scraper.
+     * Return a BibEntry by looking up the given url from the BibSonomy scraper.
      * @param entryUrl
      * @return
      */
-    public static BibtexEntry getEntry(String entryUrl) {
+    public static Optional<BibEntry> getEntry(String entryUrl) {
         try {
             // Replace special characters by corresponding sequences:
             entryUrl = entryUrl.replaceAll("%", "%25").replaceAll(":", "%3A").replaceAll("/", "%2F").replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");
@@ -50,17 +55,17 @@ class BibsonomyScraper {
             BibtexParser bp = new BibtexParser(new StringReader(bibtex));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase().getEntryCount() > 0)) {
-                return pr.getDatabase().getEntries().iterator().next();
+                return Optional.of(pr.getDatabase().getEntries().iterator().next());
             } else {
-                return null;
+                return Optional.empty();
             }
 
         } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
+            LOGGER.warn("Could not download entry", ex);
+            return Optional.empty();
         } catch (RuntimeException ex) {
-            ex.printStackTrace();
-            return null;
+            LOGGER.warn("Could not get entry", ex);
+            return Optional.empty();
         }
     }
 }

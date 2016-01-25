@@ -43,17 +43,15 @@ public class DateFormatter implements Formatter {
      * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
      */
     private TemporalAccessor tryParseDate(String dateString) {
-        //@formatter:off
         String[] formatStrings = {
                 "uuuu-M-d", "uuuu-M",
                 "M/uu", "M/uuuu",
                 "MMMM d, uuuu", "MMMM, uuuu",
                 "d.M.uuuu"};
-        //@formatter:on
         for (String formatString : formatStrings) {
             try {
                 return DateTimeFormatter.ofPattern(formatString).parse(dateString);
-            } catch (DateTimeParseException e) {
+            } catch (DateTimeParseException ignored) {
             }
         }
 

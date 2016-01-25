@@ -41,13 +41,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
@@ -107,7 +107,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         diag = new JDialog(frame, Localization.lang("Manage keywords"), true);
 
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         JButton add = new JButton(Localization.lang("Add"));
         JButton remove = new JButton(Localization.lang("Remove"));
@@ -205,7 +205,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-                String[] values = keywordList.getSelectedValuesList().toArray(new String[0]);
+                List<String> var = keywordList.getSelectedValuesList();
+                String[] values = var.toArray(new String[var.size()]);
 
                 for (String val : values) {
                     keywordListModel.removeElement(val);
@@ -260,7 +261,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
@@ -370,9 +371,9 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         }
 
-        BibtexEntry[] entries = bp.getSelectedEntries();
+        BibEntry[] entries = bp.getSelectedEntries();
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             List<String> separatedKeywords = entry.getSeparatedKeywords();
 
             // we "intercept" with a treeset
@@ -410,14 +411,14 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private void fillKeyWordList() {
         BasePanel bp = frame.getCurrentBasePanel();
-        BibtexEntry[] entries = bp.getSelectedEntries();
+        BibEntry[] entries = bp.getSelectedEntries();
 
         // fill dialog with values
         keywordListModel.clear();
         sortedKeywordsOfAllEntriesBeforeUpdateByUser.clear();
 
         if (mergeKeywords.isSelected()) {
-            for (BibtexEntry entry : entries) {
+            for (BibEntry entry : entries) {
                 List<String> separatedKeywords = entry.getSeparatedKeywords();
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
@@ -425,14 +426,14 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             assert intersectKeywords.isSelected();
 
             // all keywords from first entry have to be added
-            BibtexEntry firstEntry = entries[0];
+            BibEntry firstEntry = entries[0];
             List<String> separatedKeywords = firstEntry.getSeparatedKeywords();
             sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
 
             // for the remaining entries, intersection has to be used
             // this approach ensures that one empty keyword list leads to an empty set of common keywords
             for (int i = 1; i < entries.length; i++) {
-                BibtexEntry entry = entries[i];
+                BibEntry entry = entries[i];
                 separatedKeywords = entry.getSeparatedKeywords();
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
             }

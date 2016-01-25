@@ -25,14 +25,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.undo.CompoundEdit;
 
-import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * The class EntryFromFileCreatorManager manages entry creators.
@@ -55,7 +55,7 @@ public final class EntryFromFileCreatorManager {
 
         // add a creator for each ExternalFileType if there is no specialised
         // creator existing.
-        ExternalFileType[] fileTypes = JabRefPreferences.getInstance().getExternalFileTypeSelection();
+        ExternalFileType[] fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
 
         for (ExternalFileType exFileType : fileTypes) {
             if (!hasSpecialisedCreatorForExternalFileType(exFileType)) {
@@ -80,7 +80,7 @@ public final class EntryFromFileCreatorManager {
 
     /**
      * Returns a EntryFromFileCreator object that is capable of creating a
-     * BibtexEntry for the given File.
+     * BibEntry for the given File.
      *
      * @param file the pdf file
      * @return null if there is no EntryFromFileCreator for this File.
@@ -106,7 +106,7 @@ public final class EntryFromFileCreatorManager {
      * @return List of unexcpected import event messages including failures.
      */
     public List<String> addEntrysFromFiles(List<File> files,
-            BibtexDatabase database, EntryType entryType,
+            BibDatabase database, EntryType entryType,
             boolean generateKeywordsFromPathToFile) {
         List<String> importGUIMessages = new LinkedList<>();
         addEntriesFromFiles(files, database, null, entryType,
@@ -128,7 +128,7 @@ public final class EntryFromFileCreatorManager {
      * @return Returns The number of entries added
      */
     public int addEntriesFromFiles(List<File> files,
-            BibtexDatabase database, BasePanel panel, EntryType entryType,
+            BibDatabase database, BasePanel panel, EntryType entryType,
             boolean generateKeywordsFromPathToFile,
             ChangeListener changeListener, List<String> importGUIMessages) {
 
@@ -136,8 +136,10 @@ public final class EntryFromFileCreatorManager {
         CompoundEdit ce = new CompoundEdit();
         for (File f : files) {
             EntryFromFileCreator creator = getEntryCreator(f);
-            if (creator != null) {
-                BibtexEntry entry = creator.createEntry(f,
+            if (creator == null) {
+                importGUIMessages.add("Problem importing " + f.getPath() + ": Unknown filetype.");
+            } else {
+                BibEntry entry = creator.createEntry(f,
                         generateKeywordsFromPathToFile);
                 if (entry == null) {
                     importGUIMessages.add("Problem importing " + f.getPath()
@@ -151,7 +153,7 @@ public final class EntryFromFileCreatorManager {
                     entry.setId(IdGenerator.next());
                 }
                 /*
-                 * TODO: database.insertEntry(BibtexEntry) is not sensible. Why
+                 * TODO: database.insertEntry(BibEntry) is not sensible. Why
                  * does 'true' mean "There were duplicates", while 'false' means
                  * "Everything alright"?
                  */
@@ -160,7 +162,7 @@ public final class EntryFromFileCreatorManager {
                     // Therefore, we only insert the entry if it is not already present
                     if (database.insertEntry(entry)) {
                         importGUIMessages.add("Problem importing " + f.getPath()
-                        + ": Insert into BibtexDatabase failed.");
+                        + ": Insert into BibDatabase failed.");
                     } else {
                         count++;
                         if (panel != null) {
@@ -168,9 +170,6 @@ public final class EntryFromFileCreatorManager {
                         }
                     }
                 }
-            } else {
-                importGUIMessages.add("Problem importing " + f.getPath()
-                + ": Unknown filetype.");
             }
 
             if (changeListener != null) {

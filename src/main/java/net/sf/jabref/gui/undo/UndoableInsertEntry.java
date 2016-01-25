@@ -19,8 +19,8 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This class represents the removal of an entry. The constructor needs
@@ -30,12 +30,12 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 public class UndoableInsertEntry extends AbstractUndoableEdit {
 
-    private final BibtexDatabase base;
-    private final BibtexEntry entry;
+    private final BibDatabase base;
+    private final BibEntry entry;
     private final BasePanel panel;
 
 
-    public UndoableInsertEntry(BibtexDatabase base, BibtexEntry entry,
+    public UndoableInsertEntry(BibDatabase base, BibEntry entry,
                                BasePanel panel) {
         this.base = base;
         this.entry = entry;
@@ -58,7 +58,7 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
 
         // Revert the change.
         try {
-            base.removeEntry(entry.getId());
+            base.removeEntry(entry);
             // If the entry has an editor currently open, we must close it.
             panel.ensureNotShowing(entry);
         } catch (Throwable ex) {

@@ -25,15 +25,16 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.Enumeration;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 
 class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
-    private BibtexDatabase secondary;
+    private BibDatabase secondary;
     private final JTree tree;
     private final JPanel infoPanel = new JPanel();
     private final JCheckBox cb = new JCheckBox(Localization.lang("Accept change"));
@@ -44,13 +45,13 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
 
     public ChangeDisplayDialog(JFrame owner, final BasePanel panel,
-            BibtexDatabase secondary, final DefaultMutableTreeNode root) {
+            BibDatabase secondary, final DefaultMutableTreeNode root) {
         super(owner, Localization.lang("External changes"), true);
         this.secondary = secondary;
 
         // Just to be sure, put in an empty secondary base if none is given:
         if (secondary == null) {
-            this.secondary = new BibtexDatabase();
+            this.secondary = new BibDatabase();
         }
         tree = new JTree(root);
         tree.addTreeSelectionListener(this);
@@ -68,7 +69,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
         setInfo(rootInfo);
         infoPanel.add(cb, BorderLayout.SOUTH);
 
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(ok);
         JButton cancel = new JButton(Localization.lang("Cancel"));
@@ -103,8 +104,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
                 NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                 Enumeration<Change> enumer = root.children();
                 boolean anyDisabled = false;
-                while (enumer.hasMoreElements()) {
-                    Change c = enumer.nextElement();
+                for (Change c : Collections.list(enumer)) {
                     boolean allAccepted = false;
                     if (c.isAcceptable() && c.isAccepted()) {
                         allAccepted = c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);

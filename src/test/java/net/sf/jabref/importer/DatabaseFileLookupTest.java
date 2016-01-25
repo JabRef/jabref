@@ -1,12 +1,14 @@
 package net.sf.jabref.importer;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
@@ -27,18 +29,17 @@ import java.util.*;
  */
 public class DatabaseFileLookupTest {
 
-    private BibtexDatabase database;
-    private Collection<BibtexEntry> entries;
+    private BibDatabase database;
+    private Collection<BibEntry> entries;
 
-    private BibtexEntry entry1;
-    private BibtexEntry entry2;
+    private BibEntry entry1;
+    private BibEntry entry2;
 
 
-    /* (non-Javadoc)
-     * @see junit.framework.TestCase#setUp()
-     */
     @Before
     public void setUp() throws Exception {
+        Globals.prefs = JabRefPreferences.getInstance();
+
         try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
             ParserResult result = BibtexParser.parse(fr);
             database = result.getDatabase();
@@ -63,10 +64,8 @@ public class DatabaseFileLookupTest {
     @Test
     @Ignore
     public void testInsertTestData() throws Exception {
-
-        entry1 = new BibtexEntry();
-        JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
-        ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt("PDF");
+        entry1 = new BibEntry();
+        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("PDF");
         FileListEntry fileListEntry = new FileListEntry("", ImportDataTest.FILE_IN_DATABASE.getAbsolutePath(), fileType);
 
         FileListTableModel model = new FileListTableModel();
@@ -87,8 +86,7 @@ public class DatabaseFileLookupTest {
          * Select all nodes manually.
          */
         Enumeration<CheckableTreeNode> enumeration = treeNode.breadthFirstEnumeration();
-        while (enumeration.hasMoreElements()) {
-            CheckableTreeNode nextElement = enumeration.nextElement();
+        for (CheckableTreeNode nextElement : Collections.list(enumeration)) {
             nextElement.setSelected(true);
         }
 

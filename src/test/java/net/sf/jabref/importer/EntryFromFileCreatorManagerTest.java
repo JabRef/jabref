@@ -15,11 +15,14 @@
  */
 package net.sf.jabref.importer;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,6 +35,12 @@ import java.util.List;
  * @version 11.11.2008 | 21:51:54
  */
 public class EntryFromFileCreatorManagerTest {
+
+    // Needed to initialize ExternalFileTypes
+    @Before
+    public void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     @Test
     public void testGetCreator() throws Exception {
@@ -49,7 +58,7 @@ public class EntryFromFileCreatorManagerTest {
     public void testAddEntrysFromFiles() throws Exception {
         try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
             ParserResult result = BibtexParser.parse(fr);
-            BibtexDatabase database = result.getDatabase();
+            BibDatabase database = result.getDatabase();
 
             List<File> files = new ArrayList<>();
 
@@ -66,7 +75,7 @@ public class EntryFromFileCreatorManagerTest {
 
             boolean file1Found = false;
             boolean file2Found = false;
-            for (BibtexEntry entry : database.getEntries()) {
+            for (BibEntry entry : database.getEntries()) {
                 String filesInfo = entry.getField("file");
                 if (filesInfo.contains(files.get(0).getName())) {
                     file1Found = true;

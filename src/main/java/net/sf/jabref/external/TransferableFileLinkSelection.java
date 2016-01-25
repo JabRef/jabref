@@ -16,7 +16,7 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
@@ -37,16 +37,13 @@ public class TransferableFileLinkSelection implements Transferable {
     private final List<File> fileList = new ArrayList<>();
 
 
-    public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {
-        String s = selection[0].getField(Globals.FILE_FIELD);
+    public TransferableFileLinkSelection(BasePanel panel, BibEntry[] selection) {
         FileListTableModel tm = new FileListTableModel();
-        if (s != null) {
-            tm.setContent(s);
-        }
+        selection[0].getFieldOptional(Globals.FILE_FIELD).ifPresent(file -> tm.setContent(file));
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
             String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
-            File expLink = FileUtil.expandFilename(tm.getEntry(0).getLink(), dirs);
+            File expLink = FileUtil.expandFilename(tm.getEntry(0).link, dirs);
             fileList.add(expLink);
 
         }
@@ -76,7 +73,7 @@ public class TransferableFileLinkSelection implements Transferable {
     /*
     private StringSelection ss;
 
-    public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {
+    public TransferableFileLinkSelection(BasePanel panel, BibEntry[] selection) {
         String s = selection[0].getField(GUIGlobals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
         if (s != null)

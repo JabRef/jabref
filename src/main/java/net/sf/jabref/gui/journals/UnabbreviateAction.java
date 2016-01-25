@@ -18,7 +18,7 @@ package net.sf.jabref.gui.journals;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.journals.Abbreviations;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -42,7 +42,7 @@ public class UnabbreviateAction extends AbstractWorker {
 
     @Override
     public void run() {
-        BibtexEntry[] entries = panel.getSelectedEntries();
+        BibEntry[] entries = panel.getSelectedEntries();
         if (entries == null) {
             return;
         }
@@ -51,7 +51,7 @@ public class UnabbreviateAction extends AbstractWorker {
 
         NamedCompound ce = new NamedCompound("Unabbreviate journal names");
         int count = 0;
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
             if (undoableAbbreviator.unabbreviate(panel.database(), entry, "journal", ce)) {
                 count++;
             }

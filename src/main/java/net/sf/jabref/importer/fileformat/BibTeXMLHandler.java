@@ -16,11 +16,12 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -32,9 +33,9 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 class BibTeXMLHandler extends DefaultHandler {
 
-    private ArrayList<BibtexEntry> bibitems;
+    private List<BibEntry> bibitems;
 
-    private BibtexEntry b; // the entry being read
+    private BibEntry b; // the entry being read
 
     // XML parsing stuff
     private String currentChars;
@@ -44,7 +45,7 @@ class BibTeXMLHandler extends DefaultHandler {
         super();
     }
 
-    public ArrayList<BibtexEntry> getItems() {
+    public List<BibEntry> getItems() {
         return bibitems;
     }
 
@@ -76,8 +77,8 @@ class BibTeXMLHandler extends DefaultHandler {
                     articleID = atts.getValue(i);
                 }
             }
-            b = new BibtexEntry(IdGenerator.next());
-            b.setField(BibtexEntry.KEY_FIELD, articleID);
+            b = new BibEntry(IdGenerator.next());
+            b.setField(BibEntry.KEY_FIELD, articleID);
         } else if ("bibtex:article".equals(raw) ||
                 "bibtex:inbook".equals(raw) ||
                 "bibtex:book".equals(raw) ||

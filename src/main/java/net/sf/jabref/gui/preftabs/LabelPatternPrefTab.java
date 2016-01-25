@@ -76,8 +76,8 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, warnBeforeOverwriting.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, dontOverwrite.isSelected());
 
-        Globals.prefs.put("KeyPatternRegex", KeyPatternRegex.getText());
-        Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
+        Globals.prefs.put(JabRefPreferences.KEY_PATTERN_REGEX, KeyPatternRegex.getText());
+        Globals.prefs.put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, KeyPatternReplacement.getText());
         Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION, autoGenerateOnImport.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, generateOnSave.isSelected());
 
@@ -164,7 +164,7 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        super.setValues(prefs.getKeyPattern());
+        super.setValues(Globals.prefs.getKeyPattern());
         defaultPat.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
         dontOverwrite.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY));
         generateOnSave.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));
@@ -184,8 +184,8 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
 
-        KeyPatternRegex.setText(Globals.prefs.get("KeyPatternRegex"));
-        KeyPatternReplacement.setText(Globals.prefs.get("KeyPatternReplacement"));
+        KeyPatternRegex.setText(Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REGEX));
+        KeyPatternReplacement.setText(Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT));
 
         //basenamePatternRegex.setText(Globals.prefs.get("basenamePatternRegex"));
         //basenamePatternReplacement.setText(Globals.prefs.get("basenamePatternReplacement"));

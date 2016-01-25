@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006 Jabref-Team
- * 
+ *
  * All programs in this directory and subdirectories are published under the GNU
  * General Public License as described below.
  *

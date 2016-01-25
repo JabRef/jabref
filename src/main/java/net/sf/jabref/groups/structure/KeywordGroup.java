@@ -26,8 +26,8 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * @author jzieren
@@ -69,7 +69,7 @@ public class KeywordGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup fromString(String s, BibtexDatabase db,
+    public static AbstractGroup fromString(String s, BibDatabase db,
                                            int version) throws Exception {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new Exception(
@@ -125,8 +125,8 @@ public class KeywordGroup extends AbstractGroup {
     public SearchRule getSearchRule() {
         return new SearchRule() {
             @Override
-            public boolean applyRule(String query, BibtexEntry bibtexEntry) {
-                return contains(query, bibtexEntry);
+            public boolean applyRule(String query, BibEntry bibEntry) {
+                return contains(query, bibEntry);
             }
 
             @Override
@@ -162,7 +162,7 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibtexEntry[] entries) {
+    public AbstractUndoableEdit add(BibEntry[] entries) {
         if (!supportsAdd()) {
             return null;
         }
@@ -170,7 +170,7 @@ public class KeywordGroup extends AbstractGroup {
             NamedCompound ce = new NamedCompound(
                     Localization.lang("add entries to group"));
             boolean modified = false;
-            for (BibtexEntry entry : entries) {
+            for (BibEntry entry : entries) {
                 if (!getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
                     String oldContent = entry
                             .getField(searchField);
@@ -197,7 +197,7 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
+    public AbstractUndoableEdit remove(BibEntry[] entries) {
         if (!supportsRemove()) {
             return null;
         }
@@ -205,7 +205,7 @@ public class KeywordGroup extends AbstractGroup {
         if ((entries != null) && (entries.length > 0)) {
             NamedCompound ce = new NamedCompound(Localization.lang("remove from group"));
             boolean modified = false;
-            for (BibtexEntry entry : entries) {
+            for (BibEntry entry : entries) {
                 if (getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
                     String oldContent = entry
                             .getField(searchField);
@@ -246,19 +246,19 @@ public class KeywordGroup extends AbstractGroup {
      * (non-Javadoc)
      *
      * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
-     *      net.sf.jabref.BibtexEntry)
+     *      net.sf.jabref.BibEntry)
      */
     @Override
-    public boolean contains(String query, BibtexEntry entry) {
+    public boolean contains(String query, BibEntry entry) {
         return contains(entry);
     }
 
     @Override
-    public boolean contains(BibtexEntry entry) {
-        String content = entry.getField(searchField);
-        if (content == null) {
+    public boolean contains(BibEntry entry) {
+        if (!entry.hasField(searchField)) {
             return false;
         }
+        String content = entry.getField(searchField);
         if (regExp) {
             return pattern.matcher(content).find();
         }
@@ -299,11 +299,11 @@ public class KeywordGroup extends AbstractGroup {
      * Removes matches of searchString in the entry's field. This is only
      * possible if the search expression is not a regExp.
      */
-    private void removeMatches(BibtexEntry entry) {
-        String content = entry.getField(searchField);
-        if (content == null) {
+    private void removeMatches(BibEntry entry) {
+        if (!entry.hasField(searchField)) {
             return; // nothing to modify
         }
+        String content = entry.getField(searchField);
         StringBuffer sbOrig = new StringBuffer(content);
         StringBuffer sbLower = new StringBuffer(content.toLowerCase());
         StringBuffer haystack = caseSensitive ? sbOrig : sbLower;
@@ -330,7 +330,11 @@ public class KeywordGroup extends AbstractGroup {
         }
 
         String result = sbOrig.toString().trim();
-        entry.setField(searchField, !result.isEmpty() ? result : null);
+        if (result.isEmpty()) {
+            entry.clearField(searchField);
+        } else {
+            entry.setField(searchField, result);
+        }
     }
 
     @Override
@@ -375,7 +379,6 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     public static String getDescriptionForPreview(String field, String expr, boolean caseSensitive, boolean regExp) {
-        // @formatter:off
         String header = regExp ? Localization.lang("This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",
                 field, StringUtil.quoteForHTML(expr))
                 : Localization.lang("This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
@@ -395,7 +398,6 @@ public class KeywordGroup extends AbstractGroup {
                         + "This process removes the term <b>%1</b> from "
                         + "each entry's <b>%0</b> field.",
                 field, StringUtil.quoteForHTML(expr));
-        // @formatter:on
         return String.format("%s (%s). %s", header, caseSensitiveText, footer);
     }
 

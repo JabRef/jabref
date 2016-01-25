@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2005 Andreas Rudert
+ Copyright (C) 2005-2015 Andreas Rudert, Oscar Gustafsson
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -43,7 +43,7 @@ public class CurrentDate implements LayoutFormatter
 {
 
     // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
-    private static final String defaultFormat = "yyyy-MM-dd hh:mm:ss z";
+    private static final String DEFAULT_FORMAT = "yyyy-MM-dd hh:mm:ss z";
 
 
     /*
@@ -53,7 +53,7 @@ public class CurrentDate implements LayoutFormatter
     @Override
     public String format(String fieldText)
     {
-        String format = CurrentDate.defaultFormat;
+        String format = CurrentDate.DEFAULT_FORMAT;
         if ((fieldText != null) && (fieldText.trim() != null) && !fieldText.trim().isEmpty()) {
             format = fieldText;
         }

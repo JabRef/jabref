@@ -29,20 +29,19 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.gui.BibtexFields;
 
 /**
- *
  * @author pattonlk
- *
+ *         <p>
  *         Reestructured by ifsteinm. Jan 20th Now it is possible to export more than one jabref database. BD creation,
  *         insertions and queries where reformulated to accomodate the changes. The changes include a refactory on
  *         import/export to SQL module, creating many other classes making them more readable This class just support
  *         Exporters and Importers
  */
 
-public class SQLUtil {
+final public class SQLUtil {
 
-    private static final ArrayList<String> reservedDBWords = new ArrayList<>(Collections.singletonList("key"));
+    private static final List<String> RESERVED_DB_WORDS = new ArrayList<>(Collections.singletonList("key"));
 
-    private static ArrayList<String> allFields;
+    private static List<String> allFields;
 
     private static final Log LOGGER = LogFactory.getLog(SQLUtil.class);
 
@@ -64,10 +63,9 @@ public class SQLUtil {
     }
 
     /**
-     *
      * @return All existent fields for a bibtex entry
      */
-    public static ArrayList<String> getAllFields() {
+    public static List<String> getAllFields() {
         if (SQLUtil.allFields == null) {
             SQLUtil.refreshFields();
         }
@@ -75,7 +73,6 @@ public class SQLUtil {
     }
 
     /**
-     *
      * @return Create a common separated field names
      */
     public static String getFieldStr() {
@@ -84,7 +81,7 @@ public class SQLUtil {
         List<String> fieldNames = new ArrayList<>();
         for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
             field = SQLUtil.allFields.get(i);
-            if (SQLUtil.reservedDBWords.contains(field)) {
+            if (SQLUtil.RESERVED_DB_WORDS.contains(field)) {
                 field += "_";
             }
             fieldNames.add(field);
@@ -116,17 +113,16 @@ public class SQLUtil {
      * Generates DML specifying table columns and their datatypes. The output of this routine should be used within a
      * CREATE TABLE statement.
      *
-     * @param fields Contains unique field names
+     * @param fields   Contains unique field names
      * @param datatype Specifies the SQL data type that the fields should take on.
      * @return The SQL code to be included in a CREATE TABLE statement.
      */
-    public static String fieldsAsCols(ArrayList<String> fields, String datatype) {
+    public static String fieldsAsCols(List<String> fields, String datatype) {
         String field;
-        ArrayList<String> newFields = new ArrayList<>();
-        ListIterator<String> li = fields.listIterator();
-        while (li.hasNext()) {
-            field = li.next();
-            if (SQLUtil.reservedDBWords.contains(field)) {
+        List<String> newFields = new ArrayList<>();
+        for (String field1 : fields) {
+            field = field1;
+            if (SQLUtil.RESERVED_DB_WORDS.contains(field)) {
                 field = field + '_';
             }
             newFields.add(field + datatype);
@@ -135,17 +131,16 @@ public class SQLUtil {
     }
 
     /**
-     *
      * @param allFields All existent fields for a given entry type
      * @param reqFields list containing required fields for an entry type
      * @param optFields list containing optional fields for an entry type
      * @param utiFields list containing utility fields for an entry type
-     * @param origList original list with the correct size filled with the default values for each field
+     * @param origList  original list with the correct size filled with the default values for each field
      * @return origList changing the values of the fields that appear on reqFields, optFields, utiFields set to 'req',
-     *         'opt' and 'uti' respectively
+     * 'opt' and 'uti' respectively
      */
-    public static ArrayList<String> setFieldRequirement(ArrayList<String> allFields, List<String> reqFields,
-            List<String> optFields, List<String> utiFields, ArrayList<String> origList) {
+    public static List<String> setFieldRequirement(List<String> allFields, List<String> reqFields,
+            List<String> optFields, List<String> utiFields, List<String> origList) {
 
         String currentField;
         for (int i = 0; i < allFields.size(); i++) {
@@ -177,18 +172,16 @@ public class SQLUtil {
     }
 
     /**
-     * return a ResultSet with the result of a "SELECT *" query for a given table
+     * return a Statement with the result of a "SELECT *" query for a given table
      *
-     * @param conn Connection to the database
+     * @param conn      Connection to the database
      * @param tableName String containing the name of the table you want to get the results.
      * @return a ResultSet with the query result returned from the DB
      * @throws SQLException
      */
-    public static ResultSet queryAllFromTable(Connection conn, String tableName) throws SQLException {
+    public static Statement queryAllFromTable(Connection conn, String tableName) throws SQLException {
         String query = "SELECT * FROM " + tableName + ';';
-        try (Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query)) {
-            return res.getResultSet();
-        }
+        return (Statement) SQLUtil.processQueryWithResults(conn, query);
     }
 
     /**
@@ -211,11 +204,11 @@ public class SQLUtil {
     /**
      * Utility method for processing DML with proper output
      *
-     * @param out The output (PrintStream or Connection) object to which the DML should be sent
+     * @param out   The output (PrintStream or Connection) object to which the DML should be sent
      * @param query The DML statements to be processed
      * @return the result of the statement
      */
-    public static Object processQueryWithResults(Object out, String query) throws SQLException {
+    public static AutoCloseable processQueryWithResults(Object out, String query) throws SQLException {
         if (out instanceof PrintStream) {// TODO: how to handle the PrintStream
             // case?
             PrintStream fout = (PrintStream) out;
@@ -246,7 +239,7 @@ public class SQLUtil {
      * Process a query and returns only the first result of a result set as a String. To be used when it is certain that
      * only one String (single cell) will be returned from the DB
      *
-     * @param conn The Connection object to which the DML should be sent
+     * @param conn  The Connection object to which the DML should be sent
      * @param query The query statements to be processed
      * @return String with the result returned from the database
      * @throws SQLException
@@ -264,7 +257,7 @@ public class SQLUtil {
      * Utility method for executing DML
      *
      * @param conn The DML Connection object that will execute the SQL
-     * @param qry The DML statements to be executed
+     * @param qry  The DML statements to be executed
      */
     private static void executeQuery(Connection conn, String qry) throws SQLException {
         try (Statement stmnt = conn.createStatement()) {
@@ -273,7 +266,6 @@ public class SQLUtil {
             if (warn != null) {
                 LOGGER.warn(warn);
             }
-            stmnt.close();
         }
     }
 
@@ -281,16 +273,26 @@ public class SQLUtil {
      * Utility method for executing DML
      *
      * @param conn The DML Connection object that will execute the SQL
-     * @param qry The DML statements to be executed
+     * @param qry  The DML statements to be executed
      */
     private static Statement executeQueryWithResults(Connection conn, String qry) throws SQLException {
-        Statement stmnt = conn.createStatement();
-        stmnt.executeQuery(qry);
-        SQLWarning warn = stmnt.getWarnings();
-        if (warn != null) {
-            LOGGER.warn(warn);
+        Statement stmnt = null;
+        try {
+            stmnt = conn.createStatement();
+            stmnt.executeQuery(qry);
+            SQLWarning warn = stmnt.getWarnings();
+            if (warn != null) {
+                LOGGER.warn(warn);
+            }
+            return stmnt;
+        } catch (SQLException rethrow) {
+            // in case of exception, try to close the statement to avoid a resource leak...
+            if (stmnt != null) {
+                stmnt.close();
+            }
+            //... and rethrow the exception
+            throw rethrow;
         }
-        return stmnt;
     }
 
 }

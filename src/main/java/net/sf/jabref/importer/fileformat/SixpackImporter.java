@@ -27,7 +27,7 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -82,11 +82,11 @@ public class SixpackImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
         HashMap<String, String> fI = new HashMap<>();
         fI.put("id", "bibtexkey");
@@ -117,7 +117,6 @@ public class SixpackImporter extends ImportFormat {
         fI.put("cr", "crossref");
         fI.put("fi", "file");
 
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         in.readLine();
         String ln = in.readLine();
@@ -126,8 +125,10 @@ public class SixpackImporter extends ImportFormat {
         }
         String[] fieldDef = ln.split(",");
 
+        List<BibEntry> bibitems = new ArrayList<>();
+
         String s;
-        BibtexEntry entry;
+        BibEntry entry;
         while ((s = in.readLine()) != null) {
             try {
                 s = s.replaceAll("<par>", ""); // What is <par> ????
@@ -154,7 +155,7 @@ public class SixpackImporter extends ImportFormat {
                     }
                     typ = EntryTypes.getType(type.toLowerCase());
                 }
-                entry = new BibtexEntry(IdGenerator.next(), typ);
+                entry = new BibEntry(IdGenerator.next(), typ);
                 String fld;
                 for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++) {
                     fld = fI.get(fieldDef[i]);

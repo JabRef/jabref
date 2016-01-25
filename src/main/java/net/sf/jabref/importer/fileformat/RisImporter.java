@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -74,18 +75,18 @@ public class RisImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         while ((str = in.readLine()) != null) {
             sb.append(str);
-            sb.append("\n");
+            sb.append('\n');
         }
         String[] entries = sb.toString().replaceAll("\u2013", "-").replaceAll("\u2014", "--").replaceAll("\u2015", "--").split("ER  -.*\\n");
 
@@ -222,11 +223,11 @@ public class RisImporter extends ImportFormat {
                             }
                         }
                     } else if ("KW".equals(lab)) {
-                        if (!hm.containsKey("keywords")) {
-                            hm.put("keywords", val);
-                        } else {
+                        if (hm.containsKey("keywords")) {
                             String kw = hm.get("keywords");
                             hm.put("keywords", kw + ", " + val);
+                        } else {
+                            hm.put("keywords", val);
                         }
                     } else if ("U1".equals(lab) || "U2".equals(lab) || "N1".equals(lab)) {
                         if (!comment.isEmpty()) {
@@ -260,15 +261,15 @@ public class RisImporter extends ImportFormat {
 
                 hm.put("pages", startPage + "--" + endPage);
             }
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getBibtexEntryType(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getTypeOrDefault(type)); // id assumes an existing database so don't
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();
-            for (String key : hm.keySet()) {
-                String content = hm.get(key);
+            for (Map.Entry<String, String> key : hm.entrySet()) {
+                String content = key.getValue();
                 if ((content == null) || content.trim().isEmpty()) {
-                    toRemove.add(key);
+                    toRemove.add(key.getKey());
                 }
             }
             for (Object aToRemove : toRemove) {

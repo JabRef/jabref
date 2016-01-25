@@ -53,7 +53,6 @@ public class SpecialFieldValue {
      * @param icon - the icon of this value
      * @param toolTipText - the tool tip text
      */
-    // @formatter:off
     public SpecialFieldValue(
             SpecialField field,
             String keyword,
@@ -61,7 +60,6 @@ public class SpecialFieldValue {
             String menuString,
             Icon icon,
             String toolTipText) {
-        // @formatter:on
         this.field = field;
         this.keyword = keyword;
         this.actionName = actionName;
@@ -102,7 +100,6 @@ public class SpecialFieldValue {
 
     public SpecialFieldAction getAction(JabRefFrame frame) {
         if (this.action == null) {
-            // @formatter:off
             action = new SpecialFieldAction(
                     frame,
                     this.field,
@@ -112,7 +109,6 @@ public class SpecialFieldValue {
                     this.field.getValues().size() == 1,
                     this.getMenuString(),
                     this.field.TEXT_DONE_PATTERN);
-            // @formatter:on
         }
         return action;
     }

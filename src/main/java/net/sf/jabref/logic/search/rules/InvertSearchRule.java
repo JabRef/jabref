@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.search.rules;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.search.SearchRule;
 
 import java.util.Objects;
@@ -21,8 +21,8 @@ public class InvertSearchRule implements SearchRule {
     }
 
     @Override
-    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
-        return !otherRule.applyRule(query, bibtexEntry);
+    public boolean applyRule(String query, BibEntry bibEntry) {
+        return !otherRule.applyRule(query, bibEntry);
     }
 
     @Override

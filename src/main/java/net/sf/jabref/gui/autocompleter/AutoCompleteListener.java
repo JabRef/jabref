@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.awt.event.*;
+import java.util.List;
 
 /**
  * Created by Morten O. Alver, 16 Feb. 2007
@@ -369,9 +370,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                 comp.replaceSelection("");
 
                 StringBuffer currentword = getCurrentWord(comp);
-                if (currentword == null) {
-                    currentword = new StringBuffer();
-                }
 
                 // only "real characters" end up here
                 assert (!Character.isISOControl(ch));
@@ -410,7 +408,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
     private String[] findCompletions(String beginning) {
-        return completer.complete(beginning);
+        List<String> results = completer.complete(beginning);
+        return results.toArray(new String[results.size()]);
     }
 
     private StringBuffer getCurrentWord(JTextComponent comp) {
@@ -427,7 +426,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                         && Character.isWhitespace(comp.getText().charAt(comp.getCaretPosition()))) {
                     // caret is in the middle of the text AND current character is a whitespace
                     // that means: a new word is started and there is no current word
-                    return null;
+                    return new StringBuffer();
                 }
 
                 int piv = upToCaret.length() - 1;

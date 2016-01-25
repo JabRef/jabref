@@ -1,6 +1,6 @@
 package net.sf.jabref.specialfields;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeListener;
 import net.sf.jabref.JabRef;
@@ -17,7 +17,7 @@ public class SpecialFieldDatabaseChangeListener implements
     public void databaseChanged(DatabaseChangeEvent e) {
         if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY &&
                 SpecialFieldsUtils.keywordSyncEnabled()) {
-            final BibtexEntry entry = e.getEntry();
+            final BibEntry entry = e.getEntry();
             // NamedCompount code similar to SpecialFieldUpdateListener
             NamedCompound nc = new NamedCompound(Localization.lang("Synchronized special fields based on keywords"));
             SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);

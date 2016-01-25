@@ -16,12 +16,12 @@
 
 package net.sf.jabref.gui;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Entry containers work on a single entry, which can be asked for 
  */
 public interface EntryContainer {
 
-    BibtexEntry getEntry();
+    BibEntry getEntry();
 }

@@ -26,15 +26,7 @@ import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
-/**
- *
- * @author ifsteinm.
- *
- *  Jan 20th	Extends DBExporter to provide features specific for PostgreSQL
- *  			Created after a refactory on SQLUtil
- *
- */
-public class PostgreSQLExporter extends DBExporter {
+final public class PostgreSQLExporter extends DBExporter {
 
     private static PostgreSQLExporter instance;
 
@@ -43,7 +35,6 @@ public class PostgreSQLExporter extends DBExporter {
     }
 
     /**
-     *
      * @return The singleton instance of the PostgreSQLExporter
      */
     public static PostgreSQLExporter getInstance() {
@@ -61,10 +52,10 @@ public class PostgreSQLExporter extends DBExporter {
 
         Class.forName(drv).newInstance();
         try (Connection conn = DriverManager.getConnection(url, dbstrings.getUsername(), dbstrings.getPassword());
-                ResultSet rs = ((Statement) SQLUtil.processQueryWithResults(conn,
-                        "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='" + dbStrings.getDatabase()
-                                + '\'')).getResultSet()) {
-
+             Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
+                     "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='" + dbStrings.getDatabase()
+                             + '\'')) {
+            ResultSet rs = statement.getResultSet();
             rs.next();
             if (rs.getInt("alreadyThere") == 0) {
                 SQLUtil.processQuery(conn, "CREATE DATABASE " + dbStrings.getDatabase());
@@ -73,11 +64,10 @@ public class PostgreSQLExporter extends DBExporter {
             conn.close();
         }
 
-        try (Connection conn = DriverManager.getConnection(url, dbstrings.getUsername(), dbstrings.getPassword())) {
-            createPLPGSQLFunction(conn);
+        Connection conn = DriverManager.getConnection(url, dbstrings.getUsername(), dbstrings.getPassword());
+        createPLPGSQLFunction(conn);
 
-            return conn;
-        }
+        return conn;
     }
 
     private void createPLPGSQLFunction(Connection conn) throws SQLException {
@@ -98,8 +88,7 @@ public class PostgreSQLExporter extends DBExporter {
      * Generates SQL necessary to create all tables in a MySQL database, and
      * writes it to appropriate output.
      *
-     * @param out
-     *            The output (PrintStream or Connection) object to which the DML
+     * @param out The output (PrintStream or Connection) object to which the DML
      *            should be written.
      */
     @Override
@@ -117,7 +106,7 @@ public class PostgreSQLExporter extends DBExporter {
                         + "entry_types_id    SERIAL, \n"
                         + "label TEXT, \n"
                         + SQLUtil.fieldsAsCols(SQLUtil.getAllFields(),
-                                " VARCHAR(3) DEFAULT NULL") + ", \n"
+                        " VARCHAR(3) DEFAULT NULL") + ", \n"
                         + "PRIMARY KEY (entry_types_id) \n" + ");')");
         SQLUtil.processQuery(
                 out,
@@ -130,7 +119,7 @@ public class PostgreSQLExporter extends DBExporter {
                         + "entry_types_id  INTEGER DEFAULT NULL, \n"
                         + "cite_key        VARCHAR(100)     DEFAULT NULL, \n"
                         + SQLUtil.fieldsAsCols(SQLUtil.getAllFields(),
-                                " TEXT DEFAULT NULL")
+                        " TEXT DEFAULT NULL")
                         + ",\n"
                         + "PRIMARY KEY (entries_id), \n"
                         + "FOREIGN KEY (entry_types_id) REFERENCES entry_types (entry_types_id), \n"

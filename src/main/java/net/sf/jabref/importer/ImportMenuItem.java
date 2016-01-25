@@ -34,10 +34,9 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
 
 /*
@@ -57,8 +56,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     }
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew, ImportFormat importer) {
-        super(importer != null ? importer.getFormatName()
-                : Localization.lang("Autodetect format"));
+        super(importer == null ? Localization.lang("Autodetect format") : importer.getFormatName());
         this.importer = importer;
         this.frame = frame;
         this.openInNew = openInNew;
@@ -90,9 +88,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     class MyWorker extends AbstractWorker {
 
-        String[] filenames;
-        ParserResult bibtexResult; // Contains the merged import results
-        boolean fileOk;
+        private String[] filenames;
+        private ParserResult bibtexResult; // Contains the merged import results
+        private boolean fileOk;
 
 
         @Override
@@ -100,7 +98,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             importError = null;
             filenames = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    importer != null ? importer.getExtensions() : null, true);
+                    importer == null ? null : importer.getExtensions(), true);
 
             if ((filenames != null) && (filenames.length > 0)) {
                 frame.block();
@@ -121,7 +119,12 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
             for (String filename : filenames) {
                 try {
-                    if (importer != null) {
+                    if (importer == null) {
+                        // Unknown format:
+                        frame.output(Localization.lang("Importing in unknown format") + "...");
+                        // This import method never throws an IOException:
+                        imports.add(Globals.importFormatReader.importUnknownFormat(filename));
+                    } else {
                         // Specific importer:
                         ParserResult pr = new ParserResult(
                                 Globals.importFormatReader.importFromFile(importer,
@@ -129,12 +132,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
                         imports.add(new ImportFormatReader.UnknownFormatImport(importer
                                 .getFormatName(), pr));
-                    } else {
-                        // Unknown format:
-                        frame.output(Localization.lang("Importing in unknown format") + "...");
-                        // This import method never throws an IOException:
-                        imports.add(Globals.importFormatReader
-                                .importUnknownFormat(filename));
                     }
                 } catch (IOException e) {
                     // This indicates that a specific importer was specified, and that
@@ -147,30 +144,15 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             // Ok, done. Then try to gather in all we have found. Since we might
             // have found
             // one or more bibtex results, it's best to gather them in a
-            // BibtexDatabase.
+            // BibDatabase.
             bibtexResult = mergeImportResults(imports);
 
             /* show parserwarnings, if any. */
             for (ImportFormatReader.UnknownFormatImport p : imports) {
                 if (p != null) {
                     ParserResult pr = p.parserResult;
-                    if (pr.hasWarnings()) {
-                        if (Globals.prefs
-                                .getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)
-                                && pr.hasWarnings()) {
-                            String[] wrns = pr.warnings();
-                            StringBuilder wrn = new StringBuilder();
-                            for (int j = 0; j < wrns.length; j++) {
-                                wrn.append(j + 1).append(". ").append(wrns[j])
-                                        .append("\n");
-                            }
-                            if (wrn.length() > 0) {
-                                wrn.deleteCharAt(wrn.length() - 1);
-                            }
-                            JOptionPane.showMessageDialog(frame, wrn.toString(),
-                                    Localization.lang("Warnings"),
-                                    JOptionPane.WARNING_MESSAGE);
-                        }
+                    if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
+                        ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
                     }
                 }
             }
@@ -182,8 +164,28 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 return;
             }
 
-            if (bibtexResult != null) {
-                if (!openInNew) {
+            if (bibtexResult == null) {
+                if (importer == null) {
+                    frame.output(Localization.lang("Could not find a suitable import format."));
+                } else {
+                    // Import in a specific format was specified. Check if we have stored error information:
+                    if (importError == null) {
+                        JOptionPane.showMessageDialog(frame,
+                                Localization
+                                        .lang("No entries found. Please make sure you are using the correct import filter."),
+                                Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(frame, importError.getMessage(),
+                                Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } else {
+                if (openInNew) {
+                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(),
+                            Globals.prefs.getDefaultEncoding(), true);
+                    frame.output(
+                            Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
+                } else {
                     final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
 
                     ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
@@ -192,24 +194,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     PositionWindow.placeDialog(diag, frame);
                     diag.setVisible(true);
                     diag.toFront();
-                } else {
-                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(),
-                            Globals.prefs.getDefaultEncoding(), true);
-                    frame.output(Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
-                }
-            } else {
-                if (importer == null) {
-                    frame.output(Localization.lang("Could not find a suitable import format."));
-                } else {
-                    // Import in a specific format was specified. Check if we have stored error information:
-                    if (importError != null) {
-                        JOptionPane.showMessageDialog(frame, importError.getMessage(), Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        // @formatter:off
-                        JOptionPane.showMessageDialog(frame, Localization.lang("No entries found. Please make sure you are using the correct import filter."),
-                                Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
-                        // @formatter:on
-                    }
                 }
             }
             frame.unblock();
@@ -218,7 +202,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
 
     private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
-        BibtexDatabase database = new BibtexDatabase();
+        BibDatabase database = new BibDatabase();
         ParserResult directParserResult = null;
         boolean anythingUseful = false;
 
@@ -239,7 +223,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
 
                 // Merge entries:
-                for (BibtexEntry entry : pr.getDatabase().getEntries()) {
+                for (BibEntry entry : pr.getDatabase().getEntries()) {
                     database.insertEntry(entry);
                 }
 
@@ -255,7 +239,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             } else {
 
                 ParserResult pr = importResult.parserResult;
-                Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
+                Collection<BibEntry> entries = pr.getDatabase().getEntries();
 
                 anythingUseful = anythingUseful | !entries.isEmpty();
 
@@ -264,7 +248,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP),
                         !openInNew && Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)); // set timestamp and owner
 
-                for (BibtexEntry entry : entries) {
+                for (BibEntry entry : entries) {
                     database.insertEntry(entry);
                 }
             }
@@ -278,7 +262,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            return new ParserResult(database, new MetaData(), new HashMap<String, EntryType>());
+            return new ParserResult(database, new MetaData(), new HashMap<>());
 
         }
     }

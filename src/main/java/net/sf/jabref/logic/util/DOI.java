@@ -21,6 +21,9 @@ public class DOI {
     // DOI resolver
     public static final URI RESOLVER = URI.create("http://doi.org");
 
+    // DOI
+    private final String doi;
+
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = ""
@@ -53,9 +56,6 @@ public class DOI {
             return Optional.empty();
         }
     }
-
-    // DOI
-    private final String doi;
 
     /**
      * Creates a DOI from various schemes including URL, URN, and plain DOIs.
@@ -106,14 +106,14 @@ public class DOI {
      *
      * @return an encoded URI representation of the DOI
      */
-    public URI getURI() {
+    public Optional<URI> getURI() {
         try {
             URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/" + doi, null);
-            return uri;
+            return Optional.of(uri);
         } catch(URISyntaxException e) {
             // should never happen
             LOGGER.error(doi + " could not be encoded as URI.", e);
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -123,6 +123,6 @@ public class DOI {
      * @return an encoded URL representation of the DOI
      */
     public String getURLAsASCIIString() {
-        return getURI().toASCIIString();
+        return getURI().map(URI::toASCIIString).orElse("");
     }
 }

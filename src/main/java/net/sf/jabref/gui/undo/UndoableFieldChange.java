@@ -17,32 +17,37 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This class represents a change in any field value. The relevant
- * information is the BibtexEntry, the field name, the old and the
+ * information is the BibEntry, the field name, the old and the
  * new value. Old/new values can be null.
  */
 public class UndoableFieldChange extends AbstractUndoableEdit {
     private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
     private final String field;
     private final String oldValue;
     private final String newValue;
 
 
-    public UndoableFieldChange(BibtexEntry entry, String field,
+    public UndoableFieldChange(BibEntry entry, String field,
             String oldValue, String newValue) {
         this.entry = entry;
         this.field = field;
         this.oldValue = oldValue;
         this.newValue = newValue;
+    }
+
+    public UndoableFieldChange(FieldChange change) {
+        this(change.getEntry(), change.getField(), change.getOldValue(), change.getNewValue());
     }
 
     @Override
@@ -52,18 +57,14 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        // @formatter:off
         return Localization.lang("Undo") + ": " +
                 Localization.lang("change field");
-        // @formatter:on
     }
 
     @Override
     public String getRedoPresentationName() {
-        // @formatter:off
         return Localization.lang("Redo") + ": " +
                 Localization.lang("change field");
-        // @formatter:on
     }
 
     @Override

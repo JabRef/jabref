@@ -25,13 +25,18 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.bibtex.DuplicateCheck;
+import net.sf.jabref.model.DuplicateCheck;
 
 public class DBLPFetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(DBLPFetcher.class);
 
     private static final String URL_START = "http://www.dblp.org/search/api/";
     private static final String URL_PART1 = "?q=";
@@ -103,8 +108,8 @@ public class DBLPFetcher implements EntryFetcher {
 
                 for (final String line : htmlLines) {
                     if (line.contains("biburl")) {
-                        int sidx = line.indexOf("{");
-                        int eidx = line.indexOf("}");
+                        int sidx = line.indexOf('{');
+                        int eidx = line.indexOf('}');
                         // now we take everything within the curley braces
                         String bibtexUrl = line.substring(sidx + 1, eidx);
 
@@ -115,9 +120,9 @@ public class DBLPFetcher implements EntryFetcher {
                         //System.out.println("URL:|"+bibtexUrl+"|");
                         final String bibtexPage = Util.getResults(bibFileURL);
 
-                        Collection<BibtexEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
+                        Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
 
-                        for (BibtexEntry be : bibtexEntries) {
+                        for (BibEntry be : bibtexEntries) {
 
                             if (!bibentryKnown.containsKey(be.getCiteKey())) {
 
@@ -139,7 +144,7 @@ public class DBLPFetcher implements EntryFetcher {
             res = true;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Communcation problems", e);
             status.showMessage(e.getMessage());
         }
 
@@ -149,8 +154,7 @@ public class DBLPFetcher implements EntryFetcher {
     private String makeSearchURL() {
         StringBuilder sb = new StringBuilder(DBLPFetcher.URL_START).append(DBLPFetcher.URL_PART1);
         String cleanedQuery = helper.cleanDBLPQuery(query);
-        sb.append(cleanedQuery);
-        sb.append(DBLPFetcher.URL_END);
+        sb.append(cleanedQuery).append(DBLPFetcher.URL_END);
         return sb.toString();
     }
 

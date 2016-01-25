@@ -20,17 +20,17 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexString;
 
 public class UndoableInsertString extends AbstractUndoableEdit {
 
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private final BasePanel panel;
     private final BibtexString string;
 
 
-    public UndoableInsertString(BasePanel panel, BibtexDatabase base,
+    public UndoableInsertString(BasePanel panel, BibDatabase base,
             BibtexString string) {
         this.base = base;
         this.panel = panel;
@@ -39,18 +39,14 @@ public class UndoableInsertString extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        // @formatter:off
         return Localization.lang("Undo") + ": " +
-                Localization.lang("insert string ");
-        // @formatter:on
+                Localization.lang("insert string");
     }
 
     @Override
     public String getRedoPresentationName() {
-        // @formatter:off
         return Localization.lang("Redo") + ": " +
-                Localization.lang("insert string ");
-        // @formatter:on
+                Localization.lang("insert string");
     }
 
     @Override

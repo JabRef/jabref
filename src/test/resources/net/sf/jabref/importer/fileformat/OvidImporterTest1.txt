@@ -1,0 +1,65 @@
+<1337>
+Author
+  Mustermann  Musterfrau  
+  
+Author e-mail  
+  mustermann@mail.de
+  
+Title
+  Musterbuch
+  
+Chapter Title
+  Einleitung
+  
+Abstract  
+  Short abstract
+  
+Publication Type
+  -
+Source
+  Source Very Long Title.   28:103-106, April 2015.
+  
+<1336>  
+Author
+  Max [Ed]
+  
+Title
+  Max the Editor 
+  
+Publication Type
+  Conference Paper
+
+Source
+  Source Very Long Title.   28(2):103-106, April 2015.
+  
+<1335>
+Author
+  Max
+  
+Publication Type
+  Book
+  
+Chapter Title
+  Test
+  
+Source 
+  Very Long Title. Vol 28(2) April 2015, 103-106.
+  
+  
+<1334>
+Author
+  Max
+  
+Publication Type
+  Book
+  
+Source 
+  Editor(2015). Very Long Title. (pp. 103-106) X pp. Address: Publisher
+  
+<1333>  
+Publication Type
+  Journal
+  
+Source 
+  (2014). Titel 58 pp. Test: TestPublisher.  
+  

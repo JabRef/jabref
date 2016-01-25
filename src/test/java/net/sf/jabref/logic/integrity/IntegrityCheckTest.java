@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.integrity;
 
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -12,6 +12,16 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.*;
 
 public class IntegrityCheckTest {
+
+    @Test
+    public void testUrlChecks() {
+        assertCorrect("http://www.google.com", IntegrityCheck.URL_CHECKER);
+        assertCorrect("https://www.google.com", IntegrityCheck.URL_CHECKER);
+        assertCorrect("file://c:/asdf/asdf", IntegrityCheck.URL_CHECKER);
+        assertWrong("www.google.com", IntegrityCheck.URL_CHECKER);
+        assertWrong("google.com", IntegrityCheck.URL_CHECKER);
+        assertWrong("c:/asdf/asdf", IntegrityCheck.URL_CHECKER);
+    }
 
     @Test
     public void testYearChecks() {
@@ -78,16 +88,16 @@ public class IntegrityCheckTest {
 
     private void assertWrong(String value, IntegrityCheck.Checker yearChecker) {
         List<IntegrityMessage> messages = new LinkedList<>();
-        BibtexEntry entry = new BibtexEntry(IdGenerator.next());
-        entry.setField(BibtexEntry.KEY_FIELD, "key");
+        BibEntry entry = new BibEntry(IdGenerator.next());
+        entry.setField(BibEntry.KEY_FIELD, "key");
         yearChecker.check(value, "field", entry, messages);
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
     private void assertCorrect(String value, IntegrityCheck.Checker yearChecker) {
         List<IntegrityMessage> messages = new LinkedList<>();
-        BibtexEntry entry = new BibtexEntry(IdGenerator.next());
-        entry.setField(BibtexEntry.KEY_FIELD, "key");
+        BibEntry entry = new BibEntry(IdGenerator.next());
+        entry.setField(BibEntry.KEY_FIELD, "key");
         yearChecker.check(value, "field", entry, messages);
         assertEquals(Collections.emptyList(), messages);
     }

@@ -25,7 +25,7 @@ import javax.swing.border.TitledBorder;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
@@ -74,7 +74,7 @@ public class GenFieldsCustomizer extends JDialog {
     }
 
     private void jbInit() {
-        ok.setText(Localization.lang("Ok"));
+        ok.setText(Localization.lang("OK"));
         ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
         cancel.setText(Localization.lang("Cancel"));
         cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));
@@ -85,7 +85,7 @@ public class GenFieldsCustomizer extends JDialog {
         jPanel4.setLayout(gridBagLayout1);
         jLabel2.setText(Localization.lang("General fields"));
 
-        //    fieldsArea.setText(parent.prefs.get("generalFields"));
+        //    fieldsArea.setText(parent.prefs.get(JabRefPreferences.GENERAL_FIELDS));
         setFieldsText();
 
         //jPanel3.setBackground(GUIGlobals.lightGray);
@@ -116,7 +116,7 @@ public class GenFieldsCustomizer extends JDialog {
         // Key bindings:
         ActionMap am = buttons.getActionMap();
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             @Override
@@ -160,7 +160,7 @@ public class GenFieldsCustomizer extends JDialog {
         /*
         String delimStr = fieldsArea.getText().replaceAll("\\s+","")
           .replaceAll("\\n+","").trim();
-        parent.prefs.putStringArray("generalFields", Util.split(delimStr, ";"));
+        parent.prefs.putStringArray(JabRefPreferences.GENERAL_FIELDS, Util.split(delimStr, ";"));
         */
 
         parent.removeCachedEntryEditors();

@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.regex.Pattern;
@@ -82,12 +82,12 @@ public class SilverPlatterImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
             boolean isChapter = false;
             String str;
@@ -100,7 +100,7 @@ public class SilverPlatterImporter extends ImportFormat {
                 }
             }
             String[] entries = sb.toString().split("__::__");
-            String Type = "";
+            String type = "";
             HashMap<String, String> h = new HashMap<>();
             for (String entry : entries) {
                 if (entry.trim().length() < 6) {
@@ -134,17 +134,17 @@ public class SilverPlatterImporter extends ImportFormat {
                         String kw = frest.replaceAll("-;", ",").toLowerCase();
                         h.put("keywords", kw.substring(0, kw.length() - 1));
                     } else if ("SO".equals(f3)) {
-                        int m = frest.indexOf(".");
+                        int m = frest.indexOf('.');
                         if (m >= 0) {
                             String jr = frest.substring(0, m);
                             h.put("journal", jr.replaceAll("-", " "));
                             frest = frest.substring(m);
-                            m = frest.indexOf(";");
+                            m = frest.indexOf(';');
                             if (m >= 5) {
                                 String yr = frest.substring(m - 5, m).trim();
                                 h.put("year", yr);
                                 frest = frest.substring(m);
-                                m = frest.indexOf(":");
+                                m = frest.indexOf(':');
                                 if (m >= 0) {
                                     String pg = frest.substring(m + 1).trim();
                                     h.put("pages", pg);
@@ -153,7 +153,7 @@ public class SilverPlatterImporter extends ImportFormat {
                             }
                         }
                     } else if ("PB".equals(f3)) {
-                        int m = frest.indexOf(":");
+                        int m = frest.indexOf(':');
                         if (m >= 0) {
                             String jr = frest.substring(0, m);
                             h.put("publisher", jr.replaceAll("-", " ").trim());
@@ -178,18 +178,18 @@ public class SilverPlatterImporter extends ImportFormat {
                     } else if ("DT".equals(f3)) {
                         frest = frest.trim();
                         if ("Monograph".equals(frest)) {
-                            Type = "book";
+                            type = "book";
                         } else if (frest.startsWith("Dissertation")) {
-                            Type = "phdthesis";
+                            type = "phdthesis";
                         } else if (frest.toLowerCase().contains("journal")) {
-                            Type = "article";
+                            type = "article";
                         } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
-                            Type = "incollection";
+                            type = "incollection";
                             // This entry type contains page numbers and booktitle in the
                             // title field.
                             isChapter = true;
                         } else {
-                            Type = frest.replaceAll(" ", "");
+                            type = frest.replaceAll(" ", "");
                         }
                     }
                 }
@@ -199,7 +199,7 @@ public class SilverPlatterImporter extends ImportFormat {
                     if (titleO != null) {
                         String title = ((String) titleO).trim();
                         int inPos = title.indexOf("\" in ");
-                        int pgPos = title.lastIndexOf(" ");
+                        int pgPos = title.lastIndexOf(' ');
                         if (inPos > 1) {
                             h.put("title", title.substring(1, inPos));
                         }
@@ -212,8 +212,8 @@ public class SilverPlatterImporter extends ImportFormat {
 
                 }
 
-                BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                        .getBibtexEntryType(Type)); // id assumes an existing database so don't
+                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                        .getTypeOrDefault(type)); // id assumes an existing database so don't
                 // create one here
                 b.setField(h);
 

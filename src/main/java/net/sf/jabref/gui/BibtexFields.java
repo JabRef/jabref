@@ -32,15 +32,15 @@ package net.sf.jabref.gui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -65,13 +65,13 @@ public class BibtexFields {
     public static final String EXTRA_MONTH = "month"; // Button to show the months and set abbreviation
 
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
-            {"author", "title", "year", BibtexEntry.KEY_FIELD};
+            {"author", "title", "year", BibEntry.KEY_FIELD};
 
     // singleton instance
-    private static final BibtexFields runtime = new BibtexFields();
+    private static final BibtexFields RUNTIME = new BibtexFields();
 
     // contains all bibtex-field objects (BibtexSingleField)
-    private final HashMap<String, BibtexSingleField> fieldSet;
+    private final Map<String, BibtexSingleField> fieldSet;
 
     // contains all known (and public) bibtex fieldnames
     private final String[] PUBLIC_FIELDS;
@@ -167,7 +167,7 @@ public class BibtexFields {
         add(dummy);
 
         // some semi-standard fields
-        dummy = new BibtexSingleField(BibtexEntry.KEY_FIELD, true);
+        dummy = new BibtexSingleField(BibEntry.KEY_FIELD, true);
         dummy.setPrivate();
         add(dummy);
 
@@ -258,7 +258,7 @@ public class BibtexFields {
         }
 
         // collect all public fields for the PUBLIC_FIELDS array
-        Vector<String> pFields = new Vector<>(fieldSet.size());
+        List<String> pFields = new ArrayList<>(fieldSet.size());
         for (BibtexSingleField sField : fieldSet.values()) {
             if (!sField.isPrivate()) {
                 pFields.add(sField.getFieldName());
@@ -269,7 +269,7 @@ public class BibtexFields {
 
         PUBLIC_FIELDS = pFields.toArray(new String[pFields.size()]);
         // sort the entries
-        java.util.Arrays.sort(PUBLIC_FIELDS);
+        Arrays.sort(PUBLIC_FIELDS);
 
     }
 
@@ -279,16 +279,16 @@ public class BibtexFields {
      * add a field descriptor for the new field.
      */
     public static void setNumericFieldsFromPrefs() {
-        String[] numFields = Globals.prefs.getStringArray(JabRefPreferences.NUMERIC_FIELDS);
-        if (numFields == null) {
+        List<String> numFields = Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS);
+        if (numFields.isEmpty()) {
             return;
         }
         // Build a Set of field names for the fields that should be sorted numerically:
-        HashSet<String> nF = new HashSet<>();
-        Collections.addAll(nF, numFields);
+        Set<String> nF = new HashSet<>();
+        nF.addAll(numFields);
         // Look through all registered fields, and activate numeric sorting if necessary:
-        for (String fieldName : BibtexFields.runtime.fieldSet.keySet()) {
-            BibtexSingleField field = BibtexFields.runtime.fieldSet.get(fieldName);
+        for (String fieldName : BibtexFields.RUNTIME.fieldSet.keySet()) {
+            BibtexSingleField field = BibtexFields.RUNTIME.fieldSet.get(fieldName);
             if (!field.isNumeric() && nF.contains(fieldName)) {
                 field.setNumeric(nF.contains(fieldName));
             }
@@ -298,7 +298,7 @@ public class BibtexFields {
         for (String fieldName : nF) {
             BibtexSingleField field = new BibtexSingleField(fieldName, false);
             field.setNumeric(true);
-            BibtexFields.runtime.fieldSet.put(fieldName, field);
+            BibtexFields.RUNTIME.fieldSet.put(fieldName, field);
         }
 
     }
@@ -317,7 +317,7 @@ public class BibtexFields {
     // --------------------------------------------------------------------------
     private static BibtexSingleField getField(String name) {
         if (name != null) {
-            return BibtexFields.runtime.fieldSet.get(name.toLowerCase());
+            return BibtexFields.RUNTIME.fieldSet.get(name.toLowerCase());
         }
 
         return null;
@@ -362,15 +362,6 @@ public class BibtexFields {
         return GUIGlobals.DEFAULT_FIELD_LENGTH;
     }
 
-    // returns an alternative name for the given fieldname
-    public static String getFieldDisplayName(String fieldName) {
-        BibtexSingleField sField = BibtexFields.getField(fieldName);
-        if (sField != null) {
-            return sField.getAlternativeDisplayName();
-        }
-        return null;
-    }
-
     public static boolean isWriteableField(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
         return (sField == null) || sField.isWriteable();
@@ -401,7 +392,7 @@ public class BibtexFields {
      * returns a List with all fieldnames
      */
     public static List<String> getAllFieldNames() {
-        return Arrays.asList(BibtexFields.runtime.PUBLIC_FIELDS);
+        return Arrays.asList(BibtexFields.RUNTIME.PUBLIC_FIELDS);
     }
 
     /**
@@ -409,7 +400,7 @@ public class BibtexFields {
      */
     public static List<String> getAllPrivateFieldNames() {
         List<String> pFields = new ArrayList<>();
-        for (BibtexSingleField sField : BibtexFields.runtime.fieldSet.values()) {
+        for (BibtexSingleField sField : BibtexFields.RUNTIME.fieldSet.values()) {
             if (sField.isPrivate()) {
                 pFields.add(sField.getFieldName());
             }
@@ -422,14 +413,14 @@ public class BibtexFields {
      * returns the fieldname of the entry at index t
      */
     public static String getFieldName(int t) {
-        return BibtexFields.runtime.PUBLIC_FIELDS[t];
+        return BibtexFields.RUNTIME.PUBLIC_FIELDS[t];
     }
 
     /**
      * returns the number of available fields
      */
     public static int numberOfPublicFields() {
-        return BibtexFields.runtime.PUBLIC_FIELDS.length;
+        return BibtexFields.RUNTIME.PUBLIC_FIELDS.length;
     }
 
 
@@ -447,8 +438,7 @@ public class BibtexFields {
     // --------------------------------------------------------------------------
     private static class BibtexSingleField {
 
-        private static final int
-        STANDARD = 0x01; // it is a standard bibtex-field
+        private static final int STANDARD = 0x01; // it is a standard bibtex-field
         private static final int PRIVATE = 0x02; // internal use, e.g. owner, timestamp
         private static final int DISPLAYABLE = 0x04; // These fields cannot be shown inside the source editor panel
         private static final int WRITEABLE = 0x08; // These fields will not be saved to the .bib file.
@@ -465,9 +455,6 @@ public class BibtexFields {
 
         private int editorType = GUIGlobals.STANDARD_EDITOR;
 
-        // a alternative displayname, e.g. used for
-        // "citeseercitationcount"="Popularity"
-        private String alternativeDisplayName;
 
         // the extras data
         // fieldExtras contains mappings to tell the EntryEditor to add a specific
@@ -488,9 +475,6 @@ public class BibtexFields {
         // private HashMap props = new HashMap() ;
 
         // some constructors ;-)
-        public BibtexSingleField(String fieldName) {
-            name = fieldName;
-        }
 
         public BibtexSingleField(String fieldName, boolean pStandard) {
             name = fieldName;
@@ -520,19 +504,23 @@ public class BibtexFields {
         // -----------------------------------------------------------------------
         // -----------------------------------------------------------------------
 
-        private void setFlag(boolean onOff, int flagID) {
-            if (onOff) // set the flag
-            {
+        /**
+         * Sets or onsets the given flag
+         * @param setToOn if true, set the flag; if false, unset the flat
+         * @param flagID, the id of the flag
+         */
+        private void setFlag(boolean setToOn, int flagID) {
+            if (setToOn) {
+                // set the flag
                 flag = flag | flagID;
-            } else // unset the flag,
-            {
+            } else {
+                // unset the flag
                 flag = flag & (0xff ^ flagID);
             }
         }
 
         private boolean isSet(int flagID) {
             return (flag & flagID) == flagID;
-
         }
 
         // -----------------------------------------------------------------------
@@ -562,15 +550,6 @@ public class BibtexFields {
 
         public boolean isWriteable() {
             return isSet(BibtexSingleField.WRITEABLE);
-        }
-
-        // -----------------------------------------------------------------------
-        public void setAlternativeDisplayName(String aName) {
-            alternativeDisplayName = aName;
-        }
-
-        public String getAlternativeDisplayName() {
-            return alternativeDisplayName;
         }
 
         // -----------------------------------------------------------------------

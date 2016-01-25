@@ -1,0 +1,7 @@
+PMCR- 20481061
+TI  - This is a Testtitle
+TI  - This title should be appended:
+TI  - This title should also be appended.
+TI  - Another append to the Title?
+TI  - LastTitle
+PT  - Book

@@ -2,6 +2,8 @@ package net.sf.jabref.logic.util.io;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,17 +13,17 @@ import net.sf.jabref.JabRefPreferences;
 public class FileHistoryTest {
 
     JabRefPreferences prefs;
-    String[] oldFileNames;
+    List<String> oldFileNames;
 
     @Before
     public void setUp() throws Exception {
         prefs = JabRefPreferences.getInstance();
-        oldFileNames = prefs.getStringArray(JabRefPreferences.RECENT_FILES);
+        oldFileNames = prefs.getStringList(JabRefPreferences.RECENT_FILES);
     }
 
     @After
     public void restore() {
-        prefs.putStringArray(JabRefPreferences.RECENT_FILES, oldFileNames);
+        prefs.putStringList(JabRefPreferences.RECENT_FILES, oldFileNames);
     }
     @Test
     public void testConstructor() {
@@ -66,7 +68,8 @@ public class FileHistoryTest {
         fh.removeItem("cc");
         fh.removeItem("aa");
         fh.storeHistory();
-        assertArrayEquals(new String[] {"ii", "hh", "gg"}, prefs.getStringArray(JabRefPreferences.RECENT_FILES));
+        assertArrayEquals(new String[] {"ii", "hh", "gg"},
+                prefs.getStringList(JabRefPreferences.RECENT_FILES).toArray(new String[0]));
     }
 
 }

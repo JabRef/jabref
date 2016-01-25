@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.importer;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -23,14 +23,14 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * SAX-Handler to parse OAI2-xml files.
- * 
+ *
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
  * @author Christopher Oezbek
  */
 public class OAI2Handler extends DefaultHandler {
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
 
     private StringBuffer authors;
 
@@ -41,7 +41,7 @@ public class OAI2Handler extends DefaultHandler {
     private StringBuffer characters;
 
 
-    public OAI2Handler(BibtexEntry be) {
+    public OAI2Handler(BibEntry be) {
         this.entry = be;
     }
 
@@ -91,7 +91,7 @@ public class OAI2Handler extends DefaultHandler {
             entry.setField("pages", pages);
         } else if ("datestamp".equals(qualifiedName)) {
             String year = entry.getField("year");
-            if (year == null || "".equals(year)) {
+            if ((year == null) || year.isEmpty()) {
                 entry.setField("year", content.replaceFirst("-.*", ""));
             }
         } else if ("title".equals(qualifiedName)) {

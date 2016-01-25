@@ -16,8 +16,6 @@
 package net.sf.jabref;
 
 import java.awt.Color;
-import java.awt.Toolkit;
-import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -40,9 +38,10 @@ import javax.swing.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.CleanUpAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
@@ -54,20 +53,18 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.exporter.CustomExportList;
 import net.sf.jabref.exporter.ExportComparator;
 import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.importer.CustomImportList;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.logic.util.strings.StringUtil;
 
-public class JabRefPreferences {
+public final class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
+    public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
 
     /**
      * HashMap that contains all preferences which are set by default
      */
-    public final HashMap<String, Object> defaults = new HashMap<>();
+    public final Map<String, Object> defaults = new HashMap<>();
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
@@ -153,6 +150,7 @@ public class JabRefPreferences {
     public static final String MERGEENTRIES_POS_X = "mergeEntriesPosX";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
+    public static final String LAST_FOCUSED = "lastFocused";
     public static final String BACKUP = "backup";
     public static final String ENTRY_TYPE_FORM_WIDTH = "entryTypeFormWidth";
     public static final String ENTRY_TYPE_FORM_HEIGHT_FACTOR = "entryTypeFormHeightFactor";
@@ -162,12 +160,6 @@ public class JabRefPreferences {
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String WORKING_DIRECTORY = "workingDirectory";
     public static final String NUMBER_COL_WIDTH = "numberColWidth";
-    public static final String SHORTEST_TO_COMPLETE = "shortestToComplete";
-    public static final String AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode";
-    public static final String AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both"; // here are the possible values for _MODE:
-    public static final String AUTO_COMP_LAST_FIRST = "autoCompLF";
-    public static final String AUTO_COMP_FIRST_LAST = "autoCompFF";
-    public static final String AUTO_COMPLETE_FIELDS = "autoCompleteFields";
     public static final String AUTO_COMPLETE = "autoComplete";
     public static final String SEARCH_PANE_POS_Y = "searchPanePosY";
     public static final String SEARCH_PANE_POS_X = "searchPanePosX";
@@ -196,7 +188,6 @@ public class JabRefPreferences {
     public static final String FILE_COLUMN = "fileColumn";
     public static final String PREFER_URL_DOI = "preferUrlDoi";
     public static final String URL_COLUMN = "urlColumn";
-    public static final String PDF_COLUMN = "pdfColumn";
     public static final String DISABLE_ON_MULTIPLE_SELECTION = "disableOnMultipleSelection";
     public static final String CTRL_CLICK = "ctrlClick";
     public static final String INCOMPLETE_ENTRY_BACKGROUND = "incompleteEntryBackground";
@@ -235,7 +226,6 @@ public class JabRefPreferences {
     public static final String TOOLBAR_VISIBLE = "toolbarVisible";
     public static final String HIGHLIGHT_GROUPS_MATCHING_ALL = "highlightGroupsMatchingAll";
     public static final String HIGHLIGHT_GROUPS_MATCHING_ANY = "highlightGroupsMatchingAny";
-    public static final String SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS = "showOneLetterHeadingForIconColumns";
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
     public static final String TIME_STAMP_FIELD = "timeStampField";
     public static final String TIME_STAMP_FORMAT = "timeStampFormat";
@@ -256,6 +246,17 @@ public class JabRefPreferences {
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
 
+    public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
+    public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
+    public static final String PSVIEWER = "psviewer";
+    public static final String PDFVIEWER = "pdfviewer";
+    public static final String BINDINGS = "bindings";
+    public static final String BIND_NAMES = "bindNames";
+    public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
+    public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
+    public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
+    public static final String SAVED_SESSION = "savedSession";
+
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.LabelPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getLabelPattern(); etc
     public static final String DEFAULT_LABEL_PATTERN = "defaultLabelPattern";
@@ -271,11 +272,6 @@ public class JabRefPreferences {
     public static final String ALLOW_TABLE_EDITING = "allowTableEditing";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
     public static final String USE_OWNER = "useOwner";
-    public static final String WRITEFIELD_ADDSPACES = "writeFieldAddSpaces";
-    public static final String WRITEFIELD_CAMELCASENAME = "writeFieldCamelCase";
-    public static final String WRITEFIELD_SORTSTYLE = "writefieldSortStyle";
-    public static final String WRITEFIELD_USERDEFINEDORDER = "writefieldUserdefinedOrder";
-    public static final String WRITEFIELD_WRAPFIELD = "wrapFieldLine";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
@@ -284,6 +280,7 @@ public class JabRefPreferences {
     public static final String IMPORT_INSPECTION_DIALOG_WIDTH = "importInspectionDialogWidth";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
+    public static final String LAST_USED_IMPORT = "lastUsedImport";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
@@ -293,7 +290,6 @@ public class JabRefPreferences {
     public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
-    public static final String INCLUDE_EMPTY_FIELDS = "includeEmptyFields";
     public static final String VALUE_DELIMITERS2 = "valueDelimiters";
     public static final String BIBLATEX_MODE = "biblatexMode";
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
@@ -327,37 +323,44 @@ public class JabRefPreferences {
 
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
 
+    // OpenOffice/LibreOffice preferences
+    public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
+    public static final String OO_PATH = "ooPath";
+    public static final String OO_JARS_PATH = "ooJarsPath";
+    public static final String SHOW_OO_PANEL = "showOOPanel";
+    public static final String SYNC_OO_WHEN_CITING = "syncOOWhenCiting";
+    public static final String USE_ALL_OPEN_BASES = "useAllOpenBases";
+    public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
+    public static final String OO_USE_DEFAULT_AUTHORYEAR_STYLE = "ooUseDefaultAuthoryearStyle";
+    public static final String OO_USE_DEFAULT_NUMERICAL_STYLE = "ooUseDefaultNumericalStyle";
+    public static final String OO_CHOOSE_STYLE_DIRECTLY = "ooChooseStyleDirectly";
+    public static final String OO_DIRECT_FILE = "ooDirectFile";
+    public static final String OO_STYLE_DIRECTORY = "ooStyleDirectory";
+
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
     private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
     public static final String PDF_PREVIEW = "pdfPreview";
-    public static final String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly";
-    public static final String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly";
 
-    // This String is used in the encoded list in prefs of external file type
-    // modifications, in order to indicate a removed default file type:
-    private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
     private static final char[][] VALUE_DELIMITERS = new char[][] { {'"', '"'}, {'{', '}'}};
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
 
-    private int SHORTCUT_MASK = -1;
-
     private final Preferences prefs;
 
-    private KeyBinds keyBinds = new KeyBinds();
-    private KeyBinds defaultKeyBinds = new KeyBinds();
-
-    private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<>(4);
-    private final HashSet<String> nonWrappableFields = new HashSet<>(5);
+    private final Set<String> putBracesAroundCapitalsFields = new HashSet<>(4);
+    private final Set<String> nonWrappableFields = new HashSet<>(5);
     private GlobalLabelPattern keyPattern;
 
     // Object containing custom export formats:
     public final CustomExportList customExports;
+
+    // Helper string
+    private static final String USER_HOME = System.getProperty("user.home");
 
     /**
      * Set with all custom {@link ImportFormat}s
@@ -366,10 +369,6 @@ public class JabRefPreferences {
 
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList;
-    // Map containing all registered external file types:
-    private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<>();
-
-    private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www", IconTheme.JabRefIcon.WWW.getSmallIcon());
 
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
@@ -386,7 +385,7 @@ public class JabRefPreferences {
     // The following field is used as a global variable during the export of a database.
     // It is used to hold custom name formatters defined by a custom export filter.
     // It is set before the export starts:
-    public HashMap<String, String> customExportNameFormatters;
+    public Map<String, String> customExportNameFormatters;
 
     // The only instance of this class:
     private static JabRefPreferences singleton;
@@ -399,13 +398,8 @@ public class JabRefPreferences {
         return JabRefPreferences.singleton;
     }
 
-
-
-
-
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
-
         try {
             if (new File("jabref.xml").exists()) {
                 importPreferences("jabref.xml");
@@ -423,8 +417,8 @@ public class JabRefPreferences {
         defaults.put(TEXSTUDIO_PATH, OS.guessProgramPath("texstudio", "TeXstudio"));
 
         if (OS.OS_X) {
-            //defaults.put("pdfviewer", "/Applications/Preview.app");
-            //defaults.put("psviewer", "/Applications/Preview.app");
+            //defaults.put(JabRefPreferences.PDFVIEWER, "/Applications/Preview.app");
+            //defaults.put(JabRefPreferences.PSVIEWER, "/Applications/Preview.app");
             //defaults.put("htmlviewer", "/Applications/Safari.app");
             defaults.put(EMACS_PATH, "emacsclient");
             defaults.put(EMACS_23, true);
@@ -433,8 +427,8 @@ public class JabRefPreferences {
             defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
 
         } else if (OS.WINDOWS) {
-            //defaults.put("pdfviewer", "cmd.exe /c start /b");
-            //defaults.put("psviewer", "cmd.exe /c start /b");
+            //defaults.put(JabRefPreferences.PDFVIEWER, "cmd.exe /c start /b");
+            //defaults.put(JabRefPreferences.PSVIEWER, "cmd.exe /c start /b");
             //defaults.put("htmlviewer", "cmd.exe /c start /b");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
@@ -443,8 +437,8 @@ public class JabRefPreferences {
             defaults.put(FONT_FAMILY, "Arial");
 
         } else {
-            //defaults.put("pdfviewer", "evince");
-            //defaults.put("psviewer", "gv");
+            //defaults.put(JabRefPreferences.PDFVIEWER, "evince");
+            //defaults.put(JabRefPreferences.PSVIEWER, "gv");
             //defaults.put("htmlviewer", "firefox");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -464,7 +458,7 @@ public class JabRefPreferences {
         defaults.put(PROXY_PASSWORD, "");
         defaults.put(PDF_PREVIEW, Boolean.FALSE);
         defaults.put(USE_DEFAULT_LOOK_AND_FEEL, Boolean.TRUE);
-        defaults.put(LYXPIPE, System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
+        defaults.put(LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(VIM, "vim");
         defaults.put(VIM_SERVER, "vim");
         defaults.put(POS_X, 0);
@@ -521,23 +515,24 @@ public class JabRefPreferences {
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(COLUMN_NAMES, "entrytype;author;title;year;journal;bibtexkey");
+        defaults.put(COLUMN_NAMES, "entrytype;author/editor;title;year;journal/booktitle;bibtexkey");
         defaults.put(COLUMN_WIDTHS, "75;300;470;60;130;100");
         defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
                 PersistenceTableColumnListener.DEFAULT_ENABLED);
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put(NUMBER_COL_WIDTH, GUIGlobals.NUMBER_COL_LENGTH);
-        defaults.put(WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(EXPORT_WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(IMPORT_WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(FILE_WORKING_DIRECTORY, System.getProperty("user.home"));
+        defaults.put(WORKING_DIRECTORY, USER_HOME);
+        defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
+        defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
+        defaults.put(FILE_WORKING_DIRECTORY, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
         defaults.put(ENTRY_TYPE_FORM_HEIGHT_FACTOR, 1);
         defaults.put(ENTRY_TYPE_FORM_WIDTH, 1);
         defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, null);
+        defaults.put(LAST_FOCUSED, null);
         defaults.put(STRINGS_POS_X, 0);
         defaults.put(STRINGS_POS_Y, 0);
         defaults.put(STRINGS_SIZE_X, 600);
@@ -562,11 +557,7 @@ public class JabRefPreferences {
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
         defaults.put(AUTO_COMPLETE, Boolean.TRUE);
-        defaults.put(AUTO_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref");
-        defaults.put(AUTO_COMP_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
-        defaults.put(AUTO_COMP_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(SHORTEST_TO_COMPLETE, 1);
-        defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+        AutoCompletePreferences.putDefaults(defaults);
         defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
@@ -626,7 +617,6 @@ public class JabRefPreferences {
 
         defaults.put(CTRL_CLICK, Boolean.FALSE);
         defaults.put(DISABLE_ON_MULTIPLE_SELECTION, Boolean.FALSE);
-        defaults.put(PDF_COLUMN, Boolean.FALSE);
         defaults.put(URL_COLUMN, Boolean.TRUE);
         defaults.put(PREFER_URL_DOI, Boolean.FALSE);
         defaults.put(FILE_COLUMN, Boolean.TRUE);
@@ -644,8 +634,6 @@ public class JabRefPreferences {
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ, SpecialFieldsUtils.PREF_SHOWCOLUMN_READ_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
-
-        defaults.put(SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, Boolean.FALSE);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -720,16 +708,6 @@ public class JabRefPreferences {
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
-        // behavior of JabRef before 2.10: both: false
-        defaults.put(WRITEFIELD_ADDSPACES, Boolean.TRUE);
-        defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
-
-        //behavior of JabRef before LWang_AdjustableFieldOrder 1
-        //0 sorted order (2.10 default), 1 unsorted order (2.9.2 default), 2 user defined
-        defaults.put(WRITEFIELD_SORTSTYLE, 0);
-        defaults.put(WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
-        defaults.put(WRITEFIELD_WRAPFIELD, Boolean.FALSE);
-
         defaults.put(RemotePreferences.USE_REMOTE_SERVER, Boolean.TRUE);
         defaults.put(RemotePreferences.REMOTE_SERVER_PORT, 6050);
 
@@ -758,10 +736,10 @@ public class JabRefPreferences {
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
         defaults.put(VALUE_DELIMITERS2, 1);
-        defaults.put(INCLUDE_EMPTY_FIELDS, Boolean.FALSE);
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
-        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
+        // TODO l10n issue
+        defaults.put(EMAIL_SUBJECT, "References");
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
@@ -792,8 +770,6 @@ public class JabRefPreferences {
         // use BibTeX key appended with filename as default pattern
         defaults.put(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
 
-        restoreKeyBindings();
-
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
 
@@ -811,14 +787,14 @@ public class JabRefPreferences {
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
-        defaults.put(USER_FILE_DIR, Globals.FILE_FIELD + "Directory");
+        defaults.put(USER_FILE_DIR, Globals.FILE_FIELD + Globals.DIR_SUFFIX);
         try {
-            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
+            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
+            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
         } catch (UnknownHostException ex) {
             LOGGER.info("Hostname not found.", ex);
-            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
+            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
+            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
         }
     }
 
@@ -836,6 +812,7 @@ public class JabRefPreferences {
         defaults.put(CUSTOM_TAB_FIELDS + "_def2", "review");
         defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Review"));
 
+        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
     }
 
     public boolean putBracesAroundCapitals(String fieldName) {
@@ -949,52 +926,48 @@ public class JabRefPreferences {
     }
 
     /**
-     * Puts a string array into the Preferences, by linking its elements with ';' into a single string. Escape
+     * Puts a list of strings into the Preferences, by linking its elements with ';' into a single string. Escape
      * characters make the process transparent even if strings contain ';'.
      */
-    public void putStringArray(String key, String[] value) {
-        if (value == null) {
+    public void putStringList(String key, List<String> value) {
+        if ((value == null)) {
             remove(key);
             return;
         }
 
-        if (value.length > 0) {
+        if (value.isEmpty()) {
+            put(key, "");
+        } else {
             StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < (value.length - 1); i++) {
-                linked.append(makeEscape(value[i]));
+            for (int i = 0; i < (value.size() - 1); i++) {
+                linked.append(makeEscape(value.get(i)));
                 linked.append(';');
             }
-            linked.append(makeEscape(value[value.length - 1]));
+            linked.append(makeEscape(value.get(value.size() - 1)));
             put(key, linked.toString());
-        } else {
-            put(key, "");
         }
     }
 
+
     /**
-     * Returns a String[] containing the chosen columns.
+     * Returns a List of Strings containing the chosen columns.
      */
-    public String[] getStringArray(String key) {
+    public List<String> getStringList(String key) {
         String names = get(key);
         if (names == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         StringReader rd = new StringReader(names);
-        Vector<String> arr = new Vector<>();
+        List<String> res = new ArrayList<>();
         String rs;
         try {
             while ((rs = getNextUnit(rd)) != null) {
-                arr.add(rs);
+                res.add(rs);
             }
         } catch (IOException ignored) {
             // Ignored
         }
-        String[] res = new String[arr.size()];
-        for (int i = 0; i < res.length; i++) {
-            res[i] = arr.elementAt(i);
-        }
-
         return res;
     }
 
@@ -1034,7 +1007,7 @@ public class JabRefPreferences {
      * @param color The Color to store.
      */
     public void putColor(String key, Color color) {
-        String rgb = String.valueOf(color.getRed()) + ':' + String.valueOf(color.getGreen()) + ':' + String.valueOf(color.getBlue());
+        String rgb = String.valueOf(color.getRed()) + ':' + color.getGreen() + ':' + color.getBlue();
         put(key, rgb);
     }
 
@@ -1058,85 +1031,6 @@ public class JabRefPreferences {
             values[2] = 0;
         }
         return values;
-    }
-
-    /**
-     * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences.
-     */
-    public KeyStroke getKey(String bindName) {
-
-        String s = keyBinds.get(bindName);
-        // If the current key bindings don't contain the one asked for,
-        // we fall back on the default. This should only happen when a
-        // user has his own set in Preferences, and has upgraded to a
-        // new version where new bindings have been introduced.
-        if (s == null) {
-            s = defaultKeyBinds.get(bindName);
-            if (s == null) {
-                // there isn't even a default value
-                // Output error
-                LOGGER.info("Could not get key binding for \"" + bindName + '"');
-                // fall back to a default value
-                s = "Not associated";
-            }
-            // So, if there is no configured key binding, we add the fallback value to the current
-            // hashmap, so this doesn't happen again, and so this binding
-            // will appear in the KeyBindingsDialog.
-            keyBinds.put(bindName, s);
-        }
-
-        if (OS.OS_X) {
-            return getKeyForMac(KeyStroke.getKeyStroke(s));
-        } else {
-            return KeyStroke.getKeyStroke(s);
-        }
-    }
-
-    /**
-     * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences, but adapted for Mac
-     * users, with the Command key preferred instead of Control.
-     * TODO: Move to OS.java? Or replace with portable Java key codes, i.e. KeyEvent
-     */
-    private KeyStroke getKeyForMac(KeyStroke ks) {
-        if (ks == null) {
-            return null;
-        }
-        int keyCode = ks.getKeyCode();
-        if ((ks.getModifiers() & InputEvent.CTRL_MASK) == 0) {
-            return ks;
-        } else {
-            int modifiers = 0;
-            if ((ks.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
-                modifiers = modifiers | InputEvent.SHIFT_MASK;
-            }
-            if ((ks.getModifiers() & InputEvent.ALT_MASK) != 0) {
-                modifiers = modifiers | InputEvent.ALT_MASK;
-            }
-
-            if (SHORTCUT_MASK == -1) {
-                try {
-                    SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-                } catch (Throwable ignored) {
-                    // Ignored
-                }
-            }
-
-            return KeyStroke.getKeyStroke(keyCode, SHORTCUT_MASK + modifiers);
-        }
-    }
-
-    /**
-     * Returns the HashMap containing all key bindings.
-     */
-    public HashMap<String, String> getKeyBindings() {
-        return keyBinds.getKeyBindings();
-    }
-
-    /**
-     * Returns the HashMap containing default key bindings.
-     */
-    public HashMap<String, String> getDefaultKeys() {
-        return defaultKeyBinds.getKeyBindings();
     }
 
     /**
@@ -1166,27 +1060,7 @@ public class JabRefPreferences {
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    /**
-     * Stores new key bindings into Preferences, provided they actually differ from the old ones.
-     */
-    public void setNewKeyBindings(HashMap<String, String> newBindings) {
-        if (!newBindings.equals(keyBinds.getKeyBindings())) {
-            // This confirms that the bindings have actually changed.
-            String[] bindNames = new String[newBindings.size()];
-            String[] bindings = new String[newBindings.size()];
-            int index = 0;
-            for (Map.Entry<String, String> keyBinding : newBindings.entrySet()) {
-                bindNames[index] = keyBinding.getKey();
-                bindings[index] = keyBinding.getValue();
-                index++;
-            }
-            putStringArray("bindNames", bindNames);
-            putStringArray("bindings", bindings);
-            keyBinds.overwriteBindings(newBindings);
+            LOGGER.warn("Can not communicate with backing store", ex);
         }
     }
 
@@ -1228,39 +1102,18 @@ public class JabRefPreferences {
             LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
         }
 
-        Enumeration<String> allKeys = pattern.getAllKeys();
-        while (allKeys.hasMoreElements()) {
-            String key = allKeys.nextElement();
+        Set<String> allKeys = pattern.getAllKeys();
+        for (String key : allKeys) {
             if (!pattern.isDefaultValue(key)) {
-                ArrayList<String> value = pattern.getValue(key);
                 // no default value
                 // the first entry in the array is the full pattern
                 // see net.sf.jabref.logic.labelPattern.LabelPatternUtil.split(String)
-                pre.put(key, value.get(0));
+                pre.put(key, pattern.getValue(key).get(0));
             }
         }
     }
 
-    private void restoreKeyBindings() {
-        // Define default keybindings.
-        defaultKeyBinds = new KeyBinds();
 
-        // First read the bindings, and their names.
-        String[] bindNames = getStringArray("bindNames");
-        String[] bindings = getStringArray("bindings");
-
-        // Then set up the key bindings HashMap.
-        if ((bindNames == null) || (bindings == null)
-                || (bindNames.length != bindings.length)) {
-            // Nothing defined in Preferences, or something is wrong.
-            keyBinds = new KeyBinds();
-            return;
-        }
-
-        for (int i = 0; i < bindNames.length; i++) {
-            keyBinds.put(bindNames[i], bindings[i]);
-        }
-    }
 
     private static String getNextUnit(Reader data) throws IOException {
         // character last read
@@ -1277,18 +1130,18 @@ public class JabRefPreferences {
         StringBuilder res = new StringBuilder();
         while (!done && ((c = data.read()) != -1)) {
             if (c == '\\') {
-                if (!escape) {
-                    escape = true;
-                } else {
+                if (escape) {
                     escape = false;
                     res.append('\\');
+                } else {
+                    escape = true;
                 }
             } else {
                 if (c == ';') {
-                    if (!escape) {
-                        done = true;
-                    } else {
+                    if (escape) {
                         res.append(';');
+                    } else {
+                        done = true;
                     }
                 } else {
                     res.append((char) c);
@@ -1323,265 +1176,35 @@ public class JabRefPreferences {
      * Stores all information about the entry type in preferences, with the tag given by number.
      */
     public void storeCustomEntryType(CustomEntryType tp, int number) {
-        String nr = "" + number;
+        String nr = String.valueOf(number);
         put(JabRefPreferences.CUSTOM_TYPE_NAME + nr, tp.getName());
         put(JabRefPreferences.CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, tp.getOptionalFields().toArray(new String[0]));
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, tp.getPrimaryOptionalFields().toArray(new String[0]));
+        List<String> optionalFields = tp.getOptionalFields();
+        putStringList(JabRefPreferences.CUSTOM_TYPE_OPT + nr, optionalFields);
+        List<String> primaryOptionalFields = tp.getPrimaryOptionalFields();
+        putStringList(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, primaryOptionalFields);
     }
 
     /**
      * Retrieves all information about the entry type in preferences, with the tag given by number.
      */
     public CustomEntryType getCustomEntryType(int number) {
-        String nr = "" + number;
+        String nr = String.valueOf(number);
         String name = get(JabRefPreferences.CUSTOM_TYPE_NAME + nr);
-        String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
-        String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
-        String[] priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
         if (name == null) {
             return null;
         }
-        if (priOpt == null) {
-            return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(opt));
+        List<String> req = getStringList(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
+        List<String> opt = getStringList(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
+        List<String> priOpt = getStringList(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
+        if (priOpt.isEmpty()) {
+            return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt);
         }
-        List<String> secondary = EntryUtil.getRemainder(Arrays.asList(opt), Arrays.asList(priOpt));
-        String[] secOpt = secondary.toArray(new String[secondary.size()]);
-        return new CustomEntryType(EntryUtil.capitalizeFirst(name), Arrays.asList(req), Arrays.asList(priOpt), Arrays.asList(secOpt));
+        List<String> secondary = EntryUtil.getRemainder(opt, priOpt);
+        return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secondary);
 
     }
 
-    public List<ExternalFileType> getDefaultExternalFileTypes() {
-        List<ExternalFileType> list = new ArrayList<>();
-        list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon()));
-        list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall", IconTheme.JabRefIcon.FILE.getSmallIcon()));
-        list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_WORD.getSmallIcon()));
-        list.add(new ExternalFileType("Word 2007+", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_WORD.getSmallIcon()));
-        list.add(new ExternalFileType(Localization.lang("OpenDocument text"), "odt",
-                "application/vnd.oasis.opendocument.text", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", "openoffice", IconTheme.JabRefIcon.FILE_EXCEL.getSmallIcon()));
-        list.add(new ExternalFileType("Excel 2007+", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "oocalc", "openoffice", IconTheme.JabRefIcon.FILE_EXCEL.getSmallIcon()));
-        list.add(new ExternalFileType(Localization.lang("OpenDocument spreadsheet"), "ods",
-                "application/vnd.oasis.opendocument.spreadsheet", "oocalc", "openoffice",
-                IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("PowerPoint", "ppt", "application/vnd.ms-powerpoint", "ooimpress", "openoffice", IconTheme.JabRefIcon.FILE_POWERPOINT.getSmallIcon()));
-        list.add(new ExternalFileType("PowerPoint 2007+", "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress", "openoffice", IconTheme.JabRefIcon.FILE_POWERPOINT.getSmallIcon()));
-        list.add(new ExternalFileType(Localization.lang("OpenDocument presentation"), "odp",
-                "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice",
-                IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
-        list.add(new ExternalFileType(Localization.lang("%0 image", "PNG"), "png", "image/png", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
-        list.add(new ExternalFileType(Localization.lang("%0 image", "GIF"), "gif", "image/gif", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
-        list.add(new ExternalFileType(Localization.lang("%0 image", "JPG"), "jpg", "image/jpeg", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
-        list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall", IconTheme.JabRefIcon.FILE.getSmallIcon()));
-        list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
-        list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
-        list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
-        list.add(new ExternalFileType(Localization.lang("%0 image", "TIFF"), "tiff", "image/tiff", "gimp", "picture",
-                IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
-        list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
-        list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
-        list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
-
-        // On all OSes there is a generic application available to handle file opening,
-        // so we don't need the default application settings anymore:
-        for (ExternalFileType type : list) {
-            type.setOpenWith("");
-        }
-
-        return list;
-    }
-
-    public ExternalFileType[] getExternalFileTypeSelection() {
-        return externalFileTypes.toArray(new ExternalFileType[externalFileTypes.size()]);
-    }
-
-    /**
-     * Look up the external file type registered with this name, if any.
-     *
-     * @param name The file type name.
-     * @return The ExternalFileType registered, or null if none.
-     */
-    public ExternalFileType getExternalFileTypeByName(String name) {
-        for (ExternalFileType type : externalFileTypes) {
-            if (type.getName().equals(name)) {
-                return type;
-            }
-        }
-        // Return an instance that signifies an unknown file type:
-        return new UnknownExternalFileType(name);
-    }
-
-    /**
-     * Look up the external file type registered for this extension, if any.
-     *
-     * @param extension The file extension.
-     * @return The ExternalFileType registered, or null if none.
-     */
-    public ExternalFileType getExternalFileTypeByExt(String extension) {
-        for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
-                return type;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Look up the external file type registered for this filename, if any.
-     *
-     * @param filename The name of the file whose type to look up.
-     * @return The ExternalFileType registered, or null if none.
-     */
-    public ExternalFileType getExternalFileTypeForName(String filename) {
-        int longestFound = -1;
-        ExternalFileType foundType = null;
-        for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && filename.toLowerCase().
-                    endsWith(type.getExtension().toLowerCase())) {
-                if (type.getExtension().length() > longestFound) {
-                    longestFound = type.getExtension().length();
-                    foundType = type;
-                }
-            }
-        }
-        return foundType;
-    }
-
-    /**
-     * Look up the external file type registered for this MIME type, if any.
-     *
-     * @param mimeType The MIME type.
-     * @return The ExternalFileType registered, or null if none. For the mime type "text/html", a valid file type is
-     *         guaranteed to be returned.
-     */
-    public ExternalFileType getExternalFileTypeByMimeType(String mimeType) {
-        for (ExternalFileType type : externalFileTypes) {
-            if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
-                return type;
-            }
-        }
-        if ("text/html".equals(mimeType)) {
-            return HTML_FALLBACK_TYPE;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Reset the List of external file types after user customization.
-     *
-     * @param types The new List of external file types. This is the complete list, not just new entries.
-     */
-    public void setExternalFileTypes(List<ExternalFileType> types) {
-
-        // First find a list of the default types:
-        List<ExternalFileType> defTypes = getDefaultExternalFileTypes();
-        // Make a list of types that are unchanged:
-        List<ExternalFileType> unchanged = new ArrayList<>();
-
-        externalFileTypes.clear();
-        for (ExternalFileType type : types) {
-            externalFileTypes.add(type);
-
-            // See if we can find a type with matching name in the default type list:
-            ExternalFileType found = null;
-            for (ExternalFileType defType : defTypes) {
-                if (defType.getName().equals(type.getName())) {
-                    found = defType;
-                    break;
-                }
-            }
-            if (found != null) {
-                // Found it! Check if it is an exact match, or if it has been customized:
-                if (found.equals(type)) {
-                    unchanged.add(type);
-                } else {
-                    // It was modified. Remove its entry from the defaults list, since
-                    // the type hasn't been removed:
-                    defTypes.remove(found);
-                }
-            }
-        }
-
-        // Go through unchanged types. Remove them from the ones that should be stored,
-        // and from the list of defaults, since we don't need to mention these in prefs:
-        for (ExternalFileType type : unchanged) {
-            defTypes.remove(type);
-            types.remove(type);
-        }
-
-        // Now set up the array to write to prefs, containing all new types, all modified
-        // types, and a flag denoting each default type that has been removed:
-        String[][] array = new String[types.size() + defTypes.size()][];
-        int i = 0;
-        for (ExternalFileType type : types) {
-            array[i] = type.getStringArrayRepresentation();
-            i++;
-        }
-        for (ExternalFileType type : defTypes) {
-            array[i] = new String[] {type.getName(), JabRefPreferences.FILE_TYPE_REMOVED_FLAG};
-            i++;
-        }
-        //System.out.println("Encoded: '"+Util.encodeStringArray(array)+"'");
-        put("externalFileTypes", StringUtil.encodeStringArray(array));
-    }
-
-    /**
-     * Set up the list of external file types, either from default values, or from values recorded in Preferences.
-     */
-    public void updateExternalFileTypes() {
-        // First get a list of the default file types as a starting point:
-        List<ExternalFileType> types = getDefaultExternalFileTypes();
-        // If no changes have been stored, simply use the defaults:
-        if (prefs.get("externalFileTypes", null) == null) {
-            externalFileTypes.clear();
-            externalFileTypes.addAll(types);
-            return;
-        }
-        // Read the prefs information for file types:
-        String[][] vals = StringUtil.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
-        for (String[] val : vals) {
-            if ((val.length == 2) && val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG)) {
-                // This entry indicates that a default entry type should be removed:
-                ExternalFileType toRemove = null;
-                for (ExternalFileType type : types) {
-                    if (type.getName().equals(val[0])) {
-                        toRemove = type;
-                        break;
-                    }
-                }
-                // If we found it, remove it from the type list:
-                if (toRemove != null) {
-                    types.remove(toRemove);
-                }
-            } else {
-                // A new or modified entry type. Construct it from the string array:
-                ExternalFileType type = new ExternalFileType(val);
-                // Check if there is a default type with the same name. If so, this is a
-                // modification of that type, so remove the default one:
-                ExternalFileType toRemove = null;
-                for (ExternalFileType defType : types) {
-                    if (type.getName().equals(defType.getName())) {
-                        toRemove = defType;
-                        break;
-                    }
-                }
-                // If we found it, remove it from the type list:
-                if (toRemove != null) {
-                    types.remove(toRemove);
-                }
-
-                // Then add the new one:
-                types.add(type);
-            }
-        }
-
-        // Finally, build the list of types based on the modified defaults list:
-        for (ExternalFileType type : types) {
-            externalFileTypes.add(type);
-        }
-    }
 
     /**
      * Removes all information about custom entry types with tags of
@@ -1666,7 +1289,7 @@ public class JabRefPreferences {
      *
      * @param owPrefs
      */
-    void overwritePreferences(JabRefPreferences owPrefs) {
+    public void overwritePreferences(JabRefPreferences owPrefs) {
         singleton = owPrefs;
     }
 

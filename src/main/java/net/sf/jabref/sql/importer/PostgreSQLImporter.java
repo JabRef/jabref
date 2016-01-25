@@ -20,19 +20,19 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
 /**
- *
  * @author ifsteinm.
- *
- *  Jan 20th	Extends DBExporter to provide features specific for PostgreSQL
- *  			Created after a refactory on SQLUtil.
- *
+ *         <p>
+ *         Jan 20th	Extends DBExporter to provide features specific for PostgreSQL
+ *         Created after a refactory on SQLUtil.
  */
-public class PostgreSQLImporter extends DBImporter {
+final public class PostgreSQLImporter extends DBImporter {
 
     private static PostgreSQLImporter instance;
 
@@ -41,7 +41,6 @@ public class PostgreSQLImporter extends DBImporter {
     }
 
     /**
-     *
      * @return The singleton instance of the MySQLImporter
      */
     public static PostgreSQLImporter getInstance() {
@@ -52,10 +51,15 @@ public class PostgreSQLImporter extends DBImporter {
     }
 
     @Override
-    protected ResultSet readColumnNames(Connection conn) throws SQLException {
+    protected List<String> readColumnNames(Connection conn) throws SQLException {
         try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
                 "SELECT column_name FROM information_schema.columns WHERE table_name ='entries';")) {
-            return statement.getResultSet();
+            List<String> colNames = new ArrayList<>();
+            ResultSet rsColumns = statement.getResultSet();
+            while (rsColumns.next()) {
+                colNames.add(rsColumns.getString(1));
+            }
+            return colNames;
         }
     }
 

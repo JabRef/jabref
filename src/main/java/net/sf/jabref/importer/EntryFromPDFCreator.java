@@ -5,22 +5,23 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.gui.IconTheme;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
- * Uses XMPUtils to get one BibtexEntry for a PDF-File.
+ * Uses XMPUtils to get one BibEntry for a PDF-File.
  * Also imports the non-XMP Data (PDDocument-Information) using XMPUtil.getBibtexEntryFromDocumentInformation.
  * If data from more than one entry is read by XMPUtil then this entys are merged into one.
  * @author Dan
@@ -34,7 +35,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
     }
 
     private static ExternalFileType getPDFExternalFileType() {
-        ExternalFileType pdfFileType = JabRefPreferences.getInstance().getExternalFileTypeByExt("pdf");
+        ExternalFileType pdfFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
         if (pdfFileType == null) {
             return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         }
@@ -54,17 +55,17 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
     }
 
     @Override
-    protected BibtexEntry createBibtexEntry(File pdfFile) {
+    protected Optional<BibEntry> createBibtexEntry(File pdfFile) {
 
         if (!accept(pdfFile)) {
-            return null;
+            return Optional.empty();
         }
 
         PdfImporter pi = new PdfImporter(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), JabRef.jrf.getCurrentBasePanel().mainTable, -1);
         String[] fileNames = {pdfFile.toString()};
         ImportPdfFilesResult res = pi.importPdfFiles(fileNames, JabRef.jrf);
         assert res.entries.size() == 1;
-        return res.entries.get(0);
+        return Optional.of(res.entries.get(0));
 
         /*addEntryDataFromPDDocumentInformation(pdfFile, entry);
         addEntyDataFromXMP(pdfFile, entry);
@@ -80,7 +81,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      * @param pdfFile
      * @param entry
      */
-    private void addEntryDataFromPDDocumentInformation(File pdfFile, BibtexEntry entry) {
+    private void addEntryDataFromPDDocumentInformation(File pdfFile, BibEntry entry) {
         PDDocument document = null;
         try {
             document = PDDocument.load(pdfFile.getAbsoluteFile());
@@ -88,7 +89,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
                     .getDocumentInformation();
 
             if (pdfDocInfo != null) {
-                BibtexEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
+                BibEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
                         .getDocumentInformation());
                 if (entryDI != null) {
                     addEntryDataToEntry(entry, entryDI);
@@ -127,9 +128,9 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      * @param aFile
      * @param entry
      */
-    private void addEntyDataFromXMP(File aFile, BibtexEntry entry) {
+    private void addEntyDataFromXMP(File aFile, BibEntry entry) {
         try {
-            List<BibtexEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
+            List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
             addEntrysToEntry(entry, entrys);
         } catch (EncryptionNotSupportedException e) {
             // no canceling here, just no data added.

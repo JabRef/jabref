@@ -29,13 +29,13 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
@@ -50,9 +50,9 @@ public class WriteXMPAction extends AbstractWorker {
 
     private final BasePanel panel;
 
-    private BibtexEntry[] entries;
+    private BibEntry[] entries;
 
-    private BibtexDatabase database;
+    private BibDatabase database;
 
     private OptionsDialog optDiag;
 
@@ -76,8 +76,8 @@ public class WriteXMPAction extends AbstractWorker {
 
         if (entries.length == 0) {
 
-            Collection<BibtexEntry> var = database.getEntries();
-            entries = var.toArray(new BibtexEntry[var.size()]);
+            Collection<BibEntry> var = database.getEntries();
+            entries = var.toArray(new BibEntry[var.size()]);
 
             if (entries.length == 0) {
 
@@ -116,7 +116,7 @@ public class WriteXMPAction extends AbstractWorker {
             return;
         }
 
-        for (BibtexEntry entry : entries) {
+        for (BibEntry entry : entries) {
 
             // Make a list of all PDFs linked from this entry:
             List<File> files = new ArrayList<>();
@@ -131,14 +131,13 @@ public class WriteXMPAction extends AbstractWorker {
 
             // Then check the "file" field:
             dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
-            String field = entry.getField(Globals.FILE_FIELD);
-            if (field != null) {
+            if (entry.hasField(Globals.FILE_FIELD)) {
                 FileListTableModel tm = new FileListTableModel();
-                tm.setContent(field);
+                tm.setContent(entry.getField(Globals.FILE_FIELD));
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
-                    if ((flEntry.getType() != null) && "pdf".equals(flEntry.getType().getName().toLowerCase())) {
-                        f = FileUtil.expandFilename(flEntry.getLink(), dirs);
+                    if ((flEntry.type != null) && "pdf".equals(flEntry.type.getName().toLowerCase())) {
+                        f = FileUtil.expandFilename(flEntry.link, dirs);
                         if (f != null) {
                             files.add(f);
                         }
@@ -146,41 +145,44 @@ public class WriteXMPAction extends AbstractWorker {
                 }
             }
 
-            optDiag.progressArea.append(entry.getCiteKey() + "\n");
+            optDiag.getProgressArea().append(entry.getCiteKey() + "\n");
 
             if (files.isEmpty()) {
                 skipped++;
-                optDiag.progressArea.append("  " + Localization.lang("Skipped - No PDF linked") + ".\n");
+                optDiag.getProgressArea().append("  " + Localization.lang("Skipped - No PDF linked") + ".\n");
             } else {
                 for (File file : files) {
                     if (!file.exists()) {
                         skipped++;
-                        optDiag.progressArea.append("  " + Localization.lang("Skipped - PDF does not exist")
+                        optDiag.getProgressArea()
+                                .append("  " + Localization.lang("Skipped - PDF does not exist")
                                 + ":\n");
-                        optDiag.progressArea.append("    " + file.getPath() + "\n");
+                        optDiag.getProgressArea().append("    " + file.getPath() + "\n");
 
                     } else {
                         try {
                             XMPUtil.writeXMP(file, entry, database);
-                            optDiag.progressArea.append("  " + Localization.lang("Ok") + ".\n");
+                            optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n");
                             entriesChanged++;
                         } catch (Exception e) {
-                            optDiag.progressArea.append("  " + Localization.lang("Error while writing") + " '"
+                            optDiag.getProgressArea().append(
+                                    "  " + Localization.lang("Error while writing") + " '"
                                     + file.getPath() + "':\n");
-                            optDiag.progressArea.append("    " + e.getLocalizedMessage() + "\n");
+                            optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
                             errors++;
                         }
                     }
                 }
             }
 
-            if (optDiag.canceled) {
-                optDiag.progressArea.append("\n"
-                        + Localization.lang("Operation canceled.\n"));
+            if (optDiag.isCanceled()) {
+                optDiag.getProgressArea().append("\n"
+                        + Localization.lang("Operation canceled.") +"\n");
                 break;
             }
         }
-        optDiag.progressArea.append("\n"
+        optDiag.getProgressArea()
+                .append("\n"
                 + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
                 .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
         optDiag.done();
@@ -198,13 +200,14 @@ public class WriteXMPAction extends AbstractWorker {
 
 
     class OptionsDialog extends JDialog {
-        final JButton okButton = new JButton(Localization.lang("Ok"));
-        final JButton cancelButton = new JButton(
+
+        private final JButton okButton = new JButton(Localization.lang("OK"));
+        private final JButton cancelButton = new JButton(
                 Localization.lang("Cancel"));
 
-        boolean canceled;
+        private boolean canceled;
 
-        final JTextArea progressArea;
+        private final JTextArea progressArea;
 
 
         public OptionsDialog(JFrame parent) {
@@ -229,7 +232,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             InputMap im = cancelButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
             ActionMap am = cancelButton.getActionMap();
-            im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+            im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             am.put("close", cancel);
 
             progressArea = new JTextArea(15, 60);
@@ -286,6 +289,14 @@ public class WriteXMPAction extends AbstractWorker {
             new FocusRequester(okButton);
 
             optDiag.setVisible(true);
+        }
+
+        public boolean isCanceled() {
+            return canceled;
+        }
+
+        public JTextArea getProgressArea() {
+            return progressArea;
         }
     }
 }

@@ -17,20 +17,21 @@ package net.sf.jabref.bst;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
@@ -55,6 +56,30 @@ import org.apache.commons.logging.LogFactory;
 public class VM implements Warn {
 
     private static final Log LOGGER = LogFactory.getLog(VM.class);
+
+    private List<BstEntry> entries;
+
+    private Map<String, String> strings = new HashMap<>();
+
+    private Map<String, Integer> integers = new HashMap<>();
+
+    private Map<String, BstFunction> functions = new HashMap<>();
+
+    private Stack<Object> stack = new Stack<>();
+
+    public static final Integer FALSE = 0;
+
+    public static final Integer TRUE = 1;
+
+    private final Map<String, BstFunction> buildInFunctions;
+
+    private File file;
+
+    private final CommonTree tree;
+
+    private StringBuffer bbl;
+
+    private String preamble;
 
 
     public static class Identifier {
@@ -88,15 +113,6 @@ public class VM implements Warn {
     public interface BstFunction {
         void execute(BstEntry context);
     }
-
-
-    public static final Integer FALSE = 0;
-
-    public static final Integer TRUE = 1;
-
-    private final HashMap<String, BstFunction> buildInFunctions;
-
-    private File file;
 
 
     public VM(File f) throws RecognitionException, IOException {
@@ -144,11 +160,6 @@ public class VM implements Warn {
                     throw new VMException("Can only compare two integers with >");
                 }
 
-                if (o1 == o2) {
-                    stack.push(VM.FALSE);
-                    return;
-                }
-
                 stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? VM.TRUE : VM.FALSE);
             }
         });
@@ -166,11 +177,6 @@ public class VM implements Warn {
 
                 if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
                     throw new VMException("Can only compare two integers with <");
-                }
-
-                if (o1 == o2) {
-                    stack.push(VM.FALSE);
-                    return;
                 }
 
                 stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? VM.TRUE : VM.FALSE);
@@ -197,7 +203,7 @@ public class VM implements Warn {
                     return;
                 }
 
-                if (o1 == o2) {
+                if ((o1 == null) && (o2 == null)) {
                     stack.push(VM.TRUE);
                     return;
                 }
@@ -346,7 +352,7 @@ public class VM implements Warn {
                     throw new VMException(
                             "Call.type$ can only be called from within a context (ITERATE or REVERSE).");
                 }
-                VM.this.execute(context.entry.getType().getName().toLowerCase(), context);
+                VM.this.execute(context.getBibtexEntry().getType().getName().toLowerCase(), context);
             }
         });
 
@@ -384,7 +390,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                stack.push(context.entry.getCiteKey());
+                stack.push(context.getBibtexEntry().getCiteKey());
             }
         });
 
@@ -604,10 +610,10 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (preamble != null) {
-                    stack.push(preamble);
-                } else {
+                if (preamble == null) {
                     stack.push("");
+                } else {
+                    stack.push(preamble);
                 }
 
             }
@@ -864,7 +870,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                stack.push(context.entry.getType().getName());
+                stack.push(context.getBibtexEntry().getType().getName());
             }
         });
 
@@ -974,26 +980,31 @@ public class VM implements Warn {
     }
 
 
-    private final CommonTree tree;
-
-    private StringBuffer bbl;
-
-    private String preamble;
-
-
-    public String run(BibtexDatabase db) {
+    public String run(BibDatabase db) {
         preamble = db.getPreamble();
         return run(db.getEntries());
     }
 
-    public String run(Collection<BibtexEntry> bibtex) {
+    public String run(Collection<BibEntry> bibtex) {
 
-        reset();
+        // Reset
+        bbl = new StringBuffer();
+
+        strings = new HashMap<>();
+
+        integers = new HashMap<>();
+        integers.put("entry.max$", Integer.MAX_VALUE);
+        integers.put("global.max$", Integer.MAX_VALUE);
+
+        functions = new HashMap<>();
+        functions.putAll(buildInFunctions);
+
+        stack = new Stack<>();
 
         { // Create entries
-            entries = new Vector<>(bibtex.size());
+            entries = new ArrayList<>(bibtex.size());
             ListIterator<BstEntry> i = entries.listIterator();
-            for (BibtexEntry entry : bibtex) {
+            for (BibEntry entry : bibtex) {
                 i.add(new BstEntry(entry));
             }
         }
@@ -1034,27 +1045,13 @@ public class VM implements Warn {
             case BstParser.MACRO:
                 macro(child);
                 break;
+            default:
+                LOGGER.info("Unknown type: " + child.getType());
+                break;
             }
         }
 
         return bbl.toString();
-    }
-
-    private void reset() {
-        bbl = new StringBuffer();
-
-        entries = null;
-
-        strings = new HashMap<>();
-
-        integers = new HashMap<>();
-        integers.put("entry.max$", Integer.MAX_VALUE);
-        integers.put("global.max$", Integer.MAX_VALUE);
-
-        functions = new HashMap<>();
-        functions.putAll(buildInFunctions);
-
-        stack = new Stack<>();
     }
 
     /**
@@ -1069,16 +1066,16 @@ public class VM implements Warn {
 
         for (BstEntry e : entries) {
 
-            for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
-                Object fieldValue = e.entry.getField(mEntry.getKey());
+            for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
+                Object fieldValue = e.getBibtexEntry().getField(mEntry.getKey());
 
                 mEntry.setValue((fieldValue == null ? null : fieldValue.toString()));
             }
         }
 
         for (BstEntry e : entries) {
-            if (!e.fields.containsKey("crossref")) {
-                e.fields.put("crossref", null);
+            if (!e.getFields().containsKey("crossref")) {
+                e.getFields().put("crossref", null);
             }
         }
     }
@@ -1104,7 +1101,7 @@ public class VM implements Warn {
 
     public class MacroFunction implements BstFunction {
 
-        final String replacement;
+        private final String replacement;
 
 
         public MacroFunction(String replacement) {
@@ -1123,7 +1120,7 @@ public class VM implements Warn {
      * (possibly empty) list of variable names. The three lists are of: fields,
      * integer entry variables, and string entry variables. There is an
      * additional field that BibTEX automatically declares, crossref, used for
-     * cross ref- erencing. And there is an additional string entry variable
+     * cross referencing. And there is an additional string entry variable
      * automatically declared, sort.key$, used by the SORT command. Each of
      * these variables has a value for each entry on the list.
      */
@@ -1136,7 +1133,7 @@ public class VM implements Warn {
             String name = t.getChild(i).getText();
 
             for (BstEntry entry : entries) {
-                entry.fields.put(name, null);
+                entry.getFields().put(name, null);
             }
         }
 
@@ -1214,7 +1211,7 @@ public class VM implements Warn {
 
     public class StackFunction implements BstFunction {
 
-        final Tree localTree;
+        private final Tree localTree;
 
 
         public Tree getTree() {
@@ -1252,11 +1249,11 @@ public class VM implements Warn {
                         VM.this.execute(c.getText(), context);
                     }
                 } catch (VMException e) {
-                    if (file != null) {
+                    if (file == null) {
+                        LOGGER.error("ERROR " + e.getMessage() + " (" + c.getLine() + ")");
+                    } else {
                         LOGGER.error("ERROR " + e.getMessage() + " (" + file.getPath() + ":"
                                 + c.getLine() + ")");
-                    } else {
-                        LOGGER.error("ERROR " + e.getMessage() + " (" + c.getLine() + ")");
                     }
                     throw e;
                 }
@@ -1274,8 +1271,8 @@ public class VM implements Warn {
 
         if (context != null) {
 
-            if (context.fields.containsKey(name)) {
-                stack.push(context.fields.get(name));
+            if (context.getFields().containsKey(name)) {
+                stack.push(context.getFields().get(name));
                 return;
             }
             if (context.localStrings.containsKey(name)) {
@@ -1350,39 +1347,27 @@ public class VM implements Warn {
 
     public static class BstEntry {
 
-        public BstEntry(BibtexEntry e) {
+        private final BibEntry entry;
+
+        private final Map<String, String> localStrings = new HashMap<>();
+
+        private final Map<String, String> fields = new HashMap<>();
+
+        private final Map<String, Integer> localIntegers = new HashMap<>();
+
+
+        public BstEntry(BibEntry e) {
             this.entry = e;
         }
-
-
-        final BibtexEntry entry;
-
-        final Map<String, String> localStrings = new HashMap<>();
-
-        final Map<String, String> fields = new HashMap<>();
-
-        final Map<String, Integer> localIntegers = new HashMap<>();
-
 
         public Map<String, String> getFields() {
             return fields;
         }
 
-        public BibtexEntry getBibtexEntry() {
+        public BibEntry getBibtexEntry() {
             return entry;
         }
     }
-
-
-    private Vector<BstEntry> entries;
-
-    private Map<String, String> strings = new HashMap<>();
-
-    private Map<String, Integer> integers = new HashMap<>();
-
-    private Map<String, BstFunction> functions = new HashMap<>();
-
-    private Stack<Object> stack = new Stack<>();
 
 
     private void push(Integer integer) {
@@ -1405,7 +1390,7 @@ public class VM implements Warn {
         return integers;
     }
 
-    public Vector<BstEntry> getEntries() {
+    public List<BstEntry> getEntries() {
         return entries;
     }
 

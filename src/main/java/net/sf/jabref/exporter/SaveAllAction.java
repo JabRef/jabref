@@ -23,7 +23,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
 import spin.Spin;
@@ -43,7 +43,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
     public SaveAllAction(JabRefFrame frame) {
         super(IconTheme.JabRefIcon.SAVE_ALL.getIcon());
         this.frame = frame;
-        putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.SAVE_ALL));
+        putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.SAVE_ALL));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save all open databases"));
         putValue(Action.NAME, Localization.menuTitle("Save all"));
     }
@@ -62,7 +62,6 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
     public void run() {
         for (int i = 0; i < databases; i++) {
             if (i < frame.getTabbedPane().getTabCount()) {
-                //System.out.println("Base "+i);
                 BasePanel panel = frame.getBasePanelAt(i);
                 if (panel.getDatabaseFile() == null) {
                     frame.showBasePanelAt(i);

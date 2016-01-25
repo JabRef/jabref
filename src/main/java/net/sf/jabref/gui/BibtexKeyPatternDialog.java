@@ -67,7 +67,7 @@ public class BibtexKeyPatternDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(labelPatternPanel, BorderLayout.CENTER);
 
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(); // label of "cancel" is set later as the label is overwritten by assigning an action to the button
 
         JPanel lower = new JPanel();

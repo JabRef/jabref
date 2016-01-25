@@ -176,7 +176,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         JPanel butpan = new JPanel();
         butpan.setLayout(new GridLayout(3, 3));
-        for(PushToApplication pushToApplication : PushToApplications.applications) {
+        for(PushToApplication pushToApplication : PushToApplications.APPLICATIONS) {
             addSettingsButton(pushToApplication, butpan);
         }
         builder.append(new JPanel());
@@ -213,7 +213,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileDir.setText(prefs.get(Globals.FILE_FIELD + "Directory"));
+        fileDir.setText(prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
         bibLocationAsFileDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
@@ -244,7 +244,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         }
 
         // We should maybe do some checking on the validity of the contents?
-        prefs.put(Globals.FILE_FIELD + "Directory", fileDir.getText());
+        prefs.put(Globals.FILE_FIELD + Globals.DIR_SUFFIX, fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR, bibLocationAsFileDir.isSelected());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, matchExactKeyOnly.isSelected());

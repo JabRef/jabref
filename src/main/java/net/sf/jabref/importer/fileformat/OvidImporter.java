@@ -50,6 +50,9 @@ public class OvidImporter extends ImportFormat {
             "\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)");
 
 
+    private static final Pattern ovidPattern = Pattern.compile("<[0-9]+>");
+
+
     //   public static Pattern ovid_pat_inspec= Pattern.compile("Source ([
     // \\w&\\-]+)");
 
@@ -70,8 +73,6 @@ public class OvidImporter extends ImportFormat {
         return "ovid";
     }
 
-
-    private static final Pattern ovidPattern = Pattern.compile("<[0-9]+>");
 
 
     /**
@@ -96,12 +97,12 @@ public class OvidImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
@@ -138,15 +139,15 @@ public class OvidImporter extends ImportFormat {
 
                     h.put("author", content);
 
-                } else if (fieldName.indexOf("Title") == 0) {
+                } else if (fieldName.startsWith("Title")) {
                     content = content.replaceAll("\\[.+\\]", "").trim();
                     if (content.endsWith(".")) {
                         content = content.substring(0, content.length() - 1);
                     }
                     h.put("title", content);
-                } else if (fieldName.indexOf("Chapter Title") == 0) {
+                } else if (fieldName.startsWith("Chapter Title")) {
                     h.put("chaptertitle", content);
-                } else if (fieldName.indexOf("Source") == 0) {
+                } else if (fieldName.startsWith("Source")) {
                     Matcher matcher;
                     if ((matcher = OvidImporter.ovid_src_pat.matcher(content)).find()) {
                         h.put("journal", matcher.group(1));
@@ -198,6 +199,15 @@ public class OvidImporter extends ImportFormat {
                     } else if (content.contains("Conference Paper")) {
                         h.put("entrytype", "inproceedings");
                     }
+                } else if (fieldName.startsWith("Language")) {
+                    h.put("language", content);
+                } else if (fieldName.startsWith("Author Keywords")) {
+                    content = content.replaceAll(";", ",").replaceAll("  ", " ");
+                    h.put("keywords", content);
+                } else if (fieldName.startsWith("ISSN")) {
+                    h.put("issn", content);
+                } else if (fieldName.startsWith("DOI Number")) {
+                    h.put("doi", content);
                 }
             }
 
@@ -222,15 +232,13 @@ public class OvidImporter extends ImportFormat {
             // Set the entrytype properly:
             String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "other";
             h.remove("entrytype");
-            if ("book".equals(entryType)) {
-                if (h.containsKey("chaptertitle")) {
-                    // This means we have an "incollection" entry.
-                    entryType = "incollection";
-                    // Move the "chaptertitle" to just "title":
-                    h.put("title", h.remove("chaptertitle"));
-                }
+            if ("book".equals(entryType) && h.containsKey("chaptertitle")) {
+                // This means we have an "incollection" entry.
+                entryType = "incollection";
+                // Move the "chaptertitle" to just "title":
+                h.put("title", h.remove("chaptertitle"));
             }
-            BibtexEntry b = new BibtexEntry(IdGenerator.next(), EntryTypes.getBibtexEntryType(entryType));
+            BibEntry b = new BibEntry(IdGenerator.next(), EntryTypes.getTypeOrDefault(entryType));
             b.setField(h);
 
             bibitems.add(b);
@@ -247,7 +255,7 @@ public class OvidImporter extends ImportFormat {
      */
     private static String fixNames(String content) {
         String names;
-        if (content.indexOf(";") > 0) { //LN FN; [LN FN;]*
+        if (content.indexOf(';') > 0) { //LN FN; [LN FN;]*
             names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and");
         } else if (content.indexOf("  ") > 0) {
             String[] sNames = content.split("  ");

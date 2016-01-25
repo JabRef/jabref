@@ -3,7 +3,7 @@ package net.sf.jabref.logic.fetcher;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.DOI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +33,7 @@ public class ArXiv implements FullTextFinder {
     private static final String API_URL = "http://export.arxiv.org/api/query";
 
     @Override
-    public Optional<URL> findFullText(BibtexEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
@@ -76,11 +76,9 @@ public class ArXiv implements FullTextFinder {
                     }
                 }
             } catch(UnirestException | ParserConfigurationException | SAXException e) {
-                LOGGER.warn("arXiv API request failed: " + e.getMessage(), e);
+                LOGGER.warn("arXiv API request failed", e);
             }
         }
-        // TODO: title search
-        // We can also get abstract automatically!
         return pdfLink;
     }
 }

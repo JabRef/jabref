@@ -19,8 +19,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -38,7 +38,7 @@ public class EntryMarker {
     /**
      * @param increment whether the given increment should be added to the current one. Currently never used in JabRef
      */
-    public static void markEntry(BibtexEntry be, int markIncrement, boolean increment, NamedCompound ce) {
+    public static void markEntry(BibEntry be, int markIncrement, boolean increment, NamedCompound ce) {
         Object o = be.getField(BibtexFields.MARKED);
         int prevMarkLevel;
         String newValue = null;
@@ -72,7 +72,7 @@ public class EntryMarker {
     /**
      * SIDE EFFECT: Unselectes given entry
      */
-    public static void unmarkEntry(BibtexEntry be, boolean onlyMaxLevel, BibtexDatabase database, NamedCompound ce) {
+    public static void unmarkEntry(BibEntry be, boolean onlyMaxLevel, BibDatabase database, NamedCompound ce) {
         Object o = be.getField(BibtexFields.MARKED);
         if (o != null) {
             String s = o.toString();
@@ -86,10 +86,10 @@ public class EntryMarker {
             int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
             if (index >= 0) {
                 // Marked 1 for this user.
-                if (!onlyMaxLevel) {
-                    newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
-                } else {
+                if (onlyMaxLevel) {
                     return;
+                } else {
+                    newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
                 }
             } else {
                 Matcher m = MARK_NUMBER_PATTERN.matcher(s);
@@ -128,7 +128,11 @@ public class EntryMarker {
             }
             String newVal = sb.length() > 0 ? sb.toString() : null;*/
             ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be.getField(BibtexFields.MARKED), newValue));
-            be.setField(BibtexFields.MARKED, newValue);
+            if (newValue == null) {
+                be.clearField(BibtexFields.MARKED);
+            } else {
+                be.setField(BibtexFields.MARKED, newValue);
+            }
         }
     }
 
@@ -143,14 +147,13 @@ public class EntryMarker {
      * @param be
      * @param ce
      */
-    private static void unmarkOldStyle(BibtexEntry be, BibtexDatabase database, NamedCompound ce) {
+    private static void unmarkOldStyle(BibEntry be, BibDatabase database, NamedCompound ce) {
         TreeSet<Object> owners = new TreeSet<>();
-        for (BibtexEntry entry : database.getEntries()) {
+        for (BibEntry entry : database.getEntries()) {
             Object o = entry.getField(BibtexFields.OWNER);
-            if (o != null)
-             {
+            if (o != null) {
                 owners.add(o);
-            // System.out.println("Owner: "+entry.getField(Globals.OWNER));
+                // System.out.println("Owner: "+entry.getField(Globals.OWNER));
             }
         }
         owners.remove(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
@@ -162,15 +165,15 @@ public class EntryMarker {
         }
         String newVal = sb.toString();
         if (newVal.isEmpty()) {
-            newVal = null;
+            ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be.getField(BibtexFields.MARKED), null));
+            be.clearField(BibtexFields.MARKED);
+        } else {
+            ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be.getField(BibtexFields.MARKED), newVal));
+            be.setField(BibtexFields.MARKED, newVal);
         }
-        ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
-                .getField(BibtexFields.MARKED), newVal));
-        be.setField(BibtexFields.MARKED, newVal);
-
     }
 
-    public static int isMarked(BibtexEntry be) {
+    public static int isMarked(BibEntry be) {
         Object fieldVal = be.getField(BibtexFields.MARKED);
         if (fieldVal == null) {
             return 0;

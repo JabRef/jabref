@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -76,7 +77,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.bibtex.EntryTypes;
@@ -106,16 +107,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
     public static final String ACTION_COMMAND = "findUnlinkedFiles";
     public static final String ACTION_MENU_TITLE = Localization.menuTitle("Find unlinked files...");
     public static final String ACTION_ICON = "toggleSearch";
-    public static final String ACTION_KEYBINDING_ACTION = "Find unlinked files";
-    // @formatter:off
     public static final String ACTION_SHORT_DESCRIPTION = Localization.lang("Searches for unlinked PDF files on the file system");
-    // @formatter:on
 
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
 
     private JabRefFrame frame;
-    private BibtexDatabase database;
+    private BibDatabase database;
     private EntryFromFileCreatorManager creatorManager;
     private UnlinkedFilesCrawler crawler;
 
@@ -168,7 +166,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private ComponentListener dialogPositionListener;
 
-    private int[] threadState = new int[] {1};
+    private AtomicBoolean threadState = new AtomicBoolean();
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
     private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
@@ -203,13 +201,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     @Override
     protected JRootPane createRootPane() {
-        ActionListener actionListener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                setVisible(false);
-            }
-        };
+        ActionListener actionListener = actionEvent -> setVisible(false);
         JRootPane rPane = new JRootPane();
         KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         rPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -335,7 +327,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * Stores the working directory path for this view in the global
      * preferences.
      *
-     * @param lastSelectedDirectory
+     * @param lastSelectedDir
      *            directory that is used as the working directory in this view.
      */
     private void storeLastSelectedDirectory(File lastSelectedDir) {
@@ -395,7 +387,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         }
 
         String path = textfieldDirectoryPath.getText();
-        if ((path == null) || "".equals(path)) {
+        if ((path == null) || path.isEmpty()) {
             fileChooser.setCurrentDirectory(lastSelectedDirectory);
         } else {
             fileChooser.setCurrentDirectory(new File(path));
@@ -514,24 +506,20 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         final FileFilter selectedFileFilter = (FileFilter) comboBoxFileTypeSelection.getSelectedItem();
 
-        threadState = new int[] {1};
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
+        threadState.set(true);
+        JabRefExecutorService.INSTANCE.execute(() -> {
+            UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(selectedFileFilter, database);
+            CheckableTreeNode rootNode = crawler.searchDirectory(directory, unlinkedPDFFileFilter, threadState, new ChangeListener() {
 
-            @Override
-            public void run() {
-                UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(selectedFileFilter, database);
-                CheckableTreeNode rootNode = crawler.searchDirectory(directory, ff, threadState, new ChangeListener() {
+                int counter;
 
-                    int counter;
-
-
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        progressBarSearching.setString(++counter + " files found");
-                    }
-                });
-                searchFinishedHandler(rootNode);
-            }
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    counter++;
+                    progressBarSearching.setString(counter + " files found");
+                }
+            });
+            searchFinishedHandler(rootNode);
         });
 
     }
@@ -576,29 +564,24 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         final EntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).entryType;
 
-        threadState = new int[] {1};
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
+        threadState.set(true);
+        JabRefExecutorService.INSTANCE.execute(() -> {
+            List<String> errors = new LinkedList<>();
+            creatorManager.addEntriesFromFiles(fileList, database, frame.getCurrentBasePanel(),
+                    entryType,
+                    checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
 
-            @Override
-            public void run() {
-                List<String> errors = new LinkedList<>();
-                int count = creatorManager.addEntriesFromFiles(fileList, database, frame.getCurrentBasePanel(),
-                        entryType,
-                        checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
+                        int counter;
 
-                            int counter;
-
-
-                            @Override
-                            public void stateChanged(ChangeEvent e) {
-                                progressBarImporting.setValue(++counter);
-                                progressBarImporting.setString(counter + " of " + progressBarImporting.getMaximum());
-                            }
-                        }, errors);
-                importFinishedHandler(errors);
-            }
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            counter++;
+                            progressBarImporting.setValue(counter);
+                            progressBarImporting.setString(counter + " of " + progressBarImporting.getMaximum());
+                        }
+                    }, errors);
+            importFinishedHandler(errors);
         });
-
     }
 
     /**
@@ -632,7 +615,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
      *            The root of the file structure as the result of the search.
      */
     private void searchFinishedHandler(CheckableTreeNode rootNode) {
-
         treeModel = new DefaultTreeModel(rootNode);
         tree.setModel(treeModel);
         tree.setRootVisible(rootNode.getChildCount() > 0);
@@ -657,22 +639,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
         /**
          * Stores the selected Directory.
          */
-        buttonBrowse.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                File selectedDirectory = chooseDirectory();
-                storeLastSelectedDirectory(selectedDirectory);
-            }
+        buttonBrowse.addActionListener(e -> {
+            File selectedDirectory = chooseDirectory();
+            storeLastSelectedDirectory(selectedDirectory);
         });
 
-        buttonScan.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startSearch();
-            }
-        });
+        buttonScan.addActionListener(e -> startSearch());
 
         /**
          * Action for the button "Import...". <br>
@@ -680,23 +652,11 @@ public class FindUnlinkedFilesDialog extends JDialog {
          * Actions on this button will start the import of all file of all
          * selected nodes in this dialogs tree view. <br>
          */
-        ActionListener actionListenerImportEntrys = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startImport();
-            }
-        };
+        ActionListener actionListenerImportEntrys = e -> startImport();
 
         buttonApply.addActionListener(actionListenerImportEntrys);
 
-        buttonClose.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
+        buttonClose.addActionListener(e -> dispose());
     }
 
     /**
@@ -714,10 +674,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private List<File> getFileListFromNode(CheckableTreeNode node) {
         List<File> filesList = new ArrayList<>();
-        Enumeration<CheckableTreeNode> childs = node.depthFirstEnumeration();
+        Enumeration<CheckableTreeNode> children = node.depthFirstEnumeration();
         ArrayList<CheckableTreeNode> nodesToRemove = new ArrayList<>();
-        while (childs.hasMoreElements()) {
-            CheckableTreeNode child = childs.nextElement();
+        for (CheckableTreeNode child : Collections.list(children)) {
             if (child.isLeaf() && child.getSelected()) {
                 File nodeFile = ((FileNodeWrapper) child.getUserObject()).file;
                 if ((nodeFile != null) && nodeFile.isFile()) {
@@ -726,6 +685,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 }
             }
         }
+
 
         // remove imported files from tree
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
@@ -760,7 +720,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                threadState[0] = 0;
+                threadState.set(false);
             }
         });
 
@@ -1113,9 +1073,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
             this.entryType = bibtexType;
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#toString()
-         */
         @Override
         public String toString() {
             if (entryType == null) {
@@ -1150,8 +1107,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         public void setSelected(boolean bSelected) {
             isSelected = bSelected;
             Enumeration<CheckableTreeNode> tmpChildren = this.children();
-            while (tmpChildren.hasMoreElements()) {
-                CheckableTreeNode child = tmpChildren.nextElement();
+            for (CheckableTreeNode child : Collections.list(tmpChildren)) {
                 child.setSelected(bSelected);
             }
 

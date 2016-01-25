@@ -17,12 +17,10 @@ package net.sf.jabref.exporter.layout;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-import java.util.regex.Matcher;
+import java.util.*;
+import java.util.regex.Pattern;
 
+import net.sf.jabref.gui.search.MatchesHighlighter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -30,8 +28,8 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.format.NameFormatter;
 import net.sf.jabref.exporter.layout.format.NotFoundFormatter;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 class LayoutEntry {
@@ -49,27 +47,22 @@ class LayoutEntry {
 
     private final String classPrefix;
 
-    private ArrayList<String> invalidFormatter;
-
-    // used at highlighting in preview area.
-    // Color chosen similar to JTextComponent.getSelectionColor(), which is
-    // used at highlighting words at the editor
-    public static final String HIGHLIGHT_COLOR = "#3399FF";
+    private List<String> invalidFormatter;
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
 
-    public LayoutEntry(StringInt si, String classPrefix_) {
+    public LayoutEntry(StringInt si, final String classPrefix_) {
         type = si.i;
         classPrefix = classPrefix_;
 
-        if (si.i == LayoutHelper.IS_LAYOUT_TEXT) {
+        if (type == LayoutHelper.IS_LAYOUT_TEXT) {
             text = si.s;
-        } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
+        } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
             text = si.s.trim();
-        } else if ((si.i == LayoutHelper.IS_FIELD_START) || (si.i == LayoutHelper.IS_FIELD_END)) {
+        } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_FIELD_END)) {
             // Do nothing
-        } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+        } else if (type == LayoutHelper.IS_OPTION_FIELD) {
             Vector<String> v = new Vector<>();
             WSITools.tokenize(v, si.s, "\n");
 
@@ -95,40 +88,31 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) {
+    public LayoutEntry(Vector<StringInt> parsedEntries, final String classPrefix_, int layoutType) {
         classPrefix = classPrefix_;
-        String blockStart;
-        String blockEnd;
-        StringInt si;
         Vector<StringInt> blockEntries = null;
         Vector<LayoutEntry> tmpEntries = new Vector<>();
         LayoutEntry le;
-        si = parsedEntries.get(0);
-        blockStart = si.s;
-        si = parsedEntries.get(parsedEntries.size() - 1);
-        blockEnd = si.s;
+        String blockStart = parsedEntries.get(0).s;
+        String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
 
         if (!blockStart.equals(blockEnd)) {
             LOGGER.warn("Field start and end entry must be equal.");
         }
 
         type = layoutType;
-        text = si.s;
-
-        for (int i = 1; i < (parsedEntries.size() - 1); i++) {
-            si = parsedEntries.get(i);
-
-            // System.out.println("PARSED-ENTRY: "+si.s+"="+si.i);
-            if ((si.i == LayoutHelper.IS_LAYOUT_TEXT) || (si.i == LayoutHelper.IS_SIMPLE_FIELD)) {
+        text = blockEnd;
+        for (StringInt parsedEntry : parsedEntries.subList(1, parsedEntries.size() - 1)) {
+            if ((parsedEntry.i == LayoutHelper.IS_LAYOUT_TEXT) || (parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD)) {
                 // Do nothing
-            } else if ((si.i == LayoutHelper.IS_FIELD_START)
-                    || (si.i == LayoutHelper.IS_GROUP_START)) {
+            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_START)
+                    || (parsedEntry.i == LayoutHelper.IS_GROUP_START)) {
                 blockEntries = new Vector<>();
-                blockStart = si.s;
-            } else if ((si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_END)) {
-                if (blockStart.equals(si.s)) {
-                    blockEntries.add(si);
-                    if (si.i == LayoutHelper.IS_GROUP_END) {
+                blockStart = parsedEntry.s;
+            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
+                if (blockStart.equals(parsedEntry.s)) {
+                    blockEntries.add(parsedEntry);
+                    if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
                     } else {
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
@@ -138,18 +122,14 @@ class LayoutEntry {
                 } else {
                     LOGGER.warn("Nested field entries are not implemented !!!");
                 }
-            } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+            } else if (parsedEntry.i == LayoutHelper.IS_OPTION_FIELD) {
                 // Do nothing
             }
 
-            // else if (si.i == LayoutHelper.IS_OPTION_FIELD_PARAM)
-            // {
-            // }
             if (blockEntries == null) {
-                // System.out.println("BLOCK ADD: "+si.s+"="+si.i);
-                tmpEntries.add(new LayoutEntry(si, classPrefix));
+                tmpEntries.add(new LayoutEntry(parsedEntry, classPrefix));
             } else {
-                blockEntries.add(si);
+                blockEntries.add(parsedEntry);
             }
         }
 
@@ -174,16 +154,16 @@ class LayoutEntry {
         this.postFormatter = formatter;
     }
 
-    private String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
+    private String doLayout(BibEntry bibtex, BibDatabase database) {
         return doLayout(bibtex, database, null);
     }
 
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, List<String> wordsToHighlight) {
+    public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
         case LayoutHelper.IS_SIMPLE_FIELD:
-            String value = BibtexDatabase.getResolvedField(text, bibtex, database);
+            String value = BibDatabase.getResolvedField(text, bibtex, database);
 
             if (value == null) {
                 value = "";
@@ -197,13 +177,13 @@ class LayoutEntry {
         case LayoutHelper.IS_GROUP_START: {
             String field;
             if (type == LayoutHelper.IS_GROUP_START) {
-                field = BibtexDatabase.getResolvedField(text, bibtex, database);
+                field = BibDatabase.getResolvedField(text, bibtex, database);
             } else if (text.matches(".*(;|(\\&+)).*")) {
                 // split the strings along &, && or ; for AND formatter
                 String[] parts = text.split("\\s*(;|(\\&+))\\s*");
                 field = null;
                 for (String part : parts) {
-                    field = BibtexDatabase.getResolvedField(part, bibtex, database);
+                    field = BibDatabase.getResolvedField(part, bibtex, database);
                     if (field == null) {
                         break;
                     }
@@ -214,7 +194,7 @@ class LayoutEntry {
                 String[] parts = text.split("\\s*(\\|+)\\s*");
                 field = null;
                 for (String part : parts) {
-                    field = BibtexDatabase.getResolvedField(part, bibtex, database);
+                    field = BibDatabase.getResolvedField(part, bibtex, database);
                     if (field != null) {
                         break;
                     }
@@ -269,11 +249,9 @@ class LayoutEntry {
                              *
                             */
                             if (bibtex.isSearchHit()) {
-                                sb.append(highlightWords(fieldText, wordsToHighlight));
-                            }
-                            else {
+                                sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern));
+                            } else {
                                 sb.append(fieldText);
-
                             }
 
                         }
@@ -296,8 +274,8 @@ class LayoutEntry {
             } else {
                 // changed section begin - arudert
                 // resolve field (recognized by leading backslash) or text
-                String field = text.startsWith("\\") ? BibtexDatabase.getResolvedField(text.substring(1), bibtex, database)
-                        : BibtexDatabase.getText(text, database);
+                String field = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex, database)
+                        : BibDatabase.getText(text, database);
                 // changed section end - arudert
                 if (field == null) {
                     fieldEntry = "";
@@ -323,7 +301,7 @@ class LayoutEntry {
                 // Printing the encoding name is not supported in entry layouts, only
                 // in begin/end layouts. This prevents breakage if some users depend
                 // on a field called "encoding". We simply return this field instead:
-                return BibtexDatabase.getResolvedField("encoding", bibtex, database);
+                return BibDatabase.getResolvedField("encoding", bibtex, database);
             default:
             return "";
         }
@@ -337,7 +315,7 @@ class LayoutEntry {
      *            Bibtex Database
      * @return
      */
-    public String doLayout(BibtexDatabase database, Charset encoding) {
+    public String doLayout(BibDatabase database, Charset encoding) {
         if (type == LayoutHelper.IS_LAYOUT_TEXT) {
             return text;
         } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
@@ -350,7 +328,7 @@ class LayoutEntry {
             throw new UnsupportedOperationException(
                     "field and group ends not allowed in begin or end layout");
         } else if (type == LayoutHelper.IS_OPTION_FIELD) {
-            String field = BibtexDatabase.getText(text, database);
+            String field = BibDatabase.getText(text, database);
             if (option != null) {
                 for (LayoutFormatter anOption : option) {
                     field = anOption.format(field);
@@ -364,14 +342,12 @@ class LayoutEntry {
             return field;
         } else if (type == LayoutHelper.IS_ENCODING_NAME) {
             return encoding.displayName();
-        }
-        else if (type == LayoutHelper.IS_FILENAME) {
+        } else if (type == LayoutHelper.IS_FILENAME) {
             File f = Globals.prefs.databaseFile;
-            return f != null ? f.getName() : "";
-        }
-        else if (type == LayoutHelper.IS_FILEPATH) {
+            return f == null ? "" : f.getName();
+        } else if (type == LayoutHelper.IS_FILEPATH) {
             File f = Globals.prefs.databaseFile;
-            return f != null ? f.getPath() : "";
+            return f == null ? "" : f.getPath();
         }
         return "";
     }
@@ -433,10 +409,8 @@ class LayoutEntry {
                 LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, classPrefix);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
-                if (f instanceof ParamLayoutFormatter) {
-                    if (strings.length >= 2) {
+                if ((f instanceof ParamLayoutFormatter) && (strings.length >= 2)) {
                         ((ParamLayoutFormatter) f).setArgument(strings[1]);
-                    }
                 }
                 results.add(f);
                 continue;
@@ -467,49 +441,8 @@ class LayoutEntry {
         return invalidFormatter != null;
     }
 
-    public ArrayList<String> getInvalidFormatters() {
+    public List<String> getInvalidFormatters() {
         return invalidFormatter;
     }
 
-    /**
-     * Will return the text that was called by the method with HTML tags to highlight each word the user has searched
-     * for and will skip the highlight process if the first Char isn't a letter or a digit.
-     *
-     * This check is a quick hack to avoid highlighting of HTML tags It does not always work, but it does its job mostly
-     *
-     * @param text This is a String in which we search for different words
-     * @param wordsToHighlight List of all words which must be highlighted
-     * 
-     * @return String that was called by the method, with HTML Tags if a word was found
-     */
-    private String highlightWords(String text, List<String> wordsToHighlight) {
-        if (wordsToHighlight == null) {
-            return text;
-        }
-
-        Matcher matcher = Util.getPatternForWords(wordsToHighlight).matcher(text);
-
-        if (Character.isLetterOrDigit(text.charAt(0))) {
-            String hlColor = HIGHLIGHT_COLOR;
-            StringBuffer sb = new StringBuffer();
-            boolean foundSomething = false;
-
-            String found;
-            while (matcher.find()) {
-                matcher.end();
-                found = matcher.group();
-                // color the search keyword	-
-                // put first String Part and then html + word + html to a StringBuffer
-                matcher.appendReplacement(sb, "<span style=\"background-color:" + hlColor + ";\">" + found + "</span>");
-                foundSomething = true;
-            }
-
-            if (foundSomething) {
-                matcher.appendTail(sb);
-                text = sb.toString();
-            }
-
-        }
-        return text;
-    }
 }

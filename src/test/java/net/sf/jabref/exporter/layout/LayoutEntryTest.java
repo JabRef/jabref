@@ -1,6 +1,6 @@
 package net.sf.jabref.exporter.layout;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
@@ -10,7 +10,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry.
@@ -19,7 +20,7 @@ import java.util.ArrayList;
  * The LayoutEntry creates a human readable String assinged with html formaters.
  * To test the Highlighting Feature, an instance of LayoutEntry will be instatiated via Layout and LayoutHelper.
  * With these instance the doLayout() Method is called several times for each test case.
- * To simulate a search, a BibtexEntry will be created, wich will be used by LayoutEntry.
+ * To simulate a search, a BibEntry will be created, wich will be used by LayoutEntry.
  * The definiton of the search is set by
  * <p/>
  * LayoutEntry.setWordsToHighlight(words); and
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 
 public class LayoutEntryTest {
 
-    private BibtexEntry mBTE;
+    private BibEntry mBTE;
 
 
     /**
@@ -52,7 +53,7 @@ public class LayoutEntryTest {
 
         // create Bibtext Entry
 
-        mBTE = new BibtexEntry("testid");
+        mBTE = new BibEntry("testid");
         mBTE.setField("abstract", "In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices");
         //  Specifically, we present a core typed language to describe Android applications, and to reason about their data-flow security properties. Our operational semantics and type system provide some necessary foundations to help both users and developers of Android applications deal with their security concerns.
         mBTE.setField("keywords", "android, mobile devices, security");
@@ -79,11 +80,11 @@ public class LayoutEntryTest {
 
     // helper Methods
 
-    public String layout(String layoutFile, BibtexEntry entry, ArrayList<String> wordsToHighlight) throws Exception {
+    public String layout(String layoutFile, BibEntry entry, Optional<Pattern> highlightPattern) throws Exception {
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
 
-        return layout.doLayout(entry, null, wordsToHighlight);
+        return layout.doLayout(entry, null, highlightPattern);
     }
 
     /*************************/
@@ -99,10 +100,7 @@ public class LayoutEntryTest {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
-        // define the highlighting settings
-        Globals.prefs.putBoolean("caseSensitiveSearch", false);
-
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, new ArrayList<String>());
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, Optional.empty());
         String expecting = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices</font>";
 
         Assert.assertEquals(expecting, result);
@@ -116,14 +114,9 @@ public class LayoutEntryTest {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
-        // define the serach words
-        ArrayList<String> words = new ArrayList<>();
-        words.add("google");
+        Optional<Pattern> highlightPattern = Optional.of(Pattern.compile("(google)", Pattern.CASE_INSENSITIVE));
 
-        // define the highlighting settings
-        Globals.prefs.putBoolean("caseSensitiveSearch", false);
-
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, highlightPattern);
         String containing = "<span style=\"background-color:#3399FF;\">Google</span>";
 
         // check
@@ -138,15 +131,9 @@ public class LayoutEntryTest {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
-        // define the serach words
-        ArrayList<String> words = new ArrayList<>();
-        words.add("Android");
-        words.add("study");
+        Optional<Pattern> highlightPattern = Optional.of(Pattern.compile("(Android|study)", Pattern.CASE_INSENSITIVE));
 
-        // define the highlighting settings
-        Globals.prefs.putBoolean("caseSensitiveSearch", false);
-
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, highlightPattern);
 
         String containing = "<span style=\"background-color:#3399FF;\">Android</span>";
         String containing2 = "<span style=\"background-color:#3399FF;\">study</span>";
@@ -164,14 +151,9 @@ public class LayoutEntryTest {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
-        // define the search words
-        ArrayList<String> words = new ArrayList<>();
-        words.add("google");
+        Optional<Pattern> highlightPattern = Optional.of(Pattern.compile("(google)"));
 
-        // define the highlighting settings
-        Globals.prefs.putBoolean("caseSensitiveSearch", true);
-
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, highlightPattern);
         String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android <span style=\"background-color:#3399FF;\">google</span> Open-Source Devices</font>";
 
         // check
@@ -186,17 +168,10 @@ public class LayoutEntryTest {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
-        // define the serach words
-        ArrayList<String> words = new ArrayList<>();
-        words.add("Android");
-        words.add("study");
-        words.add("Open");
-
-        // define the highlighting settings
-        Globals.prefs.putBoolean("caseSensitiveSearch", false);
+        Optional<Pattern> highlightPattern = Optional.of(Pattern.compile("(Android|study|Open)", Pattern.CASE_INSENSITIVE));
 
         String highlightColor = "#3399FF;";
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, highlightPattern);
         String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal <span style=\"background-color:" + highlightColor + "\">study</span> of security on <span style=\"background-color:" + highlightColor + "\">Android</span>: Google's new <span style=\"background-color:" + highlightColor + "\">open</span>-source platform for mobile devices. Tags: Paper <span style=\"background-color:" + highlightColor + "\">android</span> google <span style=\"background-color:" + highlightColor + "\">Open</span>-Source Devices</font>";
 
         // check

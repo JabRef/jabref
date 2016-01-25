@@ -25,10 +25,9 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.importer.fileformat.BibTeXMLHandler;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,8 +68,7 @@ public class BibteXMLImporter extends ImportFormat {
 
         // Our strategy is to look for the "<bibtex:file *" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern
-                .compile("<bibtex:file .*");
+        Pattern pat1 = Pattern.compile("<bibtex:file .*");
         String str;
         while ((str = in.readLine()) != null) {
             if (pat1.matcher(str).find()) {
@@ -81,13 +79,13 @@ public class BibteXMLImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        ArrayList<BibtexEntry> bibItems = new ArrayList<>();
+        List<BibEntry> bibItems = new ArrayList<>();
 
         // Obtain a factory object for creating SAX parsers
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -105,15 +103,15 @@ public class BibteXMLImporter extends ImportFormat {
             // When you're done, report the results stored by your handler object
             bibItems = handler.getItems();
 
-        } catch (javax.xml.parsers.ParserConfigurationException e1) {
-            LOGGER.error("Error with XML parser configuration", e1);
-            status.showMessage(e1.getLocalizedMessage());
-        } catch (org.xml.sax.SAXException e2) {
-            LOGGER.error("Error during XML parsing", e2);
-            status.showMessage(e2.getLocalizedMessage());
-        } catch (java.io.IOException e3) {
-            LOGGER.error("Error during file import", e3);
-            status.showMessage(e3.getLocalizedMessage());
+        } catch (javax.xml.parsers.ParserConfigurationException e) {
+            LOGGER.error("Error with XML parser configuration", e);
+            status.showMessage(e.getLocalizedMessage());
+        } catch (org.xml.sax.SAXException e) {
+            LOGGER.error("Error during XML parsing", e);
+            status.showMessage(e.getLocalizedMessage());
+        } catch (IOException e) {
+            LOGGER.error("Error during file import", e);
+            status.showMessage(e.getLocalizedMessage());
         }
         return bibItems;
 

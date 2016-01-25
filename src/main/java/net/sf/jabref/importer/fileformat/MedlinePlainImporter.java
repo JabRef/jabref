@@ -22,12 +22,13 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.bibtex.EntryTypes;
 
@@ -82,24 +83,24 @@ public class MedlinePlainImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         while ((str = in.readLine()) != null) {
             sb.append(str);
-            sb.append("\n");
+            sb.append('\n');
         }
         String[] entries = sb.toString().replaceAll("\u2013", "-").replaceAll("\u2014", "--").replaceAll("\u2015", "--").split("\\n\\n");
 
         for (String entry1 : entries) {
 
-            if (entry1.trim().isEmpty()) {
+            if (entry1.trim().isEmpty() || !entry1.contains("-")) {
                 continue;
             }
 
@@ -112,16 +113,14 @@ public class MedlinePlainImporter extends ImportFormat {
             String[] fields = entry1.split("\n");
 
             for (int j = 0; j < fields.length; j++) {
-                if ("".equals(fields[j])) {
-                    continue;
-                }
 
                 StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
 
                 while (!done && (j < (fields.length - 1))) {
                     if (fields[j + 1].length() <= 4) {
-                        System.out.println("aaa");
+                        j++;
+                        continue;
                     }
                     if (fields[j + 1].charAt(4) != '-') {
                         if ((current.length() > 0)
@@ -140,7 +139,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 String val = entry.substring(entry.indexOf('-') + 1).trim();
                 if ("PT".equals(lab)) {
                     val = val.toLowerCase();
-                    if ("BOOK".equals(val)) {
+                    if ("book".equals(val)) {
                         type = "book";
                     } else if ("journal article".equals(val)
                             || "classical article".equals(val)
@@ -151,7 +150,7 @@ public class MedlinePlainImporter extends ImportFormat {
                         type = "article";
                     } else if ("clinical conference".equals(val)
                             || "consensus development conference".equals(val)
-                            || "consensus development conference, NIH".equals(val)) {
+                            || "consensus development conference, nih".equals(val)) {
                         type = "conference";
                     } else if ("technical report".equals(val)) {
                         type = "techreport";
@@ -261,15 +260,16 @@ public class MedlinePlainImporter extends ImportFormat {
                 hm.put("comment", comment);
             }
 
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getBibtexEntryType(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getTypeOrDefault(type)); // id assumes an existing database so don't
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();
-            for (String key : hm.keySet()) {
-                String content = hm.get(key);
-                if ((content == null) || content.trim().isEmpty()) {
-                    toRemove.add(key);
+            for (Map.Entry<String, String> key : hm.entrySet()) {
+                String content = key.getValue();
+                // content can never be null so only check if content is empty
+                if (content.trim().isEmpty()) {
+                    toRemove.add(key.getKey());
                 }
             }
             for (Object aToRemove : toRemove) {

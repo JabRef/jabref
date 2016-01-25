@@ -28,8 +28,8 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.SearchQueryLocalizer;
-import net.sf.jabref.logic.search.SearchTextObservable;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.search.SearchQueryHighlightObservable;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,7 +37,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * The search bar at the top of the screen allowing the user to search his database.
@@ -56,7 +58,7 @@ public class SearchBar extends JPanel {
 
     private final BasePanel basePanel;
 
-    private final SearchTextObservable searchTextObservable;
+    private final SearchQueryHighlightObservable searchQueryHighlightObservable;
     private final JSearchTextField searchField;
 
     private SearchMode searchMode = getSearchModeFromSettings();
@@ -78,7 +80,7 @@ public class SearchBar extends JPanel {
         super();
 
         this.basePanel = Objects.requireNonNull(basePanel);
-        this.searchTextObservable = new SearchTextObservable();
+        this.searchQueryHighlightObservable = new SearchQueryHighlightObservable();
 
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
 
@@ -94,7 +96,8 @@ public class SearchBar extends JPanel {
         openCurrentResultsInDialog.addActionListener(ae -> {
             SearchResultsDialog searchDialog = new SearchResultsDialog(basePanel.frame(), Localization.lang("Search results in database %0 for %1",
                     basePanel.getDatabaseFile().getName(), SearchQueryLocalizer.localize(this.getSearchQuery())));
-            basePanel.getDatabase().getEntries().stream().filter(BibtexEntry::isSearchHit).forEach(entry -> searchDialog.addEntry(entry, basePanel));
+            List<BibEntry> entries = basePanel.getDatabase().getEntries().stream().filter(BibEntry::isSearchHit).collect(Collectors.toList());
+            searchDialog.addEntries(entries, basePanel);
             searchDialog.selectFirstEntry();
             searchDialog.setVisible(true);
         });
@@ -245,7 +248,7 @@ public class SearchBar extends JPanel {
         searchField.setText("");
         searchField.setBackground(Color.WHITE);
 
-        searchTextObservable.fireSearchlistenerEvent(null);
+        searchQueryHighlightObservable.fireSearchlistenerEvent(null);
 
         this.currentResults.setText("");
 
@@ -285,7 +288,7 @@ public class SearchBar extends JPanel {
     private void informUserAboutInvalidSearchQuery() {
         searchField.setBackground(NO_RESULTS_COLOR);
 
-        searchTextObservable.fireSearchlistenerEvent(null);
+        searchQueryHighlightObservable.fireSearchlistenerEvent(null);
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
@@ -308,8 +311,8 @@ public class SearchBar extends JPanel {
         this.autoCompleteSupport.setAutoCompleter(searchCompleter);
     }
 
-    public SearchTextObservable getSearchTextObservable() {
-        return searchTextObservable;
+    public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
+        return searchQueryHighlightObservable;
     }
 
     public boolean isStillValidQuery(SearchQuery query) {

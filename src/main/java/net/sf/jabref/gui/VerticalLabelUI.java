@@ -48,10 +48,8 @@ public class VerticalLabelUI extends BasicLabelUI {
     private Rectangle verticalViewR = new Rectangle();
     private Rectangle verticalIconR = new Rectangle();
     private Rectangle verticalTextR = new Rectangle();
-    private static final VerticalLabelUI verticalLabelUI =
-            new VerticalLabelUI();
-    private static final VerticalLabelUI SAFE_VERTICAL_LABEL_UI =
-            new VerticalLabelUI();
+    private static final VerticalLabelUI VERTICAL_LABEL_UI = new VerticalLabelUI();
+    private static final VerticalLabelUI SAFE_VERTICAL_LABEL_UI = new VerticalLabelUI();
 
 
     /**
@@ -74,10 +72,10 @@ public class VerticalLabelUI extends BasicLabelUI {
      * @see ComponentUI#createUI(javax.swing.JComponent)
      */
     public static ComponentUI createUI(JComponent c) {
-        if (System.getSecurityManager() != null) {
-            return VerticalLabelUI.SAFE_VERTICAL_LABEL_UI;
+        if (System.getSecurityManager() == null) {
+            return VerticalLabelUI.VERTICAL_LABEL_UI;
         } else {
-            return VerticalLabelUI.verticalLabelUI;
+            return VerticalLabelUI.SAFE_VERTICAL_LABEL_UI;
         }
     }
 

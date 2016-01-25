@@ -4,7 +4,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,11 +24,10 @@ public class AttachFileAction implements BaseAction {
 
     @Override
     public void action() {
-        if (panel.getSelectedEntries().length != 1)
-         {
+        if (panel.getSelectedEntries().length != 1) {
             return; // TODO: display error message?
         }
-        BibtexEntry entry = panel.getSelectedEntries()[0];
+        BibEntry entry = panel.getSelectedEntries()[0];
         FileListEntry flEntry = new FileListEntry("", "", null);
         FileListEntryEditor editor = new FileListEntryEditor(panel.frame(), flEntry, false, true,
                 panel.metaData());

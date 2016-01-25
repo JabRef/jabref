@@ -21,11 +21,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import javax.swing.*;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
@@ -45,21 +44,22 @@ import com.jgoodies.forms.layout.ColumnSpec;
 public class MergeEntriesDialog extends JDialog {
 
     private final BasePanel panel;
-    private final JabRefFrame frame;
     private final CellConstraints cc = new CellConstraints();
-    private BibtexEntry one;
-    private BibtexEntry two;
+    private BibEntry one;
+    private BibEntry two;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
 
     private PositionWindow pw;
 
 
+    private static final String MERGE_ENTRIES = Localization.lang("Merge entries");
+    private static final String MARGIN = "5px";
+
     public MergeEntriesDialog(BasePanel panel) {
-        super(panel.frame(), Localization.lang("Merge entries"), true);
+        super(panel.frame(), MERGE_ENTRIES, true);
 
         this.panel = panel;
-        this.frame = panel.frame();
 
         // Start setting up the dialog
         init(panel.getSelectedEntries());
@@ -70,14 +70,13 @@ public class MergeEntriesDialog extends JDialog {
      *
      * @param selected Selected BibtexEntries
      */
-    private void init(BibtexEntry[] selected) {
+    private void init(BibEntry[] selected) {
 
         // Check if there are two entries selected
         if (selected.length != 2) { // None selected. Inform the user to select entries first.
-            // @formatter:off
-            JOptionPane.showMessageDialog(frame, Localization.lang("You have to choose exactly two entries to merge."),
-                    Localization.lang("Merge entries"), JOptionPane.INFORMATION_MESSAGE);
-            // @formatter:on
+            JOptionPane.showMessageDialog(panel.frame(),
+                    Localization.lang("You have to choose exactly two entries to merge."),
+                    MERGE_ENTRIES, JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
         }
@@ -89,7 +88,7 @@ public class MergeEntriesDialog extends JDialog {
         mergeEntries = new MergeEntries(one, two);
 
         // Create undo-compound
-        ce = new NamedCompound(Localization.lang("Merge entries"));
+        ce = new NamedCompound(MERGE_ENTRIES);
 
         FormLayout layout = new FormLayout("fill:700px:grow", "fill:400px:grow, 4px, p, 5px, p");
         // layout.setColumnGroups(new int[][] {{3, 11}});
@@ -111,7 +110,7 @@ public class MergeEntriesDialog extends JDialog {
             }
         });
 
-        JButton replaceentries = new JButton(Localization.lang("Merge entries"));
+        JButton replaceentries = new JButton(MERGE_ENTRIES);
         replaceentries.setActionCommand("replace");
         replaceentries.addActionListener(new ActionListener() {
 
@@ -125,10 +124,10 @@ public class MergeEntriesDialog extends JDialog {
         this.add(bb.getPanel(), cc.xy(1, 5));
 
         // Add some margin around the layout
-        layout.appendRow(RowSpec.decode("5px"));
-        layout.appendColumn(ColumnSpec.decode("5px"));
-        layout.insertRow(1, RowSpec.decode("5px"));
-        layout.insertColumn(1, ColumnSpec.decode("5px"));
+        layout.appendRow(RowSpec.decode(MARGIN));
+        layout.appendColumn(ColumnSpec.decode(MARGIN));
+        layout.insertRow(1, RowSpec.decode(MARGIN));
+        layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
         // Set up a ComponentListener that saves the last size and position of the dialog
         this.addComponentListener(new ComponentAdapter() {
@@ -160,7 +159,7 @@ public class MergeEntriesDialog extends JDialog {
      * @param button Button pressed
      */
     private void buttonPressed(String button) {
-        BibtexEntry mergedEntry = mergeEntries.getMergeEntry();
+        BibEntry mergedEntry = mergeEntries.getMergeEntry();
         if ("cancel".equals(button)) {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));
@@ -170,9 +169,9 @@ public class MergeEntriesDialog extends JDialog {
             panel.insertEntry(mergedEntry);
             ce.addEdit(new UndoableInsertEntry(panel.database(), mergedEntry, panel));
             ce.addEdit(new UndoableRemoveEntry(panel.database(), one, panel));
-            panel.database().removeEntry(one.getId());
+            panel.database().removeEntry(one);
             ce.addEdit(new UndoableRemoveEntry(panel.database(), two, panel));
-            panel.database().removeEntry(two.getId());
+            panel.database().removeEntry(two);
             ce.end();
             panel.undoManager.addEdit(ce);
             panel.output(Localization.lang("Merged entries"));

@@ -31,17 +31,17 @@ import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
- *
+ * <p>
  * Documentation about ISI WOS format:
- *
+ * <p>
  * <ul>
  * <li>http://wos.isitrial.com/help/helpprn.html</li>
  * </ul>
- *
+ * <p>
  * <ul>
  * <li>Check compatibility with other ISI2Bib tools like:
  * http://www-lab.imr.tohoku.ac.jp/~t-nissie/computer/software/isi/ or
@@ -51,6 +51,13 @@ import net.sf.jabref.model.entry.BibtexEntry;
  * </ul>
  */
 public class IsiImporter extends ImportFormat {
+
+    private static final Pattern SUB_SUP_PATTERN = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
+
+    // 2006.09.05: Modified pattern to avoid false positives for other files due to an
+    // extra | at the end:
+    private static final Pattern ISI_PATTERN = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
+
 
     /**
      * Return the name of this import format.
@@ -70,10 +77,6 @@ public class IsiImporter extends ImportFormat {
         return "isi";
     }
 
-
-    // 2006.09.05: Modified pattern to avoid false positives for other files due to an
-    // extra | at the end:
-    private static final Pattern isiPattern = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
 
     /**
@@ -95,7 +98,7 @@ public class IsiImporter extends ImportFormat {
              *
              * str = str.replace(" - ", "")
              */
-            if (IsiImporter.isiPattern.matcher(str).find()) {
+            if (IsiImporter.ISI_PATTERN.matcher(str).find()) {
                 return true;
             }
 
@@ -106,17 +109,15 @@ public class IsiImporter extends ImportFormat {
     }
 
 
-    private static final Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
-
-    public static void processSubSup(HashMap<String, String> map) {
+    public static void processSubSup(Map<String, String> map) {
 
         String[] subsup = {"title", "abstract", "review", "notes"};
 
         for (String aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
 
-                Matcher m = IsiImporter.subsupPattern.matcher(map.get(aSubsup));
+                Matcher m = IsiImporter.SUB_SUP_PATTERN.matcher(map.get(aSubsup));
                 StringBuffer sb = new StringBuffer();
 
                 while (m.find()) {
@@ -140,7 +141,7 @@ public class IsiImporter extends ImportFormat {
         }
     }
 
-    private static void processCapitalization(HashMap<String, String> map) {
+    private static void processCapitalization(Map<String, String> map) {
 
         String[] subsup = {"title", "journal", "publisher"};
 
@@ -158,16 +159,16 @@ public class IsiImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         if (stream == null) {
             throw new IOException("No stream given.");
         }
 
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -262,10 +263,10 @@ public class IsiImporter extends ImportFormat {
 
                     value = value.replaceAll("EOLEOL", " ");
                     String existingKeywords = hm.get("keywords");
-                    if ((existingKeywords != null) && !existingKeywords.contains(value)) {
-                        existingKeywords += ", " + value;
-                    } else {
+                    if ((existingKeywords == null) || existingKeywords.contains(value)) {
                         existingKeywords = value;
+                    } else {
+                        existingKeywords += ", " + value;
                     }
                     hm.put("keywords", existingKeywords);
 
@@ -321,7 +322,7 @@ public class IsiImporter extends ImportFormat {
                             || "FN".equals(beg)) {
                         continue;
                     }
-                    hm.put(beg, value);
+                    hm.put(beg.toLowerCase(), value);
                 }
             }
 
@@ -334,12 +335,12 @@ public class IsiImporter extends ImportFormat {
                 continue;
             }
 
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getBibtexEntryType(Type));
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
+                    .getTypeOrDefault(Type));
             // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<>();
+            List<Object> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> field : hm.entrySet()) {
                 String content = field.getValue();
                 if ((content == null) || content.trim().isEmpty()) {
@@ -364,7 +365,7 @@ public class IsiImporter extends ImportFormat {
     }
 
     private static String parsePages(String value) {
-        int lastDash = value.lastIndexOf("-");
+        int lastDash = value.lastIndexOf('-');
         return value.substring(0, lastDash) + "--" + value.substring(lastDash + 1);
     }
 
@@ -395,10 +396,9 @@ public class IsiImporter extends ImportFormat {
 
     /**
      * Will expand ISI first names.
-     *
+     * <p>
      * Fixed bug from:
      * http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306
-     *
      */
     public static String isiAuthorConvert(String author) {
 
@@ -424,17 +424,17 @@ public class IsiImporter extends ImportFormat {
             if (first.toUpperCase().equals(first)) {
                 first = first.replaceAll("\\.", "");
                 for (int j = 0; j < first.length(); j++) {
-                    sb.append(first.charAt(j)).append(".");
+                    sb.append(first.charAt(j)).append('.');
 
                     if (j < (first.length() - 1)) {
-                        sb.append(" ");
+                        sb.append(' ');
                     }
                 }
             } else {
                 sb.append(first);
             }
             if (i < (firstParts.length - 1)) {
-                sb.append(" ");
+                sb.append(' ');
             }
         }
         return sb.toString();

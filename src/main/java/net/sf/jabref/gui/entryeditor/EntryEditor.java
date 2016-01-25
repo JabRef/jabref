@@ -24,8 +24,6 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.RenderingHints;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -34,7 +32,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.VetoableChangeListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
@@ -44,26 +41,22 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
-import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.logic.search.SearchTextListener;
-import net.sf.jabref.logic.util.date.EasyDateFormat;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.logic.search.SearchQueryHighlightListener;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -77,7 +70,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * GUI component that allows editing of the fields of a BibtexEntry (i.e. the
+ * GUI component that allows editing of the fields of a BibEntry (i.e. the
  * one that shows up, when you double click on an entry in the table)
  * <p>
  * It hosts the tabs (required, general, optional) and the buttons to the left.
@@ -90,7 +83,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
-    private BibtexEntry entry;
+    private BibEntry entry;
 
     private final EntryType type;
 
@@ -169,16 +162,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private final TabListener tabListener = new TabListener();
 
-    // @formatter:off
-    private final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
-            + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
-            + "<BR>" + Localization.lang("To set up, go to") + " <B>"
-            + Localization.lang("Options") + " -> "
-            + Localization.lang("Manage journal abbreviations") + "</B></HTML>";
-    // @formatter:on
 
-
-    public EntryEditor(JabRefFrame frame, BasePanel panel, BibtexEntry entry) {
+    public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
 
         this.frame = frame;
         this.panel = panel;
@@ -316,11 +301,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * @return reference to the currently edited entry
      */
     @Override
-    public BibtexEntry getEntry() {
+    public BibEntry getEntry() {
         return entry;
     }
 
-    public BibtexDatabase getDatabase() {
+    public BibDatabase getDatabase() {
         return panel.getDatabase();
     }
 
@@ -339,23 +324,23 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         ActionMap actionMap = toolBar.getActionMap();
         InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        inputMap.put(prefs.getKey(KeyBinds.CLOSE_ENTRY_EDITOR), "close");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_ENTRY_EDITOR), "close");
         actionMap.put("close", closeAction);
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", storeFieldAction);
-        inputMap.put(prefs.getKey(KeyBinds.AUTOGENERATE_BIB_TE_X_KEYS), "generateKey");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS), "generateKey");
         actionMap.put("generateKey", generateKeyAction);
-        inputMap.put(prefs.getKey(KeyBinds.AUTOMATICALLY_LINK_FILES), "autoLink");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOMATICALLY_LINK_FILES), "autoLink");
         actionMap.put("autoLink", autoLinkAction);
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
         actionMap.put("prev", prevEntryAction);
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_ENTRY), "next");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
         actionMap.put("next", nextEntryAction);
-        inputMap.put(prefs.getKey(KeyBinds.UNDO), "undo");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.UNDO), "undo");
         actionMap.put("undo", undoAction);
-        inputMap.put(prefs.getKey(KeyBinds.REDO), "redo");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.REDO), "redo");
         actionMap.put("redo", redoAction);
-        inputMap.put(prefs.getKey(KeyBinds.HELP), "help");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", helpAction);
 
         toolBar.setFloatable(false);
@@ -422,194 +407,49 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * @param string Field name
      * @return Component to show, or null if none.
      */
-    public JComponent getExtra(String string, final FieldEditor editor) {
-
-        // fieldName and parameter string identically ????
+    public Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
-        String fieldExtras = BibtexFields.getFieldExtras(string);
+        final String fieldExtras = BibtexFields.getFieldExtras(fieldName);
 
         // timestamp or a other field with datepicker command
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName)
                 || BibtexFields.EXTRA_DATEPICKER.equals(fieldExtras)) {
             // double click AND datefield => insert the current date (today)
-            ((JTextArea) editor).addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) // double click
-                    {
-                        String date = new EasyDateFormat().getCurrentDate();
-                        editor.setText(date);
-                    }
-                }
-            });
-
-            // insert a datepicker, if the extras field contains this command
-            if (BibtexFields.EXTRA_DATEPICKER.equals(fieldExtras)) {
-                DatePickerButton datePicker = new DatePickerButton(editor);
-                return datePicker.getDatePicker();
-            }
-        }
-
-        if (BibtexFields.EXTRA_EXTERNAL.equals(fieldExtras)) {
-
+            return FieldExtraComponents.getDateTimeExtraComponent(editor,
+                    BibtexFields.EXTRA_DATEPICKER.equals(fieldExtras));
+        } else if (BibtexFields.EXTRA_EXTERNAL.equals(fieldExtras)) {
             // Add external viewer listener for "pdf" and "url" fields.
-            ((JComponent) editor).addMouseListener(new ExternalViewerListener());
-
-            return null;
+            return FieldExtraComponents.getExternalExtraComponent(editor, this);
         } else if (BibtexFields.EXTRA_JOURNAL_NAMES.equals(fieldExtras)) {
-            // Add controls for switching between abbreviated and full journal
-            // names.
-            // If this field also has a FieldContentSelector, we need to combine
-            // these.
-            JPanel controls = new JPanel();
-            controls.setLayout(new BorderLayout());
-            if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
-                FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
-                        panel.metaData, storeFieldAction, false, ", ");
-                contentSelectors.add(ws);
-                controls.add(ws, BorderLayout.NORTH);
-            }
-
-            // Button to toggle abbreviated/full journal names
-            JButton button = new JButton(Localization.lang("Toggle abbreviation"));
-            button.setToolTipText(ABBREVIATION_TOOLTIP_TEXT);
-            button.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    String text = editor.getText();
-                    if (Abbreviations.journalAbbrev.isKnownName(text)) {
-                        String s = Abbreviations.toggleAbbreviation(text);
-
-                        if (s != null) {
-                            editor.setText(s);
-                            storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-                            panel.undoManager
-                                    .addEdit(new UndoableFieldChange(getEntry(), editor.getFieldName(), text, s));
-                        }
-                    }
-                }
-            });
-
-            controls.add(button, BorderLayout.SOUTH);
-            return controls;
-        } else {
-            if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
-                FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
-                        panel.metaData, storeFieldAction, false,
-                        "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");
-                contentSelectors.add(ws);
-
-                return ws;
-            } else {
-                if (BibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
-                    JButton but = new JButton(Localization.lang("Browse"));
-                    ((JComponent) editor).addMouseListener(new ExternalViewerListener());
-
-                    but.addActionListener(new ActionListener() {
-
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String dir = editor.getText();
-
-                            if (dir.isEmpty()) {
-                                dir = prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
-                            }
-
-                            String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldName,
-                                    JFileChooser.OPEN_DIALOG, false);
-
-                            if (chosenFile != null) {
-                                File newFile = new File(chosenFile); // chooser.getSelectedFile();
-                                editor.setText(newFile.getPath());
-                                prefs.put(fieldName + Globals.FILETYPE_PREFS_EXT, newFile.getPath());
-                                updateField(editor);
-                            }
-                        }
-                    });
-
-                    return but;
-
-                } else if (BibtexFields.EXTRA_BROWSE_DOC.equals(fieldExtras)
-                        || BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
-
-                    final String ext = '.' + fieldName.toLowerCase();
-                    final OpenFileFilter off;
-                    if (BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
-                        off = new OpenFileFilter(new String[]{ext, ext + ".gz", ext + ".bz2"});
-                    } else {
-                        off = new OpenFileFilter(new String[]{ext});
-                    }
-
-                    return new ExternalFilePanel(frame, panel.metaData(), this, fieldName,
-                            off, editor);
-                } else if (BibtexFields.EXTRA_URL.equals(fieldExtras)) {
-                    ((JComponent) editor).setDropTarget(new DropTarget((Component) editor,
-                            DnDConstants.ACTION_NONE, new SimpleUrlDragDrop(editor, storeFieldAction)));
-
-                    return null;
-                } else if (BibtexFields.EXTRA_SET_OWNER.equals(fieldExtras)) {
-                    JButton button = new JButton(Localization.lang("Auto"));
-                    button.addActionListener(new ActionListener() {
-
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            editor.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
-                            storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-                        }
-                    });
-                    return button;
-                } else if (BibtexFields.EXTRA_YES_NO.equals(fieldExtras)) {
-                    final String[] options = {"", "Yes", "No"};
-                    JComboBox<String> yesno = new JComboBox<>(options);
-                    yesno.addActionListener(new ActionListener() {
-
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-
-                            editor.setText(((String) yesno.getSelectedItem()).toLowerCase());
-                            updateField(editor);
-                        }
-                    });
-                    return yesno;
-                } else if (BibtexFields.EXTRA_MONTH.equals(fieldExtras)) {
-                    final String[] options = new String[13];
-                    options[0] = Localization.lang("Select");
-                    for (int i = 1; i <= 12; i++) {
-                        options[i] = MonthUtil.getMonthByNumber(i).fullName;
-                    }
-                    JComboBox<String> month = new JComboBox<>(options);
-                    month.addActionListener(new ActionListener() {
-
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            int monthnumber = month.getSelectedIndex();
-                            if (monthnumber >= 1) {
-                                if (prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-                                    editor.setText(String.valueOf(monthnumber));
-                                } else {
-                                    editor.setText((MonthUtil.getMonthByNumber(monthnumber).bibtexFormat));
-                                }
-                            } else {
-                                editor.setText("");
-                            }
-                            updateField(editor);
-                            month.setSelectedIndex(0);
-                        }
-                    });
-                    return month;
-                } else {
-                    return null;
-                }
-            }
+            // Add controls for switching between abbreviated and full journal names.
+            // If this field also has a FieldContentSelector, we need to combine these.
+            return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
+                    storeFieldAction);
+        } else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
+            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
+                    storeFieldAction);
+        } else if (BibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
+            return FieldExtraComponents.getBrowseExtraComponent(frame, editor, this);
+        } else if (BibtexFields.EXTRA_BROWSE_DOC.equals(fieldExtras)
+                || BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
+            return FieldExtraComponents.getBrowseDocExtraComponent(frame, panel, editor, this,
+                    BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras));
+        } else if (BibtexFields.EXTRA_URL.equals(fieldExtras)) {
+            return FieldExtraComponents.getURLExtraComponent(editor, storeFieldAction);
+        } else if (BibtexFields.EXTRA_SET_OWNER.equals(fieldExtras)) {
+            return FieldExtraComponents.getSetOwnerExtraComponent(editor, storeFieldAction);
+        } else if (BibtexFields.EXTRA_YES_NO.equals(fieldExtras)) {
+            return FieldExtraComponents.getYesNoExtraComponent(editor, this);
+        } else if (BibtexFields.EXTRA_MONTH.equals(fieldExtras)) {
+            return FieldExtraComponents.getMonthExtraComponent(editor, this);
         }
+        return Optional.empty();
     }
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        panel.getSearchBar().getSearchTextObservable().addSearchListener((SearchTextListener) source);
+        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener((SearchQueryHighlightListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);
@@ -671,10 +511,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
-    public static String getSourceString(BibtexEntry entry) throws IOException {
+    public static String getSourceString(BibEntry entry) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
-        new BibtexEntryWriter(formatter, false).write(entry, stringWriter);
+        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter);
 
         return stringWriter.getBuffer().toString();
     }
@@ -689,25 +529,25 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         InputMap inputMap = textComponent.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = textComponent.getActionMap();
 
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", storeFieldAction);
 
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL), "right");
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_PANEL_2), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
         actionMap.put("right", switchRightAction);
 
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
-        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
         actionMap.put("left", switchLeftAction);
 
-        inputMap.put(prefs.getKey(KeyBinds.HELP), "help");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", helpAction);
-        inputMap.put(prefs.getKey(KeyBinds.SAVE_DATABASE), "save");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
         actionMap.put("save", saveDatabaseAction);
 
-        inputMap.put(Globals.prefs.getKey(KeyBinds.NEXT_TAB), "nexttab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", frame.nextTab);
-        inputMap.put(Globals.prefs.getKey(KeyBinds.PREVIOUS_TAB), "prevtab");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
         actionMap.put("prevtab", frame.prevTab);
 
 
@@ -841,10 +681,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Updates this editor to show the given entry, regardless of type
      * correspondence.
      *
-     * @param swtichEntry a <code>BibtexEntry</code> value
+     * @param switchEntry a <code>BibEntry</code> value
      */
-    public synchronized void switchTo(BibtexEntry swtichEntry) {
-        if (this.entry == swtichEntry) {
+    public synchronized void switchTo(BibEntry switchEntry) {
+        if (this.entry == switchEntry) {
             /**
              * Even if the editor is already showing the same entry, update
              * the source panel. I'm not sure if this is the correct place to
@@ -861,40 +701,24 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         this.entry.removePropertyChangeListener(this);
 
         // Register as property listener for the new entry:
-        swtichEntry.addPropertyChangeListener(this);
+        switchEntry.addPropertyChangeListener(this);
 
-        this.entry = swtichEntry;
+        this.entry = switchEntry;
 
         updateAllFields();
         validateAllFields();
         updateSource();
-        panel.newEntryShowing(swtichEntry);
+        panel.newEntryShowing(switchEntry);
 
     }
 
-    /**
-     * Returns false if the contents of the source panel has not been validated,
-     * true otherwise.
-     */
-    public boolean lastSourceAccepted() {
-        if (tabbed.getSelectedComponent() == srcPanel) {
-            storeSource(false);
-        }
-
-        return lastSourceAccepted;
-    }
-
-    /*
-     * public boolean storeSourceIfNeeded() { if (tabbed.getSelectedIndex() ==
-     * sourceIndex) return storeSource(); else return true; }
-     */
-    private boolean storeSource(boolean showError) {
+    private boolean storeSource() {
         // Store edited bibtex code.
         BibtexParser bibtexParser = new BibtexParser(new java.io.StringReader(source.getText()));
 
         try {
             ParserResult parserResult = bibtexParser.parse();
-            BibtexDatabase database = parserResult.getDatabase();
+            BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {
                 throw new IllegalStateException("More than one entry found.");
@@ -903,14 +727,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (database.getEntryCount() < 1) {
                 if (parserResult.hasWarnings()) {
                     // put the warning into as exception text -> it will be displayed to the user
-                    throw new IllegalStateException(parserResult.warnings()[0]);
+                    throw new IllegalStateException(parserResult.warnings().get(0));
                 } else {
                     throw new IllegalStateException("No entries found.");
                 }
             }
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
-            BibtexEntry newEntry = database.getEntryById(database.getKeySet().iterator().next());
+            BibEntry newEntry = database.getEntryById(database.getKeySet().iterator().next());
             String id = entry.getId();
             String newKey = newEntry.getCiteKey();
             boolean anyChanged = false;
@@ -926,9 +750,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             for (String field : entry.getFieldNames()) {
                 if (BibtexFields.isDisplayableField(field)) {
-                    if (newEntry.getField(field) == null) {
-                        compound.addEdit(new UndoableFieldChange(entry, field, entry
-                                .getField(field), null));
+                    if (!newEntry.hasField(field)) {
+                        compound.addEdit(new UndoableFieldChange(entry, field, entry.getField(field), null));
                         entry.clearField(field);
                         anyChanged = true;
                     }
@@ -967,7 +790,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             if (duplicateWarning) {
                 warnDuplicateBibtexkey();
-            } else if (emptyWarning && showError) {
+            } else if (emptyWarning) {
                 warnEmptyBibtexkey();
             } else {
                 panel.output(Localization.lang("Stored entry") + '.');
@@ -1004,18 +827,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             lastSourceAccepted = false;
             tabbed.setSelectedComponent(srcPanel);
 
-            if (showError) {
-                Object[] options = {Localization.lang("Edit"),
-                        Localization.lang("Revert to original source")};
+            Object[] options = {Localization.lang("Edit"), Localization.lang("Revert to original source")};
 
-                int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
-                        Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
-                        JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+            int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
+                    Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
+                    JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
-                if (answer != 0) {
-                    updateSource = true;
-                    updateSource();
-                }
+            if (answer != 0) {
+                updateSource = true;
+                updateSource();
             }
 
             return false;
@@ -1197,7 +1017,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             panel.entryEditorClosing(EntryEditor.this);
-            panel.getDatabase().removeEntry(entry.getId());
+            panel.getDatabase().removeEntry(entry);
             panel.markBaseChanged();
             panel.undoManager.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
             panel.output(Localization.lang("Deleted entry"));
@@ -1302,9 +1122,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // We check if the field has changed, since we don't want to
                 // mark the base as changed unless we have a real change.
                 if (toSet == null) {
-                    set = entry.getField(fieldEditor.getFieldName()) != null;
+                    set = entry.hasField(fieldEditor.getFieldName());
                 } else {
-                    set = !((entry.getField(fieldEditor.getFieldName()) != null)
+                    set = !((entry.hasField(fieldEditor.getFieldName()))
                             && toSet.equals(entry.getField(fieldEditor.getFieldName())));
                 }
 
@@ -1360,13 +1180,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
             } else if (source.isEditable()
                     && !source.getText().equals(lastSourceStringAccepted)) {
-                boolean accepted = storeSource(true);
-
+                storeSource();
             }
-            ////////////////////////////////////
+
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
-            //System.out.println(getType().getName()+": movingAway="+movingAway+", isShowing="+isShowing());
             if (!movingAway && isShowing()) {
                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -1374,9 +1192,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     public void run() {
                         final int row = panel.mainTable.findEntry(entry);
                         if (row >= 0) {
-                            //if (panel.mainTable.getSelectedRowCount() == 0)
-                            //    panel.mainTable.setRowSelectionInterval(row, row);
-                            //scrollTo(row);
                             panel.mainTable.ensureVisible(row);
                         }
                     }
@@ -1482,7 +1297,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            // 1. get Bitexentry for selected index (already have)
+            // 1. get BibEntry for selected index (already have)
             // 2. update label
 
             // Store the current edit in case this action is called during the
@@ -1523,7 +1338,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             String bibtexKeyData = entry.getCiteKey();
 
             // set the field named for "bibtexkey"
-            setField(BibtexEntry.KEY_FIELD, bibtexKeyData);
+            setField(BibEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();
 
@@ -1579,7 +1394,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
-    private class ExternalViewerListener extends MouseAdapter {
+    class ExternalViewerListener extends MouseAdapter {
 
         @Override
         public void mouseClicked(MouseEvent evt) {

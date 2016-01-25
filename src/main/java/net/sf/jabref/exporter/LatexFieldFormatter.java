@@ -21,6 +21,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -36,10 +37,6 @@ public class LatexFieldFormatter {
     // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
     public static final String BIBTEX_STRING = "__string";
 
-    public static LatexFieldFormatter buildIgnoreHashes() {
-        return new LatexFieldFormatter(true);
-    }
-
 
     private StringBuilder stringBuilder;
 
@@ -48,8 +45,7 @@ public class LatexFieldFormatter {
     private final boolean resolveStringsAllFields;
     private final char valueDelimiterStartOfValue;
     private final char valueDelimiterEndOfValue;
-    private final boolean writefieldWrapfield;
-    private final String[] doNotResolveStringsFors;
+    private final List<String> doNotResolveStringsFors;
 
     private final FieldContentParser parser;
 
@@ -64,16 +60,19 @@ public class LatexFieldFormatter {
         this.resolveStringsAllFields = Globals.prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS);
         valueDelimiterStartOfValue = Globals.prefs.getValueDelimiters(0);
         valueDelimiterEndOfValue = Globals.prefs.getValueDelimiters(1);
-        doNotResolveStringsFors = Globals.prefs.getStringArray(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
-        writefieldWrapfield = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD);
+        doNotResolveStringsFors = Globals.prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
 
         parser = new FieldContentParser();
+    }
+
+    public static LatexFieldFormatter buildIgnoreHashes() {
+        return new LatexFieldFormatter(true);
     }
 
     /**
      * Formats the content of a field.
      *
-     * @param content the content of the field
+     * @param content   the content of the field
      * @param fieldName the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
      * @return a formatted string suitable for output
      * @throws IllegalArgumentException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
@@ -139,13 +138,13 @@ public class LatexFieldFormatter {
             } else {
                 pos2 = content.indexOf('#', pos1 + 1);
                 if (pos2 == -1) {
-                    if (!neverFailOnHashes) {
+                    if (neverFailOnHashes) {
+                        pos1 = content.length(); // just write out the rest of the text, and throw no exception
+                    } else {
                         throw new IllegalArgumentException(
                                 "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
                                         + "In JabRef, use pairs of # characters to indicate a string.\n"
                                         + "Note that the entry causing the problem has been selected.");
-                    } else {
-                        pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     }
                 }
             }
@@ -169,23 +168,14 @@ public class LatexFieldFormatter {
             }
         }
 
-        // currently, we do not add newlines and new formatting
-        if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
-            //             introduce a line break to be read at the parser
-            return parser.format(StringUtil.wrap(stringBuilder.toString(), GUIGlobals.LINE_LENGTH), fieldName);//, but that lead to ugly .tex
-
-        } else {
-            return parser.format(stringBuilder.toString(), fieldName);
-        }
+        return parser.format(stringBuilder.toString(), fieldName);
     }
 
     private boolean shouldResolveStrings(String fieldName) {
         boolean resolveStrings = true;
         if (resolveStringsAllFields) {
             // Resolve strings for all fields except some:
-
-            String[] exceptions = doNotResolveStringsFors;
-            for (String exception : exceptions) {
+            for (String exception : doNotResolveStringsFors) {
                 if (exception.equals(fieldName)) {
                     resolveStrings = false;
                     break;
@@ -204,29 +194,16 @@ public class LatexFieldFormatter {
 
         stringBuilder = new StringBuilder(
                 String.valueOf(valueDelimiterStartOfValue));
-        // these two are also hard coded in net.sf.jabref.importer.fileformat.FieldContentParser.multiLineFields
-        // there, JabRefPreferences.NON_WRAPPABLE_FIELDS are also included
-        boolean isAbstract = "abstract".equals(fieldName);
-        boolean isReview = "review".equals(fieldName);
-        boolean doWrap = !isAbstract || !isReview;
-        boolean strangePrefSettings = writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName);
 
-        if (strangePrefSettings && doWrap) {
-            stringBuilder.append(parser.format(StringUtil.wrap(content, GUIGlobals.LINE_LENGTH), fieldName));
-        } else {
-            stringBuilder.append(parser.format(content, fieldName));
-        }
+        stringBuilder.append(parser.format(content, fieldName));
 
         stringBuilder.append(valueDelimiterEndOfValue);
 
         return stringBuilder.toString();
     }
 
-    private void writeText(String text, int start_pos,
-                           int end_pos) {
-        /*sb.append("{");
-        sb.append(text.substring(start_pos, end_pos));
-        sb.append("}");*/
+    private void writeText(String text, int startPos, int endPos) {
+
         stringBuilder.append(valueDelimiterStartOfValue);
         boolean escape = false;
         boolean inCommandName = false;
@@ -235,7 +212,7 @@ public class LatexFieldFormatter {
         int nestedEnvironments = 0;
         StringBuilder commandName = new StringBuilder();
         char c;
-        for (int i = start_pos; i < end_pos; i++) {
+        for (int i = startPos; i < endPos; i++) {
             c = text.charAt(i);
 
             // Track whether we are in a LaTeX command of some sort.
@@ -245,40 +222,32 @@ public class LatexFieldFormatter {
                     commandName.append(c);
                 }
             } else if (Character.isWhitespace(c) && (inCommand || inCommandOption)) {
-                //System.out.println("whitespace here");
+                // Whitespace
             } else if (inCommandName) {
                 // This means the command name is ended.
                 // Perhaps the beginning of an argument:
                 if (c == '[') {
                     inCommandOption = true;
-                }
-                // Or the end of an argument:
-                else if (inCommandOption && (c == ']')) {
+                } else if (inCommandOption && (c == ']')) {
+                    // Or the end of an argument:
                     inCommandOption = false;
                 } else if (!inCommandOption && (c == '{')) {
-                    //System.out.println("Read command: '"+commandName.toString()+"'");
                     inCommandName = false;
                     inCommand = true;
-                }
-                // Or simply the end of this command altogether:
-                else {
-                    //System.out.println("I think I read command: '"+commandName.toString()+"'");
-
+                } else {
+                    // Or simply the end of this command altogether:
                     commandName.delete(0, commandName.length());
                     inCommandName = false;
                 }
             }
             // If we are in a command body, see if it has ended:
             if (inCommand && (c == '}')) {
-                //System.out.println("nestedEnvironments = " + nestedEnvironments);
-                //System.out.println("Done with command: '"+commandName.toString()+"'");
                 if ("begin".equals(commandName.toString())) {
                     nestedEnvironments++;
                 }
                 if ((nestedEnvironments > 0) && "end".equals(commandName.toString())) {
                     nestedEnvironments--;
                 }
-                //System.out.println("nestedEnvironments = " + nestedEnvironments);
 
                 commandName.delete(0, commandName.length());
                 inCommand = false;
@@ -286,9 +255,8 @@ public class LatexFieldFormatter {
 
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
-            if ((c == '&') && !escape &&
-                    !(inCommand && "url".equals(commandName.toString())) &&
-                    (nestedEnvironments == 0)) {
+            if ((c == '&') && !escape && !(inCommand && "url".equals(commandName.toString()))
+                    && (nestedEnvironments == 0)) {
                 stringBuilder.append("\\&");
             } else {
                 stringBuilder.append(c);
@@ -298,11 +266,9 @@ public class LatexFieldFormatter {
         stringBuilder.append(valueDelimiterEndOfValue);
     }
 
-    private void writeStringLabel(String text, int start_pos, int end_pos,
+    private void writeStringLabel(String text, int startPos, int endPos,
                                   boolean first, boolean last) {
-        //sb.append(Util.wrap((first ? "" : " # ") + text.substring(start_pos, end_pos)
-        //		     + (last ? "" : " # "), GUIGlobals.LINE_LENGTH));
-        putIn((first ? "" : " # ") + text.substring(start_pos, end_pos)
+        putIn((first ? "" : " # ") + text.substring(startPos, endPos)
                 + (last ? "" : " # "));
     }
 

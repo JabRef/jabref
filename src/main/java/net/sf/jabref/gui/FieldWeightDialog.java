@@ -19,6 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeSet;
 
 import javax.swing.*;
@@ -39,8 +40,8 @@ import net.sf.jabref.logic.l10n.Localization;
 public class FieldWeightDialog extends JDialog {
 
     private final JabRefFrame frame;
-    private final HashMap<JSlider, SliderInfo> sliders = new HashMap<>();
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final Map<JSlider, SliderInfo> sliders = new HashMap<>();
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
     private FieldWeightDialog(JabRefFrame frame) {

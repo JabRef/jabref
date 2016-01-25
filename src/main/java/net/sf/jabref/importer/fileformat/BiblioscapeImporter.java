@@ -22,7 +22,7 @@ import java.util.*;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.EntryTypes;
 
 /**
@@ -59,17 +59,17 @@ public class BiblioscapeImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        ArrayList<BibtexEntry> bibItems = new ArrayList<>();
+        List<BibEntry> bibItems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
-        HashMap<String, String> hm = new HashMap<>();
-        HashMap<String, StringBuffer> lines = new HashMap<>();
+        Map<String, String> hm = new HashMap<>();
+        Map<String, StringBuffer> lines = new HashMap<>();
         StringBuffer previousLine = null;
         while ((line = in.readLine()) != null) {
             if (line.isEmpty())
@@ -264,15 +264,12 @@ public class BiblioscapeImporter extends ImportFormat {
 
                 // concatenate pages
                 if ((pages[0] != null) || (pages[1] != null)) {
-                    hm.put("pages",
-                            (pages[0] != null ? pages[0] : "")
-                            + (pages[1] != null ? "--" + pages[1] : ""));
+                    hm.put("pages", (pages[0] == null ? "" : pages[0]) + (pages[1] == null ? "" : "--" + pages[1]));
                 }
 
                 // concatenate address and country
                 if (address != null) {
-                    hm.put("address", address
-                            + (country != null ? ", " + country : ""));
+                    hm.put("address", address + (country == null ? "" : ", " + country));
                 }
 
                 if (!comments.isEmpty()) { // set comment if present
@@ -282,8 +279,8 @@ public class BiblioscapeImporter extends ImportFormat {
                     }
                     hm.put("comment", s.toString());
                 }
-                BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
-                        EntryTypes.getBibtexEntryType(bibtexType));
+                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID,
+                        EntryTypes.getTypeOrDefault(bibtexType));
                 b.setField(hm);
                 bibItems.add(b);
 

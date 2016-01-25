@@ -19,7 +19,9 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -38,7 +40,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import net.sf.jabref.gui.actions.BrowseAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -49,7 +51,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Created by IntelliJ IDEA.
@@ -96,7 +98,7 @@ public class DatabasePropertiesDialog extends JDialog {
         super(parent, Localization.lang("Database properties"), true);
         encoding = new JComboBox<>();
         encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
-        ok = new JButton(Localization.lang("Ok"));
+        ok = new JButton(Localization.lang("OK"));
         cancel = new JButton(Localization.lang("Cancel"));
         init(parent);
     }
@@ -177,7 +179,7 @@ public class DatabasePropertiesDialog extends JDialog {
         };
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
         ok.addActionListener(new ActionListener() {
@@ -229,8 +231,8 @@ public class DatabasePropertiesDialog extends JDialog {
         saveInOriginalOrder.addActionListener(listener);
         saveInSpecifiedOrder.addActionListener(listener);
 
-        Vector<String> v = new Vector<>(BibtexFields.getAllFieldNames());
-        v.add(BibtexEntry.KEY_FIELD);
+        List<String> v = new ArrayList<>(BibtexFields.getAllFieldNames());
+        v.add(BibEntry.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
         savePriSort = new JComboBox<>(allPlusKey);
@@ -333,13 +335,13 @@ public class DatabasePropertiesDialog extends JDialog {
             fileDir.setText("");
         } else {
             // Better be a little careful about how many entries the Vector has:
-            if (fileD.size() >= 1) {
+            if (!(fileD.isEmpty())) {
                 fileDir.setText((fileD.get(0)).trim());
             }
         }
 
-        Vector<String> fileDI = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL)); // File dir setting
-        Vector<String> fileDIL = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_IND_LEGACY)); // Legacy file dir setting for backward comp.
+        List<String> fileDI = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL)); // File dir setting
+        List<String> fileDIL = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_IND_LEGACY)); // Legacy file dir setting for backward comp.
         if (fileDI == null) {
             oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting as originally empty if reading from legacy setting
             if (fileDIL == null) {
@@ -347,23 +349,23 @@ public class DatabasePropertiesDialog extends JDialog {
             } else {
                 // Insert path from legacy setting if possible
                 // Better be a little careful about how many entries the Vector has:
-                if (fileDIL.size() >= 1) {
+                if (!(fileDIL.isEmpty())) {
                     fileDirIndv.setText((fileDIL.get(0)).trim());
                 }
             }
         } else {
             // Better be a little careful about how many entries the Vector has:
-            if (fileDI.size() >= 1) {
+            if (!(fileDI.isEmpty())) {
                 fileDirIndv.setText((fileDI.get(0)).trim());
             }
             oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting normally if reading from ordinary setting
         }
 
-        Vector<String> prot = metaData.getData(Globals.PROTECTED_FLAG_META);
+        List<String> prot = metaData.getData(Globals.PROTECTED_FLAG_META);
         if (prot == null) {
             protect.setSelected(false);
         } else {
-            if (prot.size() >= 1) {
+            if (!(prot.isEmpty())) {
                 protect.setSelected(Boolean.parseBoolean(prot.get(0)));
             }
         }
@@ -401,28 +403,28 @@ public class DatabasePropertiesDialog extends JDialog {
         Charset newEncoding = (Charset) encoding.getSelectedItem();
         panel.setEncoding(newEncoding);
 
-        Vector<String> dir = new Vector<>(1);
+        List<String> dir = new ArrayList<>(1);
         String text = fileDir.getText().trim();
-        if (!text.isEmpty()) {
-            dir.add(text);
-            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR), dir);
-        } else {
+        if (text.isEmpty()) {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
+        } else {
+            dir.add(text);
+            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR), new Vector<>(dir));
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
-        dir = new Vector<>(1);
+        dir = new ArrayList<>(1);
         text = fileDirIndv.getText().trim();
-        if (!text.isEmpty()) {
-            dir.add(text);
-            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL), dir);
-        } else {
+        if (text.isEmpty()) {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL));
+        } else {
+            dir.add(text);
+            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL), new Vector<>(dir));
         }
 
         if (protect.isSelected()) {
-            dir = new Vector<>(1);
+            dir = new ArrayList<>(1);
             dir.add("true");
-            metaData.putData(Globals.PROTECTED_FLAG_META, dir);
+            metaData.putData(Globals.PROTECTED_FLAG_META, new Vector<>(dir));
         } else {
             metaData.remove(Globals.PROTECTED_FLAG_META);
         }

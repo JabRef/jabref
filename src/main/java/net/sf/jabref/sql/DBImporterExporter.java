@@ -36,9 +36,9 @@ public class DBImporterExporter {
     protected int getDatabaseIDByName(MetaData metaData, Object out, String dbName) throws SQLException {
 
         if (out instanceof Connection) {
-            Object response = SQLUtil.processQueryWithResults(out,
+            try (Statement response = (Statement) SQLUtil.processQueryWithResults(out,
                     "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';");
-            try (ResultSet rs = ((Statement) response).getResultSet()) {
+                    ResultSet rs = response.getResultSet()) {
                 if (rs.next()) {
                     return rs.getInt("database_id");
                 } else {
@@ -54,7 +54,7 @@ public class DBImporterExporter {
         }
     }
 
-    private void removeAGivenDB(Object out, int database_id) throws SQLException {
+    private void removeAGivenDB(Object out, final int database_id) throws SQLException {
         removeAllRecordsForAGivenDB(out, database_id);
         SQLUtil.processQuery(out, "DELETE FROM jabref_database WHERE database_id='" + database_id + "';");
     }
@@ -66,7 +66,7 @@ public class DBImporterExporter {
      * @param database_id Id of the database being exported.
      * @throws SQLException
      */
-    protected void removeAllRecordsForAGivenDB(Object out, int database_id) throws SQLException {
+    protected void removeAllRecordsForAGivenDB(Object out, final int database_id) throws SQLException {
         SQLUtil.processQuery(out, "DELETE FROM entries WHERE database_id='" + database_id + "';");
         SQLUtil.processQuery(out, "DELETE FROM groups WHERE database_id='" + database_id + "';");
         SQLUtil.processQuery(out, "DELETE FROM strings WHERE database_id='" + database_id + "';");

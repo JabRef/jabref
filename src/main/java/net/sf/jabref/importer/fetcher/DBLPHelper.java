@@ -20,11 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 class DBLPHelper {
 
     private final DBLPQueryCleaner cleaner = new DBLPQueryCleaner();
+    private static final String START_PATTERN = "<pre class=\"verbatim select-on-click\">";
+    private static final String END_PATTERN = "</pre>";
 
 
     /*
@@ -61,24 +63,22 @@ class DBLPHelper {
 
     /**
      * Takes an HTML file (as String) as input and extracts the bibtex
-     * information. After that, it will convert it into a BibtexEntry and return
+     * information. After that, it will convert it into a BibEntry and return
      * it (them).
      *
      * @param page
      *            page as String
-     * @return list of BibtexEntry
+     * @return list of BibEntry
      */
-    public List<BibtexEntry> getBibTexFromPage(final String page) {
-        final List<BibtexEntry> bibtexList = new ArrayList<>();
-        final String startPattern = "<pre class=\"verbatim select-on-click\">";
-        final String endPattern = "</pre>";
+    public List<BibEntry> getBibTexFromPage(final String page) {
+        final List<BibEntry> bibtexList = new ArrayList<>();
 
         String tmpStr = page;
-        int startIdx = tmpStr.indexOf(startPattern);
-        int endIdx = tmpStr.indexOf(endPattern);
+        int startIdx = tmpStr.indexOf(START_PATTERN);
+        int endIdx = tmpStr.indexOf(END_PATTERN);
 
         // this entry exists for sure
-        String entry1 = tmpStr.substring(startIdx + startPattern.length(),
+        String entry1 = tmpStr.substring(startIdx + START_PATTERN.length(),
                 endIdx);
         entry1 = cleanEntry(entry1);
         bibtexList.add(BibtexParser.singleFromString(entry1));
@@ -86,12 +86,12 @@ class DBLPHelper {
 
         // let's see whether there is another entry (crossref)
         tmpStr = tmpStr
-                .substring(endIdx + endPattern.length(), tmpStr.length());
-        startIdx = tmpStr.indexOf(startPattern);
+                .substring(endIdx + END_PATTERN.length(), tmpStr.length());
+        startIdx = tmpStr.indexOf(START_PATTERN);
         if (startIdx != -1) {
-            endIdx = tmpStr.indexOf(endPattern);
+            endIdx = tmpStr.indexOf(END_PATTERN);
             // this entry exists for sure
-            String entry2 = tmpStr.substring(startIdx + startPattern.length(),
+            String entry2 = tmpStr.substring(startIdx + START_PATTERN.length(),
                     endIdx);
             entry2 = cleanEntry(entry2);
             bibtexList.add(BibtexParser.singleFromString(entry2));

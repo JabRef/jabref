@@ -19,32 +19,27 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.logic.search.SearchTextListener;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.regex.Matcher;
-
-import javax.swing.AbstractAction;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
+public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryHighlightListener {
 
     private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
 
-    private List<String> wordsToHighlight;
+    private Optional<Pattern> highlightPattern = Optional.empty();
 
     private UndoManager undo;
-
 
     public JTextAreaWithHighlighting() {
         super();
@@ -62,7 +57,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         //register "Paste" action
         getActionMap().put(Actions.PASTE, new PasteAction(this));
         // Bind paste command to KeyBinds.PASTE
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.PASTE), Actions.PASTE);
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
     }
 
     private void setupUndoRedo() {
@@ -88,7 +83,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         });
 
         // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
         getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
@@ -107,7 +102,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 
         // Bind the redo action to ctrl-Y
         boolean bind = true;
-        KeyStroke redoKey = Globals.prefs.getKey(KeyBinds.REDO);
+        KeyStroke redoKey = Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.REDO);
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
             // If emacs is enabled, check if we have a conflict at keys
             // If yes, do not bind
@@ -134,12 +129,12 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
      *
      * @param words to highlight
      */
-    private void highLight(List<String> words) {
+    private void highLight(Optional<Pattern> highlightPattern) {
         // highlight all characters that appear in charsToHighlight
         Highlighter highlighter = getHighlighter();
         highlighter.removeAllHighlights();
 
-        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
+        if ((highlightPattern == null) || !highlightPattern.isPresent()) {
             return;
         }
         String content = getText();
@@ -147,32 +142,33 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
             return;
         }
 
-        Matcher matcher = Util.getPatternForWords(words).matcher(content);
-
-        while (matcher.find()) {
-            try {
-                highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
-            } catch (BadLocationException ble) {
-                // should not occur if matcher works right
-                LOGGER.warn("Highlighting not possible, bad location", ble);
+        highlightPattern.ifPresent(pattern -> {
+            Matcher matcher = pattern.matcher(content);
+            while (matcher.find()) {
+                try {
+                    highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
+                } catch (BadLocationException ble) {
+                    // should not occur if matcher works right
+                    LOGGER.warn("Highlighting not possible, bad location", ble);
+                }
             }
-        }
+        });
 
     }
 
     @Override
     public void setText(String text) {
         super.setText(text);
-        highLight(wordsToHighlight);
+        highLight(highlightPattern);
         if (undo != null) {
             undo.discardAllEdits();
         }
     }
 
     @Override
-    public void searchText(List<String> words) {
-        this.wordsToHighlight = words;
-        highLight(words);
+    public void highlightPattern(Optional<Pattern> highlightPattern) {
+        this.highlightPattern = highlightPattern;
+        highLight(highlightPattern);
     }
 
 }

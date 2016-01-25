@@ -37,12 +37,12 @@ import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -60,17 +60,16 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static final ArrayList<PostOpenAction> postOpenActions = new ArrayList<>();
-
+    private static final List<PostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
     static {
         // Add the action for checking for new custom entry types loaded from
         // the bib file:
-        OpenDatabaseAction.postOpenActions.add(new CheckForNewEntryTypesAction());
+        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
         // Add the action for the new external file handling system in version 2.3:
-        OpenDatabaseAction.postOpenActions.add(new FileLinksUpgradeWarning());
+        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
         // Add the action for warning about and handling duplicate BibTeX keys:
-        OpenDatabaseAction.postOpenActions.add(new HandleDuplicateWarnings());
+        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
@@ -78,7 +77,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         this.frame = frame;
         this.showDialog = showDialog;
         putValue(Action.NAME, Localization.menuTitle("Open database"));
-        putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.OPEN_DATABASE));
+        putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.OPEN_DATABASE));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX database"));
     }
 
@@ -104,13 +103,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         openFiles(filesToOpen, true);
     }
 
-
     class OpenItSwingHelper implements Runnable {
 
-        final BasePanel basePanel;
-        final boolean raisePanel;
-        final File file;
-
+        private final BasePanel basePanel;
+        private final boolean raisePanel;
+        private final File file;
 
         OpenItSwingHelper(BasePanel basePanel, File file, boolean raisePanel) {
             this.basePanel = basePanel;
@@ -124,7 +121,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         }
     }
-
 
     /**
      * Opens the given file. If null or 404, nothing happens
@@ -220,8 +216,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // prompting.
                 int answer = JOptionPane.showConfirmDialog(null,
                         "<html>" + Localization
-                                .lang("An autosave file was found for this database. This could indicate ")
-                                + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.")
+                                .lang("An autosave file was found for this database. This could indicate "
+                                        + "that JabRef didn't shut down cleanly last time the file was used.")
                                 + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
                                 + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
@@ -235,7 +231,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 String fileName = file.getPath();
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                Charset encoding = Globals.prefs.getDefaultEncoding();
 
                 if (FileBasedLock.hasLockFile(file)) {
                     long modificationTIme = FileBasedLock.getLockFileTimeStamp(file);
@@ -261,6 +256,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }
 
                 }
+
+                Charset encoding = Globals.prefs.getDefaultEncoding();
                 ParserResult result;
                 String errorMessage = null;
                 try {
@@ -322,7 +319,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * @param result The result of the bib file parse operation.
      */
     public static void performPostOpenActions(BasePanel panel, ParserResult result, boolean mustRaisePanel) {
-        for (PostOpenAction action : OpenDatabaseAction.postOpenActions) {
+        for (PostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
                 if (mustRaisePanel) {
                     panel.frame().getTabbedPane().setSelectedComponent(panel);
@@ -335,30 +332,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     public BasePanel addNewDatabase(ParserResult result, final File file, boolean raisePanel) {
 
         String fileName = file.getPath();
-        BibtexDatabase database = result.getDatabase();
+        BibDatabase database = result.getDatabase();
         MetaData meta = result.getMetaData();
 
         if (result.hasWarnings()) {
-            final String[] warnings = result.warnings();
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 @Override
                 public void run() {
-                    StringBuilder warningString = new StringBuilder();
-                    for (int i = 0; i < warnings.length; i++) {
-                        warningString.append(i + 1).append(". ").append(warnings[i]).append("\n");
-                    }
-
-                    if (warningString.length() > 0) {
-                        warningString.deleteCharAt(warningString.length() - 1);
-                    }
-                    // Note to self or to someone else: The following line causes an
-                    // ArrayIndexOutOfBoundsException in situations with a large number of
-                    // warnings; approx. 5000 for the database I opened when I observed the problem
-                    // (duplicate key warnings). I don't think this is a big problem for normal situations,
-                    // and it may possibly be a bug in the Swing code.
-                    JOptionPane.showMessageDialog(frame, warningString.toString(),
-                            Localization.lang("Warnings") + " (" + file.getName() + ")", JOptionPane.WARNING_MESSAGE);
+                    ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
                 }
             });
         }
@@ -403,7 +385,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             result.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
-                for (BibtexEntry entry : result.getDatabase().getEntries()) {
+                for (BibEntry entry : result.getDatabase().getEntries()) {
                     SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
                 }
                 LOGGER.info("Synchronized special fields based on keywords");
@@ -428,7 +410,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             try {
                 return ImportFormatReader.getReader(fileToOpen, encoding.get());
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.warn("Problem getting reader", ex);
                 // The supplied encoding didn't work out, so we use the fallback.
                 return ImportFormatReader.getReader(fileToOpen, defaultEncoding);
             }
@@ -461,7 +443,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // Signature line, so keep reading and skip to next line
                 } else if (line.startsWith(Globals.encPrefix)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
-                    String encoding = line.substring(Globals.encPrefix.length());
+                    // Except if there is already a @ symbol signalising the starting of a BibEntry
+                    Integer atSymbolIndex = line.indexOf("@");
+                    String encoding;
+                    if (atSymbolIndex > 0) {
+                        encoding = line.substring(Globals.encPrefix.length(), atSymbolIndex);
+                    } else {
+                        encoding = line.substring(Globals.encPrefix.length());
+                    }
+
                     return Optional.of(Charset.forName(encoding));
                 } else {
                     // Line not recognized so stop parsing

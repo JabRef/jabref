@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -37,16 +38,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.TransferableFileLinkSelection;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.importer.ImportMenuItem;
 import net.sf.jabref.importer.OpenDatabaseAction;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
@@ -65,6 +66,8 @@ public class EntryTableTransferHandler extends TransferHandler {
     private static final boolean DROP_ALLOWED = true;
 
     private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
+
+    private boolean draggingFile;
 
 
     /**
@@ -101,12 +104,12 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     @Override
     public Transferable createTransferable(JComponent c) {
-        if (!draggingFile) {
-            /* so we can assume it will never be called if entryTable==null: */
-            return new TransferableEntrySelection(entryTable.getSelectedEntries());
-        } else {
+        if (draggingFile) {
             draggingFile = false;
             return new TransferableFileLinkSelection(panel, entryTable.getSelectedEntries());//.getTransferable();
+        } else {
+            /* so we can assume it will never be called if entryTable==null: */
+            return new TransferableEntrySelection(entryTable.getSelectedEntries());
         }
     }
 
@@ -182,22 +185,13 @@ public class EntryTableTransferHandler extends TransferHandler {
     }
 
 
-    private boolean draggingFile;
-
 
     @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
-        /* TODO: add support for dragging file link from table icon into other apps */
         if (e instanceof MouseEvent) {
-            MouseEvent me = (MouseEvent) e;
-            int col = entryTable.columnAtPoint(me.getPoint());
-            String[] res = entryTable.getIconTypeForColumn(col);
-            if (res == null) {
-                super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
-                return;
-            }
-            // We have an icon column:
-            if (res == MainTableFormat.FILE) {
+            int columnIndex = entryTable.columnAtPoint(((MouseEvent) e).getPoint());
+            int modelIndex = entryTable.getColumnModel().getColumn(columnIndex).getModelIndex();
+            if(entryTable.isFileColumn(modelIndex)) {
                 LOGGER.info("Dragging file");
                 draggingFile = true;
             }
@@ -234,7 +228,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             // "+url.toString());
             return handleDropTransfer(url);
         }
-        File tmpfile = java.io.File.createTempFile("jabrefimport", "");
+        File tmpfile = File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
         try (FileWriter fw = new FileWriter(tmpfile)) {
             fw.write(dropStr);
@@ -269,10 +263,8 @@ public class EntryTableTransferHandler extends TransferHandler {
             try {
                 URL url = new URL(line);
                 fl = new File(url.toURI());
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
+            } catch (MalformedURLException | URISyntaxException e) {
+                LOGGER.warn("Could not get file", e);
             }
 
             // Unless an exception was thrown, we should have the sanitized path:
@@ -356,20 +348,17 @@ public class EntryTableTransferHandler extends TransferHandler {
         List<String> bibFiles = new ArrayList<>();
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
-            String extension = "";
+            Optional<String> extension = FileUtil.getFileExtension(fileName);
             ExternalFileType fileType = null;
-            int index = fileName.lastIndexOf('.');
-            if ((index >= 0) && (index < fileName.length())) {
-                extension = fileName.substring(index + 1).toLowerCase();
-            }
-            if ("bib".equals(extension)) {
+
+            if (extension.isPresent() && "bib".equals(extension.get())) {
                 // we assume that it is a BibTeX file.
                 // When a user wants to import something with file extension "bib", but which is not a BibTeX file, he should use "file -> import"
                 bibFiles.add(fileName);
                 continue;
             }
 
-            fileType = Globals.prefs.getExternalFileTypeByExt(extension);
+            fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.orElse(""));
             /*
              * This is a linkable file. If the user dropped it on an entry, we
              * should offer options for autolinking to this files:
@@ -409,7 +398,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     }
 
     private boolean handleDropTransfer(URL dropLink) throws IOException {
-        File tmpfile = java.io.File.createTempFile("jabrefimport", "");
+        File tmpfile = File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
 
         // System.out.println("Import url: " + dropLink.toString());

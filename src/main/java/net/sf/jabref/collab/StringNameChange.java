@@ -22,7 +22,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,7 +54,7 @@ class StringNameChange extends Change {
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
 
         if (panel.database().hasStringLabel(disk)) {
             // The name to change to is already in the database, so we can't comply.
@@ -62,11 +62,7 @@ class StringNameChange extends Change {
                     + "is already in use.");
         }
 
-        if (string != null) {
-            string.setName(disk);
-            undoEdit.addEdit(new UndoableStringChange(panel, string, true, mem,
-                    disk));
-        } else {
+        if (string == null) {
             // The string was removed or renamed locally. We guess that it was removed.
             String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, disk, content);
@@ -76,23 +72,25 @@ class StringNameChange extends Change {
             } catch (KeyCollisionException ex) {
                 LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
             }
+        } else {
+            string.setName(disk);
+            undoEdit.addEdit(new UndoableStringChange(panel, string, true, mem, disk));
         }
 
         // Update tmp database:
-        if (tmpString != null) {
-            tmpString.setName(disk);
-        }
-        else {
+        if (tmpString == null) {
             String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, disk, content);
             secondary.addString(bs);
+        } else {
+            tmpString.setName(disk);
         }
 
         return true;
     }
 
     @Override
-    JComponent description() {
+    public JComponent description() {
         return new JLabel(disk + " : " + content);
     }
 

@@ -35,7 +35,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
@@ -139,7 +139,7 @@ class ManageJournalsPanel extends JPanel {
         add(externalFilesPanel, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         bb.addButton(ok);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
@@ -251,7 +251,7 @@ class ManageJournalsPanel extends JPanel {
         // Key bindings:
         ActionMap am = getActionMap();
         InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         //dialog.pack();
@@ -306,22 +306,16 @@ class ManageJournalsPanel extends JPanel {
     }
 
     private void setupExternals() {
-        String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if ((externalFiles == null) || (externalFiles.length == 0)) {
+        List<String> externalFiles = Globals.prefs.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
+        if (externalFiles.isEmpty()) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
         } else {
             for (String externalFile : externalFiles) {
                 ExternalFileEntry efe = new ExternalFileEntry(externalFile);
                 externals.add(efe);
-
             }
-
         }
-
-        //efe = new ExternalFileEntry();
-        //externals.add(efe);
-
     }
 
     private void setupUserTable() {
@@ -399,18 +393,13 @@ class ManageJournalsPanel extends JPanel {
         }
 
         // Store the list of external files set up:
-        ArrayList<String> extFiles = new ArrayList<>();
+        List<String> extFiles = new ArrayList<>();
         for (ExternalFileEntry efe : externals) {
             if (!"".equals(efe.getValue())) {
                 extFiles.add(efe.getValue());
             }
         }
-        if (extFiles.isEmpty()) {
-            Globals.prefs.put(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, "");
-        } else {
-            String[] list = extFiles.toArray(new String[extFiles.size()]);
-            Globals.prefs.putStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, list);
-        }
+        Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
         Abbreviations.initializeJournalNames(Globals.prefs);
 
@@ -490,10 +479,8 @@ class ManageJournalsPanel extends JPanel {
 
     class AbbreviationsTableModel extends AbstractTableModel implements ActionListener {
 
-        // @formatter:off
         final String[] names = new String[] {Localization.lang("Journal name"),
                 Localization.lang("Abbreviation")};
-        //
         List<JournalEntry> journals;
 
 

@@ -19,7 +19,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableModifySubtree;
@@ -33,16 +33,14 @@ class GroupChange extends Change {
 
 
     public GroupChange(GroupTreeNode changedGroups, GroupTreeNode tmpGroupRoot) {
-        // @formatter:off
-        super(changedGroups != null ? Localization.lang("Modified groups tree") :
-            Localization.lang("Removed all groups")); // JZTODO lyrics
-        // @formatter:on
+        super(changedGroups == null ? Localization.lang("Removed all groups") : Localization
+                .lang("Modified groups tree"));
         this.changedGroups = changedGroups;
         this.tmpGroupRoot = tmpGroupRoot;
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         final GroupTreeNode root = panel.metaData().getGroups();
         final UndoableModifySubtree undo = new UndoableModifySubtree(
                 panel.getGroupSelector(), panel.metaData().getGroups(),
@@ -57,8 +55,8 @@ class GroupChange extends Change {
             for (int i = 0; i < changedGroups.getChildCount(); ++i) {
                 root.add(((GroupTreeNode) changedGroups.getChildAt(i)).deepCopy());
             }
-            // the group tree is now appled to a different BibtexDatabase than it was created
-            // for, which affects groups such as ExplicitGroup (which links to BibtexEntry objects).
+            // the group tree is now appled to a different BibDatabase than it was created
+            // for, which affects groups such as ExplicitGroup (which links to BibEntry objects).
             // We must traverse the tree and refresh all groups:
             root.refreshGroupsForNewDatabase(panel.database());
         }
@@ -69,23 +67,24 @@ class GroupChange extends Change {
         undoEdit.addEdit(undo);
 
         // Update tmp database:
-        GroupTreeNode copied = changedGroups.deepCopy();
         tmpGroupRoot.removeAllChildren();
-        tmpGroupRoot.setGroup(copied.getGroup());
-        for (int i = 0; i < copied.getChildCount(); ++i) {
-            tmpGroupRoot.add(((GroupTreeNode) copied.getChildAt(i)).deepCopy());
+        if (changedGroups != null) {
+            GroupTreeNode copied = changedGroups.deepCopy();
+            tmpGroupRoot.setGroup(copied.getGroup());
+            for (int i = 0; i < copied.getChildCount(); ++i) {
+                tmpGroupRoot.add(((GroupTreeNode) copied.getChildAt(i)).deepCopy());
+            }
         }
         tmpGroupRoot.refreshGroupsForNewDatabase(secondary);
         return true;
     }
 
     @Override
-    JComponent description() {
-        return new JLabel("<html>" + toString() + '.' + (changedGroups != null ? ' ' +
-                // @formatter:off
-                Localization.lang("Accepting the change replaces the complete groups tree with the externally modified groups tree.") : "")
-                // @formatter:on
+    public JComponent description() {
+        return new JLabel("<html>" + toString() + '.'
+                + (changedGroups == null ? "" : ' ' + Localization
+                        .lang("Accepting the change replaces the complete groups tree with the externally modified groups tree."))
                 + "</html>");
-        // JZTODO lyrics
+
     }
 }

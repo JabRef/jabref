@@ -36,7 +36,7 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -83,6 +83,10 @@ public class OAI2Fetcher implements EntryFetcher {
 
     private OutputPrinter status;
 
+    private long waitTime = -1;
+
+    private Date lastCall;
+
 
     /**
      * some archives - like ArXiv.org - might expect of you to wait some time
@@ -91,10 +95,6 @@ public class OAI2Fetcher implements EntryFetcher {
         return waitTime > 0;
     }
 
-
-    private long waitTime = -1;
-
-    private Date lastCall;
 
 
     /**
@@ -185,14 +185,14 @@ public class OAI2Fetcher implements EntryFetcher {
     }
 
     /**
-     * Import an entry from an OAI2 archive. The BibtexEntry provided has to
+     * Import an entry from an OAI2 archive. The BibEntry provided has to
      * have the field OAI2_IDENTIFIER_FIELD set to the search string.
      *
      * @param key
      *            The OAI2 key to fetch from ArXiv.
-     * @return The imported BibtexEntry or null if none.
+     * @return The imported BibEntry or null if none.
      */
-    public BibtexEntry importOai2Entry(String key) {
+    public BibEntry importOai2Entry(String key) {
         /**
          * Fix for problem reported in mailing-list:
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
@@ -206,8 +206,8 @@ public class OAI2Fetcher implements EntryFetcher {
             oai2Connection.setRequestProperty("User-Agent", "Jabref");
             InputStream inputStream = oai2Connection.getInputStream();
 
-            /* create an empty BibtexEntry and set the oai2identifier field */
-            BibtexEntry be = new BibtexEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
+            /* create an empty BibEntry and set the oai2identifier field */
+            BibEntry be = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
             be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, key);
             DefaultHandler handlerBase = new OAI2Handler(be);
             /* parse the result */
@@ -230,17 +230,16 @@ public class OAI2Fetcher implements EntryFetcher {
             inputStream.close();
             return be;
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url)
- + "\n\n" + e,
+            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
-            status.showMessage(Localization.lang("An SAXException occurred while parsing '%0':", url)
- + "\n\n" + e.getMessage(),
+            status.showMessage(
+                    Localization.lang("An SAXException occurred while parsing '%0':", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            status.showMessage(Localization.lang("An Error occurred while fetching from OAI2 source (%0):", url)
-                    + "\n\n" + e.getMessage()
- + "\n\n" + Localization
+            status.showMessage(
+                    Localization.lang("An Error occurred while fetching from OAI2 source (%0):", url) + "\n\n"
+                            + e.getMessage() + "\n\n" + Localization
                                     .lang("Note: A full text search is currently not supported for %0", getTitle()),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         }
@@ -293,15 +292,15 @@ public class OAI2Fetcher implements EntryFetcher {
                     }
                 }
 
-                status.setStatus(Localization.lang("Processing ") + key);
+                status.setStatus(Localization.lang("Processing") + " " + key);
 
                 /* the cancel button has been hit */
                 if (!shouldContinue) {
                     break;
                 }
 
-                /* query the archive and load the results into the BibtexEntry */
-                BibtexEntry be = importOai2Entry(key);
+                /* query the archive and load the results into the BibEntry */
+                BibEntry be = importOai2Entry(key);
 
                 if (shouldWait()) {
                     lastCall = new Date();

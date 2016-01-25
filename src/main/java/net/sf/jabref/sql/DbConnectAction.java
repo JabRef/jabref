@@ -71,7 +71,7 @@ public class DbConnectAction implements BaseAction {
         PositionWindow.placeDialog(dbd, panel);
         dbd.setVisible(true);
 
-        // connnect to database to test DBStrings
+        // connect to database to test DBStrings
         if (dbd.getConnectToDB()) {
 
             dbs = dbd.getDBStrings();
@@ -82,8 +82,9 @@ public class DbConnectAction implements BaseAction {
                         Localization.lang("Establishing SQL connection..."));
                 DBExporter exporter = (new DBExporterAndImporterFactory())
                         .getExporter(dbs.getServerType());
-                Connection conn = exporter.connectToDB(dbs);
-                conn.close();
+                try (Connection conn = exporter.connectToDB(dbs)) {
+                    // Nothing
+                }
                 dbs.isConfigValid(true);
                 panel.frame().output(
                         Localization.lang("SQL connection established."));

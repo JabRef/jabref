@@ -85,9 +85,9 @@ import javax.swing.text.StyledDocument;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.l10n.Localization;
@@ -109,7 +109,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private JList<String> fieldList;
     private JRadioButton overRadio;
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
 
     private final JPopupMenu inputMenu = new JPopupMenu();
     private StyledDocument doc; // content from inputPane
@@ -122,7 +122,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private boolean okPressed;
 
-    public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal, BibtexEntry bibEntry) {
+
+    public TextInputDialog(JabRefFrame frame, String title, boolean modal, BibEntry bibEntry) {
         super(frame, title, modal);
 
         _frame = frame;
@@ -131,7 +132,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         marked = new TagToMarkedTextStore();
 
         try {
-            jbInit(frame);
+            jbInit();
             pack();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -139,7 +140,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         updateSourceView();
     }
 
-    private void jbInit(JabRefFrame parent) {
+    private void jbInit() {
         this.setModal(true);
         //this.setResizable( false ) ;
         getContentPane().setLayout(new BorderLayout());
@@ -172,7 +173,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         // Key bindings:
         ActionMap am = buttons.getActionMap();
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -200,7 +201,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         }
 
         OverlayPanel testPanel = new OverlayPanel(textPane,
-                Localization.lang("Text_Input_Area"));
+                Localization.lang("paste_text_here"));
 
         testPanel.setPreferredSize(new Dimension(450, 255));
         testPanel.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
@@ -349,7 +350,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     // Panel with bibtex source code
     private void initSourcePanel() {
-        //    preview =  new PreviewPanel(entry) ;
         preview = new JTextArea();
         preview.setEditable(false);
 
@@ -484,10 +484,10 @@ public class TextInputDialog extends JDialog implements ActionListener {
         text = text.replace(Globals.NEWLINE, " ");
         text = text.replace("##NEWLINE##", Globals.NEWLINE);
 
-        List<BibtexEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
+        List<BibEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
         if (importedEntries != null) {
             Util.setAutomaticFields(importedEntries, false, false, true);
-            for (BibtexEntry e : importedEntries) {
+            for (BibEntry e : importedEntries) {
                 JabRef.jrf.getCurrentBasePanel().insertEntry(e);
             }
             return true;
@@ -500,7 +500,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored) {
@@ -527,16 +527,14 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class PasteAction extends BasicAction {
         public PasteAction() {
-            // @formatter:off
             super(Localization.lang("Paste"),
                     Localization.lang("Paste from clipboard"),
                     IconTheme.JabRefIcon.PASTE.getIcon());
-            // @formatter:on
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String data = ClipBoardManager.clipBoard.getClipboardContents();
+            String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
             if (data != null) {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();
@@ -555,11 +553,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class LoadAction extends BasicAction {
         public LoadAction() {
-            // @formatter:off
             super(Localization.lang("Open"),
                     Localization.lang("Open file"),
                     IconTheme.JabRefIcon.OPEN.getIcon());
-            // @formatter:on
         }
 
         @Override
@@ -587,11 +583,9 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class ClearAction extends BasicAction {
         public ClearAction() {
-            // @formatter:off
             super(Localization.lang("Clear"),
                     Localization.lang("Clear inputarea"),
                     IconTheme.JabRefIcon.NEW.getIcon());
-            // @formatter:on
         }
 
         @Override
@@ -672,13 +666,12 @@ public class TextInputDialog extends JDialog implements ActionListener {
              */
             String s = value.toString();
             //        setIcon((s.length > 10) ? longIcon : shortIcon);
-            if (entry.getField(s) != null) {
+            if (entry.hasField(s)) {
                 this.setForeground(Color.gray);
                 this.setFont(usedFont);
                 this.setIcon(okIcon);
                 this.setToolTipText(Localization.lang("Filled"));
-            }
-            else {
+            } else {
                 this.setIcon(needIcon);
                 this.setToolTipText(Localization.lang("Field is missing"));
             }

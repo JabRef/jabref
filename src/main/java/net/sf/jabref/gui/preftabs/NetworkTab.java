@@ -121,12 +121,11 @@ public class NetworkTab extends JPanel implements PrefsTab {
     }
 
     private int getProxyConfigHash() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefs.get(JabRefPreferences.PROXY_USERNAME)).append(':')
-                .append(prefs.get(JabRefPreferences.PROXY_PASSWORD));
-        sb.append('@').append(prefs.get(JabRefPreferences.PROXY_HOSTNAME)).append(':')
-                .append(prefs.get(JabRefPreferences.PROXY_PORT));
-        return sb.toString().hashCode();
+        String sb = prefs.get(JabRefPreferences.PROXY_USERNAME) + ':' +
+                prefs.get(JabRefPreferences.PROXY_PASSWORD) +
+                '@' + prefs.get(JabRefPreferences.PROXY_HOSTNAME) + ':' +
+                prefs.get(JabRefPreferences.PROXY_PORT);
+        return sb.hashCode();
     }
 
     @Override
@@ -193,11 +192,11 @@ public class NetworkTab extends JPanel implements PrefsTab {
             validSetting = true;
         }
         if (!validSetting) {
-            if (!validAuthenticationSetting) {
-                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both username and password"),
+            if (validAuthenticationSetting) {
+                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both hostname and port"),
                         Localization.lang("Invalid setting"), JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both hostname and port"),
+                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both username and password"),
                         Localization.lang("Invalid setting"), JOptionPane.ERROR_MESSAGE);
             }
         }

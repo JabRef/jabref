@@ -20,14 +20,14 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
 
@@ -46,19 +46,16 @@ import java.util.List;
  */
 public class SynchronizeFileField extends AbstractWorker {
 
-    private final String fieldName = Globals.FILE_FIELD;
     private final BasePanel panel;
-    private BibtexEntry[] sel;
+    private BibEntry[] sel;
     private SynchronizeFileField.OptionsDialog optDiag;
 
     private final Object[] brokenLinkOptions = {
-            // @formatter:off
             Localization.lang("Ignore"),
             Localization.lang("Assign new file"),
             Localization.lang("Remove link"),
             Localization.lang("Remove all broken links"),
             Localization.lang("Quit synchronization")};
-    // @formatter:on
 
     private boolean goOn = true;
     private boolean autoSet = true;
@@ -71,14 +68,14 @@ public class SynchronizeFileField extends AbstractWorker {
 
     @Override
     public void init() {
-        Collection<BibtexEntry> col = panel.database().getEntries();
+        Collection<BibEntry> col = panel.database().getEntries();
         goOn = true;
-        sel = new BibtexEntry[col.size()];
+        sel = new BibEntry[col.size()];
         sel = col.toArray(sel);
 
         // Ask about rules for the operation:
         if (optDiag == null) {
-            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.metaData(), fieldName);
+            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.metaData());
         }
         PositionWindow.placeDialog(optDiag, panel.frame());
         optDiag.setVisible(true);
@@ -86,10 +83,10 @@ public class SynchronizeFileField extends AbstractWorker {
             goOn = false;
             return;
         }
-        autoSet = !optDiag.autoSetNone.isSelected();
-        checkExisting = optDiag.checkLinks.isSelected();
+        autoSet = !optDiag.isAutoSetNone();
+        checkExisting = optDiag.isCheckLinks();
 
-        panel.output(Localization.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
+        panel.output(Localization.lang("Synchronizing %0 links...", Globals.FILE_FIELD.toUpperCase()));
     }
 
     @Override
@@ -105,55 +102,29 @@ public class SynchronizeFileField extends AbstractWorker {
                 + (checkExisting ? sel.length : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        final NamedCompound ce = new NamedCompound(Localization.lang("Autoset %0 field", fieldName));
+        final NamedCompound ce = new NamedCompound(Localization.lang("Autoset %0 field", Globals.FILE_FIELD));
 
-        //final OpenFileFilter off = Util.getFileFilterForField(fieldName);
-
-        //ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, null, off);
-        //TextField editor = new TextField(fieldName, "", false);
-
-        Set<BibtexEntry> changedEntries = new HashSet<>();
+        Set<BibEntry> changedEntries = new HashSet<>();
 
         // First we try to autoset fields
         if (autoSet) {
-            Collection<BibtexEntry> entries = new ArrayList<>();
+            Collection<BibEntry> entries = new ArrayList<>();
             Collections.addAll(entries, sel);
 
             // Start the autosetting process:
             Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.metaData(), null, null);
             JabRefExecutorService.INSTANCE.executeAndWait(r);
-            /*
-                progress += weightAutoSet;
-                panel.frame().setProgressBarValue(progress);
-
-                Object old = sel[i].getField(fieldName);
-                FileListTableModel tableModel = new FileListTableModel();
-                if (old != null)
-                    tableModel.setContent((String)old);
-                Thread t = FileListEditor.autoSetLinks(sel[i], tableModel, null, null);
-
-                if (!tableModel.getStringRepresentation().equals(old)) {
-                    String toSet = tableModel.getStringRepresentation();
-                    if (toSet.length() == 0)
-                        toSet = null;
-                    ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old, toSet));
-                    sel[i].setField(fieldName, toSet);
-                    entriesChanged++;
-                }
-            }    */
-
         }
         progress += sel.length * weightAutoSet;
         panel.frame().setProgressBarValue(progress);
-        //System.out.println("Done setting");
         // The following loop checks all external links that are already set.
         if (checkExisting) {
             boolean removeAllBroken = false;
-            mainLoop: for (BibtexEntry aSel : sel) {
+            mainLoop: for (BibEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
-                final String old = aSel.getField(fieldName);
+                final String old = aSel.getField(Globals.FILE_FIELD);
                 // Check if a extension is set:
-                if ((old != null) && !"".equals(old)) {
+                if ((old != null) && !(old.isEmpty())) {
                     FileListTableModel tableModel = new FileListTableModel();
                     tableModel.setContentDontGuessTypes(old);
 
@@ -167,7 +138,7 @@ public class SynchronizeFileField extends AbstractWorker {
                     for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // See if the link looks like an URL:
-                        boolean httpLink = flEntry.getLink().toLowerCase().startsWith("http");
+                        boolean httpLink = flEntry.link.toLowerCase().startsWith("http");
                         if (httpLink)
                         {
                             continue; // Don't check the remote file.
@@ -178,13 +149,13 @@ public class SynchronizeFileField extends AbstractWorker {
                         boolean deleted = false;
 
                         // Get an absolute path representation:
-                        File file = FileUtil.expandFilename(flEntry.getLink(), dirsS);
+                        File file = FileUtil.expandFilename(flEntry.link, dirsS);
                         if ((file == null) || !file.exists()) {
                             int answer;
                             if (!removeAllBroken) {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
                                         Localization.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                new String[]{flEntry.getLink(), aSel.getCiteKey()}),
+                                                flEntry.link, aSel.getCiteKey()),
                                         Localization.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
@@ -212,23 +183,21 @@ public class SynchronizeFileField extends AbstractWorker {
                                 j--; // Step back in the iteration, because we removed an entry.
                                 removeAllBroken = true; // Notify for further cases.
                                 break;
-                            case 4:
+                            default:
                                 // Cancel
                                 break mainLoop;
                             }
                         }
 
                         // Unless we deleted this link, see if its file type is recognized:
-                        if (!deleted && (flEntry.getType() instanceof UnknownExternalFileType)) {
-                            // @formatter:off
+                        if (!deleted && (flEntry.type instanceof UnknownExternalFileType)) {
                             String[] options = new String[] {
-                                    Localization.lang("Define '%0'", flEntry.getType().getName()),
+                                    Localization.lang("Define '%0'", flEntry.type.getName()),
                                     Localization.lang("Change file type"),
                                     Localization.lang("Cancel")};
-                            // @formatter:on
                             String defOption = options[0];
                             int answer = JOptionPane.showOptionDialog(panel.frame(), Localization.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
-                                    flEntry.getType().getName()),
+                                    flEntry.type.getName()),
                                     Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE, null, options, defOption
                                     );
@@ -236,17 +205,18 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User doesn't want to handle this unknown link type.
                             } else if (answer == JOptionPane.YES_OPTION) {
                                 // User wants to define the new file type. Show the dialog:
-                                ExternalFileType newType = new ExternalFileType(flEntry.getType().getName(), "", "", "", "new", IconTheme.getImage("new"));
+                                ExternalFileType newType = new ExternalFileType(flEntry.type.getName(), "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
                                 ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(panel.frame(), newType);
                                 editor.setVisible(true);
                                 if (editor.okPressed()) {
                                     // Get the old list of types, add this one, and update the list in prefs:
                                     List<ExternalFileType> fileTypes = new ArrayList<>();
-                                    ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
+                                    ExternalFileType[] oldTypes = ExternalFileTypes.getInstance()
+                                            .getExternalFileTypeSelection();
                                     Collections.addAll(fileTypes, oldTypes);
                                     fileTypes.add(newType);
                                     Collections.sort(fileTypes);
-                                    Globals.prefs.setExternalFileTypes(fileTypes);
+                                    ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
                                     panel.mainTable.repaint();
                                 }
                             } else {
@@ -263,13 +233,13 @@ public class SynchronizeFileField extends AbstractWorker {
                         // The table has been modified. Store the change:
                         String toSet = tableModel.getStringRepresentation();
                         if (toSet.isEmpty()) {
-                            toSet = null;
+                            ce.addEdit(new UndoableFieldChange(aSel, Globals.FILE_FIELD, old, null));
+                            aSel.clearField(Globals.FILE_FIELD);
+                        } else {
+                            ce.addEdit(new UndoableFieldChange(aSel, Globals.FILE_FIELD, old, toSet));
+                            aSel.setField(Globals.FILE_FIELD, toSet);
                         }
-                        ce.addEdit(new UndoableFieldChange(aSel, fieldName, old,
-                                toSet));
-                        aSel.setField(fieldName, toSet);
                         changedEntries.add(aSel);
-                        //System.out.println("Changed to: "+tableModel.getStringRepresentation());
                     }
 
                 }
@@ -291,8 +261,8 @@ public class SynchronizeFileField extends AbstractWorker {
         }
 
         int entriesChangedCount = 0;
-        panel.output(Localization.lang("Finished synchronizing %0 links. Entries changed%c %1.",
-                new String[]{fieldName.toUpperCase(), String.valueOf(entriesChangedCount)}));
+        panel.output(Localization.lang("Finished synchronizing %0 links. Entries changed: %1.",
+                Globals.FILE_FIELD.toUpperCase(), String.valueOf(entriesChangedCount)));
         panel.frame().setProgressBarVisible(false);
         if (entriesChangedCount > 0) {
             panel.markBaseChanged();
@@ -302,28 +272,23 @@ public class SynchronizeFileField extends AbstractWorker {
 
     static class OptionsDialog extends JDialog {
 
-        final JRadioButton autoSetUnset;
-        final JRadioButton autoSetAll;
-        final JRadioButton autoSetNone;
-        final JCheckBox checkLinks;
-        final JButton ok = new JButton(Localization.lang("Ok"));
-        final JButton cancel = new JButton(Localization.lang("Cancel"));
-        JLabel description;
+        private final JRadioButton autoSetUnset;
+        private final JRadioButton autoSetAll;
+        private final JRadioButton autoSetNone;
+        private final JCheckBox checkLinks;
+        private final JButton ok = new JButton(Localization.lang("OK"));
+        private final JButton cancel = new JButton(Localization.lang("Cancel"));
         private boolean canceled = true;
         private final MetaData metaData;
 
 
-        public OptionsDialog(JFrame parent, MetaData metaData, String fieldName) {
-            super(parent, Localization.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
+        public OptionsDialog(JFrame parent, MetaData metaData) {
+            super(parent, Localization.lang("Synchronize %0 links", Globals.FILE_FIELD.toUpperCase()), true);
             this.metaData = metaData;
             final String fn = Localization.lang("file");
-            ok.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    canceled = false;
-                    dispose();
-                }
+            ok.addActionListener(e -> {
+                canceled = false;
+                dispose();
             });
 
             Action closeAction = new AbstractAction() {
@@ -338,7 +303,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
             InputMap im = cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
             ActionMap am = cancel.getActionMap();
-            im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+            im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             am.put("close", closeAction);
 
             autoSetUnset = new JRadioButton(Localization.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);
@@ -350,9 +315,9 @@ public class SynchronizeFileField extends AbstractWorker {
             bg.add(autoSetNone);
             bg.add(autoSetAll);
 
-            FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+            FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
             FormBuilder builder = FormBuilder.create().layout(layout);
-            description = new JLabel("<HTML>" + Localization.lang(
+            JLabel description = new JLabel("<HTML>" + Localization.lang(
                     "Attempt to autoset %0 links for your entries. Autoset works if "
                             + "a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.",
                     fn) + "</HTML>");
@@ -407,6 +372,14 @@ public class SynchronizeFileField extends AbstractWorker {
             new FocusRequester(ok);
             super.setVisible(visible);
 
+        }
+
+        public boolean isAutoSetNone() {
+            return autoSetNone.isSelected();
+        }
+
+        public boolean isCheckLinks() {
+            return checkLinks.isSelected();
         }
 
         public boolean canceled() {

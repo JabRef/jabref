@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2004 R. Nagel
-Copyright (C) 2015 T. Denkinger, JabRef Contributors
+Copyright (C) 2015-2016 T. Denkinger, JabRef Contributors
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -38,8 +38,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
  *
  * @version 1.0
  * @author r.nagel
- * @todo Redesign of dialog structure for an assitent like feeling....
- * Now - the unknown bibtex entries cannot inserted into the reference
+ * @todo Redesign of dialog structure for an assistant like feeling....
+ * Now - the unknown BibTeX entries cannot inserted into the reference
  * database without closing the dialog.
  */
 
@@ -55,38 +55,40 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 
 public class AuxSubGenerator {
 
-    private final HashSet<String> mySet; // all unique bibtex keys in aux file
+    private final Set<String> mySet = new HashSet<>(20); // all unique bibtex keys in aux file
 
-    private final Vector<String> notFoundList; // all not solved bibtex keys
+    private final List<String> notFoundList = new ArrayList<>(); // all not solved bibtex keys
 
-    private BibtexDatabase db; // reference database
-    private BibtexDatabase auxDB; // contains only the bibtex keys who found in aux file
+    private BibDatabase db; // reference database
+    private BibDatabase auxDB; // contains only the bibtex keys who found in aux file
 
     private int nestedAuxCounter; // counts the nested aux files
     private int crossreferencedEntriesCount; // counts entries pulled in due to crossref
 
+    private static final Log LOGGER = LogFactory.getLog(AuxSubGenerator.class);
 
-    public AuxSubGenerator(BibtexDatabase refDBase) {
-        mySet = new HashSet<>(20);
-        notFoundList = new Vector<>();
+
+    public AuxSubGenerator(BibDatabase refDBase) {
         db = refDBase;
-    }
-
-    private void setReferenceDatabase(BibtexDatabase newRefDB) {
-        db = newRefDB;
     }
 
     /**
@@ -136,26 +138,20 @@ public class AuxSubGenerator {
         // return value -> default: no error
         boolean back = true;
 
-        // file open status
-        boolean loopFileOpen;
-
         // the important tag
         pattern = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
 
-        // input-file-buffer
-        BufferedReader br = null;
-
         // file list, used for nested aux files
-        Vector<String> fileList = new Vector<>(5);
+        List<String> fileList = new ArrayList<>(5);
         fileList.add(filename);
 
         // get the file path
         File dummy = new File(filename);
         String path = dummy.getParent();
-        if (path != null) {
-            path = path + File.separator;
-        } else {
+        if (path == null) {
             path = "";
+        } else {
+            path = path + File.separator;
         }
 
         nestedAuxCounter = -1; // count only the nested reads
@@ -164,82 +160,62 @@ public class AuxSubGenerator {
         int fileIndex = 0;
 
         while (fileIndex < fileList.size()) {
-            String fName = fileList.elementAt(fileIndex);
-            try {
-                //        System.out.println("read #"+fName +"#") ;
-                br = new BufferedReader(new FileReader(fName));
+            String fName = fileList.get(fileIndex);
+            try (BufferedReader br = new BufferedReader(new FileReader(fName))) {
                 cont = true;
-                loopFileOpen = true;
-            } catch (FileNotFoundException fnfe) {
-                System.out.println("Cannot locate input file! " + fnfe.getMessage());
-                // System.exit( 0 ) ;
-                back = false;
-                cont = false;
-                loopFileOpen = false;
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    // Ignored
-                }
-            }
 
-            while (cont) {
-                String line;
-                try {
-                    line = br.readLine();
-                } catch (IOException ioe) {
-                    line = null;
-                    cont = false;
-                }
+                while (cont) {
+                    Optional<String> maybeLine;
+                    try {
+                        maybeLine = Optional.ofNullable(br.readLine());
+                    } catch (IOException ioe) {
+                        maybeLine = Optional.empty();
+                    }
 
-                if (line != null) {
-                    matcher = pattern.matcher(line);
+                    if (maybeLine.isPresent()) {
+                        String line = maybeLine.get();
+                        matcher = pattern.matcher(line);
 
-                    while (matcher.find()) {
-                        // extract the bibtex-key(s) XXX from \citation{XXX} string
-                        int len = matcher.end() - matcher.start();
-                        if (len > 11) {
-                            String str = matcher.group(2);
-                            // could be an comma separated list of keys
-                            String[] keys = str.split(",");
-                            if (keys != null) {
-                                for (String dummyStr : keys) {
-                                    if (dummyStr != null) {
-                                        // delete all unnecessary blanks and save key into an set
-                                        mySet.add(dummyStr.trim());
+                        while (matcher.find()) {
+                            // extract the bibtex-key(s) XXX from \citation{XXX} string
+                            int len = matcher.end() - matcher.start();
+                            if (len > 11) {
+                                String str = matcher.group(2);
+                                // could be an comma separated list of keys
+                                String[] keys = str.split(",");
+                                if (keys != null) {
+                                    for (String dummyStr : keys) {
+                                        if (dummyStr != null) {
+                                            // delete all unnecessary blanks and save key into an set
+                                            mySet.add(dummyStr.trim());
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    // try to find a nested aux file
-                    int index = line.indexOf("\\@input{");
-                    if (index >= 0) {
-                        int start = index + 8;
-                        int end = line.indexOf("}", start);
-                        if (end > start) {
-                            String str = path + line.substring(index + 8, end);
+                        // try to find a nested aux file
+                        int index = line.indexOf("\\@input{");
+                        if (index >= 0) {
+                            int start = index + 8;
+                            int end = line.indexOf('}', start);
+                            if (end > start) {
+                                String str = path + line.substring(index + 8, end);
 
-                            // if filename already in file list
-                            if (!fileList.contains(str)) {
-                                fileList.add(str); // insert file into file list
+                                // if filename already in file list
+                                if (!fileList.contains(str)) {
+                                    fileList.add(str); // insert file into file list
+                                }
                             }
                         }
+                    } else {
+                        cont = false;
                     }
-                } else {
-                    // line != null
-                    cont = false;
                 }
-            }
-
-            if (loopFileOpen) // only close, if open successful
-            {
-                try {
-                    br.close();
-                    nestedAuxCounter++;
-                } catch (IOException ignored) {
-                    // Ignored
-                }
+                nestedAuxCounter++;
+            } catch (FileNotFoundException e) {
+                LOGGER.info("Cannot locate input file!", e);
+            } catch (IOException e) {
+                LOGGER.warn("Problem opening file!", e);
             }
 
             fileIndex++; // load next file
@@ -253,13 +229,13 @@ public class AuxSubGenerator {
      * method will fill up some intern data structures.....
      */
     private void resolveTags() {
-        auxDB = new BibtexDatabase();
+        auxDB = new BibDatabase();
         notFoundList.clear();
 
         // for all bibtex keys (found in aux-file) try to find an equivalent
         // entry into reference database
         for (String str : mySet) {
-            BibtexEntry entry = db.getEntryByKey(str);
+            BibEntry entry = db.getEntryByKey(str);
 
             if (entry == null) {
                 notFoundList.add(str);
@@ -268,19 +244,20 @@ public class AuxSubGenerator {
                 // Check if the entry we just found references another entry which
                 // we don't already have in our list of entries to include. If so,
                 // pull in that entry as well:
-                String crossref = entry.getField("crossref");
-                if ((crossref != null) && !mySet.contains(crossref)) {
-                    BibtexEntry refEntry = db.getEntryByKey(crossref);
-                    /**
-                     * [ 1717849 ] Patch for aux import by Kai Eckert
-                     */
-                    if (refEntry == null) {
-                        notFoundList.add(crossref);
-                    } else {
-                        insertEntry(auxDB, refEntry);
-                        crossreferencedEntriesCount++;
+                entry.getFieldOptional("crossref").ifPresent(crossref -> {
+                    if (!mySet.contains(crossref)) {
+                        BibEntry refEntry = db.getEntryByKey(crossref);
+                        /**
+                         * [ 1717849 ] Patch for aux import by Kai Eckert
+                         */
+                        if (refEntry == null) {
+                            notFoundList.add(crossref);
+                        } else {
+                            insertEntry(auxDB, refEntry);
+                            crossreferencedEntriesCount++;
+                        }
                     }
-                }
+                });
 
             }
         }
@@ -303,9 +280,9 @@ public class AuxSubGenerator {
      * @param bibDB The database to insert into.
      * @param entry The entry to insert a copy of.
      */
-    private void insertEntry(BibtexDatabase bibDB, BibtexEntry entry) {
+    private void insertEntry(BibDatabase bibDB, BibEntry entry) {
 
-        BibtexEntry clonedEntry = (BibtexEntry) entry.clone();
+        BibEntry clonedEntry = (BibEntry) entry.clone();
         clonedEntry.setId(IdGenerator.next());
         bibDB.insertEntry(clonedEntry);
     }
@@ -314,23 +291,31 @@ public class AuxSubGenerator {
      * generate Shortcut method for easy generation.
      *
      * @param auxFileName String
-     * @param bibDB BibtexDatabase - reference database
+     * @param bibDB BibDatabase - reference database
      * @return Vector - contains all not resolved bibtex entries
      */
-    public final Vector<String> generate(String auxFileName, BibtexDatabase bibDB) {
-        setReferenceDatabase(bibDB);
+    public final List<String> generate(String auxFileName, BibDatabase bibDB) {
+        db = bibDB;
         parseAuxFile(auxFileName);
         resolveTags();
 
         return notFoundList;
     }
 
-    public BibtexDatabase getGeneratedDatabase() {
+    public BibDatabase getGeneratedDatabase() {
         if (auxDB == null) {
-            auxDB = new BibtexDatabase();
+            auxDB = new BibDatabase();
         }
 
         return auxDB;
+    }
+
+    public boolean emptyGeneratedDatabase() {
+        if (auxDB == null) {
+            return true;
+        }
+        return auxDB.getEntryCount() == 0;
+
     }
 
     public final int getFoundKeysInAux() {
@@ -362,15 +347,31 @@ public class AuxSubGenerator {
         // db = null ;  ???
     }
 
-    /** returns a vector off all not resolved bibtex entries found in aux file */
-    public Vector<String> getNotFoundList() {
-        return notFoundList;
-    }
-
     /**
      * returns the number of nested aux files, read by the last call of generate method
      */
     public int getNestedAuxCounter() {
         return this.nestedAuxCounter;
+    }
+
+    public String getInformation(boolean includeMissingEntries) {
+        StringBuffer result = new StringBuffer();
+        // print statistics
+        result.append(Localization.lang("keys_in_database")).append(' ').append(db.getEntryCount()).append('\n')
+                .append(Localization.lang("found_in_aux_file")).append(' ').append(getFoundKeysInAux()).append('\n')
+                .append(Localization.lang("resolved")).append(' ').append(getResolvedKeysCount()).append('\n')
+                .append(Localization.lang("not_found")).append(' ').append(getNotResolvedKeysCount()).append('\n')
+                .append(Localization.lang("crossreferenced entries included")).append(' ')
+                .append(getCrossreferencedEntriesCount());
+
+        if (includeMissingEntries && (getNotResolvedKeysCount() > 0)) {
+            for (String entry : notFoundList) {
+                result.append(entry).append('\n');
+            }
+        }
+        if (nestedAuxCounter > 0) {
+            result.append(Localization.lang("nested_aux_files")).append(' ').append(nestedAuxCounter);
+        }
+        return result.toString();
     }
 }

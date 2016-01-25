@@ -27,10 +27,13 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -49,7 +52,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
     private static final String INSPIRE_HOST = "inspirehep.net";
 
-
+    private static final Log LOGGER = LogFactory.getLog(INSPIREFetcher.class);
     /**
      * Construct the query URL
      *
@@ -67,15 +70,12 @@ public class INSPIREFetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        StringBuilder sb = new StringBuilder("http://").append(INSPIREFetcher.INSPIRE_HOST).append("/");
-        sb.append("/search?ln=en&ln=en&p=find+");
-        //sb.append("spires/find/hep/www").append("?");
-        //sb.append("rawcmd=find+");
-        sb.append(identifier);
-        //sb.append("&action_search=Search&sf=&so=d&rm=&rg=25&sc=0&of=hx");
-        sb.append("&action_search=Search&sf=&so=d&rm=&rg=1000&sc=0&of=hx");
+        // At least 87 characters
+        StringBuilder sb = new StringBuilder(87).append("http://").append(INSPIREFetcher.INSPIRE_HOST)
+                .append("/search?ln=en&ln=en&p=find+").append(identifier)
+                .append("&action_search=Search&sf=&so=d&rm=&rg=1000&sc=0&of=hx");
         //sb.append("&FORMAT=WWWBRIEFBIBTEX&SEQUENCE=");
-        System.out.print("Inspire URL: " + sb + "\n");
+        LOGGER.debug("Inspire URL: " + sb + "\n");
         return sb.toString();
     }
 
@@ -105,13 +105,13 @@ public class INSPIREFetcher implements EntryFetcher {
      */
 
     /**
-     * Import an entry from an OAI2 archive. The BibtexEntry provided has to have the field OAI2_IDENTIFIER_FIELD set to
+     * Import an entry from an OAI2 archive. The BibEntry provided has to have the field OAI2_IDENTIFIER_FIELD set to
      * the search string.
      *
      * @param key The OAI2 key to fetch from ArXiv.
-     * @return The imported BibtexEntry or null if none.
+     * @return The imported BibEntry or null if none.
      */
-    private BibtexDatabase importInspireEntries(String key, OutputPrinter frame) {
+    private BibDatabase importInspireEntries(String key, OutputPrinter frame) {
         String url = constructUrl(key);
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
@@ -131,14 +131,14 @@ public class INSPIREFetcher implements EntryFetcher {
         return null;
     }
 
-    // public void addSpiresURL(BibtexEntry entry) {
+    // public void addSpiresURL(BibEntry entry) {
     // String url = "http://"+spiresHost+"/spires/find/hep/www?texkey+";
     // url = url+entry.getCiteKey();
     // entry.setField("url", url);
     // }
     //
-    // public void addSpiresURLtoDatabase(BibtexDatabase db) {
-    // Iterator<BibtexEntry> iter = db.getEntries().iterator();
+    // public void addSpiresURLtoDatabase(BibDatabase db) {
+    // Iterator<BibEntry> iter = db.getEntries().iterator();
     // while (iter.hasNext())
     // addSpiresURL(iter.next());
     // }
@@ -174,15 +174,15 @@ public class INSPIREFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
         try {
             frame.setStatus("Fetching entries from Inspire");
-            /* query the archive and load the results into the BibtexEntry */
-            BibtexDatabase bd = importInspireEntries(query, frame);
+            /* query the archive and load the results into the BibEntry */
+            BibDatabase bd = importInspireEntries(query, frame);
 
             /* addSpiresURLtoDatabase(bd); */
 
             frame.setStatus("Adding fetched entries");
             /* add the entry to the inspection dialog */
             if (bd.getEntryCount() > 0) {
-                for (BibtexEntry entry : bd.getEntries()) {
+                for (BibEntry entry : bd.getEntries()) {
                     dialog.addEntry(entry);
                 }
             }
@@ -191,8 +191,8 @@ public class INSPIREFetcher implements EntryFetcher {
             // dialog.setProgress(i + 1, keys.length);
             /* inform the inspection dialog, that we're done */
         } catch (Exception e) {
-            frame.showMessage(Localization.lang("Error while fetching from Inspire: ") + e.getMessage());
-            e.printStackTrace();
+            frame.showMessage(Localization.lang("Error while fetching from Inspire:") + " " + e.getMessage());
+            LOGGER.warn("Error while fetching from Inspire", e);
         }
         return true;
     }

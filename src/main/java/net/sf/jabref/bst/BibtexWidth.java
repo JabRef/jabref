@@ -227,7 +227,7 @@ public class BibtexWidth {
                         if ((i < n) && (i == afterBackslash)) {
                             i++; // Skip non-alpha control seq
                         } else {
-                            if (BibtexCaseChanger.findSpecialChar(c, afterBackslash) != null) {
+                            if (BibtexCaseChanger.findSpecialChar(c, afterBackslash).isPresent()) {
                                 result += BibtexWidth.getSpecialCharWidth(c, afterBackslash);
                             }
                         }

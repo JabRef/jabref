@@ -81,10 +81,8 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            // @formatter:off
             JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"),
                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-            // @formatter:on
             return;
         }
 
@@ -138,19 +136,14 @@ public class DownloadExternalFile {
                     return;
                 }
                 // Download finished: call the method that stops the progress bar etc.:
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        downloadFinished();
-                    }
-                });
+                SwingUtilities.invokeLater(DownloadExternalFile.this::downloadFinished);
             }
         });
 
         ExternalFileType suggestedType = null;
         if (mimeType != null) {
             LOGGER.debug("MIME Type suggested: " + mimeType);
-            suggestedType = Globals.prefs.getExternalFileTypeByMimeType(mimeType);
+            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix;
@@ -159,11 +152,11 @@ public class DownloadExternalFile {
         } else {
             // If we didn't find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
-            suggestedType = Globals.prefs.getExternalFileTypeByExt(suffix);
+            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix);
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        String[] fDirectory = getFileDirectory(res);
+        String[] fDirectory = getFileDirectory();
         final String directory;
         if (fDirectory.length == 0) {
             directory = null;
@@ -180,8 +173,7 @@ public class DownloadExternalFile {
 
             @Override
             public boolean confirmClose(FileListEntry entry) {
-                File f = directory != null ? expandFilename(directory, entry.getLink())
-                        : new File(entry.getLink());
+                File f = directory != null ? expandFilename(directory, entry.link) : new File(entry.link);
                 if (f.isDirectory()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
                             Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
@@ -203,8 +195,7 @@ public class DownloadExternalFile {
         }
         // Editor closed. Go on:
         if (editor.okPressed()) {
-            File toFile = directory != null ? expandFilename(directory, entry.getLink())
-                    : new File(entry.getLink());
+            File toFile = directory != null ? expandFilename(directory, entry.link) : new File(entry.link);
             String dirPrefix;
             if (directory != null) {
                 if (!directory.endsWith(System.getProperty("file.separator"))) {
@@ -225,9 +216,9 @@ public class DownloadExternalFile {
 
                 // If the local file is in or below the main file directory, change the
                 // path to relative:
-                if ((directory != null) && entry.getLink().startsWith(directory) &&
-                        (entry.getLink().length() > dirPrefix.length())) {
-                    entry.setLink(entry.getLink().substring(dirPrefix.length()));
+                if ((directory != null) && entry.link.startsWith(directory) &&
+                        (entry.link.length() > dirPrefix.length())) {
+                    entry = new FileListEntry(entry.description, entry.link.substring(dirPrefix.length()), entry.type);
                 }
 
                 callback.downloadComplete(entry);
@@ -319,23 +310,23 @@ public class DownloadExternalFile {
         }
         // First see if the stripped link gives a reasonable suffix:
         String suffix;
-        int index = strippedLink.lastIndexOf('.');
-        if ((index <= 0) || (index == (strippedLink.length() - 1))) {
+        int strippedLinkIndex = strippedLink.lastIndexOf('.');
+        if ((strippedLinkIndex <= 0) || (strippedLinkIndex == (strippedLink.length() - 1))) {
             suffix = null;
         } else {
-            suffix = strippedLink.substring(index + 1);
+            suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
+        if (ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix) != null) {
             return suffix;
         } else {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
-            index = link.lastIndexOf('.');
-            if ((index <= 0) || (index == (strippedLink.length() - 1))) {
-                // No occurence, or at the end
+            int index = link.lastIndexOf('.');
+            if ((index <= 0) || (index == (link.length() - 1))) {
+                // No occurrence, or at the end
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (suffix.indexOf('/') > 0) {
+                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') > 0) {
                     return "";
                 } else {
                     return suffix; // return the first one we found, anyway.
@@ -353,7 +344,7 @@ public class DownloadExternalFile {
 
     }
 
-    private String[] getFileDirectory(String link) {
+    private String[] getFileDirectory() {
         return metaData.getFileDirectory(Globals.FILE_FIELD);
     }
 

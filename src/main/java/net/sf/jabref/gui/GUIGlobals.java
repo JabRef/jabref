@@ -30,6 +30,7 @@ import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
@@ -121,9 +122,6 @@ public class GUIGlobals {
     public static Color activeBackground;
     public static Color invalidFieldBackgroundColor;
 
-    public static final String META_FLAG = "jabref-meta: ";
-    public static final String META_FLAG_OLD = "bibkeeper-meta: ";
-
     // some fieldname constants
     public static final double DEFAULT_FIELD_WEIGHT = 1;
     public static final double MAX_FIELD_WEIGHT = 2;
@@ -153,7 +151,7 @@ public class GUIGlobals {
 
     public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
 
-    public static final int WIDTH_ICON_COL = 19;
+    public static final int WIDTH_ICON_COL = 26;
 
     // Column widths for export customization dialog table:
     public static final int EXPORT_DIALOG_COL_0_WIDTH = 50;
@@ -214,10 +212,7 @@ public class GUIGlobals {
         GUIGlobals.tableIcons.put("eprint", label);
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
-        // @formatter:off
-        label.setToolTipText(Localization.lang("Open") + " DOI " +
-                Localization.lang("web link"));
-        // @formatter:on
+        label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
         GUIGlobals.tableIcons.put("doi", label);
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
@@ -232,7 +227,7 @@ public class GUIGlobals {
         label.setToolTipText(Localization.lang("Open file"));
         GUIGlobals.tableIcons.put(Globals.FILE_FIELD, label);
 
-        for (ExternalFileType fileType : Globals.prefs.getExternalFileTypeSelection()) {
+        for (ExternalFileType fileType : ExternalFileTypes.getInstance().getExternalFileTypeSelection()) {
             label = new JLabel(fileType.getIcon());
             label.setToolTipText(Localization.lang("Open %0 file", fileType.getName()));
             GUIGlobals.tableIcons.put(fileType.getName(), label);

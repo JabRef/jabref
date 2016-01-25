@@ -39,7 +39,7 @@ import javax.swing.SwingUtilities;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
@@ -120,11 +120,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             public void actionPerformed(ActionEvent actionEvent) {
                 activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
                 Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
-                if (activeFetcher.getHelpPage() != null) {
+                if (activeFetcher.getHelpPage() == null) {
+                    helpBut.setEnabled(false);
+                } else {
                     help.setHelpFile(activeFetcher.getHelpPage());
                     helpBut.setEnabled(true);
-                } else {
-                    helpBut.setEnabled(false);
                 }
                 optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex()));
                 optPanel.removeAll();
@@ -301,7 +301,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         public FetcherAction() {
             super(Localization.lang("Web search"), IconTheme.JabRefIcon.WWW.getSmallIcon());
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.WEB_SEARCH));
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.WEB_SEARCH));
             putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.WWW.getIcon());
         }
 

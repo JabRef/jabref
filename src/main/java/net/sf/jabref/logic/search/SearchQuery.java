@@ -1,12 +1,10 @@
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescriber;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.search.rules.ContainBasedSearchRule;
 import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class SearchQuery {
 
@@ -29,7 +27,7 @@ public class SearchQuery {
         return String.format("\"%s\" (%s, %s)", query, getCaseSensitiveDescription(), getRegularExpressionDescription());
     }
 
-    public boolean isMatch(BibtexEntry entry) {
+    public boolean isMatch(BibEntry entry) {
         return this.rule.applyRule(query, entry);
     }
 

@@ -2,52 +2,33 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.FileNodeWrapper;
 
 /**
- * Util class for searching files on the filessystem which are not linked to a
- * provided {@link BibtexDatabase}.
- * 
- * @author Nosh&Dan
- * @version 09.11.2008 | 19:55:20
- * 
+ * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
  */
 public class UnlinkedFilesCrawler {
-
     /**
-     * File filter, that accepts directorys only.
+     * File filter, that accepts directories only.
      */
-    private final FileFilter directoryFilter = new FileFilter() {
+    private final static FileFilter DIRECTORY_FILTER = pathname -> pathname != null && pathname.isDirectory();
 
-        @Override
-        public boolean accept(File pathname) {
-            if (pathname == null) {
-                return false;
-            }
-            return pathname.isDirectory();
-        }
-    };
-    private final BibtexDatabase database;
+    private final BibDatabase database;
 
-
-    /**
-     * CONSTRUCTOR
-     * 
-     * @param database
-     */
-    public UnlinkedFilesCrawler(BibtexDatabase database) {
+    public UnlinkedFilesCrawler(BibDatabase database) {
         this.database = database;
     }
 
-    public CheckableTreeNode searchDirectory(File directory, FileFilter aFileFilter) {
-        UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(aFileFilter, database);
-        return searchDirectory(directory, ff, new int[] {1}, null);
+    public CheckableTreeNode searchDirectory(File directory, FileFilter filter) {
+        UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(filter, database);
+        return searchDirectory(directory, ff, new AtomicBoolean(true), null);
     }
 
     /**
@@ -60,20 +41,20 @@ public class UnlinkedFilesCrawler {
      * {@link CheckableTreeNode}. <br>
      * <br>
      * The user objects that are attached to the nodes is the
-     * {@link FileNodeWrapper}, which wrapps the {@link File}-Object. <br>
+     * {@link FileNodeWrapper}, which wraps the {@link File}-Object. <br>
      * <br>
      * For ensuring the capability to cancel the work of this recursive method,
      * the first position in the integer array 'state' must be set to 1, to keep
-     * the recursion running. When the states value changes, the methode will
+     * the recursion running. When the states value changes, the method will
      * resolve its recursion and return what it has saved so far.
      */
-    public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, int[] state, ChangeListener changeListener) {
+    public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, AtomicBoolean state, ChangeListener changeListener) {
         /* Cancellation of the search from outside! */
-        if (state == null || state.length < 1 || state[0] != 1) {
+        if ((state == null) || !state.get()) {
             return null;
         }
-        /* Return null if the directory is not valid. */
-        if (directory == null || !directory.exists() || !directory.isDirectory()) {
+        // Return null if the directory is not valid.
+        if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
             return null;
         }
 
@@ -82,10 +63,10 @@ public class UnlinkedFilesCrawler {
 
         int filesCount = 0;
 
-        File[] subDirectories = directory.listFiles(directoryFilter);
+        File[] subDirectories = directory.listFiles(DIRECTORY_FILTER);
         for (File subDirectory : subDirectories) {
             CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
-            if (subRoot != null && subRoot.getChildCount() > 0) {
+            if ((subRoot != null) && (subRoot.getChildCount() > 0)) {
                 filesCount += ((FileNodeWrapper) subRoot.getUserObject()).fileCount;
                 root.add(subRoot);
             }

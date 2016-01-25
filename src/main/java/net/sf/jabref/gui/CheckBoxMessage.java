@@ -16,14 +16,12 @@
 package net.sf.jabref.gui;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 public class CheckBoxMessage extends JPanel {
 
-    BorderLayout borderLayout1 = new BorderLayout();
     private final JCheckBox cb;
 
 

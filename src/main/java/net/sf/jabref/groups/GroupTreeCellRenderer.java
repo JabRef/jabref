@@ -21,7 +21,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
@@ -43,9 +43,9 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private Object[] highlight3Cells;
     private Object highlightBorderCell;
 
-    private static final Icon groupRefiningIcon = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
-    private static final Icon groupIncludingIcon = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
-    private static final Icon groupRegularIcon = null;
+    private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
+    private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
+    private static final Icon GROUP_REGULAR_ICON = null;
 
 
     @Override
@@ -68,7 +68,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         }
         JLabel label = (JLabel) c;
 
-        if ((highlightBorderCell != null) && (highlightBorderCell == value)) {
+        if ((highlightBorderCell != null) && (highlightBorderCell.equals(value))) {
             label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         } else {
             label.setBorder(BorderFactory.createEmptyBorder());
@@ -97,7 +97,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (name.length() > GroupTreeCellRenderer.MAX_DISPLAYED_LETTERS) {
             name = name.substring(0, GroupTreeCellRenderer.MAX_DISPLAYED_LETTERS - 2) + "...";
         }
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(60);
         sb.append("<html>");
         if (red) {
             sb.append("<font color=\"#FF0000\">");
@@ -111,15 +111,15 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         sb.append(StringUtil.quoteForHTML(name));
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
             if (group instanceof ExplicitGroup) {
-                sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
+                sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
             } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
-                for (BibtexEntry entry : JabRef.jrf.getCurrentBasePanel().getDatabase().getEntries()) {
+                for (BibEntry entry : JabRef.jrf.getCurrentBasePanel().getDatabase().getEntries()) {
                     if (group.contains(entry)) {
                         hits++;
                     }
                 }
-                sb.append(" [").append(hits).append("]");
+                sb.append(" [").append(hits).append(']');
             }
         }
         if (italics) {
@@ -141,18 +141,18 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
             switch (group.getHierarchicalContext()) {
             case REFINING:
-                if (label.getIcon() != GroupTreeCellRenderer.groupRefiningIcon) {
-                    label.setIcon(GroupTreeCellRenderer.groupRefiningIcon);
+                if (label.getIcon() != GroupTreeCellRenderer.GROUP_REFINING_ICON) {
+                    label.setIcon(GroupTreeCellRenderer.GROUP_REFINING_ICON);
                 }
                 break;
             case INCLUDING:
-                if (label.getIcon() != GroupTreeCellRenderer.groupIncludingIcon) {
-                    label.setIcon(GroupTreeCellRenderer.groupIncludingIcon);
+                if (label.getIcon() != GroupTreeCellRenderer.GROUP_INCLUDING_ICON) {
+                    label.setIcon(GroupTreeCellRenderer.GROUP_INCLUDING_ICON);
                 }
                 break;
             default:
-                if (label.getIcon() != GroupTreeCellRenderer.groupRegularIcon) {
-                    label.setIcon(GroupTreeCellRenderer.groupRegularIcon);
+                if (label.getIcon() != GroupTreeCellRenderer.GROUP_REGULAR_ICON) {
+                    label.setIcon(GroupTreeCellRenderer.GROUP_REGULAR_ICON);
                 }
                 break;
             }
@@ -167,21 +167,21 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
      *
      * @param cell The cell over which the user is currently dragging.
      */
-    void setHighlight1Cell(Object cell) {
+    public void setHighlight1Cell(Object cell) {
         this.highlight1Cell = cell;
     }
 
     /**
      * Highlights the specified cells (in red), or disables highlight if cells == null.
      */
-    void setHighlight2Cells(Object[] cells) {
+    public void setHighlight2Cells(Object[] cells) {
         this.highlight2Cells = cells;
     }
 
     /**
      * Highlights the specified cells (by underlining), or disables highlight if cells == null.
      */
-    void setHighlight3Cells(Object[] cells) {
+    public void setHighlight3Cells(Object[] cells) {
         this.highlight3Cells = cells;
     }
 
@@ -189,7 +189,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
      * Highlights the specified cells (by drawing a border around it), or disables highlight if highlightBorderCell ==
      * null.
      */
-    void setHighlightBorderCell(Object highlightBorderCell) {
+    public void setHighlightBorderCell(Object highlightBorderCell) {
         this.highlightBorderCell = highlightBorderCell;
     }
 }

@@ -17,11 +17,13 @@ package net.sf.jabref.importer.fileformat;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 
@@ -31,8 +33,8 @@ import org.xml.sax.helpers.DefaultHandler;
 class MedlineHandler extends DefaultHandler
 {
 
-    private static final HTMLConverter htmlConverter = new HTMLConverter();
-    private final ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    private static final HTMLConverter HTML_CONVERTER = new HTMLConverter();
+    private final List<BibEntry> bibitems = new ArrayList<>();
     private boolean inTitle;
     private boolean inYear;
     private boolean inJournal;
@@ -76,12 +78,12 @@ class MedlineHandler extends DefaultHandler
     private String number = "";
     private String page = "";
     private String MedlineDate = "";
-    String series = "";
-    String editor = "";
-    String booktitle = "";
-    String type = "article";
-    String key = "";
-    String address = "";
+    private final String series = "";
+    private final String editor = "";
+    private final String booktitle = "";
+    private final String type = "article";
+    private final String key = "";
+    private final String address = "";
     private String pubmedid = "";
     private String doi = "";
     private String pii = "";
@@ -90,14 +92,13 @@ class MedlineHandler extends DefaultHandler
     private String minorTopics = "";
     private String language = "";
     private String pst = "";
-    private final ArrayList<String> authors = new ArrayList<>();
-    private final TreeSet<String> descriptors = new TreeSet<>(); // To gather keywords
-    int rowNum;
+    private final List<String> authors = new ArrayList<>();
+    private final Set<String> descriptors = new TreeSet<>(); // To gather keywords
 
     private static final String KEYWORD_SEPARATOR = "; ";
 
 
-    public ArrayList<BibtexEntry> getItems() {
+    public List<BibEntry> getItems() {
         return bibitems;
     }
 
@@ -208,28 +209,18 @@ class MedlineHandler extends DefaultHandler
         return sb.toString();
     }
 
-    String makeBibtexString() {
-        String out;
-        // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
-        out = "article{,\n" + " author = { " + author + " },\n title = { " + title + "},\n journal ={ " + journal + "},\n year = " + year +
-                "},\n volume = { " + volume + "},\n number = { " + number + "},\n pages = { " + fixPageRange(page) + "},\n abstract = { " + abstractText + "},\n}";
-        return out;
-    }
-
     @Override
     public void endElement(String uri, String localName, String qName) {
         if ("PubmedArticle".equals(localName)) {
             //bibitems.add( new Bibitem(null, makeBibtexString(), Globals.nextKey(),"-1" )	 );
             // check if year ="" then give medline date instead
-            if ("".equals(year)) {
-                if (!"".equals(MedlineDate)) {
+            if ("".equals(year) && !"".equals(MedlineDate)) {
                     // multi-year date format
                     //System.out.println(MedlineDate);
                     year = MedlineDate.substring(0, 4);
                     //Matcher m = Pattern.compile("\\b[0-9]{4}\\b").matcher(MedlineDate);
                     //if(m.matches())
                     //year = m.group();
-                }
             }
 
             // Build a string from the collected keywords:
@@ -243,15 +234,15 @@ class MedlineHandler extends DefaultHandler
             }
             String keywords = sb.toString();
 
-            BibtexEntry b = new BibtexEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
-            EntryTypes.getBibtexEntryType("article")); // id assumes an existing database so don't create one here
+            BibEntry b = new BibEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
+            EntryTypes.getTypeOrDefault("article")); // id assumes an existing database so don't create one here
             if (!"".equals(author)) {
-                b.setField("author", MedlineHandler.htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
+                b.setField("author", MedlineHandler.HTML_CONVERTER.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
                 author = "";
             }
             if (!"".equals(title)) {
-                b.setField("title", MedlineHandler.htmlConverter.formatUnicode(title));
+                b.setField("title", MedlineHandler.HTML_CONVERTER.formatUnicode(title));
             }
             // if (!title.equals("")) b.setField("title",Util.replaceSpecialCharacters(title));
             if (!"".equals(journal)) {
@@ -385,7 +376,7 @@ class MedlineHandler extends DefaultHandler
             }
 
             // Put together name with last name first, and enter suffix in between if present:
-            if (lastname.indexOf(" ") > 0) {
+            if (lastname.indexOf(' ') > 0) {
                 author = "{" + lastname + "}";
             } else {
                 author = lastname;

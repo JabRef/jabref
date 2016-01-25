@@ -57,7 +57,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
         }
 
         String caseSensitiveDescription = getCaseSensitiveDescription();
-        String genericDescription = "<p><br>" + Localization.lang("Hint%c To search specific fields only, enter for example%c<p><tt>author%esmith and title%eelectrical</tt>");
+        String genericDescription = "<p><br>" + Localization.lang("Hint: To search specific fields only, enter for example:<p><tt>author=smith and title=electrical</tt>");
         return String.format("%s (%s). %s", searchDescription, caseSensitiveDescription, genericDescription);
     }
 

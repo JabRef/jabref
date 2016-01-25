@@ -34,7 +34,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Preference tab for file sorting options.
@@ -45,15 +45,16 @@ class FileSortTab extends JPanel implements PrefsTab {
     private final JRadioButton saveInOriginalOrder;
     private final JRadioButton saveInTableOrder;
     private final JRadioButton saveInSpecifiedOrder;
-    private JCheckBox savePriDesc;
-    private JCheckBox saveSecDesc;
-    private JCheckBox saveTerDesc;
-    private JTextField savePriField;
-    private JTextField saveSecField;
-    private JTextField saveTerField;
-    private JComboBox<String> savePriSort;
-    private JComboBox<String> saveSecSort;
-    private JComboBox<String> saveTerSort;
+
+    private final JCheckBox savePriDesc;
+    private final JCheckBox saveSecDesc;
+    private final JCheckBox saveTerDesc;
+    private final JTextField savePriField;
+    private final JTextField saveSecField;
+    private final JTextField saveTerField;
+    private final JComboBox<String> savePriSort;
+    private final JComboBox<String> saveSecSort;
+    private final JComboBox<String> saveTerSort;
 
     private final JRadioButton exportInOriginalOrder;
     private final JRadioButton exportInTableOrder;
@@ -107,7 +108,7 @@ class FileSortTab extends JPanel implements PrefsTab {
             saveInSpecifiedOrder.addActionListener(listener);
 
             ArrayList<String> fieldNames = new ArrayList<>(BibtexFields.getAllFieldNames());
-            fieldNames.add(BibtexEntry.KEY_FIELD);
+            fieldNames.add(BibEntry.KEY_FIELD);
             Collections.sort(fieldNames);
             String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
             savePriSort = new JComboBox<>(allPlusKey);
@@ -227,7 +228,7 @@ class FileSortTab extends JPanel implements PrefsTab {
         exportInSpecifiedOrder.addActionListener(listener);
 
         ArrayList<String> fieldNames = new ArrayList<>(BibtexFields.getAllFieldNames());
-        fieldNames.add(BibtexEntry.KEY_FIELD);
+        fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
         exportPriSort = new JComboBox<>(allPlusKey);

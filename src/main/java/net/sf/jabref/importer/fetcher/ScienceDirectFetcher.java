@@ -17,11 +17,14 @@ package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -34,18 +37,17 @@ import java.util.regex.Pattern;
 
 public class ScienceDirectFetcher implements EntryFetcher {
 
+    private static final Log LOGGER = LogFactory.getLog(ScienceDirectFetcher.class);
+
     private static final int MAX_PAGES_TO_LOAD = 8;
     private static final String WEBSITE_URL = "http://www.sciencedirect.com";
     private static final String SEARCH_URL = ScienceDirectFetcher.WEBSITE_URL + "/science/quicksearch?query=";
 
-    private static final String linkPrefix = "http://www.sciencedirect.com/science?_ob=ArticleURL&";
-    private static final Pattern linkPattern = Pattern.compile(
-            "<a href=\"" +
-                    ScienceDirectFetcher.linkPrefix.replaceAll("\\?", "\\\\?") +
-            "([^\"]+)\"\"");
+    private static final String LINK_PREFIX = "http://www.sciencedirect.com/science?_ob=ArticleURL&";
+    private static final Pattern LINK_PATTERN = Pattern
+            .compile("<a href=\"" + ScienceDirectFetcher.LINK_PREFIX.replaceAll("\\?", "\\\\?") + "([^\"]+)\"\"");
 
-    protected static final Pattern nextPagePattern = Pattern.compile(
-            "<a href=\"(.*)\">Next &gt;");
+    protected static final Pattern NEXT_PAGE_PATTERN = Pattern.compile("<a href=\"(.*)\">Next &gt;");
 
     private boolean stopFetching;
 
@@ -91,17 +93,14 @@ public class ScienceDirectFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibtexEntry entry = BibsonomyScraper.getEntry(cit);
-                if (entry != null) {
-                    dialog.addEntry(entry);
-                }
+                BibsonomyScraper.getEntry(cit).ifPresent(entry -> dialog.addEntry(entry));
                 dialog.setProgress(++i, citations.size());
             }
 
             return true;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Communcation problems", e);
             status.showMessage(Localization.lang("Error while fetching from ScienceDirect") + ": " + e.getMessage());
         }
         return false;
@@ -136,12 +135,12 @@ public class ScienceDirectFetcher implements EntryFetcher {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
         //String entirePage = cont;
-        Matcher m = ScienceDirectFetcher.linkPattern.matcher(cont);
+        Matcher m = ScienceDirectFetcher.LINK_PATTERN.matcher(cont);
         if (m.find()) {
             while (m.find()) {
-                ids.add(ScienceDirectFetcher.linkPrefix + m.group(1));
+                ids.add(ScienceDirectFetcher.LINK_PREFIX + m.group(1));
                 cont = cont.substring(m.end());
-                m = ScienceDirectFetcher.linkPattern.matcher(cont);
+                m = ScienceDirectFetcher.LINK_PATTERN.matcher(cont);
             }
         }
 

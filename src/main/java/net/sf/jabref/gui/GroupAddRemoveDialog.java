@@ -2,8 +2,8 @@ package net.sf.jabref.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.gui.actions.BaseAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.groups.structure.AbstractGroup;
@@ -33,7 +33,7 @@ public class GroupAddRemoveDialog implements BaseAction {
     private final BasePanel panel;
     private final boolean add;
     private final boolean move;
-    private BibtexEntry[] selection;
+    private BibEntry[] selection;
     private JTree tree;
     private JButton ok;
 
@@ -54,12 +54,10 @@ public class GroupAddRemoveDialog implements BaseAction {
         selection = panel.getSelectedEntries();
 
         final JDialog diag = new JDialog(panel.frame(),
-                // @formatter:off
                 (add ? (move ? Localization.lang("Move to group") :
                     Localization.lang("Add to group")) :
                     Localization.lang("Remove from group")), true);
-                // formatter:on
-        ok = new JButton(Localization.lang("Ok"));
+        ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         tree = new JTree(groups);
         tree.setCellRenderer(new AddRemoveGroupTreeCellRenderer());
@@ -127,7 +125,7 @@ public class GroupAddRemoveDialog implements BaseAction {
         // Key bindings:
         ActionMap am = sp.getActionMap();
         InputMap im = sp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             @Override
