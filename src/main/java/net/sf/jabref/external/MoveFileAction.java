@@ -33,6 +33,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Action for moving or renaming a file that is linked to from an entry in JabRef.
@@ -72,10 +73,10 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        String[] dirs = frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
-        for (int i = 0; i < dirs.length; i++) {
-            if (new File(dirs[i]).exists()) {
+        for (int i = 0; i < dirs.size(); i++) {
+            if (new File(dirs.get(i)).exists()) {
                 found = i;
                 break;
             }
@@ -121,8 +122,8 @@ public class MoveFileAction extends AbstractAction {
                         return;
                     }
                     Globals.prefs.putBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR, cbm.isSelected());
-                    StringBuilder sb = new StringBuilder(dirs[found]);
-                    if (!dirs[found].endsWith(File.separator)) {
+                    StringBuilder sb = new StringBuilder(dirs.get(found));
+                    if (!dirs.get(found).endsWith(File.separator)) {
                         sb.append(File.separator);
                     }
                     if (cbm.isSelected()) {
@@ -162,7 +163,7 @@ public class MoveFileAction extends AbstractAction {
                         // Remove the original file:
                         file.delete();
                         // Relativise path, if possible.
-                        String canPath = new File(dirs[found]).getCanonicalPath();
+                        String canPath = new File(dirs.get(found)).getCanonicalPath();
                         if (newFile.getCanonicalPath().startsWith(canPath)) {
                             if ((newFile.getCanonicalPath().length() > canPath.length()) &&
                                     (newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar)) {

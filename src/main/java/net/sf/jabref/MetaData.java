@@ -159,27 +159,34 @@ public class MetaData implements Iterable<String> {
     /**
      * Look up the directory set up for the given field type for this database.
      * If no directory is set up, return that defined in global preferences.
+     * There can be up to three directory definitions for these files:
+     * the database's metadata can specify a general directory and/or a user-specific directory
+     * or the preferences can specify one.
+     *
+     * The settings are prioritized in the following order and the first defined setting is used:
+     * 1. metadata user-specific directory
+     * 2. metadata general directory
+     * 3. preferences directory
+     * 4. bib file directory
      *
      * @param fieldName The field type
      * @return The default directory for this field type.
      */
-    public String[] getFileDirectory(String fieldName) {
-        // There can be up to three directory definitions for these files - the database's
-        // metadata can specify a general directory and/or a user-specific directory, or
-        // the preferences can specify one. The settings are prioritized in the following
-        // order and the first defined setting is used: metadata user-specific directory,
-        // metadata general directory, preferences directory.
-        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL);
-        List<String> dirs = new ArrayList<>();
+    public List<String> getFileDirectory(String fieldName) {
+        List<String> fileDirs = new ArrayList<>();
 
-        Vector<String> vec = getData(key);
-        if (vec == null) {
-            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR);
-            vec = getData(key);
+        // 1. metadata user-specific directory
+        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL); // USER_SPECIFIC_FILE_DIR_FOR_DB
+        List<String> metaData = getData(key);
+        if (metaData == null) {
+            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR); // FILE_DIR_FOR_DB
+            metaData = getData(key);
         }
-        if ((vec != null) && !vec.isEmpty()) {
+
+        // 2. metadata general directory
+        if ((metaData != null) && !metaData.isEmpty()) {
             String dir;
-            dir = vec.get(0);
+            dir = metaData.get(0);
             // If this directory is relative, we try to interpret it as relative to
             // the file path of this bib file:
             if (!new File(dir).isAbsolute() && (file != null)) {
@@ -188,7 +195,7 @@ public class MetaData implements Iterable<String> {
                     // if dir is only "current" directory, just use its parent (== real current directory) as path
                     relDir = file.getParent();
                 } else {
-                    relDir = file.getParent() + System.getProperty("file.separator") + dir;
+                    relDir = file.getParent() + File.separator + dir;
                 }
                 // If this directory actually exists, it is very likely that the
                 // user wants us to use it:
@@ -196,25 +203,27 @@ public class MetaData implements Iterable<String> {
                     dir = relDir;
                 }
             }
-            dirs.add(dir);
+            fileDirs.add(dir);
         } else {
-            String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX);
+            // 3. preferences directory?
+            String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
             if (dir != null) {
-                dirs.add(dir);
+                fileDirs.add(dir);
             }
         }
 
-        // Check if the bib file location should be included, and if so, if it is set:
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && (getFile() != null)) {
+        // 4. bib file directory
+        if (getFile() != null) {
+            String parentDir = getFile().getParent();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
-                dirs.add(0, getFile().getParent());
+                fileDirs.add(0, parentDir);
             } else {
-                dirs.add(getFile().getParent());
+                fileDirs.add(parentDir);
             }
         }
 
-        return dirs.toArray(new String[dirs.size()]);
+        return fileDirs;
     }
 
     /**

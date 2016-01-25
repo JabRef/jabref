@@ -396,7 +396,7 @@ public class CleanUpAction extends AbstractWorker {
     }
 
     private void doRenamePDFs(BibEntry entry, NamedCompound ce) {
-        String[] paths = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> paths = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         BibDatabase database = panel.database();
         Boolean onlyRelativePaths = cleanUpRenamePDFonlyRelativePaths.isSelected();
         RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, onlyRelativePaths, database);

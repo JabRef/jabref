@@ -24,6 +24,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
@@ -301,8 +302,8 @@ public class FileListEntryEditor {
         String link = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
-            String[] dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
-            if (dirs.length == 0) {
+            List<String> dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
+            if (dirs.size() == 0) {
                 link = this.link.getText().trim();
             } else {
                 boolean found = false;
@@ -366,7 +367,7 @@ public class FileListEntryEditor {
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
-                String[] dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
+                List<String> dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
                 newFile = FileUtil.shortenFileName(newFile, dirsS);
 
                 comp.setText(newFile.getPath());

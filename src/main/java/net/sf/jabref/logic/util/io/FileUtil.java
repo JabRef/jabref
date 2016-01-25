@@ -186,9 +186,9 @@ public class FileUtil {
     public static File expandFilename(final MetaData metaData, String name) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        String[] directories = metaData.getFileDirectory(extension.orElse(null));
+        List<String> directories = metaData.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
-        String[] fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
+        List<String> fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
         // Include the directory of the bib file:
         ArrayList<String> al = new ArrayList<>();
         for (String dir : directories) {
@@ -201,8 +201,8 @@ public class FileUtil {
                 al.add(aFileDir);
             }
         }
-        String[] dirs = al.toArray(new String[al.size()]);
-        return expandFilename(name, dirs);
+
+        return expandFilename(name, al);
     }
 
     /**
@@ -212,7 +212,7 @@ public class FileUtil {
      * Will look in each of the given dirs starting from the beginning and
      * returning the first found file to match if any.
      */
-    public static File expandFilename(String name, String[] directories) {
+    public static File expandFilename(String name, List<String> directories) {
         for (String dir : directories) {
             if (dir != null) {
                 File result = expandFilename(name, dir);
@@ -271,7 +271,7 @@ public class FileUtil {
      * @param fileName the filename to be shortened
      * @param dirs     directories to check.
      */
-    public static File shortenFileName(File fileName, String[] dirs) {
+    public static File shortenFileName(File fileName, List<String> dirs) {
         if ((fileName == null) || (fileName.length() == 0)) {
             return fileName;
         }
@@ -383,7 +383,7 @@ public class FileUtil {
         for (BibEntry entry : bes) {
             List<FileField.ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
             for (FileField.ParsedFileField file : fileList) {
-                File f = expandFilename(file.link, fileDirs.toArray(new String[fileDirs.size()]));
+                File f = expandFilename(file.link, fileDirs);
                 if (f != null) {
                     result.add(f);
                 }

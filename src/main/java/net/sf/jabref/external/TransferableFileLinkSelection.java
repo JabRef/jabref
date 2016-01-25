@@ -42,7 +42,7 @@ public class TransferableFileLinkSelection implements Transferable {
         selection[0].getFieldOptional(Globals.FILE_FIELD).ifPresent(file -> tm.setContent(file));
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
-            String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
             File expLink = FileUtil.expandFilename(tm.getEntry(0).link, dirs);
             fileList.add(expLink);
 

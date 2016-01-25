@@ -348,10 +348,10 @@ public class DroppedFileHandler {
                                                  BibEntry entry, boolean newEntry, final boolean multipleEntries, BibDatabase database) {
 
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
-        String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
-        for (int i = 0; i < dirs.length; i++) {
-            if (new File(dirs[i]).exists()) {
+        for (int i = 0; i < dirs.size(); i++) {
+            if (new File(dirs.get(i)).exists()) {
                 found = i;
                 break;
             }
@@ -364,7 +364,7 @@ public class DroppedFileHandler {
             renameCheckBox.setEnabled(false);
             linkInPlace.setSelected(true);
         } else {
-            destDirLabel.setText(Localization.lang("File directory is '%0':", dirs[found]));
+            destDirLabel.setText(Localization.lang("File directory is '%0':", dirs.get(found)));
             copyRadioButton.setEnabled(true);
             moveRadioButton.setEnabled(true);
             renameToTextBox.setEnabled(true);
@@ -452,14 +452,14 @@ public class DroppedFileHandler {
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
-            String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
-            String absFilename = !new File(filename).isAbsolute() && (dirs.length > 0) ?
+            List<String> dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+            String absFilename = !new File(filename).isAbsolute() && (dirs.size() > 0) ?
                     FileUtil.expandFilename(filename, dirs).getAbsolutePath() : filename;
 
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
                 // Find the absolute filename for this existing link:
-                String absName = !new File(flEntry.link).isAbsolute() && (dirs.length > 0) ?
+                String absName = !new File(flEntry.link).isAbsolute() && (dirs.size() > 0) ?
                         FileUtil.expandFilename(flEntry.link, dirs).getAbsolutePath() : flEntry.link;
                 System.out.println("absName: " + absName);
                 // If the filenames are equal, we don't need to link, so we simply return:
@@ -494,10 +494,10 @@ public class DroppedFileHandler {
      */
     private boolean doMove(String fileName, ExternalFileType fileType, String destFilename,
                            NamedCompound edits) {
-        String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
-        for (int i = 0; i < dirs.length; i++) {
-            if (new File(dirs[i]).exists()) {
+        for (int i = 0; i < dirs.size(); i++) {
+            if (new File(dirs.get(i)).exists()) {
                 found = i;
                 break;
             }
@@ -509,7 +509,7 @@ public class DroppedFileHandler {
             return false;
         }
         File fromFile = new File(fileName);
-        File toFile = new File(dirs[found] + System.getProperty("file.separator") + destFilename);
+        File toFile = new File(dirs.get(found) + System.getProperty("file.separator") + destFilename);
         if (toFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("'%0' exists. Overwrite file?", toFile.getAbsolutePath()),
@@ -545,10 +545,10 @@ public class DroppedFileHandler {
     private boolean doCopy(String fileName, ExternalFileType fileType, String toFile,
                            NamedCompound edits) {
 
-        String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
-        for (int i = 0; i < dirs.length; i++) {
-            if (new File(dirs[i]).exists()) {
+        for (int i = 0; i < dirs.size(); i++) {
+            if (new File(dirs.get(i)).exists()) {
                 found = i;
                 break;
             }
@@ -556,12 +556,12 @@ public class DroppedFileHandler {
         if (found < 0) {
             // OOps, we don't know which directory to put it in, or the given
             // dir doesn't exist....
-            System.out.println("dir: " + dirs[found] + "\t ext: " + fileType.getExtension());
+            System.out.println("dir: " + dirs.get(found) + "\t ext: " + fileType.getExtension());
             return false;
         }
         toFile = new File(toFile).getName();
 
-        File destFile = new File(dirs[found] + System.getProperty("file.separator") + toFile);
+        File destFile = new File(dirs.get(found) + System.getProperty("file.separator") + toFile);
         if (destFile.equals(new File(fileName))) {
             // File is already in the correct position. Don't override!
             return true;

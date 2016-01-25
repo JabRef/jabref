@@ -154,7 +154,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         ExternalFileType fileType = ExternalFileTypes.getInstance()
                 .getExternalFileTypeByExt(externalFileType.getFieldName());
 
-        String[] possibleFilePaths = JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> possibleFilePaths = JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
         File shortenedFileName = FileUtil.shortenFileName(file, possibleFilePaths);
         FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.getPath(), fileType);
 

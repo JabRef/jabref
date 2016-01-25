@@ -39,9 +39,8 @@ public class JabRefDesktop {
     public static void openExternalViewer(MetaData metaData, String link, String fieldName) throws IOException {
 
         if ("ps".equals(fieldName) || "pdf".equals(fieldName)) {
-
             // Find the default directory for this field type:
-            String[] dir = metaData.getFileDirectory(fieldName);
+            List<String> dir = metaData.getFileDirectory(fieldName);
 
             File file = FileUtil.expandFilename(link, dir);
 

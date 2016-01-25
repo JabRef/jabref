@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -183,9 +184,9 @@ public class ExternalFilePanel extends JPanel {
                 output(Localization.lang("Looking for pdf..."));
 
                 // Find the default directory for this field type, if any:
-                String[] dirs = metaData.getFileDirectory(fieldName);
+                List<String> dirs = metaData.getFileDirectory(fieldName);
                 File file = null;
-                if (dirs.length > 0) {
+                if (dirs.size() > 0) {
                     File tmp = FileUtil.expandFilename(editor.getText(), dirs);
                     if (tmp != null) {
                         file = tmp;
@@ -222,11 +223,10 @@ public class ExternalFilePanel extends JPanel {
     }
 
     public void browseFile(final String fieldName, final FieldEditor editor) {
-
-        String[] dirs = metaData.getFileDirectory(fieldName);
+        List<String> dirs = metaData.getFileDirectory(fieldName);
         String directory = null;
-        if (dirs.length > 0) {
-            directory = dirs[0]; // Default to the first directory in the list
+        if (dirs.size() > 0) {
+            directory = dirs.get(0); // Default to the first directory in the list
         }
 
         String dir = editor.getText();
@@ -335,7 +335,7 @@ public class ExternalFilePanel extends JPanel {
                     String plannedName = getPlannedFileName(res);
 
                     // Find the default directory for this field type:
-                    String[] dirs = metaData.getFileDirectory(fieldName);
+                    List<String> dirs = metaData.getFileDirectory(fieldName);
                     String directory = null;
                     // Look for the first one in the list that exists:
                     for (String dir : dirs) {
@@ -345,8 +345,8 @@ public class ExternalFilePanel extends JPanel {
                         }
                     }
                     if (directory == null) {
-                        if (dirs.length > 0) {
-                            JOptionPane.showMessageDialog(parent, Localization.lang("Could not find directory for %0-files: %1", fieldName, dirs[0]),
+                        if (dirs.size() > 0) {
+                            JOptionPane.showMessageDialog(parent, Localization.lang("Could not find directory for %0-files: %1", fieldName, dirs.get(0)),
                                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                         } else {
                             JOptionPane.showMessageDialog(parent, Localization.lang("No directory defined for %0-files", fieldName),
@@ -454,40 +454,33 @@ public class ExternalFilePanel extends JPanel {
         output(Localization.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o + '.'
                 + fieldName + "'...");
 
-        return new Runnable() {
+        return () -> {
+            /*
+             * Find the following directories to look in for:
+             *
+             * default directory for this field type.
+             *
+             * directory of bibtex-file. // NOT POSSIBLE at the moment.
+             *
+             * JabRef-directory.
+             */
+            List<String> dirs = metaData.getFileDirectory(fieldName);
 
-            @Override
-            public void run() {
-                /*
-                 * Find the following directories to look in for:
-                 *
-                 * default directory for this field type.
-                 *
-                 * directory of bibtex-file. // NOT POSSIBLE at the moment.
-                 *
-                 * JabRef-directory.
-                 */
-                LinkedList<String> list = new LinkedList<>();
-                String[] dirs = metaData.getFileDirectory(fieldName);
-                Collections.addAll(list, dirs);
+            String found = FileFinder.findPdf(getEntry(), fieldName, dirs
+                    .toArray(new String[dirs.size()]));// , off);
 
-                String found = FileFinder.findPdf(getEntry(), fieldName, list
-                        .toArray(new String[list.size()]));// , off);
+            // To activate findFile:
+            // String found = Util.findFile(getEntry(), null, dir,
+            // ".*[bibtexkey].*");
 
-                // To activate findFile:
-                // String found = Util.findFile(getEntry(), null, dir,
-                // ".*[bibtexkey].*");
-
-                if (found != null) {
-                    editor.setText(found);
-                    if (entryEditor != null) {
-                        entryEditor.updateField(editor);
-                    }
-                    output(Localization.lang("%0 field set", fieldName.toUpperCase()) + '.');
-                } else {
-                    output(Localization.lang("No %0 found", fieldName.toUpperCase()) + '.');
+            if (found != null) {
+                editor.setText(found);
+                if (entryEditor != null) {
+                    entryEditor.updateField(editor);
                 }
-
+                output(Localization.lang("%0 field set", fieldName.toUpperCase()) + '.');
+            } else {
+                output(Localization.lang("No %0 found", fieldName.toUpperCase()) + '.');
             }
         };
     }

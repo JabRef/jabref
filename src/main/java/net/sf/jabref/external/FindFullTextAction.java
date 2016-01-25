@@ -27,6 +27,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -59,8 +60,8 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void update() {
         if (result.isPresent()) {
-            String[] dirs = basePanel.metaData().getFileDirectory(Globals.FILE_FIELD);
-            if (dirs.length == 0) {
+            List<String> dirs = basePanel.metaData().getFileDirectory(Globals.FILE_FIELD);
+            if (dirs.size() == 0) {
                 // FIXME: Localization
                 JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
                 return;

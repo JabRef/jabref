@@ -908,7 +908,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 JabRefExecutorService.INSTANCE.execute(() -> {
                     final BibEntry[] bes = mainTable.getSelectedEntries();
                     final List<File> files = FileUtil.getListOfLinkedFiles(Arrays.asList(bes),
-                            Arrays.asList(metaData().getFileDirectory(Globals.FILE_FIELD)));
+                            metaData().getFileDirectory(Globals.FILE_FIELD));
                     for (final File f : files) {
                         try {
                             JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
@@ -2556,8 +2556,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
-            if (basePanel.metaData.getFileDirectory(Globals.FILE_FIELD).length > 0) {
-                final String[] mdDirs = basePanel.metaData.getFileDirectory(Globals.FILE_FIELD);
+            if (basePanel.metaData.getFileDirectory(Globals.FILE_FIELD).size() > 0) {
+                final List<String> mdDirs = basePanel.metaData.getFileDirectory(Globals.FILE_FIELD);
                 for (final String mdDir : mdDirs) {
                     dirs.add(new File(mdDir));
 
