@@ -255,7 +255,6 @@ public final class JabRefPreferences {
     public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
-    public static final String SAVED_SESSION = "savedSession";
 
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.LabelPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getLabelPattern(); etc
