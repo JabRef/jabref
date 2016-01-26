@@ -16,8 +16,23 @@
  */
 package net.sf.jabref.importer.fetcher;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.FetcherPreviewDialog;
+import net.sf.jabref.importer.HTMLConverter;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
+import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,27 +46,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
-import net.sf.jabref.importer.*;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.FetcherPreviewDialog;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 
@@ -353,7 +347,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             return entry;
         } catch (NoSuchElementException e) {
-            LOGGER.info("Bad Bibtex record read at: " + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END,
+            LOGGER.info("Bad BibTeX record read at: " + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END,
                     e);
             return null;
         } catch (MalformedURLException e) {
