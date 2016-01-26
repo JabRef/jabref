@@ -52,4 +52,33 @@ public class SaveActionsTest {
         assertEquals("Educational session 1", actedUpon.getField("title"));
     }
 
+    @Test
+    public void checkLowerCaseSaveAction() throws IOException {
+        BibtexParser parser = new BibtexParser(new StringReader("@InProceedings{6055279,\n" +
+                "  Title                    = {Educational session 1},\n" +
+                "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n" +
+                "  Year                     = {2011},\n" +
+                "  Month                    = {Sept},\n" +
+                "  Pages                    = {1-7},\n" +
+                "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n" +
+                "  DOI                      = {10.1109/CICC.2011.6055279},\n" +
+                "  ISSN                     = {0886-5930}\n" +
+                "}\n" +
+                "\n" +
+                "@comment{jabref-meta: saveActions:title;LowerCaseChanger;}"));
+
+        ParserResult parserResult = parser.parse();
+
+        List<String> saveActions = parserResult.getMetaData().getData(SaveActions.META_KEY);
+
+        assertEquals("title", saveActions.get(0));
+        assertEquals("LowerCaseChanger", saveActions.get(1));
+
+        SaveActions actions = new SaveActions(parserResult.getMetaData());
+
+        BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
+
+        assertEquals("educational session 1", actedUpon.getField("title"));
+    }
+
 }
