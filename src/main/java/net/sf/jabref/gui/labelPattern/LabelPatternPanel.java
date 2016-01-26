@@ -44,7 +44,7 @@ import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.EntryType;
 
 public class LabelPatternPanel extends JPanel {
 
@@ -121,8 +121,8 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(btnDefault, con);
         pan.add(btnDefault);
 
-        for (String s : EntryTypes.getAllTypes()) {
-            textFields.put(s, addEntryType(pan, s, y));
+        for (EntryType type : EntryTypes.getAllValues()) {
+            textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
             y++;
         }
 
@@ -179,10 +179,9 @@ public class LabelPatternPanel extends JPanel {
         add(btnDefaultAll);
     }
 
-    private JTextField addEntryType(Container c, String name, int y) {
+    private JTextField addEntryType(Container c, EntryType type, int y) {
 
-        JLabel lab = new JLabel(EntryUtil.capitalizeFirst(name));
-        name = name.toLowerCase();
+        JLabel lab = new JLabel(type.getName());
         con.gridx = 0;
         con.gridy = y;
         con.fill = GridBagConstraints.BOTH;
@@ -212,7 +211,7 @@ public class LabelPatternPanel extends JPanel {
         con.anchor = GridBagConstraints.CENTER;
         con.insets = new Insets(0, 5, 0, 5);
         gbl.setConstraints(but, con);
-        but.setActionCommand(name);
+        but.setActionCommand(type.getName().toLowerCase());
         but.addActionListener(new ActionListener() {
 
             @Override

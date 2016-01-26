@@ -12,6 +12,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class BibtexEntryTests {
 
@@ -24,7 +25,7 @@ public class BibtexEntryTests {
     public void testDefaultConstructor() {
         BibEntry entry = new BibEntry();
         // we have to use `getType("misc")` in the case of biblatex mode
-        Assert.assertEquals(EntryTypes.getType("misc"), entry.getType());
+        Assert.assertEquals("misc", entry.getType());
         Assert.assertNotNull(entry.getId());
         Assert.assertNull(entry.getField("author"));
     }
@@ -59,19 +60,6 @@ public class BibtexEntryTests {
 
         requiredFields.add("year/address");
         Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
-    }
-
-    @Test
-    public void hasAllRequiredFields() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
-        e.setField("author", "abc");
-        e.setField("title", "abc");
-        e.setField("journal", "abc");
-
-        Assert.assertFalse(e.hasAllRequiredFields(null));
-
-        e.setField("year", "2015");
-        Assert.assertTrue(e.hasAllRequiredFields(null));
     }
 
     @Test

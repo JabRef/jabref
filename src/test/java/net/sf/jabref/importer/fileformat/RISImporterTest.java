@@ -4,7 +4,6 @@ import net.sf.jabref.*;
 
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -98,7 +97,7 @@ public class RISImporterTest {
                     "Harrison, Warren",
                     entry.getField("author"));
 
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, entry.getType());
+            Assert.assertEquals("article", entry.getType());
             Assert.assertEquals("Empirical Software Engineering", entry.getField("journal"));
             Assert.assertEquals("2001", entry.getField("year"));
             Assert.assertEquals("6", entry.getField("volume"));

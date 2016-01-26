@@ -154,7 +154,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
             // special case for searching for entrytype=phdthesis
             if (fieldPattern.matcher("entrytype").matches()) {
-                return matchFieldValue(entry.getType().getName());
+                return matchFieldValue(entry.getType());
             }
 
             List<String> matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());

@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
  * Importer for COPAC format.
@@ -128,8 +127,7 @@ public class CopacImporter extends ImportFormat {
 
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID,
-                    BibtexEntryTypes.BOOK);
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, "book");
 
             String[] lines = entry.split("\n");
 

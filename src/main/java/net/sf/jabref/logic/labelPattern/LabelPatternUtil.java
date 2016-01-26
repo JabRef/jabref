@@ -429,7 +429,7 @@ public class LabelPatternUtil {
 
         try {
             // get the type of entry
-            String entryType = entry.getType().getName().toLowerCase();
+            String entryType = entry.getType();
             // Get the arrayList corresponding to the type
             typeList = metaData.getLabelPattern().getValue(entryType);
             int typeListSize = typeList.size();

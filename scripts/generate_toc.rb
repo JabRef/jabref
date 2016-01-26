@@ -9,7 +9,7 @@ File.open("Code-Howtos.md", 'r') do |f|
     next if !line.start_with?("#") || forbidden_words.any? { |w| line =~ /#{w}/ }
 
     title = line.gsub("#", "").strip
-    href = title.gsub(" ", "-").downcase
+    href = title.gsub(" ", "-").gsub('"',"").downcase
     puts "  " * (line.count("#")-1) + "* [#{title}](\##{href})"
   end
 end

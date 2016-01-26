@@ -413,13 +413,13 @@ class MSBibEntry {
         if (bibtex.hasField("type")) {
             thesisType = bibtex.getField("type");
         } else {
-            if ("techreport".equalsIgnoreCase(bibtex.getType().getName())) {
+            if ("techreport".equalsIgnoreCase(bibtex.getType())) {
                 thesisType = "Tech. rep.";
-            } else if ("mastersthesis".equalsIgnoreCase(bibtex.getType().getName())) {
+            } else if ("mastersthesis".equalsIgnoreCase(bibtex.getType())) {
                 thesisType = "Master's thesis";
-            } else if ("phdthesis".equalsIgnoreCase(bibtex.getType().getName())) {
+            } else if ("phdthesis".equalsIgnoreCase(bibtex.getType())) {
                 thesisType = "Ph.D. dissertation";
-            } else if ("unpublished".equalsIgnoreCase(bibtex.getType().getName())) {
+            } else if ("unpublished".equalsIgnoreCase(bibtex.getType())) {
                 thesisType = "unpublished";
             }
         }
@@ -633,7 +633,7 @@ class MSBibEntry {
     }
 
     private String getMSBibSourceType(BibEntry bibtex) {
-        String bibtexType = bibtex.getType().getName();
+        String bibtexType = bibtex.getType();
 
         String result = "Misc";
         if ("book".equalsIgnoreCase(bibtexType)) {

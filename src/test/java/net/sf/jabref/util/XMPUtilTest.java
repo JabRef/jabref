@@ -268,7 +268,7 @@ public class XMPUtilTest {
         Assert.assertEquals("OezbekC06", e.getCiteKey());
         Assert.assertEquals("2003", e.getField("year"));
         Assert.assertEquals("Beach sand convolution by surf-wave optimzation", e.getField("title"));
-        Assert.assertEquals(BibtexEntryTypes.MISC, e.getType());
+        Assert.assertEquals("misc", e.getType());
 
     }
 
@@ -293,7 +293,7 @@ public class XMPUtilTest {
         Assert.assertEquals("OezbekC06", e.getCiteKey());
         Assert.assertEquals("2003", e.getField("year"));
         Assert.assertEquals("�pt�mz�t��n", e.getField("title"));
-        Assert.assertEquals(BibtexEntryTypes.MISC, e.getType());
+        Assert.assertEquals("misc", e.getType());
     }
 
     /**
@@ -367,7 +367,7 @@ public class XMPUtilTest {
         Assert.assertEquals("Clarkson06", e.getCiteKey());
         Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getField("author"));
         Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e.getField("editor"));
-        Assert.assertEquals(BibtexEntryTypes.MISC, e.getType());
+        Assert.assertEquals("misc", e.getType());
     }
 
     /**
@@ -387,7 +387,7 @@ public class XMPUtilTest {
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals(BibtexEntryTypes.ARTICLE, e.getType());
+        Assert.assertEquals("article", e.getType());
     }
 
     public static String readManually(File tempFile) throws IOException {
@@ -807,11 +807,11 @@ public class XMPUtilTest {
         Assert.assertEquals("canh05", a.getCiteKey());
         Assert.assertEquals("K. Crowston and H. Annabi", a.getField("author"));
         Assert.assertEquals("Title A", a.getField("title"));
-        Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
+        Assert.assertEquals("article", a.getType());
 
         Assert.assertEquals("foo", b.getCiteKey());
         Assert.assertEquals("Norton Bar", b.getField("author"));
-        Assert.assertEquals(BibtexEntryTypes.INPROCEEDINGS, b.getType());
+        Assert.assertEquals("inproceedings", b.getType());
     }
 
     /**

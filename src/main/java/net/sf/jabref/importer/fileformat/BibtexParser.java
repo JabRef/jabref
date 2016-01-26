@@ -22,7 +22,6 @@ import java.io.StringReader;
 import java.util.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.importer.ParserResult;
@@ -165,48 +164,24 @@ public class BibtexParser {
 
             skipWhitespace();
 
-            // try to read the entry type
-            String entryType = parseTextToken();
-            EntryType type = EntryTypes.getType(entryType);
-            boolean isEntry = type != null;
+            // Try to read the entry type
+            String entryType = parseTextToken().toLowerCase().trim();
 
-            String trimmedEntryType = entryType.toLowerCase().trim();
-
-            // The entry type name was not recognized. This can mean
-            // that it is a string, preamble, or comment. If so,
-            // parse and set accordingly. If not, assume it is an entry
-            // with an unknown type.
-            if (!isEntry) {
-                if ("preamble".equals(trimmedEntryType)) {
-                    database.setPreamble(parsePreamble());
-                    // the preamble is saved verbatim anyways, so the text read so far can be dropped
-                    dumpTextReadSoFarToString();
-                } else if ("string".equals(trimmedEntryType)) {
-                    parseBibtexString();
-                } else if ("comment".equals(trimmedEntryType)) {
-                    parseJabRefComment(meta);
-                } else {
-                    // The entry type was not recognized. This may mean that
-                    // it is a custom entry type whose definition will
-                    // appear
-                    // at the bottom of the file. So we use an
-                    // UnknownEntryType
-                    // to remember the type name by.
-                    type = new UnknownEntryType(EntryUtil.capitalizeFirst(entryType));
-                    isEntry = true;
-                }
-            }
-
-            // True if not comment, preamble or string.
-            if (isEntry) {
-                parseAndAddEntry(type);
+            if ("preamble".equals(entryType)) {
+                database.setPreamble(parsePreamble());
+                // the preamble is saved verbatim anyways, so the text read so far can be dropped
+                dumpTextReadSoFarToString();
+            } else if ("string".equals(entryType)) {
+                parseBibtexString();
+            } else if ("comment".equals(entryType)) {
+                parseJabRefComment(meta);
+            } else {
+                // Not a comment, preamble or string thus it is an entry
+                parseAndAddEntry(entryType);
             }
 
             skipWhitespace();
         }
-        // Before returning the database, update entries with unknown type
-        // based on parsed type definitions, if possible.
-        checkEntryTypes();
 
         // Instantiate meta data:
         parserResult.setMetaData(new MetaData(meta, database));
@@ -220,7 +195,7 @@ public class BibtexParser {
         database.setEpilog(dumpTextReadSoFarToString());
     }
 
-    private void parseAndAddEntry(EntryType type) {
+    private void parseAndAddEntry(String type) {
         /**
          * Morten Alver 13 Aug 2006: Trying to make the parser more
          * robust. If an exception is thrown when parsing an entry,
@@ -463,7 +438,7 @@ public class BibtexParser {
 
     }
 
-    private BibEntry parseEntry(EntryType entryType) throws IOException {
+    private BibEntry parseEntry(String entryType) throws IOException {
         String id = IdGenerator.next();
         BibEntry result = new BibEntry(id, entryType);
         skipWhitespace();
@@ -963,21 +938,4 @@ public class BibtexParser {
                     + secondOption + " but received " + character);
         }
     }
-
-    private void checkEntryTypes() {
-        for (BibEntry bibEntry : database.getEntries()) {
-            if (bibEntry.getType() instanceof UnknownEntryType) {
-                // Look up the unknown type name in our map of parsed types:
-                String name = bibEntry.getType().getName();
-                EntryType type = entryTypes.get(name);
-                if (type == null) {
-                    parserResult.addWarning(
-                            Localization.lang("Unknown entry type") + ": " + name + "; key: " + bibEntry.getCiteKey());
-                } else {
-                    bibEntry.setType(type);
-                }
-            }
-        }
-    }
-
 }

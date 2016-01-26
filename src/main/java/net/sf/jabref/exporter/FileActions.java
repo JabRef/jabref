@@ -225,7 +225,7 @@ public class FileActions {
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                EntryType entryType = entry.getType();
+                EntryType entryType = EntryTypes.getType(entry.getType());
 
                 if (EntryTypes.getStandardType(entryType.getName()) == null) {
                     types.put(entryType.getName(), entryType);
@@ -420,7 +420,7 @@ public class FileActions {
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                EntryType tp = be.getType();
+                EntryType tp = EntryTypes.getType(be.getType());
                 if (EntryTypes.getStandardType(tp.getName()) == null) {
                     types.put(tp.getName(), tp);
                 }

@@ -69,13 +69,13 @@ public class EndnoteImporterTest {
             assertEquals(5, bibEntries.size());
 
             BibEntry be0 = bibEntries.get(0);
-            assertEquals("Misc", be0.getType().getName());
+            assertEquals("misc", be0.getType());
             assertEquals("testA0 and testA1", be0.getField("author"));
             assertEquals("testE0 and testE1", be0.getField("editor"));
             assertEquals("testT", be0.getField("title"));
 
             BibEntry be1 = bibEntries.get(1);
-            assertEquals("Misc", be1.getType().getName());
+            assertEquals("misc", be1.getType());
             assertEquals("testC", be1.getField("address"));
             assertEquals("testB2", be1.getField("booktitle"));
             assertEquals("test8", be1.getField("date"));
@@ -84,16 +84,16 @@ public class EndnoteImporterTest {
             assertEquals("testD", be1.getField("year"));
 
             BibEntry be2 = bibEntries.get(2);
-            assertEquals("Article", be2.getType().getName());
+            assertEquals("article", be2.getType());
             assertEquals("testB0", be2.getField("journal"));
 
             BibEntry be3 = bibEntries.get(3);
-            assertEquals("Book", be3.getType().getName());
+            assertEquals("book", be3.getType());
             assertEquals("testI0", be3.getField("publisher"));
             assertEquals("testB1", be3.getField("series"));
 
             BibEntry be4 = bibEntries.get(4);
-            assertEquals("MastersThesis", be4.getType().getName());
+            assertEquals("mastersthesis", be4.getType());
             assertEquals("testX", be4.getField("abstract"));
             assertEquals("testF", be4.getField("bibtexkey"));
             assertEquals("testR", be4.getField("doi"));
@@ -116,7 +116,7 @@ public class EndnoteImporterTest {
         assertEquals(1, bibEntries.size());
 
         BibEntry be = bibEntries.get(0);
-        assertEquals("Misc", be.getType().getName());
+        assertEquals("misc", be.getType());
         assertEquals("testA", be.getField("author"));
         assertEquals("testE0, testE1", be.getField("editor"));
         assertEquals("testO", be.getField("pages"));
@@ -130,7 +130,7 @@ public class EndnoteImporterTest {
             assertEquals(1, bibEntries.size());
 
             BibEntry be = bibEntries.get(0);
-            assertEquals("Book", be.getType().getName());
+            assertEquals("book", be.getType());
             assertEquals("Heidelberg", be.getField("address"));
             assertEquals("Preißel, René and Stachmann, Bjørn", be.getField("author"));
             assertEquals("3., aktualisierte und erweiterte Auflage", be.getField("edition"));

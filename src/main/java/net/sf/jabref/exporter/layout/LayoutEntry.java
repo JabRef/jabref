@@ -270,7 +270,7 @@ class LayoutEntry {
             String fieldEntry;
 
             if ("bibtextype".equals(text)) {
-                fieldEntry = bibtex.getType().getName();
+                fieldEntry = bibtex.getType();
             } else {
                 // changed section begin - arudert
                 // resolve field (recognized by leading backslash) or text

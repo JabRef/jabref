@@ -25,7 +25,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -168,8 +167,8 @@ public class MergeEntries {
         mainPanel.add(new JSeparator(), cc.xyw(1, 3, 11));
 
         // Start with entry type
-        EntryType type1 = one.getType();
-        EntryType type2 = two.getType();
+        String type1 = one.getType();
+        String type2 = two.getType();
 
         mergedEntry.setType(type1);
         label = new JLabel(Localization.lang("Entry type"));
@@ -177,7 +176,7 @@ public class MergeEntries {
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         mergePanel.add(label, cc.xy(1, 1));
 
-        JTextArea type1ta = new JTextArea(type1.getName());
+        JTextArea type1ta = new JTextArea(type1);
         type1ta.setEditable(false);
         mergePanel.add(type1ta, cc.xy(3, 1));
         if (type1.compareTo(type2) == 0) {
@@ -199,7 +198,7 @@ public class MergeEntries {
             }
             rb[0][0].setSelected(true);
         }
-        JTextArea type2ta = new JTextArea(type2.getName());
+        JTextArea type2ta = new JTextArea(type2);
         type2ta.setEditable(false);
         mergePanel.add(type2ta, cc.xy(11, 1));
 

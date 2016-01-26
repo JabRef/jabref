@@ -42,6 +42,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -84,8 +85,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     // A reference to the entry this object works on.
     private BibEntry entry;
-
-    private final EntryType type;
 
     // The action concerned with closing the window.
     private final CloseAction closeAction;
@@ -169,7 +168,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         this.panel = panel;
         this.entry = entry;
         prefs = Globals.prefs;
-        type = this.entry.getType();
 
         this.entry.addPropertyChangeListener(this);
         this.entry.addPropertyChangeListener(SpecialFieldUpdateListener.getInstance());
@@ -197,7 +195,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private void setupFieldPanels() {
         tabbed.removeAll();
         tabs.clear();
-        List<String> fieldList = entry.getRequiredFieldsFlat();
+
+        EntryType type = EntryTypes.getType(entry.getType());
+
+        List<String> fieldList = type.getRequiredFieldsFlat();
 
         EntryEditorTab reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Localization.lang("Required fields"));
         if (reqPan.fileListEditor != null) {
@@ -207,10 +208,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 .getPane(), Localization.lang("Show required fields"));
         tabs.add(reqPan);
 
-        if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().size() >= 1)) {
+        if ((type.getOptionalFields() != null) && (type.getOptionalFields().size() >= 1)) {
             EntryEditorTab optPan;
             if (!prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-                optPan = new EntryEditorTab(frame, panel, entry.getOptionalFields(), this,
+                optPan = new EntryEditorTab(frame, panel, type.getOptionalFields(), this,
                         false, false, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
@@ -219,7 +220,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
             } else {
-                optPan = new EntryEditorTab(frame, panel, entry.getType().getPrimaryOptionalFields(), this,
+                optPan = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
                         false, true, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
@@ -231,13 +232,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
-                List<String> secondaryOptionalFields = entry.getType().getSecondaryOptionalFields();
+                List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
                 List<String> temp = EntryUtil.getRemainder((secondaryOptionalFields), new ArrayList<>(deprecatedFields));
                 String[] optionalFieldsNotPrimaryOrDeprecated = temp.toArray(new String[temp.size()]);
 
                 // Get list of all optional fields of this entry and their aliases
                 Set<String> optionalFieldsAndAliases = new HashSet<>();
-                for (String field : entry.getOptionalFields()) {
+                for (String field : type.getOptionalFields()) {
                     optionalFieldsAndAliases.add(field);
                     if (EntryConverter.FIELD_ALIASES_LTX_TO_TEX.containsKey(field)) {
                         optionalFieldsAndAliases.add(EntryConverter.FIELD_ALIASES_LTX_TO_TEX.get(field));
@@ -293,8 +294,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         srcPanel.setFocusCycleRoot(true);
     }
 
-    public EntryType getType() {
-        return type;
+    public String getType() {
+        return entry.getType();
     }
 
     /**
@@ -353,7 +354,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         leftPan.add(closeBut, BorderLayout.NORTH);
 
         // Create type-label
-        leftPan.add(new TypeLabel(entry.getType().getName()), BorderLayout.CENTER);
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
+        leftPan.add(new TypeLabel(typedEntry.getTypeForDisplay()), BorderLayout.CENTER);
         TypeButton typeButton = new TypeButton();
 
         toolBar.add(typeButton);
@@ -1416,14 +1418,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class ChangeTypeAction extends AbstractAction {
 
-        private final EntryType changeType;
+        private final String changeType;
 
         private final BasePanel changeTypePanel;
 
 
         public ChangeTypeAction(EntryType type, BasePanel bp) {
             super(type.getName());
-            this.changeType = type;
+            this.changeType = type.getName();
             changeTypePanel = bp;
         }
 

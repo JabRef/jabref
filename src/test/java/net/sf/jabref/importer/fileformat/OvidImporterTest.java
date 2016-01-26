@@ -80,14 +80,14 @@ public class OvidImporterTest {
             Assert.assertEquals(5, entries.size());
 
             BibEntry entry = entries.get(0);
-            Assert.assertEquals(EntryTypes.getTypeOrDefault(""), entry.getType());
+            Assert.assertEquals("misc", entry.getType());
             Assert.assertEquals("Mustermann and Musterfrau", entry.getField("author"));
             Assert.assertEquals("Short abstract", entry.getField("abstract"));
             Assert.assertEquals("Musterbuch", entry.getField("title"));
             Assert.assertEquals("Einleitung", entry.getField("chaptertitle"));
 
             entry = entries.get(1);
-            Assert.assertEquals(EntryTypes.getTypeOrDefault("InProceedings"), entry.getType());
+            Assert.assertEquals("inproceedings", entry.getType());
             Assert.assertEquals("Max", entry.getField("editor"));
             Assert.assertEquals("Max the Editor", entry.getField("title"));
             Assert.assertEquals("Very Long Title", entry.getField("journal"));
@@ -97,7 +97,7 @@ public class OvidImporterTest {
             Assert.assertEquals("103--106", entry.getField("pages"));
 
             entry = entries.get(2);
-            Assert.assertEquals(EntryTypes.getTypeOrDefault("InCollection"), entry.getType());
+            Assert.assertEquals("incollection", entry.getType());
             Assert.assertEquals("Max", entry.getField("author"));
             Assert.assertEquals("Test", entry.getField("title"));
             Assert.assertEquals("Very Long Title", entry.getField("journal"));
@@ -108,7 +108,7 @@ public class OvidImporterTest {
             Assert.assertEquals("103--106", entry.getField("pages"));
 
             entry = entries.get(3);
-            Assert.assertEquals(EntryTypes.getTypeOrDefault("Book"), entry.getType());
+            Assert.assertEquals("book", entry.getType());
             Assert.assertEquals("Max", entry.getField("author"));
             Assert.assertEquals("2015", entry.getField("year"));
             Assert.assertEquals("Editor", entry.getField("editor"));
@@ -118,7 +118,7 @@ public class OvidImporterTest {
             Assert.assertEquals("Publisher", entry.getField("publisher"));
 
             entry = entries.get(4);
-            Assert.assertEquals(EntryTypes.getTypeOrDefault("Article"), entry.getType());
+            Assert.assertEquals("article", entry.getType());
             Assert.assertEquals("2014", entry.getField("year"));
             Assert.assertEquals("58", entry.getField("pages"));
             Assert.assertEquals("Test", entry.getField("address"));
