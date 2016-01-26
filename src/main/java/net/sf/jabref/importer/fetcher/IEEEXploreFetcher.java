@@ -356,15 +356,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up pages
-        String field = "pages";
-        String pages = entry.getField(field);
-        if (pages != null) {
+        if (entry.hasField("pages")) {
+            String pages = entry.getField("pages");
             String[] pageNumbers = pages.split("-");
             if (pageNumbers.length == 2) {
                 if (pageNumbers[0].equals(pageNumbers[1])) {// single page
-                    entry.setField(field, pageNumbers[0]);
+                    entry.setField("pages", pageNumbers[0]);
                 } else {
-                    entry.setField(field, pages.replaceAll("-", "--"));
+                    entry.setField("pages", pages.replaceAll("-", "--"));
                 }
             }
         }
@@ -378,8 +377,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         } else if ("Inproceedings".equals(type.getName())) {
             sourceField = "booktitle";
         }
-        String fullName = entry.getField(sourceField);
-        if (fullName != null) {
+        if (entry.hasField(sourceField)) {
+            String fullName = entry.getField(sourceField);
             if ("Article".equals(type.getName())) {
                 int ind = fullName.indexOf(": Accepted for future publication");
                 if (ind > 0) {
@@ -484,8 +483,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up abstract
-        String abstr = entry.getField("abstract");
-        if (abstr != null) {
+        if (entry.hasField("abstract")) {
+            String abstr = entry.getField("abstract");
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
             abstr = abstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
@@ -506,15 +505,18 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
             // Replace \infin with \infty
             abstr = abstr.replaceAll("\\\\infin", "\\\\infty");
+
             // Write back
             entry.setField("abstract", abstr);
         }
 
         // Clean up url
-        String url = entry.getField("url");
-        if (url != null) {
-            entry.setField("url", "http://ieeexplore.ieee.org" + url.replace("tp=&", ""));
-        }
+        entry.getFieldOptional("url")
+                .ifPresent(url -> entry.setField("url", "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
+
+        // Replace ; as keyword separator
+        entry.getFieldOptional("keywords").ifPresent(keys -> entry.setField("keywords",
+                keys.replace(";", Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR))));
         return entry;
     }
 

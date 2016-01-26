@@ -29,6 +29,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#212](https://github.com/JabRef/jabref/issues/212): Added command line option -g for autogenerating bibtex keys
 - Fixed [#213](https://github.com/JabRef/jabref/issues/212): Added command line option -asfl for autosetting file links
 - Fixed [#671](https://github.com/JabRef/jabref/issues/671): Remember working directory of last import
+- IEEEXplore fetcher replaces keyword separator with the preferred
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
