@@ -93,7 +93,7 @@ public class MergeEntryDOIDialog extends JDialog {
      */
     private void init() {
         mergeEntries = new MergeEntries(this.originalEntry, this.doiEntry, Localization.lang("Original entry"),
-                Localization.lang("Entry from DOI"), panel.getLoadedDatabase().getType());
+                Localization.lang("Entry from DOI"), panel.getLoadedDatabase().getMode());
 
         // Create undo-compound
         ce = new NamedCompound(Localization.lang("Merge from DOI"));

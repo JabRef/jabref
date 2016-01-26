@@ -12,12 +12,12 @@ import java.util.Collection;
 
 import static org.junit.Assert.*;
 
-public class BibDatabaseTypeDetectionTest {
+public class BibDatabaseModeDetectionTest {
     @Test
     public void detectBiblatex() {
         Collection<BibEntry> entries = Arrays.asList(new BibEntry("someid", BibLatexEntryTypes.MVBOOK.getName()));
 
-        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -26,7 +26,7 @@ public class BibDatabaseTypeDetectionTest {
         entry.setField("translator", "Stefan Kolb");
         Collection<BibEntry> entries = Arrays.asList(entry);
 
-        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -35,7 +35,7 @@ public class BibDatabaseTypeDetectionTest {
         entry.setField("journal", "IEEE Trans. Services Computing");
         Collection<BibEntry> entries = Arrays.asList(entry);
 
-        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -44,7 +44,7 @@ public class BibDatabaseTypeDetectionTest {
         entry.setField("title", "My cool paper");
         Collection<BibEntry> entries = Arrays.asList(entry);
 
-        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class BibDatabaseTypeDetectionTest {
         biblatex.setField("translator", "Stefan Kolb");
         Collection<BibEntry> entries = Arrays.asList(bibtex, biblatex);
 
-        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class BibDatabaseTypeDetectionTest {
         BibEntry entry = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
         Collection<BibEntry> entries = Arrays.asList(entry);
 
-        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class BibDatabaseTypeDetectionTest {
         entry.setField("someunknownfield", "value");
         Collection<BibEntry> entries = Arrays.asList(entry);
 
-        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class BibDatabaseTypeDetectionTest {
         BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.ARTICLE.getName());
         Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
 
-        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class BibDatabaseTypeDetectionTest {
         Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
 
 
-        assertEquals(BibDatabaseType.BIBTEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class BibDatabaseTypeDetectionTest {
         BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.MVBOOK.getName());
         Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
 
-        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
@@ -119,6 +119,6 @@ public class BibDatabaseTypeDetectionTest {
         biblatex.setField("translator", "Stefan Kolb");
         Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
 
-        assertEquals(BibDatabaseType.BIBLATEX, BibDatabaseTypeDetection.inferType(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 }

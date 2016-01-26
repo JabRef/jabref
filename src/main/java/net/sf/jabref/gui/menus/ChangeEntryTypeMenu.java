@@ -1,14 +1,13 @@
 package net.sf.jabref.gui.menus;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.ChangeTypeAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
@@ -50,8 +49,8 @@ public class ChangeEntryTypeMenu {
 
         // biblatex?
         if(panel.getLoadedDatabase().isBiblatexMode()) {
-            for (String key : EntryTypes.getAllTypes(BibDatabaseType.BIBLATEX)) {
-                menu.add(new ChangeTypeAction(EntryTypes.getType(key, BibDatabaseType.BIBLATEX), panel));
+            for (String key : EntryTypes.getAllTypes(BibDatabaseMode.BIBLATEX)) {
+                menu.add(new ChangeTypeAction(EntryTypes.getType(key, BibDatabaseMode.BIBLATEX), panel));
             }
         } else {
             // Bibtex

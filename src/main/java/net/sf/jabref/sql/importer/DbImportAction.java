@@ -157,7 +157,7 @@ public class DbImportAction extends AbstractWorker {
                             importer.removeDB(dialogo, dbName, conn, metaData);
                             performImport();
                         } else if (dialogo.moreThanOne) {
-                            databases = importer.performImport(dbs, dialogo.listOfDBs, frame.getCurrentBasePanel().getLoadedDatabase().getType());
+                            databases = importer.performImport(dbs, dialogo.listOfDBs, frame.getCurrentBasePanel().getLoadedDatabase().getMode());
                             for (DBImporterResult res : databases) {
                                 database = res.getDatabase();
                                 metaData = res.getMetaData();

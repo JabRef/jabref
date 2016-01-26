@@ -502,7 +502,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw, frame.getCurrentBasePanel().getLoadedDatabase().getType());
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw, frame.getCurrentBasePanel().getLoadedDatabase().getMode());
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored) {
@@ -514,7 +514,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private String[] getAllFields() {
         ArrayList<String> f = new ArrayList<>();
-        EntryType type = EntryTypes.getType(entry.getType(), frame.getCurrentBasePanel().getLoadedDatabase().getType());
+        EntryType type = EntryTypes.getType(entry.getType(), frame.getCurrentBasePanel().getLoadedDatabase().getMode());
         List<String> req = type.getRequiredFieldsFlat();
         List<String> opt = type.getOptionalFields();
         List<String> allFields = BibtexFields.getAllFieldNames();

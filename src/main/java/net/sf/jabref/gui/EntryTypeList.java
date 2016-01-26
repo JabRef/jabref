@@ -25,7 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.EntryTypes;
@@ -40,10 +40,10 @@ import net.sf.jabref.util.Util;
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener {
 
     private final JButton def = new JButton(Localization.lang("Default"));
-    private final BibDatabaseType type;
+    private final BibDatabaseMode type;
 
     /** Creates a new instance of EntryTypeList */
-    public EntryTypeList(List<String> fields, BibDatabaseType type) {
+    public EntryTypeList(List<String> fields, BibDatabaseMode type) {
         super(Localization.lang("Entry types"), fields, false, true);
         this.type = type;
 

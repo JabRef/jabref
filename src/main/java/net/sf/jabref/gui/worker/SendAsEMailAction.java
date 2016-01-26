@@ -84,7 +84,7 @@ public class SendAsEMailAction extends AbstractWorker {
 
         for (BibEntry entry : bes) {
             try {
-                bibtexEntryWriter.write(entry, sw, panel.getLoadedDatabase().getType());
+                bibtexEntryWriter.write(entry, sw, panel.getLoadedDatabase().getMode());
             } catch (IOException e) {
                 LOGGER.warn("Problem creating Bibtex file for mailing.", e);
             }

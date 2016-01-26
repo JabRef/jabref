@@ -3,7 +3,7 @@ package net.sf.jabref.bibtex;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.DuplicateCheck;
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -35,14 +35,14 @@ public class DuplicateCheckTest {
 
         one.setField("author", "Billy Bob");
         two.setField("author", "Billy Bob");
-        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
 
         two.setField("author", "James Joyce");
-        Assert.assertFalse(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertFalse(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
 
         two.setField("author", "Billy Bob");
         two.setType(BibtexEntryTypes.BOOK);
-        Assert.assertFalse(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertFalse(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
 
         two.setType(BibtexEntryTypes.ARTICLE);
         one.setField("year", "2005");
@@ -51,11 +51,11 @@ public class DuplicateCheckTest {
         two.setField("title", "A title");
         one.setField("journal", "A");
         two.setField("journal", "A");
-        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
         Assert.assertEquals(1.01, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
 
         two.setField("journal", "B");
-        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
         Assert.assertEquals(0.75, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
 
         two.setField("journal", "A");
@@ -63,24 +63,24 @@ public class DuplicateCheckTest {
         two.setField("volume", "21");
         one.setField("pages", "334--337");
         two.setField("pages", "334--337");
-        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
 
         two.setField("number", "1");
         one.setField("volume", "21");
-        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
 
         two.setField("volume", "22");
-        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
 
         two.setField("journal", "B");
-        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
 
         one.setField("journal", "");
         two.setField("journal", "");
-        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
 
         two.setField("title", "Another title");
-        Assert.assertFalse(DuplicateCheck.isDuplicate(one, two, BibDatabaseType.BIBTEX));
+        Assert.assertFalse(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test

@@ -564,7 +564,7 @@ public class MainTable extends JTable {
     private int getCellStatus(int row, int col) {
         try {
             BibEntry be = sortedForGrouping.get(row);
-            EntryType type = EntryTypes.getType(be.getType(), panel.getLoadedDatabase().getType());
+            EntryType type = EntryTypes.getType(be.getType(), panel.getLoadedDatabase().getMode());
             String columnName = getColumnName(col).toLowerCase();
             if (columnName.equals(BibEntry.KEY_FIELD) || type.getRequiredFieldsFlat().contains(columnName)) {
                 return MainTable.REQUIRED;
@@ -629,7 +629,7 @@ public class MainTable extends JTable {
     private boolean isComplete(int row) {
         try {
             BibEntry entry = sortedForGrouping.get(row);
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.database()), panel.getLoadedDatabase().getType());
+            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.database()), panel.getLoadedDatabase().getMode());
             return typedEntry.hasAllRequiredFields();
         } catch (NullPointerException ex) {
             return true;

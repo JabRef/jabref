@@ -34,13 +34,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.model.database.BibDatabaseType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.common.base.Strings;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class BibEntry {

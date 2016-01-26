@@ -42,7 +42,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.exporter.*;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -67,7 +66,7 @@ import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -246,10 +245,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public void actionPerformed(ActionEvent evt) {
             if(isBiblatexMode()) {
                 // to BibteX
-                JabRefFrame.this.getCurrentBasePanel().getLoadedDatabase().setType(BibDatabaseType.BIBTEX);
+                JabRefFrame.this.getCurrentBasePanel().getLoadedDatabase().setMode(BibDatabaseMode.BIBTEX);
             } else {
                 // to Biblatex
-                JabRefFrame.this.getCurrentBasePanel().getLoadedDatabase().setType(BibDatabaseType.BIBLATEX);
+                JabRefFrame.this.getCurrentBasePanel().getLoadedDatabase().setMode(BibDatabaseMode.BIBLATEX);
             }
             // update menu label
             putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", "BibTeX/BibLaTeX"));

@@ -26,7 +26,6 @@ import javax.swing.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.LoadedDatabase;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -92,7 +91,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         panel.setLayout(new VerticalLayout());
 
         if(biblatexMode) {
-            panel.add(createEntryGroupPanel("BibLateX", EntryTypes.getAllValues(loadedDatabase.getType())));
+            panel.add(createEntryGroupPanel("BibLateX", EntryTypes.getAllValues(loadedDatabase.getMode())));
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));

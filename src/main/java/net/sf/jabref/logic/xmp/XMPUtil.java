@@ -22,12 +22,11 @@ import java.util.*;
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.database.BibDatabase;
@@ -865,7 +864,7 @@ public class XMPUtil {
          *
          * Bibtex-Fields used: title
          */
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), BibDatabaseType.BIBTEX);
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), BibDatabaseMode.BIBTEX);
         String o = typedEntry.getTypeForDisplay();
         if (o != null) {
             dcSchema.addType(o);
@@ -1180,7 +1179,7 @@ public class XMPUtil {
 
                 for (BibEntry entry : l) {
                     StringWriter sw = new StringWriter();
-                    bibtexEntryWriter.write(entry, sw, BibDatabaseType.BIBTEX);
+                    bibtexEntryWriter.write(entry, sw, BibDatabaseMode.BIBTEX);
                     System.out.println(sw.getBuffer());
                 }
 

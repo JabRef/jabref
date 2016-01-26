@@ -49,7 +49,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -215,7 +215,7 @@ public class FieldExtraComponents {
      * @param type
      * @return
      */
-    public static Optional<JComponent> getMonthExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor, BibDatabaseType type) {
+    public static Optional<JComponent> getMonthExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor, BibDatabaseMode type) {
         final String[] options = new String[13];
         options[0] = Localization.lang("Select");
         for (int i = 1; i <= 12; i++) {
@@ -228,7 +228,7 @@ public class FieldExtraComponents {
             public void actionPerformed(ActionEvent actionEvent) {
                 int monthnumber = month.getSelectedIndex();
                 if (monthnumber >= 1) {
-                    if (type == BibDatabaseType.BIBLATEX) {
+                    if (type == BibDatabaseMode.BIBLATEX) {
                         fieldEditor.setText(String.valueOf(monthnumber));
                     } else {
                         fieldEditor.setText((MonthUtil.getMonthByNumber(monthnumber).bibtexFormat));

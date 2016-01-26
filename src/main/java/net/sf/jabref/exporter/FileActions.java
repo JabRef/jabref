@@ -224,9 +224,9 @@ public class FileActions {
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                EntryType entryType = EntryTypes.getType(entry.getType(), loadedDatabase.getType());
+                EntryType entryType = EntryTypes.getType(entry.getType(), loadedDatabase.getMode());
 
-                if (EntryTypes.getStandardType(entryType.getName(), loadedDatabase.getType()) == null) {
+                if (EntryTypes.getStandardType(entryType.getName(), loadedDatabase.getMode()) == null) {
                     types.put(entryType.getName(), entryType);
                 }
 
@@ -242,7 +242,7 @@ public class FileActions {
                 }
 
                 if (write) {
-                    bibtexEntryWriter.write(entry, writer, loadedDatabase.getType());
+                    bibtexEntryWriter.write(entry, writer, loadedDatabase.getMode());
                 }
             }
 
@@ -418,12 +418,12 @@ public class FileActions {
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                EntryType tp = EntryTypes.getType(be.getType(), loadedDatabase.getType());
-                if (EntryTypes.getStandardType(tp.getName(), loadedDatabase.getType()) == null) {
+                EntryType tp = EntryTypes.getType(be.getType(), loadedDatabase.getMode());
+                if (EntryTypes.getStandardType(tp.getName(), loadedDatabase.getMode()) == null) {
                     types.put(tp.getName(), tp);
                 }
 
-                bibtexEntryWriter.write(be, fw, loadedDatabase.getType());
+                bibtexEntryWriter.write(be, fw, loadedDatabase.getMode());
                 //only append newline if the entry has changed
                 if (!be.hasChanged()) {
                     fw.write(Globals.NEWLINE);

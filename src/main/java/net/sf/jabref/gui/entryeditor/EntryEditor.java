@@ -58,7 +58,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -197,7 +197,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         tabbed.removeAll();
         tabs.clear();
 
-        EntryType type = EntryTypes.getType(entry.getType(), this.frame.getCurrentBasePanel().getLoadedDatabase().getType());
+        EntryType type = EntryTypes.getType(entry.getType(), this.frame.getCurrentBasePanel().getLoadedDatabase().getMode());
 
         List<String> fieldList = type.getRequiredFieldsFlat();
 
@@ -355,7 +355,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         leftPan.add(closeBut, BorderLayout.NORTH);
 
         // Create type-label
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), panel.getLoadedDatabase().getType());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), panel.getLoadedDatabase().getMode());
         leftPan.add(new TypeLabel(typedEntry.getTypeForDisplay()), BorderLayout.CENTER);
         TypeButton typeButton = new TypeButton();
 
@@ -445,7 +445,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         } else if (BibtexFields.EXTRA_YES_NO.equals(fieldExtras)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
         } else if (BibtexFields.EXTRA_MONTH.equals(fieldExtras)) {
-            return FieldExtraComponents.getMonthExtraComponent(editor, this, this.frame.getCurrentBasePanel().getLoadedDatabase().getType());
+            return FieldExtraComponents.getMonthExtraComponent(editor, this, this.frame.getCurrentBasePanel().getLoadedDatabase().getMode());
         }
         return Optional.empty();
     }
@@ -478,7 +478,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         if (updateSource) {
 
             try {
-                String srcString = getSourceString(entry, panel.getLoadedDatabase().getType());
+                String srcString = getSourceString(entry, panel.getLoadedDatabase().getMode());
                 source.setText(srcString);
                 lastSourceStringAccepted = srcString;
 
@@ -514,7 +514,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
-    public static String getSourceString(BibEntry entry, BibDatabaseType type) throws IOException {
+    public static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
         new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);

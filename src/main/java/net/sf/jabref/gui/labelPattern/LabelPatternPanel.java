@@ -123,7 +123,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(btnDefault, con);
         pan.add(btnDefault);
 
-        for (EntryType type : EntryTypes.getAllValues(panel.getLoadedDatabase().getType())) {
+        for (EntryType type : EntryTypes.getAllValues(panel.getLoadedDatabase().getMode())) {
             textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
             y++;
         }

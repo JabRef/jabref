@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class BibDatabaseTypeDetection {
+public class BibDatabaseModeDetection {
     private static final List<EntryType> bibtex = BibtexEntryTypes.ALL;
     private static final List<EntryType> biblatex = BibLatexEntryTypes.ALL;
     private static final List<EntryType> exclusiveBiblatex = filterEntryTypes(biblatex, isNotIncludedIn(bibtex));
@@ -27,19 +27,19 @@ public class BibDatabaseTypeDetection {
      * @param database a BibDatabase database
      * @return the inferred database type
      */
-    public static BibDatabaseType inferType(BibDatabase database) {
+    public static BibDatabaseMode inferMode(BibDatabase database) {
         final List<String> entryTypes = getEntryTypes(database.getEntries());
 
         // type-based check
         if (entryTypes.stream().anyMatch(isIncludedIn(exclusiveBiblatex))) {
-            return BibDatabaseType.BIBLATEX;
+            return BibDatabaseMode.BIBLATEX;
         } else {
             // field-based check
             if(database.getEntries().stream().anyMatch(hasBiblatexFields())) {
-                return BibDatabaseType.BIBLATEX;
+                return BibDatabaseMode.BIBLATEX;
             }
         }
-        return BibDatabaseType.BIBTEX;
+        return BibDatabaseMode.BIBTEX;
     }
 
     private static List<String> exclusiveBiblatexFields(String type) {

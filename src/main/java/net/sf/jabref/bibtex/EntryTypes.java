@@ -1,6 +1,6 @@
 package net.sf.jabref.bibtex;
 
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 
 import java.util.*;
@@ -100,8 +100,8 @@ public class EntryTypes {
      * This method returns the BibtexEntryType for the name of a type,
      * or null if it does not exist.
      */
-    public static EntryType getType(String name, BibDatabaseType type) {
-        return type == BibDatabaseType.BIBLATEX ? BIBLATEX.getType(name) : BIBTEX.getType(name);
+    public static EntryType getType(String name, BibDatabaseMode type) {
+        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getType(name) : BIBTEX.getType(name);
     }
 
     /**
@@ -109,16 +109,16 @@ public class EntryTypes {
      * or the default type (*.MISC) if it does not exist.
      */
     // Get an entry type defined in BibtexEntryType
-    public static EntryType getTypeOrDefault(String name, BibDatabaseType type) {
-        return type == BibDatabaseType.BIBLATEX ? BIBLATEX.getTypeOrDefault(name) : BIBTEX.getTypeOrDefault(name);
+    public static EntryType getTypeOrDefault(String name, BibDatabaseMode type) {
+        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getTypeOrDefault(name) : BIBTEX.getTypeOrDefault(name);
     }
 
     /**
      * This method returns the standard BibtexEntryType for the
      * name of a type, or null if it does not exist.
      */
-    public static EntryType getStandardType(String name, BibDatabaseType type) {
-        return type == BibDatabaseType.BIBLATEX ? BIBLATEX.getStandardType(name) : BIBTEX.getStandardType(name);
+    public static EntryType getStandardType(String name, BibDatabaseMode type) {
+        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getStandardType(name) : BIBTEX.getStandardType(name);
     }
 
     public static void addOrModifyCustomEntryType(CustomEntryType customEntryType) {
@@ -130,12 +130,12 @@ public class EntryTypes {
         BIBTEX.addOrModifyEntryType(name);
     }
 
-    public static Set<String> getAllTypes(BibDatabaseType type) {
-        return type == BibDatabaseType.BIBLATEX ? BIBLATEX.getAllTypes() : BIBTEX.getAllTypes();
+    public static Set<String> getAllTypes(BibDatabaseMode type) {
+        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getAllTypes() : BIBTEX.getAllTypes();
     }
 
-    public static Collection<EntryType> getAllValues(BibDatabaseType type) {
-        return type == BibDatabaseType.BIBLATEX ? BIBLATEX.getAllValues() : BIBTEX.getAllValues();
+    public static Collection<EntryType> getAllValues(BibDatabaseMode type) {
+        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getAllValues() : BIBTEX.getAllValues();
     }
 
     /**
@@ -144,8 +144,8 @@ public class EntryTypes {
      *
      * @param name The customized entry type to remove.
      */
-    public static void removeType(String name, BibDatabaseType type) {
-        if (type == BibDatabaseType.BIBLATEX) {
+    public static void removeType(String name, BibDatabaseMode type) {
+        if (type == BibDatabaseMode.BIBLATEX) {
             BIBLATEX.removeType(name);
         } else {
             BIBTEX.removeType(name);

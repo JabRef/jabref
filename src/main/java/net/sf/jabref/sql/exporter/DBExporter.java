@@ -29,7 +29,7 @@ import java.util.*;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.LoadedDatabase;
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -83,7 +83,7 @@ public abstract class DBExporter extends DBImporterExporter {
 
         final int database_id = getDatabaseIDByName(metaData, out, dbName);
         removeAllRecordsForAGivenDB(out, database_id);
-        populateEntryTypesTable(out, new LoadedDatabase(database, metaData).getType());
+        populateEntryTypesTable(out, new LoadedDatabase(database, metaData).getMode());
         populateEntriesTable(database_id, entries, out);
         populateStringTable(database, out, database_id);
         populateGroupTypesTable(out);
@@ -191,7 +191,7 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param type
      */
 
-    private void populateEntryTypesTable(Object out, BibDatabaseType type) throws SQLException {
+    private void populateEntryTypesTable(Object out, BibDatabaseMode type) throws SQLException {
         List<String> fieldRequirement = new ArrayList<>();
 
         List<String> existentTypes = new ArrayList<>();

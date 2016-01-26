@@ -25,7 +25,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,7 +68,7 @@ public class MergeEntries {
     private final BibEntry mergedEntry = new BibEntry();
     private final BibEntry one;
     private final BibEntry two;
-    private final BibDatabaseType type;
+    private final BibDatabaseMode type;
     private JTextArea jta;
     private PreviewPanel pp;
     private Boolean doneBuilding = false;
@@ -86,7 +86,7 @@ public class MergeEntries {
      * @param bOne First entry
      * @param bTwo Second entry
      */
-    public MergeEntries(BibEntry bOne, BibEntry bTwo, BibDatabaseType type) {
+    public MergeEntries(BibEntry bOne, BibEntry bTwo, BibDatabaseMode type) {
         one = bOne;
         two = bTwo;
         this.type = type;
@@ -101,7 +101,7 @@ public class MergeEntries {
      * @param headingOne Heading for first entry
      * @param headingTwo Heading for second entry
      */
-    public MergeEntries(BibEntry bOne, BibEntry bTwo, String headingOne, String headingTwo, BibDatabaseType type) {
+    public MergeEntries(BibEntry bOne, BibEntry bTwo, String headingOne, String headingTwo, BibDatabaseMode type) {
         columnHeadings[1] = headingOne;
         columnHeadings[5] = headingTwo;
         one = bOne;

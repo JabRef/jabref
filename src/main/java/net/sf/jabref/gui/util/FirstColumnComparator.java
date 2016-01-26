@@ -19,8 +19,6 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import net.sf.jabref.LoadedDatabase;
-import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.TypedBibEntry;
 
@@ -37,8 +35,8 @@ public class FirstColumnComparator implements Comparator<BibEntry> {
         int score1 = 0;
         int score2 = 0;
 
-        TypedBibEntry typedEntry1 = new TypedBibEntry(e1, Optional.of(database.getDatabase()), database.getType());
-        TypedBibEntry typedEntry2 = new TypedBibEntry(e2, Optional.of(database.getDatabase()), database.getType());
+        TypedBibEntry typedEntry1 = new TypedBibEntry(e1, Optional.of(database.getDatabase()), database.getMode());
+        TypedBibEntry typedEntry2 = new TypedBibEntry(e2, Optional.of(database.getDatabase()), database.getMode());
         if (typedEntry1.hasAllRequiredFields()) {
             score1++;
         }

@@ -17,7 +17,7 @@ package net.sf.jabref.model.entry;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -26,13 +26,13 @@ public class TypedBibEntry {
 
     private final BibEntry entry;
     private final Optional<BibDatabase> database;
-    private final BibDatabaseType type;
+    private final BibDatabaseMode type;
 
-    public TypedBibEntry(BibEntry entry, BibDatabaseType type) {
+    public TypedBibEntry(BibEntry entry, BibDatabaseMode type) {
         this(entry, Optional.empty(), type);
     }
 
-    public TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseType type) {
+    public TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseMode type) {
         this.entry = Objects.requireNonNull(entry);
         this.database = Objects.requireNonNull(database);
         this.type = type;

@@ -1,16 +1,14 @@
 package net.sf.jabref;
 
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseType;
-import net.sf.jabref.model.database.BibDatabaseTypeDetection;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.database.BibDatabaseModeDetection;
 
 import java.io.File;
 import java.util.Objects;
 import java.util.Vector;
 
 public class LoadedDatabase {
-
-    private static final String DATABASE_TYPE = "DATABASE_TYPE";
 
     private final BibDatabase database;
     private final MetaData metaData;
@@ -27,7 +25,7 @@ public class LoadedDatabase {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
 
-        this.setType(getType());
+        this.setMode(getMode());
     }
 
     public LoadedDatabase(BibDatabase database, MetaData metaData, File file) {
@@ -36,18 +34,18 @@ public class LoadedDatabase {
         this.metaData.setFile(file);
     }
 
-    public BibDatabaseType getType() {
-        Vector<String> data = metaData.getData(DATABASE_TYPE);
+    public BibDatabaseMode getMode() {
+        Vector<String> data = metaData.getData(MetaData.DATABASE_TYPE);
         if(data == null) {
-            return BibDatabaseTypeDetection.inferType(database);
+            return BibDatabaseModeDetection.inferMode(database);
         }
-        return BibDatabaseType.valueOf(data.get(0));
+        return BibDatabaseMode.valueOf(data.get(0));
     }
 
-    public void setType(BibDatabaseType type) {
+    public void setMode(BibDatabaseMode bibDatabaseMode) {
         Vector<String> list = new Vector<>();
-        list.add(type.name());
-        metaData.putData(DATABASE_TYPE, list);
+        list.add(bibDatabaseMode.name());
+        metaData.putData(MetaData.DATABASE_TYPE, list);
     }
 
     /**
@@ -68,6 +66,6 @@ public class LoadedDatabase {
     }
 
     public boolean isBiblatexMode() {
-        return getType() == BibDatabaseType.BIBLATEX;
+        return getMode() == BibDatabaseMode.BIBLATEX;
     }
 }

@@ -36,7 +36,6 @@ import java.beans.VetoableChangeListener;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,8 +66,8 @@ public class BibDatabase {
      */
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
-    public BibDatabaseType getBibType() {
-        return BibDatabaseTypeDetection.inferType(this);
+    public BibDatabaseMode getBibType() {
+        return BibDatabaseModeDetection.inferMode(this);
     }
 
     /**

@@ -5,7 +5,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.AfterClass;
@@ -55,7 +55,7 @@ public class BibEntryWriterTest {
         entry.setField("number", "1");
         entry.setField("note", "some note");
 
-        writer.write(entry, stringWriter, BibDatabaseType.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
 
         String actual = stringWriter.toString();
 
@@ -97,7 +97,7 @@ public class BibEntryWriterTest {
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseType.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         assertEquals(bibtexEntry, actual);
@@ -129,7 +129,7 @@ public class BibEntryWriterTest {
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseType.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         assertEquals(bibtexEntry, actual);
@@ -165,7 +165,7 @@ public class BibEntryWriterTest {
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseType.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         // @formatter:off
@@ -211,7 +211,7 @@ public class BibEntryWriterTest {
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
 
-        writer.write(entry, stringWriter, BibDatabaseType.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         // @formatter:off
@@ -252,7 +252,7 @@ public class BibEntryWriterTest {
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseType.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         //appending newlines are not written by the writer, but by FileActions. So, these should be removed here.
@@ -293,7 +293,7 @@ public class BibEntryWriterTest {
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseType.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         assertEquals(bibtexEntry, actual);
@@ -325,7 +325,7 @@ public class BibEntryWriterTest {
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
-        writer.write(entry, stringWriter, BibDatabaseType.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         assertEquals(bibtexEntry, actual);
@@ -353,7 +353,7 @@ public class BibEntryWriterTest {
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
 
-        writer.write(entry, stringWriter, BibDatabaseType.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         // @formatter:off

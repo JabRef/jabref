@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -80,7 +80,7 @@ public abstract class DBImporter extends DBImporterExporter {
      * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
      * @throws Exception
      */
-    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs, BibDatabaseType type) throws Exception {
+    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs, BibDatabaseMode type) throws Exception {
         List<DBImporterResult> result = new ArrayList<>();
         try (Connection conn = this.connectToDB(dbs)) {
 

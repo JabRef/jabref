@@ -1,6 +1,6 @@
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ public class TypedBibEntryTest {
         e.setField("title", "abc");
         e.setField("journal", "abc");
 
-        TypedBibEntry typedEntry = new TypedBibEntry(e, Optional.empty(), BibDatabaseType.BIBTEX);
+        TypedBibEntry typedEntry = new TypedBibEntry(e, Optional.empty(), BibDatabaseMode.BIBTEX);
         Assert.assertFalse(typedEntry.hasAllRequiredFields());
     }
 
@@ -26,7 +26,7 @@ public class TypedBibEntryTest {
         e.setField("journal", "abc");
         e.setField("year", "2015");
 
-        TypedBibEntry typedEntry = new TypedBibEntry(e, Optional.empty(), BibDatabaseType.BIBTEX);
+        TypedBibEntry typedEntry = new TypedBibEntry(e, Optional.empty(), BibDatabaseMode.BIBTEX);
         Assert.assertTrue(typedEntry.hasAllRequiredFields());
     }
 }
