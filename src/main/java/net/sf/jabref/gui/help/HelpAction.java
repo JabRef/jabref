@@ -35,40 +35,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class HelpAction extends MnemonicAwareAction {
     private final HelpDialog diag;
-
-    private Class<?> resourceOwner;
-
     private String helpFile;
-
-
-    public HelpAction(HelpDialog diag, String helpFile) {
-        this(diag, helpFile, Localization.lang("Help"), IconTheme.JabRefIcon.HELP.getSmallIcon());
-    }
-
-    public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
-        this(diag, helpFile, tooltip, IconTheme.JabRefIcon.HELP.getSmallIcon());
-    }
-
-    public HelpAction(HelpDialog diag, String helpFile, Icon iconFile) {
-        this(diag, helpFile, Localization.lang("Help"), iconFile);
-    }
-
-    public HelpAction(HelpDialog diag, String helpFile, String tooltip, Icon iconFile) {
-        super(iconFile);
-        putValue(Action.NAME, Localization.menuTitle("Help"));
-        putValue(Action.SHORT_DESCRIPTION, tooltip);
-        this.diag = diag;
-        this.helpFile = helpFile;
-    }
-
-    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, KeyStroke key) {
-        super(IconTheme.JabRefIcon.HELP.getIcon());
-        putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, tooltip);
-        putValue(Action.ACCELERATOR_KEY, key);
-        this.diag = diag;
-        this.helpFile = helpFile;
-    }
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, Icon iconFile) {
         super(iconFile);
@@ -76,10 +43,6 @@ public class HelpAction extends MnemonicAwareAction {
         putValue(Action.SHORT_DESCRIPTION, tooltip);
         this.diag = diag;
         this.helpFile = helpFile;
-    }
-
-    public void setResourceOwner(Class<?> resourceOwner) {
-        this.resourceOwner = resourceOwner;
     }
 
     public JButton getIconButton() {
@@ -96,10 +59,6 @@ public class HelpAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (resourceOwner == null) {
-            diag.showPage(helpFile);
-        } else {
-            diag.showPage(helpFile, resourceOwner);
-        }
+        diag.setVisible(true);
     }
 }

@@ -71,7 +71,6 @@ import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.rules.InvertSearchRule;
 import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
 import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
 import net.sf.jabref.gui.undo.NamedCompound;

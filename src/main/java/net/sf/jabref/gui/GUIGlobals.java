@@ -56,9 +56,6 @@ public class GUIGlobals {
     public static Font CURRENTFONT;
     public static Font typeNameFont;
 
-    // Size of help window.
-    public static final Dimension
-            helpSize = new Dimension(750, 600);
     public static final Dimension aboutSize = new Dimension(600, 265);
     public static Double zoomLevel = 1.0;
 
@@ -78,7 +75,6 @@ public class GUIGlobals {
     private static final String extension = ".gif";
     public static String ex = GUIGlobals.imageSize + GUIGlobals.extension;
     public static String pre = "/images/";
-    public static final String helpPre = "/help/";
 
     private static final Map<String, JLabel> tableIcons = new HashMap<>(); // Contains table icon mappings. Set up
     // further below.

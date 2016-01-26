@@ -148,7 +148,7 @@ public class INSPIREFetcher implements EntryFetcher {
      */
     @Override
     public String getHelpPage() {
-        return "Spires.html";
+        return "Spires";
     }
 
     @Override

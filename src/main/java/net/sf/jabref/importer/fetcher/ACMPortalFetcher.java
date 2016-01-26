@@ -408,7 +408,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "ACMPortalHelp.html";
+        return "ACMPortalHelp";
     }
 
 

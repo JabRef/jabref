@@ -15,142 +15,39 @@
 */
 package net.sf.jabref.gui.help;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
- *
  * This is a non-modal help Dialog. The contents of the help is specified by
  * calling showPage().
  */
-public class HelpDialog extends JDialog implements HyperlinkListener {
+public class HelpDialog extends JDialog {
 
-    private final JabRefFrame frame;
-
-    private final HelpContent content;
-
-    private final BackAction back = new BackAction();
-
-    private final ForwardAction forward = new ForwardAction();
-
-
-    // Initializes, but does not show the help dialog.
     public HelpDialog(JabRefFrame bf) {
         super(bf, Localization.lang("JabRef help"), false);
-        frame = bf;
-        content = new HelpContent(bf.prefs());
-        content.addHyperlinkListener(this);
-        setSize(GUIGlobals.helpSize);
+        setSize(new Dimension(750, 600));
 
-        JToolBar tlb = new JToolBar();
-        tlb.add(back);
-        tlb.add(forward);
-        tlb.addSeparator();
-        tlb.setFloatable(false);
+        GridLayout layout = new GridLayout(5, 2);
+        JPanel panel = new JPanel();
+        panel.setLayout(layout);
 
-        // Make ESC close dialog, and set shortkeys for back and forward.
-        InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap am = tlb.getActionMap();
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
-        am.put("close", new CloseAction());
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.BACK_HELP_DIALOG), "left");
-        am.put("left", back);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.FORWARD_HELP_DIALOG), "right");
-        am.put("right", forward);
+        panel.add(new JLabel("Version"));
+        panel.add(new JLabel(Globals.BUILD_INFO.getVersion()));
+        panel.add(new JLabel("Year"));
+        panel.add(new JLabel(Globals.BUILD_INFO.getYear()));
+        panel.add(new JLabel("Developers"));
+        panel.add(new JLabel(Globals.BUILD_INFO.getDevelopers()));
+        panel.add(new JLabel("Authors"));
+        panel.add(new JLabel(Globals.BUILD_INFO.getAuthors()));
+        panel.add(new JLabel("License Information"));
+        panel.add(new JLabel(Globals.BUILD_INFO.getLicenseInformation()));
 
-        // Set shortkeys for back and forward specifically for the EditorPane.
-        im = content.getInputMap(JComponent.WHEN_FOCUSED);
-        am = content.getActionMap();
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.BACK_HELP_DIALOG), "left");
-        am.put("left", back);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.FORWARD_HELP_DIALOG), "right");
-        am.put("right", forward);
-
-        getContentPane().add(tlb, BorderLayout.NORTH);
-        getContentPane().add(content.getPane());
-        forward.setEnabled(false);
-        back.setEnabled(false);
+        getContentPane().add(panel);
     }
 
-    public void showPage(String url) {
-        showPage(url, JabRef.class);
-    }
-
-    public void showPage(String url, Class<?> resourceOwner) {
-        if (isVisible()) {
-            back.setEnabled(true);
-        } else {
-            PositionWindow.placeDialog(this, frame);
-            content.reset();
-            back.setEnabled(false);
-            setVisible(true);
-        }
-        forward.setEnabled(false);
-        content.setPage(url, resourceOwner);
-        content.requestFocus();
-    }
-
-    @Override
-    public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            content.setPage(e.getURL());
-            back.setEnabled(true);
-            forward.setEnabled(false);
-        }
-    }
-
-
-    class CloseAction extends AbstractAction {
-
-        public CloseAction() {
-            super(Localization.lang("Close"));
-            // , new ImageIcon(GUIGlobals.closeIconFile));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the help window"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            dispose();
-        }
-    }
-
-    class BackAction extends AbstractAction {
-
-        public BackAction() {
-            super("Back", IconTheme.JabRefIcon.LEFT.getIcon());
-            // putValue(SHORT_DESCRIPTION, "Show the previous page");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            setEnabled(content.back());
-            forward.setEnabled(true);
-        }
-    }
-
-    class ForwardAction extends AbstractAction {
-
-        public ForwardAction() {
-            super("Forward", IconTheme.JabRefIcon.RIGHT.getIcon());
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            setEnabled(content.forward());
-            back.setEnabled(true);
-        }
-    }
 }

@@ -24,7 +24,10 @@ public class BuildInfo {
     private static final String UNKOWN_VERSION = "*unknown*";
     
     private final String version;
-
+    private final String authors;
+    private final String developers;
+    private final String year;
+    private final String licenseInformation;
 
     public BuildInfo() {
         this("/build.properties");
@@ -42,9 +45,30 @@ public class BuildInfo {
         }
 
         version = properties.getProperty("version", UNKOWN_VERSION);
+        authors = properties.getProperty("authors", "");
+        licenseInformation = properties.getProperty("licenseInformation", "");
+        year = properties.getProperty("year", "");
+        developers = properties.getProperty("developers", "");
+
     }
 
     public String getVersion() {
         return version;
+    }
+
+    public String getAuthors() {
+        return authors;
+    }
+
+    public String getDevelopers() {
+        return developers;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public String getLicenseInformation() {
+        return licenseInformation;
     }
 }
