@@ -25,10 +25,15 @@ public class SaveActions {
         setAvailableFormatters();
 
         for (int i = 0; i < formatters.size(); i += 2) {
-            String field = formatters.get(i);
-            Formatter formatter = getFormatterFromString(formatters.get(i + 1));
+            try {
+                String field = formatters.get(i);
+                Formatter formatter = getFormatterFromString(formatters.get(i + 1));
 
-            actions.put(field, formatter);
+                actions.put(field, formatter);
+            } catch(IndexOutOfBoundsException e){
+                // the meta data string in the file is broken. -> Ignore the last item
+                break;
+            }
         }
 
     }
