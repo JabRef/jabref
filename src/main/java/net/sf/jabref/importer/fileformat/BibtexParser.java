@@ -58,17 +58,12 @@ public class BibtexParser {
     private final FieldContentParser fieldContentParser = new FieldContentParser();
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
-    private final boolean autoDoubleBraces;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
 
 
     public BibtexParser(Reader in) {
         Objects.requireNonNull(in);
 
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
-        autoDoubleBraces = Globals.prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES);
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
     }
 
