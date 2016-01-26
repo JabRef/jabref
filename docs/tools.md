@@ -7,6 +7,7 @@ This page lists some software we consider useful.
 ## General GIT tooling on Windows
 
 * Use [git for windows](https://git-for-windows.github.io/), no additional git tooling required
+* [Use notepad++ as editor](http://stackoverflow.com/a/2486342/873282) for `git rebase -i`
 * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) - Aim: Store password for GitHub permanently for https repository locations
   * <s>Execute `"c:\Program Files\Git\bin\git.exe" push origin` once using **cmd** not `git bash` - reason: https://github.com/Microsoft/Git-Credential-Manager-for-Windows/issues/50.</s>
 
