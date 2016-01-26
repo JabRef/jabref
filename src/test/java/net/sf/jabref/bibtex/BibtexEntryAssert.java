@@ -80,7 +80,8 @@ public class BibtexEntryAssert {
      */
     private static void assertEquals(BibEntry shouldBeEntry, BibEntry entry) {
         // use the canonical string representation to compare the entries
-        Assert.assertEquals(CanonicalBibtexEntry.getCanonicalRepresentation(shouldBeEntry),
-                CanonicalBibtexEntry.getCanonicalRepresentation(entry));
+        String shouldBeEntryRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(shouldBeEntry);
+        String entryRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(entry);
+        Assert.assertEquals(shouldBeEntryRepresentation, entryRepresentation);
     }
 }
