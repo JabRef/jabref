@@ -49,6 +49,7 @@ public class BibEntry {
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
     private static final String ID_FIELD = "id";
+    private static final String DEFAULT_TYPE = "misc";
 
     private String id;
 
@@ -76,7 +77,7 @@ public class BibEntry {
     }
 
     public BibEntry(String id) {
-        this(id, "misc");
+        this(id, DEFAULT_TYPE);
     }
 
     public BibEntry(String id, String type) {

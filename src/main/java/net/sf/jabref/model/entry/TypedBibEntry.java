@@ -29,9 +29,7 @@ public class TypedBibEntry {
     private final BibDatabaseType type;
 
     public TypedBibEntry(BibEntry entry, BibDatabaseType type) {
-        this.type = type;
-        this.entry = Objects.requireNonNull(entry);
-        this.database = Optional.empty();
+        this(entry, Optional.empty(), type);
     }
 
     public TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseType type) {
