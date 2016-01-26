@@ -1166,9 +1166,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(databaseProperties);
         file.addSeparator();
 
-        sessions.add(loadSessionAction);
-        sessions.add(saveSessionAction);
-        file.add(sessions);
         file.add(fileHistory);
         file.addSeparator();
         file.add(editModeAction);
