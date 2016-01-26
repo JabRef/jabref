@@ -1,4 +1,26 @@
-This page provides some development support in the form of howtos. See also [[High Level Documentation]]
+This page provides some development support in the form of howtos. See also [[High Level Documentation]].
+
+## Table of Contents
+  * [Generic code how tos](#generic-code-how-tos)
+  * [Error Handling in JabRef](#error-handling-in-jabref)
+    * [Throwing and Catching Exceptions](#throwing-and-catching-exceptions)
+    * [Outputting Errors in the UI](#outputting-errors-in-the-ui)
+  * [Logging](#logging)
+  * [Using Localization correctly](#using-localization-correctly)
+  * [Cleanup / Formatters](#cleanup-/-formatters)
+  * [Drag and Drop](#drag-and-drop)
+  * [Get the JabRef frame / panel](#get-the-jabref-frame-/-panel)
+  * [Get Absolute/Expanded Filename](#get-absolute/expanded-filename)
+  * [Setting a Database Directory for a .bib File](#setting-a-database-directory-for-a-.bib-file)
+  * [How to work with Preferences](#how-to-work-with-preferences)
+  * [Test Cases](#test-cases)
+    * [Preferences in tests](#preferences-in-tests)
+  * [UI](#ui)
+  * [UI for Preferences](#ui-for-preferences)
+  * ["Special Fields"](#"special-fields")
+    * [keywords sync](#keywords-sync)
+  * [Working with BibTeX data](#working-with-bibtex-data)
+    * [Working with authors](#working-with-authors)
 
 ## Generic code how tos
 
@@ -124,6 +146,9 @@ File f = Util.expandFilename(flEntry.getLink(), frame.basePanel().metaData().get
 
 ## How to work with Preferences
 
+`model` and `logic` must not know JabRefPreferences. See `ProxyPreferences` for encapsulated preferences and https://github.com/JabRef/jabref/pull/658 for a detailed discussion.
+
+
 `Globals.prefs` is a global variable storing a link to the preferences form. 
 
 `Globals.prefs.getTYPE(key)` returns the value of the given configuration key. TYPE has to be replaced by Boolean, Double, Int, ByteArray. If a string is to be put, the method name is only “get”. 
@@ -185,6 +210,10 @@ public void tearDown() {
     prefs.overwritePreferences(backup);
 }
 ```
+
+## UI
+
+Global variables are OK here. Global variables are NOT OK everywhere else, especially model and logic.
 
 ## UI for Preferences
 
