@@ -1,10 +1,14 @@
 package net.sf.jabref.exporter;
 
 import java.nio.charset.Charset;
+
+import com.google.common.base.Charsets;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
 public class SavePreferences {
+
+
 
     public enum DatabaseSaveType {
         ALL,
@@ -15,7 +19,18 @@ public class SavePreferences {
     Charset encoding;
     DatabaseSaveType saveType;
 
+
     private final boolean isSaveOperation;
+
+    public boolean isSaveInOriginalOrder() {
+        return saveInOriginalOrder;
+    }
+
+    public void setSaveInOriginalOrder(boolean saveInOriginalOrder) {
+        this.saveInOriginalOrder = saveInOriginalOrder;
+    }
+
+    private  boolean saveInOriginalOrder;
     public String pri;
     public String sec;
     public String ter;
@@ -23,6 +38,11 @@ public class SavePreferences {
     public boolean secD;
     public boolean terD;
 
+    public SavePreferences() {
+        //this.makeBackup = false;
+        //this.encoding = Charsets.UTF_8;
+        this.isSaveOperation = true;
+    }
 
     public SavePreferences(JabRefPreferences prefs) {
         this(prefs, true);
@@ -33,6 +53,10 @@ public class SavePreferences {
         this.encoding = prefs.getDefaultEncoding();
         this.isSaveOperation = isSaveOperation;
         this.saveType = DatabaseSaveType.ALL;
+        if(isSaveOperation)
+            this.saveInOriginalOrder = true;
+        else
+            this.saveInOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
 
         if (!isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
             pri = prefs.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD);

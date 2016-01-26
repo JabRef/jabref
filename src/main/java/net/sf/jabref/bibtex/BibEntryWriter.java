@@ -32,9 +32,9 @@ public class BibEntryWriter {
             out.write(entry.getParsedSerialization());
             return;
         }
-        out.write(Globals.NEWLINE + Globals.NEWLINE);
-
+        out.write(Globals.NEWLINE);
         writeRequiredFieldsFirstRemainingFieldsSecond(entry, out, bibDatabaseMode);
+        out.write(Globals.NEWLINE);
     }
 
     public void writeWithoutPrependedNewlines(BibEntry entry, Writer out, BibDatabaseMode bibDatabaseMode) throws IOException {

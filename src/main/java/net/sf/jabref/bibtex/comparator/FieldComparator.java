@@ -27,6 +27,7 @@ import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  *
@@ -71,7 +72,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     public FieldComparator(String field, boolean reversed) {
-        this.fieldName = field;
+        this.fieldName = Objects.requireNonNull(field);
         this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
         multiplier = reversed ? -1 : 1;
         isTypeHeader = this.field[0].equals(BibEntry.TYPE_HEADER);

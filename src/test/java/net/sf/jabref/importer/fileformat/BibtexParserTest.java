@@ -319,9 +319,9 @@ public class BibtexParserTest {
 
     @Test
     public void assertCorrectnessOfParsedSerialization() throws IOException {
-        String firstEntry = "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
-                + "  title = {Title A}}";
-        String secondEntry = "\n@inProceedings{foo," + "  author={Norton Bar}}";
+        String firstEntry = "@article{canh05," + "  author = {Crowston, K. and Annabi, H.}," + Globals.NEWLINE
+                + "  title = {Title A}}" + Globals.NEWLINE;
+        String secondEntry = "@inProceedings{foo," + "  author={Norton Bar}}";
 
         ParserResult result = BibtexParser.parse(new StringReader(firstEntry + secondEntry));
 
@@ -332,6 +332,31 @@ public class BibtexParserTest {
                 Assert.assertEquals(secondEntry, entry.getParsedSerialization());
             }
         }
+    }
+
+    @Test
+    public void parseRecognizesMultipleEntriesOnSameLine() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader("@article{canh05}" + "@inProceedings{foo}"));
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(2, c.size());
+
+        Iterator<BibEntry> i = c.iterator();
+        BibEntry a = i.next();
+        BibEntry b = i.next();
+
+        // Sort them because we can't be sure about the order
+        if (a.getCiteKey().equals("foo")) {
+            BibEntry tmp = a;
+            a = b;
+            b = tmp;
+        }
+
+        Assert.assertEquals("article", a.getType());
+        Assert.assertEquals("canh05", a.getCiteKey());
+
+        Assert.assertEquals("inproceedings", b.getType());
+        Assert.assertEquals("foo", b.getCiteKey());
     }
 
     @Test
@@ -1141,5 +1166,79 @@ public class BibtexParserTest {
         Assert.assertFalse(result.hasWarnings());
 
         Assert.assertEquals("some text and \\latex", result.getDatabase().getPreamble());
+    }
+
+    @Test
+    public void parseSavesEntryInParsedSerialization() throws IOException {
+        String testEntry = "@article{test,author={Ed von Test}}";
+        ParserResult result = BibtexParser
+                .parse(new StringReader(testEntry));
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(testEntry, e.getParsedSerialization());
+    }
+
+    @Test
+    public void parseSavesOneNewlineAfterEntryInParsedSerialization() throws IOException {
+        String testEntry = "@article{test,author={Ed von Test}}";
+        ParserResult result = BibtexParser
+                .parse(new StringReader(testEntry + Globals.NEWLINE + Globals.NEWLINE));
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(testEntry + Globals.NEWLINE, e.getParsedSerialization());
+    }
+
+    @Test
+    public void parseSavesNewlinesBeforeEntryInParsedSerialization() throws IOException {
+        String testEntry = "@article{test,author={Ed von Test}}";
+        ParserResult result = BibtexParser
+                .parse(new StringReader(Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + testEntry));
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + testEntry, e.getParsedSerialization());
+    }
+
+    @Test
+    public void parseSavesOnlyRealNewlinesBeforeEntryInParsedSerialization() throws IOException {
+        String testEntry = "@article{test,author={Ed von Test}}";
+        ParserResult result = BibtexParser
+                .parse(new StringReader("%Encoding: no" + Globals.NEWLINE
+                        + Globals.NEWLINE + Globals.NEWLINE + testEntry));
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(Globals.NEWLINE + Globals.NEWLINE + testEntry, e.getParsedSerialization());
+    }
+
+    @Test
+    public void parseSavesNewlinesBetweenEntriesInParsedSerialization() throws IOException {
+        String testEntryOne = "@article{test1,author={Ed von Test}}";
+        String testEntryTwo = "@article{test2,author={Ed von Test}}";
+        ParserResult result = BibtexParser
+                .parse(new StringReader(testEntryOne + Globals.NEWLINE
+                        + Globals.NEWLINE + Globals.NEWLINE + testEntryTwo));
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(2, c.size());
+
+        Iterator<BibEntry> i = c.iterator();
+        BibEntry a = i.next();
+        BibEntry b = i.next();
+
+        // Sort them because we can't be sure about the order
+        if (a.getCiteKey().equals("test2")) {
+            BibEntry tmp = a;
+            a = b;
+            b = tmp;
+        }
+
+        Assert.assertEquals(testEntryOne + Globals.NEWLINE, a.getParsedSerialization());
+        Assert.assertEquals(Globals.NEWLINE + Globals.NEWLINE + testEntryTwo, b.getParsedSerialization());
     }
 }

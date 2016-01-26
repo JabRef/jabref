@@ -62,7 +62,6 @@ public class BibDatabaseWriter {
             // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be sorted based on their creation order,
             // utilizing the fact that IDs used for entries are increasing, sortable numbers.
-            comparators = new ArrayList<>();
             comparators.add(new CrossRefEntryComparator());
             comparators.add(new IdComparator());
         } else {
@@ -87,9 +86,11 @@ public class BibDatabaseWriter {
             if (preferences.isSaveOperation()) {
                 comparators.add(new CrossRefEntryComparator());
             }
-            comparators.add(new FieldComparator(preferences.pri, preferences.priD));
-            comparators.add(new FieldComparator(preferences.sec, preferences.secD));
-            comparators.add(new FieldComparator(preferences.ter, preferences.terD));
+            if(preferences.pri != null && preferences.sec != null && preferences.ter != null) {
+                comparators.add(new FieldComparator(preferences.pri, preferences.priD));
+                comparators.add(new FieldComparator(preferences.sec, preferences.secD));
+                comparators.add(new FieldComparator(preferences.ter, preferences.terD));
+            }
             comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
         }
 
@@ -134,13 +135,13 @@ public class BibDatabaseWriter {
             List<String> storedSaveOrderConfig = metaData.getData(
                     net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             if (storedSaveOrderConfig == null) {
-                inOriginalOrder = true;
+                inOriginalOrder = preferences.isSaveInOriginalOrder();
             } else {
                 SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
                 inOriginalOrder = saveOrderConfig.saveInOriginalOrder;
             }
         } else {
-            inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+            inOriginalOrder = preferences.isSaveInOriginalOrder();
         }
         return inOriginalOrder;
     }
@@ -190,6 +191,8 @@ public class BibDatabaseWriter {
 
     public void writePartOfDatabase(Writer writer, BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
             SavePreferences preferences, boolean checkSearch, boolean checkGroup) throws IOException {
+        Objects.requireNonNull(writer);
+
         // Map to collect entry type definitions that we must save along with entries using them.
         Map<String, EntryType> typesToWrite = new TreeMap<>();
 
@@ -235,11 +238,6 @@ public class BibDatabaseWriter {
                 }
 
                 bibtexEntryWriter.write(entry, writer, bibDatabaseContext.getMode());
-
-                //only append newline if the entry has changed
-                if (!entry.hasChanged()) {
-                    writer.write(Globals.NEWLINE);
-                }
             }
         }
 
@@ -289,15 +287,17 @@ public class BibDatabaseWriter {
      * @param encoding String the name of the encoding, which is part of the file header.
      */
     private void writeBibFileHeader(Writer out, Charset encoding) throws IOException {
+        if(encoding == null)
+            return;
+
         out.write("% ");
         out.write(Globals.encPrefix + encoding);
+        out.write(Globals.NEWLINE);
     }
 
     private void writeEpilogue(Writer writer, BibDatabase database) throws IOException {
         if ((database.getEpilog() != null) && !(database.getEpilog().isEmpty())) {
            writer.write(database.getEpilog());
-        } else {
-           writer.write(Globals.NEWLINE);
         }
     }
 
@@ -359,9 +359,10 @@ public class BibDatabaseWriter {
 
     private void writePreamble(Writer fw, String preamble) throws IOException {
         if (preamble != null) {
+            fw.write(Globals.NEWLINE);
             fw.write("@PREAMBLE{");
             fw.write(preamble);
-            fw.write('}' + Globals.NEWLINE + Globals.NEWLINE);
+            fw.write('}' + Globals.NEWLINE);
         }
     }
 

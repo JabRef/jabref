@@ -314,6 +314,16 @@ public class BibtexParser {
                 runningIndex--;
             }
 
+            if(runningIndex > -1) {
+                // We have to ignore some text at the beginning
+                // so we view the first line break as the end of the previous text and don't store it
+                if(result.charAt(runningIndex + 1) == '\r') {
+                    runningIndex++;
+                }
+                if(result.charAt(runningIndex + 1) == '\n') {
+                    runningIndex++;
+                }
+            }
 
             result = result.substring(runningIndex + 1);
 
@@ -356,6 +366,34 @@ public class BibtexParser {
         }
     }
 
+    private void skipSpace() throws IOException {
+        int character;
+
+        while (true) {
+            character = read();
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
+            }
+
+            if ((char) character != ' ') {
+                // found non-space char
+                unread(character);
+                break;
+            }
+        }
+    }
+
+    private void skipOneNewline() throws IOException {
+        skipSpace();
+        if(peek() == '\r') {
+            read();
+        }
+        if(peek() == '\n') {
+            read();
+        }
+    }
+
     private boolean isEOFCharacter(int character) {
         return (character == -1) || (character == 65535);
     }
@@ -394,7 +432,10 @@ public class BibtexParser {
 
     private int read() throws IOException {
         int character = pushbackReader.read();
-        pureTextFromFile.offerLast(Character.valueOf((char) character));
+
+        if(! isEOFCharacter(character)) {
+            pureTextFromFile.offerLast(Character.valueOf((char) character));
+        }
         if (character == '\n') {
             line++;
         }
@@ -406,7 +447,9 @@ public class BibtexParser {
             line--;
         }
         pushbackReader.unread(character);
-        pureTextFromFile.pollLast();
+        if(pureTextFromFile.getLast().charValue() == character) {
+            pureTextFromFile.pollLast();
+        }
     }
 
     private BibtexString parseString() throws IOException {
@@ -466,6 +509,10 @@ public class BibtexParser {
         }
 
         consume('}', ')');
+
+        // Consume new line which signals end of entry
+        skipOneNewline();
+
         return result;
     }
 
@@ -704,7 +751,7 @@ public class BibtexParser {
 
             if (!Character.isWhitespace((char) character)
                     && (Character.isLetterOrDigit((char) character) || (character == ':') || ((character != '#') && (character != '{') && (character != '}')
-                    && (character != '\uFFFD') && (character != '~') && (character != '\uFFFD') && (character != ',') && (character != '=')))) {
+                    && (character != '\uFFFD') && (character != '~') && (character != ',') && (character != '=')))) {
                 token.append((char) character);
             } else {
 
@@ -874,7 +921,7 @@ public class BibtexParser {
 
         if ((character != firstOption) && (character != secondOption)) {
             throw new IOException("Error in line " + line + ": Expected " + firstOption + " or "
-                    + secondOption + " but received " + character);
+                    + secondOption + " but received " + (char) character);
         }
     }
 }
