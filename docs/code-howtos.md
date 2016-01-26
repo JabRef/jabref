@@ -17,7 +17,7 @@ This page provides some development support in the form of howtos. See also [[Hi
     * [Preferences in tests](#preferences-in-tests)
   * [UI](#ui)
   * [UI for Preferences](#ui-for-preferences)
-  * ["Special Fields"](#"special-fields")
+  * ["Special Fields"](#special-fields)
     * [keywords sync](#keywords-sync)
   * [Working with BibTeX data](#working-with-bibtex-data)
     * [Working with authors](#working-with-authors)
