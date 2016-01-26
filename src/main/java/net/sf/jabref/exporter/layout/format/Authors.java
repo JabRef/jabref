@@ -299,10 +299,10 @@ public class Authors extends AbstractParamLayoutFormatter {
                 }
             }
             if (!abbrDots) {
-                firstNamePart = firstNamePart.replaceAll("\\.", "");
+                firstNamePart = firstNamePart.replace(".", "");
             }
             if (!abbrSpaces) {
-                firstNamePart = firstNamePart.replaceAll(" ", "");
+                firstNamePart = firstNamePart.replace(" ", "");
             }
         }
 

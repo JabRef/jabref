@@ -247,7 +247,7 @@ public class IsiImporter extends ImportFormat {
                 } else if ("JO".equals(beg)) {
                     hm.put("booktitle", value);
                 } else if ("AU".equals(beg)) {
-                    String author = IsiImporter.isiAuthorsConvert(value.replaceAll("EOLEOL", " and "));
+                    String author = IsiImporter.isiAuthorsConvert(value.replace("EOLEOL", " and "));
 
                     // if there is already someone there then append with "and"
                     if (hm.get("author") != null) {
@@ -256,12 +256,12 @@ public class IsiImporter extends ImportFormat {
 
                     hm.put("author", author);
                 } else if ("TI".equals(beg)) {
-                    hm.put("title", value.replaceAll("EOLEOL", " "));
+                    hm.put("title", value.replace("EOLEOL", " "));
                 } else if ("SO".equals(beg) || "JA".equals(beg)) {
                     hm.put("journal", value.replaceAll("EOLEOL", " "));
                 } else if ("ID".equals(beg) || "KW".equals(beg)) {
 
-                    value = value.replaceAll("EOLEOL", " ");
+                    value = value.replace("EOLEOL", " ");
                     String existingKeywords = hm.get("keywords");
                     if ((existingKeywords == null) || existingKeywords.contains(value)) {
                         existingKeywords = value;
@@ -271,7 +271,7 @@ public class IsiImporter extends ImportFormat {
                     hm.put("keywords", existingKeywords);
 
                 } else if ("AB".equals(beg)) {
-                    hm.put("abstract", value.replaceAll("EOLEOL", " "));
+                    hm.put("abstract", value.replace("EOLEOL", " "));
                 } else if ("BP".equals(beg) || "BR".equals(beg) || "SP".equals(beg)) {
                     pages = value;
                 } else if ("EP".equals(beg)) {
@@ -315,7 +315,7 @@ public class IsiImporter extends ImportFormat {
                         Type = "misc";
                     }
                 } else if ("CR".equals(beg)) {
-                    hm.put("CitedReferences", value.replaceAll("EOLEOL", " ; ").trim());
+                    hm.put("CitedReferences", value.replace("EOLEOL", " ; ").trim());
                 } else {
                     // Preserve all other entries except
                     if ("ER".equals(beg) || "EF".equals(beg) || "VR".equals(beg)
@@ -422,7 +422,7 @@ public class IsiImporter extends ImportFormat {
 
             // Do we have only uppercase chars?
             if (first.toUpperCase().equals(first)) {
-                first = first.replaceAll("\\.", "");
+                first = first.replace(".", "");
                 for (int j = 0; j < first.length(); j++) {
                     sb.append(first.charAt(j)).append('.');
 

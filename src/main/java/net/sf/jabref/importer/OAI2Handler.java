@@ -87,7 +87,7 @@ public class OAI2Handler extends DefaultHandler {
             String pages = content.replaceFirst(journal, "");
             pages = pages.replaceFirst(volume, "");
             pages = pages.replaceFirst("\\(" + year + "\\)", "");
-            pages = pages.replaceAll(" ", "");
+            pages = pages.replace(" ", "");
             entry.setField("pages", pages);
         } else if ("datestamp".equals(qualifiedName)) {
             String year = entry.getField("year");

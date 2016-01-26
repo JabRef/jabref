@@ -227,7 +227,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private String makeUrl() {
         StringBuilder sb = new StringBuilder(ACMPortalFetcher.START_URL).append(ACMPortalFetcher.SEARCH_URL_PART)
-                .append(terms.replaceAll(" ", "%20")).append(ACMPortalFetcher.SEARCH_URL_PART_II);
+                .append(terms.replace(" ", "%20")).append(ACMPortalFetcher.SEARCH_URL_PART_II);
 
         if (acmOrGuide) {
             sb.append("ACM");
@@ -389,7 +389,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             if (m.find()) {
                 try {
                     String number = m.group(1);
-                    number = number.replaceAll(",", ""); // Remove , as in 1,234
+                    number = number.replace(",", ""); // Remove , as in 1,234
                     return Integer.parseInt(number);
                 } catch (IllegalStateException | NumberFormatException ex) {
                     throw new IOException("Cannot parse number of hits");

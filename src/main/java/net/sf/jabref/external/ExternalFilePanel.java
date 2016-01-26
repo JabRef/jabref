@@ -25,8 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -317,7 +315,7 @@ public class ExternalFilePanel extends JPanel {
                     plannedName = plannedName.replaceAll(
                             "\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
                 } else if (OS.OS_X) {
-                    plannedName = plannedName.replaceAll(":", "");
+                    plannedName = plannedName.replace(":", "");
                 }
 
                 return plannedName;

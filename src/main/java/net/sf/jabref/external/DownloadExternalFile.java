@@ -284,7 +284,7 @@ public class DownloadExternalFile {
         if (OS.WINDOWS) {
             plannedName = plannedName.replaceAll("\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
         } else if (OS.OS_X) {
-            plannedName = plannedName.replaceAll(":", "");
+            plannedName = plannedName.replace(":", "");
         }
 
         return plannedName;

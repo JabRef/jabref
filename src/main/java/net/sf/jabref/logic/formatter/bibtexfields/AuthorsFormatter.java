@@ -42,7 +42,7 @@ public class AuthorsFormatter implements Formatter {
     public String format(String value) {
         boolean andSep = false;
         // String can contain newlines. Convert each to a space
-        value = value.replaceAll("\n", " ");
+        value = value.replace("\n", " ");
         String[] authors = value.split("( |,)and ", -1);
         if (authors.length > 1) {
             andSep = true;

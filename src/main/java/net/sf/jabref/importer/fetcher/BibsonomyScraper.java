@@ -48,7 +48,8 @@ class BibsonomyScraper {
     public static Optional<BibEntry> getEntry(String entryUrl) {
         try {
             // Replace special characters by corresponding sequences:
-            entryUrl = entryUrl.replaceAll("%", "%25").replaceAll(":", "%3A").replaceAll("/", "%2F").replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");
+            entryUrl = entryUrl.replace("%", "%25").replace(":", "%3A").replace("/", "%2F").replace("?", "%3F")
+                    .replace("&", "%26").replace("=", "%3D");
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + entryUrl + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
             String bibtex = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
