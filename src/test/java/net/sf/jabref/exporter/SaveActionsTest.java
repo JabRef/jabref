@@ -50,6 +50,6 @@ public class SaveActionsTest {
         BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
 
         assertEquals("Educational session 1", actedUpon.getField("title"));
-
     }
+
 }

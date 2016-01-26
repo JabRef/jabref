@@ -10,6 +10,11 @@ public class LatexFormatter implements Formatter {
     }
 
     @Override
+    public String getKey() {
+        return "LatexFormatter";
+    }
+
+    @Override
     public String format(String oldString) {
         String newValue = oldString;
 

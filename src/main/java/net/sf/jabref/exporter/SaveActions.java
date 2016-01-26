@@ -54,7 +54,7 @@ public class SaveActions {
 
     private Formatter getFormatterFromString(String formatterName) {
         for (Formatter formatter : availableFormatters) {
-            if (formatterName.equals(formatter.getName())) {
+            if (formatterName.equals(formatter.getKey())) {
                 return formatter;
             }
         }

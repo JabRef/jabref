@@ -11,6 +11,11 @@ public class IdentityFormatter implements Formatter {
     }
 
     @Override
+    public String getKey() {
+        return getName();
+    }
+
+    @Override
     public String format(String value) {
         return value;
     }

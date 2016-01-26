@@ -10,6 +10,11 @@ public class LowerCaseChanger implements Formatter {
         return Localization.lang("lower");
     }
 
+    @Override
+    public String getKey() {
+        return "LowerCaseChanger";
+    }
+
     /**
      * Converts all characters of the string to lower case, but does not change words starting with "{"
      */

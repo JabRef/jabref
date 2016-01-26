@@ -10,6 +10,11 @@ public class UpperCaseChanger implements Formatter {
         return Localization.lang("UPPER");
     }
 
+    @Override
+    public String getKey() {
+        return "UpperCaseChanger";
+    }
+
     /**
      * Converts all characters of the given string to upper case, but does not change words starting with "{"
      */

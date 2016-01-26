@@ -8,7 +8,12 @@ import net.sf.jabref.logic.formatter.Formatter;
 public class BooktitleMinifier implements Formatter {
     @Override
     public String getName() {
-        return "Minify authors";
+        return "Minify bookt titles";
+    }
+
+    @Override
+    public String getKey() {
+        return "MinifyBookTitle";
     }
 
     /**
