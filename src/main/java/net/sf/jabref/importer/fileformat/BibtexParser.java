@@ -888,20 +888,32 @@ public class BibtexParser {
             character = (char) read();
 
             boolean isClosingBracket = (character == '}') && (lastCharacter != '\\');
+
             if (isClosingBracket && (brackets == 0)) {
                 return value;
             } else if (isEOFCharacter(character)) {
                 throw new IOException("Error in line " + line + ": EOF in mid-string");
-            } else if ((character == '{') && (lastCharacter != '\\')) {
+            } else if ((character == '{') && (!isEscapeSymbol(lastCharacter))) {
                 brackets++;
             } else if (isClosingBracket) {
                 brackets--;
+            } else if (isAtSymbol(character) && (!isEscapeSymbol(lastCharacter))){
+                // we have an unescaped @ symbol
+                throw new IOException("Error in line " + line + ": unescaped @ in field content");
             }
 
             value.append(character);
 
             lastCharacter = character;
         }
+    }
+
+    private boolean isAtSymbol(char character) {
+        return '@' == character;
+    }
+
+    private boolean isEscapeSymbol(char character) {
+        return '\\' == character;
     }
 
     private StringBuffer parseQuotedFieldExactly() throws IOException {

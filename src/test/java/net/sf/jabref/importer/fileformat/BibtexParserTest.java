@@ -626,16 +626,15 @@ public class BibtexParserTest {
         Assert.assertTrue(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
-        Assert.assertEquals(0, c.size());
+        Assert.assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
     }
 
     @Test
-    @Ignore
     public void parseIgnoresAndWarnsAboutEntryWithAtSymbolInBrackets() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author @ not good}}"));
 
-        Assert.assertTrue(result.hasWarnings());
+        Assert.assertTrue("There should be warnings, but none are found", result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(0, c.size());
