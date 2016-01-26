@@ -17,6 +17,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [#647](https://github.com/JabRef/jabref/issues/647): The preview can now be copied
 - [#459](https://github.com/JabRef/jabref/issues/459) Open default directory when trying to add files to an entry
 - Implemented [#668](https://github.com/JabRef/jabref/issues/668): Replace clear with icon to reduce search bar width
+- "," is always used to separate keywords
 
 ### Fixed
 - Make BibTex parser more robust against missing newlines

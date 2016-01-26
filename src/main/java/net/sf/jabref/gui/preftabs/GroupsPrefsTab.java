@@ -16,9 +16,6 @@
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-
 import javax.swing.*;
 
 import net.sf.jabref.JabRefPreferences;
@@ -41,26 +38,12 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox autoAssignGroup = new JCheckBox(
             Localization.lang("Automatically assign new entry to selected groups"));
     private final JTextField groupingField = new JTextField(20);
-    private final JTextField keywordSeparator = new JTextField(2);
 
     private final JabRefPreferences prefs;
 
 
     public GroupsPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
-
-        keywordSeparator.addFocusListener(new FocusListener() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                keywordSeparator.selectAll();
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                // deselection is automatic
-            }
-        });
 
         FormLayout layout = new FormLayout("9dlu, pref", //500px",
         "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, " +
@@ -104,9 +87,6 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         builder2.append(new JLabel(Localization.lang("Default grouping field") + ":"));
         builder2.append(groupingField);
         builder2.nextLine();
-        builder2.nextLine();
-        builder2.append(new JLabel(Localization.lang("When adding/removing keywords, separate them by") + ":"));
-        builder2.append(keywordSeparator);
         builder.append(builder2.getPanel());
 
         setLayout(new BorderLayout());
@@ -123,7 +103,6 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         groupingField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         autoShow.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW));
         autoHide.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE));
-        keywordSeparator.setText(prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR));
         autoAssignGroup.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
     }
 
@@ -136,7 +115,6 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.GROUP_AUTO_SHOW, autoShow.isSelected());
         prefs.putBoolean(JabRefPreferences.GROUP_AUTO_HIDE, autoHide.isSelected());
         prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
-        prefs.put(JabRefPreferences.GROUP_KEYWORD_SEPARATOR, keywordSeparator.getText());
     }
 
     @Override
