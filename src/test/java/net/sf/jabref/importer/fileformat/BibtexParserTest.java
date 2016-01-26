@@ -15,8 +15,10 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Test the BibtexParser
@@ -630,14 +632,16 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void parseIgnoresAndWarnsAboutEntryWithAtSymbolInBrackets() throws IOException {
+    public void parseAcceptsEntryWithAtSymbolInBrackets() throws IOException {
 
-        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author @ not good}}"));
-
-        Assert.assertTrue("There should be warnings, but none are found", result.hasWarnings());
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author @ good}}"));
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
-        Assert.assertEquals(0, c.size());
+        List<BibEntry> entries = new ArrayList<>(1);
+        entries.addAll(c);
+
+        Assert.assertEquals(1, entries.size());
+        Assert.assertEquals("author @ good", entries.get(0).getField("author"));
     }
 
     @Test

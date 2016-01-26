@@ -894,19 +894,12 @@ public class BibtexParser {
                 brackets++;
             } else if (isClosingBracket) {
                 brackets--;
-            } else if (isAtSymbol(character) && (!isEscapeSymbol(lastCharacter))){
-                // we have an unescaped @ symbol
-                throw new IOException("Error in line " + line + ": unescaped @ in field content");
             }
 
             value.append(character);
 
             lastCharacter = character;
         }
-    }
-
-    private boolean isAtSymbol(char character) {
-        return '@' == character;
     }
 
     private boolean isEscapeSymbol(char character) {
