@@ -59,6 +59,8 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileListEntryEditor {
 
+    private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
+
     private JDialog diag;
     private final JTextField link = new JTextField();
     private final JTextField description = new JTextField();
@@ -243,7 +245,7 @@ public class FileListEntryEditor {
             try {
                 JabRefDesktop.openExternalFileAnyFormat(metaData, link.getText(), type);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("File could not be opened" + e.getMessage());
             }
         }
     }

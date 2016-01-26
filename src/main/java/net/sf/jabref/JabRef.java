@@ -590,7 +590,7 @@ public class JabRef {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
 
         // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms
@@ -644,7 +644,7 @@ public class JabRef {
         try {
             setLookAndFeel();
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Swing look and feel could not be loaded.");
         }
 
         // If the option is enabled, open the last edited databases, if any.
