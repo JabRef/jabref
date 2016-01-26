@@ -37,6 +37,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
@@ -52,7 +53,7 @@ public class LabelPatternPanel extends JPanel {
     protected final GridBagLayout gbl = new GridBagLayout();
     protected final GridBagConstraints con = new GridBagConstraints();
 
-    private final HelpAction help;
+    private final OnlineHelpAction help;
 
     // default pattern
     protected final JTextField defaultPat = new JTextField();
@@ -62,7 +63,7 @@ public class LabelPatternPanel extends JPanel {
 
 
     public LabelPatternPanel(HelpDialog helpDiag) {
-        help = new HelpAction(helpDiag, GUIGlobals.labelPatternHelp, Localization.lang("Help on key patterns"));
+        help = new OnlineHelpAction(Localization.lang("Help on key patterns"), GUIGlobals.labelPatternHelp);
         buildGUI();
     }
 

@@ -46,6 +46,7 @@ import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.exporter.*;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
 import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
@@ -247,15 +248,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
     private final AbstractAction donationAction = new DonateAction();
-    private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), helpDiag,
-            GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
-            Globals.getKeyPrefs().getKey(KeyBinding.HELP));
-    private final AbstractAction contents = new HelpAction(Localization.menuTitle("Help contents"), helpDiag,
-            GUIGlobals.helpContents, Localization.lang("Help contents"),
-            IconTheme.JabRefIcon.HELP_CONTENTS.getIcon());
+    private final AbstractAction help = new OnlineHelpAction(Localization.menuTitle("JabRef help"), Localization.lang("JabRef help"),
+            GUIGlobals.baseFrameHelp, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
     private final AbstractAction about = new HelpAction(Localization.menuTitle("About JabRef"), helpDiag,
-            GUIGlobals.aboutPage, Localization.lang("About JabRef"),
-            IconTheme.getImage("about"));
+            GUIGlobals.aboutPage, Localization.lang("About JabRef"), IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
@@ -1335,7 +1331,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(options);
 
         helpMenu.add(help);
-        helpMenu.add(contents);
         helpMenu.addSeparator();
         helpMenu.add(errorConsole);
         helpMenu.addSeparator();

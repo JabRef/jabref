@@ -17,19 +17,23 @@ package net.sf.jabref.gui.help;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 
 import javax.swing.*;
 
+import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.l10n.Localization;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This Action keeps a reference to a URL. When activated, it shows the help
  * Dialog unless it is already visible, and shows the URL in it.
  */
 public class HelpAction extends MnemonicAwareAction {
-
     private final HelpDialog diag;
 
     private Class<?> resourceOwner;

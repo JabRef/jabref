@@ -36,6 +36,7 @@ import net.sf.jabref.gui.help.HelpDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class NameFormatterTab extends JPanel implements PrefsTab {
@@ -207,8 +208,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         toolBar.setBorder(null);
         toolBar.add(new AddRowAction());
         toolBar.add(new DeleteRowAction());
-        toolBar.add(new HelpAction(helpDialog, GUIGlobals.nameFormatterHelp,
-                Localization.lang("Help on Name Formatting"), IconTheme.JabRefIcon.HELP.getIcon()));
+        toolBar.add(new OnlineHelpAction(Localization.lang("Help on Name Formatting"), GUIGlobals.nameFormatterHelp));
 
         tabPanel.add(toolBar, BorderLayout.EAST);
 

@@ -39,6 +39,7 @@ import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -138,7 +139,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp).getIconButton();
+        JButton help = new OnlineHelpAction(GUIGlobals.ownerHelp).getIconButton();
         builder.append(help);
         builder.nextLine();
 
@@ -148,7 +149,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        help = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp).getIconButton();
+        help = new OnlineHelpAction(GUIGlobals.timeStampHelp).getIconButton();
         builder.append(help);
         builder.nextLine();
 

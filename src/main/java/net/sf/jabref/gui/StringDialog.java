@@ -49,6 +49,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;
@@ -69,7 +70,7 @@ class StringDialog extends JDialog {
     private Object[] strings;
 
     private final StringTable table;
-    private final HelpAction helpAction;
+    private final OnlineHelpAction helpAction;
 
     private final PositionWindow pw;
 
@@ -81,7 +82,7 @@ class StringDialog extends JDialog {
 
         sortStrings();
 
-        helpAction = new HelpAction(frame.helpDiag, GUIGlobals.stringEditorHelp, Localization.lang("Help"));
+        helpAction = new OnlineHelpAction(Localization.lang("Help"), GUIGlobals.stringEditorHelp);
 
         addWindowListener(new WindowAdapter() {
 

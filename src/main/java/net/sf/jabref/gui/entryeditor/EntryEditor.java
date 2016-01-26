@@ -45,6 +45,7 @@ import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
@@ -153,7 +154,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private final JabRefPreferences prefs;
 
-    final HelpAction helpAction;
+    final OnlineHelpAction helpAction;
 
     private final UndoAction undoAction = new UndoAction();
 
@@ -172,7 +173,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         this.entry.addPropertyChangeListener(this);
         this.entry.addPropertyChangeListener(SpecialFieldUpdateListener.getInstance());
 
-        helpAction = new HelpAction(this.frame.helpDiag, GUIGlobals.entryEditorHelp, IconTheme.JabRefIcon.HELP.getIcon());
+        helpAction = new OnlineHelpAction(GUIGlobals.entryEditorHelp, IconTheme.JabRefIcon.HELP.getIcon());
         closeAction = new CloseAction();
         generateKeyAction = new GenerateKeyAction();
         storeFieldAction = new StoreFieldAction();

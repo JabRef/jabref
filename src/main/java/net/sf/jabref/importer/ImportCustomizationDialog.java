@@ -31,6 +31,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
@@ -227,7 +228,7 @@ public class ImportCustomizationDialog extends JDialog {
         JButton closeButton = new JButton(Localization.lang("Close"));
         closeButton.addActionListener(closeAction);
 
-        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.importCustomizationHelp).getIconButton();
+        JButton helpButton = new OnlineHelpAction(GUIGlobals.importCustomizationHelp).getIconButton();
 
         ImportTableModel tableModel = new ImportTableModel();
         customImporterTable = new JTable(tableModel);

@@ -28,6 +28,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -126,7 +127,7 @@ public class ExportCustomizationDialog extends JDialog {
         JButton close = new JButton(Localization.lang("Close"));
         close.addActionListener(closeAction);
 
-        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp).getIconButton();
+        JButton help = new OnlineHelpAction(GUIGlobals.exportCustomizationHelp).getIconButton();
 
         DefaultEventTableModel<String[]> tableModel = new DefaultEventTableModel<>(
                 Globals.prefs.customExports.getSortedList(),

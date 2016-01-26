@@ -45,6 +45,7 @@ import net.sf.jabref.gui.help.HelpDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 class ExternalTab extends JPanel implements PrefsTab {
@@ -149,8 +150,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.append(useRegExpComboBox);
         builder.append(regExpTextField);
 
-        builder.append(new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
-                Localization.lang("Help on Regular Expression Search")).getIconButton());
+        builder.append(new OnlineHelpAction(Localization.lang("Help on Regular Expression Search"), GUIGlobals.regularExpressionSearchHelp).getIconButton());
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(runAutoFileSearch, 3);

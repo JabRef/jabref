@@ -60,6 +60,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
@@ -338,7 +339,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
-        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.groupsHelp, Localization.lang("Help on groups"))
+        JButton helpButton = new OnlineHelpAction(Localization.lang("Help on groups"), GUIGlobals.groupsHelp)
                 .getIconButton();
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);

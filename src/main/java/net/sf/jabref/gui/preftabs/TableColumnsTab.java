@@ -39,6 +39,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -291,7 +292,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special table columns and special fields ***/
 
-        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp, Localization.lang("Help on special fields")).getIconButton();
+        JButton helpButton = new OnlineHelpAction(Localization.lang("Help on special fields"), GUIGlobals.specialFieldsHelp).getIconButton();
 
         specialFieldsEnabled = new JCheckBox(Localization.lang("Enable special fields"));
         specialFieldsEnabled.addChangeListener(new ChangeListener() {

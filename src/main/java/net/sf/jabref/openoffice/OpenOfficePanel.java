@@ -22,6 +22,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.actions.BrowseAction;
@@ -88,7 +89,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private final JButton merge = new JButton(Localization.lang("Merge citations"));
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
-    private final JButton help = new HelpAction(GUIGlobals.helpDiag, "OpenOfficeIntegration.html").getIconButton();
+    private final JButton help = new OnlineHelpAction("OpenOfficeIntegration.html").getIconButton();
     private String styleFile;
     private OOBibBase ooBase;
     private JabRefFrame frame;

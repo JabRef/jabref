@@ -32,6 +32,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.logic.journals.Abbreviations;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -141,7 +142,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         JPanel p = new JPanel();
         p.add(useRemoteServer);
         p.add(remoteServerPort);
-        p.add(new HelpAction(diag, GUIGlobals.remoteHelp).getIconButton());
+        p.add(new OnlineHelpAction(GUIGlobals.remoteHelp).getIconButton());
         builder.append(p);
 
         // IEEE

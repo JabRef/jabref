@@ -23,6 +23,7 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -60,7 +61,7 @@ public class GenFieldsCustomizer extends JDialog {
     public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
         super(frame, Localization.lang("Set general fields"), false);
         parent = frame;
-        helpBut = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp).getIconButton();
+        helpBut = new OnlineHelpAction(GUIGlobals.generalFieldsHelp).getIconButton();
         try {
             jbInit();
             setSize(new Dimension(650, 300));

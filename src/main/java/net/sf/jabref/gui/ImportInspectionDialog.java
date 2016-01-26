@@ -53,6 +53,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.gui.help.OnlineHelpAction;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -305,7 +306,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addRelatedGap();
-        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.importInspectionHelp).getIconButton();
+        JButton help = new OnlineHelpAction(GUIGlobals.importInspectionHelp).getIconButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));

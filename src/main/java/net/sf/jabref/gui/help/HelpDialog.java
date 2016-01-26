@@ -59,8 +59,6 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
         tlb.add(back);
         tlb.add(forward);
         tlb.addSeparator();
-        ContentsAction contents = new ContentsAction();
-        tlb.add(contents);
         tlb.setFloatable(false);
 
         // Make ESC close dialog, and set shortkeys for back and forward.
@@ -152,19 +150,6 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             setEnabled(content.forward());
-            back.setEnabled(true);
-        }
-    }
-
-    class ContentsAction extends AbstractAction {
-
-        public ContentsAction() {
-            super("Contents", IconTheme.JabRefIcon.HELP_CONTENTS.getIcon());
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            content.setPage(GUIGlobals.helpContents, JabRef.class);
             back.setEnabled(true);
         }
     }
