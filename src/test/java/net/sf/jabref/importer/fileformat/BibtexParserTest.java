@@ -620,15 +620,13 @@ public class BibtexParserTest {
     }
 
     @Test
-    @Ignore
-    public void parseIgnoresAndWarnsAboutEntryWithUnmatchedClosingBracket() throws IOException {
+    public void parseIgnoresArbitraryContentAfterEntry() throws IOException {
 
-        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket } to much}}"));
-
-        Assert.assertTrue(result.hasWarnings());
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }}}"));
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
-        Assert.assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
+        Assert.assertEquals("Size should be one, but was " + c.size(), 1, c.size());
+        Assert.assertEquals("Epilog should be preserved","}",result.getDatabase().getEpilog());
     }
 
     @Test
