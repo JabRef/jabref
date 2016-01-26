@@ -299,7 +299,7 @@ public class FileActions {
              * 3. ordered by specified order
              */
 
-            Vector<String> storedSaveOrderConfig = null;
+            List<String> storedSaveOrderConfig = null;
             if (isSaveOperation) {
                 storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             }

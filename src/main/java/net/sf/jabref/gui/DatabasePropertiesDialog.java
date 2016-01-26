@@ -330,7 +330,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveTerField.setEnabled(selected);
         saveTerDesc.setEnabled(selected);
 
-        Vector<String> fileD = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
+        List<String> fileD = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         if (fileD == null) {
             fileDir.setText("");
         } else {

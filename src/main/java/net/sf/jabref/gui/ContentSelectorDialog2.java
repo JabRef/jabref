@@ -351,7 +351,7 @@ class ContentSelectorDialog2 extends JDialog {
                     start++;
                 }
             }
-            Vector<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName);
+            List<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName);
             boolean bNewField = false;
             if (data == null) {
                 bNewField = true;

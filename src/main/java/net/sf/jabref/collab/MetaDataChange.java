@@ -55,7 +55,7 @@ class MetaDataChange extends Change {
         return changes.size();
     }
 
-    public void insertMetaDataAddition(String key, Vector<String> value) {
+    public void insertMetaDataAddition(String key, List<String> value) {
         changes.add(new MetaDataChangeUnit(MetaDataChange.ADD, key, value));
     }
 
@@ -63,7 +63,7 @@ class MetaDataChange extends Change {
         changes.add(new MetaDataChangeUnit(MetaDataChange.REMOVE, key, null));
     }
 
-    public void insertMetaDataChange(String key, Vector<String> value) {
+    public void insertMetaDataChange(String key, List<String> value) {
         changes.add(new MetaDataChangeUnit(MetaDataChange.MODIFY, key, value));
     }
 
@@ -104,10 +104,10 @@ class MetaDataChange extends Change {
 
         private final int type;
         private final String key;
-        private final Vector<String> value;
+        private final List<String> value;
 
 
-        public MetaDataChangeUnit(int type, String key, Vector<String> value) {
+        public MetaDataChangeUnit(int type, String key, List<String> value) {
             this.type = type;
             this.key = key;
             this.value = value;
@@ -121,7 +121,7 @@ class MetaDataChange extends Change {
             return key;
         }
 
-        public Vector<String> getValue() {
+        public List<String> getValue() {
             return value;
         }
     }
