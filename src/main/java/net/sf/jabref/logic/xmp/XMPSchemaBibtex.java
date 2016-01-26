@@ -294,7 +294,8 @@ public class XMPSchemaBibtex extends XMPSchema {
                 setTextProperty(field, value);
             }
         }
-        setTextProperty("entrytype", EntryTypes.getDisplayNameFor(entry.getType()));
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
+        setTextProperty("entrytype", typedEntry.getTypeForDisplay());
     }
 
     public BibEntry getBibtexEntry() {

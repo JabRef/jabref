@@ -12,6 +12,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class BibtexEntryTests {
 
@@ -59,19 +60,6 @@ public class BibtexEntryTests {
 
         requiredFields.add("year/address");
         Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
-    }
-
-    @Test
-    public void hasAllRequiredFields() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
-        e.setField("author", "abc");
-        e.setField("title", "abc");
-        e.setField("journal", "abc");
-
-        Assert.assertFalse(EntryTypes.hasAllRequiredFields(e, null));
-
-        e.setField("year", "2015");
-        Assert.assertTrue(EntryTypes.hasAllRequiredFields(e, null));
     }
 
     @Test

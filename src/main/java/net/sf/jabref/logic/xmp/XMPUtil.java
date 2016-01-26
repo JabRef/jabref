@@ -870,7 +870,8 @@ public class XMPUtil {
          *
          * Bibtex-Fields used: title
          */
-        String o = EntryTypes.getDisplayNameFor(entry.getType());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
+        String o = typedEntry.getTypeForDisplay();
         if (o != null) {
             dcSchema.addType(o);
         }
@@ -1023,7 +1024,8 @@ public class XMPUtil {
                         entry.getField(field));
             }
         }
-        di.setCustomMetadataValue("bibtex/entrytype", EntryTypes.getDisplayNameFor(entry.getType()));
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
+        di.setCustomMetadataValue("bibtex/entrytype", typedEntry.getTypeForDisplay());
     }
 
     /**

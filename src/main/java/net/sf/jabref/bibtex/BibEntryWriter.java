@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import com.google.common.base.Strings;
+import net.sf.jabref.model.entry.TypedBibEntry;
 
 public class BibEntryWriter {
 
@@ -54,7 +55,8 @@ public class BibEntryWriter {
      */
     private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
-        out.write('@' + EntryTypes.getDisplayNameFor(entry.getType()) + '{');
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
+        out.write('@' + typedEntry.getTypeForDisplay() + '{');
 
         writeKeyField(entry, out);
 

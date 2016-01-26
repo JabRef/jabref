@@ -112,25 +112,4 @@ public class EntryTypes {
             }
         }
     }
-
-    /**
-     * Returns true if this entry contains the fields it needs to be
-     * complete.
-     */
-    public static boolean hasAllRequiredFields(BibEntry entry, BibDatabase database) {
-        EntryType type = getType(entry.getType());
-        return entry.allFieldsPresent(type.getRequiredFields(), database);
-    }
-
-    /**
-     * Gets the display name for the specified type.
-     */
-    public static String getDisplayNameFor(String type) {
-        EntryType entryType = getType(type);
-        if (entryType != null) {
-            return entryType.getName();
-        } else {
-            return EntryUtil.capitalizeFirst(type);
-        }
-    }
 }

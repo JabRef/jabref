@@ -354,7 +354,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         leftPan.add(closeBut, BorderLayout.NORTH);
 
         // Create type-label
-        leftPan.add(new TypeLabel(EntryTypes.getDisplayNameFor(entry.getType())), BorderLayout.CENTER);
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
+        leftPan.add(new TypeLabel(typedEntry.getTypeForDisplay()), BorderLayout.CENTER);
         TypeButton typeButton = new TypeButton();
 
         toolBar.add(typeButton);

@@ -22,6 +22,7 @@ import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -52,6 +53,7 @@ import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.TypedBibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -626,8 +628,9 @@ public class MainTable extends JTable {
 
     private boolean isComplete(int row) {
         try {
-            BibEntry be = sortedForGrouping.get(row);
-            return EntryTypes.hasAllRequiredFields(be, panel.database());
+            BibEntry entry = sortedForGrouping.get(row);
+            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.database()));
+            return typedEntry.hasAllRequiredFields();
         } catch (NullPointerException ex) {
             return true;
         }
