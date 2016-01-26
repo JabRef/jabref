@@ -349,12 +349,12 @@ public class SearchResultsDialog {
                         }
                         FileListEntry fl = tableModel.getEntry(0);
                         (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
-                                p.metaData(), fl.type)).actionPerformed(null);
+                                p.loadedDatabase.getMetaData(), fl.type)).actionPerformed(null);
                     }
                     break;
                 case URL_COL:
                     entry.getFieldOptional("url").ifPresent(link -> { try {
-                            JabRefDesktop.openExternalViewer(p.metaData(), link, "url");
+                        JabRefDesktop.openExternalViewer(p.loadedDatabase.getMetaData(), link, "url");
                     } catch (IOException ex) {
                             LOGGER.warn("Could not open viewer", ex);
                         }
@@ -391,7 +391,7 @@ public class SearchResultsDialog {
                         description = flEntry.link;
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
-                            flEntry.link, flEntry.type.getIcon(), p.metaData(),
+                            flEntry.link, flEntry.type.getIcon(), p.loadedDatabase.getMetaData(),
                             flEntry.type));
                     count++;
                 }
@@ -417,7 +417,7 @@ public class SearchResultsDialog {
                 // Find out which BasePanel the selected entry belongs to:
                 BasePanel p = entryHome.get(entry);
                 // Update the preview's metadata reference:
-                preview.setMetaData(p.metaData());
+                preview.setMetaData(p.loadedDatabase.getMetaData());
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);

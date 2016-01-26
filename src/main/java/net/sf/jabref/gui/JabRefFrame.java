@@ -240,7 +240,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JToggleButton fetcherToggle;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
-    private final AbstractAction editModeAction = new EditModeAction();
+    private final AbstractAction editModeAction = new SwitchBibtexModeAction();
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
     private final AbstractAction newDatabaseAction = new NewDatabaseAction(this);
@@ -691,10 +691,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         String changeFlag = panel.isModified() ? "*" : "";
 
-        if (panel.getDatabaseFile() == null) {
+        if (panel.getLoadedDatabase().getDatabaseFile() == null) {
             setTitle(GUIGlobals.frameTitle + " - " + GUIGlobals.untitledTitle + changeFlag + mode);
         } else {
-            String databaseFile = panel.getDatabaseFile().getPath();
+            String databaseFile = panel.getLoadedDatabase().getDatabaseFile().getPath();
             setTitle(GUIGlobals.frameTitle + " - " + databaseFile + changeFlag + mode);
         }
     }
@@ -794,7 +794,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 prefs.remove(JabRefPreferences.LAST_EDITED);
             } else {
                 prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
-                File focusedDatabase = getCurrentBasePanel().getDatabaseFile();
+                File focusedDatabase = getCurrentBasePanel().getLoadedDatabase().getDatabaseFile();
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
 
@@ -845,10 +845,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     tabbedPane.setSelectedIndex(i);
                     String filename;
 
-                    if (getBasePanelAt(i).getDatabaseFile() == null) {
+                    if (getBasePanelAt(i).getLoadedDatabase().getDatabaseFile() == null) {
                         filename = GUIGlobals.untitledTitle;
                     } else {
-                        filename = getBasePanelAt(i).getDatabaseFile().getAbsolutePath();
+                        filename = getBasePanelAt(i).getLoadedDatabase().getDatabaseFile().getAbsolutePath();
                     }
                     int answer = showSaveDialog(filename);
 
@@ -877,8 +877,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     }
                 }
 
-                if (getBasePanelAt(i).getDatabaseFile() != null) {
-                    filenames.add(getBasePanelAt(i).getDatabaseFile().getAbsolutePath());
+                if (getBasePanelAt(i).getLoadedDatabase().getDatabaseFile() != null) {
+                    filenames.add(getBasePanelAt(i).getLoadedDatabase().getDatabaseFile().getAbsolutePath());
                 }
             }
         }
@@ -1580,7 +1580,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             encoding = Globals.prefs.getDefaultEncoding();
         }
 
-        BasePanel bp = new BasePanel(JabRefFrame.this, db, file, metaData, encoding);
+        BasePanel bp = new BasePanel(JabRefFrame.this, new LoadedDatabase(db, metaData, file), encoding);
         addTab(bp, file, raisePanel);
         return bp;
     }
@@ -1592,10 +1592,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         for (int i = 0; i < getBasePanelCount(); i++) {
             try {
                 // db file exists
-                if(getBasePanelAt(i).getDatabaseFile() == null) {
+                if(getBasePanelAt(i).getLoadedDatabase().getDatabaseFile() == null) {
                     dbPaths.add("");
                 } else {
-                    dbPaths.add(getBasePanelAt(i).getDatabaseFile().getCanonicalPath());
+                    dbPaths.add(getBasePanelAt(i).getLoadedDatabase().getDatabaseFile().getCanonicalPath());
                 }
             } catch (IOException ex) {
                 LOGGER.error("Invalid database file path: " + ex.getMessage());
@@ -1614,7 +1614,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         List<String> paths = getUniquePathParts();
         for (int i = 0; i < getBasePanelCount(); i++) {
             String uniqPath = paths.get(i);
-            File file = getBasePanelAt(i).getDatabaseFile();
+            File file = getBasePanelAt(i).getLoadedDatabase().getDatabaseFile();
 
             if ((file != null) && !uniqPath.equals(file.getName())) {
                 // remove filename
@@ -2133,10 +2133,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         boolean close = false;
         String filename;
 
-        if (panel.getDatabaseFile() == null) {
+        if (panel.getLoadedDatabase().getDatabaseFile() == null) {
             filename = GUIGlobals.untitledTitle;
         } else {
-            filename = panel.getDatabaseFile().getAbsolutePath();
+            filename = panel.getLoadedDatabase().getDatabaseFile().getAbsolutePath();
         }
 
         int answer = showSaveDialog(filename);

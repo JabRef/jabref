@@ -53,6 +53,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,12 +64,8 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
@@ -236,7 +233,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                                   String undoName, boolean newDatabase) {
         this.frame = frame;
         this.panel = panel;
-        this.metaData = (panel == null) ? new MetaData() : panel.metaData();
+        this.metaData = (panel == null) ? new MetaData() : panel.loadedDatabase.getMetaData();
         this.fields = Arrays.copyOf(fields, fields.length);
         this.undoName = undoName;
         this.newDatabase = newDatabase;
@@ -514,7 +511,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             localMetaData = new MetaData();
         } else {
             database = panel.database();
-            localMetaData = panel.metaData();
+            localMetaData = panel.loadedDatabase.getMetaData();
         }
 
         entry.setId(IdGenerator.next());
@@ -549,7 +546,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             localMetaData = new MetaData();
         } else {
             database = panel.database();
-            localMetaData = panel.metaData();
+            localMetaData = panel.loadedDatabase.getMetaData();
         }
 
         List<String> keys = new ArrayList<>(entries.size());
@@ -724,8 +721,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
                 if (newDatabase) {
                     // Create a new BasePanel for the entries:
-                    BibDatabase base = new BibDatabase();
-                    panel = new BasePanel(frame, base, null, new MetaData(), Globals.prefs.getDefaultEncoding());
+                    panel = new BasePanel(frame, new LoadedDatabase(), Globals.prefs.getDefaultEncoding());
                 }
 
                 boolean groupingCanceled = false;
@@ -959,7 +955,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null, panel.metaData(), fl.type))
+                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null, panel.loadedDatabase.getMetaData(), fl.type))
                                 .actionPerformed(null);
                     }
                 } else { // Must be URL_COL
@@ -1018,7 +1014,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     description = flEntry.link;
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry
-                        .link, flEntry.type.getIcon(), panel.metaData(), flEntry.type));
+                        .link, flEntry.type.getIcon(), panel.loadedDatabase.getMetaData(), flEntry.type));
                 count++;
             }
             if (count == 0) {
@@ -1040,7 +1036,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             entry.getFieldOptional(fieldName).ifPresent(link -> {
                 try {
-                    JabRefDesktop.openExternalViewer(panel.metaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(panel.loadedDatabase.getMetaData(), link, fieldName);
                 } catch (IOException ex) {
                     LOGGER.warn("Could not open link", ex);
                 }

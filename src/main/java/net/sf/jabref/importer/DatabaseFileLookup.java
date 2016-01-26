@@ -23,8 +23,6 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.model.entry.FileField;
 
 /**
@@ -50,7 +48,7 @@ class DatabaseFileLookup {
      */
     public DatabaseFileLookup(BibDatabase database) {
         Objects.requireNonNull(database);
-        possibleFilePaths = Optional.ofNullable(JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD)).orElse(new ArrayList<>());
+        possibleFilePaths = Optional.ofNullable(JabRef.jrf.getCurrentBasePanel().loadedDatabase.getMetaData().getFileDirectory(Globals.FILE_FIELD)).orElse(new ArrayList<>());
 
         for (BibEntry entry : database.getEntries()) {
             fileCache.addAll(parseFileField(entry));

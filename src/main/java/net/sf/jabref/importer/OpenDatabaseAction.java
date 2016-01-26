@@ -156,7 +156,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
-                if ((basePanel.getDatabaseFile() != null) && basePanel.getDatabaseFile().equals(file)) {
+                if ((basePanel.getLoadedDatabase().getDatabaseFile() != null) && basePanel.getLoadedDatabase().getDatabaseFile().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
@@ -190,7 +190,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
         else if (toRaise != null) {
-            frame.output(Localization.lang("File '%0' is already open.", toRaise.getDatabaseFile().getPath()));
+            frame.output(Localization.lang("File '%0' is already open.", toRaise.getLoadedDatabase().getDatabaseFile().getPath()));
             frame.getTabbedPane().setSelectedComponent(toRaise);
         }
 
@@ -336,15 +336,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         MetaData meta = result.getMetaData();
 
         if (result.hasWarnings()) {
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
-                }
-            });
+            JabRefExecutorService.INSTANCE.execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
         }
-        BasePanel basePanel = new BasePanel(frame, database, file, meta, result.getEncoding());
+        BasePanel basePanel = new BasePanel(frame, new LoadedDatabase(database, meta, file), result.getEncoding());
 
         // file is set to null inside the EventDispatcherThread
         SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, file, raisePanel));

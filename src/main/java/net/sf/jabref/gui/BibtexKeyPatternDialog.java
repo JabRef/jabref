@@ -58,7 +58,7 @@ public class BibtexKeyPatternDialog extends JDialog {
      */
     public void setPanel(BasePanel panel) {
         this.panel = panel;
-        this.metaData = panel.metaData();
+        this.metaData = panel.loadedDatabase.getMetaData();
         AbstractLabelPattern keypatterns = metaData.getLabelPattern();
         labelPatternPanel.setValues(keypatterns);
     }

@@ -17,10 +17,7 @@ package net.sf.jabref.external;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.CheckBoxMessage;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.logic.l10n.Localization;
@@ -73,7 +70,7 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        List<String> dirs = frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = frame.getCurrentBasePanel().loadedDatabase.getMetaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {

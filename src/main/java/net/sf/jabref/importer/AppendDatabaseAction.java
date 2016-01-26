@@ -210,7 +210,7 @@ public class AppendDatabaseAction implements BaseAction {
         if (importSelectorWords) {
             for (String s : meta) {
                 if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
-                    panel.metaData().putData(s, meta.getData(s));
+                    panel.loadedDatabase.getMetaData().putData(s, meta.getData(s));
                 }
             }
         }

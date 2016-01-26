@@ -70,7 +70,7 @@ public class AutoSaveManager {
             }
 
             for (BasePanel panel : panels) {
-                if (panel.isModified() && (panel.getDatabaseFile() != null)) {
+                if (panel.isModified() && (panel.getLoadedDatabase().getDatabaseFile() != null)) {
                         AutoSaveManager.autoSave(panel);
                 }
             }
@@ -94,9 +94,9 @@ public class AutoSaveManager {
      * @return true if successful, false otherwise.
      */
     private static boolean autoSave(BasePanel panel) {
-        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getDatabaseFile());
+        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getLoadedDatabase().getDatabaseFile());
         try {
-            SaveSession ss = FileActions.saveDatabase(panel.database(), panel.metaData(),
+            SaveSession ss = FileActions.saveDatabase(panel.database(), panel.loadedDatabase.getMetaData(),
                     backupFile, Globals.prefs,
                     false, false, panel.getEncoding(), true);
             ss.commit();
@@ -116,10 +116,10 @@ public class AutoSaveManager {
      * @return true if there was no autosave or if the autosave was successfully deleted, false otherwise.
      */
     public static boolean deleteAutoSaveFile(BasePanel panel) {
-        if (panel.getDatabaseFile() == null) {
+        if (panel.getLoadedDatabase().getDatabaseFile() == null) {
             return true;
         }
-        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getDatabaseFile());
+        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getLoadedDatabase().getDatabaseFile());
         if (backupFile.exists()) {
             return backupFile.delete();
         } else {

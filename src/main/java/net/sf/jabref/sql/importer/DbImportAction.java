@@ -193,7 +193,7 @@ public class DbImportAction extends AbstractWorker {
             metaData = res.getMetaData();
             if (database != null) {
                 BasePanel pan = frame.addTab(database, null, metaData, Globals.prefs.getDefaultEncoding(), true);
-                pan.metaData().setDBStrings(dbs);
+                pan.loadedDatabase.getMetaData().setDBStrings(dbs);
                 frame.setTabTitle(pan, res.getName() + "(Imported)", "Imported DB");
                 pan.markBaseChanged();
             }

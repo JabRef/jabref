@@ -428,7 +428,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
                     storeFieldAction);
-        } else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
+        } else if (panel.loadedDatabase.getMetaData().getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
         } else if (BibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
@@ -1327,7 +1327,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
             }
 
-            LabelPatternUtil.makeLabel(panel.metaData, panel.getDatabase(), entry);
+            LabelPatternUtil.makeLabel(panel.loadedDatabase.getMetaData(), panel.getDatabase(), entry);
 
             // Store undo information:
             panel.undoManager.addEdit(new UndoableKeyChange(panel.getDatabase(), entry.getId(), (String) oldValue, entry.getCiteKey()));
@@ -1408,7 +1408,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 String link = tf.getText(); // get selected ? String
 
                 try {
-                    JabRefDesktop.openExternalViewer(panel.metaData(), link, tf.getFieldName());
+                    JabRefDesktop.openExternalViewer(panel.loadedDatabase.getMetaData(), link, tf.getFieldName());
                 } catch (IOException ex) {
                     LOGGER.warn("Error opening file.", ex);
                 }

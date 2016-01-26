@@ -379,7 +379,7 @@ class ContentSelectorDialog2 extends JDialog {
         } else {
             panel.updateAllContentSelectors();
         }
-        panel.getAutoCompleters().addContentSelectorValuesToAutoCompleters(panel.metaData);
+        panel.getAutoCompleters().addContentSelectorValuesToAutoCompleters(panel.loadedDatabase.getMetaData());
 
     }
 
