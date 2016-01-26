@@ -167,7 +167,7 @@ public class PdfImporter {
         int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
         // Get a list of file directories:
-        List<String> dirsS = panel.loadedDatabase.getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirsS = panel.getLoadedDatabase().getMetaData().getFileDirectory(Globals.FILE_FIELD);
 
         List<BibEntry> res = new ArrayList<>();
 
@@ -273,7 +273,7 @@ public class PdfImporter {
 
                     panel.database().insertEntry(entry);
                     panel.markBaseChanged();
-                    LabelPatternUtil.makeLabel(panel.loadedDatabase.getMetaData(), panel.database(), entry);
+                    LabelPatternUtil.makeLabel(panel.getLoadedDatabase().getMetaData(), panel.database(), entry);
                     dfh = new DroppedFileHandler(frame, panel);
                     dfh.linkPdfToEntry(fileName, entryTable, entry);
                     panel.highlightEntry(entry);

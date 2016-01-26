@@ -105,7 +105,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public void setPanel(BasePanel panel) {
         this.panel = panel;
-        this.metaData = panel.loadedDatabase.getMetaData();
+        this.metaData = panel.getLoadedDatabase().getMetaData();
     }
 
     private void init(JFrame parent) {

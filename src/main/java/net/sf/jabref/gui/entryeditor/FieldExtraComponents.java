@@ -77,8 +77,8 @@ public class FieldExtraComponents {
             BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
-        if (panel.loadedDatabase.getMetaData().getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
-            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.loadedDatabase.getMetaData(),
+        if (panel.getLoadedDatabase().getMetaData().getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
+            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getLoadedDatabase().getMetaData(),
                     storeFieldAction, false, ", ");
             contentSelectors.add(ws);
             controls.add(ws, BorderLayout.NORTH);
@@ -167,7 +167,7 @@ public class FieldExtraComponents {
             off = new OpenFileFilter(new String[] {ext});
         }
 
-        return Optional.of(new ExternalFilePanel(frame, panel.loadedDatabase.getMetaData(), entryEditor, fieldEditor.getFieldName(), off,
+        return Optional.of(new ExternalFilePanel(frame, panel.getLoadedDatabase().getMetaData(), entryEditor, fieldEditor.getFieldName(), off,
                 fieldEditor));
     }
 
@@ -292,7 +292,7 @@ public class FieldExtraComponents {
      */
     public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
             Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
-        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.loadedDatabase.getMetaData(),
+        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getLoadedDatabase().getMetaData(),
                 storeFieldAction, false,
                 "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");
         contentSelectors.add(ws);

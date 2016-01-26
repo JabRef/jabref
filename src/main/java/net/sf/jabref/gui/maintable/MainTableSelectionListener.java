@@ -84,9 +84,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.panel = panel;
         this.tableRows = table.getTableRows();
         previewPanel = new PreviewPanel[] {
-                new PreviewPanel(panel.database(), null, panel, panel.loadedDatabase.getMetaData(), Globals.prefs
+                new PreviewPanel(panel.database(), null, panel, panel.getLoadedDatabase().getMetaData(), Globals.prefs
                         .get(JabRefPreferences.PREVIEW_0), true),
-                new PreviewPanel(panel.database(), null, panel, panel.loadedDatabase.getMetaData(), Globals.prefs
+                new PreviewPanel(panel.database(), null, panel, panel.getLoadedDatabase().getMetaData(), Globals.prefs
                         .get(JabRefPreferences.PREVIEW_1), true)};
 
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
@@ -321,7 +321,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
-                                        flEntry.link, flEntry.type.getIcon(), panel.loadedDatabase.getMetaData(),
+                                        flEntry.link, flEntry.type.getIcon(), panel.getLoadedDatabase().getMetaData(),
                                         flEntry.type);
                                 boolean success = item.openLink();
                                 if (!success) {
@@ -330,7 +330,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                         } else {
                             try {
-                                JabRefDesktop.openExternalViewer(panel.loadedDatabase.getMetaData(), link, fieldName);
+                                JabRefDesktop.openExternalViewer(panel.getLoadedDatabase().getMetaData(), link, fieldName);
                             } catch (IOException ex) {
                                 panel.output(Localization.lang("Unable to open link."));
                             }
@@ -379,7 +379,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             table.setRowSelectionInterval(row, row);
             //panel.updateViewToSelected();
         }
-        RightClickMenu rightClickMenu = new RightClickMenu(panel, panel.loadedDatabase.getMetaData());
+        RightClickMenu rightClickMenu = new RightClickMenu(panel, panel.getLoadedDatabase().getMetaData());
         rightClickMenu.show(table, e.getX(), e.getY());
     }
 
@@ -416,7 +416,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             description = flEntry.link;
                         }
                         menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
-                                flEntry.link, flEntry.type.getIcon(), panel.loadedDatabase.getMetaData(),
+                                flEntry.link, flEntry.type.getIcon(), panel.getLoadedDatabase().getMetaData(),
                                 flEntry.type));
                         showDefaultPopup = false;
                     }
@@ -426,7 +426,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         if (entry.hasField(field)) {
                             String content = entry.getField(field);
                             menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content,
-                                    GUIGlobals.getTableIcon(field).getIcon(), panel.loadedDatabase.getMetaData(), field));
+                                    GUIGlobals.getTableIcon(field).getIcon(), panel.getLoadedDatabase().getMetaData(), field));
                             showDefaultPopup = false;
                         }
                     } else {

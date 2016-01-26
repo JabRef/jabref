@@ -207,7 +207,7 @@ public class OAI2Fetcher implements EntryFetcher {
             InputStream inputStream = oai2Connection.getInputStream();
 
             /* create an empty BibEntry and set the oai2identifier field */
-            BibEntry be = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE.getName());
+            BibEntry be = new BibEntry(IdGenerator.next(), "article");
             be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, key);
             DefaultHandler handlerBase = new OAI2Handler(be);
             /* parse the result */

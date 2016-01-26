@@ -46,7 +46,7 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     @Override
     public void action() throws Throwable {
-        GroupTreeNode groups = panel.loadedDatabase.getMetaData().getGroups();
+        GroupTreeNode groups = panel.getLoadedDatabase().getMetaData().getGroups();
         if (groups == null) {
             return;
         }

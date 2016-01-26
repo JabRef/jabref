@@ -233,7 +233,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                                   String undoName, boolean newDatabase) {
         this.frame = frame;
         this.panel = panel;
-        this.metaData = (panel == null) ? new MetaData() : panel.loadedDatabase.getMetaData();
+        this.metaData = (panel == null) ? new MetaData() : panel.getLoadedDatabase().getMetaData();
         this.fields = Arrays.copyOf(fields, fields.length);
         this.undoName = undoName;
         this.newDatabase = newDatabase;
@@ -511,7 +511,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             localMetaData = new MetaData();
         } else {
             database = panel.database();
-            localMetaData = panel.loadedDatabase.getMetaData();
+            localMetaData = panel.getLoadedDatabase().getMetaData();
         }
 
         entry.setId(IdGenerator.next());
@@ -546,7 +546,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             localMetaData = new MetaData();
         } else {
             database = panel.database();
-            localMetaData = panel.loadedDatabase.getMetaData();
+            localMetaData = panel.getLoadedDatabase().getMetaData();
         }
 
         List<String> keys = new ArrayList<>(entries.size());
@@ -955,7 +955,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null, panel.loadedDatabase.getMetaData(), fl.type))
+                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null, panel.getLoadedDatabase().getMetaData(), fl.type))
                                 .actionPerformed(null);
                     }
                 } else { // Must be URL_COL
@@ -1014,7 +1014,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     description = flEntry.link;
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry
-                        .link, flEntry.type.getIcon(), panel.loadedDatabase.getMetaData(), flEntry.type));
+                        .link, flEntry.type.getIcon(), panel.getLoadedDatabase().getMetaData(), flEntry.type));
                 count++;
             }
             if (count == 0) {
@@ -1036,7 +1036,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             entry.getFieldOptional(fieldName).ifPresent(link -> {
                 try {
-                    JabRefDesktop.openExternalViewer(panel.loadedDatabase.getMetaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(panel.getLoadedDatabase().getMetaData(), link, fieldName);
                 } catch (IOException ex) {
                     LOGGER.warn("Could not open link", ex);
                 }

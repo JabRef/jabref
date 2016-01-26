@@ -197,7 +197,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         tabbed.removeAll();
         tabs.clear();
 
-        EntryType type = EntryTypes.getType(entry.getType(), this.frame.getCurrentBasePanel().loadedDatabase.getType());
+        EntryType type = EntryTypes.getType(entry.getType(), this.frame.getCurrentBasePanel().getLoadedDatabase().getType());
 
         List<String> fieldList = type.getRequiredFieldsFlat();
 
@@ -211,7 +211,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         if ((type.getOptionalFields() != null) && (type.getOptionalFields().size() >= 1)) {
             EntryEditorTab optPan;
-            if (!this.frame.getCurrentBasePanel().loadedDatabase.isBiblatexMode()) {
+            if (!this.frame.getCurrentBasePanel().getLoadedDatabase().isBiblatexMode()) {
                 optPan = new EntryEditorTab(frame, panel, type.getOptionalFields(), this,
                         false, false, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
@@ -429,7 +429,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
                     storeFieldAction);
-        } else if (panel.loadedDatabase.getMetaData().getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
+        } else if (panel.getLoadedDatabase().getMetaData().getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
         } else if (BibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
@@ -445,7 +445,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         } else if (BibtexFields.EXTRA_YES_NO.equals(fieldExtras)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
         } else if (BibtexFields.EXTRA_MONTH.equals(fieldExtras)) {
-            return FieldExtraComponents.getMonthExtraComponent(editor, this, this.frame.getCurrentBasePanel().loadedDatabase.getType());
+            return FieldExtraComponents.getMonthExtraComponent(editor, this, this.frame.getCurrentBasePanel().getLoadedDatabase().getType());
         }
         return Optional.empty();
     }
@@ -1328,7 +1328,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
             }
 
-            LabelPatternUtil.makeLabel(panel.loadedDatabase.getMetaData(), panel.getDatabase(), entry);
+            LabelPatternUtil.makeLabel(panel.getLoadedDatabase().getMetaData(), panel.getDatabase(), entry);
 
             // Store undo information:
             panel.undoManager.addEdit(new UndoableKeyChange(panel.getDatabase(), entry.getId(), (String) oldValue, entry.getCiteKey()));
@@ -1409,7 +1409,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 String link = tf.getText(); // get selected ? String
 
                 try {
-                    JabRefDesktop.openExternalViewer(panel.loadedDatabase.getMetaData(), link, tf.getFieldName());
+                    JabRefDesktop.openExternalViewer(panel.getLoadedDatabase().getMetaData(), link, tf.getFieldName());
                 } catch (IOException ex) {
                     LOGGER.warn("Error opening file.", ex);
                 }

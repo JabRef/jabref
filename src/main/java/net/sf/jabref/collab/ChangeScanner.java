@@ -82,7 +82,7 @@ public class ChangeScanner implements Runnable {
         this.panel = bp;
         this.frame = frame;
         this.inMem = bp.database();
-        this.mdInMem = bp.loadedDatabase.getMetaData();
+        this.mdInMem = bp.getLoadedDatabase().getMetaData();
         this.f = file;
     }
 

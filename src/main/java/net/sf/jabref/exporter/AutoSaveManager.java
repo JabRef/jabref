@@ -98,7 +98,7 @@ public class AutoSaveManager {
         File databaseFile = panel.getLoadedDatabase().getDatabaseFile();
         File backupFile = AutoSaveManager.getAutoSaveFile(databaseFile);
         try {
-            SaveSession ss = FileActions.saveDatabase(new LoadedDatabase(panel.database(), panel.loadedDatabase.getMetaData()),
+            SaveSession ss = FileActions.saveDatabase(new LoadedDatabase(panel.database(), panel.getLoadedDatabase().getMetaData()),
                     backupFile, Globals.prefs, false, false, panel.getEncoding(), true);
             ss.commit();
         } catch (SaveException e) {

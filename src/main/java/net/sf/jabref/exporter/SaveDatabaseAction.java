@@ -128,7 +128,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 }
                 else { // User indicated to store anyway.
                        // See if the database has the protected flag set:
-                    List<String> pd = panel.loadedDatabase.getMetaData().getData(Globals.PROTECTED_FLAG_META);
+                    List<String> pd = panel.getLoadedDatabase().getMetaData().getData(Globals.PROTECTED_FLAG_META);
                     boolean databaseProtectionFlag = (pd != null) && Boolean.parseBoolean(pd.get(0));
                     if (databaseProtectionFlag) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Database is protected. Cannot save until external changes have been reviewed."),
@@ -226,11 +226,11 @@ public class SaveDatabaseAction extends AbstractWorker {
         frame.block();
         try {
             if (selectedOnly) {
-                session = FileActions.savePartOfDatabase(new LoadedDatabase(panel.database(), panel.loadedDatabase.getMetaData()),
+                session = FileActions.savePartOfDatabase(new LoadedDatabase(panel.database(), panel.getLoadedDatabase().getMetaData()),
                         file, Globals.prefs,
                         panel.getSelectedEntries(), encoding, FileActions.DatabaseSaveType.DEFAULT);
             } else {
-                session = FileActions.saveDatabase(new LoadedDatabase(panel.database(), panel.loadedDatabase.getMetaData()),
+                session = FileActions.saveDatabase(new LoadedDatabase(panel.database(), panel.getLoadedDatabase().getMetaData()),
                         file, Globals.prefs, false, false, encoding, false);
             }
 
@@ -376,13 +376,13 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         if (chosenFile != null) {
-            File oldFile = panel.loadedDatabase.getDatabaseFile();
-            panel.loadedDatabase.getMetaData().setFile(f);
+            File oldFile = panel.getLoadedDatabase().getDatabaseFile();
+            panel.getLoadedDatabase().getMetaData().setFile(f);
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
             runCommand();
             // If the operation failed, revert the file field and return:
             if (!success) {
-                panel.loadedDatabase.getMetaData().setFile(oldFile);
+                panel.getLoadedDatabase().getMetaData().setFile(oldFile);
                 return;
             }
             // Register so we get notifications about outside changes to the file.
@@ -391,7 +391,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             } catch (IOException ex) {
                 LOGGER.error("Problem registering file change notifications", ex);
             }
-            frame.getFileHistory().newFile(panel.loadedDatabase.getDatabaseFile().getPath());
+            frame.getFileHistory().newFile(panel.getLoadedDatabase().getDatabaseFile().getPath());
         }
 
     }

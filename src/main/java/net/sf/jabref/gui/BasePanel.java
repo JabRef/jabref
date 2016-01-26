@@ -107,7 +107,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public static final int WILL_SHOW_EDITOR = 3;
 
     private final BibDatabase database;
-    public final LoadedDatabase loadedDatabase;
+    private final LoadedDatabase loadedDatabase;
 
     private int mode;
     private EntryEditor currentEditor;
@@ -2538,8 +2538,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
-            if (basePanel.loadedDatabase.getMetaData().getFileDirectory(Globals.FILE_FIELD).size() > 0) {
-                final List<String> mdDirs = basePanel.loadedDatabase.getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            if (basePanel.getLoadedDatabase().getMetaData().getFileDirectory(Globals.FILE_FIELD).size() > 0) {
+                final List<String> mdDirs = basePanel.getLoadedDatabase().getMetaData().getFileDirectory(Globals.FILE_FIELD);
                 for (final String mdDir : mdDirs) {
                     dirs.add(new File(mdDir));
 
@@ -2567,7 +2567,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 .getExternalFileTypeByExt(extension.get());
                         if (type != null) {
                             try {
-                                JabRefDesktop.openExternalFileAnyFormat(basePanel.loadedDatabase.getMetaData(), filepath, type);
+                                JabRefDesktop.openExternalFileAnyFormat(basePanel.getLoadedDatabase().getMetaData(), filepath, type);
                                 basePanel.output(Localization.lang("External viewer called") + '.');
                                 return Optional.of(filepath);
                             } catch (IOException ex) {

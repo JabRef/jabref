@@ -59,7 +59,7 @@ public class DbConnectAction implements BaseAction {
     @Override
     public void action() {
 
-        DBStrings dbs = panel.loadedDatabase.getMetaData().getDBStrings();
+        DBStrings dbs = panel.getLoadedDatabase().getMetaData().getDBStrings();
 
         // init DB strings if necessary
         if (!dbs.isInitialized()) {
@@ -99,7 +99,7 @@ public class DbConnectAction implements BaseAction {
                         Localization.lang("Connect to SQL database"),
                         JOptionPane.ERROR_MESSAGE);
             } finally {
-                panel.loadedDatabase.getMetaData().setDBStrings(dbs);
+                panel.getLoadedDatabase().getMetaData().setDBStrings(dbs);
                 dbd.dispose();
             }
         }

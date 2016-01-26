@@ -124,7 +124,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             IntegrityCheck check = new IntegrityCheck();
-            List<IntegrityMessage> messages = check.checkBibtexDatabase(getCurrentBasePanel().database(), getCurrentBasePanel().loadedDatabase.isBiblatexMode());
+            List<IntegrityMessage> messages = check.checkBibtexDatabase(getCurrentBasePanel().database(),
+                    getCurrentBasePanel().getLoadedDatabase().isBiblatexMode());
 
             if (messages.isEmpty()) {
                 JOptionPane.showMessageDialog(getCurrentBasePanel(), Localization.lang("No problems found."));
@@ -517,7 +518,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private List<NewEntryAction> getNewEntryActions() {
         List<NewEntryAction> actions = new ArrayList<>();
 
-        if (this.getCurrentBasePanel() != null && this.getCurrentBasePanel().loadedDatabase.isBiblatexMode()) {
+        if (this.getCurrentBasePanel() != null && this.getCurrentBasePanel().getLoadedDatabase().isBiblatexMode()) {
             for (EntryType entryType : BibLatexEntryTypes.ALL) {
                 actions.add(new NewEntryAction(this, entryType.getName()));
             }
