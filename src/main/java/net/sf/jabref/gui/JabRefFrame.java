@@ -1131,7 +1131,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         mb.setBorder(null);
         JMenu file = JabRefFrame.subMenu(Localization.menuTitle("File"));
-        JMenu sessions = JabRefFrame.subMenu(Localization.menuTitle("Sessions"));
         JMenu edit = JabRefFrame.subMenu(Localization.menuTitle("Edit"));
         JMenu search = JabRefFrame.subMenu(Localization.menuTitle("Search"));
         JMenu groups = JabRefFrame.subMenu(Localization.menuTitle("Groups"));
