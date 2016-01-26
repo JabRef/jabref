@@ -722,10 +722,9 @@ public class BibtexParserTest {
      * Test for SF Bug #1283
      */
     @Test
-    @Ignore
     public void parseRecognizesMonthFieldsWithFollowingComma() throws IOException {
 
-        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={Ed von Test}},month={8,},"));
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={Ed von Test},month={8,}},"));
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
