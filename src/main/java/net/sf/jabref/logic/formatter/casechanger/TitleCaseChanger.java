@@ -10,6 +10,11 @@ public class TitleCaseChanger implements Formatter {
         return Localization.lang("Title");
     }
 
+    @Override
+    public String getKey() {
+        return "TitleCaseChanger";
+    }
+
     /**
      * Converts all words to upper case, but converts articles, prepositions, and conjunctions to lower case
      * Capitalizes first and last word

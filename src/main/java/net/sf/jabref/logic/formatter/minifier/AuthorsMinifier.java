@@ -11,6 +11,11 @@ public class AuthorsMinifier implements Formatter {
         return "Minify authors";
     }
 
+    @Override
+    public String getKey() {
+        return "MinifyAuthors";
+    }
+
     /**
      * Replaces three or more authors with and others.
      *

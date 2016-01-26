@@ -22,7 +22,6 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 

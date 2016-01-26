@@ -11,6 +11,11 @@ public class MonthFormatter implements Formatter {
     }
 
     @Override
+    public String getKey() {
+        return "MonthFormatter";
+    }
+
+    @Override
     public String format(String value) {
         MonthUtil.Month month = MonthUtil.getMonth(value);
         if (month.isValid()) {

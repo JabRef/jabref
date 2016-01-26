@@ -217,6 +217,8 @@ public class FileActions {
             // sorted as they appear on the screen.
             List<BibEntry> sorter = FileActions.getSortedEntries(database, metaData, null, true);
 
+            sorter = FileActions.applySaveActions(sorter, metaData);
+
             BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
 
             for (BibEntry entry : sorter) {
@@ -279,6 +281,17 @@ public class FileActions {
 
         return session;
 
+    }
+
+    private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
+        List<BibEntry> result = new ArrayList<>(toChange.size());
+        SaveActions saveActions = new SaveActions(metaData);
+
+        for(BibEntry entry: toChange){
+            result.add(saveActions.applySaveActions(entry));
+        }
+
+        return result;
     }
 
 

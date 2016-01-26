@@ -35,6 +35,11 @@ public class AuthorsFormatter implements Formatter {
         return "BibTex authors format";
     }
 
+    @Override
+    public String getKey() {
+        return "AuthorsFormatter";
+    }
+
     /**
      *
      */

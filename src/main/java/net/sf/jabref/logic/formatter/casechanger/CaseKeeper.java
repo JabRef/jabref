@@ -47,4 +47,9 @@ public class CaseKeeper implements Formatter {
         return Localization.lang("CaseKeeper");
     }
 
+    @Override
+    public String getKey() {
+        return "CaseKeeper";
+    }
+
 }

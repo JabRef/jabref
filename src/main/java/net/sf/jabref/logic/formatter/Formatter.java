@@ -17,6 +17,13 @@ public interface Formatter {
      */
     String getName();
 
+
+    /**
+     * Returns a unique key for the formatter that can be used for its identification
+     * @return
+     */
+    String getKey();
+
     /**
      * Formats a field value by with a particular formatter transformation.
      *

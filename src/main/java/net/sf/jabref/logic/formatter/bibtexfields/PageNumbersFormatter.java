@@ -20,6 +20,11 @@ public class PageNumbersFormatter implements Formatter {
         return "Page numbers";
     }
 
+    @Override
+    public String getKey() {
+        return "PageNumbersFormatter";
+    }
+
     /**
      * Format page numbers, separated either by commas or double-hyphens.
      * Converts the range number format of the <code>pages</code> field to page_number--page_number.
