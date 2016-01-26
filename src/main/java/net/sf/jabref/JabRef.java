@@ -727,10 +727,6 @@ public class JabRef {
             first = false;
         }
 
-        if (cli.isLoadSession()) {
-            JabRef.jrf.loadSessionAction.actionPerformed(new java.awt.event.ActionEvent(JabRef.jrf, 0, ""));
-        }
-
         // Start auto save timer:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_SAVE)) {
             Globals.startAutoSaveManager(JabRef.jrf);
