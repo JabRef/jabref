@@ -240,7 +240,7 @@ public class FileListEntryEditor {
             try {
                 JabRefDesktop.openExternalFileAnyFormat(metaData, link.getText(), type);
             } catch (IOException e) {
-                LOGGER.error("File could not be opened" + e.getMessage());
+                LOGGER.error("File could not be opened", e);
             }
         }
     }
