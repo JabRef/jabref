@@ -109,14 +109,6 @@ public final class JabRefPreferences {
     public static final String TABLE_SECONDARY_SORT_DESCENDING = "secDescending";
     public static final String TABLE_TERTIARY_SORT_FIELD = "terSort";
     public static final String TABLE_TERTIARY_SORT_DESCENDING = "terDescending";
-    public static final String SAVE_IN_ORIGINAL_ORDER = "saveInOriginalOrder";
-    public static final String SAVE_IN_SPECIFIED_ORDER = "saveInSpecifiedOrder";
-    public static final String SAVE_PRIMARY_SORT_FIELD = "savePriSort";
-    public static final String SAVE_PRIMARY_SORT_DESCENDING = "savePriDescending";
-    public static final String SAVE_SECONDARY_SORT_FIELD = "saveSecSort";
-    public static final String SAVE_SECONDARY_SORT_DESCENDING = "saveSecDescending";
-    public static final String SAVE_TERTIARY_SORT_FIELD = "saveTerSort";
-    public static final String SAVE_TERTIARY_SORT_DESCENDING = "saveTerDescending";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
     public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
     public static final String EXPORT_PRIMARY_SORT_FIELD = "exportPriSort";
@@ -482,18 +474,6 @@ public final class JabRefPreferences {
         defaults.put(TABLE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
         defaults.put(TABLE_TERTIARY_SORT_FIELD, "title");
         defaults.put(TABLE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
-
-        // if both are false, then the entries are saved in table order
-        defaults.put(SAVE_IN_ORIGINAL_ORDER, Boolean.FALSE);
-        defaults.put(SAVE_IN_SPECIFIED_ORDER, Boolean.TRUE);
-
-        // save order: if SAVE_IN_SPECIFIED_ORDER, then use following criteria
-        defaults.put(SAVE_PRIMARY_SORT_FIELD, "bibtexkey");
-        defaults.put(SAVE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(SAVE_SECONDARY_SORT_FIELD, "author");
-        defaults.put(SAVE_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(SAVE_TERTIARY_SORT_FIELD, "title");
-        defaults.put(SAVE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
 
         // export order
         defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);

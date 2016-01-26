@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Global sorting options and preferences are removed. Databases can still be sorted on save, but this is configured locally and stored in the file
 - OvidImporter now also imports fields: doi, issn, language and keywords
 - Implemented [#647](https://github.com/JabRef/jabref/issues/647): The preview can now be copied
 - [#459](https://github.com/JabRef/jabref/issues/459) Open default directory when trying to add files to an entry

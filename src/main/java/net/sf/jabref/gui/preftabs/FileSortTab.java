@@ -42,19 +42,6 @@ import net.sf.jabref.model.entry.BibEntry;
 class FileSortTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
-    private final JRadioButton saveInOriginalOrder;
-    private final JRadioButton saveInTableOrder;
-    private final JRadioButton saveInSpecifiedOrder;
-
-    private final JCheckBox savePriDesc;
-    private final JCheckBox saveSecDesc;
-    private final JCheckBox saveTerDesc;
-    private final JTextField savePriField;
-    private final JTextField saveSecField;
-    private final JTextField saveTerField;
-    private final JComboBox<String> savePriSort;
-    private final JComboBox<String> saveSecSort;
-    private final JComboBox<String> saveTerSort;
 
     private final JRadioButton exportInOriginalOrder;
     private final JRadioButton exportInTableOrder;
@@ -75,126 +62,6 @@ class FileSortTab extends JPanel implements PrefsTab {
         FormLayout layout = new FormLayout("4dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.leadingColumnOffset(1);
-
-        { // SAVE SORT ORDER
-          // create Components
-            saveInOriginalOrder = new JRadioButton(Localization.lang("Save entries in their original order"));
-            saveInTableOrder = new JRadioButton(Localization.lang("Save in current table sort order"));
-            saveInSpecifiedOrder = new JRadioButton(Localization.lang("Save entries ordered as specified"));
-
-            ButtonGroup buttonGroup = new ButtonGroup();
-            buttonGroup.add(saveInOriginalOrder);
-            buttonGroup.add(saveInTableOrder);
-            buttonGroup.add(saveInSpecifiedOrder);
-
-            ActionListener listener = new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    boolean selected = e.getSource() == saveInSpecifiedOrder;
-                    savePriSort.setEnabled(selected);
-                    savePriField.setEnabled(selected);
-                    savePriDesc.setEnabled(selected);
-                    saveSecSort.setEnabled(selected);
-                    saveSecField.setEnabled(selected);
-                    saveSecDesc.setEnabled(selected);
-                    saveTerSort.setEnabled(selected);
-                    saveTerField.setEnabled(selected);
-                    saveTerDesc.setEnabled(selected);
-                }
-            };
-            saveInOriginalOrder.addActionListener(listener);
-            saveInTableOrder.addActionListener(listener);
-            saveInSpecifiedOrder.addActionListener(listener);
-
-            ArrayList<String> fieldNames = new ArrayList<>(BibtexFields.getAllFieldNames());
-            fieldNames.add(BibEntry.KEY_FIELD);
-            Collections.sort(fieldNames);
-            String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-            savePriSort = new JComboBox<>(allPlusKey);
-            saveSecSort = new JComboBox<>(allPlusKey);
-            saveTerSort = new JComboBox<>(allPlusKey);
-
-            savePriField = new JTextField(10);
-            saveSecField = new JTextField(10);
-            saveTerField = new JTextField(10);
-
-            savePriSort.insertItemAt(Localization.lang("<select>"), 0);
-            saveSecSort.insertItemAt(Localization.lang("<select>"), 0);
-            saveTerSort.insertItemAt(Localization.lang("<select>"), 0);
-
-            savePriSort.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (savePriSort.getSelectedIndex() > 0) {
-                        savePriField.setText(savePriSort.getSelectedItem().toString());
-                        savePriSort.setSelectedIndex(0);
-                    }
-                }
-            });
-            saveSecSort.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (saveSecSort.getSelectedIndex() > 0) {
-                        saveSecField.setText(saveSecSort.getSelectedItem().toString());
-                        saveSecSort.setSelectedIndex(0);
-                    }
-                }
-            });
-            saveTerSort.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (saveTerSort.getSelectedIndex() > 0) {
-                        saveTerField.setText(saveTerSort.getSelectedItem().toString());
-                        saveTerSort.setSelectedIndex(0);
-                    }
-                }
-            });
-
-            savePriDesc = new JCheckBox(Localization.lang("Descending"));
-            saveSecDesc = new JCheckBox(Localization.lang("Descending"));
-            saveTerDesc = new JCheckBox(Localization.lang("Descending"));
-
-            // create GUI
-            JLabel lab;
-
-            builder.appendSeparator(Localization.lang("Save sort order"));
-            builder.append(saveInOriginalOrder, 1);
-            builder.nextLine();
-            builder.append(saveInTableOrder, 1);
-            builder.nextLine();
-            builder.append(saveInSpecifiedOrder, 1);
-            builder.nextLine();
-
-            // Create a new panel with its own FormLayout for these items:
-            FormLayout layout2 = new FormLayout(
-                    "right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
-            DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-            lab = new JLabel(Localization.lang("Primary sort criterion"));
-            builder2.append(lab);
-            builder2.append(savePriSort);
-            builder2.append(savePriField);
-            builder2.append(savePriDesc);
-            builder2.nextLine();
-            lab = new JLabel(Localization.lang("Secondary sort criterion"));
-            builder2.append(lab);
-            builder2.append(saveSecSort);
-            builder2.append(saveSecField);
-            builder2.append(saveSecDesc);
-            builder2.nextLine();
-            lab = new JLabel(Localization.lang("Tertiary sort criterion"));
-            builder2.append(lab);
-            builder2.append(saveTerSort);
-            builder2.append(saveTerField);
-            builder2.append(saveTerDesc);
-
-            JPanel saveSpecPanel = builder2.getPanel();
-            builder.append(saveSpecPanel);
-            builder.nextLine();
-        }
 
         // EXPORT SORT ORDER
         // create Components
@@ -323,39 +190,6 @@ class FileSortTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        if (prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER)) {
-            saveInOriginalOrder.setSelected(true);
-        } else if (prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER)) {
-            saveInSpecifiedOrder.setSelected(true);
-        } else {
-            saveInTableOrder.setSelected(true);
-        }
-
-        {
-            boolean selected = prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER);
-            savePriSort.setEnabled(selected);
-            savePriField.setEnabled(selected);
-            savePriDesc.setEnabled(selected);
-            saveSecSort.setEnabled(selected);
-            saveSecField.setEnabled(selected);
-            saveSecDesc.setEnabled(selected);
-            saveTerSort.setEnabled(selected);
-            saveTerField.setEnabled(selected);
-            saveTerDesc.setEnabled(selected);
-        }
-
-        savePriField.setText(prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD));
-        saveSecField.setText(prefs.get(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD));
-        saveTerField.setText(prefs.get(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD));
-
-        savePriSort.setSelectedIndex(0);
-        saveSecSort.setSelectedIndex(0);
-        saveTerSort.setSelectedIndex(0);
-
-        savePriDesc.setSelected(prefs.getBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING));
-        saveSecDesc.setSelected(prefs.getBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING));
-        saveTerDesc.setSelected(prefs.getBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING));
-
         if (prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER)) {
             exportInOriginalOrder.setSelected(true);
         } else if (prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
@@ -390,17 +224,6 @@ class FileSortTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        prefs.putBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER, saveInOriginalOrder.isSelected());
-        prefs.putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, saveInSpecifiedOrder.isSelected());
-
-        prefs.putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, savePriDesc.isSelected());
-        prefs.putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, saveSecDesc.isSelected());
-        prefs.putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, saveTerDesc.isSelected());
-
-        prefs.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, savePriField.getText().toLowerCase().trim());
-        prefs.put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, saveSecField.getText().toLowerCase().trim());
-        prefs.put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, saveTerField.getText().toLowerCase().trim());
-
         prefs.putBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER, exportInOriginalOrder.isSelected());
         prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, exportInSpecifiedOrder.isSelected());
 
@@ -421,6 +244,6 @@ class FileSortTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Localization.lang("File Sorting");
+        return Localization.lang("Export Sorting");
     }
 }

@@ -29,8 +29,8 @@ public class JabRefPreferencesTest {
 
         prefs.importPreferences(importFile.getAbsolutePath());
 
-        String expected = "editor";
-        String actual = prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD);
+        String expected = "my proxy host";
+        String actual = prefs.get(JabRefPreferences.PROXY_HOSTNAME);
 
         assertEquals(expected, actual);
     }
