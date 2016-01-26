@@ -118,61 +118,13 @@ sourceSets {
 }
 
 processResources {
-    def licenseInformation = ""
-    def id = ""
-    def projectName
-    def url
-    def license
-    def note = ""
-
     def externalLibraries = new File('external-libraries.txt')
-    externalLibraries.eachLine { currentLine ->
-        if (currentLine.startsWith('Id')) {
-            id = currentLine.substring(9)
-            // TODO: we can distinguish between fonts and libraries by the suffix of the id:
-            // fonts always end with ".font"
-            // With that information we can generate different sections
-        } else if (currentLine.startsWith('Project')) {
-            projectName = currentLine.substring(9)
-        } else if (currentLine.startsWith('URL')) {
-            url = currentLine.substring(9)
-        } else if (currentLine.startsWith('License:')) {
-            license = currentLine.substring(9)
-        } else if (currentLine.startsWith('Note:')) {
-            note =  currentLine.substring(9)
-        } else if (currentLine.isEmpty() && (!id.equals(""))) {
-            // the entry is finished, write it
-
-            licenseInformation += "\n<h3>" + projectName + "</h3>\n"
-            licenseInformation += '<p>URL: <a href="' + url + '">' + url + '</a></p>\n'
-            licenseInformation += '<p>License: ' + license + '</p>\n'
-            if (!note.equals("")) {
-                licenseInformation += '<p>Note: ' + note + '</p>\n'
-            }
-
-            id = id.replaceAll(':', '_')
-            def fileName = "licenses/" + id + ".txt"
-            def licenseInformationFile = new File(fileName)
-            if (licenseInformationFile.exists()) {
-                licenseInformation += '\n<h4>Further information</h4>\n'
-                licenseInformation += '<pre>\n'
-                licenseInformation += licenseInformationFile.text
-                licenseInformation += '</pre>\n'
-            }
-
-            // mark that entry has been written
-            id = ""
-            // note is not present at all entries. Ensure that no note is written instead of the last note.
-            note = ""
-        }
-    }
 
     filesMatching("build.properties") {
         expand (version: project.version,
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "),
-                "developers": new File('DEVELOPERS').readLines().findAll {!it.startsWith("#")}.join(", "),
-                "licenseInformation": licenseInformation)
+                "developers": new File('DEVELOPERS').readLines().findAll {!it.startsWith("#")}.join(", "))
     }
 
     filesMatching("resource/**/meta.xml") {
