@@ -559,8 +559,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             @Override
             public void windowClosing(WindowEvent e) {
+
                 if (OS.OS_X) {
-                    setState(Frame.ICONIFIED);
+                    JabRefFrame.this.setVisible(false);
                 } else {
                     new CloseAction().actionPerformed(null);
                 }
