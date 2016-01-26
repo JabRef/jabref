@@ -15,8 +15,29 @@
 */
 package net.sf.jabref.external;
 
-import java.awt.Component;
-import java.awt.GridLayout;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.OpenFileFilter;
+import net.sf.jabref.gui.UrlDragDrop;
+import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.io.FileFinder;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.swing.*;
+import javax.xml.transform.TransformerException;
+import java.awt.*;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
@@ -26,33 +47,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.xml.transform.TransformerException;
-
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.OpenFileFilter;
-import net.sf.jabref.gui.UrlDragDrop;
-import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.net.MonitoredURLDownload;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.util.io.FileFinder;
-import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
  * Initial Version:
@@ -98,7 +92,7 @@ public class ExternalFilePanel extends JPanel {
         JButton download = new JButton(Localization.lang("Download"));
         JButton auto = new JButton(Localization.lang("Auto"));
         JButton xmp = new JButton(Localization.lang("Write XMP"));
-        xmp.setToolTipText(Localization.lang("Write BibtexEntry as XMP-metadata to PDF."));
+        xmp.setToolTipText(Localization.lang("Write BibTeXEntry as XMP-metadata to PDF."));
 
         browseBut.addActionListener(new ActionListener() {
 

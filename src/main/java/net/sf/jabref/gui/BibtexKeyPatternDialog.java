@@ -15,27 +15,18 @@
  */
 package net.sf.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
+import net.sf.jabref.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
-
-import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
-import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
-import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class BibtexKeyPatternDialog extends JDialog {
 
@@ -45,7 +36,7 @@ public class BibtexKeyPatternDialog extends JDialog {
 
 
     public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
-        super(parent, Localization.lang("Bibtex key patterns"), true);
+        super(parent, Localization.lang("BibTeX key patterns"), true);
         this.labelPatternPanel = new LabelPatternPanel(parent.helpDiag);
         setPanel(panel);
         init();
