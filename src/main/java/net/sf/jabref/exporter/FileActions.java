@@ -305,7 +305,6 @@ public class FileActions {
             }
 
             // This case should never be hit as SaveSettings() is never called if InOriginalOrder is true
-            assert (storedSaveOrderConfig == null) && isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
             assert (storedSaveOrderConfig == null) && !isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
 
             if (storedSaveOrderConfig != null) {
@@ -319,13 +318,6 @@ public class FileActions {
                 priD = saveOrderConfig.sortCriteria[0].descending;
                 secD = saveOrderConfig.sortCriteria[1].descending;
                 terD = saveOrderConfig.sortCriteria[2].descending;
-            } else if (isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER)) {
-                pri = Globals.prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD);
-                sec = Globals.prefs.get(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD);
-                ter = Globals.prefs.get(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD);
-                priD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING);
-                secD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING);
-                terD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING);
             } else if (!isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
                 pri = Globals.prefs.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD);
                 sec = Globals.prefs.get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD);
@@ -504,7 +496,7 @@ public class FileActions {
             List<String> storedSaveOrderConfig = metaData
                     .getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             if (storedSaveOrderConfig == null) {
-                inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
+                inOriginalOrder = true;
             } else {
                 SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
                 inOriginalOrder = saveOrderConfig.saveInOriginalOrder;
