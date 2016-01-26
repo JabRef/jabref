@@ -501,7 +501,7 @@ public class BibtexParser {
 
     private void parseField(BibEntry entry) throws IOException {
         String key = parseTextToken().toLowerCase();
-        // Util.pr("Field: _"+key+"_");
+
         skipWhitespace();
         consume('=');
         String content = parseFieldContent(key);
@@ -781,16 +781,13 @@ public class BibtexParser {
 
         while (true) {
             int character = read();
-            // Util.pr(".. '"+(char)c+"'\t"+c);
+
             if (character == -1) {
                 eof = true;
 
                 return token.toString();
             }
 
-            // Ikke: #{}\uFFFD~\uFFFD
-            //
-            // G\uFFFDr: $_*+.-\/?"^
             if (!Character.isWhitespace((char) character)
                     && (Character.isLetterOrDigit((char) character) || (character == ':') || ((character != '#') && (character != '{') && (character != '}')
                     && (character != '\uFFFD') && (character != '~') && (character != '\uFFFD') && (character != ',') && (character != '=')))) {
