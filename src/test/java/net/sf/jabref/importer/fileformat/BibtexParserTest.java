@@ -630,7 +630,19 @@ public class BibtexParserTest {
     @Test
     public void parseWarnsAboutUnmatchedContentInEntry() throws IOException {
 
-        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, to much}"));
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, too much}"));
+
+        Assert.assertTrue("There should be warnings", result.hasWarnings());
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
+    }
+
+    @Test
+    @Ignore("Ignoring because this is an edge case")
+    public void parseWarnsAboutUnmatchedContentInEntryWithoutComma() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket } too much}"));
 
         Assert.assertTrue("There should be warnings", result.hasWarnings());
 
