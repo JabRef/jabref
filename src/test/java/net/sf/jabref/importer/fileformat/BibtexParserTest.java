@@ -304,6 +304,23 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void assertCorrectnessOfParsedSerialization() throws IOException {
+        String firstEntry = "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
+                + "  title = {Title A}}";
+        String secondEntry = "\n@inProceedings{foo," + "  author={Norton Bar}}";
+
+        ParserResult result = BibtexParser.parse(new StringReader(firstEntry + secondEntry));
+
+        for (BibEntry entry : result.getDatabase().getEntries()) {
+            if (entry.getCiteKey().equals("canh05")) {
+                Assert.assertEquals(firstEntry, entry.getParsedSerialization());
+            } else {
+                Assert.assertEquals(secondEntry, entry.getParsedSerialization());
+            }
+        }
+    }
+
+    @Test
     public void parseCombinesMultipleAuthorFields() throws IOException {
 
         ParserResult result = BibtexParser.parse(
@@ -624,7 +641,7 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals("Size should be one, but was " + c.size(), 1, c.size());
-        Assert.assertEquals("Epilog should be preserved","}",result.getDatabase().getEpilog());
+        Assert.assertEquals("Epilog should be preserved", "}", result.getDatabase().getEpilog());
     }
 
     @Test
