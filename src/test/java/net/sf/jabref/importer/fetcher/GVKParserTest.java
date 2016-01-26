@@ -47,12 +47,12 @@ public class GVKParserTest {
 
     @Test
     public void resultFor797485368() throws Exception {
-        doTest("gvk_result_for_797485368.xml", 1, Arrays.asList(new String[] {"gvk_result_for_797485368.bib"}));
+        doTest("gvk_result_for_797485368.xml", 1, Arrays.asList("gvk_result_for_797485368.bib"));
     }
 
     @Test
     public void GMP() throws Exception {
-        doTest("gvk_gmp.xml", 2, Arrays.asList(new String[] {"gvk_gmp.1.bib", "gvk_gmp.2.bib"}));
+        doTest("gvk_gmp.xml", 2, Arrays.asList("gvk_gmp.1.bib", "gvk_gmp.2.bib"));
     }
 
     @Test
