@@ -509,8 +509,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 .ifPresent(url -> entry.setField("url", "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
 
         // Replace ; as keyword separator
-        entry.getFieldOptional("keywords").ifPresent(keys -> entry.setField("keywords",
-                keys.replace(";", Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR))));
+        entry.getFieldOptional("keywords").ifPresent(keys -> entry.setField("keywords", keys.replace(";", ",")));
         return entry;
     }
 

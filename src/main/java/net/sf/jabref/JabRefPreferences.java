@@ -552,7 +552,6 @@ public final class JabRefPreferences {
         defaults.put(GROUP_AUTO_HIDE, Boolean.TRUE);
         defaults.put(GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
-        defaults.put(GROUP_KEYWORD_SEPARATOR, ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
         defaults.put(HIGHLIGHT_GROUPS_MATCHING_ANY, Boolean.FALSE);
         defaults.put(HIGHLIGHT_GROUPS_MATCHING_ALL, Boolean.FALSE);
