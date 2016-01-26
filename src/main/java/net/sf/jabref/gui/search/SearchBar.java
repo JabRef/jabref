@@ -17,10 +17,7 @@ package net.sf.jabref.gui.search;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.WrapLayout;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -120,7 +117,7 @@ public class SearchBar extends JPanel {
         updateSearchModeButtonText();
         searchModeButton.addActionListener((l) -> toggleSearchModeAndSearch());
 
-        JToolBar toolBar = new JToolBar();
+        JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
         toolBar.add(clearSearchButton);
         toolBar.addSeparator();
