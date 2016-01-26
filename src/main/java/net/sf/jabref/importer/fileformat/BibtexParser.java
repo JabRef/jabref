@@ -522,20 +522,6 @@ public class BibtexParser {
             if (character == '"') {
                 StringBuffer text = parseQuotedFieldExactly();
                 value.append(fieldContentParser.format(text, key));
-                /*
-                 *
-                 * The following code doesn't handle {"} correctly: // value is
-                 * a string consume('"');
-                 *
-                 * while (!((peek() == '"') && (j != '\\'))) { j = read(); if
-                 * (_eof || (j == -1) || (j == 65535)) { throw new
-                 * IOException("Error in line "+line+ ": EOF in
-                 * mid-string"); }
-                 *
-                 * value.append((char) j); }
-                 *
-                 * consume('"');
-                 */
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside of a field, so we need to count the
