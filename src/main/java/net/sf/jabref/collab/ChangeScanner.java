@@ -163,8 +163,8 @@ public class ChangeScanner implements Runnable {
             @Override
             public void run() {
                 try {
-                    SaveSession ss = FileActions.saveDatabase(new LoadedDatabase(inTemp, mdInTemp,
-                            Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle())), Globals.prefs,
+                    SaveSession ss = FileActions.saveDatabase(new LoadedDatabase(inTemp, mdInTemp),
+                            Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs,
                             false, false, panel.getEncoding(), true);
                     ss.commit();
                 } catch (SaveException ex) {

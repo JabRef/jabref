@@ -1202,10 +1202,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         final String SAVE_DATABASE = Localization.lang("Save database");
         try {
             if (selectedOnly) {
-                session = FileActions.savePartOfDatabase(new LoadedDatabase(database, loadedDatabase.getMetaData(), file), Globals.prefs,
-                        mainTable.getSelectedEntries(), enc, saveType);
+                session = FileActions.savePartOfDatabase(new LoadedDatabase(database, loadedDatabase.getMetaData()),
+                        file, Globals.prefs, mainTable.getSelectedEntries(), enc, saveType);
             } else {
-                session = FileActions.saveDatabase(new LoadedDatabase(database, loadedDatabase.getMetaData(), file), Globals.prefs, false, false, enc, false);
+                session = FileActions.saveDatabase(new LoadedDatabase(database, loadedDatabase.getMetaData()),
+                        file, Globals.prefs, false, false, enc, false);
             }
 
         } catch (UnsupportedCharsetException ex2) {

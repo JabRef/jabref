@@ -171,7 +171,7 @@ public class FileActions {
      * let the user save only the results of a search. False and false means all
      * entries are saved.
      */
-    public static SaveSession saveDatabase(LoadedDatabase loadedDatabase, JabRefPreferences prefs,
+    public static SaveSession saveDatabase(LoadedDatabase loadedDatabase, File target, JabRefPreferences prefs,
                                            boolean checkSearch, boolean checkGroup, Charset encoding, boolean suppressBackup)
             throws SaveException {
 
@@ -183,7 +183,7 @@ public class FileActions {
         SaveSession session;
         BibEntry exceptionCause = null;
         try {
-            session = new SaveSession(loadedDatabase.getDatabaseFile(), encoding, backup);
+            session = new SaveSession(target, encoding, backup);
         } catch (Throwable e) {
             if (encoding != null) {
                 LOGGER.error("Error from encoding: '" + encoding.displayName(), e);
@@ -366,7 +366,7 @@ public class FileActions {
      *
      * @return A List containing warnings, if any.
      */
-    public static SaveSession savePartOfDatabase(LoadedDatabase loadedDatabase,
+    public static SaveSession savePartOfDatabase(LoadedDatabase loadedDatabase, File target,
                                                  JabRefPreferences prefs, BibEntry[] bes, Charset encoding, DatabaseSaveType saveType)
             throws SaveException {
 
@@ -376,7 +376,7 @@ public class FileActions {
 
         SaveSession session;
         try {
-            session = new SaveSession(loadedDatabase.getDatabaseFile(), encoding, backup);
+            session = new SaveSession( target, encoding, backup);
         } catch (IOException e) {
             throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }

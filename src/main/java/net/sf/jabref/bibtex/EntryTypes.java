@@ -7,6 +7,9 @@ import java.util.*;
 
 public class EntryTypes {
 
+    /**
+     * This class is used to specify entry types for either BIBTEX and BIBLATEX.
+     */
     private static class InternalEntryTypes {
 
         private final Map<String, EntryType> ALL_TYPES = new TreeMap<>();

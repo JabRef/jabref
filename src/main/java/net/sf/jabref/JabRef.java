@@ -17,26 +17,11 @@ package net.sf.jabref;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
-
-import java.awt.Font;
-import java.io.File;
-import java.io.IOException;
-import java.net.Authenticator;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Vector;
-import java.util.prefs.BackingStoreException;
-
-import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
-
+import net.sf.jabref.exporter.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.remote.JabRefMessageHandler;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -44,32 +29,32 @@ import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.logging.JabRefLogger;
+import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
+import net.sf.jabref.logic.remote.RemotePreferences;
+import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.io.FileBasedLock;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-
 import net.sf.jabref.util.Util;
+import net.sf.jabref.wizard.auximport.AuxCommandLine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.exporter.AutoSaveManager;
-import net.sf.jabref.exporter.ExportFormats;
-import net.sf.jabref.exporter.FileActions;
-import net.sf.jabref.exporter.IExportFormat;
-import net.sf.jabref.exporter.SaveException;
-import net.sf.jabref.exporter.SaveSession;
-import net.sf.jabref.importer.*;
-import net.sf.jabref.logic.remote.RemotePreferences;
-import net.sf.jabref.logic.remote.client.RemoteListenerClient;
-import net.sf.jabref.gui.remote.JabRefMessageHandler;
-import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.logic.util.io.FileBasedLock;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
-import net.sf.jabref.wizard.auximport.AuxCommandLine;
+import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.Authenticator;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.List;
+import java.util.prefs.BackingStoreException;
 
 /**
  * JabRef Main Class - The application gets started here.
@@ -81,7 +66,6 @@ public class JabRef {
     public static JabRefFrame jrf;
 
     private JabRefCLI cli;
-
 
     public void start(String[] args) {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
@@ -288,18 +272,18 @@ public class JabRef {
 
                     //read in the export format, take default format if no format entered
                     switch (data.length) {
-                        case 3:
-                            formatName = data[2];
-                            break;
-                        case 2:
-                            //default ExportFormat: HTML table (with Abstract & BibTeX)
-                            formatName = "tablerefsabsbib";
-                            break;
-                        default:
-                            System.err.println(
-                                    Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
-                                            + JabRefCLI.getExportMatchesSyntax());
-                            return Optional.empty();
+                    case 3:
+                        formatName = data[2];
+                        break;
+                    case 2:
+                        //default ExportFormat: HTML table (with Abstract & BibTeX)
+                        formatName = "tablerefsabsbib";
+                        break;
+                    default:
+                        System.err.println(
+                                Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
+                                        + JabRefCLI.getExportMatchesSyntax());
+                        return Optional.empty();
                     } //end switch
 
                     //export new database
@@ -328,7 +312,7 @@ public class JabRef {
             regenerateBibtexKeys(loaded);
         }
 
-        if(cli.isAutomaticallySetFileLinks()) {
+        if (cli.isAutomaticallySetFileLinks()) {
             automaticallySetFileLinks(loaded);
         }
 
@@ -344,8 +328,9 @@ public class JabRef {
                         if (!pr.isInvalid()) {
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + data[0]);
-                                SaveSession session = FileActions.saveDatabase(new LoadedDatabase(pr.getDatabase(), pr.getMetaData(),
-                                        new File(data[0])), Globals.prefs, false, false,
+                                SaveSession session = FileActions.saveDatabase(
+                                        new LoadedDatabase(pr.getDatabase(), pr.getMetaData()),
+                                        new File(data[0]), Globals.prefs, false, false,
                                         Globals.prefs.getDefaultEncoding(), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
@@ -432,8 +417,8 @@ public class JabRef {
 
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + subName);
-                                SaveSession session = FileActions.saveDatabase(new LoadedDatabase(newBase, new MetaData(),
-                                        new File(subName)), Globals.prefs, false, false,
+                                SaveSession session = FileActions.saveDatabase(new LoadedDatabase(newBase, new MetaData()),
+                                        new File(subName), Globals.prefs, false, false,
                                         Globals.prefs.getDefaultEncoding(), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
@@ -475,12 +460,12 @@ public class JabRef {
     }
 
     private void automaticallySetFileLinks(Vector<ParserResult> loaded) {
-        for(ParserResult parserResult: loaded) {
+        for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
 
             MetaData metaData = parserResult.getMetaData();
 
-            if( metaData != null){
+            if (metaData != null) {
                 LOGGER.info(Localization.lang("Automatically setting file links"));
                 Util.autoSetLinks(database.getEntries(), metaData);
             }

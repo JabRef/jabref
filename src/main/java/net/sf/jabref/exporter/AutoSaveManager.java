@@ -98,8 +98,8 @@ public class AutoSaveManager {
         File databaseFile = panel.getLoadedDatabase().getDatabaseFile();
         File backupFile = AutoSaveManager.getAutoSaveFile(databaseFile);
         try {
-            SaveSession ss = FileActions.saveDatabase(new LoadedDatabase(panel.database(), panel.loadedDatabase.getMetaData(),
-                    backupFile), Globals.prefs, false, false, panel.getEncoding(), true);
+            SaveSession ss = FileActions.saveDatabase(new LoadedDatabase(panel.database(), panel.loadedDatabase.getMetaData()),
+                    backupFile, Globals.prefs, false, false, panel.getEncoding(), true);
             ss.commit();
         } catch (SaveException e) {
             e.printStackTrace();
@@ -107,9 +107,6 @@ public class AutoSaveManager {
         } catch (Throwable ex) {
             ex.printStackTrace();
             return false;
-        } finally {
-            // HACK required to reset the file field of the metadata
-            panel.loadedDatabase.getMetaData().setFile(databaseFile);
         }
         return true;
     }
