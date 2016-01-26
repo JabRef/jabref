@@ -38,6 +38,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
         this.add(new JLabel(icon));
         this.manager = manager;
         JToolBar tlb = new JToolBar();
+        tlb.setOpaque(false);
         close.setMargin(new Insets(0, 0, 0, 0));
         close.setBorder(null);
         JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
