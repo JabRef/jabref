@@ -19,10 +19,13 @@ import com.sun.star.awt.Point;
 import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.comp.helper.Bootstrap;
-import com.sun.star.container.*;
 import com.sun.star.container.NoSuchElementException;
+import com.sun.star.container.*;
 import com.sun.star.document.XDocumentPropertiesSupplier;
-import com.sun.star.frame.*;
+import com.sun.star.frame.XComponentLoader;
+import com.sun.star.frame.XController;
+import com.sun.star.frame.XDesktop;
+import com.sun.star.frame.XModel;
 import com.sun.star.lang.*;
 import com.sun.star.lang.Locale;
 import com.sun.star.text.*;
@@ -30,13 +33,15 @@ import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
-import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
+import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.openoffice.sorting.AuthorYearTitleComparator;
 import net.sf.jabref.openoffice.sorting.YearAuthorTitleComparator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,9 +51,6 @@ import java.net.URLClassLoader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
@@ -443,7 +445,7 @@ class OOBibBase {
                         cEntries[j] = OOUtil.createAdaptedEntry(database.getEntryByKey(keys[j]));
                     }
                     if (cEntries[j] == null) {
-                        LOGGER.info("Bibtex key not found : '" + keys[j] + '\'');
+                        LOGGER.info("BibTex key not found : '" + keys[j] + '\'');
                         LOGGER.info("Problem with reference mark: '" + names[i] + '\'');
                         cEntries[j] = new UndefinedBibtexEntry(keys[j]);
                     }
@@ -812,7 +814,7 @@ class OOBibBase {
                         origEntry = database.getEntryByKey(key);
                     }
                     if (origEntry == null) {
-                        LOGGER.info("Bibtex key not found : '" + key + "'");
+                        LOGGER.info("BibTex key not found : '" + key + "'");
                         LOGGER.info("Problem with reference mark: '" + name + "'");
                         newList.put(new UndefinedBibtexEntry(key), null);
                     } else {

@@ -15,7 +15,20 @@
  */
 package net.sf.jabref.gui.worker;
 
-import java.awt.Desktop;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -24,19 +37,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import net.sf.jabref.*;
-import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
@@ -86,7 +86,7 @@ public class SendAsEMailAction extends AbstractWorker {
             try {
                 bibtexEntryWriter.write(entry, sw);
             } catch (IOException e) {
-                LOGGER.warn("Problem creating Bibtex file for mailing.", e);
+                LOGGER.warn("Problem creating BibTex file for mailing.", e);
             }
         }
 
