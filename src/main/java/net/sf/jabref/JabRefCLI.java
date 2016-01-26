@@ -132,7 +132,6 @@ public class JabRefCLI {
         options.addOption("v", "version", false, Localization.lang("Display version"));
         options.addOption("n", "nogui", false, Localization.lang("No GUI. Only process command line options."));
         options.addOption("h", "help", false, Localization.lang("Display help on command line options"));
-        options.addOption("l", "loads", false, Localization.lang("Load session"));
         options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
         options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 

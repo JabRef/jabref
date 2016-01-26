@@ -318,8 +318,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.PRINTED.getIcon());
     private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS,
             Localization.menuTitle("Manage content selectors"));
-    private final AbstractAction saveSessionAction = new SaveSessionAction();
-    public final AbstractAction loadSessionAction = new LoadSessionAction();
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
 
@@ -1133,7 +1131,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         mb.setBorder(null);
         JMenu file = JabRefFrame.subMenu(Localization.menuTitle("File"));
-        JMenu sessions = JabRefFrame.subMenu(Localization.menuTitle("Sessions"));
         JMenu edit = JabRefFrame.subMenu(Localization.menuTitle("Edit"));
         JMenu search = JabRefFrame.subMenu(Localization.menuTitle("Search"));
         JMenu groups = JabRefFrame.subMenu(Localization.menuTitle("Groups"));
@@ -1166,9 +1163,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(databaseProperties);
         file.addSeparator();
 
-        sessions.add(loadSessionAction);
-        sessions.add(saveSessionAction);
-        file.add(sessions);
         file.add(fileHistory);
         file.addSeparator();
         file.add(editModeAction);
@@ -1868,105 +1862,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             });
         }
 
-    }
-
-
-    class SaveSessionAction
-            extends MnemonicAwareAction {
-
-        public SaveSessionAction() {
-            super();
-            putValue(Action.NAME, Localization.menuTitle("Save session"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.SAVE_SESSION));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Here we store the names of all current files. If
-            // there is no current file, we remove any
-            // previously stored filename.
-            List<String> filenames = new ArrayList<>();
-            if (tabbedPane.getTabCount() > 0) {
-                for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                    if (tabbedPane.getTitleAt(i).equals(GUIGlobals.untitledTitle)) {
-                        tabbedPane.setSelectedIndex(i);
-                        int answer = JOptionPane.showConfirmDialog
-                                (JabRefFrame.this, Localization.lang
-                                                ("This untitled database must be saved first to be "
-                                                        + "included in the saved session. Save now?"),
-                                        Localization.lang("Save database"),
-                                        JOptionPane.YES_NO_OPTION);
-                        if (answer == JOptionPane.YES_OPTION) {
-                            // The user wants to save.
-                            try {
-                                getCurrentBasePanel().runCommand(Actions.SAVE);
-                            } catch (Throwable ignored) {
-                                // Ignored
-                            }
-                        }
-                    }
-                    if (getBasePanelAt(i).getDatabaseFile() != null) {
-                        filenames.add(getBasePanelAt(i).getDatabaseFile().getPath());
-                    }
-                }
-            }
-
-            if (filenames.isEmpty()) {
-                output(Localization.lang("Not saved (empty session)") + '.');
-            } else {
-                prefs.putStringList(JabRefPreferences.SAVED_SESSION, filenames);
-                output(Localization.lang("Saved session") + '.');
-            }
-
-        }
-    }
-
-    public class LoadSessionAction extends MnemonicAwareAction {
-
-        private volatile boolean running;
-
-        public LoadSessionAction() {
-            super();
-            putValue(Action.NAME, Localization.menuTitle("Load session"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.LOAD_SESSION));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (prefs.get(JabRefPreferences.SAVED_SESSION) == null) {
-                output(Localization.lang("No saved session found."));
-                return;
-            }
-            if (running) {
-                return;
-            } else {
-                running = true;
-            }
-
-            output(Localization.lang("Loading session..."));
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    HashSet<String> currentFiles = new HashSet<>();
-                    if (tabbedPane.getTabCount() > 0) {
-                        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                            if (getBasePanelAt(i).getDatabaseFile() != null) {
-                                currentFiles.add(getBasePanelAt(i).getDatabaseFile().getPath());
-                            }
-                        }
-                    }
-                    List<String> names = prefs.getStringList(JabRefPreferences.SAVED_SESSION);
-                    ArrayList<File> filesToOpen = new ArrayList<>();
-                    for (String name : names) {
-                        filesToOpen.add(new File(name));
-                    }
-                    open.openFiles(filesToOpen, true);
-                    running = false;
-                }
-            });
-
-        }
     }
 
     class ChangeTabAction extends MnemonicAwareAction {

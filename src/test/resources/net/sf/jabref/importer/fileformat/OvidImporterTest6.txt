@@ -15,25 +15,7 @@ Source
 Status
   Publish Ahead of Print, POST ACCEPTANCE, 30 November 2015
 Abstract
-  Objectives: To assess the correct positioning of iliosacral screw in patients with unstable traumatic pelvic ring injury by comparing fluoroscopically guided computer-navigated surgery (CNS) with conventional fluoroscopy (CF) through reviewing post-operative CT scans and clinical indicators.
-
-  Design: A comparative multicenter cohort study.
-
-  Setting: Two level I Trauma Centers in The Netherlands.
-
-  Patients: The computer-navigated group (n=56) and the conventional fluoroscopy group (n=24) were comparable regarding age (mean, 43 yr), gender (58%, male), BMI (25 kg/m2), ISS (27), injury-to-surgery interval (7 days) and OTA classification (40% 61-B, 60% 61-C).
-
-  Main Outcome Measurements: The position of the iliosacral screws was evaluated on postoperative CT scans. Additionally, clinical morbidity and re-operation were assessed.
-
-  Results: In the CNS group, a total of 111 screws were placed (2.0 per patient), of which 83% were placed correctly. In the CF group, 39 screws (1.6 per patient) were placed, 82% of them correctly.
-
-  Inadequate fixation included neural foramina hit (12 screws (11%) in the CNS group vs. 3 screws (8%) in the CF group, p = 0.76) and extra osseous dislocation (7 screws (6%) vs. 4 screws (10%), respectively, p = 0.47). Five patients required re-operation, all in the computer-navigated surgery group, p = 0.32. We observed more adequate positioning with increased surgical experience, p = 0.12.
-
-  Conclusions: In contrast to what has been suggested by previous studies, we found no benefit from computer-navigated iliosacral screw fixation compared to fluoroscopically guided surgery regarding the correct positioning of iliosacral screw on postoperative CT scans and related morbidity.
-
-  Level of Evidence: Therapeutic Level III. See Instructions for Authors for a complete description of levels of evidence.
-
-  Copyright (C) 2015 Wolters Kluwer Health, Inc. All rights reserved.
+  Lorem ipsum abstract
 Author Keywords
   iliosacral;  iliosacral screw;  IS screw;  SI screw;  sacroiliac joint;  Computer-navigated surgery;  navigation;  Computer-Assisted;  Conventional fluoroscopy;  Fluoroscopy;  computed tomography;  surgery;  OTA;  Traumatic;  Pelvic ring;  fracture;  pelvic fracture.
 Language

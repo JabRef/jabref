@@ -207,15 +207,7 @@ public class IsiImporterTest {
             Assert.assertEquals("89", a.getField("volume"));
             Assert.assertEquals("4", a.getField("number"));
             Assert.assertEquals(
-                    "We report on the generation of continuous-wave (cw) ultraviolet"
-                            + " (UV) laser light at lambda =278 nm by optical frequency doubling of"
-                            + " visible light in beta -BaB$_2$O$_4$ waveguides. Ridge-type "
-                            + "waveguides were produced by He$^+$ implantation, photolithography"
-                            + " masking, and plasma etching. The final waveguides have core dimension"
-                            + " of a few mu m$^2$ and show transmission losses of 5 dB/cm at 532 nm "
-                            + "and less than 10 dB/cm at 266 nm. In our first experiments, a second "
-                            + "harmonic power of 24 mu W has been generated at 278 nm in an 8 mm long "
-                            + "waveguide pumped by 153 mW at 556 nm.".replaceFirst("266", "\n"),
+                    "Lorem ipsum abstract",
                     a.getField("abstract"));
             Assert.assertEquals("Aip", a.getField("publisher"));
 
@@ -314,23 +306,7 @@ public class IsiImporterTest {
             Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
             Assert.assertEquals("2006", a.getField("year"));
             Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
-            Assert.assertEquals("In this letter, the problem of detecting urban road "
-                    + "networks from high-resolution optical/synthetic aperture "
-                    + "radar (SAR) images is addressed. To this end, this letter "
-                    + "exploits a priori knowledge about road direction "
-                    + "distribution in urban areas. In particular, this letter "
-                    + "presents an adaptive filtering procedure able to capture the "
-                    + "predominant directions of these roads and enhance the "
-                    + "extraction results. After road element extraction, to both "
-                    + "discard redundant segments and avoid gaps, a special "
-                    + "perceptual grouping algorithm is devised, exploiting "
-                    + "colinearity as well as proximity concepts. Finally, the road "
-                    + "network topology is considered, checking for road "
-                    + "intersections and regularizing the overall patterns using "
-                    + "these focal points. The proposed procedure was tested on a "
-                    + "pair of very high resolution images, one from an optical "
-                    + "sensor and one from a SAR sensor. The experiments show an "
-                    + "increase in both the completeness and the quality indexes " + "for the extracted road network.",
+            Assert.assertEquals("Lorem ipsum abstract",
                     a.getField("abstract"));
 
         }
@@ -359,23 +335,7 @@ public class IsiImporterTest {
             Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
             Assert.assertEquals("2006", a.getField("year"));
             Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
-            Assert.assertEquals("In this letter, the problem of detecting urban road "
-                    + "networks from high-resolution optical/synthetic aperture "
-                    + "radar (SAR) images is addressed. To this end, this letter "
-                    + "exploits a priori knowledge about road direction "
-                    + "distribution in urban areas. In particular, this letter "
-                    + "presents an adaptive filtering procedure able to capture the "
-                    + "predominant directions of these roads and enhance the "
-                    + "extraction results. After road element extraction, to both "
-                    + "discard redundant segments and avoid gaps, a special "
-                    + "perceptual grouping algorithm is devised, exploiting "
-                    + "colinearity as well as proximity concepts. Finally, the road "
-                    + "network topology is considered, checking for road "
-                    + "intersections and regularizing the overall patterns using "
-                    + "these focal points. The proposed procedure was tested on a "
-                    + "pair of very high resolution images, one from an optical "
-                    + "sensor and one from a SAR sensor. The experiments show an "
-                    + "increase in both the completeness and the quality indexes " + "for the extracted road network.",
+            Assert.assertEquals("Lorem ipsum abstract",
                     a.getField("abstract"));
 
         }

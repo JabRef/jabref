@@ -41,7 +41,7 @@ public class CanonicalBibtexEntry {
         // generate field entries
         StringJoiner sj = new StringJoiner(",\n", "", "\n");
         for (String fieldName : sortedFields) {
-            String line = String.format("  %s = {%s}", fieldName, mapFieldToValue.get(fieldName));
+            String line = String.format("  %s = {%s}", fieldName, String.valueOf(mapFieldToValue.get(fieldName)).replaceAll("\\r\\n","\n"));
             sj.add(line);
         }
         sb.append(sj);

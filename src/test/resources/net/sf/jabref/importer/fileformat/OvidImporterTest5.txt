@@ -12,8 +12,6 @@ Title
 Source
   Nursing Science Quarterly.   28(2):103-106, April 2015.
 Abstract
-  : The author presents ideas from Parse's humanbecoming paradigm, including living quality as the stuff of a life. The following question is explored: In what way could listening be important to living the core knowings of living quality? Three ways of viewing listening as connected to living quality are presented: listening as silence, listening as dialogue, and listening as ethics.
-
-  (C)2015Sage Publications
+  Lorem ipsum abstract
 DOI Number
   10.1177/0894318415571606

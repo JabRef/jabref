@@ -12,9 +12,7 @@ Title
 Source
   Ecohydrology.   8(6):1048-1064, September 2015.
 Abstract
-  : Cloud deposition can contribute a significant amount of water and elements to montane forests and thus play an important role in the hydrological and biochemical cycles of these ecosystems. However, elevational pattern in cloud and throughfall input to forest ecosystems and the associated chemical element fluxes are poorly understood so far. We studied gross precipitation, throughfall and cloud water deposition, and the associated fluxes of elements (N, P, Ca, K, Mg and Na) in five mature stands of Norway spruce along an elevation transect from lowlands to the alpine treeline (420-1060 m) at Mt Brocken (Harz Mountains, Germany). We tested the hypotheses that water input increases with elevation despite a reduction in intercepting plant surfaces, leading to higher inputs of nitrogen and other elements to high-elevation forests than in lower-elevation stands. Gross precipitation (only snow-free period) rose by 75% towards the treeline, but water input with throughfall increased by 350% because of a large increase in cloud water deposition (from 2 mm at 420 m to 160-200 mm at 1000 m in the study period). Element fluxes with gross precipitation were not uniformly related to elevation across all six elements. However, element fluxes via throughfall showed a positive correlation with elevation for all elements. Thus, the upper montane spruce forests received ~50-150% higher atmospheric inputs of base cations and inorganic N and ~200% higher P inputs than lower-elevation forests. We conclude that elevation does have a large influence on the atmospheric water and element inputs in temperate mountain forests. Copyright (C) 2014 John Wiley & Sons, Ltd.
-
-  (C) 2015 John Wiley & Sons, Ltd
+  Lorem ipsum abstract
 Author Keywords
   alpine treeline;  canopy cover;  canopy water budget;  gross precipitation;  Picea abies;  throughfall.
 References

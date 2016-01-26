@@ -618,12 +618,21 @@ public class BibtexParserTest {
     }
 
     @Test
-    @Ignore
-    public void parseIgnoresAndWarnsAboutEntryWithUnmatchedClosingBracket() throws IOException {
+    public void parseIgnoresArbitraryContentAfterEntry() throws IOException {
 
-        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket } to much}}"));
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }}}"));
 
-        Assert.assertTrue(result.hasWarnings());
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals("Size should be one, but was " + c.size(), 1, c.size());
+        Assert.assertEquals("Epilog should be preserved","}",result.getDatabase().getEpilog());
+    }
+
+    @Test
+    public void parseWarnsAboutUnmatchedContentInEntry() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, to much}"));
+
+        Assert.assertTrue("There should be warnings", result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
@@ -720,16 +729,15 @@ public class BibtexParserTest {
      * Test for SF Bug #1283
      */
     @Test
-    @Ignore
     public void parseRecognizesMonthFieldsWithFollowingComma() throws IOException {
 
-        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={Ed von Test}},month={8,},"));
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={Ed von Test},month={8,}},"));
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
 
         BibEntry e = c.iterator().next();
-        Assert.assertEquals(BibtexEntryTypes.ARTICLE, e.getType());
+        Assert.assertEquals("article", e.getType());
         Assert.assertEquals("test", e.getCiteKey());
         Assert.assertEquals(3, e.getFieldNames().size());
         Assert.assertEquals("Ed von Test", e.getField("author"));
