@@ -1035,7 +1035,7 @@ public class BibtexParserTest {
      * @author Andrei Haralevich
      */
     @Test
-    @Ignore
+    @Ignore("Ignoring, since the parser is not responsible for fixing the content. This should be done later")
     public void parseRemovesTabsInFileField() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,file = {ups  \tsala}}"));
 
@@ -1051,7 +1051,7 @@ public class BibtexParserTest {
      * @author Andrei Haralevich
      */
     @Test
-    @Ignore
+    @Ignore("Ignoring, since the parser is not responsible for fixing the content. This should be done later")
     public void parseRemovesNewlineInFileField() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,file = {ups \n\tsala}}"));
 
