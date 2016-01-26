@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.Globals;
@@ -59,9 +60,10 @@ public class LabelPatternPanel extends JPanel {
 
     // one field for each type
     private final Map<String, JTextField> textFields = new HashMap<>();
+    private final BasePanel panel;
 
-
-    public LabelPatternPanel(HelpDialog helpDiag) {
+    public LabelPatternPanel(HelpDialog helpDiag, BasePanel panel) {
+        this.panel = panel;
         help = new HelpAction(helpDiag, GUIGlobals.labelPatternHelp, Localization.lang("Help on key patterns"));
         buildGUI();
     }
@@ -121,7 +123,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(btnDefault, con);
         pan.add(btnDefault);
 
-        for (EntryType type : EntryTypes.getAllValues()) {
+        for (EntryType type : EntryTypes.getAllValues(panel.getLoadedDatabase().getType())) {
             textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
             y++;
         }

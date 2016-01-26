@@ -275,8 +275,7 @@ public class EndnoteImporter extends ImportFormat {
                 hm.put("pages", artnum);
             }
 
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getTypeOrDefault(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
             // create one here
             b.setField(hm);
             //if (hm.isEmpty())

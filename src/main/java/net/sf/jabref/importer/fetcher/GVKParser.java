@@ -360,7 +360,7 @@ public class GVKParser {
          * dann @incollection annehmen, wenn weder ISBN noch
          * ZDB-ID vorhanden sind.
          */
-        BibEntry result = new BibEntry(IdGenerator.next(), EntryTypes.getType(entryType));
+        BibEntry result = new BibEntry(IdGenerator.next(), entryType);
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {

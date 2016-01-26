@@ -93,8 +93,7 @@ class BibTeXMLHandler extends DefaultHandler {
                 "bibtex:unpublished".equals(raw) ||
                 "bibtex:misc".equals(raw) ||
                 "bibtex:other".equals(raw)) {
-            EntryType tp = EntryTypes.getType(local);
-            b.setType(tp);
+            b.setType(local);
         }
         currentChars = "";
     }

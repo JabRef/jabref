@@ -60,7 +60,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     private final Set<String> changed = new HashSet<>();
 
     private boolean biblatexMode;
-
+    private LoadedDatabase loadedDatabase;
 
     /**
      * Creates a new instance of EntryCustomizationDialog2
@@ -76,7 +76,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         Container pane = getContentPane();
         pane.setLayout(new BorderLayout());
 
-        biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
+        loadedDatabase = frame.getCurrentBasePanel().getLoadedDatabase();
+        biblatexMode = loadedDatabase.isBiblatexMode();
 
         JPanel main = new JPanel();
         JPanel buttons = new JPanel();
@@ -85,11 +86,11 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
         List<String> entryTypes = new ArrayList<>();
-        for (String s : EntryTypes.getAllTypes()) {
+        for (String s : EntryTypes.getAllTypes(loadedDatabase.getType())) {
             entryTypes.add(s);
         }
 
-        typeComp = new EntryTypeList(entryTypes);
+        typeComp = new EntryTypeList(entryTypes, loadedDatabase.getType());
         typeComp.addListSelectionListener(this);
         typeComp.addAdditionActionListener(this);
         typeComp.addDefaultActionListener(new DefaultListener());
@@ -179,7 +180,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         }
         List<String> rl = reqLists.get(s);
         if (rl == null) {
-            EntryType type = EntryTypes.getType(s);
+            EntryType type = EntryTypes.getType(s,loadedDatabase.getType());
             if (type == null) {
                 // New entry
                 reqComp.setFields(new ArrayList<>());
@@ -247,13 +248,13 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             if (defaulted.contains(stringListEntry.getKey())) {
                 // This type should be reverted to its default setup.
                 String nm = EntryUtil.capitalizeFirst(stringListEntry.getKey());
-                EntryTypes.removeType(nm);
+                EntryTypes.removeType(nm, loadedDatabase.getType());
 
                 updateTypesForEntries(nm);
                 continue;
             }
 
-            EntryType oldType = EntryTypes.getType(stringListEntry.getKey());
+            EntryType oldType = EntryTypes.getType(stringListEntry.getKey(), loadedDatabase.getType());
             if (oldType != null) {
                 List<String> oldReq = oldType.getRequiredFieldsFlat();
                 List<String> oldOpt = oldType.getOptionalFields();
@@ -280,7 +281,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         }
 
         Set<Object> toRemove = new HashSet<>();
-        for (String o : EntryTypes.getAllTypes()) {
+        for (String o : EntryTypes.getAllTypes(loadedDatabase.getType())) {
             if (!types.contains(o)) {
                 toRemove.add(o);
             }
@@ -297,10 +298,10 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     }
 
     private void typeDeletion(String name) {
-        EntryType type = EntryTypes.getType(name);
+        EntryType type = EntryTypes.getType(name, loadedDatabase.getType());
 
         if (type instanceof CustomEntryType) {
-            if (EntryTypes.getStandardType(name) == null) {
+            if (EntryTypes.getStandardType(name, loadedDatabase.getType()) == null) {
                 int reply = JOptionPane.showConfirmDialog
                         (frame, Localization.lang("All entries of this "
                                         + "type will be declared "
@@ -312,7 +313,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                     return;
                 }
             }
-            EntryTypes.removeType(name);
+            EntryTypes.removeType(name, loadedDatabase.getType());
             updateTypesForEntries(EntryUtil.capitalizeFirst(name));
             changed.remove(name);
             reqLists.remove(name);
@@ -372,7 +373,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             bp.entryEditors.remove(typeName);
 
             for (BibEntry entry : bp.database().getEntries()) {
-                EntryType newType = EntryTypes.getType(entry.getType());
+                EntryType newType = EntryTypes.getType(entry.getType(), loadedDatabase.getType());
                 if (newType != null) {
                     entry.setType(newType);
                 }
@@ -400,7 +401,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             }
             defaulted.add(lastSelected);
 
-            EntryType type = EntryTypes.getStandardType(lastSelected);
+            EntryType type = EntryTypes.getStandardType(lastSelected, loadedDatabase.getType());
             if (type != null) {
                 List<String> of = type.getOptionalFields();
                 List<String> req = type.getRequiredFields();

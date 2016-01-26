@@ -138,24 +138,20 @@ public class SixpackImporter extends ImportFormat {
                 {
                     continue; // Avoid ArrayIndexOutOfBoundsException
                 }
-                EntryType typ = EntryTypes.getType(fields[1].toLowerCase());
-                if (typ == null) {
-                    String type = "";
-                    if ("Masterthesis".equals(fields[1])) {
-                        type = "mastersthesis";
-                    }
-                    if ("PhD-Thesis".equals(fields[1])) {
-                        type = "phdthesis";
-                    }
-                    if ("miscellaneous".equals(fields[1])) {
-                        type = "misc";
-                    }
-                    if ("Conference".equals(fields[1])) {
-                        type = "proceedings";
-                    }
-                    typ = EntryTypes.getType(type.toLowerCase());
+                String type = fields[1].toLowerCase();
+                if ("Masterthesis".equals(fields[1])) {
+                    type = "mastersthesis";
                 }
-                entry = new BibEntry(IdGenerator.next(), typ);
+                if ("PhD-Thesis".equals(fields[1])) {
+                    type = "phdthesis";
+                }
+                if ("miscellaneous".equals(fields[1])) {
+                    type = "misc";
+                }
+                if ("Conference".equals(fields[1])) {
+                    type = "proceedings";
+                }
+                entry = new BibEntry(IdGenerator.next(), type);
                 String fld;
                 for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++) {
                     fld = fI.get(fieldDef[i]);

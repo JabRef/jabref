@@ -260,8 +260,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 hm.put("comment", comment);
             }
 
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getTypeOrDefault(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();

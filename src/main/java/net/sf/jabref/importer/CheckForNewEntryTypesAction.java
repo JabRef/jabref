@@ -20,7 +20,9 @@ import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.LoadedDatabase;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.BibDatabaseType;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.EntryTypes;
@@ -34,10 +36,11 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult pr) {
+        BibDatabaseType type = new LoadedDatabase(pr.getDatabase(), pr.getMetaData()).getType();
         // See if any custom entry types were imported, but disregard those we already know:
         for (Iterator<String> i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
             String typeName = i.next().toLowerCase();
-            if (EntryTypes.getType(typeName) != null) {
+            if (EntryTypes.getType(typeName, type) != null) {
                 i.remove();
             }
         }

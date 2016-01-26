@@ -30,7 +30,7 @@ public class ExplicitGroupTest {
     }
 
     public BibEntry makeBibtexEntry() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION);
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
         e.setField("title", "Marine finfish larviculture in Europe");
         e.setField("bibtexkey", "shields01");
         e.setField("year", "2001");

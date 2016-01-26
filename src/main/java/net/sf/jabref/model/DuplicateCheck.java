@@ -16,6 +16,7 @@
 package net.sf.jabref.model;
 
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.database.BibDatabaseType;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -72,13 +73,13 @@ public class DuplicateCheck {
      * @param two BibEntry
      * @return boolean
      */
-    public static boolean isDuplicate(BibEntry one, BibEntry two) {
+    public static boolean isDuplicate(BibEntry one, BibEntry two, BibDatabaseType bibDatabaseType) {
 
         // First check if they are of the same type - a necessary condition:
         if (!one.getType().equals(two.getType())) {
             return false;
         }
-        EntryType type = EntryTypes.getType(one.getType());
+        EntryType type = EntryTypes.getType(one.getType(), bibDatabaseType);
 
         // The check if they have the same required fields:
         java.util.List<String> var = type.getRequiredFieldsFlat();
@@ -214,9 +215,9 @@ public class DuplicateCheck {
      * @param entry    The entry of which we are looking for duplicates.
      * @return The first duplicate entry found. null if no duplicates are found.
      */
-    public static Optional<BibEntry> containsDuplicate(BibDatabase database, BibEntry entry) {
+    public static Optional<BibEntry> containsDuplicate(BibDatabase database, BibEntry entry, BibDatabaseType bibDatabaseType) {
         for (BibEntry other : database.getEntries()) {
-            if (DuplicateCheck.isDuplicate(entry, other)) {
+            if (DuplicateCheck.isDuplicate(entry, other, bibDatabaseType)) {
                 return Optional.of(other); // Duplicate found.
             }
         }

@@ -234,8 +234,7 @@ class MedlineHandler extends DefaultHandler
             }
             String keywords = sb.toString();
 
-            BibEntry b = new BibEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
-            EntryTypes.getTypeOrDefault("article")); // id assumes an existing database so don't create one here
+            BibEntry b = new BibEntry(IdGenerator.next(), "article"); // id assumes an existing database so don't create one here
             if (!"".equals(author)) {
                 b.setField("author", MedlineHandler.HTML_CONVERTER.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));

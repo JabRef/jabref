@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.database.BibDatabaseType;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,11 +75,12 @@ public abstract class DBImporter extends DBImporterExporter {
      * Worker method to perform the import from a database
      *
      * @param dbs The necessary database connection information
+     * @param type
      * @return An ArrayList containing pairs of Objects. Each position of the ArrayList stores three Objects: a
      * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
      * @throws Exception
      */
-    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs) throws Exception {
+    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs, BibDatabaseType type) throws Exception {
         List<DBImporterResult> result = new ArrayList<>();
         try (Connection conn = this.connectToDB(dbs)) {
 
@@ -101,7 +103,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         ResultSet rsEntryType = entryTypes.getResultSet();
                         while (rsEntryType.next()) {
                             types.put(rsEntryType.getString("entry_types_id"),
-                                    EntryTypes.getType(rsEntryType.getString("label")));
+                                    EntryTypes.getType(rsEntryType.getString("label"), type));
                         }
                         rsEntryType.getStatement().close();
                     }
@@ -116,8 +118,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         ResultSet rsEntries = entryStatement.getResultSet();
                         while (rsEntries.next()) {
                             String id = rsEntries.getString("entries_id");
-                            BibEntry entry = new BibEntry(IdGenerator.next(),
-                                    types.get(rsEntries.getString("entry_types_id")));
+                            BibEntry entry = new BibEntry(IdGenerator.next(), types.get(rsEntries.getString("entry_types_id")).getName());
                             entry.setField(BibEntry.KEY_FIELD, rsEntries.getString("cite_key"));
                             for (String col : colNames) {
                                 String value = rsEntries.getString(col);

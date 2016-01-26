@@ -27,6 +27,7 @@ import javax.swing.*;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.LoadedDatabase;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
@@ -44,6 +45,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     private final boolean biblatexMode;
 
     private final CancelAction cancelAction = new CancelAction();
+    private final LoadedDatabase loadedDatabase;
 
     static class TypeButton extends JButton implements Comparable<TypeButton> {
         final EntryType type;
@@ -64,7 +66,9 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         // modal dialog
         super(frame, true);
 
-        biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
+        loadedDatabase = frame.getCurrentBasePanel().getLoadedDatabase();
+        biblatexMode = loadedDatabase.isBiblatexMode();
+
 
         setTitle(Localization.lang("Select entry type"));
 
@@ -88,7 +92,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         panel.setLayout(new VerticalLayout());
 
         if(biblatexMode) {
-            panel.add(createEntryGroupPanel("BibLateX", EntryTypes.getAllValues()));
+            panel.add(createEntryGroupPanel("BibLateX", EntryTypes.getAllValues(loadedDatabase.getType())));
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));

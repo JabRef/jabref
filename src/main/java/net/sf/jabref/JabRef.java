@@ -344,8 +344,8 @@ public class JabRef {
                         if (!pr.isInvalid()) {
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + data[0]);
-                                SaveSession session = FileActions.saveDatabase(pr.getDatabase(), pr.getMetaData(),
-                                        new File(data[0]), Globals.prefs, false, false,
+                                SaveSession session = FileActions.saveDatabase(new LoadedDatabase(pr.getDatabase(), pr.getMetaData(),
+                                        new File(data[0])), Globals.prefs, false, false,
                                         Globals.prefs.getDefaultEncoding(), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
@@ -432,8 +432,8 @@ public class JabRef {
 
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + subName);
-                                SaveSession session = FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
-                                        new File(subName), Globals.prefs, false, false,
+                                SaveSession session = FileActions.saveDatabase(new LoadedDatabase(newBase, new MetaData(),
+                                        new File(subName)), Globals.prefs, false, false,
                                         Globals.prefs.getDefaultEncoding(), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {

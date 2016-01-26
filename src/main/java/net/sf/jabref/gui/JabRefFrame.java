@@ -67,6 +67,7 @@ import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseType;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -101,8 +102,6 @@ import osx.macadapter.MacAdapter;
 public class JabRefFrame extends JFrame implements OutputPrinter {
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
-    private static final boolean biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
-
     final JSplitPane contentPane = new JSplitPane();
 
     private final JabRefPreferences prefs = Globals.prefs;
@@ -125,7 +124,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             IntegrityCheck check = new IntegrityCheck();
-            List<IntegrityMessage> messages = check.checkBibtexDatabase(getCurrentBasePanel().database());
+            List<IntegrityMessage> messages = check.checkBibtexDatabase(getCurrentBasePanel().database(), getCurrentBasePanel().loadedDatabase.isBiblatexMode());
 
             if (messages.isEmpty()) {
                 JOptionPane.showMessageDialog(getCurrentBasePanel(), Localization.lang("No problems found."));
@@ -240,7 +239,26 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JToggleButton fetcherToggle;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
-    private final AbstractAction editModeAction = new SwitchBibtexModeAction();
+    private final AbstractAction editModeAction = new AbstractAction() {
+
+        @Override
+        public void actionPerformed(ActionEvent evt) {
+            if(isBiblatexMode()) {
+                // to BibteX
+                JabRefFrame.this.getCurrentBasePanel().getLoadedDatabase().setType(BibDatabaseType.BIBTEX);
+            } else {
+                // to Biblatex
+                JabRefFrame.this.getCurrentBasePanel().getLoadedDatabase().setType(BibDatabaseType.BIBLATEX);
+            }
+            // update menu label
+            putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", "BibTeX/BibLaTeX"));
+        }
+
+        private boolean isBiblatexMode() {
+            return JabRefFrame.this.getCurrentBasePanel().getLoadedDatabase().isBiblatexMode();
+        }
+
+    };
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
     private final AbstractAction newDatabaseAction = new NewDatabaseAction(this);
@@ -499,14 +517,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private List<NewEntryAction> getNewEntryActions() {
         List<NewEntryAction> actions = new ArrayList<>();
 
-        if (biblatexMode) {
-            for (String key : EntryTypes.getAllTypes()) {
-                actions.add(new NewEntryAction(this, key));
+        if (this.getCurrentBasePanel() != null && this.getCurrentBasePanel().loadedDatabase.isBiblatexMode()) {
+            for (EntryType entryType : BibLatexEntryTypes.ALL) {
+                actions.add(new NewEntryAction(this, entryType.getName()));
             }
         } else {
             // Bibtex
             for (EntryType type : BibtexEntryTypes.ALL) {
-                KeyStroke keyStroke = ChangeEntryTypeMenu.entryShortCuts.get(type.getName());
+                KeyStroke keyStroke = new ChangeEntryTypeMenu().entryShortCuts.get(type.getName());
                 if (keyStroke == null) {
                     actions.add(new NewEntryAction(this, type.getName()));
                 } else {
@@ -681,7 +699,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     public void setWindowTitle() {
         BasePanel panel = getCurrentBasePanel();
-        String mode = biblatexMode ? " (" + Localization.lang("%0 mode", "BibLaTeX") + ")" : " (" + Localization.lang("%0 mode", "BibTeX") + ")";
+        String mode = panel.getLoadedDatabase().isBiblatexMode() ? " (" + Localization.lang("%0 mode", "BibLaTeX") + ")" : " (" + Localization.lang("%0 mode", "BibTeX") + ")";
 
         // no database open
         if (panel == null) {
@@ -1017,6 +1035,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * Returns the currently viewed BasePanel.
      */
     public BasePanel getCurrentBasePanel() {
+        if(tabbedPane == null) {
+            return null;
+        }
         return (BasePanel) tabbedPane.getSelectedComponent();
     }
 

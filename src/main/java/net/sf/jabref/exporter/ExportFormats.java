@@ -210,7 +210,7 @@ public class ExportFormats {
                     Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().loadedDatabase.getMetaData()
                             .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
                     // Also store the database's file in a global variable:
-                    Globals.prefs.databaseFile = frame.getCurrentBasePanel().loadedDatabase.getMetaData().getFile();
+                    Globals.prefs.databaseFile = frame.getCurrentBasePanel().loadedDatabase.getDatabaseFile();
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:

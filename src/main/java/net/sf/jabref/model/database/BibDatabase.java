@@ -29,7 +29,7 @@ Modified for use in JabRef
  */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.MonthUtil;
+import net.sf.jabref.model.entry.*;
 
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
@@ -37,9 +37,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.TypedBibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -71,7 +68,7 @@ public class BibDatabase {
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
     public BibDatabaseType getBibType() {
-        return BibDatabaseTypeDetection.inferType(entries.values());
+        return BibDatabaseTypeDetection.inferType(this);
     }
 
     /**
@@ -553,8 +550,7 @@ public class BibDatabase {
      */
     public static String getResolvedField(String field, BibEntry entry, BibDatabase database) {
         if ("bibtextype".equals(field)) {
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.ofNullable(database));
-            return typedEntry.getTypeForDisplay();
+            return EntryUtil.capitalizeFirst(entry.getType());
         }
 
         // TODO: Changed this to also consider alias fields, which is the expected

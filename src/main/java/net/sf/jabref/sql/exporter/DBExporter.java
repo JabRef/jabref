@@ -28,6 +28,8 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.LoadedDatabase;
+import net.sf.jabref.model.database.BibDatabaseType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -81,7 +83,7 @@ public abstract class DBExporter extends DBImporterExporter {
 
         final int database_id = getDatabaseIDByName(metaData, out, dbName);
         removeAllRecordsForAGivenDB(out, database_id);
-        populateEntryTypesTable(out);
+        populateEntryTypesTable(out, new LoadedDatabase(database, metaData).getType());
         populateEntriesTable(database_id, entries, out);
         populateStringTable(database, out, database_id);
         populateGroupTypesTable(out);
@@ -186,9 +188,10 @@ public abstract class DBExporter extends DBImporterExporter {
      * Generates the SQL required to populate the entry_types table with jabref data.
      *
      * @param out The output (PrintSream or Connection) object to which the DML should be written.
+     * @param type
      */
 
-    private void populateEntryTypesTable(Object out) throws SQLException {
+    private void populateEntryTypesTable(Object out, BibDatabaseType type) throws SQLException {
         List<String> fieldRequirement = new ArrayList<>();
 
         List<String> existentTypes = new ArrayList<>();
@@ -200,7 +203,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
             }
         }
-        for (EntryType val : EntryTypes.getAllValues()) {
+        for (EntryType val : EntryTypes.getAllValues(type)) {
             StringBuilder querySB = new StringBuilder();
 
             fieldRequirement.clear();

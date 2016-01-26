@@ -319,7 +319,7 @@ public class PdfImporter {
 
         if (type != null) { // Only if the dialog was not cancelled.
             String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, type);
+            final BibEntry be = new BibEntry(id, type.getName());
             try {
                 panel.database().insertEntry(be);
 

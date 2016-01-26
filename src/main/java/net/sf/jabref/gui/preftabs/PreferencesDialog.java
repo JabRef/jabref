@@ -109,7 +109,7 @@ public class PreferencesDialog extends JDialog {
         tabs.add(new ExternalTab(frame, this, prefs, parent.helpDiag));
         tabs.add(new TablePrefsTab(prefs));
         tabs.add(new TableColumnsTab(prefs, parent));
-        tabs.add(new LabelPatternPrefTab(prefs, parent.helpDiag));
+        tabs.add(new LabelPatternPrefTab(prefs, parent.helpDiag, parent.getCurrentBasePanel()));
         tabs.add(new PreviewPrefsTab(prefs));
         tabs.add(new NameFormatterTab(parent.helpDiag));
         tabs.add(new ImportSettingsTab());
@@ -220,7 +220,6 @@ public class PreferencesDialog extends JDialog {
                 try {
                     prefs.importPreferences(filename);
                     setValues();
-                    CustomEntryTypesManager.loadCustomEntryTypes(prefs);
                     ExportFormats.initAllExports();
                     frame.removeCachedEntryEditors();
                     Globals.prefs.updateEntryEditorTabList();

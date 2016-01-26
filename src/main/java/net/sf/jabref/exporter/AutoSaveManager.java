@@ -15,11 +15,15 @@
  */
 package net.sf.jabref.exporter;
 
+import net.sf.jabref.LoadedDatabase;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.List;
@@ -34,9 +38,7 @@ public class AutoSaveManager {
     private final JabRefFrame frame;
     private Timer t;
 
-
     public AutoSaveManager(JabRefFrame frame) {
-
         this.frame = frame;
     }
 
@@ -84,8 +86,7 @@ public class AutoSaveManager {
      * @return its corresponding autosave file.
      */
     public static File getAutoSaveFile(File f) {
-        String n = f.getName();
-        return new File(f.getParentFile(), ".$" + n + '$');
+        return new File(f.getParentFile(), ".$" + f.getName() + '$');
     }
 
     /**
@@ -94,11 +95,11 @@ public class AutoSaveManager {
      * @return true if successful, false otherwise.
      */
     private static boolean autoSave(BasePanel panel) {
-        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getLoadedDatabase().getDatabaseFile());
+        File databaseFile = panel.getLoadedDatabase().getDatabaseFile();
+        File backupFile = AutoSaveManager.getAutoSaveFile(databaseFile);
         try {
-            SaveSession ss = FileActions.saveDatabase(panel.database(), panel.loadedDatabase.getMetaData(),
-                    backupFile, Globals.prefs,
-                    false, false, panel.getEncoding(), true);
+            SaveSession ss = FileActions.saveDatabase(new LoadedDatabase(panel.database(), panel.loadedDatabase.getMetaData(),
+                    backupFile), Globals.prefs, false, false, panel.getEncoding(), true);
             ss.commit();
         } catch (SaveException e) {
             e.printStackTrace();
@@ -106,6 +107,9 @@ public class AutoSaveManager {
         } catch (Throwable ex) {
             ex.printStackTrace();
             return false;
+        } finally {
+            // HACK required to reset the file field of the metadata
+            panel.loadedDatabase.getMetaData().setFile(databaseFile);
         }
         return true;
     }

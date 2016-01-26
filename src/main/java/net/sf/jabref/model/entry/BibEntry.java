@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.jabref.model.database.BibDatabaseType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -75,11 +76,7 @@ public class BibEntry {
     }
 
     public BibEntry(String id) {
-        this(id, EntryTypes.getTypeOrDefault("misc"));
-    }
-
-    public BibEntry(String id, EntryType type) {
-        this(id, type.getName());
+        this(id, "misc");
     }
 
     public BibEntry(String id, String type) {

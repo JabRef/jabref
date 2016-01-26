@@ -936,11 +936,9 @@ class MSBibEntry {
 
         BibEntry entry = null;
         if (tag == null) {
-            entry = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID,
-                    mapMSBibToBibtexType(sourceType));
+            entry = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, mapMSBibToBibtexType(sourceType).getName());
         } else {
-            entry = new BibEntry(tag,
-                    mapMSBibToBibtexType(sourceType)); // id assumes an existing database so don't
+            entry = new BibEntry(tag, mapMSBibToBibtexType(sourceType).getName()); // id assumes an existing database so don't
         }
 
         // Todo: add check for BibTexEntry types

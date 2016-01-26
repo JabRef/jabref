@@ -8,6 +8,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
 import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.database.BibDatabaseType;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -116,7 +117,7 @@ public class XMPUtilTest {
 
     public static String bibtexEntry2BibtexString(BibEntry e) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibEntryWriter(new LatexFieldFormatter(), false).write(e, sw);
+        new BibEntryWriter(new LatexFieldFormatter(), false).write(e, sw, BibDatabaseType.BIBTEX);
         return sw.getBuffer().toString();
     }
 
@@ -146,7 +147,7 @@ public class XMPUtilTest {
     }
 
     public BibEntry t2BibtexEntry() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION);
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
         e.setField("title", "�pt�mz�t��n");
         e.setField("bibtexkey", "OezbekC06");
         e.setField("year", "2003");

@@ -15,7 +15,7 @@ public class BibDatabaseTypeDetection {
     private static final List<EntryType> exclusiveBiblatex = filterEntryTypes(biblatex, isNotIncludedIn(bibtex));
 
     /**
-     * Tries to infer the database type by examining a BibEntry collection.
+     * Tries to infer the database type by examining a BibDatabase database.
      *
      * All checks are based on the case-insensitive comparison of entry tag names.
      * Only standard BibTex and Biblatex entry types are considered in the decision process.
@@ -24,18 +24,18 @@ public class BibDatabaseTypeDetection {
      * 2. Check if any exclusive Biblatex fields are present
      * 3. Otherwise return BibTex
      *
-     * @param entries a BibEntry collection
+     * @param database a BibDatabase database
      * @return the inferred database type
      */
-    public static BibDatabaseType inferType(Collection<BibEntry> entries) {
-        final List<String> entryTypes = getEntryTypes(entries);
+    public static BibDatabaseType inferType(BibDatabase database) {
+        final List<String> entryTypes = getEntryTypes(database.getEntries());
 
         // type-based check
         if (entryTypes.stream().anyMatch(isIncludedIn(exclusiveBiblatex))) {
             return BibDatabaseType.BIBLATEX;
         } else {
             // field-based check
-            if(entries.stream().anyMatch(hasBiblatexFields())) {
+            if(database.getEntries().stream().anyMatch(hasBiblatexFields())) {
                 return BibDatabaseType.BIBLATEX;
             }
         }

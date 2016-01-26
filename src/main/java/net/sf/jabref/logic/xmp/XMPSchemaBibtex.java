@@ -294,21 +294,12 @@ public class XMPSchemaBibtex extends XMPSchema {
                 setTextProperty(field, value);
             }
         }
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
-        setTextProperty("entrytype", typedEntry.getTypeForDisplay());
+        setTextProperty("entrytype", entry.getType());
     }
 
     public BibEntry getBibtexEntry() {
-
         String type = getTextProperty("entrytype");
-        EntryType t;
-        if (type != null) {
-            t = EntryTypes.getStandardType(type);
-        } else {
-            t = BibtexEntryTypes.MISC;
-        }
-
-        BibEntry e = new BibEntry(IdGenerator.next(), t);
+        BibEntry e = new BibEntry(IdGenerator.next(), String.valueOf(type));
 
         // Get Text Properties
         Map<String, String> text = XMPSchemaBibtex.getAllProperties(this, "bibtex");

@@ -3,6 +3,7 @@ package net.sf.jabref.gui.maintable;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.TypedBibEntry;
 
 import javax.swing.*;
@@ -95,8 +96,7 @@ public class MainTableColumn {
         String content = null;
         for (String field : bibtexFields) {
             if (field.equals(BibEntry.TYPE_HEADER)) {
-                TypedBibEntry typedEntry = new TypedBibEntry(entry, database);
-                content = typedEntry.getTypeForDisplay();
+                content = EntryUtil.capitalizeFirst(entry.getType());
             } else {
                 content = entry.getFieldOrAlias(field);
                 if (database.isPresent() && "Author".equalsIgnoreCase(columnName) && (content != null)) {

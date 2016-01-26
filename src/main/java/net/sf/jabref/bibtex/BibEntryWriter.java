@@ -4,6 +4,7 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabaseType;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class BibEntryWriter {
         this.write = write;
     }
 
-    public void write(BibEntry entry, Writer out) throws IOException {
+    public void write(BibEntry entry, Writer out, BibDatabaseType bibDatabaseType) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!entry.hasChanged()) {
             out.write(entry.getParsedSerialization());
@@ -33,17 +34,17 @@ public class BibEntryWriter {
         }
         out.write(Globals.NEWLINE + Globals.NEWLINE);
 
-        writeRequiredFieldsFirstRemainingFieldsSecond(entry, out);
+        writeRequiredFieldsFirstRemainingFieldsSecond(entry, out, bibDatabaseType);
     }
 
-    public void writeWithoutPrependedNewlines(BibEntry entry, Writer out) throws IOException {
+    public void writeWithoutPrependedNewlines(BibEntry entry, Writer out, BibDatabaseType bibDatabaseType) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!entry.hasChanged()) {
             out.write(entry.getParsedSerialization().trim());
             return;
         }
 
-        writeRequiredFieldsFirstRemainingFieldsSecond(entry, out);
+        writeRequiredFieldsFirstRemainingFieldsSecond(entry, out, bibDatabaseType);
     }
 
     /**
@@ -53,9 +54,9 @@ public class BibEntryWriter {
      * @param out
      * @throws IOException
      */
-    private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, Writer out) throws IOException {
+    private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, Writer out, BibDatabaseType bibDatabaseType) throws IOException {
         // Write header with type and bibtex-key.
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), bibDatabaseType);
         out.write('@' + typedEntry.getTypeForDisplay() + '{');
 
         writeKeyField(entry, out);
@@ -65,7 +66,7 @@ public class BibEntryWriter {
         boolean hasWritten = false;
         int indentation = getLengthOfLongestFieldName(entry);
 
-        EntryType type = EntryTypes.getType(entry.getType());
+        EntryType type = EntryTypes.getType(entry.getType(), bibDatabaseType);
 
         // Write required fields first.
         List<String> fields = type.getRequiredFieldsFlat();

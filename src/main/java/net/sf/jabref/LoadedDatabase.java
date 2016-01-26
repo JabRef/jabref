@@ -2,6 +2,7 @@ package net.sf.jabref;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseType;
+import net.sf.jabref.model.database.BibDatabaseTypeDetection;
 
 import java.io.File;
 import java.util.Objects;
@@ -25,15 +26,22 @@ public class LoadedDatabase {
     public LoadedDatabase(BibDatabase database, MetaData metaData) {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
+
+        this.setType(getType());
     }
 
     public LoadedDatabase(BibDatabase database, MetaData metaData, File file) {
         this(database, metaData);
+
         this.metaData.setFile(file);
     }
 
     public BibDatabaseType getType() {
-        return BibDatabaseType.valueOf(metaData.getData(DATABASE_TYPE).get(0));
+        Vector<String> data = metaData.getData(DATABASE_TYPE);
+        if(data == null) {
+            return BibDatabaseTypeDetection.inferType(database);
+        }
+        return BibDatabaseType.valueOf(data.get(0));
     }
 
     public void setType(BibDatabaseType type) {
@@ -57,5 +65,9 @@ public class LoadedDatabase {
 
     public MetaData getMetaData() {
         return metaData;
+    }
+
+    public boolean isBiblatexMode() {
+        return getType() == BibDatabaseType.BIBLATEX;
     }
 }

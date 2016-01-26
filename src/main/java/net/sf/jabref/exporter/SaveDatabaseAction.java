@@ -226,10 +226,10 @@ public class SaveDatabaseAction extends AbstractWorker {
         frame.block();
         try {
             if (selectedOnly) {
-                session = FileActions.savePartOfDatabase(panel.database(), panel.loadedDatabase.getMetaData(), file, Globals.prefs,
+                session = FileActions.savePartOfDatabase(new LoadedDatabase(panel.database(), panel.loadedDatabase.getMetaData(), file), Globals.prefs,
                         panel.getSelectedEntries(), encoding, FileActions.DatabaseSaveType.DEFAULT);
             } else {
-                session = FileActions.saveDatabase(panel.database(), panel.loadedDatabase.getMetaData(), file,
+                session = FileActions.saveDatabase(new LoadedDatabase(panel.database(), panel.loadedDatabase.getMetaData(), file),
                         Globals.prefs, false, false, encoding, false);
             }
 
@@ -375,7 +375,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         if (chosenFile != null) {
-            File oldFile = panel.loadedDatabase.getMetaData().getFile();
+            File oldFile = panel.loadedDatabase.getDatabaseFile();
             panel.loadedDatabase.getMetaData().setFile(f);
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
             runCommand();
@@ -390,7 +390,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             } catch (IOException ex) {
                 LOGGER.error("Problem registering file change notifications", ex);
             }
-            frame.getFileHistory().newFile(panel.loadedDatabase.getMetaData().getFile().getPath());
+            frame.getFileHistory().newFile(panel.loadedDatabase.getDatabaseFile().getPath());
         }
 
     }

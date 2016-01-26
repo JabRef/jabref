@@ -8,6 +8,7 @@ import net.sf.jabref.gui.actions.ChangeTypeAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabaseType;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
@@ -18,10 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChangeEntryTypeMenu {
-    private static final boolean biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
-    public static final Map<String, KeyStroke> entryShortCuts = new HashMap<>();
+    public final Map<String, KeyStroke> entryShortCuts = new HashMap<>();
 
-    static {
+    public ChangeEntryTypeMenu () {
         entryShortCuts.put(BibtexEntryTypes.ARTICLE.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_ARTICLE));
         entryShortCuts.put(BibtexEntryTypes.BOOK.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_BOOK));
         entryShortCuts.put(BibtexEntryTypes.PHDTHESIS.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_PHDTHESIS));
@@ -31,13 +31,13 @@ public class ChangeEntryTypeMenu {
         entryShortCuts.put(BibtexEntryTypes.UNPUBLISHED.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_UNPUBLISHED));
     }
 
-    public static JMenu getChangeEntryTypeMenu(BasePanel panel) {
+    public JMenu getChangeEntryTypeMenu(BasePanel panel) {
         JMenu menu = new JMenu(Localization.lang("Change entry type"));
         populateChangeEntryTypeMenu(menu, panel);
         return menu;
     }
 
-    public static JPopupMenu getChangeentryTypePopupMenu(BasePanel panel) {
+    public JPopupMenu getChangeentryTypePopupMenu(BasePanel panel) {
         JMenu menu = getChangeEntryTypeMenu(panel);
         return menu.getPopupMenu();
     }
@@ -45,13 +45,13 @@ public class ChangeEntryTypeMenu {
      * Remove all types from the menu. Then cycle through all available
      * types, and add them.
      */
-    private static void populateChangeEntryTypeMenu(JMenu menu, BasePanel panel) {
+    private void populateChangeEntryTypeMenu(JMenu menu, BasePanel panel) {
         menu.removeAll();
 
         // biblatex?
-        if(biblatexMode) {
-            for (String key : EntryTypes.getAllTypes()) {
-                menu.add(new ChangeTypeAction(EntryTypes.getType(key), panel));
+        if(panel.getLoadedDatabase().isBiblatexMode()) {
+            for (String key : EntryTypes.getAllTypes(BibDatabaseType.BIBLATEX)) {
+                menu.add(new ChangeTypeAction(EntryTypes.getType(key, BibDatabaseType.BIBLATEX), panel));
             }
         } else {
             // Bibtex
@@ -65,7 +65,7 @@ public class ChangeEntryTypeMenu {
         }
     }
 
-    private static void createEntryTypeSection(BasePanel panel, JMenu menu, String title, java.util.List<EntryType> types) {
+    private void createEntryTypeSection(BasePanel panel, JMenu menu, String title, java.util.List<EntryType> types) {
         // bibtex
         JMenuItem header = new JMenuItem(title);
         Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());

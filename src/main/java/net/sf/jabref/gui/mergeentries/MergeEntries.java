@@ -25,6 +25,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.model.database.BibDatabaseType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,6 +68,7 @@ public class MergeEntries {
     private final BibEntry mergedEntry = new BibEntry();
     private final BibEntry one;
     private final BibEntry two;
+    private final BibDatabaseType type;
     private JTextArea jta;
     private PreviewPanel pp;
     private Boolean doneBuilding = false;
@@ -84,9 +86,10 @@ public class MergeEntries {
      * @param bOne First entry
      * @param bTwo Second entry
      */
-    public MergeEntries(BibEntry bOne, BibEntry bTwo) {
+    public MergeEntries(BibEntry bOne, BibEntry bTwo, BibDatabaseType type) {
         one = bOne;
         two = bTwo;
+        this.type = type;
         initialize();
     }
 
@@ -98,11 +101,13 @@ public class MergeEntries {
      * @param headingOne Heading for first entry
      * @param headingTwo Heading for second entry
      */
-    public MergeEntries(BibEntry bOne, BibEntry bTwo, String headingOne, String headingTwo) {
+    public MergeEntries(BibEntry bOne, BibEntry bTwo, String headingOne, String headingTwo, BibDatabaseType type) {
         columnHeadings[1] = headingOne;
         columnHeadings[5] = headingTwo;
         one = bOne;
         two = bTwo;
+
+        this.type = type;
 
         initialize();
     }
@@ -337,7 +342,7 @@ public class MergeEntries {
         jta.setEditable(false);
         StringWriter sw = new StringWriter();
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw, type);
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
         }
@@ -420,7 +425,7 @@ public class MergeEntries {
         // Update the Bibtex source view
         StringWriter sw = new StringWriter();
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw, type);
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
         }

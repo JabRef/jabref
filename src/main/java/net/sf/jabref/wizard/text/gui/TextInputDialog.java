@@ -120,7 +120,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private final TagToMarkedTextStore marked;
 
-    private final JabRefFrame _frame;
+    private final JabRefFrame frame;
 
     private boolean okPressed;
 
@@ -128,7 +128,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     public TextInputDialog(JabRefFrame frame, String title, boolean modal, BibEntry bibEntry) {
         super(frame, title, modal);
 
-        _frame = frame;
+        this.frame = frame;
 
         entry = bibEntry;
         marked = new TagToMarkedTextStore();
@@ -502,7 +502,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw, frame.getCurrentBasePanel().getLoadedDatabase().getType());
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored) {
@@ -514,7 +514,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private String[] getAllFields() {
         ArrayList<String> f = new ArrayList<>();
-        EntryType type = EntryTypes.getType(entry.getType());
+        EntryType type = EntryTypes.getType(entry.getType(), frame.getCurrentBasePanel().getLoadedDatabase().getType());
         List<String> req = type.getRequiredFieldsFlat();
         List<String> opt = type.getOptionalFields();
         List<String> allFields = BibtexFields.getAllFieldNames();
@@ -564,7 +564,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = FileDialogs.getNewFile(_frame, null, null,
+                String chosen = FileDialogs.getNewFile(frame, null, null,
                         ".txt",
                         JFileChooser.OPEN_DIALOG, false);
                 if (chosen != null) {

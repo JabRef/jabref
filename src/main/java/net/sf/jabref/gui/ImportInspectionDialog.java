@@ -131,7 +131,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private BasePanel panel;
 
-    private final JabRefFrame frame;
+    public final JabRefFrame frame;
 
     private final MetaData metaData;
 
@@ -401,7 +401,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Checking duplicates means both checking against the background
             // database (if
             // applicable) and against entries already in the table.
-            if (((panel != null) && (DuplicateCheck.containsDuplicate(panel.database(), entry).isPresent()))
+            if (((panel != null) && (DuplicateCheck.containsDuplicate(panel.database(), entry, panel.getLoadedDatabase().getType()).isPresent()))
                     || (internalDuplicate(this.entries, entry).isPresent())) {
                 entry.setGroupHit(true);
                 deselectAllDuplicates.setEnabled(true);
@@ -420,12 +420,12 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * @param entry   The entry to search for duplicates of.
      * @return A possible duplicate, if any, or null if none were found.
      */
-    private static Optional<BibEntry> internalDuplicate(Collection<BibEntry> entriesDupe, BibEntry entry) {
+    private Optional<BibEntry> internalDuplicate(Collection<BibEntry> entriesDupe, BibEntry entry) {
         for (BibEntry othEntry : entriesDupe) {
             if (othEntry.equals(entry)) {
                 continue; // Don't compare the entry to itself
             }
-            if (DuplicateCheck.isDuplicate(entry, othEntry)) {
+            if (DuplicateCheck.isDuplicate(entry, othEntry, panel.getLoadedDatabase().getType())) {
                 return Optional.of(othEntry);
             }
         }
@@ -1067,7 +1067,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Is this the duplicate icon column, and is there an icon?
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibEntry first = sortedList.get(row);
-                Optional<BibEntry> other = DuplicateCheck.containsDuplicate(panel.database(), first);
+                Optional<BibEntry> other = DuplicateCheck.containsDuplicate(panel.database(), first, panel.getLoadedDatabase().getType());
                 if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.

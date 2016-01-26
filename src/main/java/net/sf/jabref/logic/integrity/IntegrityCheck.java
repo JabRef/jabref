@@ -2,6 +2,7 @@ package net.sf.jabref.logic.integrity;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.LoadedDatabase;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -20,15 +21,18 @@ public class IntegrityCheck {
     public static final Checker BRACKET_CHECKER = new BracketChecker();
     public static final Checker PAGES_CHECKER = new PagesChecker();
     public static final Checker URL_CHECKER = new UrlChecker();
+    private boolean isBiblatexMode;
 
-    public List<IntegrityMessage> checkBibtexDatabase(BibDatabase base) {
+    public List<IntegrityMessage> checkBibtexDatabase(BibDatabase database, boolean isBiblatexMode) {
         List<IntegrityMessage> result = new ArrayList<>();
 
-        if (base == null) {
+        if (database == null) {
             return result;
         }
 
-        for (BibEntry entry : base.getEntries()) {
+        this.isBiblatexMode = isBiblatexMode;
+
+        for (BibEntry entry : database.getEntries()) {
             result.addAll(checkBibtexEntry(entry));
         }
 
@@ -47,7 +51,7 @@ public class IntegrityCheck {
         entry.getFieldOptional("editor").ifPresent(data -> AUTHOR_NAME_CHECKER.check(data, "editor", entry, result));
 
         entry.getFieldOptional("title").ifPresent(data -> {
-            if(!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+            if(!isBiblatexMode) {
                 TITLE_CHECKER.check(data, "title", entry, result);
             }
             BRACKET_CHECKER.check(data, "title", entry, result);

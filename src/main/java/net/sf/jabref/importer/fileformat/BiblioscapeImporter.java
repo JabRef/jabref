@@ -279,8 +279,7 @@ public class BiblioscapeImporter extends ImportFormat {
                     }
                     hm.put("comment", s.toString());
                 }
-                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID,
-                        EntryTypes.getTypeOrDefault(bibtexType));
+                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, bibtexType);
                 b.setField(hm);
                 bibItems.add(b);
 
