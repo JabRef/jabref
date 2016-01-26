@@ -239,7 +239,6 @@ public final class JabRefPreferences {
     public static final String PUT_BRACES_AROUND_CAPITALS = "putBracesAroundCapitals";
     public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";
     public static final String DO_NOT_RESOLVE_STRINGS_FOR = "doNotResolveStringsFor";
-    public static final String AUTO_DOUBLE_BRACES = "autoDoubleBraces";
     public static final String PREVIEW_PRINT_BUTTON = "previewPrintButton";
     public static final String PREVIEW_1 = "preview1";
     public static final String PREVIEW_0 = "preview0";
@@ -687,7 +686,6 @@ public final class JabRefPreferences {
 
         // TODO: Currently not possible to edit this setting:
         defaults.put(PREVIEW_PRINT_BUTTON, Boolean.FALSE);
-        defaults.put(AUTO_DOUBLE_BRACES, Boolean.FALSE);
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, "url");
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(PUT_BRACES_AROUND_CAPITALS, "");//"title;journal;booktitle;review;abstract");
