@@ -43,7 +43,6 @@ public enum KeyBinding {
     IMPORT_INTO_CURRENT_DATABASE("Import into current database", Localization.lang("Import into current database"), "ctrl I"),
     IMPORT_INTO_NEW_DATABASE("Import into new database", Localization.lang("Import into new database"), "ctrl alt I"),
     INCREASE_TABLE_FONT_SIZE("Increase table font size", Localization.lang("Increase table font size"), "ctrl PLUS"),
-    LOAD_SESSION("Load session", Localization.lang("Load session"), "F12"),
     MARK_ENTRIES("Mark entries", Localization.lang("Mark entries"), "ctrl M"),
     NEW_ARTICLE("New article", Localization.lang("New article"), "ctrl shift A"),
     NEW_BOOK("New book", Localization.lang("New book"), "ctrl shift B"),

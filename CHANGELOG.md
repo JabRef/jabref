@@ -33,6 +33,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
 - Removed configuration option to use database file directory as base directory for attached files and make it default instead.
+- Removed save session functionality as it just saved the last opened tabs which is done by default
+- Removed CLI option -l to load a session
 
 
 
