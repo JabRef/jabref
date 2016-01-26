@@ -15,85 +15,70 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.MouseAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.exporter.*;
-import net.sf.jabref.gui.actions.*;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.keyboard.KeyBindingRepository;
-import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
-import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
-import net.sf.jabref.gui.menus.help.DonateAction;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.gui.preftabs.PreferencesDialog;
-import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.importer.*;
-import net.sf.jabref.importer.fetcher.GeneralFetcher;
-import net.sf.jabref.logic.logging.GuiAppender;
-import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.logic.integrity.IntegrityCheck;
-import net.sf.jabref.logic.integrity.IntegrityMessage;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;
 import net.sf.jabref.external.push.PushToApplications;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
+import net.sf.jabref.gui.actions.*;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.gui.journals.ManageJournalsAction;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.keyboard.KeyBindingRepository;
+import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
+import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
+import net.sf.jabref.gui.menus.help.DonateAction;
+import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
+import net.sf.jabref.gui.preftabs.PreferencesDialog;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.gui.worker.MarkEntriesAction;
+import net.sf.jabref.importer.*;
+import net.sf.jabref.importer.fetcher.GeneralFetcher;
+import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.integrity.IntegrityCheck;
+import net.sf.jabref.logic.integrity.IntegrityMessage;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.logging.GuiAppender;
+import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IEEETranEntryTypes;
 import net.sf.jabref.openoffice.OpenOfficePanel;
-import net.sf.jabref.specialfields.Printed;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Quality;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.specialfields.*;
 import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.util.ManageKeywordsAction;
 import net.sf.jabref.util.MassSetFieldAction;
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The main window of the application.
@@ -552,7 +537,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         databasePropertiesBtn.addActionListener(databaseProperties);
         popupMenu.add(databasePropertiesBtn);
 
-        JMenuItem bibtexKeyPatternBtn = new JMenuItem(Localization.lang("Bibtex key patterns"));
+        JMenuItem bibtexKeyPatternBtn = new JMenuItem(Localization.lang("BibTex key patterns"));
         bibtexKeyPatternBtn.addActionListener(bibtexKeyPattern);
         popupMenu.add(bibtexKeyPatternBtn);
 
@@ -2002,7 +1987,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
 
         public BibtexKeyPatternAction() {
-            putValue(Action.NAME, Localization.lang("Bibtex key patterns"));
+            putValue(Action.NAME, Localization.lang("BibTex key patterns"));
         }
 
         @Override
