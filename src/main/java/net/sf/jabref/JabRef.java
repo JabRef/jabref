@@ -40,6 +40,8 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.ProxyPreferences;
+import net.sf.jabref.logic.ProxyRegisterer;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
@@ -84,47 +86,25 @@ public class JabRef {
 
 
     public void start(String[] args) {
-        JabRefPreferences prefs = JabRefPreferences.getInstance();
+        JabRefPreferences preferences = JabRefPreferences.getInstance();
 
-        if (prefs.getBoolean(JabRefPreferences.USE_PROXY)) {
-            // NetworkTab.java ensures that proxyHostname and proxyPort are not null
-            System.setProperty("http.proxyHost", prefs.get(JabRefPreferences.PROXY_HOSTNAME));
-            System.setProperty("http.proxyPort", prefs.get(JabRefPreferences.PROXY_PORT));
-
-            // NetworkTab.java ensures that proxyUsername and proxyPassword are neither null nor empty
-            if (prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION)) {
-                System.setProperty("http.proxyUser", prefs.get(JabRefPreferences.PROXY_USERNAME));
-                System.setProperty("http.proxyPassword", prefs.get(JabRefPreferences.PROXY_PASSWORD));
-            }
-        } else {
-            // The following two lines signal that the system proxy settings
-            // should be used:
-            System.setProperty("java.net.useSystemProxies", "true");
-            System.setProperty("proxySet", "true");
-        }
-
-        if (prefs.getBoolean(JabRefPreferences.USE_PROXY)
-                && prefs.getBoolean(JabRefPreferences.USE_PROXY_AUTHENTICATION)) {
+        ProxyPreferences proxyPreferences = ProxyPreferences.loadFromPreferences(preferences);
+        ProxyRegisterer.register(proxyPreferences);
+        if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
 
         Globals.startBackgroundTasks();
-        Globals.prefs = prefs;
-        Localization.setLanguage(prefs.get(JabRefPreferences.LANGUAGE));
+        Globals.prefs = preferences;
+        Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
-        /*
-         * The Plug-in System is started automatically on the first call to
-         * PluginCore.getManager().
-         *
-         * Plug-ins are activated on the first call to their getInstance method.
-         */
 
         // Update which fields should be treated as numeric, based on preferences:
         BibtexFields.setNumericFieldsFromPrefs();
 
         /* Build list of Import and Export formats */
         Globals.importFormatReader.resetImportFormats();
-        CustomEntryTypesManager.loadCustomEntryTypes(prefs);
+        CustomEntryTypesManager.loadCustomEntryTypes(preferences);
         ExportFormats.initAllExports();
 
         // Read list(s) of journal names and abbreviations:
