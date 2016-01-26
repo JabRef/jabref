@@ -249,7 +249,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
     private final AbstractAction donationAction = new DonateAction();
     private final AbstractAction help = new OnlineHelpAction(Localization.menuTitle("JabRef help"), Localization.lang("JabRef help"),
-            GUIGlobals.baseFrameHelp, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
+            GUIGlobals.helpContents, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
     private final AbstractAction about = new HelpAction(Localization.menuTitle("About JabRef"), helpDiag,
             GUIGlobals.aboutPage, Localization.lang("About JabRef"), IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),

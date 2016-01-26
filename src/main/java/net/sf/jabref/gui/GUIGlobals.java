@@ -87,7 +87,7 @@ public class GUIGlobals {
     public static HelpDialog helpDiag;
 
     //Help files (in HTML format):
-    public static final String baseFrameHelp = "Contents";
+    public static final String helpContents = "";
     public static final String entryEditorHelp = "EntryEditorHelp";
     public static final String stringEditorHelp = "StringEditorHelp";
     public static final String searchHelp = "SearchHelp";
