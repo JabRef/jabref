@@ -131,7 +131,7 @@ public class SixpackImporter extends ImportFormat {
         BibEntry entry;
         while ((s = in.readLine()) != null) {
             try {
-                s = s.replaceAll("<par>", ""); // What is <par> ????
+                s = s.replace("<par>", ""); // What is <par> ????
                 String[] fields = s.split(SEPARATOR);
                 // Check type and create entry:
                 if (fields.length < 2)
@@ -161,12 +161,10 @@ public class SixpackImporter extends ImportFormat {
                     fld = fI.get(fieldDef[i]);
                     if (fld != null) {
                         if ("author".equals(fld) || "editor".equals(fld)) {
-                            ImportFormatReader.setIfNecessary(entry,
-                                    fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ",
-                                            " and "));
+                            ImportFormatReader.setIfNecessary(entry, fld,
+                                    fields[i].replace(" and ", ", ").replace(", ", " and "));
                         } else if ("pages".equals(fld)) {
-                            ImportFormatReader.setIfNecessary(entry, fld, fields[i]
-                                    .replaceAll("-", "--"));
+                            ImportFormatReader.setIfNecessary(entry, fld, fields[i].replace("-", "--"));
                         } else if ("file".equals(fld)) {
                             String fieldName = "pdf"; // We set pdf as default.
                             if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz")) {

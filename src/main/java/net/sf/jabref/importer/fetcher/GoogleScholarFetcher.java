@@ -220,7 +220,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         Matcher m = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(cont);
         int lastRegionStart = 0;
         while (m.find()) {
-            String link = m.group(1).replaceAll("&amp;", "&");
+            String link = m.group(1).replace("&amp;", "&");
             String pText;
             //System.out.println("regionStart: "+m.start());
             String part = cont.substring(lastRegionStart, m.start());
@@ -240,7 +240,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                 pText = link;
             }
 
-            pText = pText.replaceAll("\\[PDF\\]", "");
+            pText = pText.replace("[PDF]", "");
             JLabel preview = new JLabel("<html>" + pText + "</html>");
             ids.put(link, preview);
 

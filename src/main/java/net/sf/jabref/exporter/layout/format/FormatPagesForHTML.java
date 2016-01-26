@@ -21,6 +21,6 @@ public class FormatPagesForHTML implements LayoutFormatter {
 
     @Override
     public String format(String field) {
-        return field.replaceAll("--", "-");
+        return field.replace("--", "-");
     }
 }

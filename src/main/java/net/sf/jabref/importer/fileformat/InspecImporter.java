@@ -119,7 +119,7 @@ public class InspecImporter extends ImportFormat {
                     h.put("year", frest);
                 } else if ("AU".equals(f3)) {
                     h.put("author",
-                            AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(";", " and ")));
+                            AuthorList.fixAuthor_lastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                 } else if ("AB".equals(f3)) {
                     h.put("abstract", frest);
                 } else if ("ID".equals(f3)) {
@@ -128,7 +128,7 @@ public class InspecImporter extends ImportFormat {
                     int m = frest.indexOf('.');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put("journal", jr.replaceAll("-", " "));
+                        h.put("journal", jr.replace("-", " "));
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
@@ -151,7 +151,7 @@ public class InspecImporter extends ImportFormat {
                     } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
                         type = "inproceedings";
                     } else {
-                        type = frest.replaceAll(" ", "");
+                        type = frest.replace(" ", "");
                     }
                 }
             }

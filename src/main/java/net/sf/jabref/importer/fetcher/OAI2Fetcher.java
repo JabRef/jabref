@@ -272,7 +272,7 @@ public class OAI2Fetcher implements EntryFetcher {
             shouldContinue = true;
 
             /* multiple keys can be delimited by ; or space */
-            query = query.replaceAll(" ", ";");
+            query = query.replace(" ", ";");
             String[] keys = query.split(";");
             for (int i = 0; i < keys.length; i++) {
                 String key = keys[i];

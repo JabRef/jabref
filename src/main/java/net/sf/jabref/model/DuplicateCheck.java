@@ -144,8 +144,8 @@ public class DuplicateCheck {
         if ("author".equals(field) || "editor".equals(field)) {
             // Specific for name fields.
             // Harmonise case:
-            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase();
-            String auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ").toLowerCase();
+            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replace(" and ", " ").toLowerCase();
+            String auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replace(" and ", " ").toLowerCase();
             double similarity = DuplicateCheck.correlateByWords(auth1, auth2);
             if (similarity > 0.8) {
                 return EQUAL;
@@ -165,8 +165,8 @@ public class DuplicateCheck {
             // We do not attempt to harmonize abbreviation state of the journal names,
             // but we remove periods from the names in case they are abbreviated with
             // and without dots:
-            s1 = s1.replaceAll("\\.", "").toLowerCase();
-            s2 = s2.replaceAll("\\.", "").toLowerCase();
+            s1 = s1.replace(".", "").toLowerCase();
+            s2 = s2.replace(".", "").toLowerCase();
             double similarity = DuplicateCheck.correlateByWords(s1, s2);
             if (similarity > 0.8) {
                 return EQUAL;

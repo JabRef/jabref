@@ -23,11 +23,11 @@ public class PreferencesMigrations {
             if ("abstract".equals(genFields)) {
                 newGen = "";
             } else if (genFields.contains(";abstract;")) {
-                newGen = genFields.replaceAll(";abstract;", ";");
+                newGen = genFields.replace(";abstract;", ";");
             } else if (genFields.indexOf("abstract;") == 0) {
-                newGen = genFields.replaceAll("abstract;", "");
+                newGen = genFields.replace("abstract;", "");
             } else if (genFields.indexOf(";abstract") == (genFields.length() - 9)) {
-                newGen = genFields.replaceAll(";abstract", "");
+                newGen = genFields.replace(";abstract", "");
             } else {
                 newGen = genFields;
             }

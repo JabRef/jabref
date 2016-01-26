@@ -94,7 +94,7 @@ public class LatexFieldFormatter {
         if (shouldNormalizeNewlines) {
             // if we don't have real new lines, but pseudo newlines, we replace them
             // On Win 8.1, this is always true for multiline fields
-            content = content.replaceAll("\n", Globals.NEWLINE);
+            content = content.replace("\n", Globals.NEWLINE);
         }
 
         // If the field is non-standard, we will just append braces,

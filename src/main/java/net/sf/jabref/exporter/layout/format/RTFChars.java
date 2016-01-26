@@ -176,7 +176,8 @@ public class RTFChars implements LayoutFormatter {
             }
         }
 
-        return sb.toString().replaceAll("---", "{\\\\emdash}").replaceAll("--", "{\\\\endash}").replaceAll("``", "{\\\\ldblquote}").replaceAll("''", "{\\\\rdblquote}");
+        return sb.toString().replace("---", "{\\emdash}").replace("--", "{\\endash}").replace("``", "{\\ldblquote}")
+                .replace("''", "{\\rdblquote}");
     }
 
     /**

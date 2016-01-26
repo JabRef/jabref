@@ -306,7 +306,7 @@ public class EndnoteImporter extends ImportFormat {
         // Look for the comma at the end:
         index = s.lastIndexOf(',');
         if (index == (s.length() - 1)) {
-            String mod = s.substring(0, s.length() - 1).replaceAll(", ", " and ");
+            String mod = s.substring(0, s.length() - 1).replace(", ", " and ");
             return AuthorList.fixAuthor_lastNameFirst(mod);
         } else {
             return AuthorList.fixAuthor_lastNameFirst(s);

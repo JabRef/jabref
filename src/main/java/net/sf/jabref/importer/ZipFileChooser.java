@@ -139,7 +139,8 @@ class ZipFileChooser extends JDialog {
                     ZipEntry tempZipEntry = model.getZipEntry(row);
                     CustomImporter importer = new CustomImporter();
                     importer.setBasePath(model.getZipFile().getName());
-                    String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replaceAll("/", ".");
+                    String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.'))
+                            .replace("/", ".");
                     importer.setClassName(className);
                     try {
                         ImportFormat importFormat = importer.getInstance();

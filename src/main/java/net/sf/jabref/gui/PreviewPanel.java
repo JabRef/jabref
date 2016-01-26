@@ -309,7 +309,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     private void updateLayout() {
-        StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
+        StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
             layout = Optional.of(new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE));
         } catch (IOException e) {
