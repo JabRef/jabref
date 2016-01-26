@@ -20,6 +20,7 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
+
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -459,6 +460,7 @@ public class BibtexParser {
     private String parsePreamble() throws IOException {
         skipWhitespace();
         return parseBracketedText().toString();
+
     }
 
     private BibEntry parseEntry(EntryType entryType) throws IOException {
@@ -524,7 +526,7 @@ public class BibtexParser {
                 // for users if JabRef didn't accept it.
                 if ("author".equals(key) || "editor".equals(key)) {
                     entry.setField(key, entry.getField(key) + " and " + content);
-                } else if("keywords".equals(key)) {
+                } else if ("keywords".equals(key)) {
                     //multiple keywords fields should be combined to one
                     entry.setField("keywords", entry.getField("keywords") + ", " + content);
                 }
@@ -822,18 +824,18 @@ public class BibtexParser {
     private StringBuffer parseBracketedText() throws IOException {
         StringBuffer value = new StringBuffer();
 
-        consume('{');
+        consume('{','(');
 
         int brackets = 0;
 
-        while (!((peek() == '}') && (brackets == 0))) {
+        while (!((isClosingBracketNext()) && (brackets == 0))) {
 
             int character = read();
             if (isEOFCharacter(character)) {
                 throw new IOException("Error in line " + line + ": EOF in mid-string");
-            } else if (character == '{') {
+            } else if (character == '{' || character == '(') {
                 brackets++;
-            } else if (character == '}') {
+            } else if (character == '}' || character == ')') {
                 brackets--;
             }
 
@@ -857,9 +859,20 @@ public class BibtexParser {
             }
         }
 
-        consume('}');
+        consume('}',')');
 
         return value;
+    }
+
+    private boolean isClosingBracketNext () {
+        try {
+            int peek = peek();
+            boolean isCurlyBracket = peek == '}';
+            boolean isRoundBracket = peek == ')';
+            return isCurlyBracket || isRoundBracket;
+        } catch(IOException e) {
+            return false;
+        }
     }
 
     private StringBuffer parseBracketedTextExactly() throws IOException {
