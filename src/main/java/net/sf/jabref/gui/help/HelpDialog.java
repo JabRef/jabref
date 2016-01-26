@@ -15,21 +15,21 @@
 */
 package net.sf.jabref.gui.help;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 
 /**
  *
@@ -55,7 +55,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
         content.addHyperlinkListener(this);
         setSize(GUIGlobals.helpSize);
 
-        JToolBar tlb = new JToolBar();
+        JToolBar tlb = new OSXCompatibleToolbar();
         tlb.add(back);
         tlb.add(forward);
         tlb.addSeparator();

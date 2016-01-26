@@ -313,7 +313,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private void setupToolBar() {
         JPanel leftPan = new JPanel();
         leftPan.setLayout(new BorderLayout());
-        JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+        JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
 
         toolBar.setBorder(null);
         toolBar.setRollover(true);

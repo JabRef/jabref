@@ -26,6 +26,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.SearchQueryLocalizer;
 import net.sf.jabref.logic.search.SearchQueryHighlightObservable;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -106,11 +107,15 @@ public class SearchBar extends JPanel {
         searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
         this.add(searchIcon);
         this.searchField = initSearchField();
+        if (OS.OS_X) {
+            searchField.putClientProperty("JTextField.variant", "search");
+        }
         this.add(searchField);
 
         JButton clearSearchButton = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
         clearSearchButton.setToolTipText(Localization.lang("Clear"));
         clearSearchButton.addActionListener((l) -> endSearch());
+
         this.add(clearSearchButton);
 
         searchModeButton = new JButton();
