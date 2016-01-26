@@ -630,6 +630,17 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseWarnsAboutUnmatchedContentInEntry() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, to much}"));
+
+        Assert.assertTrue("There should be warnings", result.hasWarnings());
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
+    }
+
+    @Test
     public void parseAcceptsEntryWithAtSymbolInBrackets() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author @ good}}"));
