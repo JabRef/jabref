@@ -144,7 +144,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "GoogleScholarHelp.html";
+        return "GoogleScholarHelp";
     }
 
     @Override

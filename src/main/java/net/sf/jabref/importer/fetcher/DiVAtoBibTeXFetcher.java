@@ -123,7 +123,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "DiVAtoBibTeXHelp.html";
+        return "DiVAtoBibTeXHelp";
     }
 
     @Override

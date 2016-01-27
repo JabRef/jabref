@@ -27,8 +27,8 @@ import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.gui.journals.ManageJournalsAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
@@ -52,6 +52,11 @@ import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabase;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.gui.help.AboutAction;
+import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -61,8 +66,6 @@ import net.sf.jabref.specialfields.*;
 import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.util.ManageKeywordsAction;
 import net.sf.jabref.util.MassSetFieldAction;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
 
 import javax.swing.*;
@@ -208,7 +211,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 
     // The help window.
-    public final HelpDialog helpDiag = new HelpDialog(this);
+    public final AboutDialog helpDiag = new AboutDialog(this);
 
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
@@ -231,15 +234,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
     private final AbstractAction donationAction = new DonateAction();
-    private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), helpDiag,
-            GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
-            Globals.getKeyPrefs().getKey(KeyBinding.HELP));
-    private final AbstractAction contents = new HelpAction(Localization.menuTitle("Help contents"), helpDiag,
-            GUIGlobals.helpContents, Localization.lang("Help contents"),
-            IconTheme.JabRefIcon.HELP_CONTENTS.getIcon());
-    private final AbstractAction about = new HelpAction(Localization.menuTitle("About JabRef"), helpDiag,
-            GUIGlobals.aboutPage, Localization.lang("About JabRef"),
-            IconTheme.getImage("about"));
+    private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), Localization.lang("JabRef help"),
+            HelpFiles.helpContents, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
+    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), helpDiag,
+            Localization.lang("About JabRef"), IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
@@ -1322,7 +1320,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(options);
 
         helpMenu.add(help);
-        helpMenu.add(contents);
         helpMenu.addSeparator();
         helpMenu.add(errorConsole);
         helpMenu.addSeparator();

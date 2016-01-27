@@ -20,6 +20,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoableInsertString;
@@ -60,7 +61,7 @@ class StringDialog extends JDialog {
 
         sortStrings();
 
-        helpAction = new HelpAction(frame.helpDiag, GUIGlobals.stringEditorHelp, Localization.lang("Help"));
+        helpAction = new HelpAction(Localization.lang("Help"), HelpFiles.stringEditorHelp);
 
         addWindowListener(new WindowAdapter() {
 

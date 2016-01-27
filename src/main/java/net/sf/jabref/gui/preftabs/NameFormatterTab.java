@@ -19,11 +19,11 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.format.NameFormatter;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.OSXCompatibleToolbar;
+import net.sf.jabref.gui.help.AboutDialog;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -114,7 +114,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
      * Tab to create custom Name Formatters
      *
      */
-    public NameFormatterTab(HelpDialog helpDialog) {
+    public NameFormatterTab(AboutDialog aboutDialog) {
         setLayout(new BorderLayout());
 
         TableModel tableModel = new AbstractTableModel() {
@@ -206,8 +206,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         toolBar.setBorder(null);
         toolBar.add(new AddRowAction());
         toolBar.add(new DeleteRowAction());
-        toolBar.add(new HelpAction(helpDialog, GUIGlobals.nameFormatterHelp,
-                Localization.lang("Help on Name Formatting"), IconTheme.JabRefIcon.HELP.getIcon()));
+        toolBar.add(new HelpAction(Localization.lang("Help on Name Formatting"), HelpFiles.nameFormatterHelp));
 
         tabPanel.add(toolBar, BorderLayout.EAST);
 

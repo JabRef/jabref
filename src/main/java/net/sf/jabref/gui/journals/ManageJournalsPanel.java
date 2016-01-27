@@ -28,6 +28,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,8 +38,6 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.Abbreviations;
@@ -150,8 +150,7 @@ class ManageJournalsPanel extends JPanel {
         bb.addButton(cancel);
         bb.addUnrelatedGap();
 
-        JButton help = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.journalAbbrHelp,
-                IconTheme.JabRefIcon.HELP.getSmallIcon()).getIconButton();
+        JButton help = new HelpAction(HelpFiles.journalAbbrHelp).getHelpButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

@@ -124,7 +124,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "ISBNtoBibTeXHelp.html";
+        return "ISBNtoBibTeXHelp";
     }
 
     @Override

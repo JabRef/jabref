@@ -21,6 +21,11 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
@@ -282,7 +287,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special table columns and special fields ***/
 
-        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp, Localization.lang("Help on special fields")).getIconButton();
+        JButton helpButton = new HelpAction(Localization.lang("Help on special fields"), HelpFiles.specialFieldsHelp).getHelpButton();
 
         specialFieldsEnabled = new JCheckBox(Localization.lang("Enable special fields"));
         specialFieldsEnabled.addChangeListener(new ChangeListener() {
