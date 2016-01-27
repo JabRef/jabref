@@ -39,7 +39,6 @@ import javax.swing.SwingUtilities;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -54,7 +53,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     private final CardLayout optionsCards = new CardLayout();
     private final JPanel optionsPanel = new JPanel(optionsCards);
     private final JPanel optPanel = new JPanel(new BorderLayout());
-    private final OnlineHelpAction help;
+    private final HelpAction help;
     private final JButton helpBut;
 
     private final SidePaneManager sidePaneManager;
@@ -92,8 +91,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         if (this.activeFetcher.getOptionsPanel() != null) {
             optPanel.add(this.activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
         }
-        help = new OnlineHelpAction(activeFetcher.getHelpPage());
-        helpBut = help.getIconButton();
+        help = new HelpAction(activeFetcher.getHelpPage());
+        helpBut = help.getHelpButton();
         helpBut.setEnabled(activeFetcher.getHelpPage() != null);
 
         //optionsCards.show(optionsPanel, String.valueOf(defaultFetcher));

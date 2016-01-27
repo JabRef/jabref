@@ -26,10 +26,10 @@ import java.awt.*;
  * This is a non-modal help Dialog. The contents of the help is specified by
  * calling showPage().
  */
-public class HelpDialog extends JDialog {
+public class AboutDialog extends JDialog {
 
-    public HelpDialog(JabRefFrame bf) {
-        super(bf, Localization.lang("JabRef help"), false);
+    public AboutDialog(JabRefFrame bf) {
+        super(bf, Localization.lang("About JabRef"), false);
         setSize(new Dimension(750, 600));
 
         GridLayout layout = new GridLayout(5, 2);

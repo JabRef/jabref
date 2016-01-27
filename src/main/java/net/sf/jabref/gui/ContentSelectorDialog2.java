@@ -47,8 +47,8 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
@@ -523,7 +523,7 @@ class ContentSelectorDialog2 extends JDialog {
         bsb.addButton(apply);
         bsb.addButton(cancel);
         bsb.addRelatedGap();
-        bsb.addButton(new OnlineHelpAction(GUIGlobals.contentSelectorHelp).getIconButton());
+        bsb.addButton(new HelpAction(HelpFiles.contentSelectorHelp).getHelpButton());
         bsb.addGlue();
 
         // Add panels to dialog:

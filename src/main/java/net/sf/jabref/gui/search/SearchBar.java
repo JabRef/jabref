@@ -18,12 +18,11 @@ package net.sf.jabref.gui.search;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.OnlineHelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -141,7 +140,7 @@ public class SearchBar extends JPanel {
         globalSearch.setEnabled(false);
         toolBar.add(globalSearch);
         toolBar.addSeparator();
-        toolBar.add(new OnlineHelpAction(GUIGlobals.searchHelp));
+        toolBar.add(new HelpAction(HelpFiles.searchHelp));
 
         this.add(toolBar);
         this.add(currentResults);

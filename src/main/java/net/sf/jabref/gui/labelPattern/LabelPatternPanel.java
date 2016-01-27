@@ -33,17 +33,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.help.OnlineHelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 
@@ -53,7 +52,7 @@ public class LabelPatternPanel extends JPanel {
     protected final GridBagLayout gbl = new GridBagLayout();
     protected final GridBagConstraints con = new GridBagConstraints();
 
-    private final OnlineHelpAction help;
+    private final HelpAction help;
 
     // default pattern
     protected final JTextField defaultPat = new JTextField();
@@ -62,8 +61,8 @@ public class LabelPatternPanel extends JPanel {
     private final Map<String, JTextField> textFields = new HashMap<>();
 
 
-    public LabelPatternPanel(HelpDialog helpDiag) {
-        help = new OnlineHelpAction(Localization.lang("Help on key patterns"), GUIGlobals.labelPatternHelp);
+    public LabelPatternPanel(AboutDialog helpDiag) {
+        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFiles.labelPatternHelp);
         buildGUI();
     }
 

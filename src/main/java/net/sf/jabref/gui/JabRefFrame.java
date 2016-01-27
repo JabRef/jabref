@@ -46,7 +46,8 @@ import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.exporter.*;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.help.OnlineHelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
 import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
@@ -78,8 +79,8 @@ import net.sf.jabref.external.push.PushToApplications;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.gui.help.AboutAction;
+import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.journals.ManageJournalsAction;
 import net.sf.jabref.openoffice.OpenOfficePanel;
 import net.sf.jabref.specialfields.Printed;
@@ -225,7 +226,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 
     // The help window.
-    public final HelpDialog helpDiag = new HelpDialog(this);
+    public final AboutDialog helpDiag = new AboutDialog(this);
 
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
@@ -248,10 +249,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
     private final AbstractAction donationAction = new DonateAction();
-    private final AbstractAction help = new OnlineHelpAction(Localization.menuTitle("JabRef help"), Localization.lang("JabRef help"),
-            GUIGlobals.helpContents, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
-    private final AbstractAction about = new HelpAction(Localization.menuTitle("About JabRef"), helpDiag,
-            GUIGlobals.aboutPage, Localization.lang("About JabRef"), IconTheme.getImage("about"));
+    private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), Localization.lang("JabRef help"),
+            HelpFiles.helpContents, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
+    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), helpDiag,
+            Localization.lang("About JabRef"), IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,

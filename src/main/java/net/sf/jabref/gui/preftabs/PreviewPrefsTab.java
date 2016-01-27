@@ -26,11 +26,10 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.gui.help.OnlineHelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -46,7 +45,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final JTextArea layout1 = new JTextArea("", 1, 1);
     private final JTextArea layout2 = new JTextArea("", 1, 1);
 
-    private final JButton help = new OnlineHelpAction(Localization.lang("Help on Preview Settings"), GUIGlobals.previewHelp).getIconButton();
+    private final JButton help = new HelpAction(Localization.lang("Help on Preview Settings"), HelpFiles.previewHelp).getHelpButton();
 
     private final JButton testButton = new JButton(Localization.lang("Test"));
     private final JButton defaultButton = new JButton(Localization.lang("Default"));

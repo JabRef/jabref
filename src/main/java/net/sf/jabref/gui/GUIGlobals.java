@@ -31,7 +31,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -80,31 +80,7 @@ public class GUIGlobals {
     // further below.
     public static final Color activeEditor = new Color(230, 230, 255);
     public static SidePaneManager sidePaneManager;
-    public static HelpDialog helpDiag;
-
-    //Help files (in HTML format):
-    public static final String helpContents = "";
-    public static final String entryEditorHelp = "EntryEditorHelp";
-    public static final String stringEditorHelp = "StringEditorHelp";
-    public static final String searchHelp = "SearchHelp";
-    public static final String groupsHelp = "GroupsHelp";
-    public static final String contentSelectorHelp = "ContentSelectorHelp";
-    public static final String specialFieldsHelp = "SpecialFieldsHelp";
-    public static final String labelPatternHelp = "LabelPatterns";
-    public static final String ownerHelp = "OwnerHelp";
-    public static final String timeStampHelp = "TimeStampHelp";
-    public static final String exportCustomizationHelp = "CustomExports";
-    public static final String importCustomizationHelp = "CustomImports";
-    public static final String medlineHelp = "MedlineHelp";
-    public static final String generalFieldsHelp = "GeneralFields";
-    public static final String aboutPage = "About.html";
-    public static final String importInspectionHelp = "ImportInspectionDialog";
-    public static final String remoteHelp = "RemoteHelp";
-    public static final String journalAbbrHelp = "JournalAbbreviations";
-    public static final String regularExpressionSearchHelp = "ExternalFiles#RegularExpressionSearch";
-    public static final String nameFormatterHelp = "CustomExports#NameFormatter";
-    public static final String previewHelp = "PreviewHelp";
-    public static final String autosaveHelp = "Autosave";
+    public static AboutDialog helpDiag;
 
     //	Colors.
     public static final Color entryEditorLabelColor = new Color(100, 100, 150); // Empty field, blue.
@@ -173,7 +149,6 @@ public class GUIGlobals {
             return (JLabel) o;
         }
     }
-
 
     public static void updateEntryEditorColors() {
         GUIGlobals.activeBackground = JabRefPreferences.getInstance().getColor(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR);
