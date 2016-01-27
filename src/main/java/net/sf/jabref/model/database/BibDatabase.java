@@ -36,7 +36,6 @@ import java.beans.VetoableChangeListener;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.TypedBibEntry;
