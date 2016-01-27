@@ -20,6 +20,9 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 
 /**
@@ -32,20 +35,35 @@ public class AboutDialog extends JDialog {
         super(bf, Localization.lang("About JabRef"), false);
         setSize(new Dimension(750, 600));
 
-        GridLayout layout = new GridLayout(5, 2);
         JPanel panel = new JPanel();
-        panel.setLayout(layout);
+        panel.setLayout(new GridLayout());
 
-        panel.add(new JLabel("Version"));
-        panel.add(new JLabel(Globals.BUILD_INFO.getVersion()));
-        panel.add(new JLabel("Year"));
-        panel.add(new JLabel(Globals.BUILD_INFO.getYear()));
-        panel.add(new JLabel("Developers"));
-        panel.add(new JLabel(Globals.BUILD_INFO.getDevelopers()));
-        panel.add(new JLabel("Authors"));
-        panel.add(new JLabel(Globals.BUILD_INFO.getAuthors()));
-        panel.add(new JLabel("License Information"));
-        panel.add(new JLabel(Globals.BUILD_INFO.getLicenseInformation()));
+        JTextPane textArea = new JTextPane();
+
+        textArea.setEditable(false);
+        textArea.setCursor(null);
+        textArea.setOpaque(false);
+        textArea.setFocusable(false);
+
+        // center everything
+        StyledDocument doc = textArea.getStyledDocument();
+        SimpleAttributeSet center = new SimpleAttributeSet();
+        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+        doc.setParagraphAttributes(0, doc.getLength(), center, false);
+
+        panel.add(new JScrollPane(textArea));
+
+        String text = String.format("JabRef %s%n2003-%s%n%s%n%s%n%nDevelopers: %s%n%nAuthors: %s%n%nExternal Libraries: %s%nCode: %s",
+                Globals.BUILD_INFO.getVersion(),
+                Globals.BUILD_INFO.getYear(),
+                "http://www.jabref.org",
+                "GNU General Public License v2 or later",
+                Globals.BUILD_INFO.getDevelopers(),
+                Globals.BUILD_INFO.getAuthors(),
+                "https://github.com/JabRef/jabref/blob/master/external-libraries.txt",
+                "https://github.com/JabRef/jabref");
+
+        textArea.setText(text);
 
         getContentPane().add(panel);
     }
