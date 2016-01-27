@@ -118,8 +118,6 @@ sourceSets {
 }
 
 processResources {
-    def externalLibraries = new File('external-libraries.txt')
-
     filesMatching("build.properties") {
         expand (version: project.version,
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
