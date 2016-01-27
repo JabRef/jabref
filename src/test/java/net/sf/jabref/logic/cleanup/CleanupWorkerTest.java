@@ -1,13 +1,13 @@
 package net.sf.jabref.logic.cleanup;
 
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FileField;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -33,10 +33,11 @@ public class CleanupWorkerTest {
     }
 
     @Test
-    public void cleanupDoesNothingByDefault() {
+    public void cleanupDoesNothingByDefault() throws IOException {
         CleanupPreset preset = new CleanupPreset();
         CleanupWorker worker = new CleanupWorker(preset);
         BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEY_FIELD, "Toot");
         entry.setField("pdf", "aPdfFile");
         entry.setField("some", "1st");
         entry.setField("doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
@@ -49,7 +50,9 @@ public class CleanupWorkerTest {
         entry.setField("journal", "test");
         entry.setField("title", "<b>hallo</b> units 1 A case AlGaAs and latex $\\alpha$$\\beta$");
         entry.setField("abstract", "Réflexions");
-        // TODO: Add files for rename + relative
+        File tempFile = testFolder.newFile();
+        FileField.ParsedFileField fileField = new FileField.ParsedFileField("", tempFile.getAbsolutePath(), "");
+        entry.setField("file", FileField.getStringRepresentation(fileField));
 
         List<FieldChange> changes = worker.cleanup(entry);
         Assert.assertEquals(Collections.emptyList(), changes);
@@ -65,7 +68,7 @@ public class CleanupWorkerTest {
         CleanupWorker worker = new CleanupWorker(preset);
         worker.cleanup(entry);
         Assert.assertEquals(null, entry.getField("pdf"));
-        Assert.assertEquals("aPdfFile:aPdfFile:", entry.getField("file"));
+        Assert.assertEquals("aPdfFile:aPdfFile:PDF", entry.getField("file"));
     }
 
     @Test
@@ -78,7 +81,7 @@ public class CleanupWorkerTest {
         CleanupWorker worker = new CleanupWorker(preset);
         worker.cleanup(entry);
         Assert.assertEquals(null, entry.getField("pdf"));
-        Assert.assertEquals("aPsFile:aPsFile:", entry.getField("file"));
+        Assert.assertEquals("aPsFile:aPsFile:PostScript", entry.getField("file"));
     }
 
     @Test
@@ -169,26 +172,38 @@ public class CleanupWorkerTest {
     }
 
     @Test
-    @Ignore
     public void cleanupRelativePathsConvertAbsoluteToRelativePath() throws IOException {
-        // TODO: Correct test
         CleanupPreset preset = new CleanupPreset();
         preset.setMakePathsRelative(true);
 
         File tempFile = testFolder.newFile();
         BibEntry entry = new BibEntry();
-        entry.setField("file", tempFile.getAbsolutePath());
+        FileField.ParsedFileField fileField = new FileField.ParsedFileField("", tempFile.getAbsolutePath(), "");
+        entry.setField("file", FileField.getStringRepresentation(fileField));
 
         CleanupWorker worker = new CleanupWorker(preset,
                 Collections.singletonList(testFolder.getRoot().getAbsolutePath()));
         worker.cleanup(entry);
-        Assert.assertEquals(tempFile.getName(), entry.getField("file"));
+        FileField.ParsedFileField newFileField = new FileField.ParsedFileField("", tempFile.getName(), "");
+        Assert.assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
     }
 
     @Test
-    @Ignore
-    public void cleanupRenamePdfDoesSomething() {
-        // TODO: Add test
+    public void cleanupRenamePdfRenamesRelativeFile() throws IOException {
+        CleanupPreset preset = new CleanupPreset();
+        preset.setRenamePDF(true);
+
+        File tempFile = testFolder.newFile();
+        BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEY_FIELD, "Toot");
+        FileField.ParsedFileField fileField = new FileField.ParsedFileField("", tempFile.getAbsolutePath(), "");
+        entry.setField("file", FileField.getStringRepresentation(fileField));
+
+        CleanupWorker worker = new CleanupWorker(preset,
+                Collections.singletonList(testFolder.getRoot().getAbsolutePath()));
+        worker.cleanup(entry);
+        FileField.ParsedFileField newFileField = new FileField.ParsedFileField("", "Toot.tmp", "");
+        Assert.assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
     }
 
     @Test

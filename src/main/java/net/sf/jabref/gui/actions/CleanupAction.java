@@ -15,22 +15,24 @@
  */
 package net.sf.jabref.gui.actions;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
-import javax.swing.JOptionPane;
-import net.sf.jabref.*;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.CheckBoxMessage;
+import net.sf.jabref.gui.CleanupPresetPanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.CleanupWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+
+import javax.swing.*;
+import java.util.List;
+import java.util.Objects;
 
 public class CleanupAction extends AbstractWorker {
 
@@ -46,7 +48,6 @@ public class CleanupAction extends AbstractWorker {
     private int modifiedEntriesCount;
     private final JabRefPreferences preferences;
     private final CleanupPresetPanel presetPanel;
-
 
     public CleanupAction(BasePanel panel, JabRefPreferences preferences) {
         this.panel = panel;
@@ -84,7 +85,8 @@ public class CleanupAction extends AbstractWorker {
         cleanupPreset.storeInPreferences(preferences);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN)) {
-            CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
+            CheckBoxMessage cbm = new CheckBoxMessage(
+                    Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                     Localization.lang("Disable this confirmation dialog"), false);
             int answer = JOptionPane.showConfirmDialog(frame, cbm, Localization.lang("Autogenerate PDF Names"),
                     JOptionPane.YES_NO_OPTION);
@@ -155,11 +157,10 @@ public class CleanupAction extends AbstractWorker {
      */
     private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
         // Run cleaner
-        CleanupWorker cleaner = new CleanupWorker(preset,
-                Arrays.asList(panel.metaData().getFileDirectory(Globals.FILE_FIELD)));
+        CleanupWorker cleaner = new CleanupWorker(preset, panel.metaData().getFileDirectory(Globals.FILE_FIELD));
         List<FieldChange> changes = cleaner.cleanup(entry);
 
-        // TODO: Set unsuccessful renames
+        unsuccessfulRenames = cleaner.getUnsuccessfulRenames();
 
         if (changes.isEmpty()) {
             return;

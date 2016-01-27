@@ -13,11 +13,15 @@
 */
 package net.sf.jabref.logic.cleanup;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.CleanupUtil;
+import net.sf.jabref.model.entry.FileField;
 
 /**
  * Fixes the format of the file field. For example, if the file link is empty but the description wrongly contains the path.
@@ -26,6 +30,20 @@ public class FileLinksCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        return CleanupUtil.fixFileEntries(entry);
+        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        if (!oldValue.isPresent()) {
+            return new ArrayList<>();
+        }
+
+        List<FileField.ParsedFileField> fileList = FileField.parse(oldValue.get());
+
+        // Parsing automatically moves a single description to link, so we just need to write the fileList back again
+        String newValue = FileField.getStringRepresentation(fileList);
+        if (!oldValue.get().equals(newValue)) {
+            entry.setField(Globals.FILE_FIELD, newValue);
+            FieldChange change = new FieldChange(entry, Globals.FILE_FIELD, oldValue.get(), newValue);
+            return Collections.singletonList(change);
+        }
+        return new ArrayList<>();
     }
 }

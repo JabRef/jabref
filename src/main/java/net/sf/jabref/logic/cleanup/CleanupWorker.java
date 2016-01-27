@@ -30,7 +30,7 @@ public class CleanupWorker {
     private final CleanupPreset preset;
     private final List<String> paths;
     private final BibDatabase database;
-
+    private int unsuccessfulRenames;
 
     public CleanupWorker(CleanupPreset preset) {
         this(preset, Collections.emptyList());
@@ -44,6 +44,10 @@ public class CleanupWorker {
         this.preset = Objects.requireNonNull(preset);
         this.paths = Objects.requireNonNull(paths);
         this.database = database;
+    }
+
+    public int getUnsuccessfulRenames() {
+        return unsuccessfulRenames;
     }
 
     public List<FieldChange> cleanup(BibEntry entry) {
@@ -89,8 +93,7 @@ public class CleanupWorker {
         if (preset.isRenamePDF()) {
             RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, preset.isRenamePdfOnlyRelativePaths(), database);
             jobs.add(cleaner);
-            // Reenable this:
-            //unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
+            unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }
         if (preset.isConvertHTMLToLatex()) {
             jobs.add(FieldFormatterCleanup.TITLE_HTML);

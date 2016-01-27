@@ -13,17 +13,21 @@
 */
 package net.sf.jabref.logic.cleanup;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.CleanupUtil;
-
+import net.sf.jabref.model.entry.FileField;
 
 public class RelativePathsCleanup implements CleanupJob {
 
     private final List<String> paths;
-
 
     public RelativePathsCleanup(List<String> paths) {
         this.paths = paths;
@@ -31,7 +35,33 @@ public class RelativePathsCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        return CleanupUtil.makePathsRelative(entry, paths.toArray(new String[] {}));
+        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        if (!oldValue.isPresent()) {
+            return new ArrayList<>();
+        }
+
+        List<FileField.ParsedFileField> fileList = FileField.parse(oldValue.get());
+        List<FileField.ParsedFileField> newFileList = new ArrayList<>();
+        boolean changed = false;
+        for (FileField.ParsedFileField flEntry : fileList) {
+            String oldFileName = flEntry.link;
+            String newFileName = FileUtil.shortenFileName(new File(oldFileName), paths).toString();
+
+            FileField.ParsedFileField newFlEntry = flEntry;
+            if (!oldFileName.equals(newFileName)) {
+                newFlEntry = new FileField.ParsedFileField(flEntry.description, newFileName, flEntry.fileType);
+                changed = true;
+            }
+            newFileList.add(newFlEntry);
+        }
+        if (changed) {
+            String newValue = FileField.getStringRepresentation(newFileList);
+            assert (!oldValue.get().equals(newValue));
+            entry.setField(Globals.FILE_FIELD, newValue);
+            FieldChange change = new FieldChange(entry, Globals.FILE_FIELD, oldValue.get(), newValue);
+            return Collections.singletonList(change);
+        }
+        return new ArrayList<>();
     }
 
 }

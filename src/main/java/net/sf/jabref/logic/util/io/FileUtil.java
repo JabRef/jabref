@@ -272,10 +272,7 @@ public class FileUtil {
      * @param dirs     directories to check.
      */
     public static File shortenFileName(File fileName, List<String> dirs) {
-        if ((fileName == null) || (fileName.length() == 0)) {
-            return fileName;
-        }
-        if (!fileName.isAbsolute() || (dirs == null)) {
+        if (fileName == null || !fileName.isAbsolute() || (dirs == null)) {
             return fileName;
         }
 
@@ -291,10 +288,7 @@ public class FileUtil {
     }
 
     private static File shortenFileName(File fileName, String dir) {
-        if ((fileName == null) || (fileName.length() == 0)) {
-            return fileName;
-        }
-        if (!fileName.isAbsolute() || (dir == null)) {
+        if (fileName == null || !fileName.isAbsolute() || (dir == null)) {
             return fileName;
         }
 
