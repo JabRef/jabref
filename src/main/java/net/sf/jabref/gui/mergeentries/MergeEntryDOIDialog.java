@@ -162,12 +162,12 @@ public class MergeEntryDOIDialog extends JDialog {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));
         } else if ("done".equals(button)) {
-            // Create a new entry and add it to the undo stack
-            // Remove the old entry and add it to the undo stack (which is not working...)
-            Set<String> joint = new TreeSet<>(mergedEntry.getFieldNames());
+            // Updated the original entry with the new fields
+            Set<String> jointFields = new TreeSet<>(mergedEntry.getFieldNames());
+            Set<String> originalFields = new TreeSet<>(originalEntry.getFieldNames());
             Boolean edited = false;
 
-            for (String field : joint) {
+            for (String field : jointFields) {
                 String originalString = originalEntry.getField(field);
                 String mergedString = mergedEntry.getField(field);
                 if ((originalString == null) || !originalString.equals(mergedEntry.getField(field))) {
@@ -176,6 +176,18 @@ public class MergeEntryDOIDialog extends JDialog {
                     edited = true;
                 }
             }
+
+            // Remove fields which are not in the merged entry
+            for (String field : originalFields) {
+                if (!jointFields.contains(field)) {
+                    String originalString = originalEntry.getField(field);
+                    originalEntry.clearField(field);
+                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString, null));
+                    edited = true;
+                }
+            }
+
+            //
 
             if (edited) {
                 ce.end();

@@ -34,6 +34,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#671](https://github.com/JabRef/jabref/issues/671): Remember working directory of last import
 - IEEEXplore fetcher replaces keyword separator with the preferred
 - Fixed [#710](https://github.com/JabRef/jabref/issues/710): Fixed quit behaviour under OSX
+- Merge from DOI now honors removed fields
 
 
 ### Removed
