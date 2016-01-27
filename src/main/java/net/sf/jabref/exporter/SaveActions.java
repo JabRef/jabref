@@ -21,18 +21,23 @@ public class SaveActions {
 
     public SaveActions(MetaData metaData) {
         actions = new HashMap<>();
-        List<String> formatters = metaData.getData(META_KEY);
         setAvailableFormatters();
 
-        for (int i = 0; i < formatters.size(); i += 2) {
-            try {
-                String field = formatters.get(i);
-                Formatter formatter = getFormatterFromString(formatters.get(i + 1));
+        List<String> formatters = metaData.getData(META_KEY);
+        if(formatters==null) {
+            // no save actions defined in the meta data
+            return;
+        } else {
+            for (int i = 0; i < formatters.size(); i += 2) {
+                try {
+                    String field = formatters.get(i);
+                    Formatter formatter = getFormatterFromString(formatters.get(i + 1));
 
-                actions.put(field, formatter);
-            } catch(IndexOutOfBoundsException e){
-                // the meta data string in the file is broken. -> Ignore the last item
-                break;
+                    actions.put(field, formatter);
+                } catch (IndexOutOfBoundsException e) {
+                    // the meta data string in the file is broken. -> Ignore the last item
+                    break;
+                }
             }
         }
 
