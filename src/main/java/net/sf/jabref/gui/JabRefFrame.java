@@ -1932,7 +1932,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JDialog dl = new EntryCustomizationDialog2(JabRefFrame.this);
+            JDialog dl = new EntryCustomizationDialog(JabRefFrame.this);
             PositionWindow.placeDialog(dl, JabRefFrame.this);
             dl.setVisible(true);
         }

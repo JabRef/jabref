@@ -33,7 +33,7 @@ import net.sf.jabref.util.Util;
 
 /**
  * This class extends FieldSetComponent to provide some required functionality for the
- * list of entry types in EntryCustomizationDialog2.
+ * list of entry types in EntryCustomizationDialog.
  * @author alver
  */
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener {

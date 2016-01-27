@@ -35,7 +35,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.*;
 
-public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
+public class EntryCustomizationDialog extends JDialog implements ListSelectionListener, ActionListener {
 
     private final JabRefFrame frame;
     protected GridBagLayout gbl = new GridBagLayout();
@@ -63,9 +63,9 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
 
     /**
-     * Creates a new instance of EntryCustomizationDialog2
+     * Creates a new instance of EntryCustomizationDialog
      */
-    public EntryCustomizationDialog2(JabRefFrame frame) {
+    public EntryCustomizationDialog(JabRefFrame frame) {
         super(frame, Localization.lang("Customize entry types"), false);
 
         this.frame = frame;
@@ -236,7 +236,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             List<String> optStr = optLists.get(stringListEntry.getKey());
             List<String> opt2Str = opt2Lists.get(stringListEntry.getKey());
 
-            if (opt2Str != null) {
+            if (opt2Str == null) {
                 opt2Str = new ArrayList<>(0);
             }
 
