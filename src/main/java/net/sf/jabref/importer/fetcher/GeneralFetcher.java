@@ -81,8 +81,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         if (this.activeFetcher.getOptionsPanel() != null) {
             optPanel.add(this.activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
         }
-        help = new HelpAction(GUIGlobals.helpDiag, activeFetcher.getHelpPage());
-        helpBut = help.getIconButton();
+        help = new HelpAction(activeFetcher.getHelpPage());
+        helpBut = help.getHelpButton();
         helpBut.setEnabled(activeFetcher.getHelpPage() != null);
 
         //optionsCards.show(optionsPanel, String.valueOf(defaultFetcher));
@@ -192,10 +192,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         add(main, BorderLayout.CENTER);
         go.addActionListener(this);
         tf.addActionListener(this);
-    }
-
-    public void setHelpResourceOwner(Class<?> c) {
-        help.setResourceOwner(c);
     }
 
     private JTextField getTextField() {

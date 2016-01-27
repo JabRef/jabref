@@ -3,7 +3,6 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Vector;
 
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.model.database.BibDatabase;

@@ -130,7 +130,7 @@ public class DOAJFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "DOAJHelp.html";
+        return "DOAJHelp";
     }
 
     @Override

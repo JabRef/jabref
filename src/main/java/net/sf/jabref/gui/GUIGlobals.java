@@ -31,7 +31,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -56,9 +56,6 @@ public class GUIGlobals {
     public static Font CURRENTFONT;
     public static Font typeNameFont;
 
-    // Size of help window.
-    public static final Dimension
-            helpSize = new Dimension(750, 600);
     public static final Dimension aboutSize = new Dimension(600, 265);
     public static Double zoomLevel = 1.0;
 
@@ -78,38 +75,12 @@ public class GUIGlobals {
     private static final String extension = ".gif";
     public static String ex = GUIGlobals.imageSize + GUIGlobals.extension;
     public static String pre = "/images/";
-    public static final String helpPre = "/help/";
 
     private static final Map<String, JLabel> tableIcons = new HashMap<>(); // Contains table icon mappings. Set up
     // further below.
     public static final Color activeEditor = new Color(230, 230, 255);
     public static SidePaneManager sidePaneManager;
-    public static HelpDialog helpDiag;
-
-    //Help files (in HTML format):
-    public static final String baseFrameHelp = "BaseFrameHelp.html";
-    public static final String entryEditorHelp = "EntryEditorHelp.html";
-    public static final String stringEditorHelp = "StringEditorHelp.html";
-    public static final String helpContents = "Contents.html";
-    public static final String searchHelp = "SearchHelp.html";
-    public static final String groupsHelp = "GroupsHelp.html";
-    public static final String contentSelectorHelp = "ContentSelectorHelp.html";
-    public static final String specialFieldsHelp = "SpecialFieldsHelp.html";
-    public static final String labelPatternHelp = "LabelPatterns.html";
-    public static final String ownerHelp = "OwnerHelp.html";
-    public static final String timeStampHelp = "TimeStampHelp.html";
-    public static final String exportCustomizationHelp = "CustomExports.html";
-    public static final String importCustomizationHelp = "CustomImports.html";
-    public static final String medlineHelp = "MedlineHelp.html";
-    public static final String generalFieldsHelp = "GeneralFields.html";
-    public static final String aboutPage = "About.html";
-    public static final String importInspectionHelp = "ImportInspectionDialog.html";
-    public static final String remoteHelp = "RemoteHelp.html";
-    public static final String journalAbbrHelp = "JournalAbbreviations.html";
-    public static final String regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch";
-    public static final String nameFormatterHelp = "CustomExports.html#NameFormatter";
-    public static final String previewHelp = "PreviewHelp.html";
-    public static final String autosaveHelp = "Autosave.html";
+    public static AboutDialog helpDiag;
 
     //	Colors.
     public static final Color entryEditorLabelColor = new Color(100, 100, 150); // Empty field, blue.
@@ -178,7 +149,6 @@ public class GUIGlobals {
             return (JLabel) o;
         }
     }
-
 
     public static void updateEntryEditorColors() {
         GUIGlobals.activeBackground = JabRefPreferences.getInstance().getColor(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR);

@@ -16,7 +16,6 @@
 package net.sf.jabref.migrations;
 
 import java.util.List;
-import java.util.Vector;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.groups.GroupTreeNode;

@@ -54,7 +54,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "ScienceDirect.html";
+        return "ScienceDirect";
     }
 
     @Override

@@ -63,7 +63,7 @@ public class GVKFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "GVKHelp.html";
+        return "GVKHelp";
     }
 
     @Override

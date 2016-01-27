@@ -62,7 +62,7 @@ public class JSTORFetcher2 implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "JSTOR.html";
+        return "JSTOR";
     }
 
     @Override

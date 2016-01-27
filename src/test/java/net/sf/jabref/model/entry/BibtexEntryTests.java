@@ -7,12 +7,10 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class BibtexEntryTests {
 

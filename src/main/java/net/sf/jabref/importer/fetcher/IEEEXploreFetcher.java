@@ -186,7 +186,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "IEEEXploreHelp.html";
+        return "IEEEXploreHelp";
     }
 
     /**

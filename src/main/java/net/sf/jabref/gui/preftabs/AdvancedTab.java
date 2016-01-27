@@ -29,9 +29,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import net.sf.jabref.*;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.help.AboutDialog;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.logic.journals.Abbreviations;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -60,7 +60,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final RemotePreferences remotePreferences;
 
 
-    public AdvancedTab(JabRefPreferences prefs, HelpDialog diag, JabRef jabRef) {
+    public AdvancedTab(JabRefPreferences prefs, AboutDialog diag, JabRef jabRef) {
         this.jabRef = jabRef;
         preferences = prefs;
         this.remotePreferences = new RemotePreferences(preferences);
@@ -141,7 +141,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         JPanel p = new JPanel();
         p.add(useRemoteServer);
         p.add(remoteServerPort);
-        p.add(new HelpAction(diag, GUIGlobals.remoteHelp).getIconButton());
+        p.add(new HelpAction(HelpFiles.remoteHelp).getHelpButton());
         builder.append(p);
 
         // IEEE
