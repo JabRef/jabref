@@ -268,9 +268,9 @@ public class FileActions {
 
             //finally write whatever remains of the file, but at least a concluding newline
             if ((database.getEpilog() != null) && !(database.getEpilog().isEmpty())) {
-               writer.write(database.getEpilog());
+                writer.write(database.getEpilog());
             } else {
-               writer.write(Globals.NEWLINE);
+                writer.write(Globals.NEWLINE);
             }
         } catch (IOException ex) {
             LOGGER.error("Could not write file", ex);
@@ -284,14 +284,21 @@ public class FileActions {
     }
 
     private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
-        List<BibEntry> result = new ArrayList<>(toChange.size());
-        SaveActions saveActions = new SaveActions(metaData);
+        if (metaData.getData(SaveActions.META_KEY) != null) {
+            // no save actions defined -> do nothing
+            return toChange;
+        } else {
+            // save actions defined -> apply for every entry
+            List<BibEntry> result = new ArrayList<>(toChange.size());
 
-        for(BibEntry entry: toChange){
-            result.add(saveActions.applySaveActions(entry));
+            SaveActions saveActions = new SaveActions(metaData);
+
+            for (BibEntry entry : toChange) {
+                result.add(saveActions.applySaveActions(entry));
+            }
+
+            return result;
         }
-
-        return result;
     }
 
 
@@ -498,7 +505,7 @@ public class FileActions {
      */
     public static List<BibEntry> getSortedEntries(BibDatabase database, MetaData metaData, Set<String> keySet, boolean isSaveOperation) {
         //if no meta data are present, simply return in original order
-        if(metaData == null) {
+        if (metaData == null) {
             List<BibEntry> result = new LinkedList<>();
             result.addAll(database.getEntries());
             return result;
