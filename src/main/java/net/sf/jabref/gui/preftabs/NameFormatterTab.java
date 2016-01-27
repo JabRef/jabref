@@ -15,28 +15,27 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.Globals;
+import net.sf.jabref.exporter.layout.format.NameFormatter;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.help.AboutDialog;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
+import net.sf.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.exporter.layout.format.NameFormatter;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.help.AboutDialog;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.logic.l10n.Localization;
 
 public class NameFormatterTab extends JPanel implements PrefsTab {
 
@@ -202,7 +201,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         scrollPane.setPreferredSize(new Dimension(600, 300));
         tabPanel.add(scrollPane, BorderLayout.CENTER);
 
-        JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+        JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
         toolBar.setFloatable(false);
         toolBar.setBorder(null);
         toolBar.add(new AddRowAction());

@@ -15,52 +15,31 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.TreeSet;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.DefaultCellEditor;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.LayoutFocusTraversalPolicy;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.undo.CompoundEdit;
-
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
 import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.IdGenerator;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.undo.CompoundEdit;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.TreeSet;
 
 class StringDialog extends JDialog {
 
@@ -119,7 +98,7 @@ class StringDialog extends JDialog {
         gbl.setConstraints(table.getPane(), con);
         pan.add(table.getPane());
 
-        JToolBar tlb = new JToolBar();
+        JToolBar tlb = new OSXCompatibleToolbar();
         InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = tlb.getActionMap();
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.STRING_DIALOG_ADD_STRING), "add");

@@ -15,23 +15,10 @@
  */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-
-import net.sf.jabref.*;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
@@ -39,13 +26,21 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
@@ -241,7 +236,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         colSetup.setPreferredScrollableViewportSize(new Dimension(250, 200));
         sp.setMinimumSize(new Dimension(250, 300));
         tabPanel.add(sp, BorderLayout.CENTER);
-        JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+        JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
         toolBar.setFloatable(false);
         AddRowAction addRow = new AddRowAction();
         DeleteRowAction deleteRow = new DeleteRowAction();

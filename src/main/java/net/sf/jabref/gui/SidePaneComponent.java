@@ -55,7 +55,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
         down.setBorder(null);
         down.addActionListener(new DownButtonListener());
 
-        JToolBar tlb = new JToolBar();
+        JToolBar tlb = new OSXCompatibleToolbar();
         tlb.add(up);
         tlb.add(down);
         tlb.add(close);

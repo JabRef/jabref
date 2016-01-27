@@ -131,7 +131,7 @@ public class Util {
             StringBuilder newKey = new StringBuilder();
             for (int i = 0; i < key.length(); i++) {
                 char c = key.charAt(i);
-                if (!Character.isWhitespace(c) && (c != '{') && (c != '\\') && (c != '"') && (c != '}') && (c != ',')) {
+                if (!Character.isWhitespace(c) && (c != '{') && (c != '\\') && (c != '"') && (c != '}') && (c != ',') && (c != '(') && (c != ')')) {
                     newKey.append(c);
                 }
             }
@@ -142,7 +142,7 @@ public class Util {
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
             if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"') && (c != '}')
-                    && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
+                    && (c != '~') && (c != ',') && (c != '^') && (c != '\'')  && (c != '(') && (c != ')')) {
                 newKey.append(c);
             }
         }
@@ -342,12 +342,9 @@ public class Util {
     /**
      * TODO: Move this to cleanup class. Collect file links from the given set of fields, and add them to the list
      * contained in the field GUIGlobals.FILE_FIELD.
-     *
-<<<<<<< HEAD
-     * @param entries The entries to modify.
-=======
-     * @param entry The entry to modify.
->>>>>>> origin/master
+     * <p>
+     * @param entry   The entry to modify.
+     *                >>>>>>> origin/master
      * @param fields  The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
@@ -513,7 +510,6 @@ public class Util {
     }
 
     /**
-     *
      * Updating a field will result in the entry being reformatted on save
      *
      * @param ce indicates the undo named compound. May be null
@@ -799,7 +795,7 @@ public class Util {
     }
 
     /**
-     *  Shortcut method for setting a single entry
+     * Shortcut method for setting a single entry
      *
      * @param entry
      * @param ce

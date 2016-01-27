@@ -118,6 +118,23 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseQuotedEntries() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@article{test,author=\"Ed von Test\"}"));
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals("article", e.getType());
+        Assert.assertEquals("test", e.getCiteKey());
+        Assert.assertEquals(2, e.getFieldNames().size());
+        Assert.assertEquals("Ed von Test", e.getField("author"));
+    }
+
+
+    @Test
     public void parseRecognizesEntryOnlyWithKey() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader(

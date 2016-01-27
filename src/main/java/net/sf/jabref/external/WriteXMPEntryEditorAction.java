@@ -49,7 +49,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         // normally, the next call should be without "Localization.lang". However, the string "Write XMP" is also used in non-menu places and therefore, the translation must be also available at Localization.lang
         putValue(Action.NAME, Localization.lang("Write XMP"));
         putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.WRITE_XMP.getIcon());
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Write BibtexEntry as XMP-metadata to PDF."));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Write BibTeXEntry as XMP-metadata to PDF."));
     }
 
     @Override

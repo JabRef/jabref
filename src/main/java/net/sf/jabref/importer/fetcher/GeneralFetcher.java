@@ -15,34 +15,24 @@
 */
 package net.sf.jabref.importer.fetcher;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
@@ -141,6 +131,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         helpBut.setMargin(new Insets(0, 0, 0, 0));
         tf.setPreferredSize(new Dimension(1, tf.getPreferredSize().height));
+        if (OS.OS_X) {
+            tf.putClientProperty("JTextField.variant", "search");
+        }
 
         tf.setName("tf");
         // add action to reset-button. resets tf and requests focus

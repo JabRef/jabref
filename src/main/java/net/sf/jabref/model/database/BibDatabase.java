@@ -29,13 +29,17 @@ Modified for use in JabRef
  */
 package net.sf.jabref.model.database;
 
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.MonthUtil;
+import net.sf.jabref.model.entry.TypedBibEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.TypedBibEntry;
@@ -233,7 +237,7 @@ public class BibDatabase {
         }
 
         if (bibtexStrings.containsKey(string.getId())) {
-            throw new KeyCollisionException("Duplicate BibtexString id.");
+            throw new KeyCollisionException("Duplicate BibTeXString id.");
         }
 
         bibtexStrings.put(string.getId(), string);
