@@ -18,7 +18,6 @@ package net.sf.jabref.gui.util;
 import java.util.Comparator;
 import java.util.Optional;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.TypedBibEntry;

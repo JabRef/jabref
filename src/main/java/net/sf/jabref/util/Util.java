@@ -668,8 +668,6 @@ public class Util {
             wr.writeBytes(postData);
         }
 
-        int responseCode = source.getResponseCode();
-
         String inputLine;
         StringBuffer response = new StringBuffer();
 
