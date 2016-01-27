@@ -329,20 +329,11 @@ public final class JabRefPreferences {
     public static final String CLEANUP_FIX_FILE_LINKS = "CleanUpFixFileLinks";
     public static final CleanupPreset CLEANUP_DEFAULT_PRESET;
     static {
-        CLEANUP_DEFAULT_PRESET = new CleanupPreset();
-        CLEANUP_DEFAULT_PRESET.setCleanUpSuperscripts(true);
-        CLEANUP_DEFAULT_PRESET.setCleanUpDOI(true);
-        CLEANUP_DEFAULT_PRESET.setCleanUpMonth(true);
-        CLEANUP_DEFAULT_PRESET.setCleanUpPageNumbers(true);
-        CLEANUP_DEFAULT_PRESET.setCleanUpDate(true);
-        CLEANUP_DEFAULT_PRESET.setMakePathsRelative(true);
-        CLEANUP_DEFAULT_PRESET.setRenamePDF(true);
-        CLEANUP_DEFAULT_PRESET.setConvertHTMLToLatex(true);
-        CLEANUP_DEFAULT_PRESET.setConvertCase(true);
-        CLEANUP_DEFAULT_PRESET.setConvertLaTeX(true);
-        CLEANUP_DEFAULT_PRESET.setConvertUnits(true);
-        CLEANUP_DEFAULT_PRESET.setConvertUnicodeToLatex(true);
-        CLEANUP_DEFAULT_PRESET.setFixFileLinks(true);
+        EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
+                CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
+        CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs));
     }
 
 

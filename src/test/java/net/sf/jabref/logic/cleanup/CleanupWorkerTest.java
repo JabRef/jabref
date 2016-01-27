@@ -11,6 +11,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 public class CleanupWorkerTest {
@@ -27,14 +28,14 @@ public class CleanupWorkerTest {
 
     @Test(expected = NullPointerException.class)
     public void cleanupNullThrowsException() {
-        CleanupPreset preset = new CleanupPreset();
+        CleanupPreset preset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
         CleanupWorker worker = new CleanupWorker(preset);
         worker.cleanup(null);
     }
 
     @Test
     public void cleanupDoesNothingByDefault() throws IOException {
-        CleanupPreset preset = new CleanupPreset();
+        CleanupPreset preset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
         CleanupWorker worker = new CleanupWorker(preset);
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "Toot");
@@ -60,8 +61,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void upgradeExternalLinksMoveFromPdfToFile() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setCleanUpUpgradeExternalLinks(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         BibEntry entry = new BibEntry();
         entry.setField("pdf", "aPdfFile");
 
@@ -73,8 +73,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void upgradeExternalLinksMoveFromPsToFile() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setCleanUpUpgradeExternalLinks(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         BibEntry entry = new BibEntry();
         entry.setField("ps", "aPsFile");
 
@@ -86,8 +85,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupSupercriptChangesFirstToLatex() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setCleanUpSuperscripts(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_SUPERSCRIPTS);
         BibEntry entry = new BibEntry();
         entry.setField("some", "1st");
 
@@ -98,8 +96,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupDoiRemovesLeadingHttp() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setCleanUpDOI(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         BibEntry entry = new BibEntry();
         entry.setField("doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
@@ -110,8 +107,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupDoiReturnsChanges() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setCleanUpDOI(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         BibEntry entry = new BibEntry();
         entry.setField("doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
@@ -125,8 +121,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupMonthChangesNumberToBibtex() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setCleanUpMonth(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_MONTH);
         BibEntry entry = new BibEntry();
         entry.setField("month", "01");
 
@@ -136,9 +131,8 @@ public class CleanupWorkerTest {
     }
 
     @Test
-    public void cleanupPagenumbersConvertsSingleDashToDouble() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setCleanUpPageNumbers(true);
+    public void cleanupPageNumbersConvertsSingleDashToDouble() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_PAGE_NUMBERS);
         BibEntry entry = new BibEntry();
         entry.setField("pages", "1-2");
 
@@ -149,8 +143,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupDatesConvertsToCorrectFormat() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setCleanUpDate(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DATE);
         BibEntry entry = new BibEntry();
         entry.setField("date", "01/1999");
 
@@ -161,8 +154,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupFixFileLinksMovesSingleDescriptionToLink() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setFixFileLinks(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
         BibEntry entry = new BibEntry();
         entry.setField("file", "link::");
 
@@ -173,8 +165,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupRelativePathsConvertAbsoluteToRelativePath() throws IOException {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setMakePathsRelative(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
 
         File tempFile = testFolder.newFile();
         BibEntry entry = new BibEntry();
@@ -190,8 +181,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupRenamePdfRenamesRelativeFile() throws IOException {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setRenamePDF(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
 
         File tempFile = testFolder.newFile();
         BibEntry entry = new BibEntry();
@@ -208,8 +198,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupHtmlStripsHtmlTag() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setConvertHTMLToLatex(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_HTML_TO_LATEX);
         BibEntry entry = new BibEntry();
         entry.setField("title", "<b>hallo</b>");
 
@@ -220,8 +209,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupUnitsConvertsOneAmpereToLatex() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setConvertUnits(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_UNITS);
         BibEntry entry = new BibEntry();
         entry.setField("title", "1 A");
 
@@ -232,8 +220,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupCasesAddsBracketAroundAluminiumGalliumArsenid() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setConvertCase(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_CASE);
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 
@@ -244,8 +231,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupLatexMergesTwoLatexMathEnvironments() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setConvertLaTeX(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_LATEX);
         BibEntry entry = new BibEntry();
         entry.setField("title", "$\\alpha$$\\beta$");
 
@@ -256,8 +242,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupUnicodeConvertsAcuteToLatex() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setConvertUnicodeToLatex(true);
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_UNICODE_TO_LATEX);
         BibEntry entry = new BibEntry();
         entry.setField("abstract", "Réflexions");
 
@@ -267,9 +252,8 @@ public class CleanupWorkerTest {
     }
 
     @Test
-    public void convertToBiblatexMovesJournalToJournaltitle() {
-        CleanupPreset preset = new CleanupPreset();
-        preset.setConvertToBiblatex(true);
+    public void convertToBiblatexMovesJournalToJournalTitle() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
         BibEntry entry = new BibEntry();
         entry.setField("journal", "test");
 

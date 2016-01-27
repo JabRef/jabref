@@ -1,10 +1,12 @@
 package net.sf.jabref.gui;
 
+import java.util.EnumSet;
 import java.util.Objects;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -32,8 +34,7 @@ public class CleanupPresetPanel {
     private JCheckBox cleanUpBibLatex;
 
     private JPanel panel;
-    private final CleanupPreset cleanupPreset;
-
+    private CleanupPreset cleanupPreset;
 
     public CleanupPresetPanel(CleanupPreset cleanupPreset) {
         this.cleanupPreset = Objects.requireNonNull(cleanupPreset);
@@ -63,8 +64,8 @@ public class CleanupPresetPanel {
         cleanUpUnits = new JCheckBox(
                 Localization.lang("Add brackets and replace separators with their non-breaking version for units"));
         cleanUpUnicode = new JCheckBox(Localization.lang("Run Unicode converter on title, author(s), and abstract"));
-        cleanUpBibLatex = new JCheckBox(Localization.lang(
-                "Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
+        cleanUpBibLatex = new JCheckBox(Localization
+                .lang("Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
         updateDisplay(cleanupPreset);
 
         FormLayout layout = new FormLayout("left:15dlu,pref:grow",
@@ -83,8 +84,8 @@ public class CleanupPresetPanel {
         builder.add(cleanUpUpgradeExternalLinks).xyw(1, 11, 2);
         builder.add(cleanUpMakePathsRelative).xyw(1, 12, 2);
         builder.add(cleanUpRenamePDF).xyw(1, 13, 2);
-        String currentPattern = Localization.lang("Filename format pattern").concat(": ")
-                .concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
+        String currentPattern = Localization.lang("Filename format pattern").concat(": ").concat(
+                Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern)).xy(2, 14);
         builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 15);
         builder.add(cleanUpBibLatex).xyw(1, 16, 2);
@@ -115,21 +116,60 @@ public class CleanupPresetPanel {
     }
 
     public CleanupPreset getCleanupPreset() {
-        cleanupPreset.setCleanUpSuperscripts(cleanUpSuperscripts.isSelected());
-        cleanupPreset.setCleanUpDOI(cleanUpDOI.isSelected());
-        cleanupPreset.setCleanUpMonth(cleanUpMonth.isSelected());
-        cleanupPreset.setCleanUpPageNumbers(cleanUpPageNumbers.isSelected());
-        cleanupPreset.setCleanUpDate(cleanUpDate.isSelected());
-        cleanupPreset.setCleanUpUpgradeExternalLinks(cleanUpUpgradeExternalLinks.isSelected());
-        cleanupPreset.setMakePathsRelative(cleanUpMakePathsRelative.isSelected());
-        cleanupPreset.setRenamePDF(cleanUpRenamePDF.isSelected());
-        cleanupPreset.setConvertHTMLToLatex(cleanUpHTML.isSelected());
-        cleanupPreset.setConvertCase(cleanUpCase.isSelected());
-        cleanupPreset.setConvertLaTeX(cleanUpLaTeX.isSelected());
-        cleanupPreset.setConvertUnits(cleanUpUnits.isSelected());
-        cleanupPreset.setConvertUnicodeToLatex(cleanUpUnicode.isSelected());
-        cleanupPreset.setConvertToBiblatex(cleanUpBibLatex.isSelected());
-        cleanupPreset.setFixFileLinks(true);
+
+        EnumSet<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
+
+        if (cleanUpSuperscripts.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_SUPERSCRIPTS);
+        }
+        if (cleanUpDOI.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
+        }
+        if (cleanUpMonth.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_MONTH);
+        }
+        if (cleanUpPageNumbers.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_PAGE_NUMBERS);
+        }
+        if (cleanUpDate.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_DATE);
+        }
+        if (cleanUpMakePathsRelative.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
+        }
+        if (cleanUpRenamePDF.isSelected()) {
+            if (cleanUpRenamePDFonlyRelativePaths.isSelected()) {
+                activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
+            } else {
+                activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF);
+            }
+        }
+
+        if (cleanUpUpgradeExternalLinks.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
+        }
+        if (cleanUpHTML.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_HTML_TO_LATEX);
+        }
+        if (cleanUpCase.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_CASE);
+        }
+        if (cleanUpLaTeX.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_LATEX);
+        }
+        if (cleanUpUnits.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_UNITS);
+        }
+        if (cleanUpUnicode.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_UNICODE_TO_LATEX);
+        }
+        if (cleanUpBibLatex.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
+        }
+
+        activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
+
+        cleanupPreset = new CleanupPreset(activeJobs);
         return cleanupPreset;
     }
 }
