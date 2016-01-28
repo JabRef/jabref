@@ -26,8 +26,9 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.NetUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -124,7 +125,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         try {
             URL url = new URL(address);
 
-            String page = Util.getResults(url);
+            String page = NetUtil.getResults(url);
 
             String resultsFound = "<div id=\"resfound\">";
             int hits = getNumberOfHits(page, resultsFound, ACMPortalFetcher.HITS_PATTERN);
@@ -337,7 +338,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             // get abstract
             if (downloadAbstract) {
                 url = new URL(ACMPortalFetcher.START_URL + ACMPortalFetcher.ABSTRACT_URL + id);
-                String page = Util.getResults(url);
+                String page = NetUtil.getResults(url);
                 Matcher absM = ACMPortalFetcher.ABSTRACT_PATTERN.matcher(page);
                 if (absM.find()) {
                     entry.setField("abstract", absM.group(1).trim());
