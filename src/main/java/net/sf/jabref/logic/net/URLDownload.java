@@ -24,6 +24,8 @@ import java.net.CookieHandler;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
@@ -36,6 +38,10 @@ public class URLDownload {
     private final URL source;
 
     private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
+
+    private final Map<String, String> parameters = new HashMap<>();
+
+    private String postData = "";
 
     /**
      * URL download to a string.
@@ -85,11 +91,32 @@ public class URLDownload {
         }
     }
 
+    public void addParameters(String key, String value) {
+        parameters.put(key, value);
+    }
+
+    public void setPostData(String postData) {
+        if (postData != null) {
+            this.postData = postData;
+        }
+    }
+
     private URLConnection openConnection() throws IOException {
         URLConnection connection = source.openConnection();
         connection.setRequestProperty("User-Agent", "JabRef");
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            connection.setRequestProperty(entry.getKey(), entry.getValue());
+        }
+        if (!postData.isEmpty()) {
+            connection.setDoOutput(true);
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream());) {
+                wr.writeBytes(postData);
+            }
+
+        }
         // this does network i/o: GET + read returned headers
         connection.connect();
+
         return connection;
     }
 
