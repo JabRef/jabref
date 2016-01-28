@@ -2,6 +2,8 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.event.ChangeEvent;
@@ -18,7 +20,7 @@ public class UnlinkedFilesCrawler {
     /**
      * File filter, that accepts directories only.
      */
-    private final static FileFilter DIRECTORY_FILTER = pathname -> pathname != null && pathname.isDirectory();
+    private final static FileFilter DIRECTORY_FILTER = pathname -> (pathname != null) && pathname.isDirectory();
 
     private final BibDatabase database;
 
@@ -58,12 +60,12 @@ public class UnlinkedFilesCrawler {
             return null;
         }
 
-        File[] files = directory.listFiles(ff);
+        List<File> files = Arrays.asList(directory.listFiles(ff));
         CheckableTreeNode root = new CheckableTreeNode(null);
 
         int filesCount = 0;
 
-        File[] subDirectories = directory.listFiles(DIRECTORY_FILTER);
+        List<File> subDirectories = Arrays.asList(directory.listFiles(DIRECTORY_FILTER));
         for (File subDirectory : subDirectories) {
             CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
             if ((subRoot != null) && (subRoot.getChildCount() > 0)) {
@@ -72,7 +74,7 @@ public class UnlinkedFilesCrawler {
             }
         }
 
-        root.setUserObject(new FileNodeWrapper(directory, files.length + filesCount));
+        root.setUserObject(new FileNodeWrapper(directory, files.size() + filesCount));
 
         for (File file : files) {
             root.add(new CheckableTreeNode(new FileNodeWrapper(file)));

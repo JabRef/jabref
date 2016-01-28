@@ -160,34 +160,33 @@ public class UrlDragDrop implements DropTargetListener {
                                     new JOptionChoice(
                                             Localization.lang("Download file"), 1)},
                             new JOptionChoice(Localization.lang("Insert URL"), 0));
-            switch (res.getId()) {
-            //insert URL
-            case 0:
-                feditor.setText(url.toString());
-                editor.updateField(feditor);
-                break;
-            //download file
-            case 1:
-                try {
-                    //auto filename:
-                    File file = new File(new File(Globals.prefs.get("pdfDirectory")),
-                            editor.getEntry().getCiteKey()
-                            + ".pdf");
-                    frame.output(Localization.lang("Downloading..."));
-                    MonitoredURLDownload.buildMonitoredDownload(editor, url).downloadToFile(file);
-                    frame.output(Localization.lang("Download completed"));
-                    feditor.setText(file.toURI().toURL().toString());
+            if (res != null) {
+                switch (res.getId()) {
+                //insert URL
+                case 0:
+                    feditor.setText(url.toString());
                     editor.updateField(feditor);
+                    break;
+                //download file
+                case 1:
+                    try {
+                        //auto filename:
+                        File file = new File(new File(Globals.prefs.get("pdfDirectory")),
+                                editor.getEntry().getCiteKey() + ".pdf");
+                        frame.output(Localization.lang("Downloading..."));
+                        MonitoredURLDownload.buildMonitoredDownload(editor, url).downloadToFile(file);
+                        frame.output(Localization.lang("Download completed"));
+                        feditor.setText(file.toURI().toURL().toString());
+                        editor.updateField(feditor);
 
-                } catch (IOException ioex) {
-                    LOGGER.error("Error while downloading file.", ioex);
-                    JOptionPane.showMessageDialog(editor,
-                            Localization.lang("File download"),
-                            Localization.lang("Error while downloading file:"
-                                    + ioex.getMessage()),
-                            JOptionPane.ERROR_MESSAGE);
+                    } catch (IOException ioex) {
+                        LOGGER.error("Error while downloading file.", ioex);
+                        JOptionPane.showMessageDialog(editor, Localization.lang("File download"),
+                                Localization.lang("Error while downloading file:" + ioex.getMessage()),
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
                 }
-                break;
             }
             return;
         } catch (UnsupportedFlavorException nfe) {

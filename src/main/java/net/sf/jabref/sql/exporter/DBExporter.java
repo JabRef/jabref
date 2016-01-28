@@ -490,7 +490,7 @@ public abstract class DBExporter extends DBImporterExporter {
     }
 
     private boolean isValidDBName(List<String> databaseNames, String desiredName) {
-        return (desiredName.trim().length() > 1) && !databaseNames.contains(desiredName);
+        return (desiredName != null) && (desiredName.trim().length() > 1) && !databaseNames.contains(desiredName);
     }
 
     /**
