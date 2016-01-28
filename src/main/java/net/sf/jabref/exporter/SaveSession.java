@@ -154,9 +154,8 @@ public class SaveSession {
         if (lock.exists()) {
             return true;
         }
-        FileOutputStream out = new FileOutputStream(lock);
-        out.write(0);
-        try {
+        try (FileOutputStream out = new FileOutputStream(lock)) {
+            out.write(0);
             out.close();
         } catch (IOException ex) {
             LOGGER.error("Error when creating lock file.", ex);

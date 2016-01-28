@@ -26,6 +26,9 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -49,6 +52,8 @@ import net.sf.jabref.sql.SQLUtil;
  * one DB imported (by ifsteinm)
  */
 public class DbImportAction extends AbstractWorker {
+
+    private static final Log LOGGER = LogFactory.getLog(DbImportAction.class);
 
     private BibDatabase database;
     private MetaData metaData;
@@ -80,7 +85,7 @@ public class DbImportAction extends AbstractWorker {
             try {
                 Util.runAbstractWorker(DbImportAction.this);
             } catch (Throwable throwable) {
-                throwable.printStackTrace();
+                LOGGER.warn("Problem importing from database", throwable);
             }
         }
     }
@@ -134,8 +139,9 @@ public class DbImportAction extends AbstractWorker {
                 DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
                 DBImporter importer = factory.getImporter(dbs.getServerType());
                 try (Connection conn = importer.connectToDB(dbs);
-                     Statement statement = SQLUtil.queryAllFromTable(conn, "jabref_database")) {
-                    ResultSet rs = statement.getResultSet();
+                        Statement statement = SQLUtil.queryAllFromTable(conn, "jabref_database");
+                        ResultSet rs = statement.getResultSet()) {
+
                     Vector<String> v;
                     Vector<Vector<String>> matrix = new Vector<>();
 
@@ -177,7 +183,7 @@ public class DbImportAction extends AbstractWorker {
                 JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
                         Localization.lang("Import from SQL database"), JOptionPane.ERROR_MESSAGE);
                 frame.output(Localization.lang("Error importing from database"));
-                ex.printStackTrace();
+                LOGGER.error("Error importing from databae", ex);
             }
         }
     }
