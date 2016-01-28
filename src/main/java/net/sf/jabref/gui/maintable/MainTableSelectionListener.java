@@ -23,6 +23,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 
+import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -421,8 +423,15 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     if (specialField == null) {
                         if (entry.hasField(field)) {
                             String content = entry.getField(field);
-                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content,
-                                    GUIGlobals.getTableIcon(field).getIcon(), panel.metaData(), field));
+                            Icon icon;
+                            JLabel iconLabel = GUIGlobals.getTableIcon(field);
+                            if (iconLabel == null) {
+                                icon = IconTheme.JabRefIcon.FILE.getIcon();
+                            } else {
+                                icon = iconLabel.getIcon();
+                            }
+                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content, icon,
+                                    panel.metaData(), field));
                             showDefaultPopup = false;
                         }
                     } else {

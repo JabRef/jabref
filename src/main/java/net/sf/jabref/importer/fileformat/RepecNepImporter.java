@@ -285,17 +285,22 @@ public class RepecNepImporter extends ImportFormat {
     private void parseAuthors(BibEntry be) throws IOException {
         // read authors and institutions
         String authors = "";
-        String institutions = "";
+        StringBuffer institutions = new StringBuffer();
         while ((this.lastLine != null) && !"".equals(this.lastLine) && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
 
             // read single author
             String author;
-            String institution = null;
+            StringBuffer institution = new StringBuffer();
             boolean institutionDone;
             if (this.lastLine.indexOf('(') >= 0) {
                 author = this.lastLine.substring(0, this.lastLine.indexOf('(')).trim();
                 institutionDone = this.lastLine.indexOf(')') > 0;
-                institution = this.lastLine.substring(this.lastLine.indexOf('(') + 1, institutionDone && (this.lastLine.indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
+                institution
+                        .append(this.lastLine.substring(this.lastLine.indexOf('(') + 1,
+                                institutionDone && (this.lastLine
+                                        .indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine
+                                                .indexOf(')') : this.lastLine.length())
+                                .trim());
             } else {
                 author = this.lastLine.substring(0, this.lastLine.length()).trim();
                 institutionDone = true;
@@ -304,23 +309,25 @@ public class RepecNepImporter extends ImportFormat {
             readLine();
             while (!institutionDone && (this.lastLine != null)) {
                 institutionDone = this.lastLine.indexOf(')') > 0;
-                institution += this.lastLine.substring(0, institutionDone ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
+                institution.append(this.lastLine
+                        .substring(0, institutionDone ? this.lastLine.indexOf(')') : this.lastLine.length()).trim());
                 readLine();
             }
 
             if (author != null) {
                 authors += "".equals(authors) ? author : " and " + author;
             }
-            if (institution != null) {
-                institutions += "".equals(institutions) ? institution : " and " + institution;
+            if (institution.length() > 0) {
+                institutions.append(
+                        (institutions.length() == 0) ? institution.toString() : " and " + institution.toString());
             }
         }
 
         if (!"".equals(authors)) {
             be.setField("author", authors);
         }
-        if (!"".equals(institutions)) {
-            be.setField("institution", institutions);
+        if (institutions.length() > 0) {
+            be.setField("institution", institutions.toString());
         }
     }
 

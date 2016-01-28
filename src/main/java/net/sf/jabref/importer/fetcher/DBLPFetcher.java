@@ -63,6 +63,11 @@ public class DBLPFetcher implements EntryFetcher {
 
         shouldContinue = true;
 
+        // we save the duplicate check threshold
+        // we need to overcome the "smart" approach of this heuristic
+        // and we will set it back afterwards, so maybe someone is happy again
+        double saveThreshold = DuplicateCheck.duplicateThreshold;
+
         try {
 
             String address = makeSearchURL();
@@ -82,10 +87,6 @@ public class DBLPFetcher implements EntryFetcher {
                 }
             }
 
-            // we save the duplicate check threshold
-            // we need to overcome the "smart" approach of this heuristic
-            // and we will set it back afterwards, so maybe someone is happy again
-            double saveThreshold = DuplicateCheck.duplicateThreshold;
             DuplicateCheck.duplicateThreshold = Double.MAX_VALUE;
 
             // 2014-11-08
@@ -138,7 +139,6 @@ public class DBLPFetcher implements EntryFetcher {
                 count++;
             }
 
-            DuplicateCheck.duplicateThreshold = saveThreshold;
 
             // everything went smooth
             res = true;
@@ -146,6 +146,9 @@ public class DBLPFetcher implements EntryFetcher {
         } catch (IOException e) {
             LOGGER.warn("Communcation problems", e);
             status.showMessage(e.getMessage());
+        } finally {
+            // Restore the threshold
+            DuplicateCheck.duplicateThreshold = saveThreshold;
         }
 
         return res;

@@ -284,7 +284,7 @@ public class ExportFormat implements IExportFormat {
             }
 
             // Write footer
-            if (endLayout != null) {
+            if ((endLayout != null) && (encoding != null)) {
                 ps.write(endLayout.doLayout(database, encoding));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }

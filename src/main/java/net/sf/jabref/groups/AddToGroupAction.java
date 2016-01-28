@@ -110,7 +110,10 @@ public class AddToGroupAction extends AbstractAction {
             for (int i = 0; i < removeGroupsNodes.size(); ++i) {
                 GroupTreeNode node = removeGroupsNodes.elementAt(i);
                 if (node.getGroup().containsAny(entries)) {
-                    undoAll.addEdit(node.removeFromGroup(entries));
+                    AbstractUndoableEdit undoRemove = node.removeFromGroup(entries);
+                    if (undoRemove != null) {
+                        undoAll.addEdit(undoRemove);
+                    }
                 }
             }
             // then add

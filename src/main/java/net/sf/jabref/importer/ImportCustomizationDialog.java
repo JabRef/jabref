@@ -87,11 +87,13 @@ public class ImportCustomizationDialog extends JDialog {
             className = path.getName() + (className == null ? "" : "." + className);
             path = path.getParentFile();
         }
-        int lastDot = className.lastIndexOf('.');
-        if (lastDot < 0) {
-            return className;
+        if (className != null) {
+            int lastDot = className.lastIndexOf('.');
+            if (lastDot < 0) {
+                return className;
+            }
+            className = className.substring(0, lastDot);
         }
-        className = className.substring(0, lastDot);
         return className;
     }
 
