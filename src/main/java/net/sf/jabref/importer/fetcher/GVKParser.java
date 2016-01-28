@@ -58,8 +58,8 @@ public class GVKParser {
             Element e = getChild("zs:recordData", record);
             if (e != null) {
                 e = getChild("record", e);
+                result.add(parseEntry(e));
             }
-            result.add(parseEntry(e));
         }
         return result;
     }
@@ -101,6 +101,9 @@ public class GVKParser {
             // mak
             if ("002@".equals(tag)) {
                 mak = getSubfield("0", datafield);
+                if (mak == null) {
+                    mak = "";
+                }
             }
 
             //ppn
@@ -270,8 +273,10 @@ public class GVKParser {
             if ("034D".equals(tag)) {
                 pagetotal = getSubfield("a", datafield);
 
-                // S, S. etc. entfernen
-                pagetotal = pagetotal.replaceAll(" S\\.?$", "");
+                if (pagetotal != null) {
+                    // S, S. etc. entfernen
+                    pagetotal = pagetotal.replaceAll(" S\\.?$", "");
+                }
             }
 
             // Behandlung von Konferenzen
