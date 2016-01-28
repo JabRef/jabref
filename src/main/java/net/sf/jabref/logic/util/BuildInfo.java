@@ -24,7 +24,9 @@ public class BuildInfo {
     private static final String UNKOWN_VERSION = "*unknown*";
     
     private final String version;
-
+    private final String authors;
+    private final String developers;
+    private final String year;
 
     public BuildInfo() {
         this("/build.properties");
@@ -40,12 +42,28 @@ public class BuildInfo {
         } catch (IOException ignored) {
             // nothing to do -> default already set
         }
-        String versionFromProps = properties.getProperty("version", UNKOWN_VERSION);
 
-        version = versionFromProps;
+        version = properties.getProperty("version", UNKOWN_VERSION);
+        authors = properties.getProperty("authors", "");
+        year = properties.getProperty("year", "");
+        developers = properties.getProperty("developers", "");
+
     }
 
     public String getVersion() {
         return version;
     }
+
+    public String getAuthors() {
+        return authors;
+    }
+
+    public String getDevelopers() {
+        return developers;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
 }

@@ -19,25 +19,32 @@ package net.sf.jabref.importer.fetcher;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.NetUtil;
 import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.util.Util;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(DOItoBibTeXFetcher.class);
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
@@ -50,7 +57,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-        BibtexEntry entry = getEntryFromDOI(query, status);
+        BibEntry entry = getEntryFromDOI(query, status);
         if (entry != null) {
             inspector.addEntry(entry);
             return true;
@@ -65,7 +72,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "DOItoBibTeXHelp.html";
+        return "DOItoBibTeXHelp";
     }
 
     @Override
@@ -74,7 +81,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         return null;
     }
 
-    public BibtexEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
+    public BibEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
         DOI doi;
         try {
             doi = new DOI(doiStr);
@@ -90,9 +97,14 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         // construct URL
         URL url;
         try {
-            url = doi.getURI().toURL();
+            Optional<URI> uri = doi.getURI();
+            if (uri.isPresent()) {
+                url = uri.get().toURL();
+            } else {
+                return null;
+            }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.warn("Bad URL", e);
             return null;
         }
 
@@ -100,7 +112,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         try {
             conn = url.openConnection();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not open URL connection", e);
             return null;
         }
 
@@ -108,32 +120,28 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
         String bibtexString;
         try {
-            bibtexString = Util.getResultsWithEncoding(conn, StandardCharsets.UTF_8);
+            bibtexString = NetUtil.getResultsWithEncoding(conn, StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
 
             if (status != null) {
-                // @formatter:off
                 status.showMessage(Localization.lang("Unknown DOI: '%0'.", doi.getDOI()),
                         Localization.lang("Get BibTeX entry from DOI"),
                         JOptionPane.INFORMATION_MESSAGE);
-                // @formatter:on
             }
             return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Communication problems", e);
             return null;
         }
 
         //Usually includes an en-dash in the page range. Char is in cp1252 but not
         // ISO 8859-1 (which is what latex expects). For convenience replace here.
         bibtexString = bibtexString.replaceAll("(pages=\\{[0-9]+)\u2013([0-9]+\\})", "$1--$2");
-        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+        BibEntry entry = BibtexParser.singleFromString(bibtexString);
 
         if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
-            String title = entry.getField("title");
-            if (title != null) {
-
+            entry.getFieldOptional("title").ifPresent(title -> {
                 // Unit formatting
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitFormatter.format(title);
@@ -144,7 +152,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);
-            }
+            });
         }
         return entry;
     }

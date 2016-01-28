@@ -25,13 +25,18 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.util.Util;
-import net.sf.jabref.bibtex.DuplicateCheck;
+import net.sf.jabref.logic.net.NetUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.DuplicateCheck;
 
 public class DBLPFetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(DBLPFetcher.class);
 
     private static final String URL_START = "http://www.dblp.org/search/api/";
     private static final String URL_PART1 = "?q=";
@@ -58,12 +63,17 @@ public class DBLPFetcher implements EntryFetcher {
 
         shouldContinue = true;
 
+        // we save the duplicate check threshold
+        // we need to overcome the "smart" approach of this heuristic
+        // and we will set it back afterwards, so maybe someone is happy again
+        double saveThreshold = DuplicateCheck.duplicateThreshold;
+
         try {
 
             String address = makeSearchURL();
             //System.out.println(address);
             URL url = new URL(address);
-            String page = Util.getResults(url);
+            String page = NetUtil.getResults(url);
 
             //System.out.println(page);
             String[] lines = page.split("\n");
@@ -77,10 +87,6 @@ public class DBLPFetcher implements EntryFetcher {
                 }
             }
 
-            // we save the duplicate check threshold
-            // we need to overcome the "smart" approach of this heuristic
-            // and we will set it back afterwards, so maybe someone is happy again
-            double saveThreshold = DuplicateCheck.duplicateThreshold;
             DuplicateCheck.duplicateThreshold = Double.MAX_VALUE;
 
             // 2014-11-08
@@ -97,14 +103,14 @@ public class DBLPFetcher implements EntryFetcher {
 
                 final URL bibUrl = new URL(urlStr);
 
-                final String bibtexHTMLPage = Util.getResults(bibUrl);
+                final String bibtexHTMLPage = NetUtil.getResults(bibUrl);
 
                 final String[] htmlLines = bibtexHTMLPage.split("\n");
 
                 for (final String line : htmlLines) {
                     if (line.contains("biburl")) {
-                        int sidx = line.indexOf("{");
-                        int eidx = line.indexOf("}");
+                        int sidx = line.indexOf('{');
+                        int eidx = line.indexOf('}');
                         // now we take everything within the curley braces
                         String bibtexUrl = line.substring(sidx + 1, eidx);
 
@@ -113,11 +119,11 @@ public class DBLPFetcher implements EntryFetcher {
 
                         final URL bibFileURL = new URL(bibtexUrl);
                         //System.out.println("URL:|"+bibtexUrl+"|");
-                        final String bibtexPage = Util.getResults(bibFileURL);
+                        final String bibtexPage = NetUtil.getResults(bibFileURL);
 
-                        Collection<BibtexEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
+                        Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
 
-                        for (BibtexEntry be : bibtexEntries) {
+                        for (BibEntry be : bibtexEntries) {
 
                             if (!bibentryKnown.containsKey(be.getCiteKey())) {
 
@@ -133,14 +139,16 @@ public class DBLPFetcher implements EntryFetcher {
                 count++;
             }
 
-            DuplicateCheck.duplicateThreshold = saveThreshold;
 
             // everything went smooth
             res = true;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Communcation problems", e);
             status.showMessage(e.getMessage());
+        } finally {
+            // Restore the threshold
+            DuplicateCheck.duplicateThreshold = saveThreshold;
         }
 
         return res;
@@ -149,8 +157,7 @@ public class DBLPFetcher implements EntryFetcher {
     private String makeSearchURL() {
         StringBuilder sb = new StringBuilder(DBLPFetcher.URL_START).append(DBLPFetcher.URL_PART1);
         String cleanedQuery = helper.cleanDBLPQuery(query);
-        sb.append(cleanedQuery);
-        sb.append(DBLPFetcher.URL_END);
+        sb.append(cleanedQuery).append(DBLPFetcher.URL_END);
         return sb.toString();
     }
 

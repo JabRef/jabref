@@ -1,8 +1,9 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
+import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.external.ExternalFileType;
 
 /** EntryCreator for any predefined ExternalFileType.
@@ -20,12 +21,12 @@ public class EntryFromExternalFileCreator extends EntryFromFileCreator {
     }
 
     @Override
-    protected BibtexEntry createBibtexEntry(File file) {
+    protected Optional<BibEntry> createBibtexEntry(File file) {
         if (!accept(file)) {
-            return null;
+            return Optional.empty();
         }
 
-        return new BibtexEntry();
+        return Optional.of(new BibEntry());
     }
 
     @Override

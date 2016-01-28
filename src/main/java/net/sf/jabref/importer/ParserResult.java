@@ -18,25 +18,28 @@ package net.sf.jabref.importer;
 import java.io.File;
 import java.nio.charset.Charset;
 
+import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabases;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.entry.EntryType;
 
 public class ParserResult {
     public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
     public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private MetaData metaData;
-    private final HashMap<String, EntryType> entryTypes;
+    private final Map<String, EntryType> entryTypes;
 
     private File file;
-    private final ArrayList<String> warnings = new ArrayList<>();
-    private final ArrayList<String> duplicateKeys = new ArrayList<>();
+    private final List<String> warnings = new ArrayList<>();
+    private final List<String> duplicateKeys = new ArrayList<>();
 
     private String errorMessage;
     // Which encoding was used?
@@ -47,11 +50,11 @@ public class ParserResult {
     private boolean toOpenTab;
 
 
-    public ParserResult(Collection<BibtexEntry> entries) {
-        this(ImportFormatReader.createDatabase(entries), null, new HashMap<>());
+    public ParserResult(Collection<BibEntry> entries) {
+        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), null, new HashMap<>());
     }
 
-    public ParserResult(BibtexDatabase base, MetaData metaData, HashMap<String, EntryType> entryTypes) {
+    public ParserResult(BibDatabase base, MetaData metaData, Map<String, EntryType> entryTypes) {
         this.base = base;
         this.metaData = metaData;
         this.entryTypes = entryTypes;
@@ -70,7 +73,7 @@ public class ParserResult {
         this.toOpenTab = toOpenTab;
     }
 
-    public BibtexDatabase getDatabase() {
+    public BibDatabase getDatabase() {
         return base;
     }
 
@@ -82,7 +85,7 @@ public class ParserResult {
         this.metaData = md;
     }
 
-    public HashMap<String, EntryType> getEntryTypes() {
+    public Map<String, EntryType> getEntryTypes() {
         return entryTypes;
     }
 
@@ -126,12 +129,8 @@ public class ParserResult {
         return !warnings.isEmpty();
     }
 
-    public String[] warnings() {
-        String[] s = new String[warnings.size()];
-        for (int i = 0; i < warnings.size(); i++) {
-            s[i] = warnings.get(i);
-        }
-        return s;
+    public List<String> warnings() {
+        return new ArrayList<>(warnings);
     }
 
     /**

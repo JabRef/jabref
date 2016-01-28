@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.mods.MODSDatabase;
@@ -41,29 +41,25 @@ class ModsExportFormat extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData,
+    public void performExport(final BibDatabase database, final MetaData metaData,
  final String file,
             final Charset encoding, Set<String> keySet) throws IOException {
         SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
-        VerifyingWriter ps = ss.getWriter();
-        MODSDatabase md = new MODSDatabase(database, keySet);
+        try (VerifyingWriter ps = ss.getWriter()) {
+            MODSDatabase md = new MODSDatabase(database, keySet);
 
-        try {
-            DOMSource source = new DOMSource(md.getDOMrepresentation());
-            StreamResult result = new StreamResult(ps);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
-            trans.setOutputProperty(OutputKeys.INDENT, "yes");
-            trans.transform(source, result);
-        } catch (Exception e) {
-            throw new Error(e);
-        }
-
-        try {
+            try {
+                DOMSource source = new DOMSource(md.getDOMrepresentation());
+                StreamResult result = new StreamResult(ps);
+                Transformer trans = TransformerFactory.newInstance().newTransformer();
+                trans.setOutputProperty(OutputKeys.INDENT, "yes");
+                trans.transform(source, result);
+            } catch (Exception e) {
+                throw new Error(e);
+            }
             finalizeSaveSession(ss);
-        } catch (SaveException ex) {
+        } catch (Exception ex) {
             throw new IOException(ex.getMessage());
-        } catch (Exception e) {
-            throw new IOException(e.getMessage());
         }
     }
 }

@@ -23,8 +23,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 
 import org.w3c.dom.Document;
@@ -59,16 +58,7 @@ public class MsBibImporter extends ImportFormat {
         } catch (Exception e) {
             return false;
         }
-        if (docin != null && !docin.getDocumentElement().getTagName().contains("Sources")) {
-            return false;
-        }
-        //   		NodeList rootLst = docin.getElementsByTagName("b:Sources");
-        //   		if(rootLst.getLength()==0)
-        //   			rootLst = docin.getElementsByTagName("Sources");
-        //   		if(rootLst.getLength()==0)
-        //   			return false;
-        // System.out.println(docin.getDocumentElement().getTagName());
-        return true;
+        return ((docin == null) || docin.getDocumentElement().getTagName().contains("Sources"));
     }
 
     /**
@@ -80,7 +70,7 @@ public class MsBibImporter extends ImportFormat {
     }
 
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
 
         MSBibDatabase dbase = new MSBibDatabase();
 

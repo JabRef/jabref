@@ -21,8 +21,7 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
-
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -41,7 +40,7 @@ import net.sf.jabref.logic.l10n.Localization;
 /**
  * A combo-box and a manage button that will add selected strings to an
  * associated entry editor.
- * 
+ *
  * Used to manage keywords and authors for instance.
  */
 public class FieldContentSelector extends JComponent {
@@ -61,9 +60,9 @@ public class FieldContentSelector extends JComponent {
 
 
     /**
-     * 
+     *
      * Create a new FieldContentSelector.
-     * 
+     *
      * @param frame
      *            The one JabRef-Frame.
      * @param panel
@@ -137,7 +136,7 @@ public class FieldContentSelector extends JComponent {
                  * list, so we should not react to it. I'm not sure if this is
                  * well defined enough to be guaranteed to work everywhere.
                  */
-                if ("comboBoxChanged".equals(e.getActionCommand()) && e.getModifiers() == 0) {
+                if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
                     return;
                 }
 
@@ -190,7 +189,7 @@ public class FieldContentSelector extends JComponent {
         }
 
         String chosen = (String) comboBox.getSelectedItem();
-        if (chosen == null || "".equals(chosen)) {
+        if ((chosen == null) || chosen.isEmpty()) {
             return;
         }
 
@@ -224,7 +223,7 @@ public class FieldContentSelector extends JComponent {
 
         // TODO: CO - What for?
         comboBox.addItem("");
-        Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
+        List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
         if (items != null) {
             for (String item : items) {
                 comboBox.addItem(item);
@@ -236,7 +235,7 @@ public class FieldContentSelector extends JComponent {
     //	/**
     //	 * Adds a word to the selector (to the JList and to the MetaData), unless it
     //	 * is already there
-    //	 * 
+    //	 *
     //	 * @param newWord
     //	 *            String Word to add
     //	 */

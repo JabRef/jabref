@@ -8,17 +8,17 @@ import java.util.*;
 
 public class EntryTypes {
 
-    private static final TreeMap<String, EntryType> ALL_TYPES = new TreeMap<>();
-    private static final TreeMap<String, EntryType> STANDARD_TYPES;
+    private static final Map<String, EntryType> ALL_TYPES = new TreeMap<>();
+    private static final Map<String, EntryType> STANDARD_TYPES;
 
 
     static {
         // Put the standard entry types into the type map.
         Globals.prefs = JabRefPreferences.getInstance();
-        if (!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-            initBibtexEntryTypes();
-        } else {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
             initBibLatexEntryTypes();
+        } else {
+            initBibtexEntryTypes();
         }
         // We need a record of the standard types, in case the user wants
         // to remove a customized version. Therefore we clone the map.
@@ -48,6 +48,24 @@ public class EntryTypes {
      */
     public static EntryType getType(String name) {
         return ALL_TYPES.get(name.toLowerCase());
+    }
+
+    /**
+     * This method returns the EntryType for the name of a type,
+     * or the default type (*.MISC) if it does not exist.
+     */
+    // Get an entry type defined in BibtexEntryType
+    public static EntryType getTypeOrDefault(String type) {
+        EntryType entryType = getType(type);
+
+        if (entryType == null) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+                return BibLatexEntryTypes.MISC;
+            } else {
+                return BibtexEntryTypes.MISC;
+            }
+        }
+        return entryType;
     }
 
     /**
@@ -91,20 +109,6 @@ public class EntryTypes {
                 // of a standard type. We reinstate the standard type.
                 addOrModifyEntryType(STANDARD_TYPES.get(toLowerCase));
             }
-        }
-    }
-
-    // Get an entry type defined in BibtexEntryType
-    public static EntryType getBibtexEntryType(String type) {
-        // decide which entryType object to return
-        EntryType o = getType(type);
-        if (o != null) {
-            return o;
-        }
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-            return BibLatexEntryTypes.MISC;
-        } else {
-            return BibtexEntryTypes.MISC;
         }
     }
 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,54 +17,37 @@ package net.sf.jabref.gui;
 
 import net.sf.jabref.external.ExternalFileType;
 
+import java.util.Objects;
+
 /**
  * This class represents a file link for a Bibtex entry.
  */
 public class FileListEntry {
 
-    private String link;
-    private String description;
-    private ExternalFileType type;
+    public String description;
+    public String link;
+    public ExternalFileType type;
 
+    public FileListEntry(String description, String link) {
+        this(description, link, null);
+    }
 
     public FileListEntry(String description, String link, ExternalFileType type) {
-        this.link = link;
-        this.description = description;
-        this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getLink() {
-        return link;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
-    }
-
-    public ExternalFileType getType() {
-        return type;
-    }
-
-    public void setType(ExternalFileType type) {
-        this.type = type;
+        this.description = Objects.requireNonNull(description);
+        this.link = Objects.requireNonNull(link);
+        this.type = type; // may be null
     }
 
     public String[] getStringArrayRepresentation() {
-        String type = getType() != null ? getType().getName() : "";
-        return new String[] {getDescription(), getLink(), type};
+        return new String[] {description, link, getTypeName()};
+    }
+
+    private String getTypeName() {
+        return this.type == null ? "" : this.type.getName();
     }
 
     @Override
     public String toString() {
         return description + " : " + link + " : " + type;
     }
-
 }

@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.openoffice.sorting;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 
 import java.util.Comparator;
@@ -25,14 +25,14 @@ import java.util.Comparator;
  *
  * Sort by ascending: AUTHOR, YEAR, TITLE
  */
-public class AuthorYearTitleComparator implements Comparator<BibtexEntry> {
+public class AuthorYearTitleComparator implements Comparator<BibEntry> {
 
     private final FieldComparator authComp = new FieldComparator("author");
     private final FieldComparator yearComp = new FieldComparator("year");
     private final FieldComparator titleComp = new FieldComparator("title");
 
     @Override
-    public int compare(BibtexEntry o1, BibtexEntry o2) {
+    public int compare(BibEntry o1, BibEntry o2) {
         // Author as first criterion:
         int comp = authComp.compare(o1, o2);
         if (comp != 0) {

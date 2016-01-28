@@ -17,15 +17,12 @@ import org.w3c.dom.Document;
  * Currently used for debugging only
  */
 public class XMLUtil {
-
     private static final Log LOGGER = LogFactory.getLog(XMLUtil.class);
-
 
     /**
      * Prints out the document to standard out. Used to generate files for test cases.
      */
     public static void printDocument(Document doc) {
-        // code by http://stackoverflow.com/a/10356322/873282
         try {
             DOMSource domSource = new DOMSource(doc);
             StringWriter writer = new StringWriter();

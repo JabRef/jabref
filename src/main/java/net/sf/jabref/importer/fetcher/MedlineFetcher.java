@@ -27,11 +27,11 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.fileformat.MedlineImporter;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -52,7 +52,7 @@ public class MedlineFetcher implements EntryFetcher {
 
 
         public void addID(String id) {
-            if ("".equals(ids)) {
+            if (ids.isEmpty()) {
                 ids = id;
             } else {
                 ids += "," + id;
@@ -148,7 +148,7 @@ public class MedlineFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return GUIGlobals.medlineHelp;
+        return HelpFiles.medlineHelp;
     }
 
     @Override
@@ -172,13 +172,13 @@ public class MedlineFetcher implements EntryFetcher {
         if (query.matches("\\d+[,\\d+]*")) {
             frameOP.setStatus(Localization.lang("Fetching Medline by id..."));
 
-            List<BibtexEntry> bibs = MedlineImporter.fetchMedline(query, frameOP);
+            List<BibEntry> bibs = MedlineImporter.fetchMedline(query, frameOP);
 
             if (bibs.isEmpty()) {
                 frameOP.showMessage(Localization.lang("No references found"));
             }
 
-            for (BibtexEntry entry : bibs) {
+            for (BibEntry entry : bibs) {
                 iIDialog.addEntry(entry);
             }
             return true;
@@ -230,8 +230,8 @@ public class MedlineFetcher implements EntryFetcher {
                 // get the ids from entrez
                 result = getIds(searchTerm, i, noToFetch);
 
-                List<BibtexEntry> bibs = MedlineImporter.fetchMedline(result.ids, frameOP);
-                for (BibtexEntry entry : bibs) {
+                List<BibEntry> bibs = MedlineImporter.fetchMedline(result.ids, frameOP);
+                for (BibEntry entry : bibs) {
                     iIDialog.addEntry(entry);
                 }
                 iIDialog.setProgress(i + noToFetch, numberToFetch);

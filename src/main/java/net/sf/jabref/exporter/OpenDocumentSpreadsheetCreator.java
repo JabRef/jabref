@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -46,7 +46,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, Set<String> keySet) throws Exception {
         OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, keySet);
     }
@@ -86,7 +86,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         }
     }
 
-    private static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database, Set<String> keySet)
+    private static void exportOpenDocumentSpreadsheet(File file, BibDatabase database, Set<String> keySet)
             throws Exception {
 
         // First store the xml formatted content to a temporary file.
@@ -101,22 +101,19 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         tmpFile.delete();
     }
 
-    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
+    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, Set<String> keySet) {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
 
-        try {
-            try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
+        try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
 
-                DOMSource source = new DOMSource(od.getDOMrepresentation());
-                StreamResult result = new StreamResult(ps);
-                Transformer trans = TransformerFactory.newInstance().newTransformer();
-                trans.setOutputProperty(OutputKeys.INDENT, "yes");
-                trans.transform(source, result);
-            }
+            DOMSource source = new DOMSource(od.getDOMrepresentation());
+            StreamResult result = new StreamResult(ps);
+            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            trans.transform(source, result);
         } catch (Exception e) {
             throw new Error(e);
         }
-
     }
 
     private static void addResourceFile(String name, String resource, ZipOutputStream out) throws IOException {

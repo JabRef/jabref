@@ -5,7 +5,6 @@ package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,7 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
@@ -31,15 +30,15 @@ import com.google.common.base.Strings;
 public class GVKParser {
     private static final Log LOGGER = LogFactory.getLog(GVKParser.class);
 
-    public List<BibtexEntry> parseEntries(InputStream is)
+    public List<BibEntry> parseEntries(InputStream is)
             throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document content = dbuild.parse(is);
         return this.parseEntries(content);
     }
 
-    public List<BibtexEntry> parseEntries(Document content) {
-        List<BibtexEntry> result = new LinkedList<>();
+    public List<BibEntry> parseEntries(Document content) {
+        List<BibEntry> result = new LinkedList<>();
 
         // used for creating test cases
         // XMLUtil.printDocument(content);
@@ -57,13 +56,15 @@ public class GVKParser {
         List<Element> records = getChildren("zs:record", srwrecords);
         for (Element record : records) {
             Element e = getChild("zs:recordData", record);
-            e = getChild("record", e);
+            if (e != null) {
+                e = getChild("record", e);
+            }
             result.add(parseEntry(e));
         }
         return result;
     }
 
-    private BibtexEntry parseEntry(Element e) {
+    private BibEntry parseEntry(Element e) {
         String author = null;
         String editor = null;
         String title = null;
@@ -93,10 +94,7 @@ public class GVKParser {
         // Alle relevanten Informationen einsammeln
 
         List<Element> datafields = getChildren("datafield", e);
-        Iterator<Element> iter = datafields.iterator();
-        while (iter.hasNext()) {
-            Element datafield = iter.next();
-
+        for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
             LOGGER.debug("tag: " + tag);
 
@@ -115,10 +113,10 @@ public class GVKParser {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
-                if (author != null) {
-                    author = author.concat(" and ");
-                } else {
+                if (author == null) {
                     author = "";
+                } else {
+                    author = author.concat(" and ");
                 }
                 author = author.concat(vorname + " " + nachname);
             }
@@ -127,10 +125,10 @@ public class GVKParser {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
-                if (author != null) {
-                    author = author.concat(" and ");
-                } else {
+                if (author == null) {
                     author = "";
+                } else {
+                    author = author.concat(" and ");
                 }
                 author = author.concat(vorname + " " + nachname);
             }
@@ -140,10 +138,10 @@ public class GVKParser {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
 
-                if (editor != null) {
-                    editor = editor.concat(" and ");
-                } else {
+                if (editor == null) {
                     editor = "";
+                } else {
+                    editor = editor.concat(" and ");
                 }
                 editor = editor.concat(vorname + " " + nachname);
             }
@@ -218,8 +216,8 @@ public class GVKParser {
 
             //isbn
             if ("004A".equals(tag)) {
-                String isbn_10 = getSubfield("0", datafield);
-                String isbn_13 = getSubfield("A", datafield);
+                final String isbn_10 = getSubfield("0", datafield);
+                final String isbn_13 = getSubfield("A", datafield);
 
                 if (isbn_10 != null) {
                     isbn = isbn_10;
@@ -236,7 +234,9 @@ public class GVKParser {
             if ("037C".equals(tag)) {
                 if (address == null) {
                     address = getSubfield("b", datafield);
-                    address = removeSortCharacters(address);
+                    if (address != null) {
+                        address = removeSortCharacters(address);
+                    }
                 }
 
                 String st = getSubfield("a", datafield);
@@ -303,7 +303,7 @@ public class GVKParser {
                 quelle = getSubfield("8", datafield);
             }
             if ("046R".equals(tag)) {
-                if ("".equals(quelle) || (quelle == null)) {
+                if ((quelle == null) || quelle.isEmpty()) {
                     quelle = getSubfield("a", datafield);
                 }
             }
@@ -349,7 +349,7 @@ public class GVKParser {
             if (quelle.contains("ZDB-ID")) {
                 entryType = "article";
             }
-        } else if ("".equals(mak)) {
+        } else if (mak.isEmpty()) {
             entryType = "misc";
         } else if (mak.startsWith("O")) {
             entryType = "misc";
@@ -364,7 +364,7 @@ public class GVKParser {
          * dann @incollection annehmen, wenn weder ISBN noch
          * ZDB-ID vorhanden sind.
          */
-        BibtexEntry result = new BibtexEntry(IdGenerator.next(), EntryTypes.getType(entryType));
+        BibEntry result = new BibEntry(IdGenerator.next(), EntryTypes.getType(entryType));
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {
@@ -447,10 +447,8 @@ public class GVKParser {
 
     private String getSubfield(String a, Element datafield) {
         List<Element> liste = getChildren("subfield", datafield);
-        Iterator<Element> iter = liste.iterator();
 
-        while (iter.hasNext()) {
-            Element subfield = iter.next();
+        for (Element subfield : liste) {
             if (subfield.getAttribute("code").equals(a)) {
                 return (subfield.getTextContent());
             }
@@ -459,8 +457,6 @@ public class GVKParser {
     }
 
     private Element getChild(String name, Element e) {
-        Element result = null;
-
         NodeList children = e.getChildNodes();
 
         int j = children.getLength();
@@ -473,7 +469,7 @@ public class GVKParser {
                 }
             }
         }
-        return result;
+        return null;
     }
 
     private List<Element> getChildren(String name, Element e) {

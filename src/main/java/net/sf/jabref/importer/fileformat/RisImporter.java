@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.*;
@@ -75,20 +74,21 @@ public class RisImporter extends ImportFormat {
     }
 
     /**
-     * Parse the entries in the source, and return a List of BibtexEntry
+     * Parse the entries in the source, and return a List of BibEntry
      * objects.
      */
     @Override
-    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        ArrayList<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         while ((str = in.readLine()) != null) {
             sb.append(str);
-            sb.append("\n");
+            sb.append('\n');
         }
-        String[] entries = sb.toString().replaceAll("\u2013", "-").replaceAll("\u2014", "--").replaceAll("\u2015", "--").split("ER  -.*\\n");
+        String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
+                .split("ER  -.*\\n");
 
         for (String entry1 : entries) {
 
@@ -223,11 +223,11 @@ public class RisImporter extends ImportFormat {
                             }
                         }
                     } else if ("KW".equals(lab)) {
-                        if (!hm.containsKey("keywords")) {
-                            hm.put("keywords", val);
-                        } else {
+                        if (hm.containsKey("keywords")) {
                             String kw = hm.get("keywords");
                             hm.put("keywords", kw + ", " + val);
+                        } else {
+                            hm.put("keywords", val);
                         }
                     } else if ("U1".equals(lab) || "U2".equals(lab) || "N1".equals(lab)) {
                         if (!comment.isEmpty()) {
@@ -261,8 +261,7 @@ public class RisImporter extends ImportFormat {
 
                 hm.put("pages", startPage + "--" + endPage);
             }
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getBibtexEntryType(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();

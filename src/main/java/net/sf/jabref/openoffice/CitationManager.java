@@ -25,15 +25,18 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.container.XNameAccess;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.List;
 
 /**
  * Dialog for modifying existing citations.
@@ -45,8 +48,8 @@ class CitationManager {
     private final EventList<CitEntry> list;
     private final JTable table;
     private final DefaultEventTableModel<CitEntry> tableModel;
-    private final JButton ok = new JButton(Localization.lang("Ok"));
-    private final JButton cancel = new JButton(Localization.lang("Cancel"));
+
+    private static final Log LOGGER = LogFactory.getLog(CitationManager.class);
 
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase) throws Exception {
@@ -57,8 +60,7 @@ class CitationManager {
         XNameAccess nameAccess = ooBase.getReferenceMarks();
         String[] names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
-            List<String> keys = ooBase.parseRefMarkName(name);
-            list.add(new CitEntry(name, keys,
+            list.add(new CitEntry(name,
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
@@ -68,7 +70,9 @@ class CitationManager {
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
+        JButton ok = new JButton(Localization.lang("OK"));
         bb.addButton(ok);
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -84,7 +88,7 @@ class CitationManager {
                 try {
                     storeSettings();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Problem modifying citation", ex);
                     JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
                 }
                 diag.dispose();
@@ -102,7 +106,7 @@ class CitationManager {
         cancel.addActionListener(cancelAction);
 
         bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                (Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+                (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(600);
@@ -129,26 +133,15 @@ class CitationManager {
 
         final String refMarkName;
         String pageInfo;
-        final String keyString;
         final String context;
-        final String origPageInfo;
-        final List<String> keys;
+        private final String origPageInfo;
 
 
-        public CitEntry(String refMarkName, List<String> keys, String context, String pageInfo) {
+        public CitEntry(String refMarkName, String context, String pageInfo) {
             this.refMarkName = refMarkName;
-            this.keys = keys;
             this.context = context;
             this.pageInfo = pageInfo;
             this.origPageInfo = pageInfo;
-            StringBuilder sb = new StringBuilder();
-            for (int j = 0; j < keys.size(); j++) {
-                sb.append(keys.get(j));
-                if (j < (keys.size() - 1)) {
-                    sb.append(", ");
-                }
-            }
-            keyString = sb.toString();
         }
 
         public boolean pageInfoChanged() {
@@ -156,10 +149,10 @@ class CitationManager {
                     || ((pageInfo == null) && (origPageInfo != null))) {
                 return true;
             }
-            if (pageInfo != null) {
-                return pageInfo.compareTo(origPageInfo) != 0;
-            } else {
+            if (pageInfo == null) {
                 return false;
+            } else {
+                return pageInfo.compareTo(origPageInfo) != 0;
             }
         }
 
@@ -178,23 +171,19 @@ class CitationManager {
 
         @Override
         public String getColumnName(int i) {
-            switch (i) {
-            case 0:
+            if (i == 0) {
                 return Localization.lang("Citation");
-                //case 1: return Globals.lang("Context");
-            default:
+            } else {
                 return Localization.lang("Extra information");
             }
         }
 
         @Override
         public Object getColumnValue(CitEntry citEntry, int i) {
-            switch (i) {
-            //case 0: return citEntry.keyString;
-            case 0:
+            if (i == 0) {
                 return citEntry.context;
-            default:
-                return citEntry.pageInfo != null ? citEntry.pageInfo : "";
+            } else {
+                return citEntry.pageInfo == null ? "" : citEntry.pageInfo;
             }
         }
     }
@@ -210,19 +199,17 @@ class CitationManager {
                     scd.showDialog();
                 }
             }
-            //else if (e.isPopupTrigger())
-            //    processPopupTrigger(e);
         }
     }
 
     class SingleCitDialog {
 
-        final JDialog singleCiteDialog;
-        final JTextField pageInfo = new JTextField(20);
-        final JLabel title;
-        final JButton okButton = new JButton(Localization.lang("Ok"));
-        final JButton cancelButton = new JButton(Localization.lang("Cancel"));
-        final CitEntry _entry;
+        private final JDialog singleCiteDialog;
+        private final JTextField pageInfo = new JTextField(20);
+        private final JLabel title;
+        private final JButton okButton = new JButton(Localization.lang("OK"));
+        private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
+        private final CitEntry _entry;
 
 
         public SingleCitDialog(CitEntry entry) {
@@ -253,10 +240,10 @@ class CitationManager {
 
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (!pageInfo.getText().trim().isEmpty()) {
-                        _entry.pageInfo = pageInfo.getText().trim();
-                    } else {
+                    if (pageInfo.getText().trim().isEmpty()) {
                         _entry.pageInfo = null;
+                    } else {
+                        _entry.pageInfo = pageInfo.getText().trim();
                     }
                     tableModel.fireTableDataChanged();
                     singleCiteDialog.dispose();
@@ -274,7 +261,7 @@ class CitationManager {
             cancelButton.addActionListener(cancelAction);
 
             b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                    (Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+                    (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             b.getPanel().getActionMap().put("close", cancelAction);
 
         }

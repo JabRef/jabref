@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.migrations;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.*;
@@ -23,16 +24,18 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.cleanup.UpgradePdfPsToFileCleanup;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This class defines the warning that can be offered when opening a pre-2.3
@@ -45,7 +48,7 @@ import net.sf.jabref.util.Util;
  */
 public class FileLinksUpgradeWarning implements PostOpenAction {
 
-    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {"pdf", "ps"};
+    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {"pdf", "ps", "evastar_pdf"};
 
     private boolean offerChangeSettings;
 
@@ -68,7 +71,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         // Only offer to upgrade links if the pdf/ps fields are used:
         offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
-        offerSetFileDir = !Globals.prefs.hasKey(Globals.FILE_FIELD + "Directory")
+        offerSetFileDir = !Globals.prefs.hasKey(Globals.FILE_FIELD + Globals.DIR_SUFFIX)
                 && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
         // First check if this warning is disabled:
@@ -79,10 +82,10 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * This method presents a dialog box explaining and offering to make the
      * changes. If the user confirms, the changes are performed.
      * @param panel
-     * @param pr
+     * @param parserResult
      */
     @Override
-    public void performAction(BasePanel panel, ParserResult pr) {
+    public void performAction(BasePanel panel, ParserResult parserResult) {
 
 
         if (!isThereSomethingToBeDone())         {
@@ -99,23 +102,23 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 false);
 
         JPanel message = new JPanel();
-        FormBuilder b = FormBuilder.create().layout(new FormLayout("left:pref", "p"));
+        FormBuilder formBuilder = FormBuilder.create().layout(new FormLayout("left:pref", "p"));
         // Keep the formatting of these lines. Otherwise, strings have to be translated again.
         // See updated JabRef_en.properties modifications by python syncLang.py -s -u
         int row = 1;
-        b.add(new JLabel("<html>" + Localization.lang("This database was written using an older version of JabRef.") + "<br>"
-                + Localization.lang("The current version features a new way of handling links to external files.<br>To take advantage of this, your links must be changed into the new format, and<br>JabRef must be configured to show the new links.") + "<p>"
+        formBuilder.add(new JLabel("<html>" + Localization.lang("This database uses outdated file links.") + "<br><br>"
+                + Localization.lang("JabRef no longer supports 'ps' or 'pdf' fields.<br>File links are now stored in the 'file' field and files are stored in an external file directory.<br>To make use of this feature, JabRef needs to upgrade file links.<br><br>") + "<p>"
                 + Localization.lang("Do you want JabRef to do the following operations?") + "</html>")).xy(1, row);
 
         if (offerChangeSettings) {
-            b.appendRows("2dlu, p");
+            formBuilder.appendRows("2dlu, p");
             row += 2;
-            b.add(changeSettings).xy(1, row);
+            formBuilder.add(changeSettings).xy(1, row);
         }
         if (offerChangeDatabase) {
-            b.appendRows("2dlu, p");
+            formBuilder.appendRows("2dlu, p");
             row += 2;
-            b.add(changeDatabase).xy(1, row);
+            formBuilder.add(changeDatabase).xy(1, row);
         }
         if (offerSetFileDir) {
             if (Globals.prefs.hasKey("pdfDirectory")) {
@@ -123,20 +126,20 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             } else {
                 fileDir.setText(Globals.prefs.get("psDirectory"));
             }
-            JPanel pan = new JPanel();
-            pan.add(setFileDir);
-            pan.add(fileDir);
+            JPanel builderPanel = new JPanel();
+            builderPanel.add(setFileDir);
+            builderPanel.add(fileDir);
             JButton browse = new JButton(Localization.lang("Browse"));
             browse.addActionListener(BrowseAction.buildForDir(fileDir));
-            pan.add(browse);
-            b.appendRows("2dlu, p");
+            builderPanel.add(browse);
+            formBuilder.appendRows("2dlu, p");
             row += 2;
-            b.add(pan).xy(1, row);
+            formBuilder.add(builderPanel).xy(1, row);
         }
-        b.appendRows("6dlu, p");
-        b.add(doNotShowDialog).xy(1, row+2);
+        formBuilder.appendRows("6dlu, p");
+        formBuilder.add(doNotShowDialog).xy(1, row+2);
 
-        message.add(b.build());
+        message.add(formBuilder.build());
 
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 message, Localization.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
@@ -145,7 +148,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         }
 
         if (answer == JOptionPane.YES_OPTION) {
-            makeChanges(panel, pr, changeSettings.isSelected(), changeDatabase.isSelected(),
+            makeChanges(panel, parserResult, changeSettings.isSelected(), changeDatabase.isSelected(),
                     setFileDir.isSelected() ? fileDir.getText() : null);
         }
     }
@@ -162,10 +165,10 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @return true if at least one of the given fields is set in at least one entry,
      *  false otherwise.
      */
-    private boolean linksFound(BibtexDatabase database, String[] fields) {
-        for (BibtexEntry entry : database.getEntries()) {
+    private boolean linksFound(BibDatabase database, String[] fields) {
+        for (BibEntry entry : database.getEntries()) {
             for (String field : fields) {
-                if (entry.getField(field) != null) {
+                if (entry.hasField(field)) {
                     return true;
                 }
             }
@@ -184,25 +187,23 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
         if (upgradeDatabase) {
             // Update file links links in the database:
-            NamedCompound ce = Util.upgradePdfPsToFile(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
+            NamedCompound ce = upgradePdfPsToFile(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
             panel.undoManager.addEdit(ce);
             panel.markBaseChanged();
         }
 
         if (fileDir != null) {
-            Globals.prefs.put(Globals.FILE_FIELD + "Directory", fileDir);
+            Globals.prefs.put(Globals.FILE_FIELD + Globals.DIR_SUFFIX, fileDir);
         }
 
         if (upgradePrefs) {
             // Exchange table columns:
-            Globals.prefs.putBoolean(JabRefPreferences.PDF_COLUMN, Boolean.FALSE);
             Globals.prefs.putBoolean(JabRefPreferences.FILE_COLUMN, Boolean.TRUE);
 
             // Modify General fields if necessary:
             // If we don't find the file field, insert it at the bottom of the first tab:
             if (!showsFileInGenFields()) {
                 String gfs = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "0");
-                //System.out.println(gfs);
                 StringBuilder sb = new StringBuilder(gfs);
                 if (!gfs.isEmpty()) {
                     sb.append(";");
@@ -231,4 +232,27 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         return found;
     }
 
+    /**
+     * Collect file links from the given set of fields, and add them to the list contained in the field
+     * GUIGlobals.FILE_FIELD.
+     *
+     * @param database The database to modify.
+     * @param fields   The fields to find links in.
+     * @return A CompoundEdit specifying the undo operation for the whole operation.
+     */
+    private static NamedCompound upgradePdfPsToFile(BibDatabase database, String[] fields) {
+        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
+
+        UpgradePdfPsToFileCleanup cleanupJob = new UpgradePdfPsToFileCleanup(Arrays.asList(fields));
+        for (BibEntry entry : database.getEntryMap().values()) {
+            List<FieldChange> changes = cleanupJob.cleanup(entry);
+
+            for (FieldChange change : changes) {
+                ce.addEdit(new UndoableFieldChange(change));
+            }
+        }
+
+        ce.end();
+        return ce;
+    }
 }

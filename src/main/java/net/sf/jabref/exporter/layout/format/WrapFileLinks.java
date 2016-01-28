@@ -17,9 +17,8 @@ package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.exporter.layout.AbstractParamLayoutFormatter;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.model.entry.FileField;
 
 import java.util.*;
 import java.io.File;
@@ -112,18 +111,16 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     public String format(String field) {
         StringBuilder sb = new StringBuilder();
 
-        // Build the table model containing the links:
-        FileListTableModel tableModel = new FileListTableModel();
         if (field == null) {
             return "";
         }
-        tableModel.setContent(field);
+        // Build the list containing the links:
+        List<FileField.ParsedFileField> fileList = FileField.parse(field);
 
         int piv = 1; // counter for relevant iterations
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            FileListEntry flEntry = tableModel.getEntry(i);
+        for (FileField.ParsedFileField flEntry : fileList) {
             // Use this entry if we don't discriminate on types, or if the type fits:
-            if ((fileType == null) || flEntry.getType().getName().toLowerCase().equals(fileType)) {
+            if ((fileType == null) || flEntry.fileType.equalsIgnoreCase(fileType)) {
 
                 for (FormatEntry entry : format) {
                     switch (entry.getType()) {
@@ -134,10 +131,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         sb.append(piv);
                         break;
                     case FILE_PATH:
-                        if (flEntry.getLink() == null) {
-                            break;
-                        }
-
                         String[] dirs;
                         // We need to resolve the file directory from the database's metadata,
                         // but that is not available from a formatter. Therefore, as an
@@ -146,10 +139,10 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         if (Globals.prefs.fileDirForDatabase != null) {
                             dirs = Globals.prefs.fileDirForDatabase;
                         } else {
-                            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + "Directory")};
+                            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX)};
                         }
 
-                        File f = FileUtil.expandFilename(flEntry.getLink(), dirs);
+                        File f = FileUtil.expandFilename(flEntry.link, Arrays.asList(dirs));
 
                         /*
                          * Stumbled over this while investigating
@@ -164,37 +157,29 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                                 sb.append(replaceStrings(f.getPath()));
                             }
                         } else {
-                            sb.append(replaceStrings(flEntry.getLink()));
+                            sb.append(replaceStrings(flEntry.link));
                         }
 
                         break;
                     case RELATIVE_FILE_PATH:
-                        if (flEntry.getLink() == null) {
-                            break;
-                        }
 
                         /*
                          * Stumbled over this while investigating
                          *
                          * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
                          */
-                        sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
+                        sb.append(replaceStrings(flEntry.link));//f.toURI().toString();
 
                         break;
                     case FILE_EXTENSION:
-                        if (flEntry.getLink() == null) {
-                            break;
-                        }
-                        int index = flEntry.getLink().lastIndexOf('.');
-                        if ((index >= 0) && (index < (flEntry.getLink().length() - 1))) {
-                            sb.append(replaceStrings(flEntry.getLink().substring(index + 1)));
-                        }
+                        FileUtil.getFileExtension(flEntry.link)
+                                .ifPresent(extension -> sb.append(replaceStrings(extension)));
                         break;
                     case FILE_TYPE:
-                        sb.append(replaceStrings(flEntry.getType().getName()));
+                        sb.append(replaceStrings(flEntry.fileType));
                         break;
                     case FILE_DESCRIPTION:
-                        sb.append(replaceStrings(flEntry.getDescription()));
+                        sb.append(replaceStrings(flEntry.description));
                         break;
                     }
                 }

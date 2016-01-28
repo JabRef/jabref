@@ -16,18 +16,18 @@
 package net.sf.jabref.groups;
 
 import ca.odell.glazedlists.matchers.Matcher;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Matcher for filtering or sorting the table according to whether entries
  * are tagged as group matches.
  */
-public class GroupMatcher implements Matcher<BibtexEntry> {
+public class GroupMatcher implements Matcher<BibEntry> {
 
     public static final GroupMatcher INSTANCE = new GroupMatcher();
 
     @Override
-    public boolean matches(BibtexEntry entry) {
+    public boolean matches(BibEntry entry) {
         return entry.isGroupHit();
     }
 }

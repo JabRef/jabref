@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Delivers possible completions for a given string based on the key fields of the added items.
@@ -38,7 +38,7 @@ class BibtexKeyAutoCompleter extends AbstractAutoCompleter {
      * The bibtex key of the entry will be added to the index.
      */
     @Override
-    public void addBibtexEntry(BibtexEntry entry) {
+    public void addBibtexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }
@@ -47,5 +47,10 @@ class BibtexKeyAutoCompleter extends AbstractAutoCompleter {
         if (key != null) {
             addItemToIndex(key.trim());
         }
+    }
+
+    @Override
+    protected int getLengthOfShortestWordToAdd() {
+        return 1;
     }
 }

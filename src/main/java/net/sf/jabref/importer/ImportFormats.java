@@ -26,11 +26,14 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -43,11 +46,14 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class ImportFormats {
 
+    private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
+
+
     private static JFileChooser createImportFileChooser(String currentDir) {
 
         SortedSet<ImportFormat> importers = Globals.importFormatReader.getImportFormats();
 
-        String lastUsedFormat = Globals.prefs.get("lastUsedImport");
+        String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_IMPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
         TreeSet<ImportFileFilter> filters = new TreeSet<>();
@@ -62,10 +68,10 @@ public class ImportFormats {
             fc.addChoosableFileFilter(filter);
         }
 
-        if (defaultFilter != null) {
-            fc.setFileFilter(defaultFilter);
-        } else {
+        if (defaultFilter == null) {
             fc.setFileFilter(fc.getAcceptAllFileFilter());
+        } else {
+            fc.setFileFilter(defaultFilter);
         }
         return fc;
     }
@@ -92,14 +98,12 @@ public class ImportFormats {
                 putValue(Action.NAME, openInNew ? Localization.menuTitle("Import into new database") : Localization
                         .menuTitle("Import into current database"));
                 putValue(Action.ACCELERATOR_KEY,
-                        openInNew ? Globals.prefs.getKey(KeyBinds.IMPORT_INTO_NEW_DATABASE) : Globals.prefs
-                                .getKey(KeyBinds.IMPORT_INTO_CURRENT_DATABASE));
+                        openInNew ? Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_NEW_DATABASE) : Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_CURRENT_DATABASE));
             }
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = ImportFormats.createImportFileChooser
-                        (Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY));
+                JFileChooser fc = ImportFormats.createImportFileChooser(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
                 fc.showOpenDialog(frame);
                 File file = fc.getSelectedFile();
                 if (file == null) {
@@ -126,14 +130,14 @@ public class ImportFormats {
 
                     // Make sure we remember which filter was used, to set the default
                     // for next time:
-                    if (format != null) {
-                        Globals.prefs.put("lastUsedImport", format.getFormatName());
+                    if (format == null) {
+                        Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, "__all");
                     } else {
-                        Globals.prefs.put("lastUsedImport", "__all");
+                        Globals.prefs.put(JabRefPreferences.LAST_USED_IMPORT, format.getFormatName());
                     }
                     Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent());
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Problem with import format", ex);
                 }
 
             }

@@ -35,25 +35,20 @@ public class EncodingControl extends Control {
         String bundleName = toBundleName(baseName, locale);
         String resourceName = toResourceName(bundleName, "properties");
         ResourceBundle bundle = null;
-        InputStream stream = null;
         if (reload) {
             URL url = loader.getResource(resourceName);
             if (url != null) {
                 URLConnection connection = url.openConnection();
                 if (connection != null) {
                     connection.setUseCaches(false);
-                    stream = connection.getInputStream();
+                    try (InputStream stream = connection.getInputStream()) {
+                        bundle = new PropertyResourceBundle(new InputStreamReader(stream, encoding));
+                    }
                 }
             }
         } else {
-            stream = loader.getResourceAsStream(resourceName);
-        }
-        if (stream != null) {
-            try {
-                // Only this line is changed to make it to read properties files as UTF-8.
+            try (InputStream stream = loader.getResourceAsStream(resourceName)) {
                 bundle = new PropertyResourceBundle(new InputStreamReader(stream, encoding));
-            } finally {
-                stream.close();
             }
         }
         return bundle;

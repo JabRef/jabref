@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * This class handles the download of an external file. Typically called when the user clicks
@@ -81,10 +82,8 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            // @formatter:off
             JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"),
                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-            // @formatter:on
             return;
         }
 
@@ -138,37 +137,34 @@ public class DownloadExternalFile {
                     return;
                 }
                 // Download finished: call the method that stops the progress bar etc.:
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        downloadFinished();
-                    }
-                });
+                SwingUtilities.invokeLater(DownloadExternalFile.this::downloadFinished);
             }
         });
 
         ExternalFileType suggestedType = null;
         if (mimeType != null) {
             LOGGER.debug("MIME Type suggested: " + mimeType);
-            suggestedType = Globals.prefs.getExternalFileTypeByMimeType(mimeType);
+            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix;
         if (suggestedType != null) {
             suffix = suggestedType.getExtension();
+            suffix = suffix == null ? "" : suffix;
         } else {
             // If we didn't find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
-            suggestedType = Globals.prefs.getExternalFileTypeByExt(suffix);
+            suffix = suffix == null ? "" : suffix;
+            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix);
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        String[] fDirectory = getFileDirectory(res);
+        List<String> fDirectory = getFileDirectory();
         final String directory;
-        if (fDirectory.length == 0) {
+        if (fDirectory.size() == 0) {
             directory = null;
         } else {
-            directory = fDirectory[0];
+            directory = fDirectory.get(0);
         }
         final String suggestDir = directory != null ? directory : System.getProperty("user.home");
         File file = new File(new File(suggestDir), suggestedName);
@@ -180,8 +176,7 @@ public class DownloadExternalFile {
 
             @Override
             public boolean confirmClose(FileListEntry entry) {
-                File f = directory != null ? expandFilename(directory, entry.getLink())
-                        : new File(entry.getLink());
+                File f = directory != null ? expandFilename(directory, entry.link) : new File(entry.link);
                 if (f.isDirectory()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
                             Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
@@ -203,8 +198,7 @@ public class DownloadExternalFile {
         }
         // Editor closed. Go on:
         if (editor.okPressed()) {
-            File toFile = directory != null ? expandFilename(directory, entry.getLink())
-                    : new File(entry.getLink());
+            File toFile = directory != null ? expandFilename(directory, entry.link) : new File(entry.link);
             String dirPrefix;
             if (directory != null) {
                 if (!directory.endsWith(System.getProperty("file.separator"))) {
@@ -225,14 +219,14 @@ public class DownloadExternalFile {
 
                 // If the local file is in or below the main file directory, change the
                 // path to relative:
-                if ((directory != null) && entry.getLink().startsWith(directory) &&
-                        (entry.getLink().length() > dirPrefix.length())) {
-                    entry.setLink(entry.getLink().substring(dirPrefix.length()));
+                if ((directory != null) && entry.link.startsWith(directory) &&
+                        (entry.link.length() > dirPrefix.length())) {
+                    entry = new FileListEntry(entry.description, entry.link.substring(dirPrefix.length()), entry.type);
                 }
 
                 callback.downloadComplete(entry);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOGGER.warn("Problem downloading file", ex);
             }
 
             tmp.delete();
@@ -292,7 +286,7 @@ public class DownloadExternalFile {
         if (OS.WINDOWS) {
             plannedName = plannedName.replaceAll("\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
         } else if (OS.OS_X) {
-            plannedName = plannedName.replaceAll(":", "");
+            plannedName = plannedName.replace(":", "");
         }
 
         return plannedName;
@@ -325,7 +319,7 @@ public class DownloadExternalFile {
         } else {
             suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
+        if (ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix) != null) {
             return suffix;
         } else {
             // If the suffix doesn't seem to give any reasonable file type, try
@@ -353,7 +347,7 @@ public class DownloadExternalFile {
 
     }
 
-    private String[] getFileDirectory(String link) {
+    private List<String> getFileDirectory() {
         return metaData.getFileDirectory(Globals.FILE_FIELD);
     }
 
@@ -363,7 +357,6 @@ public class DownloadExternalFile {
      * notification when download is complete.
      */
     public interface DownloadCallback {
-
         void downloadComplete(FileListEntry file);
     }
 }

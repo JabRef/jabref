@@ -18,7 +18,7 @@ package net.sf.jabref.exporter;
 import java.nio.charset.Charset;
 import java.util.Set;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
@@ -43,7 +43,7 @@ public class MySQLExport extends ExportFormat {
      *             to the user.
      */
     @Override
-    public void performExport(final BibtexDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encodingToUse, Set<String> keySet) throws Exception {
 
         new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(database, metaData, keySet, file,

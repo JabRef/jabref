@@ -24,13 +24,13 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 import javax.swing.*;
@@ -64,28 +64,23 @@ class GroupDialog extends JDialog {
             Localization.lang("Dynamically group entries by searching a field for a keyword"));
     private final JRadioButton m_searchRadioButton = new JRadioButton(
             Localization.lang("Dynamically group entries by a free-form search expression"));
-    private final JRadioButton m_independentButton = new JRadioButton( // JZTODO lyrics
+    private final JRadioButton m_independentButton = new JRadioButton(
             Localization.lang("Independent group: When selected, view only this group's entries"));
-    private final JRadioButton m_intersectionButton = new JRadioButton( // JZTODO lyrics
+    private final JRadioButton m_intersectionButton = new JRadioButton(
             Localization.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
-    private final JRadioButton m_unionButton = new JRadioButton( // JZTODO lyrics
+    private final JRadioButton m_unionButton = new JRadioButton(
             Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
     // for KeywordGroup
     private final JTextField m_kgSearchField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
-    private final TextField m_kgSearchTerm = new net.sf.jabref.gui.fieldeditors.TextField("keywords", "",
-            false);
-    private final JCheckBox m_kgCaseSensitive = new JCheckBox(
-            Localization.lang("Case sensitive"));
-    private final JCheckBox m_kgRegExp = new JCheckBox(
-            Localization.lang("regular expression"));
+    private final TextField m_kgSearchTerm = new TextField("keywords", "", false);
+    private final JCheckBox m_kgCaseSensitive = new JCheckBox(Localization.lang("Case sensitive"));
+    private final JCheckBox m_kgRegExp = new JCheckBox(Localization.lang("regular expression"));
     // for SearchGroup
     private final JTextField m_sgSearchExpression = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
-    private final JCheckBox m_sgCaseSensitive = new JCheckBox(
-            Localization.lang("Case sensitive"));
-    private final JCheckBox m_sgRegExp = new JCheckBox(
-            Localization.lang("regular expression"));
+    private final JCheckBox m_sgCaseSensitive = new JCheckBox(Localization.lang("Case sensitive"));
+    private final JCheckBox m_sgRegExp = new JCheckBox(Localization.lang("regular expression"));
     // for all types
-    private final JButton m_ok = new JButton(Localization.lang("Ok"));
+    private final JButton m_ok = new JButton(Localization.lang("OK"));
     private final JPanel m_optionsPanel = new JPanel();
     private final JLabel m_description = new JLabel() {
 
@@ -99,13 +94,13 @@ class GroupDialog extends JDialog {
         }
     };
 
-    private boolean m_okPressed;
+    private boolean mOkPressed;
 
     private final BasePanel m_basePanel;
 
-    private AbstractGroup m_resultingGroup;
+    private AbstractGroup mResultingGroup;
 
-    private AbstractUndoableEdit m_undoAddPreviousEntires;
+    private AbstractUndoableEdit mUndoAddPreviousEntires;
 
     private final AbstractGroup m_editedGroup;
 
@@ -143,7 +138,7 @@ class GroupDialog extends JDialog {
         // build individual layout cards for each group
         m_optionsPanel.setLayout(m_optionsLayout);
         // ... for explicit group
-        m_optionsPanel.add(new JPanel(), "" + GroupDialog.INDEX_EXPLICITGROUP);
+        m_optionsPanel.add(new JPanel(), String.valueOf(GroupDialog.INDEX_EXPLICITGROUP));
         // ... for keyword group
         FormLayout layoutKG = new FormLayout(
                 "right:pref, 4dlu, fill:1dlu:grow, 2dlu, left:pref");
@@ -159,7 +154,7 @@ class GroupDialog extends JDialog {
         builderKG.append(m_kgCaseSensitive, 3);
         builderKG.nextLine();
         builderKG.append(m_kgRegExp, 3);
-        m_optionsPanel.add(builderKG.getPanel(), "" + GroupDialog.INDEX_KEYWORDGROUP);
+        m_optionsPanel.add(builderKG.getPanel(), String.valueOf(GroupDialog.INDEX_KEYWORDGROUP));
         // ... for search group
         FormLayout layoutSG = new FormLayout("right:pref, 4dlu, fill:1dlu:grow");
         DefaultFormBuilder builderSG = new DefaultFormBuilder(layoutSG);
@@ -169,15 +164,15 @@ class GroupDialog extends JDialog {
         builderSG.append(m_sgCaseSensitive, 3);
         builderSG.nextLine();
         builderSG.append(m_sgRegExp, 3);
-        m_optionsPanel.add(builderSG.getPanel(), "" + GroupDialog.INDEX_SEARCHGROUP);
+        m_optionsPanel.add(builderSG.getPanel(), String.valueOf(GroupDialog.INDEX_SEARCHGROUP));
         // ... for buttons panel
         FormLayout layoutBP = new FormLayout("pref, 4dlu, pref", "p");
         layoutBP.setColumnGroups(new int[][] {{1, 3}});
         ButtonBarBuilder builderBP = new ButtonBarBuilder();
         builderBP.addGlue();
         builderBP.addButton(m_ok);
-        JButton m_cancel = new JButton(Localization.lang("Cancel"));
-        builderBP.addButton(m_cancel);
+        JButton mCancel = new JButton(Localization.lang("Cancel"));
+        builderBP.addButton(mCancel);
         builderBP.addGlue();
         builderBP.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -205,7 +200,7 @@ class GroupDialog extends JDialog {
         builderAll.append(m_searchRadioButton, 5);
         builderAll.nextLine();
         builderAll.nextLine();
-        builderAll.appendSeparator(Localization.lang("Hierarchical context")); // JZTODO lyrics
+        builderAll.appendSeparator(Localization.lang("Hierarchical context"));
         builderAll.nextLine();
         builderAll.nextLine();
         builderAll.append(m_independentButton, 5);
@@ -275,24 +270,24 @@ class GroupDialog extends JDialog {
                 dispose();
             }
         };
-        m_cancel.addActionListener(cancelAction);
+        mCancel.addActionListener(cancelAction);
         builderAll.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+                .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         builderAll.getPanel().getActionMap().put("close", cancelAction);
 
         m_ok.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                m_okPressed = true;
+                mOkPressed = true;
                 if (m_explicitRadioButton.isSelected()) {
                     if (m_editedGroup instanceof ExplicitGroup) {
                         // keep assignments from possible previous ExplicitGroup
-                        m_resultingGroup = m_editedGroup.deepCopy();
-                        m_resultingGroup.setName(m_name.getText().trim());
-                        m_resultingGroup.setHierarchicalContext(getContext());
+                        mResultingGroup = m_editedGroup.deepCopy();
+                        mResultingGroup.setName(m_name.getText().trim());
+                        mResultingGroup.setHierarchicalContext(getContext());
                     } else {
-                        m_resultingGroup = new ExplicitGroup(m_name.getText()
+                        mResultingGroup = new ExplicitGroup(m_name.getText()
                                 .trim(), getContext());
                         if (m_editedGroup != null) {
                             addPreviousEntries();
@@ -301,13 +296,13 @@ class GroupDialog extends JDialog {
                 } else if (m_keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
-                    m_resultingGroup = new KeywordGroup(
+                    mResultingGroup = new KeywordGroup(
                             m_name.getText().trim(), m_kgSearchField.getText()
                             .trim(), m_kgSearchTerm.getText().trim(),
                             m_kgCaseSensitive.isSelected(), m_kgRegExp
                             .isSelected(), getContext());
                     if (((m_editedGroup instanceof ExplicitGroup) || (m_editedGroup instanceof SearchGroup))
-                            && m_resultingGroup.supportsAdd()) {
+                            && mResultingGroup.supportsAdd()) {
                         addPreviousEntries();
                     }
                 } else if (m_searchRadioButton.isSelected()) {
@@ -315,7 +310,7 @@ class GroupDialog extends JDialog {
                         // regex is correct, otherwise OK would have been
                         // disabled
                         // therefore I don't catch anything here
-                        m_resultingGroup = new SearchGroup(m_name.getText()
+                        mResultingGroup = new SearchGroup(m_name.getText()
                                 .trim(), m_sgSearchExpression.getText().trim(),
                                 isCaseSensitive(), isRegex(), getContext());
                     } catch (Exception e1) {
@@ -380,11 +375,11 @@ class GroupDialog extends JDialog {
     }
 
     public boolean okPressed() {
-        return m_okPressed;
+        return mOkPressed;
     }
 
     public AbstractGroup getResultingGroup() {
-        return m_resultingGroup;
+        return mResultingGroup;
     }
 
     private void setLayoutForSelectedGroup() {
@@ -415,45 +410,45 @@ class GroupDialog extends JDialog {
             okEnabled = okEnabled && s1.matches("\\w+");
             s2 = m_kgSearchTerm.getText().trim();
             okEnabled = okEnabled && !s2.isEmpty();
-            if (!okEnabled) {
-                setDescription(Localization.lang("Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
-            } else {
+            if (okEnabled) {
                 if (m_kgRegExp.isSelected()) {
                     try {
                         Pattern.compile(s2);
-                        setDescription(KeywordGroup.getDescriptionForPreview(s1, s2,
-                                m_kgCaseSensitive.isSelected(), m_kgRegExp
-                                        .isSelected()));
-                    } catch (Exception e) {
+                        setDescription(KeywordGroup.getDescriptionForPreview(s1, s2, m_kgCaseSensitive.isSelected(),
+                                m_kgRegExp.isSelected()));
+                    } catch (PatternSyntaxException e) {
                         okEnabled = false;
                         setDescription(formatRegExException(s2, e));
                     }
                 } else {
-                    setDescription(KeywordGroup.getDescriptionForPreview(s1, s2,
-                            m_kgCaseSensitive.isSelected(), m_kgRegExp
-                                    .isSelected()));
+                    setDescription(KeywordGroup.getDescriptionForPreview(s1, s2, m_kgCaseSensitive.isSelected(),
+                            m_kgRegExp.isSelected()));
                 }
+            } else {
+                setDescription(Localization.lang(
+                        "Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
             }
             setNameFontItalic(true);
         } else if (m_searchRadioButton.isSelected()) {
             s1 = m_sgSearchExpression.getText().trim();
             okEnabled = okEnabled & !s1.isEmpty();
-            if (!okEnabled) {
-                setDescription(Localization.lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter%c<p>"
-                        + "<tt>smith</tt><p>"
-                        + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter%c<p>"
-                        + "<tt>author%esmith and title%eelectrical</tt>"));
-            } else {
+            if (okEnabled) {
                 setDescription(SearchDescribers.getSearchDescriberFor(SearchRules.getSearchRuleByQuery(s1, isCaseSensitive(), isRegex()), s1).getDescription());
 
                 if (isRegex()) {
                     try {
                         Pattern.compile(s1);
-                    } catch (Exception e) {
+                    } catch (PatternSyntaxException e) {
                         okEnabled = false;
                         setDescription(formatRegExException(s1, e));
                     }
                 }
+            } else {
+                setDescription(Localization
+                        .lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p>"
+                                + "<tt>smith</tt><p>"
+                                + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter:<p>"
+                                + "<tt>author=smith and title=electrical</tt>"));
             }
             setNameFontItalic(true);
         } else if (m_explicitRadioButton.isSelected()) {
@@ -477,7 +472,6 @@ class GroupDialog extends JDialog {
      * added to the new group.
      */
     private void addPreviousEntries() {
-        // JZTODO lyrics...
         int i = JOptionPane.showConfirmDialog(m_basePanel.frame(),
                 Localization.lang("Assign the original group's entries to this group?"),
                 Localization.lang("Change of Grouping Method"),
@@ -485,23 +479,23 @@ class GroupDialog extends JDialog {
         if (i == JOptionPane.NO_OPTION) {
             return;
         }
-        Vector<BibtexEntry> vec = new Vector<>();
-        for (BibtexEntry entry : m_basePanel.database().getEntries()) {
+        Vector<BibEntry> vec = new Vector<>();
+        for (BibEntry entry : m_basePanel.database().getEntries()) {
             if (m_editedGroup.contains(entry)) {
                 vec.add(entry);
             }
         }
         if (!vec.isEmpty()) {
-            BibtexEntry[] entries = new BibtexEntry[vec.size()];
+            BibEntry[] entries = new BibEntry[vec.size()];
             vec.toArray(entries);
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {m_resultingGroup},
+            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mResultingGroup},
                     entries, m_basePanel.getDatabase(), this)) {
                 return;
             }
             // the undo information for a conversion to an ExplicitGroup is
             // contained completely in the UndoableModifyGroup object.
-            if (!(m_resultingGroup instanceof ExplicitGroup)) {
-                m_undoAddPreviousEntires = m_resultingGroup.add(entries);
+            if (!(mResultingGroup instanceof ExplicitGroup)) {
+                mUndoAddPreviousEntires = mResultingGroup.add(entries);
             }
         }
     }
@@ -520,7 +514,7 @@ class GroupDialog extends JDialog {
             sb.append(StringUtil.quoteForHTML(sa[i]));
         }
         String s = Localization.lang(
-                "The regular expression <b>%0</b> is invalid%c",
+                "The regular expression <b>%0</b> is invalid:",
                 StringUtil.quoteForHTML(regExp))
                 + "<p><tt>"
                 + sb
@@ -529,10 +523,9 @@ class GroupDialog extends JDialog {
             return s;
         }
         int lastNewline = s.lastIndexOf("<br>");
-        int hat = s.lastIndexOf("^");
+        int hat = s.lastIndexOf('^');
         if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
-            return s.substring(0, lastNewline + 4)
-                    + s.substring(lastNewline + 4).replaceAll(" ", "&nbsp;");
+            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
         }
         return s;
     }
@@ -542,7 +535,7 @@ class GroupDialog extends JDialog {
      * group, or null if this did not occur.
      */
     public AbstractUndoableEdit getUndoForAddPreviousEntries() {
-        return m_undoAddPreviousEntires;
+        return mUndoAddPreviousEntires;
     }
 
     /**

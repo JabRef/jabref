@@ -61,7 +61,7 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
 
     public boolean isNotStartedBefore() {
         // threads can only be started when in state NEW
-        return remoteListenerServerThread == null ? true : remoteListenerServerThread.getState() == Thread.State.NEW;
+        return remoteListenerServerThread == null || remoteListenerServerThread.getState() == Thread.State.NEW;
     }
 
     public void openAndStart(MessageHandler messageHandler, int port) {

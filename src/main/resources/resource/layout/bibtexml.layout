@@ -23,7 +23,6 @@
 \begin{url}    <bibtex:url>\format[XMLChars]{\url}</bibtex:url>\end{url}
 \begin{doi}    <bibtex:doi>\format[XMLChars]{\doi}</bibtex:doi>\end{doi}
 \begin{eid}    <bibtex:eid>\format[XMLChars]{\eid}</bibtex:eid>\end{eid}
-\begin{pdf}    <bibtex:pdf>\format[ResolvePDF,XMLChars]{\pdf}</bibtex:pdf>\end{pdf}
 \begin{type}    <bibtex:type>\format[XMLChars]{\type}</bibtex:type>\end{type}
 \begin{crossref}    <bibtex:crossref>\format[XMLChars]{\crossref}</bibtex:crossref>\end{crossref}
 \begin{annote}    <bibtex:annote>\format[XMLChars]{\annote}</bibtex:annote>\end{annote}

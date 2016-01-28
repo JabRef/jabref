@@ -22,7 +22,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,36 +53,26 @@ class StringChange extends Change {
         this.mem = mem;
         this.disk = disk;
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("<HTML><H2>");
-        sb.append(Localization.lang("Modified string"));
-        sb.append("</H2><H3>");
-        sb.append(Localization.lang("Label")).append(":</H3>");
-        sb.append(label);
-        sb.append("<H3>");
-        sb.append(Localization.lang("New content")).append(":</H3>");
-        sb.append(disk);
-        if (string != null) {
-            sb.append("<H3>");
-            sb.append(Localization.lang("Current content")).append(":</H3>");
-            sb.append(string.getContent());
-        } else {
+        StringBuilder sb = new StringBuilder(46);
+        sb.append("<HTML><H2>").append(Localization.lang("Modified string")).append("</H2><H3>")
+                .append(Localization.lang("Label")).append(":</H3>").append(label).append("<H3>")
+                .append(Localization.lang("New content")).append(":</H3>").append(disk);
+        if (string == null) {
             sb.append("<P><I>");
             sb.append(Localization.lang("Cannot merge this change")).append(": ");
             sb.append(Localization.lang("The string has been removed locally")).append("</I>");
+        } else {
+            sb.append("<H3>");
+            sb.append(Localization.lang("Current content")).append(":</H3>");
+            sb.append(string.getContent());
         }
         sb.append("</HTML>");
         tp.setText(sb.toString());
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
-        if (string != null) {
-            string.setContent(disk);
-            undoEdit.addEdit(new UndoableStringChange(panel, string, false, mem, disk));
-            // Update tmp databse:
-
-        } else {
+    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
+        if (string == null) {
             // The string was removed or renamed locally. We guess that it was removed.
             String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, label, disk);
@@ -92,22 +82,26 @@ class StringChange extends Change {
             } catch (KeyCollisionException ex) {
                 LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
             }
+        } else {
+            string.setContent(disk);
+            undoEdit.addEdit(new UndoableStringChange(panel, string, false, mem, disk));
+            // Update tmp databse:
+
         }
 
         // Update tmp database:
-        if (tmpString != null) {
-            tmpString.setContent(disk);
-        }
-        else {
+        if (tmpString == null) {
             BibtexString bs = new BibtexString(IdGenerator.next(), label, disk);
             secondary.addString(bs);
+        } else {
+            tmpString.setContent(disk);
         }
 
         return true;
     }
 
     @Override
-    JComponent description() {
+    public JComponent description() {
         return sp;
     }
 

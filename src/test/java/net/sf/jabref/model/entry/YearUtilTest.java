@@ -3,8 +3,6 @@ package net.sf.jabref.model.entry;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jabref.model.entry.YearUtil;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;
@@ -36,10 +34,10 @@ public class YearUtilTest {
         NumberFormat f = new DecimalFormat("00");
 
         for (int i = 0; i <= 30; i++) {
-            Assert.assertTrue("" + i, thisYear <= Integer.parseInt(YearUtil.toFourDigitYear(f.format((d2 + i) % 100))));
+            Assert.assertTrue(String.valueOf(i), thisYear <= Integer.parseInt(YearUtil.toFourDigitYear(f.format((d2 + i) % 100))));
         }
         for (int i = 0; i < 70; i++) {
-            Assert.assertTrue("" + i, thisYear >= Integer.parseInt(YearUtil.toFourDigitYear(f.format((d2 - i + 100) % 100))));
+            Assert.assertTrue(String.valueOf(i), thisYear >= Integer.parseInt(YearUtil.toFourDigitYear(f.format((d2 - i + 100) % 100))));
         }
     }
 

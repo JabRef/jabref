@@ -3,7 +3,7 @@ We welcome contributions to JabRef and encourage to create a fork, clone, **crea
 Be sure to create a **separate branch** for each improvement you implement.
 Take a look at GitHub's excellent [help documentation] for a detailed explanation.
 
-We also have [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
+We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) and [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
 
 For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
 It contains steps to get started with JabRef development.

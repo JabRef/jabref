@@ -4,6 +4,8 @@ import com.google.common.base.Objects;
 
 public class Abbreviation implements Comparable<Abbreviation> {
 
+    private final static String SPLITTER = ";"; // elements after SPLITTER are not used at the moment
+
     private final String name;
     private final String abbreviation;
 
@@ -17,7 +19,6 @@ public class Abbreviation implements Comparable<Abbreviation> {
     }
 
     public String getIsoAbbreviation() {
-        String SPLITTER = ";"; // elements after SPLITTER are not used at the moment
         if (abbreviation.contains(SPLITTER)) {
             String[] restParts = abbreviation.split(SPLITTER);
             return restParts[0].trim();
@@ -26,7 +27,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
     }
 
     public String getMedlineAbbreviation() {
-        return getIsoAbbreviation().replaceAll("\\.", " ").replaceAll("  ", " ").trim();
+        return getIsoAbbreviation().replace(".", " ").replace("  ", " ").trim();
     }
 
     @Override

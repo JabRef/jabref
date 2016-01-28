@@ -17,8 +17,7 @@ public class NewEntryAction extends MnemonicAwareAction {
     private static final Log LOGGER = LogFactory.getLog(NewEntryAction.class);
 
     private final JabRefFrame jabRefFrame;
-    String type; // The type of item to create.
-    KeyStroke keyStroke; // Used for the specific instances.
+    private String type; // The type of item to create.
 
     public NewEntryAction(JabRefFrame jabRefFrame, KeyStroke key) {
         // This action leads to a dialog asking for entry type.
@@ -29,19 +28,19 @@ public class NewEntryAction extends MnemonicAwareAction {
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX entry"));
     }
 
-    public NewEntryAction(JabRefFrame jabRefFrame, String type_) {
+    public NewEntryAction(JabRefFrame jabRefFrame, String type) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, EntryUtil.capitalizeFirst(type_));
-        type = type_;
+        putValue(Action.NAME, EntryUtil.capitalizeFirst(type));
+        this.type = type;
     }
 
-    public NewEntryAction(JabRefFrame jabRefFrame, String type_, KeyStroke key) {
+    public NewEntryAction(JabRefFrame jabRefFrame, String type, KeyStroke key) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, EntryUtil.capitalizeFirst(type_));
+        putValue(Action.NAME, EntryUtil.capitalizeFirst(type));
         putValue(Action.ACCELERATOR_KEY, key);
-        type = type_;
+        this.type = type;
     }
 
     @Override
@@ -62,7 +61,7 @@ public class NewEntryAction extends MnemonicAwareAction {
             ((BasePanel) jabRefFrame.tabbedPane.getSelectedComponent())
                     .newEntry(EntryTypes.getType(thisType));
         } else {
-            LOGGER.info("Action 'New entry' must be disabled when no " + "database is open.");
+            LOGGER.info("Action 'New entry' must be disabled when no database is open.");
         }
     }
 }

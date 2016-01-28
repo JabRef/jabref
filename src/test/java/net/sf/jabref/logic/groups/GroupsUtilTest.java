@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +15,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 
 public class GroupsUtilTest {
 
@@ -37,7 +35,7 @@ public class GroupsUtilTest {
 
             ParserResult result = BibtexParser.parse(fr);
 
-            BibtexDatabase db = result.getDatabase();
+            BibDatabase db = result.getDatabase();
 
             List<String> fieldList = new ArrayList<>();
             fieldList.add("author");
@@ -46,11 +44,11 @@ public class GroupsUtilTest {
             assertTrue(authorSet.contains("Brewer"));
             assertEquals(15, authorSet.size());
 
-            TreeSet<String> keywordSet = GroupsUtil.findDeliminatedWordsInField(db, "keywords", ";");
+            Set<String> keywordSet = GroupsUtil.findDeliminatedWordsInField(db, "keywords", ";");
             assertTrue(keywordSet.contains("Brain"));
             assertEquals(60, keywordSet.size());
 
-            TreeSet<String> wordSet = GroupsUtil.findAllWordsInField(db, "month", "");
+            Set<String> wordSet = GroupsUtil.findAllWordsInField(db, "month", "");
             assertTrue(wordSet.contains("Feb"));
             assertTrue(wordSet.contains("Mar"));
             assertTrue(wordSet.contains("May"));

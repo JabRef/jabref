@@ -46,22 +46,22 @@ import org.apache.commons.logging.LogFactory;
  * If committing fails, the temporary file will not be deleted.
  */
 public class SaveSession {
+    private static final Log LOGGER = LogFactory.getLog(SaveSession.class);
 
     public static final String LOCKFILE_SUFFIX = ".lock";
+
     // The age in ms of a lockfile before JabRef will offer to "steal" the locked file:
     public static final long LOCKFILE_CRITICAL_AGE = 60000;
-
     private static final String TEMP_PREFIX = "jabref";
-    private static final String TEMP_SUFFIX = "save.bib";
 
+    private static final String TEMP_SUFFIX = "save.bib";
     private final File file;
     private final File tmp;
     private final Charset encoding;
     private boolean backup;
     private final boolean useLockFile;
-    private final VerifyingWriter writer;
 
-    private static final Log LOGGER = LogFactory.getLog(SaveSession.class);
+    private final VerifyingWriter writer;
 
 
     public SaveSession(File file, Charset encoding, boolean backup) throws IOException, UnsupportedCharsetException {
@@ -103,7 +103,7 @@ public class SaveSession {
             try {
                 FileUtil.copyFile(file, backupFile, true);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOGGER.error("Problem copying file", ex);
                 throw SaveException.BACKUP_CREATION;
             }
         }
@@ -154,9 +154,8 @@ public class SaveSession {
         if (lock.exists()) {
             return true;
         }
-        FileOutputStream out = new FileOutputStream(lock);
-        out.write(0);
-        try {
+        try (FileOutputStream out = new FileOutputStream(lock)) {
+            out.write(0);
             out.close();
         } catch (IOException ex) {
             LOGGER.error("Error when creating lock file.", ex);

@@ -15,8 +15,9 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 /**
@@ -29,7 +30,7 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
 
     private final String fieldName;
 
-    private final String SEPARATING_CHARS = ";,\n ";
+    private static final String SEPARATING_CHARS = ";,\n ";
 
     /**
      * @see AutoCompleterFactory
@@ -37,7 +38,7 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
     DefaultAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
         super(preferences);
 
-        this.fieldName = fieldName;
+        this.fieldName = Objects.requireNonNull(fieldName);
     }
 
     @Override
@@ -50,18 +51,16 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
      * Stores all words in the given field which are separated by SEPARATING_CHARS.
      */
     @Override
-    public void addBibtexEntry(BibtexEntry entry) {
+    public void addBibtexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }
 
-        String fieldValue = entry.getField(fieldName);
-        if (fieldValue != null) {
+        entry.getFieldOptional(fieldName).ifPresent(fieldValue -> {
             StringTokenizer tok = new StringTokenizer(fieldValue, SEPARATING_CHARS);
             while (tok.hasMoreTokens()) {
-                String word = tok.nextToken();
-                addItemToIndex(word);
+                addItemToIndex(tok.nextToken());
             }
-        }
+        });
     }
 }

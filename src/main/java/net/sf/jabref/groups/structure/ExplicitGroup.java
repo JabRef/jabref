@@ -15,8 +15,8 @@
  */
 package net.sf.jabref.groups.structure;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
@@ -38,13 +38,13 @@ public class ExplicitGroup extends AbstractGroup {
 
     public static final String ID = "ExplicitGroup:";
 
-    private final Set<BibtexEntry> entries = new HashSet<>();
+    private final Set<BibEntry> entries = new HashSet<>();
 
     public ExplicitGroup(String name, GroupHierarchyType context) {
         super(name, context);
     }
 
-    public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
+    public static AbstractGroup fromString(String s, BibDatabase db, int version) throws Exception {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new Exception(
                     "Internal error: ExplicitGroup cannot be created from \""
@@ -77,8 +77,8 @@ public class ExplicitGroup extends AbstractGroup {
     /**
      * Called only when created fromString
      */
-    private void addEntries(QuotedStringTokenizer tok, BibtexDatabase db) {
-        BibtexEntry[] entries;
+    private void addEntries(QuotedStringTokenizer tok, BibDatabase db) {
+        BibEntry[] entries;
         while (tok.hasMoreTokens()) {
             entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR));
             Collections.addAll(this.entries, entries);
@@ -90,8 +90,8 @@ public class ExplicitGroup extends AbstractGroup {
         return new SearchRule() {
 
             @Override
-            public boolean applyRule(String query, BibtexEntry bibtexEntry) {
-                return contains(query, bibtexEntry);
+            public boolean applyRule(String query, BibEntry bibEntry) {
+                return contains(query, bibEntry);
             }
 
             @Override
@@ -112,46 +112,46 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibtexEntry[] entries) {
+    public AbstractUndoableEdit add(BibEntry[] entries) {
         if (entries.length == 0) {
             return null; // nothing to do
         }
 
-        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<>(this.entries);
+        HashSet<BibEntry> entriesBeforeEdit = new HashSet<>(this.entries);
         Collections.addAll(this.entries, entries);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, this.entries);
     }
 
-    public boolean addEntry(BibtexEntry entry) {
+    public boolean addEntry(BibEntry entry) {
         return entries.add(entry);
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
+    public AbstractUndoableEdit remove(BibEntry[] entries) {
         if (entries.length == 0) {
             return null; // nothing to do
         }
 
-        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<>(this.entries);
-        for (BibtexEntry entry : entries) {
+        HashSet<BibEntry> entriesBeforeEdit = new HashSet<>(this.entries);
+        for (BibEntry entry : entries) {
             this.entries.remove(entry);
         }
 
         return new UndoableChangeAssignment(entriesBeforeEdit, this.entries);
     }
 
-    public boolean removeEntry(BibtexEntry entry) {
+    public boolean removeEntry(BibEntry entry) {
         return entries.remove(entry);
     }
 
     @Override
-    public boolean contains(BibtexEntry entry) {
+    public boolean contains(BibEntry entry) {
         return entries.contains(entry);
     }
 
     @Override
-    public boolean contains(String query, BibtexEntry entry) {
+    public boolean contains(String query, BibEntry entry) {
         return contains(entry);
     }
 
@@ -173,17 +173,17 @@ public class ExplicitGroup extends AbstractGroup {
             return false; // add/remove
         }
         HashSet<String> keys = new HashSet<>();
-        BibtexEntry entry;
+        BibEntry entry;
         String key;
         // compare bibtex keys for all entries that have one
-        for (BibtexEntry m_entry1 : entries) {
+        for (BibEntry m_entry1 : entries) {
             entry = m_entry1;
             key = entry.getCiteKey();
             if (key != null) {
                 keys.add(key);
             }
         }
-        for (BibtexEntry m_entry : other.entries) {
+        for (BibEntry m_entry : other.entries) {
             entry = m_entry;
             key = entry.getCiteKey();
             if (key != null) {
@@ -213,7 +213,7 @@ public class ExplicitGroup extends AbstractGroup {
         String s;
         // write entries in well-defined order for CVS compatibility
         Set<String> sortedKeys = new TreeSet<>();
-        for (BibtexEntry m_entry : entries) {
+        for (BibEntry m_entry : entries) {
             s = m_entry.getCiteKey();
             if ((s != null) && !s.isEmpty()) {
                 sortedKeys.add(s);
@@ -271,18 +271,18 @@ public class ExplicitGroup extends AbstractGroup {
 
     /**
      * Update the group to handle the situation where the group
-     * is applied to a different BibtexDatabase than it was created for.
-     * This group type contains a Set of BibtexEntry objects, and these will not
+     * is applied to a different BibDatabase than it was created for.
+     * This group type contains a Set of BibEntry objects, and these will not
      * be the same objects as in the new database. We must reset the entire Set with
      * matching entries from the new database.
      *
      * @param db The database to refresh for.
      */
     @Override
-    public void refreshForNewDatabase(BibtexDatabase db) {
-        Set<BibtexEntry> newSet = new HashSet<>();
-        for (BibtexEntry entry : entries) {
-            BibtexEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
+    public void refreshForNewDatabase(BibDatabase db) {
+        Set<BibEntry> newSet = new HashSet<>();
+        for (BibEntry entry : entries) {
+            BibEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
             /*if (sameEntry == null) {
                 System.out.println("Error: could not find entry '"+entry.getCiteKey()+"'");
             } else {
@@ -294,7 +294,7 @@ public class ExplicitGroup extends AbstractGroup {
         entries.addAll(newSet);
     }
 
-    public Set<BibtexEntry> getEntries() {
+    public Set<BibEntry> getEntries() {
         return entries;
     }
 

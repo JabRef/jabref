@@ -38,7 +38,7 @@ public class Cache {
         this.capacity = capacity;
     }
 
-    public String get() {
+    public synchronized String get() {
         ensureCacheIsFresh();
         return cache;
     }
@@ -53,7 +53,7 @@ public class Cache {
         }
     }
 
-    public void add(String message) {
+    public synchronized void add(String message) {
         queue.add(message);
 
         if (isCapacityExceeded()) {

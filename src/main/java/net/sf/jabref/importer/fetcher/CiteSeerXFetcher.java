@@ -20,9 +20,13 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -44,6 +48,17 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
     private boolean stopFetching;
 
+    private static final String BASE_PATTERN = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER
+            + "\" content=\"(.*)\" />";
+    private static final Pattern TITLE_PATTERN = Pattern
+            .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_title"));
+    private static final Pattern AUTHOR_PATTERN = Pattern
+            .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_authors"));
+    private static final Pattern YEAR_PATTERN = Pattern
+            .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
+    private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
+
+    private static final Log LOGGER = LogFactory.getLog(CiteSeerXFetcher.class);
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
@@ -54,10 +69,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibtexEntry entry = getSingleCitation(citation);
-                //BibtexEntry entry = BibsonomyScraper.getEntry(citation);
-
-                //dialog.setProgress(++i, citations.size());
+                BibEntry entry = getSingleCitation(citation);
                 if (entry != null) {
                     inspector.addEntry(entry);
                 }
@@ -65,7 +77,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not download", e);
             return false;
         }
     }
@@ -77,7 +89,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "CiteSeerHelp.html";
+        return "CiteSeerHelp";
     }
 
     @Override
@@ -132,39 +144,33 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
 
-    private static final String basePattern = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER + "\" content=\"(.*)\" />";
-    private static final Pattern titlePattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_title"));
-    private static final Pattern authorPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_authors"));
-    private static final Pattern yearPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
-    private static final Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
-
-    private static BibtexEntry getSingleCitation(String urlString) throws IOException {
+    private static BibEntry getSingleCitation(String urlString) throws IOException {
 
         URL url = new URL(urlString);
         String cont = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
 
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
-        Matcher m = CiteSeerXFetcher.titlePattern.matcher(cont);
+        Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);
         if (m.find()) {
-            BibtexEntry entry = new BibtexEntry(IdGenerator.next());
+            BibEntry entry = new BibEntry(IdGenerator.next());
             entry.setField("title", m.group(1));
 
             // Find authors:
-            m = CiteSeerXFetcher.authorPattern.matcher(cont);
+            m = CiteSeerXFetcher.AUTHOR_PATTERN.matcher(cont);
             if (m.find()) {
                 String authors = m.group(1);
                 entry.setField("author", new AuthorsFormatter().format(authors));
             }
 
             // Find year:
-            m = CiteSeerXFetcher.yearPattern.matcher(cont);
+            m = CiteSeerXFetcher.YEAR_PATTERN.matcher(cont);
             if (m.find()) {
                 entry.setField("year", m.group(1));
             }
 
             // Find abstract:
-            m = CiteSeerXFetcher.abstractPattern.matcher(cont);
+            m = CiteSeerXFetcher.ABSTRACT_PATTERN.matcher(cont);
             if (m.find()) {
                 entry.setField("abstract", m.group(1));
             }

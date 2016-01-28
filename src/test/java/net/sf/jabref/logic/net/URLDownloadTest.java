@@ -3,7 +3,6 @@ package net.sf.jabref.logic.net;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
-import net.sf.jabref.logic.net.URLDownload;
 import org.junit.Assert;
 import org.junit.Test;
 

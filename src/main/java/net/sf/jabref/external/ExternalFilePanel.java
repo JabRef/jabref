@@ -15,27 +15,10 @@
 */
 package net.sf.jabref.external;
 
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.LinkedList;
-
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.xml.transform.TransformerException;
-
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OpenFileFilter;
 import net.sf.jabref.gui.UrlDragDrop;
@@ -44,16 +27,26 @@ import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.util.io.FileFinder;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.util.io.FileFinder;
-import net.sf.jabref.logic.xmp.XMPUtil;
+import javax.swing.*;
+import javax.xml.transform.TransformerException;
+import java.awt.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 
 /**
  * Initial Version:
@@ -63,25 +56,25 @@ import net.sf.jabref.logic.xmp.XMPUtil;
  *
  */
 public class ExternalFilePanel extends JPanel {
-    private EntryEditor entryEditor;
+
+    private final EntryEditor entryEditor;
 
     private final JabRefFrame frame;
 
     private final OpenFileFilter off;
 
-    private BibtexEntry entry;
+    private BibEntry entry;
 
-    private BibtexDatabase database;
+    private BibDatabase database;
 
     private final MetaData metaData;
 
     private static final Log LOGGER = LogFactory.getLog(ExternalFilePanel.class);
 
 
-    public ExternalFilePanel(final String fieldName, final MetaData metaData, final BibtexEntry entry, final FieldEditor editor, final OpenFileFilter off) {
+    public ExternalFilePanel(final String fieldName, final MetaData metaData, final BibEntry entry, final FieldEditor editor, final OpenFileFilter off) {
         this(null, metaData, null, fieldName, off, editor);
         this.entry = entry;
-        this.entryEditor = null;
     }
 
     public ExternalFilePanel(final JabRefFrame frame, final MetaData metaData,
@@ -99,7 +92,7 @@ public class ExternalFilePanel extends JPanel {
         JButton download = new JButton(Localization.lang("Download"));
         JButton auto = new JButton(Localization.lang("Auto"));
         JButton xmp = new JButton(Localization.lang("Write XMP"));
-        xmp.setToolTipText(Localization.lang("Write BibtexEntry as XMP-metadata to PDF."));
+        xmp.setToolTipText(Localization.lang("Write BibTeXEntry as XMP-metadata to PDF."));
 
         browseBut.addActionListener(new ActionListener() {
 
@@ -150,16 +143,16 @@ public class ExternalFilePanel extends JPanel {
      * Change which entry this panel is operating on. This is used only when
      * this panel is not attached to an entry editor.
      */
-    public void setEntry(BibtexEntry entry, BibtexDatabase database) {
+    public void setEntry(BibEntry entry, BibDatabase database) {
         this.entry = entry;
         this.database = database;
     }
 
-    private BibtexDatabase getDatabase() {
+    private BibDatabase getDatabase() {
         return database != null ? database : entryEditor.getDatabase();
     }
 
-    private BibtexEntry getEntry() {
+    private BibEntry getEntry() {
         return entry != null ? entry : entryEditor.getEntry();
     }
 
@@ -183,9 +176,9 @@ public class ExternalFilePanel extends JPanel {
                 output(Localization.lang("Looking for pdf..."));
 
                 // Find the default directory for this field type, if any:
-                String[] dirs = metaData.getFileDirectory(fieldName);
+                List<String> dirs = metaData.getFileDirectory(fieldName);
                 File file = null;
-                if (dirs.length > 0) {
+                if (dirs.size() > 0) {
                     File tmp = FileUtil.expandFilename(editor.getText(), dirs);
                     if (tmp != null) {
                         file = tmp;
@@ -214,7 +207,7 @@ public class ExternalFilePanel extends JPanel {
                     JOptionPane.showMessageDialog(editor.getParent(),
                             Localization.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
                             Localization.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info("Error while converting BibtexEntry to XMP " + finalFile.getAbsolutePath(), e);
+                    LOGGER.info("Error while converting BibEntry to XMP " + finalFile.getAbsolutePath(), e);
                     output(Localization.lang("Error converting XMP to '%0'...", finalFile.getName()));
                 }
             }
@@ -222,11 +215,10 @@ public class ExternalFilePanel extends JPanel {
     }
 
     public void browseFile(final String fieldName, final FieldEditor editor) {
-
-        String[] dirs = metaData.getFileDirectory(fieldName);
+        List<String> dirs = metaData.getFileDirectory(fieldName);
         String directory = null;
-        if (dirs.length > 0) {
-            directory = dirs[0]; // Default to the first directory in the list
+        if (dirs.size() > 0) {
+            directory = dirs.get(0); // Default to the first directory in the list
         }
 
         String dir = editor.getText();
@@ -281,7 +273,7 @@ public class ExternalFilePanel extends JPanel {
          * If this panel belongs in an entry editor, note which entry is
          * currently shown:
          */
-        final BibtexEntry targetEntry;
+        final BibEntry targetEntry;
         if (entryEditor != null) {
             targetEntry = entryEditor.getEntry();
         } else {
@@ -313,13 +305,13 @@ public class ExternalFilePanel extends JPanel {
                  * http://sourceforge.net/tracker/index.php?func=detail&aid=1548875&group_id=92314&atid=600306
                  *
                  */
-                if (OS.WINDOWS) {
-                    plannedName = plannedName.replaceAll(
-                            "\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
-                } else if (OS.OS_X) {
-                    plannedName = plannedName.replaceAll(":", "");
+                if (plannedName != null) {
+                    if (OS.WINDOWS) {
+                        plannedName = plannedName.replaceAll("\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
+                    } else if (OS.OS_X) {
+                        plannedName = plannedName.replace(":", "");
+                    }
                 }
-
                 return plannedName;
             }
 
@@ -335,7 +327,7 @@ public class ExternalFilePanel extends JPanel {
                     String plannedName = getPlannedFileName(res);
 
                     // Find the default directory for this field type:
-                    String[] dirs = metaData.getFileDirectory(fieldName);
+                    List<String> dirs = metaData.getFileDirectory(fieldName);
                     String directory = null;
                     // Look for the first one in the list that exists:
                     for (String dir : dirs) {
@@ -345,8 +337,8 @@ public class ExternalFilePanel extends JPanel {
                         }
                     }
                     if (directory == null) {
-                        if (dirs.length > 0) {
-                            JOptionPane.showMessageDialog(parent, Localization.lang("Could not find directory for %0-files: %1", fieldName, dirs[0]),
+                        if (dirs.size() > 0) {
+                            JOptionPane.showMessageDialog(parent, Localization.lang("Could not find directory for %0-files: %1", fieldName, dirs.get(0)),
                                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                         } else {
                             JOptionPane.showMessageDialog(parent, Localization.lang("No directory defined for %0-files", fieldName),
@@ -445,7 +437,7 @@ public class ExternalFilePanel extends JPanel {
      */
     public Runnable autoSetFile(final String fieldName, final FieldEditor editor) {
         Object o = getKey();
-        if ((o == null) || (Globals.prefs.get(fieldName + "Directory") == null)) {
+        if ((o == null) || (Globals.prefs.get(fieldName + Globals.DIR_SUFFIX) == null)) {
             output(Localization.lang("You must set both BibTeX key and %0 directory", fieldName
                     .toUpperCase())
                     + '.');
@@ -454,40 +446,33 @@ public class ExternalFilePanel extends JPanel {
         output(Localization.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o + '.'
                 + fieldName + "'...");
 
-        return new Runnable() {
+        return () -> {
+            /*
+             * Find the following directories to look in for:
+             *
+             * default directory for this field type.
+             *
+             * directory of bibtex-file. // NOT POSSIBLE at the moment.
+             *
+             * JabRef-directory.
+             */
+            List<String> dirs = metaData.getFileDirectory(fieldName);
 
-            @Override
-            public void run() {
-                /*
-                 * Find the following directories to look in for:
-                 *
-                 * default directory for this field type.
-                 *
-                 * directory of bibtex-file. // NOT POSSIBLE at the moment.
-                 *
-                 * JabRef-directory.
-                 */
-                LinkedList<String> list = new LinkedList<>();
-                String[] dirs = metaData.getFileDirectory(fieldName);
-                Collections.addAll(list, dirs);
+            String found = FileFinder.findPdf(getEntry(), fieldName, dirs
+                    .toArray(new String[dirs.size()]));// , off);
 
-                String found = FileFinder.findPdf(getEntry(), fieldName, list
-                        .toArray(new String[list.size()]));// , off);
+            // To activate findFile:
+            // String found = Util.findFile(getEntry(), null, dir,
+            // ".*[bibtexkey].*");
 
-                // To activate findFile:
-                // String found = Util.findFile(getEntry(), null, dir,
-                // ".*[bibtexkey].*");
-
-                if (found != null) {
-                    editor.setText(found);
-                    if (entryEditor != null) {
-                        entryEditor.updateField(editor);
-                    }
-                    output(Localization.lang("%0 field set", fieldName.toUpperCase()) + '.');
-                } else {
-                    output(Localization.lang("No %0 found", fieldName.toUpperCase()) + '.');
+            if (found != null) {
+                editor.setText(found);
+                if (entryEditor != null) {
+                    entryEditor.updateField(editor);
                 }
-
+                output(Localization.lang("%0 field set", fieldName.toUpperCase()) + '.');
+            } else {
+                output(Localization.lang("No %0 found", fieldName.toUpperCase()) + '.');
             }
         };
     }

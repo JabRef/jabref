@@ -1,14 +1,14 @@
 package net.sf.jabref.logic.integrity;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class IntegrityMessage implements Cloneable {
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
     private final String fieldName;
     private final String message;
 
-    public IntegrityMessage(String message, BibtexEntry entry, String fieldName) {
+    public IntegrityMessage(String message, BibEntry entry, String fieldName) {
         this.message = message;
         this.entry = entry;
         this.fieldName = fieldName;
@@ -23,7 +23,7 @@ public class IntegrityMessage implements Cloneable {
         return message;
     }
 
-    public BibtexEntry getEntry() {
+    public BibEntry getEntry() {
         return entry;
     }
 

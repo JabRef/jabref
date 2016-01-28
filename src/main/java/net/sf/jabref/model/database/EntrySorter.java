@@ -15,23 +15,23 @@
 */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.*;
 
 public class EntrySorter implements DatabaseChangeListener {
 
-    private final ArrayList<BibtexEntry> set;
-    private final Comparator<BibtexEntry> comp;
+    private final List<BibEntry> set;
+    private final Comparator<BibEntry> comp;
     private String[] idArray;
-    private BibtexEntry[] entryArray;
+    private BibEntry[] entryArray;
     private boolean changed;
 
 
-    public EntrySorter(Map<String, BibtexEntry> entries, Comparator<BibtexEntry> comp) {
+    public EntrySorter(Map<String, BibEntry> entries, Comparator<BibEntry> comp) {
         set = new ArrayList<>();
         this.comp = comp;
-        for (Map.Entry<String, BibtexEntry> stringBibtexEntryEntry : entries.entrySet()) {
+        for (Map.Entry<String, BibEntry> stringBibtexEntryEntry : entries.entrySet()) {
             set.add(stringBibtexEntryEntry.getValue());
         }
         changed = true;
@@ -64,9 +64,9 @@ public class EntrySorter implements DatabaseChangeListener {
 
             int count = set.size();
             idArray = new String[count];
-            entryArray = new BibtexEntry[count];
+            entryArray = new BibEntry[count];
             int piv = 0;
-            for (BibtexEntry entry : set) {
+            for (BibEntry entry : set) {
                 idArray[piv] = entry.getId();
                 entryArray[piv] = entry;
                 piv++;
@@ -84,7 +84,7 @@ public class EntrySorter implements DatabaseChangeListener {
         }
     }
 
-    public BibtexEntry getEntryAt(int pos) {
+    public BibEntry getEntryAt(int pos) {
         synchronized (set) {
             return entryArray[pos];
         }

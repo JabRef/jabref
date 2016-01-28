@@ -36,9 +36,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 package net.sf.jabref.exporter.layout;
 
+import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Vector;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author     wegnerj
  */
-public class WSITools
+public final class WSITools
 {
 
     private static final Log LOGGER = LogFactory.getLog(WSITools.class);
@@ -58,48 +57,48 @@ public class WSITools
     }
 
     /**
-     * @param  vcr  {@link java.util.Vector} of <tt>String</tt>
+     * @param  list  {@link java.util.List} of <tt>String</tt>
      * @param  buf  Description of the Parameter
      * @return      Description of the Return Value
      */
-    public static boolean tokenize(Vector<String> vcr, String buf)
+    public static boolean tokenize(List<String> list, String buf)
     {
-        return WSITools.tokenize(vcr, buf, " \t\n");
+        return WSITools.tokenize(list, buf, " \t\n");
     }
 
     /**
-     * @param  vcr       {@link java.util.Vector} of <tt>String</tt>
+     * @param  list       {@link java.util.List} of <tt>String</tt>
      * @param  buf       Description of the Parameter
      * @param  delimstr  Description of the Parameter
      * @return           Description of the Return Value
      */
-    public static boolean tokenize(Vector<String> vcr, String buf, String delimstr)
+    public static boolean tokenize(List<String> list, String buf, String delimstr)
     {
-        vcr.clear();
+        list.clear();
         buf = buf + '\n';
 
         StringTokenizer st = new StringTokenizer(buf, delimstr);
 
         while (st.hasMoreTokens())
         {
-            vcr.add(st.nextToken());
+            list.add(st.nextToken());
         }
 
         return true;
     }
 
     /**
-     * @param  vcr       {@link java.util.Vector} of <tt>String</tt>
+     * @param  list       {@link java.util.List} of <tt>String</tt>
      * @param  s         Description of the Parameter
      * @param  delimstr  Description of the Parameter
      * @param  limit     Description of the Parameter
      * @return           Description of the Return Value
      */
-    public static boolean tokenize(Vector<String> vcr, String s, String delimstr,
+    public static boolean tokenize(List<String> list, String s, String delimstr,
             int limit)
     {
         LOGGER.warn("Tokenize \"" + s + '"');
-        vcr.clear();
+        list.clear();
         s = s + '\n';
 
         int endpos;
@@ -110,14 +109,14 @@ public class WSITools
         while (st.hasMoreTokens())
         {
             String tmp = st.nextToken();
-            vcr.add(tmp);
+            list.add(tmp);
 
             matched++;
 
             if (matched == limit)
             {
                 endpos = s.lastIndexOf(tmp);
-                vcr.add(s.substring(endpos + tmp.length()));
+                list.add(s.substring(endpos + tmp.length()));
 
                 break;
             }

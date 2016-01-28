@@ -28,7 +28,7 @@ import java.io.File;
 /**
  * Action used to produce a "Browse" button for one of the text fields.
  */
-public class BrowseAction extends AbstractAction {
+public final class BrowseAction extends AbstractAction {
     private final JFrame frame;
     private final JTextField comp;
     private final boolean dir;

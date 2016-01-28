@@ -17,7 +17,7 @@ package net.sf.jabref.gui.util;
 
 import java.util.Comparator;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 /**
@@ -27,17 +27,17 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
  * Only comparing ranking field
  * inverse comparison of ranking as rank5 is higher than rank1
  */
-public class RankingFieldComparator implements Comparator<BibtexEntry> {
+public class RankingFieldComparator implements Comparator<BibEntry> {
 
     @Override
-    public int compare(BibtexEntry e1, BibtexEntry e2) {
+    public int compare(BibEntry e1, BibEntry e2) {
         String val1 = e1.getField(SpecialFieldsUtils.FIELDNAME_RANKING);
         String val2 = e2.getField(SpecialFieldsUtils.FIELDNAME_RANKING);
         if (val1 == null) {
-            if (val2 != null) {
-                return 1;
-            } else {
+            if (val2 == null) {
                 return 0;
+            } else {
+                return 1;
             }
         } else {
             if (val2 == null) {
@@ -45,10 +45,10 @@ public class RankingFieldComparator implements Comparator<BibtexEntry> {
             } else {
                 // val1 is not null AND val2 is not null
                 int compareToRes = val1.compareTo(val2);
-                if (compareToRes != 0) {
-                    return compareToRes * -1;
-                } else {
+                if (compareToRes == 0) {
                     return 0;
+                } else {
+                    return compareToRes * -1;
                 }
             }
         }

@@ -15,26 +15,28 @@
  */
 package net.sf.jabref.gui.worker;
 
-import java.awt.Desktop;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import net.sf.jabref.*;
-import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.util.Util;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
@@ -75,16 +77,16 @@ public class SendAsEMailAction extends AbstractWorker {
         }
 
         StringWriter sw = new StringWriter();
-        BibtexEntry[] bes = panel.getSelectedEntries();
+        BibEntry[] bes = panel.getSelectedEntries();
 
         // write the entries using sw, which is used later to form the email content
-        BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
 
-        for (BibtexEntry entry : bes) {
+        for (BibEntry entry : bes) {
             try {
                 bibtexEntryWriter.write(entry, sw);
             } catch (IOException e) {
-                LOGGER.warn("Problem creating Bibtex file for mailing.", e);
+                LOGGER.warn("Problem creating BibTeX file for mailing.", e);
             }
         }
 
@@ -94,7 +96,8 @@ public class SendAsEMailAction extends AbstractWorker {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<File> fileList = Util.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD));
+        List<File> fileList = FileUtil.getListOfLinkedFiles(Arrays.asList(bes),
+                frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD));
         for (File f : fileList) {
             attachments.add(f.getPath());
             if (openFolders) {

@@ -15,7 +15,8 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.JabRefPreferences;
@@ -31,7 +32,7 @@ public class AutoCompletePreferences {
     private static final String PREF_COMPLETE_FIELDS = "autoCompleteFields";
 
 
-    public static void putDefaults(HashMap<String, Object> defaults) {
+    public static void putDefaults(Map<String, Object> defaults) {
         defaults.put(PREF_SHORTEST_TO_COMPLETE, 1);
         defaults.put(PREF_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
         defaults.put(PREF_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
@@ -51,6 +52,12 @@ public class AutoCompletePreferences {
         preferences.putInt(PREF_SHORTEST_TO_COMPLETE, value);
     }
 
+    /**
+     * Returns how the first names are handled.
+     * For "ONLY_FULL", the auto completer returns the full name, e.g. "Smith, Bob"
+     * For "ONLY_ABBREVIATED", the auto completer returns the first name abbreviated, e.g. "Smith, B."
+     * For "BOTH", the auto completer returns both versions.
+     */
     public AutoCompleteFirstNameMode getFirstnameMode() {
         try {
             return AutoCompleteFirstNameMode.valueOf(preferences.get(PREF_FIRSTNAME_MODE));
@@ -64,24 +71,24 @@ public class AutoCompletePreferences {
         preferences.put(PREF_FIRSTNAME_MODE, mode.name());
     }
 
-    public boolean getCompleteLastFirst() {
+    public boolean getOnlyCompleteLastFirst() {
         return preferences.getBoolean(PREF_LAST_FIRST);
     }
 
-    public void setCompleteLastFirst(boolean value) {
+    public void setOnlyCompleteLastFirst(boolean value) {
         preferences.putBoolean(PREF_LAST_FIRST, value);
     }
 
-    public boolean getCompleteFirstLast() {
+    public boolean getOnlyCompleteFirstLast() {
         return preferences.getBoolean(PREF_FIRST_LAST);
     }
 
-    public void setCompleteFirstLast(boolean value) {
+    public void setOnlyCompleteFirstLast(boolean value) {
         preferences.putBoolean(PREF_FIRST_LAST, value);
     }
 
-    public String[] getCompleteNames() {
-        return preferences.getStringArray(PREF_COMPLETE_FIELDS);
+    public List<String> getCompleteNames() {
+        return preferences.getStringList(PREF_COMPLETE_FIELDS);
     }
 
     public String getCompleteNamesAsString() {

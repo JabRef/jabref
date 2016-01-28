@@ -15,34 +15,24 @@
 */
 package net.sf.jabref.importer.fetcher;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.logic.l10n.Localization;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
@@ -91,8 +81,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         if (this.activeFetcher.getOptionsPanel() != null) {
             optPanel.add(this.activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
         }
-        help = new HelpAction(GUIGlobals.helpDiag, activeFetcher.getHelpPage());
-        helpBut = help.getIconButton();
+        help = new HelpAction(activeFetcher.getHelpPage());
+        helpBut = help.getHelpButton();
         helpBut.setEnabled(activeFetcher.getHelpPage() != null);
 
         //optionsCards.show(optionsPanel, String.valueOf(defaultFetcher));
@@ -120,11 +110,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             public void actionPerformed(ActionEvent actionEvent) {
                 activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
                 Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
-                if (activeFetcher.getHelpPage() != null) {
+                if (activeFetcher.getHelpPage() == null) {
+                    helpBut.setEnabled(false);
+                } else {
                     help.setHelpFile(activeFetcher.getHelpPage());
                     helpBut.setEnabled(true);
-                } else {
-                    helpBut.setEnabled(false);
                 }
                 optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex()));
                 optPanel.removeAll();
@@ -141,6 +131,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         helpBut.setMargin(new Insets(0, 0, 0, 0));
         tf.setPreferredSize(new Dimension(1, tf.getPreferredSize().height));
+        if (OS.OS_X) {
+            tf.putClientProperty("JTextField.variant", "search");
+        }
 
         tf.setName("tf");
         // add action to reset-button. resets tf and requests focus
@@ -199,10 +192,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         add(main, BorderLayout.CENTER);
         go.addActionListener(this);
         tf.addActionListener(this);
-    }
-
-    public void setHelpResourceOwner(Class<?> c) {
-        help.setResourceOwner(c);
     }
 
     private JTextField getTextField() {
@@ -301,7 +290,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         public FetcherAction() {
             super(Localization.lang("Web search"), IconTheme.JabRefIcon.WWW.getSmallIcon());
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.WEB_SEARCH));
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.WEB_SEARCH));
             putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.WWW.getIcon());
         }
 

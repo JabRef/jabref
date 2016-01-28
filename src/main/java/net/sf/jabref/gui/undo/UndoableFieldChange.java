@@ -22,23 +22,23 @@ import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This class represents a change in any field value. The relevant
- * information is the BibtexEntry, the field name, the old and the
+ * information is the BibEntry, the field name, the old and the
  * new value. Old/new values can be null.
  */
 public class UndoableFieldChange extends AbstractUndoableEdit {
     private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
 
-    private final BibtexEntry entry;
+    private final BibEntry entry;
     private final String field;
     private final String oldValue;
     private final String newValue;
 
 
-    public UndoableFieldChange(BibtexEntry entry, String field,
+    public UndoableFieldChange(BibEntry entry, String field,
             String oldValue, String newValue) {
         this.entry = entry;
         this.field = field;
@@ -57,18 +57,14 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        // @formatter:off
         return Localization.lang("Undo") + ": " +
                 Localization.lang("change field");
-        // @formatter:on
     }
 
     @Override
     public String getRedoPresentationName() {
-        // @formatter:off
         return Localization.lang("Redo") + ": " +
                 Localization.lang("change field");
-        // @formatter:on
     }
 
     @Override
@@ -77,10 +73,10 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
         // Revert the change.
         try {
-            if (oldValue != null) {
-                entry.setField(field, oldValue);
-            } else {
+            if (oldValue == null) {
                 entry.clearField(field);
+            } else {
+                entry.setField(field, oldValue);
             }
 
             // this is the only exception explicitly thrown here
@@ -95,10 +91,10 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
         // Redo the change.
         try {
-            if (newValue != null) {
-                entry.setField(field, newValue);
-            } else {
+            if (newValue == null) {
                 entry.clearField(field);
+            } else {
+                entry.setField(field, newValue);
             }
 
         } catch (IllegalArgumentException ex) {

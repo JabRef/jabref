@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.search.rules.sets;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.search.SearchRule;
 
 /**
@@ -25,12 +25,12 @@ import net.sf.jabref.logic.search.SearchRule;
 public class OrSearchRuleSet extends SearchRuleSet {
 
     @Override
-    public boolean applyRule(String searchString, BibtexEntry bibtexEntry) {
+    public boolean applyRule(String searchString, BibEntry bibEntry) {
         int score = 0;
 
         // We let each rule add a maximum of 1 to the score.
         for (SearchRule rule : ruleSet) {
-            if(rule.applyRule(searchString, bibtexEntry)) {
+            if(rule.applyRule(searchString, bibEntry)) {
                 score++;
             }
         }

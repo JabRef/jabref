@@ -21,7 +21,7 @@ import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 
@@ -46,7 +46,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         //menuItem = new JMenuItem(Globals.menuTitle("Mark entries").replaceAll("&",""));
         menuItem = new JMenuItem("               ");
         menuItem.setMnemonic(String.valueOf(level + 1).charAt(0));
-        menuItem.setBackground(Globals.prefs.getColor("markedEntryBackground" + this.level));
+        menuItem.setBackground(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + this.level));
         menuItem.setOpaque(true);
         menuItem.addActionListener(this);
     }
@@ -69,14 +69,14 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
     @Override
     public void run() {
         BasePanel panel = frame.getCurrentBasePanel();
-        BibtexEntry[] bes = panel.getSelectedEntries();
+        BibEntry[] bes = panel.getSelectedEntries();
 
         // used at update() to determine output string
         besLength = bes.length;
 
         if (bes.length != 0) {
             NamedCompound ce = new NamedCompound(Localization.lang("Mark entries"));
-            for (BibtexEntry be : bes) {
+            for (BibEntry be : bes) {
                 EntryMarker.markEntry(be, level + 1, false, ce);
             }
             ce.end();

@@ -5,7 +5,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.ChangeTypeAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -22,13 +22,13 @@ public class ChangeEntryTypeMenu {
     public static final Map<String, KeyStroke> entryShortCuts = new HashMap<>();
 
     static {
-        entryShortCuts.put(BibtexEntryTypes.ARTICLE.getName(), Globals.prefs.getKey(KeyBinds.NEW_ARTICLE));
-        entryShortCuts.put(BibtexEntryTypes.BOOK.getName(), Globals.prefs.getKey(KeyBinds.NEW_BOOK));
-        entryShortCuts.put(BibtexEntryTypes.PHDTHESIS.getName(), Globals.prefs.getKey(KeyBinds.NEW_PHDTHESIS));
-        entryShortCuts.put(BibtexEntryTypes.INBOOK.getName(), Globals.prefs.getKey(KeyBinds.NEW_MASTERSTHESIS));
-        entryShortCuts.put(BibtexEntryTypes.INBOOK.getName(), Globals.prefs.getKey(KeyBinds.NEW_INBOOK));
-        entryShortCuts.put(BibtexEntryTypes.PROCEEDINGS.getName(), Globals.prefs.getKey(KeyBinds.NEW_PROCEEDINGS));
-        entryShortCuts.put(BibtexEntryTypes.UNPUBLISHED.getName(), Globals.prefs.getKey(KeyBinds.NEW_UNPUBLISHED));
+        entryShortCuts.put(BibtexEntryTypes.ARTICLE.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_ARTICLE));
+        entryShortCuts.put(BibtexEntryTypes.BOOK.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_BOOK));
+        entryShortCuts.put(BibtexEntryTypes.PHDTHESIS.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_PHDTHESIS));
+        entryShortCuts.put(BibtexEntryTypes.INBOOK.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_MASTERSTHESIS));
+        entryShortCuts.put(BibtexEntryTypes.INBOOK.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_INBOOK));
+        entryShortCuts.put(BibtexEntryTypes.PROCEEDINGS.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_PROCEEDINGS));
+        entryShortCuts.put(BibtexEntryTypes.UNPUBLISHED.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_UNPUBLISHED));
     }
 
     public static JMenu getChangeEntryTypeMenu(BasePanel panel) {

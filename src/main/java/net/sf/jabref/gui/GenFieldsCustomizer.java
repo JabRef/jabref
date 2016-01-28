@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,12 +20,11 @@ import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
-
 import net.sf.jabref.*;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
@@ -47,8 +46,6 @@ public class GenFieldsCustomizer extends JDialog {
     private final JButton ok = new JButton();
     private final JButton cancel = new JButton();
     private JButton helpBut = new JButton();
-    TitledBorder titledBorder1;
-    TitledBorder titledBorder2;
     private final JLabel jLabel1 = new JLabel();
     private final JPanel jPanel3 = new JPanel();
     private final JPanel jPanel4 = new JPanel();
@@ -64,7 +61,7 @@ public class GenFieldsCustomizer extends JDialog {
     public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
         super(frame, Localization.lang("Set general fields"), false);
         parent = frame;
-        helpBut = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp).getIconButton();
+        helpBut = new HelpAction(HelpFiles.generalFieldsHelp).getHelpButton();
         try {
             jbInit();
             setSize(new Dimension(650, 300));
@@ -74,7 +71,7 @@ public class GenFieldsCustomizer extends JDialog {
     }
 
     private void jbInit() {
-        ok.setText(Localization.lang("Ok"));
+        ok.setText(Localization.lang("OK"));
         ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
         cancel.setText(Localization.lang("Cancel"));
         cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));
@@ -85,7 +82,7 @@ public class GenFieldsCustomizer extends JDialog {
         jPanel4.setLayout(gridBagLayout1);
         jLabel2.setText(Localization.lang("General fields"));
 
-        //    fieldsArea.setText(parent.prefs.get("generalFields"));
+        //    fieldsArea.setText(parent.prefs.get(JabRefPreferences.GENERAL_FIELDS));
         setFieldsText();
 
         //jPanel3.setBackground(GUIGlobals.lightGray);
@@ -116,7 +113,7 @@ public class GenFieldsCustomizer extends JDialog {
         // Key bindings:
         ActionMap am = buttons.getActionMap();
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             @Override
@@ -160,7 +157,7 @@ public class GenFieldsCustomizer extends JDialog {
         /*
         String delimStr = fieldsArea.getText().replaceAll("\\s+","")
           .replaceAll("\\n+","").trim();
-        parent.prefs.putStringArray("generalFields", Util.split(delimStr, ";"));
+        parent.prefs.putStringArray(JabRefPreferences.GENERAL_FIELDS, Util.split(delimStr, ";"));
         */
 
         parent.removeCachedEntryEditors();

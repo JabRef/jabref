@@ -32,7 +32,7 @@ import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.EntryType;
@@ -97,10 +97,10 @@ public class PdfContentImporter extends ImportFormat {
         while (!Character.isLetter(lastC) && (lastC != ')')) {
             // if there is an asterix, a dot or something else at the end: remove it
             input = input.substring(0, input.length() - 1);
-            if (!input.isEmpty()) {
-                lastC = input.charAt(input.length() - 1);
-            } else {
+            if (input.isEmpty()) {
                 break;
+            } else {
+                lastC = input.charAt(input.length() - 1);
             }
         }
         return input;
@@ -155,24 +155,7 @@ public class PdfContentImporter extends ImportFormat {
             int i = 0;
             res = "";
             do {
-                if (!workedOnFirstOrMiddle) {
-                    if ("and".equalsIgnoreCase(splitNames[i])) {
-                        // do nothing, just increment i at the end of this iteration
-                    } else {
-                        if (isFirst) {
-                            isFirst = false;
-                        } else {
-                            res = res.concat(" and ");
-                        }
-                        if ("et".equalsIgnoreCase(splitNames[i]) && (splitNames.length > (i + 1)) && "al.".equalsIgnoreCase(splitNames[i + 1])) {
-                            res = res.concat("others");
-                            break;
-                        } else {
-                            res = res.concat(splitNames[i]).concat(" ");
-                            workedOnFirstOrMiddle = true;
-                        }
-                    }
-                } else {
+                if (workedOnFirstOrMiddle) {
                     // last item was a first or a middle name
                     // we have to check whether we are on a middle name
                     // if not, just add the item as last name and add an "and"
@@ -193,10 +176,27 @@ public class PdfContentImporter extends ImportFormat {
                             workedOnFirstOrMiddle = false;
                         }
                     }
+                } else {
+                    if ("and".equalsIgnoreCase(splitNames[i])) {
+                        // do nothing, just increment i at the end of this iteration
+                    } else {
+                        if (isFirst) {
+                            isFirst = false;
+                        } else {
+                            res = res.concat(" and ");
+                        }
+                        if ("et".equalsIgnoreCase(splitNames[i]) && (splitNames.length > (i + 1))
+                                && "al.".equalsIgnoreCase(splitNames[i + 1])) {
+                            res = res.concat("others");
+                            break;
+                        } else {
+                            res = res.concat(splitNames[i]).concat(" ");
+                            workedOnFirstOrMiddle = true;
+                        }
+                    }
                 }
                 i++;
             } while (i < splitNames.length);
-
         }
         return res;
     }
@@ -206,8 +206,8 @@ public class PdfContentImporter extends ImportFormat {
     }
 
     @Override
-    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        final ArrayList<BibtexEntry> res = new ArrayList<>(1);
+    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
+        final ArrayList<BibEntry> res = new ArrayList<>(1);
 
         try (PDDocument document = PDDocument.load(in)) {
             if (document.isEncrypted()) {
@@ -242,7 +242,7 @@ public class PdfContentImporter extends ImportFormat {
                     }
 
                     @Override
-                    public void addEntry(BibtexEntry entry) {
+                    public void addEntry(BibEntry entry) {
                         // add the entry to the result object
                         res.add(entry);
                     }
@@ -255,22 +255,6 @@ public class PdfContentImporter extends ImportFormat {
                     // otherwise, we just parse the PDF
                 }
             }
-
-            String author;
-            String editor = null;
-            String institution = null;
-            String abstractT = null;
-            String keywords = null;
-            String title;
-            String conference = null;
-            String DOI = null;
-            String series = null;
-            String volume = null;
-            String number = null;
-            String pages = null;
-            // year is a class variable as the method extractYear() uses it;
-            String publisher = null;
-            EntryType type = BibtexEntryTypes.INPROCEEDINGS;
 
             final String lineBreak = System.lineSeparator();
 
@@ -291,9 +275,25 @@ public class PdfContentImporter extends ImportFormat {
                 // return empty list
                 return res;
             }
+
             curString = split[i];
             i = i + 1;
 
+            String author;
+            String editor = null;
+            String institution = null;
+            String abstractT = null;
+            String keywords = null;
+            String title;
+            String conference = null;
+            String DOI = null;
+            String series = null;
+            String volume = null;
+            String number = null;
+            String pages = null;
+            // year is a class variable as the method extractYear() uses it;
+            String publisher = null;
+            EntryType type = BibtexEntryTypes.INPROCEEDINGS;
             if (curString.length() > 4) {
                 // special case: possibly conference as first line on the page
                 extractYear();
@@ -479,7 +479,7 @@ public class PdfContentImporter extends ImportFormat {
                 }
             }
 
-            BibtexEntry entry = new BibtexEntry();
+            BibEntry entry = new BibEntry();
             entry.setType(type);
 
             if (author != null) {

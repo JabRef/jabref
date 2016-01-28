@@ -16,24 +16,24 @@
 
 package net.sf.jabref.logic.util.io;
 
-import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sf.jabref.JabRefPreferences;
 
 public class FileHistory {
 
     private final JabRefPreferences prefs;
-    private final LinkedList<String> history = new LinkedList<>();
+    private final List<String> history = new LinkedList<>();
 
     private final static int HISTORY_SIZE = 8;
 
 
     public FileHistory(JabRefPreferences prefs) {
         this.prefs = prefs;
-        String[] old = prefs.getStringArray(JabRefPreferences.RECENT_FILES);
+        List<String> old = prefs.getStringList(JabRefPreferences.RECENT_FILES);
         if (old != null) {
-            history.addAll(Arrays.asList(old));
+            history.addAll(old);
         }
     }
 
@@ -49,9 +49,9 @@ public class FileHistory {
 
     public void newFile(String filename) {
         history.remove(filename);
-        history.addFirst(filename);
+        ((LinkedList<String>) history).addFirst(filename);
         while (history.size() > HISTORY_SIZE) {
-            history.removeLast();
+            ((LinkedList<String>) history).removeLast();
         }
     }
 
@@ -65,8 +65,7 @@ public class FileHistory {
 
     public void storeHistory() {
         if (!history.isEmpty()) {
-            String[] names = history.toArray(new String[history.size()]);
-            prefs.putStringArray(JabRefPreferences.RECENT_FILES, names);
+            prefs.putStringList(JabRefPreferences.RECENT_FILES, history);
         }
     }
 

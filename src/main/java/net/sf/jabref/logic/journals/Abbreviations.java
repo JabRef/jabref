@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collections;
+import java.util.List;
 
 public class Abbreviations {
 
@@ -50,10 +52,10 @@ public class Abbreviations {
         }
 
         // Read external lists
-        String[] lists = jabRefPreferences.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if ((lists != null) && (lists.length > 0)) {
-            for (int i = lists.length - 1; i >= 0; i--) {
-                String filename = lists[i];
+        List<String> lists = jabRefPreferences.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
+        if (!(lists.isEmpty())) {
+            Collections.reverse(lists);
+            for (String filename : lists) {
                 try {
                     journalAbbrev.readJournalListFromFile(new File(filename));
                 } catch (FileNotFoundException e) {

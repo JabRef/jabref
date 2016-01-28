@@ -24,7 +24,7 @@ import net.sf.jabref.bst.VM.BstFunction;
 
 /**
  * From Bibtex:
- * 
+ *
  * "The |built_in| function {\.{format.name\$}} pops the
  * top three literals (they are a string, an integer, and a string
  * literal, in that order). The last string literal represents a
@@ -34,9 +34,9 @@ import net.sf.jabref.bst.VM.BstFunction;
  * described in the \BibTeX\ documentation. Finally, this function
  * pushes the formatted name. If any of the types is incorrect, it
  * complains and pushes the null string."
- * 
+ *
  * All the pain is encapsulated in BibtexNameFormatter. :-)
- * 
+ *
  */
 public class FormatNameFunction implements BstFunction {
 
@@ -68,7 +68,9 @@ public class FormatNameFunction implements BstFunction {
         Integer name = (Integer) o2;
         String names = (String) o3;
 
-        if (names != null) {
+        if (names == null) {
+            stack.push("");
+        } else {
             AuthorList a = AuthorList.getAuthorList(names);
             if (name > a.size()) {
                 throw new VMException("Author Out of Bounds. Number " + name + " invalid for " + names);
@@ -76,8 +78,6 @@ public class FormatNameFunction implements BstFunction {
             Author author = a.getAuthor(name - 1);
 
             stack.push(BibtexNameFormatter.formatName(author, format, vm));
-        } else {
-            stack.push("");
         }
     }
 }

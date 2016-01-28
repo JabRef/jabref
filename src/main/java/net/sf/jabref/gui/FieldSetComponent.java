@@ -15,10 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -73,10 +70,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * values. These are put into a JComboBox.
      */
     public FieldSetComponent(String title, List<String> fields, List<String> preset, boolean arrows, boolean forceLowerCase) {
-        // @formatter:off
         this(title, fields, preset, Localization.lang("Add"),
                 Localization.lang("Remove"), arrows, forceLowerCase);
-        // @formatter:on
     }
 
     /**
@@ -84,10 +79,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * values. Replaces the JComboBox with a JTextField.
      */
     FieldSetComponent(String title, List<String> fields, boolean arrows, boolean forceLowerCase) {
-        // @formatter:off
         this(title, fields, null, Localization.lang("Add"),
                 Localization.lang("Remove"), arrows, forceLowerCase);
-        // @formatter:on
     }
 
     private FieldSetComponent(String title, List<String> fields, List<String> preset, String addText, String removeText,
@@ -159,17 +152,17 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
         con.gridwidth = 3;
         con.weightx = 1;
-        if (preset != null) {
+        if (preset == null) {
+            input = new JTextField(20);
+            input.addActionListener(this);
+            gbl.setConstraints(input, con);
+            add(input);
+        } else {
             sel = new JComboBox<>(preset.toArray(new String[preset.size()]));
             sel.setEditable(true);
             //sel.addActionListener(this);
             gbl.setConstraints(sel, con);
             add(sel);
-        } else {
-            input = new JTextField(20);
-            input.addActionListener(this);
-            gbl.setConstraints(input, con);
-            add(input);
         }
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 0;
@@ -192,7 +185,10 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
         // Make sure it is visible:
         JViewport viewport = sp.getViewport();
-        viewport.scrollRectToVisible(list.getCellBounds(idx, idx));
+        Rectangle rectangle = list.getCellBounds(idx, idx);
+        if(rectangle != null) {
+            viewport.scrollRectToVisible(rectangle);
+        }
 
     }
 
@@ -341,15 +337,12 @@ class FieldSetComponent extends JPanel implements ActionListener {
             } else if ((input != null) && !"".equals(input.getText())) {
                 addField(input.getText());
             }
-        }
-        else if (src == input) {
+        } else if (src == input) {
             addField(input.getText());
-        }
-        else if (src == remove) {
+        } else if (src == remove) {
             // Remove button pressed:
             removeSelected();
-        }
-        else if (src == sel) {
+        } else if (src == sel) {
             if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
                 // These conditions signify arrow key navigation in the dropdown list, so we should
                 // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
@@ -359,11 +352,9 @@ class FieldSetComponent extends JPanel implements ActionListener {
             String s = sel.getSelectedItem().toString();
             addField(s);
             sel.getEditor().selectAll();
-        }
-        else if (src == up) {
+        } else if (src == up) {
             move(-1);
-        }
-        else if (src == down) {
+        } else if (src == down) {
             move(1);
         }
     }

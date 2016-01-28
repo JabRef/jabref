@@ -10,8 +10,8 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 public class LabelPatternUtilTest {
@@ -45,25 +45,25 @@ public class LabelPatternUtilTest {
 
     @Before
     public void setUp() {
-        LabelPatternUtil.setDataBase(new BibtexDatabase());
+        LabelPatternUtil.setDataBase(new BibDatabase());
     }
 
     @Test
     public void testAndInAuthorName() {
-        BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}");
+        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}");
         Assert.assertEquals("Holland", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth")));
     }
 
     @Test
     public void testAndAuthorNames() {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
-        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+        BibEntry entry = BibtexParser.singleFromString(bibtexString);
         Assert.assertEquals("HerlandHaugeHelgeland", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry, "authors3")));
     }
 
     @Test
     public void testSpecialLatexCharacterInAuthorName() {
-        BibtexEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}");
+        BibEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}");
         Assert.assertEquals("Popovicova", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
     }
 
@@ -73,7 +73,7 @@ public class LabelPatternUtilTest {
      */
     @Test
     public void testMakeLabelAndCheckLegalKeys() {
-        BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Köning}, year={2000}}");
+        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Köning}, year={2000}}");
         Assert.assertEquals("Koen", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}");
@@ -115,7 +115,7 @@ public class LabelPatternUtilTest {
      */
     @Test
     public void testMakeLabelAndCheckLegalKeysAccentGrave() {
-        BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}");
+        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}");
         Assert.assertEquals("Aoen", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}");
@@ -212,13 +212,11 @@ public class LabelPatternUtilTest {
                 .firstAuthor("K{\\\"o}ning"));
 
         Assert.assertEquals("", LabelPatternUtil.firstAuthor(""));
+    }
 
-        try {
+    @Test(expected = NullPointerException.class)
+    public void testFirstAuthorNull() {
             LabelPatternUtil.firstAuthor(null);
-            Assert.fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
     }
 
     @Test
@@ -244,13 +242,11 @@ public class LabelPatternUtilTest {
 
         Assert.assertEquals("Newton", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 6));
         Assert.assertEquals("Newton", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 7));
+    }
 
-        try {
+    @Test(expected = NullPointerException.class)
+    public void testAuthIniNNull() {
             LabelPatternUtil.authIniN(null, 3);
-            Assert.fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
     }
 
     /**
@@ -548,13 +544,11 @@ public class LabelPatternUtilTest {
         Assert.assertEquals("7", LabelPatternUtil.firstPage("7,41,73--97"));
         Assert.assertEquals("7", LabelPatternUtil.firstPage("41,7,73--97"));
         Assert.assertEquals("43", LabelPatternUtil.firstPage("43+"));
+    }
 
-        try {
-            LabelPatternUtil.firstPage(null);
-            Assert.fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
+    @Test(expected = NullPointerException.class)
+    public void testFirstPageNull() {
+        LabelPatternUtil.firstPage(null);
     }
 
     @Test
@@ -567,12 +561,11 @@ public class LabelPatternUtilTest {
         Assert.assertEquals("97", LabelPatternUtil.lastPage("7,41,73--97"));
         Assert.assertEquals("97", LabelPatternUtil.lastPage("7,41,97--73"));
         Assert.assertEquals("43", LabelPatternUtil.lastPage("43+"));
-        try {
-            LabelPatternUtil.lastPage(null);
-            Assert.fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testLastPageNull() {
+        LabelPatternUtil.lastPage(null);
     }
 
     /**
@@ -643,7 +636,7 @@ public class LabelPatternUtilTest {
 
     @Test
     public void keywordN_keywordsSeparatedBySpace() {
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("keywords", "w1, w2a w2b, w3");
 
         String result = LabelPatternUtil.makeLabel(entry, "keyword1");
@@ -660,7 +653,7 @@ public class LabelPatternUtilTest {
 
     @Test
     public void keywordsN_keywordsSeparatedBySpace() {
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         entry.setField("keywords", "w1, w2a w2b, w3");
 
         // all keywords

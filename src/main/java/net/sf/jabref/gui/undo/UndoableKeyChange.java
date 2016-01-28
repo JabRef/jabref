@@ -17,23 +17,23 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class represents a change in any field value. The relevant
- * information is the BibtexEntry, the field name, the old and the
+ * information is the BibEntry, the field name, the old and the
  * new value. Old/new values can be null.
  */
 public class UndoableKeyChange extends AbstractUndoableEdit {
 
     private final String entryId;
-    private final BibtexDatabase base;
+    private final BibDatabase base;
     private final String oldValue;
     private final String newValue;
 
 
-    public UndoableKeyChange(BibtexDatabase base, String entryId,
+    public UndoableKeyChange(BibDatabase base, String entryId,
             String oldValue, String newValue) {
         this.base = base;
         this.entryId = entryId;
@@ -48,18 +48,14 @@ public class UndoableKeyChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        // @formatter:off
         return Localization.lang("Undo") + ": " +
                 Localization.lang("change key");
-        // @formatter:on
     }
 
     @Override
     public String getRedoPresentationName() {
-        // @formatter:off
         return Localization.lang("Redo") + ": " +
                 Localization.lang("change key");
-        // @formatter:on
     }
 
     @Override

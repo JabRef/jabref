@@ -20,7 +20,7 @@ import net.sf.jabref.model.entry.AuthorList.Author;
 
 /**
  * From Bibtex:
- * 
+ *
  * "The |built_in| function {\.{format.name\$}} pops the
  * top three literals (they are a string, an integer, and a string
  * literal, in that order). The last string literal represents a
@@ -30,9 +30,9 @@ import net.sf.jabref.model.entry.AuthorList.Author;
  * described in the \BibTeX\ documentation. Finally, this function
  * pushes the formatted name. If any of the types is incorrect, it
  * complains and pushes the null string."
- * 
+ *
  * Sounds easy - is a nightmare... X-(
- * 
+ *
  */
 public class BibtexNameFormatter {
 
@@ -47,7 +47,7 @@ public class BibtexNameFormatter {
     }
 
     /**
-     * 
+     *
      * @param author
      * @param format
      * @param warn may-be-null
@@ -66,7 +66,6 @@ public class BibtexNameFormatter {
         while (i < n) {
             if (c[i] == '{') {
                 group++;
-                int groupStart = sb.length();
                 i++;
                 braceLevel++;
                 StringBuffer level1Chars = new StringBuffer();
@@ -83,15 +82,15 @@ public class BibtexNameFormatter {
                         i++;
                         continue;
                     }
-                    if (braceLevel == 1) {
-                        if (Character.isLetter(c[i])) {
-                            if ("fvlj".indexOf(c[i]) == -1) {
-                                if (warn != null) {
-                                    warn.warn("Format String in format.name$ may only contain fvlj on brace level 1 in group " + group + ": " + format);
-                                }
-                            } else {
-                                level1Chars.append(c[i]);
+                    if ((braceLevel == 1) && Character.isLetter(c[i])) {
+                        if ("fvlj".indexOf(c[i]) == -1) {
+                            if (warn != null) {
+                                warn.warn(
+                                        "Format String in format.name$ may only contain fvlj on brace level 1 in group "
+                                                + group + ": " + format);
                             }
+                        } else {
+                            level1Chars.append(c[i]);
                         }
                     }
                     i++;
@@ -156,6 +155,7 @@ public class BibtexNameFormatter {
                 int bLevel = 1;
 
                 String interToken = null;
+                int groupStart = sb.length();
 
                 for (int j = 0; j < d.length; j++) {
 
@@ -164,12 +164,10 @@ public class BibtexNameFormatter {
                         if (!abbreviateThatIsSingleLetter) {
                             j++;
                         }
-                        if ((j + 1) < d.length) {
-                            if (d[j + 1] == '{') {
-                                StringBuffer interTokenSb = new StringBuffer();
-                                j = BibtexNameFormatter.consumeToMatchingBrace(interTokenSb, d, j + 1);
-                                interToken = interTokenSb.substring(1, interTokenSb.length() - 1);
-                            }
+                        if (((j + 1) < d.length) && (d[j + 1] == '{')) {
+                            StringBuffer interTokenSb = new StringBuffer();
+                            j = BibtexNameFormatter.consumeToMatchingBrace(interTokenSb, d, j + 1);
+                            interToken = interTokenSb.substring(1, interTokenSb.length() - 1);
                         }
 
                         for (int k = 0; k < tokens.length; k++) {
@@ -195,15 +193,15 @@ public class BibtexNameFormatter {
                                 // Output Intertoken String
                                 if (interToken == null) {
                                     if (abbreviateThatIsSingleLetter) {
-                                        sb.append(".");
+                                        sb.append('.');
                                     }
                                     // No clue what this means (What the hell are tokens anyway???
                                     // if (lex_class[name_sep_char[cur_token]] = sep_char) then
                                     //    append_ex_buf_char_and_check (name_sep_char[cur_token])
                                     if ((k == (tokens.length - 2)) || (BibtexNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 3) < 3)) {
-                                        sb.append("~");
+                                        sb.append('~');
                                     } else {
-                                        sb.append(" ");
+                                        sb.append(' ');
                                     }
                                 } else {
                                     sb.append(interToken);
@@ -224,7 +222,6 @@ public class BibtexNameFormatter {
                 }
                 if (sb.length() > 0) {
                     boolean noDisTie = false;
-                    // @formatter:off
                     if ((sb.charAt(sb.length() - 1) == '~') &&
                             ((BibtexNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4) ||
                             ((sb.length() > 1) && (noDisTie = sb.charAt(sb.length() - 2) == '~')))) {
@@ -233,7 +230,6 @@ public class BibtexNameFormatter {
                             sb.append(' ');
                         }
                     }
-                    // @formatter:on
                 }
             } else if (c[i] == '}') {
                 if (warn != null) {
@@ -244,7 +240,7 @@ public class BibtexNameFormatter {
             }
             i++;
         }
-        if (braceLevel != 0) {
+        if ((braceLevel != 0) && (warn != null)) {
             warn.warn("Unbalanced brace in format string for nameFormat: " + format);
         }
 
@@ -253,12 +249,12 @@ public class BibtexNameFormatter {
 
     /**
      * Including the matching brace.
-     * 
+     *
      * @param sb
      * @param c
      * @param pos
      * @return
-     * 
+     *
      * assert c[pos] == '{'
      */
     public static int consumeToMatchingBrace(StringBuffer sb, char[] c, int pos) {
@@ -284,7 +280,7 @@ public class BibtexNameFormatter {
 
     /**
      * Takes care of special characters too
-     * 
+     *
      * @param s
      * @return
      */
@@ -294,12 +290,10 @@ public class BibtexNameFormatter {
             if (Character.isLetter(c[i])) {
                 return String.valueOf(c[i]);
             }
-            if (c[i] == '{') {
-                if (((i + 1) < c.length) && (c[i + 1] == '\\')) {
-                    StringBuffer sb = new StringBuffer();
-                    BibtexNameFormatter.consumeToMatchingBrace(sb, c, i);
-                    return sb.toString();
-                }
+            if ((c[i] == '{') && ((i + 1) < c.length) && (c[i + 1] == '\\')) {
+                StringBuffer sb = new StringBuffer();
+                BibtexNameFormatter.consumeToMatchingBrace(sb, c, i);
+                return sb.toString();
             }
         }
         return "";

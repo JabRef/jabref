@@ -1,6 +1,6 @@
 package net.sf.jabref.exporter.layout;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -40,16 +40,16 @@ public class LayoutTest {
                 + "\\~n\n" + "\\'i\n" + "\\i\n" + "\\i}\n" + "}\n";
     }
 
-    public static BibtexEntry bibtexString2BibtexEntry(String s) throws IOException {
+    public static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(s));
-        Collection<BibtexEntry> c = result.getDatabase().getEntries();
+        Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();
     }
 
     public String layout(String layoutFile, String entry) throws Exception {
 
-        BibtexEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
+        BibEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
 

@@ -15,25 +15,15 @@
 */
 package net.sf.jabref.logic.labelPattern;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.jabref.Globals;
 
 public class DatabaseLabelPattern extends AbstractLabelPattern {
 
     @Override
-    public ArrayList<String> getValue(String key) {
-        ArrayList<String> result = data.get(key);
-        //  Test to see if we found anything
-        if (result == null) {
-            // check default value
-            result = getDefaultValue();
-            if (result == null) {
-                // no default value, ask global label pattern
-                result = Globals.prefs.getKeyPattern().getValue(key);
-            }
-        }
-        return result;
+    public List<String> getLastLevelLabelPattern(String key) {
+        return Globals.prefs.getKeyPattern().getValue(key);
     }
 
 }

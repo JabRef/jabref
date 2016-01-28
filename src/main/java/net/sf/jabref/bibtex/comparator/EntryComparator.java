@@ -17,7 +17,7 @@ package net.sf.jabref.bibtex.comparator;
 
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Comparator;
 
@@ -29,16 +29,16 @@ import java.util.Comparator;
  * there is no next entry, the entries' unique IDs will decide the ordering. Consequently, this comparator can never
  * return 0 unless the entries are the same object.
  */
-public class EntryComparator implements Comparator<BibtexEntry> {
+public class EntryComparator implements Comparator<BibEntry> {
 
     private final String sortField;
     private final boolean descending;
     private final boolean binary;
     private final boolean numeric;
-    private final Comparator<BibtexEntry> next;
+    private final Comparator<BibEntry> next;
 
 
-    public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibtexEntry> next) {
+    public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibEntry> next) {
         this.binary = binary;
         this.sortField = field;
         this.descending = desc;
@@ -55,7 +55,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
     }
 
     @Override
-    public int compare(BibtexEntry e1, BibtexEntry e2) throws ClassCastException {
+    public int compare(BibEntry e1, BibEntry e2) throws ClassCastException {
 
         if (e1 == e2) {
             return 0;
@@ -85,10 +85,10 @@ public class EntryComparator implements Comparator<BibtexEntry> {
                 //ImportFormatReader.fixAuthor_lastNameFirst((String)f2);
             }
 
-        } else if (sortField.equals(BibtexEntry.TYPE_HEADER)) {
+        } else if (sortField.equals(BibEntry.TYPE_HEADER)) {
             // Sort by type.
-            f1 = e1.getType().getName();
-            f2 = e2.getType().getName();
+            f1 = e1.getType();
+            f2 = e2.getType();
         } else if (numeric) {
             try {
                 Integer i1 = Integer.parseInt((String) f1);
@@ -139,7 +139,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         }
     }
 
-    private static int idCompare(BibtexEntry b1, BibtexEntry b2) {
+    private static int idCompare(BibEntry b1, BibEntry b2) {
         return b1.getId().compareTo(b2.getId());
     }
 

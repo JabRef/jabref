@@ -21,6 +21,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
@@ -33,7 +35,7 @@ import net.sf.jabref.sql.SQLUtil;
  *  			Created after a refactory on SQLUtil
  *
  */
-public class MySQLImporter extends DBImporter {
+final public class MySQLImporter extends DBImporter {
 
     private static MySQLImporter instance;
 
@@ -53,9 +55,14 @@ public class MySQLImporter extends DBImporter {
     }
 
     @Override
-    protected ResultSet readColumnNames(Connection conn) throws SQLException {
-        try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn, "SHOW columns FROM entries;")) {
-            return statement.getResultSet();
+    protected List<String> readColumnNames(Connection conn) throws SQLException {
+        try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn, "SHOW columns FROM entries;");
+                ResultSet rsColumns = statement.getResultSet()) {
+            List<String> colNames = new ArrayList<>();
+            while (rsColumns.next()) {
+                    colNames.add(rsColumns.getString(1));
+            }
+            return colNames;
         }
     }
 

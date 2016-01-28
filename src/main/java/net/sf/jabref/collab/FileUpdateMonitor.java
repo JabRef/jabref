@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.io.File;
 import java.io.IOException;
 
@@ -34,7 +35,7 @@ public class FileUpdateMonitor implements Runnable {
     private static final int WAIT = 4000;
 
     private int numberOfUpdateListener;
-    private final HashMap<String, Entry> entries = new HashMap<>();
+    private final Map<String, Entry> entries = new HashMap<>();
 
     @Override
     public void run() {
@@ -106,7 +107,7 @@ public class FileUpdateMonitor implements Runnable {
         if (o == null) {
             return;
         }
-        ((Entry) o).timeStamp--;
+        ((Entry) o).decreaseTimeStamp();
     }
 
     /**
@@ -139,7 +140,7 @@ public class FileUpdateMonitor implements Runnable {
         if (o == null) {
             throw new IllegalArgumentException("Entry not found");
         }
-        return ((Entry) o).tmpFile;
+        return ((Entry) o).getTmpFile();
     }
 
 
@@ -148,11 +149,11 @@ public class FileUpdateMonitor implements Runnable {
      */
     static class Entry {
 
-        final FileUpdateListener listener;
-        final File file;
-        final File tmpFile;
-        long timeStamp;
-        long fileSize;
+        private final FileUpdateListener listener;
+        private final File file;
+        private final File tmpFile;
+        private long timeStamp;
+        private long fileSize;
 
 
         public Entry(FileUpdateListener ul, File f) {
@@ -161,8 +162,10 @@ public class FileUpdateMonitor implements Runnable {
             timeStamp = file.lastModified();
             fileSize = file.length();
             tmpFile = FileUpdateMonitor.getTempFile();
-            tmpFile.deleteOnExit();
-            copy();
+            if (tmpFile != null) {
+                tmpFile.deleteOnExit();
+                copy();
+            }
         }
 
         /**
@@ -172,10 +175,10 @@ public class FileUpdateMonitor implements Runnable {
          */
         public boolean hasBeenUpdated() throws IOException {
             long modified = file.lastModified();
-            long fileSizeNow = file.length();
             if (modified == 0L) {
                 throw new IOException("File deleted");
             }
+            long fileSizeNow = file.length();
             return (timeStamp != modified) || (fileSize != fileSizeNow);
         }
 
@@ -215,6 +218,14 @@ public class FileUpdateMonitor implements Runnable {
          */
         public void notifyFileRemoved() {
             listener.fileRemoved();
+        }
+
+        public File getTmpFile() {
+            return tmpFile;
+        }
+
+        public void decreaseTimeStamp() {
+            timeStamp--;
         }
     }
 

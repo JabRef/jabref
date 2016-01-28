@@ -21,9 +21,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import net.sf.jabref.importer.fileformat.*;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabases;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,14 +46,11 @@ public class ImportFormatReader {
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter());
         formats.add(new BibteXMLImporter());
-        formats.add(new BiomailImporter());
         formats.add(new CopacImporter());
-        formats.add(new CsaImporter());
         formats.add(new EndnoteImporter());
         formats.add(new FreeCiteImporter());
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
-        formats.add(new JstorImporter());
         formats.add(new MedlineImporter());
         formats.add(new MedlinePlainImporter());
         formats.add(new MsBibImporter());
@@ -63,20 +59,19 @@ public class ImportFormatReader {
         formats.add(new PdfXmpImporter());
         formats.add(new RepecNepImporter());
         formats.add(new RisImporter());
-        formats.add(new ScifinderImporter());
         formats.add(new SilverPlatterImporter());
         formats.add(new SixpackImporter());
 
         /**
          * Get custom import formats
          */
-        for (CustomImportList.Importer importer : Globals.prefs.customImports) {
+        for (CustomImporter importer : Globals.prefs.customImports) {
             try {
                 ImportFormat imFo = importer.getInstance();
                 formats.add(imFo);
             } catch (Exception e) {
-                System.err.println("Could not instantiate " + importer.getName() + " importer, will ignore it. Please check if the class is still available.");
-                e.printStackTrace();
+                LOGGER.error("Could not instantiate " + importer.getName()
+                        + " importer, will ignore it. Please check if the class is still available.", e);
             }
         }
     }
@@ -99,7 +94,7 @@ public class ImportFormatReader {
         return null;
     }
 
-    public List<BibtexEntry> importFromStream(String format, InputStream in, OutputPrinter status)
+    public List<BibEntry> importFromStream(String format, InputStream in, OutputPrinter status)
             throws IOException {
         ImportFormat importer = getByCliId(format);
 
@@ -107,17 +102,17 @@ public class ImportFormatReader {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        List<BibtexEntry> res = importer.importEntries(in, status);
+        List<BibEntry> res = importer.importEntries(in, status);
 
         // Remove all empty entries
         if (res != null) {
-            ImportFormatReader.purgeEmptyEntries(res);
+            BibDatabases.purgeEmptyEntries(res);
         }
 
         return res;
     }
 
-    public List<BibtexEntry> importFromFile(String format, String filename, OutputPrinter status)
+    public List<BibEntry> importFromFile(String format, String filename, OutputPrinter status)
             throws IOException {
         ImportFormat importer = getByCliId(format);
 
@@ -128,31 +123,22 @@ public class ImportFormatReader {
         return importFromFile(importer, filename, status);
     }
 
-    public List<BibtexEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
+    public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
         File file = new File(filename);
 
-        try (InputStream stream = new FileInputStream(file)) {
+        try (InputStream stream = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(stream)) {
 
-            if (!importer.isRecognizedFormat(stream)) {
+            bis.mark(Integer.MAX_VALUE);
+
+            if (!importer.isRecognizedFormat(bis)) {
                 throw new IOException("Wrong file format");
             }
 
-            return importer.importEntries(stream, status);
+            bis.reset();
+
+            return importer.importEntries(bis, status);
         }
-    }
-
-    public static BibtexDatabase createDatabase(Collection<BibtexEntry> bibentries) {
-        ImportFormatReader.purgeEmptyEntries(bibentries);
-
-        BibtexDatabase database = new BibtexDatabase();
-
-        for (BibtexEntry entry : bibentries) {
-
-            entry.setId(IdGenerator.next());
-            database.insertEntry(entry);
-        }
-
-        return database;
     }
 
     /**
@@ -165,7 +151,7 @@ public class ImportFormatReader {
     public SortedSet<ImportFormat> getCustomImportFormats() {
         SortedSet<ImportFormat> result = new TreeSet<>();
         for (ImportFormat format : formats) {
-            if (format.getIsCustomImporter()) {
+            if (format.isCustomImporter()) {
                 result.add(format);
             }
         }
@@ -182,7 +168,7 @@ public class ImportFormatReader {
     public SortedSet<ImportFormat> getBuiltInInputFormats() {
         SortedSet<ImportFormat> result = new TreeSet<>();
         for (ImportFormat format : formats) {
-            if (!format.getIsCustomImporter()) {
+            if (!format.isCustomImporter()) {
                 result.add(format);
             }
         }
@@ -218,12 +204,12 @@ public class ImportFormatReader {
             sb.append(imFo.getFormatName());
 
             for (int j = 0; j < pad; j++) {
-                sb.append(" ");
+                sb.append(' ');
             }
 
             sb.append(" : ");
             sb.append(imFo.getCLIId());
-            sb.append("\n");
+            sb.append('\n');
         }
 
         return sb.toString(); //.substring(0, res.length()-1);
@@ -264,7 +250,7 @@ public class ImportFormatReader {
                     sb.append(ImportFormatReader.expandAll(names[0]));
                 }
                 for (int j = 1; j < names.length; j++) {
-                    sb.append(" ");
+                    sb.append(' ');
                     sb.append(names[j]);
                 }
             }
@@ -313,23 +299,10 @@ public class ImportFormatReader {
         return sb.toString().trim();
     }
 
-    static File checkAndCreateFile(String filename) {
-        File f = new File(filename);
-
-        if (!f.exists() && !f.canRead() && !f.isFile()) {
-
-            LOGGER.info("Error " + filename + " is not a valid file and|or is not readable.");
-            return null;
-
-        } else {
-            return f;
-        }
-    }
-
     //==================================================
     // Set a field, unless the string to set is empty.
     //==================================================
-    public static void setIfNecessary(BibtexEntry be, String field, String content) {
+    public static void setIfNecessary(BibEntry be, String field, String content) {
         if (!"".equals(content)) {
             be.setField(field, content);
         }
@@ -348,30 +321,12 @@ public class ImportFormatReader {
         return new InputStreamReader(new FileInputStream(f), charset);
     }
 
-    public static Reader getReaderDefaultEncoding(InputStream in)
-            throws IOException {
+    public static Reader getReaderDefaultEncoding(InputStream in) {
         InputStreamReader reader;
         reader = new InputStreamReader(in, Globals.prefs.getDefaultEncoding());
 
         return reader;
     }
-
-    /**
-     * Receives an ArrayList of BibtexEntry instances, iterates through them, and
-     * removes all entries that have no fields set. This is useful for rooting out
-     * an unsucessful import (wrong format) that returns a number of empty entries.
-     */
-    private static void purgeEmptyEntries(Collection<BibtexEntry> entries) {
-        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext(); ) {
-            BibtexEntry entry = i.next();
-
-            // If there are no fields, remove the entry:
-            if (entry.getFieldNames().isEmpty()) {
-                i.remove();
-            }
-        }
-    }
-
 
     public static class UnknownFormatImport {
 
@@ -389,7 +344,7 @@ public class ImportFormatReader {
     /**
      * Tries to import a file by iterating through the available import filters,
      * and keeping the import that seems most promising.
-     * <p>
+     * <p/>
      * If all fails this method attempts to read this file as bibtex.
      *
      * @throws IOException
@@ -402,22 +357,34 @@ public class ImportFormatReader {
         OutputPrinterToNull nullOutput = new OutputPrinterToNull();
 
         // stores ref to best result, gets updated at the next loop
-        List<BibtexEntry> bestResult = null;
+        List<BibEntry> bestResult = null;
         int bestResultCount = 0;
         String bestFormatName = null;
+
+        // First, see if it is a BibTeX file:
+        try {
+            ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
+                    Globals.prefs.getDefaultEncoding());
+            if ((pr.getDatabase().getEntryCount() > 0)
+                    || (pr.getDatabase().getStringCount() > 0)) {
+                pr.setFile(new File(filename));
+                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
+            }
+        } catch (Throwable ignore) {
+        }
 
         // Cycle through all importers:
         for (ImportFormat imFo : getImportFormats()) {
 
             try {
 
-                List<BibtexEntry> entries = importFromFile(imFo, filename, nullOutput);
+                List<BibEntry> entries = importFromFile(imFo, filename, nullOutput);
 
                 int entryCount;
                 if (entries == null) {
                     entryCount = 0;
                 } else {
-                    ImportFormatReader.purgeEmptyEntries(entries);
+                    BibDatabases.purgeEmptyEntries(entries);
                     entryCount = entries.size();
                 }
 
@@ -435,19 +402,6 @@ public class ImportFormatReader {
             // we found something
             ParserResult parserResult = new ParserResult(bestResult);
             return new UnknownFormatImport(bestFormatName, parserResult);
-        }
-
-        // Finally, if all else fails, see if it is a BibTeX file:
-        try {
-            ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
- Globals.prefs.getDefaultEncoding());
-            if ((pr.getDatabase().getEntryCount() > 0)
-                    || (pr.getDatabase().getStringCount() > 0)) {
-                pr.setFile(new File(filename));
-                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
-            }
-        } catch (Throwable ex) {
-            return null;
         }
 
         return null;

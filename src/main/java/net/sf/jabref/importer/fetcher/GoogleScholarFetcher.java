@@ -22,7 +22,7 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 
@@ -57,7 +57,9 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private static final Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     private static final Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
-    private final HashMap<String, String> entryLinks = new HashMap<>();
+    private static final Pattern INPUT_PATTERN = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
+
+    private final Map<String, String> entryLinks = new HashMap<>();
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
@@ -95,7 +97,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Error fetching from Google Scholar", e);
             status.showMessage(Localization.lang("Error fetching from Google Scholar"));
             return false;
         }
@@ -104,7 +106,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     @Override
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector) {
         int toDownload = 0;
-        int downloaded = 0;
         for (Map.Entry<String, Boolean> selEntry : selection.entrySet()) {
             boolean isSelected = selEntry.getValue();
             if (isSelected) {
@@ -115,6 +116,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             return;
         }
 
+        int downloaded = 0;
+
         for (Map.Entry<String, Boolean> selEntry : selection.entrySet()) {
             if (stopFetching) {
                 break;
@@ -124,7 +127,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             if (isSelected) {
                 downloaded++;
                 try {
-                    BibtexEntry entry = downloadEntry(selEntry.getKey());
+                    BibEntry entry = downloadEntry(selEntry.getKey());
                     inspector.addEntry(entry);
                 } catch (IOException e) {
                     LOGGER.warn("Cannot download entry from Google scholar", e);
@@ -141,7 +144,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "GoogleScholarHelp.html";
+        return "GoogleScholarHelp";
     }
 
     @Override
@@ -168,7 +171,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             //save("setting.html", ud.getStringContent());
             String settingsPage = new URLDownload(new URL(GoogleScholarFetcher.URL_SETTING)).downloadToString();
             // Get the form items and their values from the page:
-            HashMap<String, String> formItems = GoogleScholarFetcher.getFormElements(settingsPage);
+            Map<String, String> formItems = GoogleScholarFetcher.getFormElements(settingsPage);
             // Override the important ones:
             formItems.put("scis", "yes");
             formItems.put("scisf", "4");
@@ -217,7 +220,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         Matcher m = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(cont);
         int lastRegionStart = 0;
         while (m.find()) {
-            String link = m.group(1).replaceAll("&amp;", "&");
+            String link = m.group(1).replace("&amp;", "&");
             String pText;
             //System.out.println("regionStart: "+m.start());
             String part = cont.substring(lastRegionStart, m.start());
@@ -237,7 +240,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                 pText = link;
             }
 
-            pText = pText.replaceAll("\\[PDF\\]", "");
+            pText = pText.replace("[PDF]", "");
             JLabel preview = new JLabel("<html>" + pText + "</html>");
             ids.put(link, preview);
 
@@ -260,23 +263,20 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         return null;
     }
 
-    private BibtexEntry downloadEntry(String link) throws IOException {
+    private BibEntry downloadEntry(String link) throws IOException {
         try {
             URL url = new URL(GoogleScholarFetcher.URL_START + link);
             String s = new URLDownload(url).downloadToString();
             BibtexParser bp = new BibtexParser(new StringReader(s));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase() != null)) {
-                Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
+                Collection<BibEntry> entries = pr.getDatabase().getEntries();
                 if (entries.size() == 1) {
-                    BibtexEntry entry = entries.iterator().next();
-                    boolean clearKeys = true;
-                    if (clearKeys) {
-                        entry.setField(BibtexEntry.KEY_FIELD, null);
-                    }
+                    BibEntry entry = entries.iterator().next();
+                    entry.clearField(BibEntry.KEY_FIELD);
                     // If the entry's url field is not set, and we have stored an url for this
                     // entry, set it:
-                    if (entry.getField("url") == null) {
+                    if (!entry.hasField("url")) {
                         String storedUrl = entryLinks.get(link);
                         if (storedUrl != null) {
                             entry.setField("url", storedUrl);
@@ -312,11 +312,9 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
 
-    private static final Pattern inputPattern = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
 
-
-    private static HashMap<String, String> getFormElements(String page) {
-        Matcher m = GoogleScholarFetcher.inputPattern.matcher(page);
+    private static Map<String, String> getFormElements(String page) {
+        Matcher m = GoogleScholarFetcher.INPUT_PATTERN.matcher(page);
         HashMap<String, String> items = new HashMap<>();
         while (m.find()) {
             String name = m.group(2);

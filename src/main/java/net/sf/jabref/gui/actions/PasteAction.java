@@ -3,7 +3,7 @@ package net.sf.jabref.gui.actions;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.URLUtil;
+import net.sf.jabref.logic.net.URLUtil;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -24,7 +24,7 @@ public class PasteAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        String data = ClipBoardManager.clipBoard.getClipboardContents();
+        String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
 
         if (data.isEmpty()) {
             return;

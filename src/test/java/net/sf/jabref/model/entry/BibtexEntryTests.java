@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 
 import java.util.ArrayList;
@@ -22,16 +21,16 @@ public class BibtexEntryTests {
 
     @Test
     public void testDefaultConstructor() {
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         // we have to use `getType("misc")` in the case of biblatex mode
-        Assert.assertEquals(EntryTypes.getType("misc"), entry.getType());
+        Assert.assertEquals("misc", entry.getType());
         Assert.assertNotNull(entry.getId());
         Assert.assertNull(entry.getField("author"));
     }
 
     @Test
     public void allFieldsPresentDefault() {
-        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -47,7 +46,7 @@ public class BibtexEntryTests {
 
     @Test
     public void allFieldsPresentOr() {
-        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -62,29 +61,24 @@ public class BibtexEntryTests {
     }
 
     @Test
-    public void hasAllRequiredFields() {
-        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
-        e.setField("author", "abc");
-        e.setField("title", "abc");
-        e.setField("journal", "abc");
-
-        Assert.assertFalse(e.hasAllRequiredFields(null));
-
-        e.setField("year", "2015");
-        Assert.assertTrue(e.hasAllRequiredFields(null));
-    }
-
-    @Test
     public void isNullOrEmptyCiteKey() {
-        BibtexEntry e = new BibtexEntry("id", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
         Assert.assertFalse(e.hasCiteKey());
-        e.setField(BibtexEntry.KEY_FIELD, "");
+
+        e.setField(BibEntry.KEY_FIELD, "");
         Assert.assertFalse(e.hasCiteKey());
-        e.setField(BibtexEntry.KEY_FIELD, null);
-        Assert.assertFalse(e.hasCiteKey());
-        e.setField(BibtexEntry.KEY_FIELD, "key");
+
+        try {
+            e.setField(BibEntry.KEY_FIELD, null);
+            Assert.fail();
+        } catch(NullPointerException asExpected) {
+
+        }
+
+        e.setField(BibEntry.KEY_FIELD, "key");
         Assert.assertTrue(e.hasCiteKey());
-        e.clearField(BibtexEntry.KEY_FIELD);
+
+        e.clearField(BibEntry.KEY_FIELD);
         Assert.assertFalse(e.hasCiteKey());
     }
 
@@ -116,7 +110,7 @@ public class BibtexEntryTests {
 
     @Test
     public void testKeywordMethods() {
-        BibtexEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
 
         String[] expected = {"Foo",  "Bar"};
         Assert.assertArrayEquals(expected, be.getSeparatedKeywords().toArray());
@@ -136,13 +130,14 @@ public class BibtexEntryTests {
         be.addKeyword("");
         Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
 
-        be.addKeyword(null);
-        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+        try {
+            be.addKeyword(null);
+            Assert.fail();
+        } catch(NullPointerException asExpected){
 
-        be.addKeywords(null);
-        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+        }
 
-        BibtexEntry be2 = new BibtexEntry();
+        BibEntry be2 = new BibEntry();
         Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());
         be2.addKeyword("");
         Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());
@@ -154,7 +149,7 @@ public class BibtexEntryTests {
 
     @Test
     public void testGroupAndSearchHits() {
-        BibtexEntry be = new BibtexEntry();
+        BibEntry be = new BibEntry();
         be.setGroupHit(true);
         Assert.assertTrue(be.isGroupHit());
         be.setGroupHit(false);
@@ -168,10 +163,10 @@ public class BibtexEntryTests {
 
     @Test
     public void testCiteKeyAndID() {
-        BibtexEntry be = new BibtexEntry();
+        BibEntry be = new BibEntry();
         Assert.assertFalse(be.hasCiteKey());
         be.setField("author", "Albert Einstein");
-        be.setField(BibtexEntry.KEY_FIELD, "Einstein1931");
+        be.setField(BibEntry.KEY_FIELD, "Einstein1931");
         Assert.assertTrue(be.hasCiteKey());
         Assert.assertEquals("Einstein1931", be.getCiteKey());
         Assert.assertEquals("Albert Einstein", be.getField("author"));

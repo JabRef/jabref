@@ -23,14 +23,13 @@ import net.sf.jabref.logic.util.strings.StringUtil;
  * This formatter escapes characters so they are suitable for HTML.
  */
 public class HTMLChars implements LayoutFormatter {
-    
+
     private static final HtmlCharsMap HTML_CHARS = new HtmlCharsMap();
 
     @Override
     public String format(String field) {
         int i;
-        field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{2,}", "<p>")
-                .replaceAll("\\n", "<br>");
+        field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{2,}", "<p>").replace("\n", "<br>");
 
         StringBuilder sb = new StringBuilder();
         StringBuffer currentCommand = null;
@@ -41,7 +40,7 @@ public class HTMLChars implements LayoutFormatter {
 
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
-            if (escaped && c == '\\') {
+            if (escaped && (c == '\\')) {
                 sb.append('\\');
                 escaped = false;
             } else if (c == '\\') {
@@ -49,18 +48,18 @@ public class HTMLChars implements LayoutFormatter {
                     /* Close Command */
                     String command = currentCommand.toString();
                     Object result = HTML_CHARS.get(command);
-                    if (result != null) {
-                        sb.append((String) result);
-                    } else {
+                    if (result == null) {
                         sb.append(command);
+                    } else {
+                        sb.append((String) result);
                     }
                 }
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuffer();
-            } else if (!incommand && (c == '{' || c == '}')) {
+            } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
-            } else if (Character.isLetter(c) || c == '%'
+            } else if (Character.isLetter(c) || (c == '%')
                     || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
@@ -68,11 +67,11 @@ public class HTMLChars implements LayoutFormatter {
                     sb.append(c);
                 } else {
                     currentCommand.append(c);
-                    testCharCom: if (currentCommand.length() == 1
+                    testCharCom: if ((currentCommand.length() == 1)
                             && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= field.length() - 1) {
+                        if (i >= (field.length() - 1)) {
                             break testCharCom;
                         }
 
@@ -99,17 +98,17 @@ public class HTMLChars implements LayoutFormatter {
                         escaped = false;
                     } else {
                         //	Are we already at the end of the string?
-                        if (i + 1 == field.length()) {
+                        if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
                             Object result = HTML_CHARS.get(command);
                             /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
                              */
-                            if (result != null) {
-                                sb.append((String) result);
-                            } else {
+                            if (result == null) {
                                 sb.append(command);
+                            } else {
+                                sb.append((String) result);
                             }
 
                         }
@@ -120,7 +119,7 @@ public class HTMLChars implements LayoutFormatter {
 
                 if (!incommand) {
                     sb.append(c);
-                } else if (Character.isWhitespace(c) || c == '{' || c == '}') {
+                } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
                     // First test if we are already at the end of the string.
                     // if (i >= field.length()-1)
                     // break testContent;
@@ -151,10 +150,10 @@ public class HTMLChars implements LayoutFormatter {
                             // If found, then use translated version. If not, then keep
                             // the
                             // text of the parameter intact.
-                            if (result != null) {
-                                sb.append((String) result);
-                            } else {
+                            if (result == null) {
                                 sb.append(argument);
+                            } else {
+                                sb.append((String) result);
                             }
                         }
                     } else if (c == '}') {
@@ -162,18 +161,18 @@ public class HTMLChars implements LayoutFormatter {
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
                         Object result = HTML_CHARS.get(command);
-                        if (result != null) {
-                            sb.append((String) result);
-                        } else {
+                        if (result == null) {
                             // If the command is unknown, just print it:
                             sb.append(command);
+                        } else {
+                            sb.append((String) result);
                         }
                     } else {
                         Object result = HTML_CHARS.get(command);
-                        if (result != null) {
-                            sb.append((String) result);
-                        } else {
+                        if (result == null) {
                             sb.append(command);
+                        } else {
+                            sb.append((String) result);
                         }
                         sb.append(' ');
                     }

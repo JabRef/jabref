@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -23,8 +23,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,22 +53,21 @@ public class MSBibDatabase {
         importEntries(stream);
     }
 
-    public MSBibDatabase(BibtexDatabase bibtex) {
+    public MSBibDatabase(BibDatabase bibtex) {
         Set<String> keySet = bibtex.getKeySet();
         addEntries(bibtex, keySet);
     }
 
-    public MSBibDatabase(BibtexDatabase bibtex, Set<String> keySet) {
+    public MSBibDatabase(BibDatabase bibtex, Set<String> keySet) {
         if (keySet == null) {
             keySet = bibtex.getKeySet();
         }
         addEntries(bibtex, keySet);
     }
 
-    public List<BibtexEntry> importEntries(InputStream stream) {
+    public List<BibEntry> importEntries(InputStream stream) {
         entries = new HashSet<>();
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
-        Document inputDocument = null;
+        Document inputDocument;
         try {
             DocumentBuilder documentBuilder = DocumentBuilderFactory.
                     newInstance().
@@ -76,6 +75,7 @@ public class MSBibDatabase {
             inputDocument = documentBuilder.parse(stream);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.warn("Could not parse document", e);
+            return null;
         }
         String bcol = "b:";
         NodeList rootList = inputDocument.getElementsByTagName("b:Sources");
@@ -83,6 +83,7 @@ public class MSBibDatabase {
             rootList = inputDocument.getElementsByTagName("Sources");
             bcol = "";
         }
+        List<BibEntry> bibitems = new ArrayList<>();
         if (rootList.getLength() == 0) {
             return bibitems;
         }
@@ -97,10 +98,10 @@ public class MSBibDatabase {
         return bibitems;
     }
 
-    private void addEntries(BibtexDatabase database, Set<String> keySet) {
+    private void addEntries(BibDatabase database, Set<String> keySet) {
         entries = new HashSet<>();
         for (String key : keySet) {
-            BibtexEntry entry = database.getEntryById(key);
+            BibEntry entry = database.getEntryById(key);
             MSBibEntry newMods = new MSBibEntry(entry);
             entries.add(newMods);
         }

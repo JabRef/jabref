@@ -17,7 +17,7 @@ package net.sf.jabref.gui;
 
 import java.util.Collections;
 import java.util.Map;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeListener;
 import net.sf.jabref.logic.id.IdComparator;
@@ -26,12 +26,12 @@ import ca.odell.glazedlists.EventList;
 
 public class GlazedEntrySorter implements DatabaseChangeListener {
 
-    private final EventList<BibtexEntry> list;
+    private final EventList<BibEntry> list;
 
-    public GlazedEntrySorter(Map<String, BibtexEntry> entries) {
+    public GlazedEntrySorter(Map<String, BibEntry> entries) {
         list = new BasicEventList<>();
         list.getReadWriteLock().writeLock().lock();
-        for (Map.Entry<String, BibtexEntry> entry : entries.entrySet()) {
+        for (Map.Entry<String, BibEntry> entry : entries.entrySet()) {
             list.add(entry.getValue());
         }
 
@@ -43,7 +43,7 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
 
     }
 
-    public EventList<BibtexEntry> getTheList() {
+    public EventList<BibEntry> getTheList() {
         return list;
     }
 

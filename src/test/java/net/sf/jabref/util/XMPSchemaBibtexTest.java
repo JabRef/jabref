@@ -1,12 +1,15 @@
 package net.sf.jabref.util;
 
 import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.BibtexTestData;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,7 +26,12 @@ import java.util.Map;
 
 public class XMPSchemaBibtexTest {
 
-    public void assertEqualsBibtexEntry(BibtexEntry e, BibtexEntry x) {
+    @Before
+    public void setUp() throws Exception {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
+
+    public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
         Assert.assertEquals(e.getCiteKey(), x.getCiteKey());
         Assert.assertEquals(e.getType(), x.getType());
 
@@ -237,10 +245,10 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = new XMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        BibtexEntry e = BibtexTestData.getBibtexEntry();
+        BibEntry e = BibtexTestData.getBibtexEntry();
         bibtex.setBibtexEntry(e, null);
 
-        BibtexEntry e2 = bibtex.getBibtexEntry();
+        BibEntry e2 = bibtex.getBibtexEntry();
 
         assertEqualsBibtexEntry(e, e2);
     }

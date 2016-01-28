@@ -9,7 +9,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.event.ActionEvent;
 
 public class CopyAction extends AbstractAction {
-    private JTextComponent field;
+    private final JTextComponent field;
 
     public CopyAction(JTextComponent field) {
         this.field = field;
@@ -24,10 +24,8 @@ public class CopyAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         if (field != null) {
             String data = field.getSelectedText();
-            if (data != null) {
-                if (!data.isEmpty()) {
-                    ClipBoardManager.clipBoard.setClipboardContents(data);
-                }
+            if ((data != null) && !data.isEmpty()) {
+                    ClipBoardManager.CLIPBOARD.setClipboardContents(data);
             }
         }
     }

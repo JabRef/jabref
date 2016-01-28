@@ -16,8 +16,6 @@
 package net.sf.jabref.groups;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -28,9 +26,10 @@ import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
@@ -51,20 +50,16 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JTextField remove = new JTextField(60);
     private final JTextField field = new JTextField(60);
     private final JTextField deliminator = new JTextField(60);
-    JLabel nf = new JLabel(Localization.lang("Field to group by") + ":");
-    JLabel nr = new JLabel(Localization.lang("Characters to ignore") + ":");
     private final JRadioButton keywords = new JRadioButton(
             Localization.lang("Generate groups from keywords in a BibTeX field"));
     private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
     private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
     private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final GroupTreeNode m_groupsRoot;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final GroupSelector gs;
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
 
 
     /**
@@ -89,7 +84,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(new ExplicitGroup(
                         Localization.lang("Automatically created groups"), GroupHierarchyType.INCLUDING));
-                Set<String> hs = null;
+                Set<String> hs;
                 String fieldText = field.getText();
                 if (keywords.isSelected()) {
                     if (nd.isSelected()) {
@@ -105,7 +100,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     fields.add("author");
                     hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
                     fieldText = "author";
-                } else if (editors.isSelected()) {
+                } else { // editors.isSelected() as it is a radio button group.
                     List<String> fields = new ArrayList<>(2);
                     fields.add("editor");
                     hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
@@ -149,7 +144,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(frame.prefs().getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         ButtonGroup bg = new ButtonGroup();

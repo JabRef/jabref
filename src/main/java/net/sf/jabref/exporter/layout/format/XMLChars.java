@@ -51,6 +51,9 @@ public class XMLChars implements LayoutFormatter {
 
     private static final Map<String, String> ASCII_TO_XML_CHARS = new HashMap<>();
 
+    private boolean[] forceReplace;
+
+
     static {
         ASCII_TO_XML_CHARS.put("<", "&lt;");
         ASCII_TO_XML_CHARS.put("\"", "&quot;");
@@ -77,12 +80,10 @@ public class XMLChars implements LayoutFormatter {
     }
 
 
-    private boolean[] forceReplace;
-
 
     private String restFormat(String toFormat) {
 
-        String fieldText = toFormat.replaceAll("\\}", "").replaceAll("\\{", "");
+        String fieldText = toFormat.replace("}", "").replace("{", "");
 
         // now some copy-paste problems most often occuring in abstracts when
         // copied from PDF

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +16,6 @@
 package net.sf.jabref.gui;
 
 import java.io.File;
-import java.io.FilenameFilter;
-
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -107,7 +105,7 @@ public class FileDialogs {
         // Added the !dirOnly condition below as a workaround to the native file dialog
         // not supporting directory selection:
         if (!dirOnly && OS.OS_X) {
-            return FileDialogs.getNewFileForMac(owner, directory, extension, dialogType, updateWorkingDirectory, dirOnly, off);
+            return FileDialogs.getNewFileForMac(owner, directory, dialogType, updateWorkingDirectory);
         }
 
         JFileChooser fc;
@@ -122,7 +120,7 @@ public class FileDialogs {
             // bug in JGoodies Windows PLAF. This clause can be removed if the
             // bug is fixed, but for now we just resort to the native file
             // dialog, using the same method as is always used on Mac:
-            return FileDialogs.getNewFileForMac(owner, directory, extension, dialogType, updateWorkingDirectory, dirOnly, off);
+            return FileDialogs.getNewFileForMac(owner, directory, dialogType, updateWorkingDirectory);
         }
 
         if (dirOnly) {
@@ -167,23 +165,23 @@ public class FileDialogs {
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, selectedFile.getPath());
         }
 
-        if (!multipleSelection) {
-            return selectedFile.getAbsolutePath();
-        } else {
+        if (multipleSelection) {
             File[] files = fc.getSelectedFiles();
             String[] filenames = new String[files.length];
             for (int i = 0; i < files.length; i++) {
                 filenames[i] = files[i].getAbsolutePath();
             }
             return filenames;
+        } else {
+            return selectedFile.getAbsolutePath();
         }
     }
 
-    private static String getNewFileForMac(JFrame owner, File directory, String extensions, int dialogType, boolean updateWorkingDirectory, boolean dirOnly, FilenameFilter filter) {
+    private static String getNewFileForMac(JFrame owner, File directory, int dialogType,
+            boolean updateWorkingDirectory) {
 
         java.awt.FileDialog fc = new java.awt.FileDialog(owner);
 
-        // fc.setFilenameFilter(filter);
         if (directory != null) {
             fc.setDirectory(directory.getParent());
         }
@@ -193,15 +191,15 @@ public class FileDialogs {
             fc.setMode(java.awt.FileDialog.SAVE);
         }
 
-        fc.setVisible(true); // fc.show(); -> deprecated since 1.5
+        fc.setVisible(true);
 
-        if (fc.getFile() != null) {
+        if (fc.getFile() == null) {
+            return null;
+        } else {
             if (updateWorkingDirectory) {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fc.getDirectory() + fc.getFile());
             }
             return fc.getDirectory() + fc.getFile();
-        } else {
-            return null;
         }
     }
 }

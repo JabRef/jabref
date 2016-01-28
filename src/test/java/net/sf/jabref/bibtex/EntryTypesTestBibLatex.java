@@ -40,11 +40,15 @@ public class EntryTypesTestBibLatex {
         assertEquals(34, biblatexentrytypes.getAllValues().size());
         assertEquals(34, biblatexentrytypes.getAllTypes().size());
 
-        assertEquals(BibLatexEntryTypes.MISC, biblatexentrytypes.getBibtexEntryType("aaaaarticle"));
-
         biblatexentrytypes.removeType("article");
         // Should not be possible to remove a standard type
         assertEquals(BibLatexEntryTypes.ARTICLE, biblatexentrytypes.getType("article"));
+    }
+
+    @Test
+    public void defaultType() {
+        EntryTypes types = new EntryTypes();
+        assertEquals(BibLatexEntryTypes.MISC, types.getTypeOrDefault("unknowntype"));
     }
 
     @Test

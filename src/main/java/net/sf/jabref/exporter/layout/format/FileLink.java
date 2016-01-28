@@ -20,9 +20,12 @@ import java.io.File;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.ParamLayoutFormatter;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.FileField.ParsedFileField;
+
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Export formatter that handles the file link list of JabRef 2.3 and later, by
@@ -35,25 +38,24 @@ public class FileLink implements ParamLayoutFormatter {
 
     @Override
     public String format(String field) {
-        FileListTableModel tableModel = new FileListTableModel();
         if (field == null) {
             return "";
         }
 
-        tableModel.setContent(field);
+        List<ParsedFileField> fileList = FileField.parse(field);
+
         String link = null;
         if (fileType == null) {
             // No file type specified. Simply take the first link.
-            if (tableModel.getRowCount() > 0) {
-                link = tableModel.getEntry(0).getLink();
+            if (!(fileList.isEmpty())) {
+                link = fileList.get(0).link;
             }
         }
         else {
             // A file type is specified:
-            for (int i = 0; i < tableModel.getRowCount(); i++) {
-                FileListEntry flEntry = tableModel.getEntry(i);
-                if (flEntry.getType().getName().toLowerCase().equals(fileType)) {
-                    link = flEntry.getLink();
+            for (ParsedFileField flEntry : fileList) {
+                if (flEntry.fileType.equalsIgnoreCase(fileType)) {
+                    link = flEntry.link;
                     break;
                 }
             }
@@ -71,10 +73,10 @@ public class FileLink implements ParamLayoutFormatter {
         if (Globals.prefs.fileDirForDatabase != null) {
             dirs = Globals.prefs.fileDirForDatabase;
         } else {
-            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + "Directory")};
+            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX)};
         }
 
-        File f = FileUtil.expandFilename(link, dirs);
+        File f = FileUtil.expandFilename(link, Arrays.asList(dirs));
 
         /*
          * Stumbled over this while investigating

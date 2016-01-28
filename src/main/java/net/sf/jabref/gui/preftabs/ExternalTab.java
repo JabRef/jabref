@@ -37,14 +37,14 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.*;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.gui.help.AboutDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 class ExternalTab extends JPanel implements PrefsTab {
@@ -70,7 +70,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs,
-            HelpDialog helpDialog) {
+            AboutDialog aboutDialog) {
         this.prefs = prefs;
         this.frame = frame;
         setLayout(new BorderLayout());
@@ -149,8 +149,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.append(useRegExpComboBox);
         builder.append(regExpTextField);
 
-        builder.append(new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
-                Localization.lang("Help on Regular Expression Search")).getIconButton());
+        builder.append(new HelpAction(Localization.lang("Help on Regular Expression Search"), HelpFiles.regularExpressionSearchHelp).getHelpButton());
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(runAutoFileSearch, 3);
@@ -176,7 +175,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         JPanel butpan = new JPanel();
         butpan.setLayout(new GridLayout(3, 3));
-        for(PushToApplication pushToApplication : PushToApplications.applications) {
+        for(PushToApplication pushToApplication : PushToApplications.APPLICATIONS) {
             addSettingsButton(pushToApplication, butpan);
         }
         builder.append(new JPanel());
@@ -213,8 +212,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileDir.setText(prefs.get(Globals.FILE_FIELD + "Directory"));
-        bibLocationAsFileDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR));
+        fileDir.setText(prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
@@ -244,8 +242,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         }
 
         // We should maybe do some checking on the validity of the contents?
-        prefs.put(Globals.FILE_FIELD + "Directory", fileDir.getText());
-        prefs.putBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR, bibLocationAsFileDir.isSelected());
+        prefs.put(Globals.FILE_FIELD + Globals.DIR_SUFFIX, fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, matchExactKeyOnly.isSelected());
         prefs.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, runAutoFileSearch.isSelected());

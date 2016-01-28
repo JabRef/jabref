@@ -19,7 +19,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.ClipboardOwner;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.*;
@@ -28,10 +27,13 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
@@ -45,15 +47,17 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class ExportToClipboardAction extends AbstractWorker {
 
+    private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);
+
     private final JabRefFrame frame;
-    private final BibtexDatabase database;
+    private final BibDatabase database;
 
     /**
      * written by run() and read by update()
      */
     private String message;
 
-    public ExportToClipboardAction(JabRefFrame frame, BibtexDatabase database) {
+    public ExportToClipboardAction(JabRefFrame frame, BibDatabase database) {
         this.frame = Objects.requireNonNull(frame);
         this.database = Objects.requireNonNull(database);
     }
@@ -84,11 +88,9 @@ public class ExportToClipboardAction extends AbstractWorker {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         int answer = JOptionPane.showOptionDialog(frame, list, Localization.lang("Select export format"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                // @formatter:off
                 new String[] {Localization.lang("Export with selected format"),
                         Localization.lang("Return to JabRef")},
                 Localization.lang("Export with selected format"));
-                // @formatter:on
         if (answer == JOptionPane.NO_OPTION) {
             return;
         }
@@ -99,20 +101,19 @@ public class ExportToClipboardAction extends AbstractWorker {
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().metaData()
-                .getFileDirectory(Globals.FILE_FIELD);
+                .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
         // Also store the database's file in a global variable:
         Globals.prefs.databaseFile = frame.getCurrentBasePanel().metaData().getFile();
 
         File tmp = null;
-        Reader reader = null;
         try {
             // To simplify the exporter API we simply do a normal export to a temporary
             // file, and read the contents afterwards:
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
-            BibtexEntry[] bes = panel.getSelectedEntries();
+            BibEntry[] bes = panel.getSelectedEntries();
             HashSet<String> entries = new HashSet<>(bes.length);
-            for (BibtexEntry be : bes) {
+            for (BibEntry be : bes) {
                 entries.add(be.getId());
             }
 
@@ -121,10 +122,11 @@ public class ExportToClipboardAction extends AbstractWorker {
                     tmp.getPath(), panel.getEncoding(), entries);
             // Read the file and put the contents on the clipboard:
             StringBuilder sb = new StringBuilder();
-            reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding());
-            int s;
-            while ((s = reader.read()) != -1) {
-                sb.append((char) s);
+            try (Reader reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding())) {
+                int s;
+                while ((s = reader.read()) != -1) {
+                    sb.append((char) s);
+                }
             }
             ClipboardOwner owner = (clipboard, content) -> {
                 // Do nothing
@@ -136,22 +138,14 @@ public class ExportToClipboardAction extends AbstractWorker {
             message = Localization.lang("Entries exported to clipboard") + ": " + bes.length;
 
         } catch (Exception e) {
-            e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error("Error exporting to clipboard", e); //To change body of catch statement use File | Settings | File Templates.
             message = Localization.lang("Error exporting to clipboard");
         } finally {
             // Clean up:
             if (tmp != null) {
                 tmp.delete();
             }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
         }
-
     }
 
     @Override

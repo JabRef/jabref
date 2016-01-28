@@ -15,18 +15,18 @@
 */
 package net.sf.jabref.gui;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.FileField;
 
 /**
  * Data structure to contain a list of file links, parseable from a coded string.
@@ -34,7 +34,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
  */
 public class FileListTableModel extends AbstractTableModel {
 
-    private final ArrayList<FileListEntry> list = new ArrayList<>();
+    private final List<FileListEntry> list = new ArrayList<>();
 
     @Override
     public int getRowCount() {
@@ -59,12 +59,11 @@ public class FileListTableModel extends AbstractTableModel {
             FileListEntry entry = list.get(rowIndex);
             switch (columnIndex) {
             case 0:
-                return entry.getDescription();
+                return entry.description;
             case 1:
-                return entry.getLink();
+                return entry.link;
             default:
-                return entry.getType() != null ?
-                        entry.getType().getName() : "";
+                return entry.type == null ? "" : entry.type.getName();
             }
         }
     }
@@ -72,6 +71,13 @@ public class FileListTableModel extends AbstractTableModel {
     public FileListEntry getEntry(int index) {
         synchronized (list) {
             return list.get(index);
+        }
+    }
+
+    public void setEntry(int index, FileListEntry entry) {
+        synchronized (list) {
+            list.set(index, entry);
+            fireTableRowsUpdated(index, index);
         }
     }
 
@@ -92,16 +98,10 @@ public class FileListTableModel extends AbstractTableModel {
     public void addEntry(final int index, final FileListEntry entry) {
         synchronized (list) {
             list.add(index, entry);
-            if (!SwingUtilities.isEventDispatchThread()) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        fireTableRowsInserted(index, index);
-                    }
-                });
-            } else {
+            if (SwingUtilities.isEventDispatchThread()) {
                 fireTableRowsInserted(index, index);
+            } else {
+                SwingUtilities.invokeLater(() -> fireTableRowsInserted(index, index));
             }
         }
 
@@ -128,62 +128,25 @@ public class FileListTableModel extends AbstractTableModel {
         if (value == null) {
             value = "";
         }
-        ArrayList<FileListEntry> newList = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<>();
-        boolean inXmlChar = false;
-        boolean escaped = false;
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (!escaped && (c == '\\')) {
-                escaped = true;
+
+        List<FileField.ParsedFileField> fields = FileField.parse(value);
+        ArrayList<FileListEntry> files = new ArrayList<>();
+
+        for(FileField.ParsedFileField entry : fields) {
+            if (entry.isEmpty()) {
                 continue;
             }
-            // Check if we are entering an XML special character construct such
-            // as "&#44;", because we need to know in order to ignore the semicolon.
-            else if (!escaped && (c == '&') && !inXmlChar) {
-                sb.append(c);
-                if ((value.length() > (i + 1)) && (value.charAt(i + 1) == '#')) {
-                    inXmlChar = true;
-                }
-            }
-            // Check if we are exiting an XML special character construct:
-            else if (!escaped && inXmlChar && (c == ';')) {
-                sb.append(c);
-                inXmlChar = false;
-            }
-            else if (!escaped && (c == ':')) {
-                thisEntry.add(sb.toString());
-                sb = new StringBuilder();
-            }
-            else if (!escaped && (c == ';') && !inXmlChar) {
-                thisEntry.add(sb.toString());
-                sb = new StringBuilder();
-                if (firstOnly) {
-                    return decodeEntry(thisEntry, deduceUnknownTypes);
-                } else {
-                    newList.add(decodeEntry(thisEntry, deduceUnknownTypes));
-                    thisEntry.clear();
-                }
-            } else {
-                sb.append(c);
-            }
-            escaped = false;
-        }
-        if (sb.length() > 0) {
-            thisEntry.add(sb.toString());
-        }
-        if (!thisEntry.isEmpty()) {
+
             if (firstOnly) {
-                return decodeEntry(thisEntry, deduceUnknownTypes);
+                return decodeEntry(entry, deduceUnknownTypes);
             } else {
-                newList.add(decodeEntry(thisEntry, deduceUnknownTypes));
+                files.add(decodeEntry(entry, deduceUnknownTypes));
             }
         }
 
         synchronized (list) {
             list.clear();
-            list.addAll(newList);
+            list.addAll(files);
         }
         fireTableChanged(new TableModelEvent(this));
         return null;
@@ -202,48 +165,33 @@ public class FileListTableModel extends AbstractTableModel {
     public static JLabel getFirstLabel(String content) {
         FileListTableModel tm = new FileListTableModel();
         FileListEntry entry = tm.setContent(content, true, true);
-        if ((entry == null) || (entry.getType() == null)) {
+        if ((entry == null) || (entry.type == null)) {
             return null;
         }
-        return entry.getType().getIconLabel();
+        return entry.type.getIconLabel();
     }
 
-    private FileListEntry decodeEntry(ArrayList<String> contents, boolean deduceUnknownType) {
-        ExternalFileType type = Globals.prefs.getExternalFileTypeByName
-                (getElementIfAvailable(contents, 2));
+    private FileListEntry decodeEntry(FileField.ParsedFileField entry, boolean deduceUnknownType) {
+        ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.fileType);
 
         if (deduceUnknownType && (type instanceof UnknownExternalFileType)) {
             // No file type was recognized. Try to find a usable file type based
             // on mime type:
-            type = Globals.prefs.getExternalFileTypeByMimeType
-                    (getElementIfAvailable(contents, 2));
+            type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.fileType);
             if (type == null) {
                 // No type could be found from mime type on the extension:
-                //System.out.println("Not found by mime: '"+getElementIfAvailable(contents, 2));
-                ExternalFileType typeGuess = null;
-                String link = getElementIfAvailable(contents, 1);
-                int index = link.lastIndexOf('.');
-                if ((index >= 0) && (index < (link.length() - 1))) {
-                    String extension = link.substring(index + 1);
-                    typeGuess = Globals.prefs.getExternalFileTypeByExt(extension);
-                }
-                if (typeGuess != null) {
-                    type = typeGuess;
+                Optional<String> extension = FileUtil.getFileExtension(entry.link);
+                if (extension.isPresent()) {
+                    ExternalFileType typeGuess = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
+
+                    if (typeGuess != null) {
+                        type = typeGuess;
+                    }
                 }
             }
         }
 
-        return new FileListEntry(getElementIfAvailable(contents, 0),
-                getElementIfAvailable(contents, 1),
-                type);
-    }
-
-    private String getElementIfAvailable(ArrayList<String> contents, int index) {
-        if (index < contents.size()) {
-            return contents.get(index);
-        } else {
-            return "";
-        }
+        return new FileListEntry(entry.description, entry.link, type);
     }
 
     /**
@@ -254,12 +202,11 @@ public class FileListTableModel extends AbstractTableModel {
     public String getStringRepresentation() {
         String[][] array = new String[list.size()][];
         int i = 0;
-        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry entry = iterator.next();
+        for (FileListEntry entry : list) {
             array[i] = entry.getStringArrayRepresentation();
             i++;
         }
-        return StringUtil.encodeStringArray(array);
+        return FileField.encodeStringArray(array);
     }
 
     /**
@@ -268,23 +215,13 @@ public class FileListTableModel extends AbstractTableModel {
      * @return Tooltip representation.
      */
     public String getToolTipHTMLRepresentation() {
-        StringBuilder sb = new StringBuilder("<html>");
-        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry entry = iterator.next();
-            sb.append(entry.getDescription()).append(" (").append(entry.getLink()).append(')');
-            if (iterator.hasNext()) {
-                sb.append("<br>");
-            }
-        }
-        return sb.append("</html>").toString();
-    }
+        StringJoiner sb = new StringJoiner("<br>", "<html>", "</html>");
 
-    public void print() {
-        System.out.println("----");
-        for (FileListEntry fileListEntry : list) {
-            System.out.println(fileListEntry);
+        for(FileListEntry entry : list) {
+            sb.add(String.format("%s (%s)", entry.description, entry.link));
         }
-        System.out.println("----");
+
+        return sb.toString();
     }
 
 }

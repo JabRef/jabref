@@ -32,13 +32,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -98,7 +98,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         overwriteTimeStamp.setToolTipText(Localization.lang("If a pasted or imported entry already has "
                 + "the field set, overwrite."));
         keyDuplicateWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when a duplicate BibTeX key is entered"));
-        keyEmptyWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
+        keyEmptyWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when an empty BibTeX key is entered"));
         enforceLegalKeys = new JCheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new JCheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
 
@@ -138,7 +138,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp).getIconButton();
+        JButton help = new HelpAction(HelpFiles.ownerHelp).getHelpButton();
         builder.append(help);
         builder.nextLine();
 
@@ -148,7 +148,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        help = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp).getIconButton();
+        help = new HelpAction(HelpFiles.timeStampHelp).getHelpButton();
         builder.append(help);
         builder.nextLine();
 

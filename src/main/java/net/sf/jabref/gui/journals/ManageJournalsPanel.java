@@ -28,14 +28,17 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
@@ -52,6 +55,8 @@ import net.sf.jabref.logic.l10n.Localization;
  * Settings | File Templates.
  */
 class ManageJournalsPanel extends JPanel {
+
+    private static final Log LOGGER = LogFactory.getLog(ManageJournalsPanel.class);
 
     private final JabRefFrame frame;
     private final JTextField personalFile = new JTextField();
@@ -139,14 +144,13 @@ class ManageJournalsPanel extends JPanel {
         add(externalFilesPanel, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         bb.addButton(ok);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addUnrelatedGap();
 
-        JButton help = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.journalAbbrHelp,
-                IconTheme.JabRefIcon.HELP.getSmallIcon()).getIconButton();
+        JButton help = new HelpAction(HelpFiles.journalAbbrHelp).getHelpButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -251,7 +255,7 @@ class ManageJournalsPanel extends JPanel {
         // Key bindings:
         ActionMap am = getActionMap();
         InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
         //dialog.pack();
@@ -306,22 +310,16 @@ class ManageJournalsPanel extends JPanel {
     }
 
     private void setupExternals() {
-        String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if ((externalFiles == null) || (externalFiles.length == 0)) {
+        List<String> externalFiles = Globals.prefs.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
+        if (externalFiles.isEmpty()) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
         } else {
             for (String externalFile : externalFiles) {
                 ExternalFileEntry efe = new ExternalFileEntry(externalFile);
                 externals.add(efe);
-
             }
-
         }
-
-        //efe = new ExternalFileEntry();
-        //externals.add(efe);
-
     }
 
     private void setupUserTable() {
@@ -331,7 +329,7 @@ class ManageJournalsPanel extends JPanel {
             try {
                 userAbbr.readJournalListFromFile(new File(filename));
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                LOGGER.warn("Problem reading abbreviation file", e);
             }
         }
 
@@ -344,13 +342,7 @@ class ManageJournalsPanel extends JPanel {
     private boolean readyToClose() {
         File f;
         if (newFile.isSelected()) {
-            if (!newNameTf.getText().isEmpty()) {
-                f = new File(newNameTf.getText());
-                return !f.exists() || (JOptionPane.showConfirmDialog(this,
-                        Localization.lang("'%0' exists. Overwrite file?", f.getName()),
-                        Localization.lang("Store journal abbreviations"),
-                        JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION);
-            } else {
+            if (newNameTf.getText().isEmpty()) {
                 if (tableModel.getRowCount() > 0) {
                     JOptionPane.showMessageDialog(this,
                             Localization.lang("You must choose a filename to store journal abbreviations"),
@@ -359,7 +351,12 @@ class ManageJournalsPanel extends JPanel {
                 } else {
                     return true;
                 }
-
+            } else {
+                f = new File(newNameTf.getText());
+                return !f.exists() || (JOptionPane.showConfirmDialog(this,
+                        Localization.lang("'%0' exists. Overwrite file?", f.getName()),
+                        Localization.lang("Store journal abbreviations"),
+                        JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION);
             }
         }
         return true;
@@ -389,7 +386,7 @@ class ManageJournalsPanel extends JPanel {
                     fw.write(Globals.NEWLINE);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Problem writing abbreviation file", e);
             }
             String filename = f.getPath();
             if ("".equals(filename)) {
@@ -399,18 +396,13 @@ class ManageJournalsPanel extends JPanel {
         }
 
         // Store the list of external files set up:
-        ArrayList<String> extFiles = new ArrayList<>();
+        List<String> extFiles = new ArrayList<>();
         for (ExternalFileEntry efe : externals) {
             if (!"".equals(efe.getValue())) {
                 extFiles.add(efe.getValue());
             }
         }
-        if (extFiles.isEmpty()) {
-            Globals.prefs.put(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, "");
-        } else {
-            String[] list = extFiles.toArray(new String[extFiles.size()]);
-            Globals.prefs.putStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, list);
-        }
+        Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
         Abbreviations.initializeJournalNames(Globals.prefs);
 
@@ -425,7 +417,7 @@ class ManageJournalsPanel extends JPanel {
 
     class DownloadAction extends AbstractAction {
 
-        final JTextField comp;
+        private final JTextField comp;
 
 
         public DownloadAction(JTextField tc) {
@@ -442,7 +434,6 @@ class ManageJournalsPanel extends JPanel {
             }
             File toFile;
             try {
-                URL url = new URL(chosen);
                 String toName = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), null,
                         JFileChooser.SAVE_DIALOG, false);
                 if (toName == null) {
@@ -450,6 +441,7 @@ class ManageJournalsPanel extends JPanel {
                 } else {
                     toFile = new File(toName);
                 }
+                URL url = new URL(chosen);
                 MonitoredURLDownload.buildMonitoredDownload(comp, url).downloadToFile(toFile);
                 comp.setText(toFile.getPath());
             } catch (Exception ex) {
@@ -461,8 +453,8 @@ class ManageJournalsPanel extends JPanel {
 
     class BrowseAction extends AbstractAction {
 
-        final JTextField comp;
-        final boolean dir;
+        private final JTextField comp;
+        private final boolean dir;
 
 
         public BrowseAction(JTextField tc, boolean dir) {
@@ -490,11 +482,9 @@ class ManageJournalsPanel extends JPanel {
 
     class AbbreviationsTableModel extends AbstractTableModel implements ActionListener {
 
-        // @formatter:off
-        final String[] names = new String[] {Localization.lang("Journal name"),
+        private final String[] names = new String[] {Localization.lang("Journal name"),
                 Localization.lang("Abbreviation")};
-        //
-        List<JournalEntry> journals;
+        private List<JournalEntry> journals;
 
 
         public AbbreviationsTableModel() {

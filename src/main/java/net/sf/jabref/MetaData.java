@@ -22,7 +22,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
-import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -32,7 +32,7 @@ public class MetaData implements Iterable<String> {
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
 
-    private final HashMap<String, Vector<String>> metaData = new HashMap<>();
+    private final HashMap<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
     private File file; // The File where this base gets saved.
     private boolean groupTreeValid = true;
@@ -48,10 +48,10 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(HashMap<String, String> inData, BibtexDatabase db) {
+    public MetaData(HashMap<String, String> inData, BibDatabase db) {
         boolean groupsTreePresent = false;
-        Vector<String> flatGroupsData = null;
-        Vector<String> treeGroupsData = null;
+        List<String> flatGroupsData = null;
+        List<String> treeGroupsData = null;
         // The first version (0) lacked a version specification,
         // thus this value defaults to 0.
         int groupsVersionOnDisk = 0;
@@ -60,7 +60,7 @@ public class MetaData implements Iterable<String> {
             for (Map.Entry<String, String> entry : inData.entrySet()) {
                 StringReader data = new StringReader(entry.getValue());
                 String unit;
-                Vector<String> orderedData = new Vector<>();
+                List<String> orderedData = new ArrayList<>();
                 // We must allow for ; and \ in escape sequences.
                 try {
                     while ((unit = getNextUnit(data)) != null) {
@@ -71,7 +71,7 @@ public class MetaData implements Iterable<String> {
                 }
                 if ("groupsversion".equals(entry.getKey())) {
                     if (orderedData.size() >= 1) {
-                        groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
+                        groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
                     }
                 } else if ("groupstree".equals(entry.getKey())) {
                     groupsTreePresent = true;
@@ -132,7 +132,7 @@ public class MetaData implements Iterable<String> {
      * @param key the key to look up
      * @return null if no data is found
      */
-    public Vector<String> getData(String key) {
+    public List<String> getData(String key) {
         return metaData.get(key);
     }
 
@@ -152,34 +152,41 @@ public class MetaData implements Iterable<String> {
      * reconstructed from their textual (String) representation if they are of
      * type String, and stored as an actual instance.
      */
-    public void putData(String key, Vector<String> orderedData) {
+    public void putData(String key, List<String> orderedData) {
         metaData.put(key, orderedData);
     }
 
     /**
      * Look up the directory set up for the given field type for this database.
      * If no directory is set up, return that defined in global preferences.
+     * There can be up to three directory definitions for these files:
+     * the database's metadata can specify a general directory and/or a user-specific directory
+     * or the preferences can specify one.
+     *
+     * The settings are prioritized in the following order and the first defined setting is used:
+     * 1. metadata user-specific directory
+     * 2. metadata general directory
+     * 3. preferences directory
+     * 4. bib file directory
      *
      * @param fieldName The field type
      * @return The default directory for this field type.
      */
-    public String[] getFileDirectory(String fieldName) {
-        // There can be up to three directory definitions for these files - the database's
-        // metadata can specify a general directory and/or a user-specific directory, or
-        // the preferences can specify one. The settings are prioritized in the following
-        // order and the first defined setting is used: metadata user-specific directory,
-        // metadata general directory, preferences directory.
-        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL);
-        List<String> dirs = new ArrayList<>();
+    public List<String> getFileDirectory(String fieldName) {
+        List<String> fileDirs = new ArrayList<>();
 
-        Vector<String> vec = getData(key);
-        if (vec == null) {
-            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR);
-            vec = getData(key);
+        // 1. metadata user-specific directory
+        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL); // USER_SPECIFIC_FILE_DIR_FOR_DB
+        List<String> metaData = getData(key);
+        if (metaData == null) {
+            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR); // FILE_DIR_FOR_DB
+            metaData = getData(key);
         }
-        if ((vec != null) && !vec.isEmpty()) {
+
+        // 2. metadata general directory
+        if ((metaData != null) && !metaData.isEmpty()) {
             String dir;
-            dir = vec.get(0);
+            dir = metaData.get(0);
             // If this directory is relative, we try to interpret it as relative to
             // the file path of this bib file:
             if (!new File(dir).isAbsolute() && (file != null)) {
@@ -188,7 +195,7 @@ public class MetaData implements Iterable<String> {
                     // if dir is only "current" directory, just use its parent (== real current directory) as path
                     relDir = file.getParent();
                 } else {
-                    relDir = file.getParent() + System.getProperty("file.separator") + dir;
+                    relDir = file.getParent() + File.separator + dir;
                 }
                 // If this directory actually exists, it is very likely that the
                 // user wants us to use it:
@@ -196,36 +203,38 @@ public class MetaData implements Iterable<String> {
                     dir = relDir;
                 }
             }
-            dirs.add(dir);
+            fileDirs.add(dir);
         } else {
-            String dir = Globals.prefs.get(fieldName + "Directory");
+            // 3. preferences directory?
+            String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
             if (dir != null) {
-                dirs.add(dir);
+                fileDirs.add(dir);
             }
         }
 
-        // Check if the bib file location should be included, and if so, if it is set:
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && (getFile() != null)) {
+        // 4. bib file directory
+        if (getFile() != null) {
+            String parentDir = getFile().getParent();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
-                dirs.add(0, getFile().getParent());
+                fileDirs.add(0, parentDir);
             } else {
-                dirs.add(getFile().getParent());
+                fileDirs.add(parentDir);
             }
         }
 
-        return dirs.toArray(new String[dirs.size()]);
+        return fileDirs;
     }
 
     /**
      * Parse the groups metadata string
      *
      * @param orderedData The vector of metadata strings
-     * @param db          The BibtexDatabase this metadata belongs to
+     * @param db          The BibDatabase this metadata belongs to
      * @param version     The group tree version
      * @return true if parsing was successful, false otherwise
      */
-    private void putGroups(Vector<String> orderedData, BibtexDatabase db, int version) {
+    private void putGroups(List<String> orderedData, BibDatabase db, int version) {
         try {
             groupsRoot = VersionHandling.importGroups(orderedData, db,
                     version);
@@ -263,10 +272,10 @@ public class MetaData implements Iterable<String> {
             StringBuffer sb = new StringBuffer();
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
-            Vector<String> orderedData = metaData.get(key);
+            List<String> orderedData = metaData.get(key);
             sb.append("@comment{").append(META_FLAG).append(key).append(":");
             for (int j = 0; j < orderedData.size(); j++) {
-                sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
+                sb.append(StringUtil.quote(orderedData.get(j), ";", '\\')).append(";");
             }
             sb.append("}");
 
@@ -362,12 +371,12 @@ public class MetaData implements Iterable<String> {
         // read the data from the metadata and store it into the labelPattern
         for (String key : this) {
             if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
-                Vector<String> value = getData(key);
+                List<String> value = getData(key);
                 String type = key.substring(MetaData.PREFIX_KEYPATTERN.length());
                 labelPattern.addLabelPattern(type, value.get(0));
             }
         }
-        Vector<String> defaultPattern = getData(MetaData.KEYPATTERNDEFAULT);
+        List<String> defaultPattern = getData(MetaData.KEYPATTERNDEFAULT);
         if (defaultPattern != null) {
             labelPattern.setDefaultValue(defaultPattern.get(0));
         }
@@ -392,14 +401,12 @@ public class MetaData implements Iterable<String> {
         }
 
         // set new value if it is not a default value
-        Enumeration<String> allKeys = labelPattern.getAllKeys();
-        while (allKeys.hasMoreElements()) {
-            String key = allKeys.nextElement();
+        Set<String> allKeys = labelPattern.getAllKeys();
+        for (String key : allKeys) {
             String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
             if (!labelPattern.isDefaultValue(key)) {
-                ArrayList<String> value = labelPattern.getValue(key);
-                Vector<String> data = new Vector<>();
-                data.add(value.get(0));
+                List<String> data = new ArrayList<>();
+                data.add(labelPattern.getValue(key).get(0));
                 this.putData(metaDataKey, data);
             }
         }
@@ -408,7 +415,7 @@ public class MetaData implements Iterable<String> {
         if (labelPattern.getDefaultValue() == null) {
             this.remove(MetaData.KEYPATTERNDEFAULT);
         } else {
-            Vector<String> data = new Vector<>();
+            List<String> data = new ArrayList<>();
             data.add(labelPattern.getDefaultValue().get(0));
             this.putData(MetaData.KEYPATTERNDEFAULT, data);
         }

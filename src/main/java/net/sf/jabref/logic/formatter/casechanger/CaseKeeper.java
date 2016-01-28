@@ -24,9 +24,6 @@ import net.sf.jabref.logic.util.strings.StringLengthComparator;
 public class CaseKeeper implements Formatter {
 
     private String format(String text, String[] listOfWords) {
-        if (text == null) {
-            return null;
-        }
         Arrays.sort(listOfWords, new StringLengthComparator());
         // For each word in the list
         for (String listOfWord : listOfWords) {
@@ -38,8 +35,8 @@ public class CaseKeeper implements Formatter {
 
     @Override
     public String format(String text) {
-        if (text == null) {
-            return null;
+        if ((text == null) || text.isEmpty()) {
+            return text;
         }
         final CaseKeeperList list = new CaseKeeperList();
         return this.format(text, list.getAll());
@@ -47,7 +44,12 @@ public class CaseKeeper implements Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("CaseKepper");
+        return Localization.lang("CaseKeeper");
+    }
+
+    @Override
+    public String getKey() {
+        return "CaseKeeper";
     }
 
 }

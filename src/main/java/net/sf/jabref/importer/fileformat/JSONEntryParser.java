@@ -25,7 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
 
 public class JSONEntryParser {
@@ -38,12 +38,12 @@ public class JSONEntryParser {
     }
 
     /**
-     * Convert a JSONObject containing a bibJSON entry to a BibtexEntry
+     * Convert a JSONObject containing a bibJSON entry to a BibEntry
      *
      * @param bibJsonEntry The JSONObject to convert
-     * @return the converted BibtexEntry
+     * @return the converted BibEntry
      */
-    public BibtexEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
+    public BibEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
         // Fields that are directly accessible at the top level BibJson object
         String[] singleFieldStrings = {"year", "title", "abstract", "month"};
 
@@ -52,8 +52,8 @@ public class JSONEntryParser {
 
 
 
-        BibtexEntry entry = new BibtexEntry();
-        entry.setType(EntryTypes.getType("article"));
+        BibEntry entry = new BibEntry();
+        entry.setType("article");
 
         // Authors
         if (bibJsonEntry.has("author")) {
@@ -140,10 +140,8 @@ public class JSONEntryParser {
             for (int i = 0; i < links.length(); i++) {
                 if (links.getJSONObject(i).has("type")) {
                     String type = links.getJSONObject(i).getString("type");
-                    if ("fulltext".equals(type)) {
-                        if (links.getJSONObject(i).has("url")) {
-                            entry.setField("url", links.getJSONObject(i).getString("url"));
-                        }
+                    if ("fulltext".equals(type) && links.getJSONObject(i).has("url")) {
+                        entry.setField("url", links.getJSONObject(i).getString("url"));
                     }
                 }
             }
@@ -153,17 +151,17 @@ public class JSONEntryParser {
     }
 
     /**
-     * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibtexEntry
+     * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry
      *
      * @param springerJsonEntry the JSONObject from search results
-     * @return the converted BibtexEntry
+     * @return the converted BibEntry
      */
-    public static BibtexEntry SpringerJSONtoBibtex(JSONObject springerJsonEntry) {
+    public static BibEntry SpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
         String[] singleFieldStrings = {"issn", "volume", "abstract", "doi", "title", "number",
                 "publisher"};
 
-        BibtexEntry entry = new BibtexEntry();
+        BibEntry entry = new BibEntry();
         String nametype;
 
         // Guess publication type
@@ -206,8 +204,8 @@ public class JSONEntryParser {
         }
 
         // Page numbers
-        if (springerJsonEntry.has("startingPage") && (springerJsonEntry.getString("startingPage").length() > 0)) {
-            if (springerJsonEntry.has("endPage") && (springerJsonEntry.getString("endPage").length() > 0)) {
+        if (springerJsonEntry.has("startingPage") && !(springerJsonEntry.getString("startingPage").isEmpty())) {
+            if (springerJsonEntry.has("endPage") && !(springerJsonEntry.getString("endPage").isEmpty())) {
                 entry.setField("pages",
                         springerJsonEntry.getString("startingPage") + "--" + springerJsonEntry.getString("endPage"));
             } else {
@@ -223,10 +221,10 @@ public class JSONEntryParser {
         // URL
         if (springerJsonEntry.has("url")) {
             JSONArray urlarray = springerJsonEntry.optJSONArray("url");
-            if (urlarray != null) {
-                entry.setField("url", urlarray.getJSONObject(0).optString("value"));
-            } else {
+            if (urlarray == null) {
                 entry.setField("url", springerJsonEntry.optString("url"));
+            } else {
+                entry.setField("url", urlarray.getJSONObject(0).optString("value"));
             }
         }
 

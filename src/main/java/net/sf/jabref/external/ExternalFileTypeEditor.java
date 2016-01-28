@@ -23,6 +23,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -32,7 +33,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
@@ -44,11 +45,11 @@ import net.sf.jabref.logic.l10n.Localization;
 public class ExternalFileTypeEditor extends JDialog {
     private JFrame frame;
     private JDialog dialog;
-    private ArrayList<ExternalFileType> fileTypes;
+    private List<ExternalFileType> fileTypes;
     private JTable table;
     private ExternalFileTypeEntryEditor entryEditor;
     private FileTypeTableModel tableModel;
-    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
     private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
@@ -74,7 +75,7 @@ public class ExternalFileTypeEditor extends JDialog {
      */
     private void setValues() {
         fileTypes.clear();
-        ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+        ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         for (ExternalFileType type : types) {
 
             fileTypes.add(type.copy());
@@ -86,7 +87,7 @@ public class ExternalFileTypeEditor extends JDialog {
      * Store the list of external entry types to Preferences.
      */
     private void storeSettings() {
-        Globals.prefs.setExternalFileTypes(fileTypes);
+        ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
     }
 
     private void init() {
@@ -116,7 +117,7 @@ public class ExternalFileTypeEditor extends JDialog {
                         Globals.lang("Reset file type definitions"), JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);*/
                 //if (reply == JOptionPane.YES_OPTION) {
-                java.util.List<ExternalFileType> list = Globals.prefs.getDefaultExternalFileTypes();
+                java.util.List<ExternalFileType> list = ExternalFileTypes.getInstance().getDefaultExternalFileTypes();
                 fileTypes.clear();
                 fileTypes.addAll(list);
                 Collections.sort(fileTypes);
@@ -173,17 +174,17 @@ public class ExternalFileTypeEditor extends JDialog {
         // Key bindings:
         ActionMap am = upper.getActionMap();
         InputMap im = upper.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
         am = bb.getPanel().getActionMap();
         im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
-        if (frame != null) {
-            setLocationRelativeTo(frame);
-        } else {
+        if (frame == null) {
             setLocationRelativeTo(dialog);
+        } else {
+            setLocationRelativeTo(frame);
         }
     }
 
@@ -267,7 +268,7 @@ public class ExternalFileTypeEditor extends JDialog {
 
     static class IconRenderer implements TableCellRenderer {
 
-        final JLabel lab = new JLabel();
+        private final JLabel lab = new JLabel();
 
 
         @Override
@@ -301,10 +302,8 @@ public class ExternalFileTypeEditor extends JDialog {
                 return Localization.lang("Extension");
             case 3:
                 return Localization.lang("MIME type");
-            case 4:
+            default: // Five columns
                 return Localization.lang("Application");
-            default:
-                return null;
             }
         }
 
@@ -329,10 +328,8 @@ public class ExternalFileTypeEditor extends JDialog {
                 return type.getExtension();
             case 3:
                 return type.getMimeType();
-            case 4:
+            default: // Five columns
                 return type.getOpenWith();
-            default:
-                return null;
             }
         }
     }
@@ -364,7 +361,7 @@ public class ExternalFileTypeEditor extends JDialog {
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
         private JabRefFrame frame;
         private JDialog dialog;
-        ExternalFileTypeEditor editor;
+        private ExternalFileTypeEditor editor;
 
 
         public EditExternalFileTypesAction(JabRefFrame frame) {
@@ -382,18 +379,16 @@ public class ExternalFileTypeEditor extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (editor == null) {
-                if (frame != null) {
-                    editor = new ExternalFileTypeEditor(frame);
-                } else {
+                if (frame == null) {
                     editor = new ExternalFileTypeEditor(dialog);
+                } else {
+                    editor = new ExternalFileTypeEditor(frame);
                 }
             }
             editor.setValues();
             editor.setVisible(true);
-            if (frame != null) {
-                if (frame.getCurrentBasePanel() != null) {
-                    frame.getCurrentBasePanel().mainTable.repaint();
-                }
+            if ((frame != null) && (frame.getCurrentBasePanel() != null)) {
+                frame.getCurrentBasePanel().mainTable.repaint();
             }
         }
     }

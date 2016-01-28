@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -24,18 +24,17 @@ public class GoogleScholar implements FullTextFinder {
     private static final int NUM_RESULTS = 10;
 
     @Override
-    public Optional<URL> findFullText(BibtexEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
         // Search in title
-        String entryTitle = entry.getField("title");
-
-        if (entryTitle == null) {
+        if (!entry.hasField("title")) {
             return pdfLink;
         }
 
-        String url = String.format(SEARCH_URL, URLEncoder.encode(entryTitle, StandardCharsets.UTF_8.name()));
+        String url = String.format(SEARCH_URL,
+                URLEncoder.encode(entry.getField("title"), StandardCharsets.UTF_8.name()));
 
         Document doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler

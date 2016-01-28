@@ -28,6 +28,11 @@ public class SuperscriptFormatter implements Formatter {
         return "Superscripts";
     }
 
+    @Override
+    public String getKey() {
+        return "SuperscriptFormatter";
+    }
+
     /**
      * Converts ordinal numbers to superscripts, e.g. 1st, 2nd or 3rd.
      * Will replace ordinal numbers even if they are semantically wrong, e.g. 21rd
@@ -50,8 +55,7 @@ public class SuperscriptFormatter implements Formatter {
 
         Matcher matcher = pattern.matcher(value);
         // replace globally
-        String newValue = matcher.replaceAll(replace);
 
-        return newValue;
+        return matcher.replaceAll(replace);
     }
 }

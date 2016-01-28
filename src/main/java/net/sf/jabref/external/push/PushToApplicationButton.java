@@ -15,40 +15,25 @@
  */
 package net.sf.jabref.external.push;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Insets;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.logic.l10n.Localization;
+import java.util.Map;
 
 /**
  * Customized UI component for pushing to external applications. Has a selection popup menu to change the selected
@@ -64,7 +49,7 @@ public class PushToApplicationButton implements ActionListener {
     private JButton menuButton;
     private int selected;
     private JPopupMenu popup;
-    private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<>();
+    private final Map<PushToApplication, PushToApplicationAction> actions = new HashMap<>();
     private final Dimension buttonDim = new Dimension(23, 23);
     private static final Icon ARROW_ICON = IconTheme.JabRefIcon.DOWN.getSmallIcon();
     private final MenuAction mAction = new MenuAction();
@@ -88,7 +73,12 @@ public class PushToApplicationButton implements ActionListener {
                 new Dimension(menuButton.getIcon().getIconWidth(), menuButton.getIcon().getIconHeight()));
         menuButton.addActionListener(new MenuButtonActionListener());
         menuButton.setToolTipText(Localization.lang("Select external application"));
+
         pushButton = new JButton();
+        if (OS.OS_X) {
+            menuButton.putClientProperty("JButton.buttonType", "toolbar");
+            pushButton.putClientProperty("JButton.buttonType", "toolbar");
+        }
 
         // Set the last used external application
         String appSelected = Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
@@ -189,12 +179,12 @@ public class PushToApplicationButton implements ActionListener {
 
     static class BooleanHolder {
 
+        public boolean value;
+
+
         public BooleanHolder(boolean value) {
             this.value = value;
         }
-
-
-        public boolean value;
     }
 
 
@@ -211,7 +201,7 @@ public class PushToApplicationButton implements ActionListener {
         options.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(options, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addGlue();
         bb.addButton(ok);
@@ -237,7 +227,7 @@ public class PushToApplicationButton implements ActionListener {
         // Key bindings:
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.prefs.getKey(KeyBinds.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
 
             @Override
@@ -297,7 +287,7 @@ public class PushToApplicationButton implements ActionListener {
     class MenuAction extends MnemonicAwareAction {
 
         public MenuAction() {
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(KeyBinds.PUSH_TO_APPLICATION));
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.PUSH_TO_APPLICATION));
         }
 
         public void setTitle(String appName) {

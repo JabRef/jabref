@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,7 +24,7 @@ import org.xml.sax.SAXException;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -35,7 +36,7 @@ public class GVKFetcher implements EntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(GVKFetcher.class);
 
-    HashMap<String, String> searchKeys = new HashMap<>();
+    private final Map<String, String> searchKeys = new HashMap<>();
 
 
     public GVKFetcher() {
@@ -62,7 +63,7 @@ public class GVKFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "GVKHelp.html";
+        return "GVKHelp";
     }
 
     @Override
@@ -77,7 +78,6 @@ public class GVKFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
-        String gvkQuery = "";
 
         query = query.trim();
 
@@ -97,6 +97,7 @@ public class GVKFetcher implements EntryFetcher {
             }
         }
 
+        String gvkQuery;
         if (searchKeys.containsKey(qterms[0])) {
             gvkQuery = processComplexQuery(qterms);
         } else {
@@ -109,13 +110,13 @@ public class GVKFetcher implements EntryFetcher {
             }
         }
 
-        List<BibtexEntry> bibs = fetchGVK(gvkQuery);
+        List<BibEntry> bibs = fetchGVK(gvkQuery);
 
-        for (BibtexEntry entry : bibs) {
+        for (BibEntry entry : bibs) {
             dialog.addEntry(entry);
         }
 
-        if (bibs.size() == 0) {
+        if (bibs.isEmpty()) {
             frame.showMessage(Localization.lang("No references found"));
         }
 
@@ -128,10 +129,10 @@ public class GVKFetcher implements EntryFetcher {
 
         for (int x = 0; x < s.length; x++) {
             if (searchKeys.containsKey(s[x])) {
-                if (!(x == 0)) {
-                    result = result.concat("%20and%20" + searchKeys.get(s[x]));
-                } else {
+                if (x == 0) {
                     result = searchKeys.get(s[x]);
+                } else {
+                    result = result.concat("%20and%20" + searchKeys.get(s[x]));
                 }
                 lastWasKey = true;
             } else {
@@ -139,8 +140,7 @@ public class GVKFetcher implements EntryFetcher {
                     result = result.concat("%20");
                 }
                 String encoded = s[x];
-                encoded = encoded.replaceAll(",", "%2C");
-                encoded = encoded.replaceAll("\\?", "%3F");
+                encoded = encoded.replace(",", "%2C").replace("?", "%3F");
 
                 result = result.concat(encoded);
                 lastWasKey = false;
@@ -149,22 +149,21 @@ public class GVKFetcher implements EntryFetcher {
         return (result);
     }
 
-    private List<BibtexEntry> fetchGVK(String query) {
-        List<BibtexEntry> result;
+    private List<BibEntry> fetchGVK(String query) {
+        List<BibEntry> result;
 
         String urlPrefix = "http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=";
-        String urlQuery = query;
         String urlSuffix = "&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1";
 
-        String searchstring = (urlPrefix + urlQuery + urlSuffix);
+        String searchstring = (urlPrefix + query + urlSuffix);
         LOGGER.debug(searchstring);
         try {
-            URI uri = null;
+            URI uri;
             try {
                 uri = new URI(searchstring);
             } catch (URISyntaxException e) {
                 LOGGER.error("URI malformed error", e);
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
             URL url = uri.toURL();
             try (InputStream is = url.openStream()) {
@@ -172,13 +171,13 @@ public class GVKFetcher implements EntryFetcher {
             }
         } catch (IOException e) {
             LOGGER.error("GVK plugin: An I/O exception occurred", e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         } catch (ParserConfigurationException e) {
             LOGGER.error("GVK plugin: An internal parser error occurred", e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         } catch (SAXException e) {
             LOGGER.error("An internal parser error occurred", e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return result;

@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,12 +11,12 @@ import java.util.Optional;
 
 public class SpringerLinkTest {
     SpringerLink finder;
-    BibtexEntry entry;
+    BibEntry entry;
 
     @Before
     public void setup() {
         finder = new SpringerLink();
-        entry = new BibtexEntry();
+        entry = new BibEntry();
     }
 
     @Test(expected = NullPointerException.class)
@@ -31,6 +31,8 @@ public class SpringerLinkTest {
 
     @Test
     public void findByDOI() throws IOException {
+
+
         entry.setField("doi", "10.1186/s13677-015-0042-8");
 
         Assert.assertEquals(

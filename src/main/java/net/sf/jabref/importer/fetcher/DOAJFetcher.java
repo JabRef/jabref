@@ -32,13 +32,13 @@ import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.JSONEntryParser;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class DOAJFetcher implements EntryFetcher {
 
-    private final String searchURL = "https://doaj.org/api/v1/search/articles/";
+    private static final String SEARCH_URL = "https://doaj.org/api/v1/search/articles/";
     private static final Log LOGGER = LogFactory.getLog(DOAJFetcher.class);
-    private final int maxPerPage = 100;
+    private static final int MAX_PER_PAGE = 100;
     private boolean shouldContinue;
 
 
@@ -59,12 +59,12 @@ public class DOAJFetcher implements EntryFetcher {
         try {
             status.setStatus(Localization.lang("Searching..."));
             HttpResponse<JsonNode> jsonResponse;
-            jsonResponse = Unirest.get(searchURL + query + "?pageSize=1").header("accept", "application/json").asJson();
+            jsonResponse = Unirest.get(SEARCH_URL + query + "?pageSize=1").header("accept", "application/json").asJson();
             JSONObject jo = jsonResponse.getBody().getObject();
             int hits = jo.getInt("total");
             int numberToFetch = 0;
             if (hits > 0) {
-                if (hits > maxPerPage) {
+                if (hits > MAX_PER_PAGE) {
                     while (true) {
                         String strCount = JOptionPane
                                 .showInputDialog(
@@ -80,7 +80,7 @@ public class DOAJFetcher implements EntryFetcher {
                         try {
                             numberToFetch = Integer.parseInt(strCount.trim());
                             break;
-                        } catch (RuntimeException ex) {
+                        } catch (NumberFormatException ex) {
                             status.showMessage(Localization.lang("Please enter a valid number"));
                         }
                     }
@@ -89,20 +89,20 @@ public class DOAJFetcher implements EntryFetcher {
                 }
 
                 int fetched = 0; // Keep track of number of items fetched for the progress bar
-                for (int page = 1; ((page - 1) * maxPerPage) <= numberToFetch; page++) {
+                for (int page = 1; ((page - 1) * MAX_PER_PAGE) <= numberToFetch; page++) {
                     if (!shouldContinue) {
                         break;
                     }
 
-                    int noToFetch = Math.min(maxPerPage, numberToFetch - ((page - 1) * maxPerPage));
-                    jsonResponse = Unirest.get(searchURL + query + "?page=" + page + "&pageSize=" + noToFetch)
+                    int noToFetch = Math.min(MAX_PER_PAGE, numberToFetch - ((page - 1) * MAX_PER_PAGE));
+                    jsonResponse = Unirest.get(SEARCH_URL + query + "?page=" + page + "&pageSize=" + noToFetch)
                             .header("accept", "application/json").asJson();
                     jo = jsonResponse.getBody().getObject();
                     if (jo.has("results")) {
                         JSONArray results = jo.getJSONArray("results");
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                            BibtexEntry entry = jsonConverter.BibJSONtoBibtex(bibJsonEntry);
+                            BibEntry entry = jsonConverter.BibJSONtoBibtex(bibJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);
@@ -130,7 +130,7 @@ public class DOAJFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "DOAJHelp.html";
+        return "DOAJHelp";
     }
 
     @Override

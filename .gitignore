@@ -37,6 +37,9 @@ out/
 .project
 bin/
 
+# For Mac OS
+.DS_Store
+
 # UNKNWON
 jabref.xml
 

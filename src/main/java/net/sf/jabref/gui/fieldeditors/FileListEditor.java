@@ -25,6 +25,10 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -48,10 +52,10 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.model.entry.EntryUtil;
 import org.apache.commons.logging.Log;
@@ -187,7 +191,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         });
 
         // Add input/action pair for moving an entry up:
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.FILE_LIST_EDITOR_MOVE_ENTRY_UP), "move up");
+        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.FILE_LIST_EDITOR_MOVE_ENTRY_UP), "move up");
         getActionMap().put("move up", new AbstractAction() {
 
             @Override
@@ -197,7 +201,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         });
 
         // Add input/action pair for moving an entry down:
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.FILE_LIST_EDITOR_MOVE_ENTRY_DOWN), "move down");
+        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.FILE_LIST_EDITOR_MOVE_ENTRY_DOWN), "move down");
         getActionMap().put("move down", new AbstractAction() {
 
             @Override
@@ -226,7 +230,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 if (row >= 0) {
                     FileListEntry entry = tableModel.getEntry(row);
                     try {
-                        JabRefDesktop.openFolderAndSelectFile(entry.getLink());
+                        JabRefDesktop.openFolderAndSelectFile(entry.link);
                     } catch (IOException ex) {
                         LOGGER.debug("Cannot open folder", ex);
                     }
@@ -255,11 +259,11 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
-                File file = FileUtil.expandFilename(metaData, entry.getLink());
+                File file = FileUtil.expandFilename(metaData, entry.link);
 
                 // transactional delete and unlink
                 try {
-                    if(file != null) {
+                    if (file != null) {
                         Files.delete(file.toPath());
                     }
                     removeEntries();
@@ -277,9 +281,9 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         if (row >= 0) {
             FileListEntry entry = tableModel.getEntry(row);
             try {
-                ExternalFileType type = Globals.prefs.getExternalFileTypeByName(entry.getType().getName());
-                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(),
-                        type != null ? type : entry.getType());
+                ExternalFileType type = ExternalFileTypes.getInstance()
+                        .getExternalFileTypeByName(entry.type.getName());
+                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.link, type == null ? entry.type : type);
             } catch (IOException e) {
                 LOGGER.warn("Cannot open selected file.", e);
             }
@@ -365,7 +369,12 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     private void addEntry() {
-        addEntry("");
+        List<String> defaultDirectory = metaData.getFileDirectory(Globals.FILE_FIELD);
+        if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
+            addEntry("");
+        } else {
+            addEntry(defaultDirectory.get(0));
+        }
     }
 
     private void removeEntries() {
@@ -421,11 +430,12 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void autoSetLinks() {
         auto.setEnabled(false);
 
-        BibtexEntry entry = entryEditor.getEntry();
+        Collection<BibEntry> entries = new ArrayList<>();
+        entries.addAll(Arrays.asList(frame.getCurrentBasePanel().getSelectedEntries()));
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
+        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entries, null, null, tableModel, metaData, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
@@ -444,6 +454,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 auto.setEnabled(true);
             }
         }, dialog));
+
     }
 
     /**
@@ -523,26 +534,34 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     @Override
-    public void undo() {}
+    public void undo() {
+    }
 
     @Override
-    public void redo() {}
+    public void redo() {
+    }
 
     @Override
-    public void setAutoCompleteListener(AutoCompleteListener listener) {}
+    public void setAutoCompleteListener(AutoCompleteListener listener) {
+    }
 
     @Override
-    public void clearAutoCompleteSuggestion() {}
+    public void clearAutoCompleteSuggestion() {
+    }
 
     @Override
-    public void setActiveBackgroundColor() {}
+    public void setActiveBackgroundColor() {
+    }
 
     @Override
-    public void setValidBackgroundColor() {}
+    public void setValidBackgroundColor() {
+    }
 
     @Override
-    public void setInvalidBackgroundColor() {}
+    public void setInvalidBackgroundColor() {
+    }
 
     @Override
-    public void updateFontColor() {}
+    public void updateFontColor() {
+    }
 }

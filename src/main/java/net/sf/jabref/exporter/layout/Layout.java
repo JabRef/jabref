@@ -15,17 +15,17 @@
 */
 package net.sf.jabref.exporter.layout;
 
-import java.util.Vector;
-
+import java.util.Optional;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Main class for formatting DOCUMENT ME!
@@ -34,46 +34,45 @@ public class Layout {
 
     private final LayoutEntry[] layoutEntries;
 
-    private final ArrayList<String> missingFormatters = new ArrayList<>();
+    private final List<String> missingFormatters = new ArrayList<>();
 
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
-    public Layout(Vector<StringInt> parsedEntries, String classPrefix) {
-        StringInt si;
-        Vector<LayoutEntry> tmpEntries = new Vector<>(parsedEntries.size());
 
-        Vector<StringInt> blockEntries = null;
+    public Layout(List<StringInt> parsedEntries, String classPrefix) {
+        List<LayoutEntry> tmpEntries = new ArrayList<>(parsedEntries.size());
+
+        List<StringInt> blockEntries = null;
         LayoutEntry le;
         String blockStart = null;
 
         for (StringInt parsedEntry : parsedEntries) {
-            si = parsedEntry;
             // TODO: Rewrite using switch
-            if ((si.i == LayoutHelper.IS_LAYOUT_TEXT) || (si.i == LayoutHelper.IS_SIMPLE_FIELD)) {
+            if ((parsedEntry.i == LayoutHelper.IS_LAYOUT_TEXT) || (parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD)) {
                 // Do nothing
-            } else if (si.i == LayoutHelper.IS_FIELD_START) {
-                blockEntries = new Vector<>();
-                blockStart = si.s;
-            } else if (si.i == LayoutHelper.IS_FIELD_END) {
+            } else if (parsedEntry.i == LayoutHelper.IS_FIELD_START) {
+                blockEntries = new ArrayList<>();
+                blockStart = parsedEntry.s;
+            } else if (parsedEntry.i == LayoutHelper.IS_FIELD_END) {
                 if ((blockStart != null) && (blockEntries != null)) {
-                    if (blockStart.equals(si.s)) {
-                        blockEntries.add(si);
+                    if (blockStart.equals(parsedEntry.s)) {
+                        blockEntries.add(parsedEntry);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        LOGGER.debug(blockStart + '\n' + si.s);
+                        LOGGER.debug(blockStart + '\n' + parsedEntry.s);
                         LOGGER.warn("Nested field entries are not implemented!");
                         Thread.dumpStack();
                     }
                 }
-            } else if (si.i == LayoutHelper.IS_GROUP_START) {
-                blockEntries = new Vector<>();
-                blockStart = si.s;
-            } else if (si.i == LayoutHelper.IS_GROUP_END) {
+            } else if (parsedEntry.i == LayoutHelper.IS_GROUP_START) {
+                blockEntries = new ArrayList<>();
+                blockStart = parsedEntry.s;
+            } else if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
                 if ((blockStart != null) && (blockEntries != null)) {
-                    if (blockStart.equals(si.s)) {
-                        blockEntries.add(si);
+                    if (blockStart.equals(parsedEntry.s)) {
+                        blockEntries.add(parsedEntry);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
                         tmpEntries.add(le);
                         blockEntries = null;
@@ -82,14 +81,14 @@ public class Layout {
                         Thread.dumpStack();
                     }
                 }
-            } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+            } else if (parsedEntry.i == LayoutHelper.IS_OPTION_FIELD) {
                 // Do nothing
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(si, classPrefix));
+                tmpEntries.add(new LayoutEntry(parsedEntry, classPrefix));
             } else {
-                blockEntries.add(si);
+                blockEntries.add(parsedEntry);
             }
         }
 
@@ -102,8 +101,6 @@ public class Layout {
             if (layoutEntries[i].isInvalidFormatter()) {
                 missingFormatters.addAll(layoutEntries[i].getInvalidFormatters());
             }
-
-            //System.out.println(layoutEntries[i].text);
         }
     }
 
@@ -113,7 +110,7 @@ public class Layout {
         }
     }
 
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
+    public String doLayout(BibEntry bibtex, BibDatabase database) {
         return doLayout(bibtex, database, null);
     }
 
@@ -123,11 +120,11 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, List<String> wordsToHighlight) {
+    public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
         StringBuilder sb = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {
-            String fieldText = layoutEntry.doLayout(bibtex, database, wordsToHighlight);
+            String fieldText = layoutEntry.doLayout(bibtex, database, highlightPattern);
 
             // 2005.05.05 M. Alver
             // The following change means we treat null fields as "". This is to fix the
@@ -149,7 +146,7 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibtexDatabase database, Charset encoding)
+    public String doLayout(BibDatabase database, Charset encoding)
     {
         //System.out.println("LAYOUT: " + bibtex.getId());
         StringBuilder sb = new StringBuilder(100);
@@ -186,7 +183,7 @@ public class Layout {
 
     // added section - end (arudert)
 
-    public ArrayList<String> getMissingFormatters() {
-        return missingFormatters;
+    public List<String> getMissingFormatters() {
+        return new ArrayList<>(missingFormatters);
     }
 }

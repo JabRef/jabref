@@ -21,7 +21,6 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
-import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.model.entry.EntryUtil;
 
 import java.awt.Color;
@@ -167,7 +166,7 @@ public class TextField extends JTextField implements FieldEditor {
         //register "Paste" action
         getActionMap().put(Actions.PASTE, new PasteAction(this));
         // Bind paste command to KeyBinds.PASTE
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.PASTE), Actions.PASTE);
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
     }
 
     private void setupUndoRedo() {
@@ -193,7 +192,7 @@ public class TextField extends JTextField implements FieldEditor {
         });
 
         // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
         getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
@@ -211,6 +210,6 @@ public class TextField extends JTextField implements FieldEditor {
         });
 
         // Bind the redo action to ctl-Y
-        getInputMap().put(Globals.prefs.getKey(KeyBinds.REDO), "Redo");
+        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.REDO), "Redo");
     }
 }

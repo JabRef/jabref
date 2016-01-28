@@ -28,8 +28,12 @@ import net.sf.jabref.importer.HTMLConverter;
  */
 public class Converters {
 
-    private static final HTMLConverter htmlConverter = new HTMLConverter();
+    private static final HTMLConverter HTML_CONVERTER = new HTMLConverter();
 
+    public static final UnicodeToLatexConverter UNICODE_TO_LATEX = new UnicodeToLatexConverter();
+    public static final HTMLToLatexConverter HTML_TO_LATEX = new HTMLToLatexConverter();
+
+    public static final List<Converter> ALL = Arrays.asList(Converters.HTML_TO_LATEX, Converters.UNICODE_TO_LATEX);
 
     public interface Converter {
 
@@ -47,7 +51,7 @@ public class Converters {
 
         @Override
         public String convert(String input) {
-            return Converters.htmlConverter.formatUnicode(input);
+            return Converters.HTML_CONVERTER.formatUnicode(input);
         }
     }
 
@@ -60,13 +64,7 @@ public class Converters {
 
         @Override
         public String convert(String input) {
-            return Converters.htmlConverter.format(input);
+            return Converters.HTML_CONVERTER.format(input);
         }
     }
-
-
-    public static final UnicodeToLatexConverter UNICODE_TO_LATEX = new UnicodeToLatexConverter();
-    public static final HTMLToLatexConverter HTML_TO_LATEX = new HTMLToLatexConverter();
-
-    public static final List<Converter> ALL = Arrays.asList(Converters.HTML_TO_LATEX, Converters.UNICODE_TO_LATEX);
 }

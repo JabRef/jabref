@@ -25,17 +25,22 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.net.NetUtil;
 
 public class DiVAtoBibTeXFetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(DiVAtoBibTeXFetcher.class);
 
     private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s";
     private final CaseKeeper caseKeeper = new CaseKeeper();
@@ -56,7 +61,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             // this should never happen
             status.setStatus(Localization.lang("Error"));
-            e.printStackTrace();
+            LOGGER.warn("Encoding issues", e);
             return false;
         }
 
@@ -67,28 +72,27 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.warn("Bad URL", e);
             return false;
         }
 
         String bibtexString;
         try {
-            bibtexString = Util.getResultsWithEncoding(url, StandardCharsets.UTF_8);
+            bibtexString = NetUtil.getResultsWithEncoding(url, StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
             status.showMessage(Localization.lang("Unknown DiVA entry: '%0'.",
                             query),
                     Localization.lang("Get BibTeX entry from DiVA"), JOptionPane.INFORMATION_MESSAGE);
             return false;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Communication problems", e);
             return false;
         }
 
-        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+        BibEntry entry = BibtexParser.singleFromString(bibtexString);
         if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
-            String title = entry.getField("title");
-            if (title != null) {
+            entry.getFieldOptional("title").ifPresent(title -> {
                 // Unit formatting
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitFormatter.format(title);
@@ -99,15 +103,12 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);
-            }
+            });
 
-            String institution = entry.getField("institution");
-            if (institution != null) {
-                institution = htmlConverter.formatUnicode(institution);
-                entry.setField("institution", institution);
-            }
+            entry.getFieldOptional("institution")
+                    .ifPresent(institution -> entry.setField("institution", htmlConverter.formatUnicode(institution)));
             // Do not use the provided key
-            // entry.setField(BibtexFields.KEY_FIELD,null);
+            // entry.clearField(BibtexFields.KEY_FIELD);
             inspector.addEntry(entry);
 
             return true;
@@ -122,7 +123,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "DiVAtoBibTeXHelp.html";
+        return "DiVAtoBibTeXHelp";
     }
 
     @Override

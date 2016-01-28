@@ -35,7 +35,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -45,16 +45,16 @@ public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
 
     /** distance from component borders from which on autoscrolling starts. */
-    private static final int dragScrollActivationMargin = 10;
+    private static final int DRAG_SCROLL_ACTIVATION_MARGIN = 10;
 
     /** number of pixels to scroll each time handler is called. */
-    private static final int dragScrollDistance = 5;
+    private static final int DRAG_SCROLL_DISTANCE = 5;
 
     /** time of last autoscroll event (for limiting speed). */
     private static long lastDragAutoscroll;
 
     /** minimum interval between two autoscroll events (for limiting speed). */
-    private static final long minAutoscrollInterval = 50L;
+    private static final long MIN_AUTOSCROLL_INTERVAL = 50L;
 
     /**
      * the point on which the cursor is currently idling during a drag
@@ -66,10 +66,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
     private long idleStartTime;
 
     /** max. distance cursor may move in x or y direction while idling. */
-    private static final int idleMargin = 1;
+    private static final int IDLE_MARGIN = 1;
 
     /** idle time after which the node below is expanded. */
-    private static final long idleTimeToExpandNode = 1000L;
+    private static final long IDLE_TIME_TO_EXPAND_NODE = 1000L;
 
     private final GroupSelector groupSelector;
 
@@ -120,8 +120,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
         final GroupTreeNode target = (GroupTreeNode) path
                 .getLastPathComponent();
-        if ((target == null) || dragNode.isNodeDescendant(target)
-                || (dragNode == target)) {
+        if ((target == null) || dragNode.isNodeDescendant(target) || (dragNode.equals(target))) {
             dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
             return;
         }
@@ -164,11 +163,11 @@ public class GroupsTree extends JTree implements DragSourceListener,
         setHighlight1Cell(target);
 
         // accept or reject
-        if (dtde.isDataFlavorSupported(GroupTreeNode.flavor)) {
+        if (dtde.isDataFlavorSupported(GroupTreeNode.FLAVOR)) {
             // accept: move nodes within tree
             dtde.acceptDrag(DnDConstants.ACTION_MOVE);
         } else if (dtde
-                .isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
+                .isDataFlavorSupported(TransferableEntrySelection.FLAVOR_INTERNAL)) {
             // check if node accepts explicit assignment
             if (path == null) {
                 dtde.rejectDrag();
@@ -190,12 +189,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
 
         // auto open
-        if ((Math.abs(cursor.x - idlePoint.x) < GroupsTree.idleMargin)
-                && (Math.abs(cursor.y - idlePoint.y) < GroupsTree.idleMargin)) {
-            if ((currentTime - idleStartTime) >= GroupsTree.idleTimeToExpandNode) {
-                if (path != null) {
-                    expandPath(path);
-                }
+        if ((Math.abs(cursor.x - idlePoint.x) < GroupsTree.IDLE_MARGIN)
+                && (Math.abs(cursor.y - idlePoint.y) < GroupsTree.IDLE_MARGIN)) {
+            if (((currentTime - idleStartTime) >= GroupsTree.IDLE_TIME_TO_EXPAND_NODE) && (path != null)) {
+                expandPath(path);
             }
         } else {
             idlePoint = cursor;
@@ -203,23 +200,23 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
 
         // autoscrolling
-        if ((currentTime - GroupsTree.lastDragAutoscroll) < GroupsTree.minAutoscrollInterval) {
+        if ((currentTime - GroupsTree.lastDragAutoscroll) < GroupsTree.MIN_AUTOSCROLL_INTERVAL) {
             return;
         }
         final Rectangle r = getVisibleRect();
-        final boolean scrollUp = (cursor.y - r.y) < GroupsTree.dragScrollActivationMargin;
-        final boolean scrollDown = ((r.y + r.height) - cursor.y) < GroupsTree.dragScrollActivationMargin;
-        final boolean scrollLeft = (cursor.x - r.x) < GroupsTree.dragScrollActivationMargin;
-        final boolean scrollRight = ((r.x + r.width) - cursor.x) < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollUp = (cursor.y - r.y) < GroupsTree.DRAG_SCROLL_ACTIVATION_MARGIN;
+        final boolean scrollDown = ((r.y + r.height) - cursor.y) < GroupsTree.DRAG_SCROLL_ACTIVATION_MARGIN;
+        final boolean scrollLeft = (cursor.x - r.x) < GroupsTree.DRAG_SCROLL_ACTIVATION_MARGIN;
+        final boolean scrollRight = ((r.x + r.width) - cursor.x) < GroupsTree.DRAG_SCROLL_ACTIVATION_MARGIN;
         if (scrollUp) {
-            r.translate(0, -GroupsTree.dragScrollDistance);
+            r.translate(0, -GroupsTree.DRAG_SCROLL_DISTANCE);
         } else if (scrollDown) {
-            r.translate(0, +GroupsTree.dragScrollDistance);
+            r.translate(0, +GroupsTree.DRAG_SCROLL_DISTANCE);
         }
         if (scrollLeft) {
-            r.translate(-GroupsTree.dragScrollDistance, 0);
+            r.translate(-GroupsTree.DRAG_SCROLL_DISTANCE, 0);
         } else if (scrollRight) {
-            r.translate(+GroupsTree.dragScrollDistance, 0);
+            r.translate(+GroupsTree.DRAG_SCROLL_DISTANCE, 0);
         }
         scrollRectToVisible(r);
         GroupsTree.lastDragAutoscroll = currentTime;
@@ -235,7 +232,6 @@ public class GroupsTree extends JTree implements DragSourceListener,
         setHighlight1Cell(null);
         try {
             // initializations common to all flavors
-            final Transferable transferable = dtde.getTransferable();
             final Point p = dtde.getLocation();
             final TreePath path = getPathForLocation(p.x, p.y);
             if (path == null) {
@@ -245,9 +241,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
             final GroupTreeNode target = (GroupTreeNode) path
                     .getLastPathComponent();
             // check supported flavors
-            if (transferable.isDataFlavorSupported(GroupTreeNode.flavor)) {
+            final Transferable transferable = dtde.getTransferable();
+            if (transferable.isDataFlavorSupported(GroupTreeNode.FLAVOR)) {
                 GroupTreeNode source = (GroupTreeNode) transferable
-                        .getTransferData(GroupTreeNode.flavor);
+                        .getTransferData(GroupTreeNode.FLAVOR);
                 if (source == target) {
                     dtde.rejectDrop(); // ignore this
                     return;
@@ -267,7 +264,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                         source.getPath())}, refreshPaths(expandedPaths));
                 groupSelector.concludeMoveGroup(undo, source);
             } else if (transferable
-                    .isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
+                    .isDataFlavorSupported(TransferableEntrySelection.FLAVOR_INTERNAL)) {
                 final AbstractGroup group = target.getGroup();
                 if (!group.supportsAdd()) {
                     // this should never happen, because the same condition
@@ -276,10 +273,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
                     return;
                 }
                 final TransferableEntrySelection selection = (TransferableEntrySelection) transferable
-                        .getTransferData(TransferableEntrySelection.flavorInternal);
-                final BibtexEntry[] entries = selection.getSelection();
+                        .getTransferData(TransferableEntrySelection.FLAVOR_INTERNAL);
+                final BibEntry[] entries = selection.getSelection();
                 int assignedEntries = 0;
-                for (BibtexEntry entry : entries) {
+                for (BibEntry entry : entries) {
                     if (!target.getGroup().contains(entry)) {
                         ++assignedEntries;
                     }
@@ -338,8 +335,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     /** Returns the first selected node, or null if nothing is selected. */
     private GroupTreeNode getSelectedNode() {
         TreePath selectionPath = getSelectionPath();
-        return selectionPath != null ? (GroupTreeNode) selectionPath
-                .getLastPathComponent() : null;
+        return selectionPath == null ? null : (GroupTreeNode) selectionPath.getLastPathComponent();
     }
 
     /**

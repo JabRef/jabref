@@ -24,8 +24,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
@@ -40,8 +40,8 @@ import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
  */
 public class GroupTreeNode extends DefaultMutableTreeNode implements Transferable {
 
-    public static final DataFlavor flavor;
-    private static final DataFlavor[] flavors;
+    public static final DataFlavor FLAVOR;
+    private static final DataFlavor[] FLAVORS;
 
     static {
         DataFlavor df = null;
@@ -51,8 +51,8 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         } catch (ClassNotFoundException e) {
             // never happens
         }
-        flavor = df;
-        flavors = new DataFlavor[]{GroupTreeNode.flavor};
+        FLAVOR = df;
+        FLAVORS = new DataFlavor[] {GroupTreeNode.FLAVOR};
     }
 
 
@@ -89,7 +89,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         GroupTreeNode cursor;
         while (e.hasMoreElements()) {
             cursor = e.nextElement();
-            sb.append(cursor.getLevel()).append(" ").append(cursor.getGroup()).append("\n");
+            sb.append(cursor.getLevel()).append(' ').append(cursor.getGroup()).append('\n');
         }
         return sb.toString();
     }
@@ -110,12 +110,12 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
 
     /**
      * Update all groups, if necessary, to handle the situation where the group
-     * tree is applied to a different BibtexDatabase than it was created for. This
+     * tree is applied to a different BibDatabase than it was created for. This
      * is for instance used when updating the group tree due to an external change.
      *
      * @param db The database to refresh for.
      */
-    public void refreshGroupsForNewDatabase(BibtexDatabase db) {
+    public void refreshGroupsForNewDatabase(BibDatabase db) {
         for (int i = 0; i < getChildCount(); ++i) {
             GroupTreeNode node = (GroupTreeNode) getChildAt(i);
             node.getGroup().refreshForNewDatabase(db);
@@ -199,26 +199,6 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
                     .getSearchRule(originalContext));
         }
         return searchRule;
-    }
-
-    @Override
-    public Enumeration<GroupTreeNode> preorderEnumeration() {
-        return super.preorderEnumeration();
-    }
-
-    @Override
-    public Enumeration<GroupTreeNode> depthFirstEnumeration() {
-        return super.depthFirstEnumeration();
-    }
-
-    @Override
-    public Enumeration<GroupTreeNode> breadthFirstEnumeration() {
-        return super.breadthFirstEnumeration();
-    }
-
-    @Override
-    public Enumeration<GroupTreeNode> children() {
-        return super.children();
     }
 
     public boolean canMoveUp() {
@@ -311,7 +291,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Adds the selected entries to this node's group.
      */
-    public AbstractUndoableEdit addToGroup(BibtexEntry[] entries) {
+    public AbstractUndoableEdit addToGroup(BibEntry[] entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }
@@ -325,7 +305,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Removes the selected entries from this node's group.
      */
-    public AbstractUndoableEdit removeFromGroup(BibtexEntry[] entries) {
+    public AbstractUndoableEdit removeFromGroup(BibEntry[] entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }
@@ -338,12 +318,12 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return GroupTreeNode.flavors;
+        return GroupTreeNode.FLAVORS;
     }
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor someFlavor) {
-        return someFlavor.equals(GroupTreeNode.flavor);
+        return someFlavor.equals(GroupTreeNode.FLAVOR);
     }
 
     @Override

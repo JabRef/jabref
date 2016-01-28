@@ -16,8 +16,12 @@
 package net.sf.jabref.logic.util.io;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.entry.BibEntry;
+
+import net.sf.jabref.model.entry.FileField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -33,19 +37,32 @@ import java.util.regex.Pattern;
 public class FileUtil {
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
+    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+    private static final Pattern SLASH = Pattern.compile("/");
+    private static final Pattern BACKSLASH = Pattern.compile("\\\\");
+
     /**
-     * Returns the extension of a file or null if the file does not have one (no . in name).
+     * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
      * @param file
      * @return The extension, trimmed and in lowercase.
      */
-    public static String getFileExtension(File file) {
-        String name = file.getName();
-        int pos = name.lastIndexOf('.');
-        if ((pos >= 0) && (pos < (name.length() - 1))) {
-            return name.substring(pos + 1).trim().toLowerCase();
+    public static Optional<String> getFileExtension(File file) {
+        return getFileExtension(file.getName());
+    }
+
+    /**
+     * Returns the extension of a file name or Optional.empty() if the file does not have one (no . in name).
+     *
+     * @param fileName
+     * @return The extension, trimmed and in lowercase.
+     */
+    public static Optional<String> getFileExtension(String fileName) {
+        int pos = fileName.lastIndexOf('.');
+        if ((pos > 0) && (pos < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(pos + 1).trim().toLowerCase());
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -70,23 +87,23 @@ public class FileUtil {
         List<String> pathSubstrings = Arrays.asList(arr);
 
         // compute shortest folder substrings
-        while(!stackList.stream().allMatch(p -> p.isEmpty())) {
-            for(int i = 0; i < stackList.size(); i++) {
+        while (!stackList.stream().allMatch(Vector::isEmpty)) {
+            for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
-                if(tempString.isEmpty() && !stackList.get(i).isEmpty()) {
+                if (tempString.isEmpty() && !stackList.get(i).isEmpty()) {
                     pathSubstrings.set(i, stackList.get(i).pop());
                 } else {
-                    if(!stackList.get(i).isEmpty()) {
+                    if (!stackList.get(i).isEmpty()) {
                         pathSubstrings.set(i, stackList.get(i).pop() + File.separator + tempString);
                     }
                 }
             }
 
-            for(int i = 0; i < stackList.size(); i++) {
+            for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
-                if(Collections.frequency(pathSubstrings, tempString) == 1) {
+                if (Collections.frequency(pathSubstrings, tempString) == 1) {
                     stackList.get(i).clear();
                 }
             }
@@ -106,33 +123,22 @@ public class FileUtil {
      * @throws IOException
      */
     public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
-
-        BufferedInputStream in = null;
-        BufferedOutputStream out = null;
-        try {
-            // Check if the file already exists.
-            if (dest.exists()) {
-                if (!deleteIfExists) {
-                    return false;
-                    // else dest.delete();
-                }
+        // Check if the file already exists.
+        if (dest.exists()) {
+            if (!deleteIfExists) {
+                return false;
+                // else dest.delete();
             }
+        }
+        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(source));
+                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
 
-            in = new BufferedInputStream(new FileInputStream(source));
-            out = new BufferedOutputStream(new FileOutputStream(dest));
+
             int el;
-            // int tell = 0;
             while ((el = in.read()) >= 0) {
                 out.write(el);
             }
-        } finally {
-            if (out != null) {
-                out.flush();
-                out.close();
-            }
-            if (in != null) {
-                in.close();
-            }
+            out.flush();
         }
         return true;
     }
@@ -167,18 +173,16 @@ public class FileUtil {
      * @param name     The filename, may also be a relative path to the file
      */
     public static File expandFilename(final MetaData metaData, String name) {
-        int pos = name.lastIndexOf('.');
-        String extension = (pos >= 0) && (pos < (name.length() - 1)) ? name
-                .substring(pos + 1).trim().toLowerCase() : null;
+        Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        String[] dir = metaData.getFileDirectory(extension);
+        List<String> directories = metaData.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
-        String[] fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
+        List<String> fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
         // Include the directory of the bib file:
         ArrayList<String> al = new ArrayList<>();
-        for (String aDir : dir) {
-            if (!al.contains(aDir)) {
-                al.add(aDir);
+        for (String dir : directories) {
+            if (!al.contains(dir)) {
+                al.add(dir);
             }
         }
         for (String aFileDir : fileDir) {
@@ -186,8 +190,8 @@ public class FileUtil {
                 al.add(aFileDir);
             }
         }
-        String[] dirs = al.toArray(new String[al.size()]);
-        return expandFilename(name, dirs);
+
+        return expandFilename(name, al);
     }
 
     /**
@@ -197,11 +201,10 @@ public class FileUtil {
      * Will look in each of the given dirs starting from the beginning and
      * returning the first found file to match if any.
      */
-    public static File expandFilename(String name, String[] dir) {
-
-        for (String aDir : dir) {
-            if (aDir != null) {
-                File result = expandFilename(name, aDir);
+    public static File expandFilename(String name, List<String> directories) {
+        for (String dir : directories) {
+            if (dir != null) {
+                File result = expandFilename(name, dir);
                 if (result != null) {
                     return result;
                 }
@@ -217,47 +220,34 @@ public class FileUtil {
      */
     public static File expandFilename(String name, String dir) {
 
-        File file;
         if ((name == null) || name.isEmpty()) {
             return null;
+        }
+
+        File file = new File(name);
+        if (file.exists() || (dir == null)) {
+            return file;
+        }
+
+        if (dir.endsWith(FILE_SEPARATOR)) {
+            name = dir + name;
         } else {
-            file = new File(name);
+            name = dir + FILE_SEPARATOR + name;
         }
 
-        if (!file.exists() && (dir != null)) {
-            if (dir.endsWith(System.getProperty("file.separator"))) {
-                name = dir + name;
-            } else {
-                name = dir + System.getProperty("file.separator") + name;
-            }
-
-            // System.out.println("expanded to: "+name);
-            // if (name.startsWith("ftp"))
-
-            file = new File(name);
-
-            if (file.exists()) {
-                return file;
-            }
-            // Ok, try to fix / and \ problems:
-            if (OS.WINDOWS) {
-                // workaround for catching Java bug in regexp replacer
-                // and, why, why, why ... I don't get it - wegner 2006/01/22
-                try {
-                    name = name.replaceAll("/", "\\\\");
-                } catch (StringIndexOutOfBoundsException exc) {
-                    LOGGER.error("An internal Java error was caused by the entry " + "\"" + name + "\"", exc);
-                }
-            } else {
-                name = name.replaceAll("\\\\", "/");
-            }
-            // System.out.println("expandFilename: "+name);
-            file = new File(name);
-            if (!file.exists()) {
-                file = null;
-            }
+        // fix / and \ problems:
+        if (OS.WINDOWS) {
+            name = SLASH.matcher(name).replaceAll("\\\\");
+        } else {
+            name = BACKSLASH.matcher(name).replaceAll("/");
         }
-        return file;
+
+        File fileInDir = new File(name);
+        if (fileInDir.exists()) {
+            return fileInDir;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -270,11 +260,8 @@ public class FileUtil {
      * @param fileName the filename to be shortened
      * @param dirs     directories to check.
      */
-    public static File shortenFileName(File fileName, String[] dirs) {
-        if ((fileName == null) || (fileName.length() == 0)) {
-            return fileName;
-        }
-        if (!fileName.isAbsolute() || (dirs == null)) {
+    public static File shortenFileName(File fileName, List<String> dirs) {
+        if (fileName == null || !fileName.isAbsolute() || (dirs == null)) {
             return fileName;
         }
 
@@ -290,10 +277,7 @@ public class FileUtil {
     }
 
     private static File shortenFileName(File fileName, String dir) {
-        if ((fileName == null) || (fileName.length() == 0)) {
-            return fileName;
-        }
-        if (!fileName.isAbsolute() || (dir == null)) {
+        if (fileName == null || !fileName.isAbsolute() || (dir == null)) {
             return fileName;
         }
 
@@ -306,8 +290,8 @@ public class FileUtil {
             longName = fileName.toString();
         }
 
-        if (!dir.endsWith(System.getProperty("file.separator"))) {
-            dir = dir.concat(System.getProperty("file.separator"));
+        if (!dir.endsWith(FILE_SEPARATOR)) {
+            dir = dir.concat(FILE_SEPARATOR);
         }
 
         if (longName.startsWith(dir)) {
@@ -318,4 +302,78 @@ public class FileUtil {
             return fileName;
         }
     }
+
+    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
+        HashMap<BibEntry, List<File>> result = new HashMap<>();
+
+        // First scan directories
+        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
+
+        // Initialize Result-Set
+        for (BibEntry entry : entries) {
+            result.put(entry, new ArrayList<>());
+        }
+
+        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
+        // Now look for keys
+        nextFile: for (File file : filesWithExtension) {
+
+            String name = file.getName();
+            int dot = name.lastIndexOf('.');
+            // First, look for exact matches:
+            for (BibEntry entry : entries) {
+                String citeKey = entry.getCiteKey();
+                if ((citeKey != null) && !citeKey.isEmpty()) {
+                    if (dot > 0) {
+                        if (name.substring(0, dot).equals(citeKey)) {
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
+            // If we get here, we didn't find any exact matches. If non-exact
+            // matches are allowed, try to find one:
+            if (!exactOnly) {
+                for (BibEntry entry : entries) {
+                    String citeKey = entry.getCiteKey();
+                    if ((citeKey != null) && !citeKey.isEmpty()) {
+                        if (name.startsWith(citeKey)) {
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns the list of linked files. The files have the absolute filename
+     *
+     * @param bes list of BibTeX entries
+     * @param fileDirs list of directories to try for expansion
+     *
+     * @return list of files. May be empty
+     */
+    public static List<File> getListOfLinkedFiles(List<BibEntry> bes, List<String> fileDirs) {
+        Objects.requireNonNull(bes);
+        Objects.requireNonNull(fileDirs);
+
+        List<File> result = new ArrayList<>();
+        for (BibEntry entry : bes) {
+            List<FileField.ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
+            for (FileField.ParsedFileField file : fileList) {
+                File f = expandFilename(file.link, fileDirs);
+                if (f != null) {
+                    result.add(f);
+                }
+            }
+        }
+
+        return result;
+    }
+
 }

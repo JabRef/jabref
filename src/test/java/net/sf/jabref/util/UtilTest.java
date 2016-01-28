@@ -1,7 +1,7 @@
 package net.sf.jabref.util;
 
-import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.util.*;
-import java.util.List;
+
 public class UtilTest {
 
     @Test
@@ -50,8 +50,8 @@ public class UtilTest {
 
 
 
-    BibtexDatabase database;
-    BibtexEntry entry;
+    BibDatabase database;
+    BibEntry entry;
 
 
     @Before
@@ -142,35 +142,26 @@ public class UtilTest {
     @Ignore
     public void testUserFieldAndFormat() {
 
-        String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
-        if (names == null) {
-            names = new String[] {};
-        }
+        List<String> names = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATER_KEY);
 
-        String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
-        if (formats == null) {
-            formats = new String[] {};
-        }
+        List<String> formats = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATTER_VALUE);
 
         try {
 
-            List<String> f = new LinkedList<>(Arrays.asList(formats));
-            List<String> n = new LinkedList<>(Arrays.asList(names));
+            List<String> f = new LinkedList<>(formats);
+            List<String> n = new LinkedList<>(names);
 
             n.add("testMe123454321");
             f.add("*@*@test");
 
-            String[] newNames = n.toArray(new String[n.size()]);
-            String[] newFormats = f.toArray(new String[f.size()]);
-
-            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, newNames);
-            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, newFormats);
+            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATER_KEY, n);
+            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATTER_VALUE, f);
 
             Assert.assertEquals("testtest", net.sf.jabref.util.Util.getFieldAndFormat("[author:testMe123454321]", entry, database));
 
         } finally {
-            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, names);
-            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
+            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATER_KEY, names);
+            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
         }
     }
 
