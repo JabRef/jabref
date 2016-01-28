@@ -305,13 +305,13 @@ public class ExternalFilePanel extends JPanel {
                  * http://sourceforge.net/tracker/index.php?func=detail&aid=1548875&group_id=92314&atid=600306
                  *
                  */
-                if (OS.WINDOWS) {
-                    plannedName = plannedName.replaceAll(
-                            "\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
-                } else if (OS.OS_X) {
-                    plannedName = plannedName.replace(":", "");
+                if (plannedName != null) {
+                    if (OS.WINDOWS) {
+                        plannedName = plannedName.replaceAll("\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
+                    } else if (OS.OS_X) {
+                        plannedName = plannedName.replace(":", "");
+                    }
                 }
-
                 return plannedName;
             }
 
