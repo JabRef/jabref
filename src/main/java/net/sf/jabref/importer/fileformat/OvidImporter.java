@@ -170,7 +170,7 @@ public class OvidImporter extends ImportFormat {
                         h.put("pages", matcher.group(6));
 
                     } else if ((matcher = OvidImporter.incollection_pat.matcher(content)).find()) {
-                        h.put("editor", matcher.group(1).replaceAll(" \\(Ed\\)", ""));
+                        h.put("editor", matcher.group(1).replace(" (Ed)", ""));
                         h.put("year", matcher.group(2));
                         h.put("booktitle", matcher.group(3));
                         h.put("pages", matcher.group(4));
@@ -185,7 +185,7 @@ public class OvidImporter extends ImportFormat {
                     }
                     // Add double hyphens to page ranges:
                     if (h.get("pages") != null) {
-                        h.put("pages", h.get("pages").replaceAll("-", "--"));
+                        h.put("pages", h.get("pages").replace("-", "--"));
                     }
 
                 } else if ("Abstract".equals(fieldName)) {
@@ -202,7 +202,7 @@ public class OvidImporter extends ImportFormat {
                 } else if (fieldName.startsWith("Language")) {
                     h.put("language", content);
                 } else if (fieldName.startsWith("Author Keywords")) {
-                    content = content.replaceAll(";", ",").replaceAll("  ", " ");
+                    content = content.replace(";", ",").replace("  ", " ");
                     h.put("keywords", content);
                 } else if (fieldName.startsWith("ISSN")) {
                     h.put("issn", content);
@@ -216,7 +216,7 @@ public class OvidImporter extends ImportFormat {
             String auth = h.get("author");
             if ((auth != null) && auth.contains(" [Ed]")) {
                 h.remove("author");
-                h.put("editor", auth.replaceAll(" \\[Ed\\]", ""));
+                h.put("editor", auth.replace(" [Ed]", ""));
             }
 
             // Rearrange names properly:
@@ -256,7 +256,7 @@ public class OvidImporter extends ImportFormat {
     private static String fixNames(String content) {
         String names;
         if (content.indexOf(';') > 0) { //LN FN; [LN FN;]*
-            names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and");
+            names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replace(";", " and");
         } else if (content.indexOf("  ") > 0) {
             String[] sNames = content.split("  ");
             StringBuilder sb = new StringBuilder();

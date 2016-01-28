@@ -89,7 +89,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "CiteSeerHelp.html";
+        return "CiteSeerHelp";
     }
 
     @Override

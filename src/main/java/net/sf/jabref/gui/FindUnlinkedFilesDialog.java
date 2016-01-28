@@ -97,26 +97,26 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  *
  */
 public class FindUnlinkedFilesDialog extends JDialog {
+    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
 
     /**
      * Keys to be used for referencing this Action.
      */
     public static final String ACTION_COMMAND = "findUnlinkedFiles";
     public static final String ACTION_MENU_TITLE = Localization.menuTitle("Find unlinked files...");
-    public static final String ACTION_ICON = "toggleSearch";
+
     public static final String ACTION_SHORT_DESCRIPTION = Localization.lang("Searches for unlinked PDF files on the file system");
-
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
-    private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
 
+    private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
     private JabRefFrame frame;
     private BibDatabase database;
     private EntryFromFileCreatorManager creatorManager;
+
     private UnlinkedFilesCrawler crawler;
-
     private File lastSelectedDirectory;
-    private TreeModel treeModel;
 
+    private TreeModel treeModel;
     /* PANELS */
     private JPanel panelDirectory;
     private JPanel panelSearchArea;
@@ -124,50 +124,48 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private JPanel panelOptions;
     private JPanel panelButtons;
     private JPanel panelEntryTypesSelection;
-    private JPanel panelImportArea;
 
+    private JPanel panelImportArea;
     private JButton buttonBrowse;
     private JButton buttonScan;
     private JButton buttonApply;
-    private JButton buttonClose;
 
+    private JButton buttonClose;
     /* Options for the TreeView */
     private JButton buttonOptionSelectAll;
     private JButton buttonOptionUnselectAll;
     private JButton buttonOptionExpandAll;
     private JButton buttonOptionCollapseAll;
-    private JCheckBox checkboxCreateKeywords;
 
+    private JCheckBox checkboxCreateKeywords;
     private JTextField textfieldDirectoryPath;
     private JLabel labelDirectoryDescription;
     private JLabel labelFileTypesDescription;
     private JLabel labelFilesDescription;
     private JLabel labelEntryTypeDescription;
     private JLabel labelSearchingDirectoryInfo;
-    private JLabel labelImportingInfo;
 
+    private JLabel labelImportingInfo;
     private JTree tree;
     private JScrollPane scrollpaneTree;
     private JComboBox<FileFilter> comboBoxFileTypeSelection;
-    private JComboBox<BibtexEntryTypeWrapper> comboBoxEntryTypeSelection;
 
+    private JComboBox<BibtexEntryTypeWrapper> comboBoxEntryTypeSelection;
     private JProgressBar progressBarSearching;
     private JProgressBar progressBarImporting;
     private JFileChooser fileChooser;
-    private MouseListener treeMouseListener;
 
+    private MouseListener treeMouseListener;
     private Action actionSelectAll;
     private Action actionUnselectAll;
     private Action actionExpandTree;
+
     private Action actionCollapseTree;
 
     private ComponentListener dialogPositionListener;
-
     private final AtomicBoolean threadState = new AtomicBoolean();
+
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
-
-    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
-
 
     /**
      * For Unit-testing only. <i>Don't remove!</i> <br>

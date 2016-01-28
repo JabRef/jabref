@@ -216,6 +216,8 @@ public class FileActions {
             // sorted as they appear on the screen.
             List<BibEntry> sorter = FileActions.getSortedEntries(loadedDatabase.getDatabase(), loadedDatabase.getMetaData(), null, true);
 
+            sorter = FileActions.applySaveActions(sorter, loadedDatabase.getMetaData());
+
             BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
 
             for (BibEntry entry : sorter) {
@@ -267,7 +269,7 @@ public class FileActions {
             if ((loadedDatabase.getDatabase().getEpilog() != null) && !(loadedDatabase.getDatabase().getEpilog().isEmpty())) {
                writer.write(loadedDatabase.getDatabase().getEpilog());
             } else {
-               writer.write(Globals.NEWLINE);
+                writer.write(Globals.NEWLINE);
             }
         } catch (IOException ex) {
             LOGGER.error("Could not write file", ex);
@@ -278,6 +280,24 @@ public class FileActions {
 
         return session;
 
+    }
+
+    private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
+        if (metaData.getData(SaveActions.META_KEY) != null) {
+            // no save actions defined -> do nothing
+            return toChange;
+        } else {
+            // save actions defined -> apply for every entry
+            List<BibEntry> result = new ArrayList<>(toChange.size());
+
+            SaveActions saveActions = new SaveActions(metaData);
+
+            for (BibEntry entry : toChange) {
+                result.add(saveActions.applySaveActions(entry));
+            }
+
+            return result;
+        }
     }
 
 
@@ -298,13 +318,12 @@ public class FileActions {
              * 3. ordered by specified order
              */
 
-            Vector<String> storedSaveOrderConfig = null;
+            List<String> storedSaveOrderConfig = null;
             if (isSaveOperation) {
                 storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             }
 
             // This case should never be hit as SaveSettings() is never called if InOriginalOrder is true
-            assert (storedSaveOrderConfig == null) && isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
             assert (storedSaveOrderConfig == null) && !isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
 
             if (storedSaveOrderConfig != null) {
@@ -318,13 +337,6 @@ public class FileActions {
                 priD = saveOrderConfig.sortCriteria[0].descending;
                 secD = saveOrderConfig.sortCriteria[1].descending;
                 terD = saveOrderConfig.sortCriteria[2].descending;
-            } else if (isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER)) {
-                pri = Globals.prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD);
-                sec = Globals.prefs.get(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD);
-                ter = Globals.prefs.get(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD);
-                priD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING);
-                secD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING);
-                terD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING);
             } else if (!isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
                 pri = Globals.prefs.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD);
                 sec = Globals.prefs.get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD);
@@ -491,7 +503,7 @@ public class FileActions {
      */
     public static List<BibEntry> getSortedEntries(BibDatabase database, MetaData metaData, Set<String> keySet, boolean isSaveOperation) {
         //if no meta data are present, simply return in original order
-        if(metaData == null) {
+        if (metaData == null) {
             List<BibEntry> result = new LinkedList<>();
             result.addAll(database.getEntries());
             return result;
@@ -502,7 +514,7 @@ public class FileActions {
             List<String> storedSaveOrderConfig = metaData
                     .getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             if (storedSaveOrderConfig == null) {
-                inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
+                inOriginalOrder = true;
             } else {
                 SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
                 inOriginalOrder = saveOrderConfig.saveInOriginalOrder;

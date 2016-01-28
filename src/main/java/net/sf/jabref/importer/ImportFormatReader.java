@@ -321,8 +321,7 @@ public class ImportFormatReader {
         return new InputStreamReader(new FileInputStream(f), charset);
     }
 
-    public static Reader getReaderDefaultEncoding(InputStream in)
-            throws IOException {
+    public static Reader getReaderDefaultEncoding(InputStream in) {
         InputStreamReader reader;
         reader = new InputStreamReader(in, Globals.prefs.getDefaultEncoding());
 

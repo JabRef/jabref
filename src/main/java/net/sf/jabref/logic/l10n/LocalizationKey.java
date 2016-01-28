@@ -12,15 +12,15 @@ public class LocalizationKey {
 
     public String getPropertiesKeyUnescaped() {
         // space, = and : are not allowed in properties file keys
-        return this.key.replaceAll(" ", "_");
+        return this.key.replace(" ", "_");
     }
 
     public String getPropertiesKey() {
         // space, = and : are not allowed in properties file keys
-        return this.key.replaceAll(" ", "_").replace("=", "\\=").replace(":", "\\:").replace("\\\\", "\\");
+        return this.key.replace(" ", "_").replace("=", "\\=").replace(":", "\\:").replace("\\\\", "\\");
     }
 
     public String getTranslationValue() {
-        return this.key.replaceAll("_", " ").replaceAll("\\\\=", "=").replaceAll("\\\\:", ":");
+        return this.key.replace("_", " ").replaceAll("\\\\=", "=").replaceAll("\\\\:", ":");
     }
 }

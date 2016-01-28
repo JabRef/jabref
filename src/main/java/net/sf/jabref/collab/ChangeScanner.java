@@ -17,12 +17,7 @@ package net.sf.jabref.collab;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Vector;
-import java.util.ArrayList;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -182,12 +177,12 @@ public class ChangeScanner implements Runnable {
         // matches
         for (String key : inTemp1) {
             // See if the key is missing in the disk database:
-            Vector<String> vod = onDisk.getData(key);
+            List<String> vod = onDisk.getData(key);
             if (vod == null) {
                 mdc.insertMetaDataRemoval(key);
             } else {
                 // Both exist. Check if they are different:
-                Vector<String> vit = inTemp1.getData(key);
+                List<String> vit = inTemp1.getData(key);
                 if (!vod.equals(vit)) {
                     mdc.insertMetaDataChange(key, vod);
                 }

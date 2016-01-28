@@ -4,7 +4,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.BibtexString;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -117,6 +116,23 @@ public class BibtexParserTest {
         Assert.assertEquals(2, e.getFieldNames().size());
         Assert.assertEquals("Ed von Test", e.getField("author"));
     }
+
+    @Test
+    public void parseQuotedEntries() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@article{test,author=\"Ed von Test\"}"));
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals("article", e.getType());
+        Assert.assertEquals("test", e.getCiteKey());
+        Assert.assertEquals(2, e.getFieldNames().size());
+        Assert.assertEquals("Ed von Test", e.getField("author"));
+    }
+
 
     @Test
     public void parseRecognizesEntryOnlyWithKey() throws IOException {
@@ -301,6 +317,23 @@ public class BibtexParserTest {
         Assert.assertEquals("inproceedings", b.getType());
         Assert.assertEquals("foo", b.getCiteKey());
         Assert.assertEquals("Norton Bar", b.getField("author"));
+    }
+
+    @Test
+    public void assertCorrectnessOfParsedSerialization() throws IOException {
+        String firstEntry = "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
+                + "  title = {Title A}}";
+        String secondEntry = "\n@inProceedings{foo," + "  author={Norton Bar}}";
+
+        ParserResult result = BibtexParser.parse(new StringReader(firstEntry + secondEntry));
+
+        for (BibEntry entry : result.getDatabase().getEntries()) {
+            if (entry.getCiteKey().equals("canh05")) {
+                Assert.assertEquals(firstEntry, entry.getParsedSerialization());
+            } else {
+                Assert.assertEquals(secondEntry, entry.getParsedSerialization());
+            }
+        }
     }
 
     @Test
@@ -624,13 +657,25 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals("Size should be one, but was " + c.size(), 1, c.size());
-        Assert.assertEquals("Epilog should be preserved","}",result.getDatabase().getEpilog());
+        Assert.assertEquals("Epilog should be preserved", "}", result.getDatabase().getEpilog());
     }
 
     @Test
     public void parseWarnsAboutUnmatchedContentInEntry() throws IOException {
 
-        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, to much}"));
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, too much}"));
+
+        Assert.assertTrue("There should be warnings", result.hasWarnings());
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
+    }
+
+    @Test
+    @Ignore("Ignoring because this is an edge case")
+    public void parseWarnsAboutUnmatchedContentInEntryWithoutComma() throws IOException {
+
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket } too much}"));
 
         Assert.assertTrue("There should be warnings", result.hasWarnings());
 
@@ -1023,7 +1068,7 @@ public class BibtexParserTest {
      * @author Andrei Haralevich
      */
     @Test
-    @Ignore
+    @Ignore("Ignoring, since the parser is not responsible for fixing the content. This should be done later")
     public void parseRemovesTabsInFileField() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,file = {ups  \tsala}}"));
 
@@ -1039,7 +1084,7 @@ public class BibtexParserTest {
      * @author Andrei Haralevich
      */
     @Test
-    @Ignore
+    @Ignore("Ignoring, since the parser is not responsible for fixing the content. This should be done later")
     public void parseRemovesNewlineInFileField() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,file = {ups \n\tsala}}"));
 

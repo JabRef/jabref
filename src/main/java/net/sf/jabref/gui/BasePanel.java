@@ -35,7 +35,7 @@ import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
-import net.sf.jabref.gui.actions.CleanUpAction;
+import net.sf.jabref.gui.actions.CleanupAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
@@ -280,7 +280,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private void setupActions() {
         SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
-        CleanUpAction cleanUpAction = new CleanUpAction(this);
+        CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs);
 
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);

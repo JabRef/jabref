@@ -96,7 +96,8 @@ public class MedlinePlainImporter extends ImportFormat {
             sb.append(str);
             sb.append('\n');
         }
-        String[] entries = sb.toString().replaceAll("\u2013", "-").replaceAll("\u2014", "--").replaceAll("\u2015", "--").split("\\n\\n");
+        String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
+                .split("\\n\\n");
 
         for (String entry1 : entries) {
 

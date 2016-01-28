@@ -15,6 +15,11 @@ public class DateFormatter implements Formatter {
         return "Date";
     }
 
+    @Override
+    public String getKey() {
+        return "DateFormatter";
+    }
+
     /**
      * Format date string to yyyy-mm-dd or yyyy-mm. Keeps the existing String if it does not match one of the following
      * formats:

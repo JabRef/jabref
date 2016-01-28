@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -59,15 +59,14 @@ public class MergeDialog extends JDialog {
     public MergeDialog(JabRefFrame frame, String title, boolean modal) {
         super(frame, title, modal);
         try {
-            jbInit(frame);
+            jbInit();
             pack();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    private void jbInit(JabRefFrame parent) {
-        //  titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
+    private void jbInit() {
         panel1.setLayout(borderLayout1);
         ok.setText(Localization.lang("OK"));
         ok.addActionListener(new MergeDialog_ok_actionAdapter(this));
@@ -111,12 +110,12 @@ public class MergeDialog extends JDialog {
 
     }
 
-    void ok_actionPerformed(ActionEvent e) {
+    void ok_actionPerformed() {
         okPressed = true;
         dispose();
     }
 
-    void Cancel_actionPerformed(ActionEvent e) {
+    void Cancel_actionPerformed() {
         dispose();
     }
 
@@ -152,7 +151,7 @@ class MergeDialog_ok_actionAdapter implements java.awt.event.ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.ok_actionPerformed(e);
+        adaptee.ok_actionPerformed();
     }
 }
 
@@ -167,6 +166,6 @@ class MergeDialog_Cancel_actionAdapter implements java.awt.event.ActionListener 
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.Cancel_actionPerformed(e);
+        adaptee.Cancel_actionPerformed();
     }
 }

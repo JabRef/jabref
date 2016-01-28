@@ -13,7 +13,6 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 

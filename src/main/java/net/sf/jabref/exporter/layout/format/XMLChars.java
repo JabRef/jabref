@@ -83,7 +83,7 @@ public class XMLChars implements LayoutFormatter {
 
     private String restFormat(String toFormat) {
 
-        String fieldText = toFormat.replaceAll("\\}", "").replaceAll("\\{", "");
+        String fieldText = toFormat.replace("}", "").replace("{", "");
 
         // now some copy-paste problems most often occuring in abstracts when
         // copied from PDF

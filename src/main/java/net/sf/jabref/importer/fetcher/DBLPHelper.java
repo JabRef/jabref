@@ -41,10 +41,7 @@ class DBLPHelper {
         public String cleanQuery(final String query) {
             String cleaned = query;
 
-            cleaned = cleaned.replaceAll("-", " ");
-            cleaned = cleaned.replaceAll(" ", "%20");
-            cleaned = cleaned.replaceAll(":", "");
-            cleaned = cleaned.toLowerCase();
+            cleaned = cleaned.replace("-", " ").replace(" ", "%20").replace(":", "").toLowerCase();
 
             return cleaned;
         }

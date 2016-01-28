@@ -15,38 +15,33 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.FileUtil;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * This class produces a dialog box for editing a single file link from a Bibtex entry.
@@ -58,6 +53,8 @@ import com.jgoodies.forms.layout.FormLayout;
  * label that can be hidden when the download is complete.
  */
 public class FileListEntryEditor {
+
+    private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
 
     private JDialog diag;
     private final JTextField link = new JTextField();
@@ -243,7 +240,7 @@ public class FileListEntryEditor {
             try {
                 JabRefDesktop.openExternalFileAnyFormat(metaData, link.getText(), type);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("File could not be opened", e);
             }
         }
     }

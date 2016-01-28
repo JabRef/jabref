@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 /**
- * The side pane is displayed at the right side of JabRef and shows instances of
+ * The side pane is displayed at the left side of JabRef and shows instances of
  * SidePaneComponents, for instance the GroupSelector, or the SearchManager.
  */
 public class SidePane extends JPanel {
@@ -38,7 +38,6 @@ public class SidePane extends JPanel {
 
 
     public SidePane() {
-
         // For debugging the border:
         // setBorder(BorderFactory.createLineBorder(Color.BLUE));
 

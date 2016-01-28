@@ -72,7 +72,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "DOItoBibTeXHelp.html";
+        return "DOItoBibTeXHelp";
     }
 
     @Override

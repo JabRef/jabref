@@ -60,6 +60,8 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
@@ -70,7 +72,6 @@ import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.rules.InvertSearchRule;
 import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
 import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -338,8 +339,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
-        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.groupsHelp, Localization.lang("Help on groups"))
-                .getIconButton();
+        JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFiles.groupsHelp)
+                .getHelpButton();
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);
         autoGroup.setPreferredSize(butDim);

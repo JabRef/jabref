@@ -525,8 +525,7 @@ class GroupDialog extends JDialog {
         int lastNewline = s.lastIndexOf("<br>");
         int hat = s.lastIndexOf('^');
         if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
-            return s.substring(0, lastNewline + 4)
-                    + s.substring(lastNewline + 4).replaceAll(" ", "&nbsp;");
+            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
         }
         return s;
     }

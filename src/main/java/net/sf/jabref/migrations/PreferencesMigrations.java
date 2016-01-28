@@ -23,11 +23,11 @@ public class PreferencesMigrations {
             if ("abstract".equals(genFields)) {
                 newGen = "";
             } else if (genFields.contains(";abstract;")) {
-                newGen = genFields.replaceAll(";abstract;", ";");
+                newGen = genFields.replace(";abstract;", ";");
             } else if (genFields.indexOf("abstract;") == 0) {
-                newGen = genFields.replaceAll("abstract;", "");
+                newGen = genFields.replace("abstract;", "");
             } else if (genFields.indexOf(";abstract") == (genFields.length() - 9)) {
-                newGen = genFields.replaceAll(";abstract", "");
+                newGen = genFields.replace(";abstract", "");
             } else {
                 newGen = genFields;
             }
@@ -82,26 +82,6 @@ public class PreferencesMigrations {
      */
     public static void upgradeSortOrder() {
         JabRefPreferences prefs = Globals.prefs;
-        if (prefs.get(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, null) == null) {
-            if (prefs.getBoolean("saveInStandardOrder", false)) {
-                prefs.putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, true);
-                prefs.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "author");
-                prefs.put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "editor");
-                prefs.put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "year");
-                prefs.putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, false);
-                prefs.putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, false);
-                prefs.putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, false);
-            } else if (prefs.getBoolean("saveInTitleOrder", false)) {
-                // saveInTitleOrder => title, author, editor
-                prefs.putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, true);
-                prefs.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "title");
-                prefs.put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "author");
-                prefs.put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "editor");
-                prefs.putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, false);
-                prefs.putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, false);
-                prefs.putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, false);
-            }
-        }
 
         if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("exportInStandardOrder", false)) {

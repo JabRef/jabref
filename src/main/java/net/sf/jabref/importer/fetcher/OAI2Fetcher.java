@@ -15,6 +15,23 @@
 */
 package net.sf.jabref.importer.fetcher;
 
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OAI2Handler;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.entry.MonthUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.swing.*;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -23,25 +40,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OAI2Handler;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -203,31 +201,33 @@ public class OAI2Fetcher implements EntryFetcher {
         try {
             URL oai2Url = new URL(url);
             HttpURLConnection oai2Connection = (HttpURLConnection) oai2Url.openConnection();
-            oai2Connection.setRequestProperty("User-Agent", "Jabref");
-            InputStream inputStream = oai2Connection.getInputStream();
+            oai2Connection.setRequestProperty("User-Agent", "JabRef");
 
             /* create an empty BibEntry and set the oai2identifier field */
             BibEntry be = new BibEntry(IdGenerator.next(), "article");
             be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, key);
             DefaultHandler handlerBase = new OAI2Handler(be);
-            /* parse the result */
-            saxParser.parse(inputStream, handlerBase);
 
-            /* Correct line breaks and spacing */
-            for (String name : be.getFieldNames()) {
-                be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name)));
-            }
+            try (InputStream inputStream = oai2Connection.getInputStream()) {
 
-            if (key.matches("\\d\\d\\d\\d\\..*")) {
-                be.setField("year", "20" + key.substring(0, 2));
+                /* parse the result */
+                saxParser.parse(inputStream, handlerBase);
 
-                int monthNumber = Integer.parseInt(key.substring(2, 4));
-                MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
-                if (month.isValid()) {
-                    be.setField("month", month.bibtexFormat);
+                /* Correct line breaks and spacing */
+                for (String name : be.getFieldNames()) {
+                    be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name)));
+                }
+
+                if (key.matches("\\d\\d\\d\\d\\..*")) {
+                    be.setField("year", "20" + key.substring(0, 2));
+
+                    int monthNumber = Integer.parseInt(key.substring(2, 4));
+                    MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
+                    if (month.isValid()) {
+                        be.setField("month", month.bibtexFormat);
+                    }
                 }
             }
-            inputStream.close();
             return be;
         } catch (IOException e) {
             status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
@@ -272,7 +272,7 @@ public class OAI2Fetcher implements EntryFetcher {
             shouldContinue = true;
 
             /* multiple keys can be delimited by ; or space */
-            query = query.replaceAll(" ", ";");
+            query = query.replace(" ", ";");
             String[] keys = query.split(";");
             for (int i = 0; i < keys.length; i++) {
                 String key = keys[i];

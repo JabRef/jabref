@@ -188,4 +188,8 @@ public class FileField {
         }
         return encodeStringArray(array);
     }
+
+    public static String getStringRepresentation(ParsedFileField field) {
+        return getStringRepresentation(Collections.singletonList(field));
+    }
 }

@@ -15,6 +15,29 @@
 */
 package net.sf.jabref.gui;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.exporter.ExportFormats;
+import net.sf.jabref.exporter.layout.Layout;
+import net.sf.jabref.exporter.layout.LayoutHelper;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.search.SearchQueryHighlightListener;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.JobName;
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
@@ -26,27 +49,6 @@ import java.io.StringReader;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
-
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.JobName;
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-
-import net.sf.jabref.*;
-import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.exporter.layout.LayoutHelper;
-import net.sf.jabref.exporter.ExportFormats;
-import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Displays an BibEntry using the given layout format.
@@ -230,7 +232,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     private JToolBar createToolBar() {
-        JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+        JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
 
         toolBar.setMargin(new Insets(0, 0, 0, 2));
 
@@ -303,13 +305,13 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         this.metaData = metaData;
     }
 
-    public void updateLayout(String layoutFormat) throws IOException {
+    public void updateLayout(String layoutFormat) {
         layoutFile = layoutFormat;
         updateLayout();
     }
 
     private void updateLayout() {
-        StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
+        StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
             layout = Optional.of(new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE));
         } catch (IOException e) {

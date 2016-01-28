@@ -74,8 +74,6 @@ public class DatabasePropertiesDialog extends JDialog {
     private SaveOrderConfig oldSaveOrderConfig;
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
-
-    private JRadioButton saveAsConfiguredGlobally;
     private JRadioButton saveInOriginalOrder;
     private JRadioButton saveInSpecifiedOrder;
     private JComboBox<String> savePriSort;
@@ -133,9 +131,8 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.add(browseFileIndv).xy(5, 7);
 
         builder.addSeparator(Localization.lang("Save sort order")).xyw(1, 13, 5);
-        builder.add(saveAsConfiguredGlobally).xyw(1, 15, 5);
-        builder.add(saveInOriginalOrder).xyw(1, 17, 5);
-        builder.add(saveInSpecifiedOrder).xyw(1, 19, 5);
+        builder.add(saveInOriginalOrder).xyw(1, 15, 5);
+        builder.add(saveInSpecifiedOrder).xyw(1, 17, 5);
 
         // Create a new panel with its own FormLayout for these items:
         FormLayout layout2 = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref",
@@ -202,12 +199,10 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void setupSortOrderConfiguration() {
-        saveAsConfiguredGlobally = new JRadioButton(Localization.lang("Save entries as configured globally"));
         saveInOriginalOrder = new JRadioButton(Localization.lang("Save entries in their original order"));
         saveInSpecifiedOrder = new JRadioButton(Localization.lang("Save entries ordered as specified"));
 
         ButtonGroup bg = new ButtonGroup();
-        bg.add(saveAsConfiguredGlobally);
         bg.add(saveInOriginalOrder);
         bg.add(saveInSpecifiedOrder);
         ActionListener listener = new ActionListener() {
@@ -227,7 +222,6 @@ public class DatabasePropertiesDialog extends JDialog {
             }
         };
 
-        saveAsConfiguredGlobally.addActionListener(listener);
         saveInOriginalOrder.addActionListener(listener);
         saveInSpecifiedOrder.addActionListener(listener);
 
@@ -298,7 +292,7 @@ public class DatabasePropertiesDialog extends JDialog {
         List<String> storedSaveOrderConfig = metaData.getData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
         boolean selected;
         if (storedSaveOrderConfig == null) {
-            saveAsConfiguredGlobally.setSelected(true);
+            saveInOriginalOrder.setSelected(true);
             oldSaveOrderConfig = null;
             selected = false;
         } else {
@@ -330,7 +324,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveTerField.setEnabled(selected);
         saveTerDesc.setEnabled(selected);
 
-        Vector<String> fileD = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
+        List<String> fileD = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         if (fileD == null) {
             fileDir.setText("");
         } else {
@@ -377,27 +371,22 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private void storeSettings() {
         SaveOrderConfig newSaveOrderConfig;
-        if (saveAsConfiguredGlobally.isSelected()) {
-            metaData.remove(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
-            newSaveOrderConfig = null;
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig();
+        newSaveOrderConfig = saveOrderConfig;
+        if (saveInOriginalOrder.isSelected()) {
+            saveOrderConfig.setSaveInOriginalOrder();
         } else {
-            SaveOrderConfig saveOrderConfig = new SaveOrderConfig();
-            newSaveOrderConfig = saveOrderConfig;
-            if (saveInOriginalOrder.isSelected()) {
-                saveOrderConfig.setSaveInOriginalOrder();
-            } else {
-                saveOrderConfig.setSaveInSpecifiedOrder();
-            }
-            saveOrderConfig.sortCriteria[0].field = savePriField.getText();
-            saveOrderConfig.sortCriteria[0].descending = savePriDesc.isSelected();
-            saveOrderConfig.sortCriteria[1].field = saveSecField.getText();
-            saveOrderConfig.sortCriteria[1].descending = saveSecDesc.isSelected();
-            saveOrderConfig.sortCriteria[2].field = saveTerField.getText();
-            saveOrderConfig.sortCriteria[2].descending = saveTerDesc.isSelected();
-
-            Vector<String> serialized = saveOrderConfig.getVector();
-            metaData.putData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG, serialized);
+            saveOrderConfig.setSaveInSpecifiedOrder();
         }
+        saveOrderConfig.sortCriteria[0].field = savePriField.getText();
+        saveOrderConfig.sortCriteria[0].descending = savePriDesc.isSelected();
+        saveOrderConfig.sortCriteria[1].field = saveSecField.getText();
+        saveOrderConfig.sortCriteria[1].descending = saveSecDesc.isSelected();
+        saveOrderConfig.sortCriteria[2].field = saveTerField.getText();
+        saveOrderConfig.sortCriteria[2].descending = saveTerDesc.isSelected();
+
+        Vector<String> serialized = saveOrderConfig.getVector();
+        metaData.putData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG, serialized);
 
         Charset oldEncoding = panel.getEncoding();
         Charset newEncoding = (Charset) encoding.getSelectedItem();

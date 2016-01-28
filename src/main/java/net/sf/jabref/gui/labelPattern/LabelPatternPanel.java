@@ -15,37 +15,26 @@
 */
 package net.sf.jabref.gui.labelPattern;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.help.AboutDialog;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpDialog;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LabelPatternPanel extends JPanel {
 
@@ -62,9 +51,9 @@ public class LabelPatternPanel extends JPanel {
     private final Map<String, JTextField> textFields = new HashMap<>();
     private final BasePanel panel;
 
-    public LabelPatternPanel(HelpDialog helpDiag, BasePanel panel) {
+    public LabelPatternPanel(AboutDialog helpDiag, BasePanel panel) {
         this.panel = panel;
-        help = new HelpAction(helpDiag, GUIGlobals.labelPatternHelp, Localization.lang("Help on key patterns"));
+        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFiles.labelPatternHelp);
         buildGUI();
     }
 

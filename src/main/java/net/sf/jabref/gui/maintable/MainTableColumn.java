@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.maintable;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;

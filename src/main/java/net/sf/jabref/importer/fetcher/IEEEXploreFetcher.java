@@ -186,7 +186,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "IEEEXploreHelp.html";
+        return "IEEEXploreHelp";
     }
 
     /**
@@ -307,12 +307,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
             author = String.join(" and ", authorSplit);
 
-            author = author.replaceAll("\\.", ". ");
-            author = author.replaceAll("  ", " ");
-            author = author.replaceAll("\\. -", ".-");
-            author = author.replaceAll("; ", " and ");
-            author = author.replaceAll(" ,", ",");
-            author = author.replaceAll("  ", " ");
+            author = author.replace(".", ". ").replace("  ", " ").replace(". -", ".-").replace("; ", " and ")
+                    .replace(" ,", ",").replace("  ", " ");
             author = author.replaceAll("[ ,;]+$", "");
             //TODO: remove trailing commas
             entry.setField("author", author);
@@ -321,7 +317,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         // clean up month
         String month = entry.getField("month");
         if ((month != null) && !month.isEmpty()) {
-            month = month.replaceAll("\\.", "");
+            month = month.replace(".", "");
             month = month.toLowerCase();
 
             Pattern monthPattern = Pattern.compile("(\\d*+)\\s*([a-z]*+)-*(\\d*+)\\s*([a-z]*+)");
@@ -402,10 +398,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             } else {
                 fullName = fullName.replace("Conference Proceedings", "Proceedings")
                         .replace("Proceedings of", "Proceedings").replace("Proceedings.", "Proceedings");
-                fullName = fullName.replaceAll("International", "Int.");
-                fullName = fullName.replaceAll("Symposium", "Symp.");
-                fullName = fullName.replaceAll("Conference", "Conf.");
-                fullName = fullName.replaceAll(" on", " ").replace("  ", " ");
+                fullName = fullName.replace("International", "Int.");
+                fullName = fullName.replace("Symposium", "Symp.");
+                fullName = fullName.replace("Conference", "Conf.");
+                fullName = fullName.replace(" on", " ").replace("  ", " ");
             }
 
             Matcher m1 = PUBLICATION_PATTERN.matcher(fullName);
@@ -503,8 +499,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 abstr = abstr.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\\\textsubscript\\{$1\\}");
             }
             // Replace \infin with \infty
-            abstr = abstr.replaceAll("\\\\infin", "\\\\infty");
-
+            abstr = abstr.replace("\\infin", "\\infty");
             // Write back
             entry.setField("abstract", abstr);
         }

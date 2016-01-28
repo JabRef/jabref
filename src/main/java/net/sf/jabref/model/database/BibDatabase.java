@@ -29,20 +29,23 @@ Modified for use in JabRef
  */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.*;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.MonthUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
- * A bibliograhpy database.
+ * A bibliography database.
  */
 public class BibDatabase {
+
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**
@@ -230,7 +233,7 @@ public class BibDatabase {
         }
 
         if (bibtexStrings.containsKey(string.getId())) {
-            throw new KeyCollisionException("Duplicate BibtexString id.");
+            throw new KeyCollisionException("Duplicate BibTeXString id.");
         }
 
         bibtexStrings.put(string.getId(), string);
@@ -541,7 +544,7 @@ public class BibDatabase {
      * unset fields in the entry linked by the "crossref" field, if any.
      *
      * @param field    The field to return the value of.
-     * @param entry   maybenull
+     * @param entry    maybenull
      *                 The bibtex entry which contains the field.
      * @param database maybenull
      *                 The database of the bibtex entry.

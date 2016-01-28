@@ -13,10 +13,13 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Global sorting options and preferences are removed. Databases can still be sorted on save, but this is configured locally and stored in the file
 - OvidImporter now also imports fields: doi, issn, language and keywords
 - Implemented [#647](https://github.com/JabRef/jabref/issues/647): The preview can now be copied
 - [#459](https://github.com/JabRef/jabref/issues/459) Open default directory when trying to add files to an entry
 - Implemented [#668](https://github.com/JabRef/jabref/issues/668): Replace clear with icon to reduce search bar width
+- Improved layout for OSX: Toolbar buttons and search field
+- Migrated JabRef help to markdown at https://github.com/JabRef/help.jabref.org
 
 ### Fixed
 - Make BibTex parser more robust against missing newlines
@@ -30,12 +33,16 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#213](https://github.com/JabRef/jabref/issues/212): Added command line option -asfl for autosetting file links
 - Fixed [#671](https://github.com/JabRef/jabref/issues/671): Remember working directory of last import
 - IEEEXplore fetcher replaces keyword separator with the preferred
+- Fixed [#710](https://github.com/JabRef/jabref/issues/710): Fixed quit behaviour under OSX
+- Merge from DOI now honors removed fields
+
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
 - Removed configuration option to use database file directory as base directory for attached files and make it default instead.
 - Removed save session functionality as it just saved the last opened tabs which is done by default
 - Removed CLI option -l to load a session
+- Removed JabRef offline help files which are replaced by the new online documentation at https://github.com/JabRef/help.jabref.org
 
 
 

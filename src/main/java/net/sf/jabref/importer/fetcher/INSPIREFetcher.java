@@ -15,6 +15,17 @@
 */
 package net.sf.jabref.importer.fetcher;
 
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,18 +34,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.importer.*;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.l10n.Localization;
 
 /**
  *
@@ -115,7 +114,7 @@ public class INSPIREFetcher implements EntryFetcher {
         String url = constructUrl(key);
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-            conn.setRequestProperty("User-Agent", "Jabref");
+            conn.setRequestProperty("User-Agent", "JabRef");
             InputStream inputStream = conn.getInputStream();
 
             try (INSPIREBibtexFilterReader reader = new INSPIREBibtexFilterReader(new InputStreamReader(inputStream))) {
@@ -148,7 +147,7 @@ public class INSPIREFetcher implements EntryFetcher {
      */
     @Override
     public String getHelpPage() {
-        return "Spires.html";
+        return "Spires";
     }
 
     @Override

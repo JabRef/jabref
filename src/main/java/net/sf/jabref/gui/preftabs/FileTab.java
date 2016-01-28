@@ -32,13 +32,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -52,7 +52,6 @@ class FileTab extends JPanel implements PrefsTab {
 
     private final JCheckBox backup;
     private final JCheckBox openLast;
-    private final JCheckBox autoDoubleBraces;
     private final JCheckBox autoSave;
     private final JCheckBox promptBeforeUsingAutoSave;
     private final JComboBox<String> valueDelimiter;
@@ -90,7 +89,6 @@ class FileTab extends JPanel implements PrefsTab {
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
         doNotResolveStringsFor = new JTextField(30);
-        autoDoubleBraces = new JCheckBox(Localization.lang("Remove double braces around BibTeX fields when loading."));
 
         autoSave.addChangeListener(new ChangeListener() {
 
@@ -109,8 +107,6 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(openLast, 3);
         builder.nextLine();
         builder.append(backup, 3);
-        builder.nextLine();
-        builder.append(autoDoubleBraces, 3);
         builder.nextLine();
 
         JLabel label = new JLabel(Localization.lang("Store the following fields with braces around capital letters") + ":");
@@ -134,7 +130,7 @@ class FileTab extends JPanel implements PrefsTab {
 
         builder.appendSeparator(Localization.lang("Autosave"));
         builder.append(autoSave, 1);
-        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.autosaveHelp).getIconButton();
+        JButton help = new HelpAction(HelpFiles.autosaveHelp).getHelpButton();
         help.setPreferredSize(new Dimension(24, 24));
         JPanel hPan = new JPanel();
         hPan.setLayout(new BorderLayout());
@@ -169,7 +165,6 @@ class FileTab extends JPanel implements PrefsTab {
             newlineSeparator.setSelectedIndex(1);
         }
 
-        autoDoubleBraces.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES));
         resolveStringsAll.setSelected(prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS));
         resolveStringsStandard.setSelected(!resolveStringsAll.isSelected());
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
@@ -202,7 +197,6 @@ class FileTab extends JPanel implements PrefsTab {
 
         prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());
         prefs.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLast.isSelected());
-        prefs.putBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES, autoDoubleBraces.isSelected());
         prefs.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAll.isSelected());
         prefs.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, doNotResolveStringsFor.getText().trim());
         prefs.putBoolean(JabRefPreferences.AUTO_SAVE, autoSave.isSelected());

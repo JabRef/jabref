@@ -26,10 +26,10 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -45,8 +45,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final JTextArea layout1 = new JTextArea("", 1, 1);
     private final JTextArea layout2 = new JTextArea("", 1, 1);
 
-    private final JButton help = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.previewHelp,
-            Localization.lang("Help on Preview Settings")).getIconButton();
+    private final JButton help = new HelpAction(Localization.lang("Help on Preview Settings"), HelpFiles.previewHelp).getHelpButton();
 
     private final JButton testButton = new JButton(Localization.lang("Test"));
     private final JButton defaultButton = new JButton(Localization.lang("Default"));
@@ -155,10 +154,10 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String tmp = layout1.getText().replaceAll("\n", "__NEWLINE__");
+                String tmp = layout1.getText().replace("\n", "__NEWLINE__");
                 PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_0);
                 layout1.setText(
-                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
+                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replace("__NEWLINE__", "\n"));
                 PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_0, tmp);
             }
         });
@@ -166,10 +165,10 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String tmp = layout2.getText().replaceAll("\n", "__NEWLINE__");
+                String tmp = layout2.getText().replace("\n", "__NEWLINE__");
                 PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_1);
                 layout2.setText(
-                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
+                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replace("__NEWLINE__", "\n"));
                 PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_1, tmp);
             }
         });
@@ -262,15 +261,15 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        layout1.setText(prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
-        layout2.setText(prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
+        layout1.setText(prefs.get(JabRefPreferences.PREVIEW_0).replace("__NEWLINE__", "\n"));
+        layout2.setText(prefs.get(JabRefPreferences.PREVIEW_1).replace("__NEWLINE__", "\n"));
         pdfPreview.setSelected(prefs.getBoolean(JabRefPreferences.PDF_PREVIEW));
     }
 
     @Override
     public void storeSettings() {
-        prefs.put(JabRefPreferences.PREVIEW_0, layout1.getText().replaceAll("\n", "__NEWLINE__"));
-        prefs.put(JabRefPreferences.PREVIEW_1, layout2.getText().replaceAll("\n", "__NEWLINE__"));
+        prefs.put(JabRefPreferences.PREVIEW_0, layout1.getText().replace("\n", "__NEWLINE__"));
+        prefs.put(JabRefPreferences.PREVIEW_1, layout2.getText().replace("\n", "__NEWLINE__"));
         prefs.putBoolean(JabRefPreferences.PDF_PREVIEW, pdfPreview.isSelected());
     }
 

@@ -131,7 +131,7 @@ public class SpringerFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "SpringerHelp.html";
+        return "SpringerHelp";
     }
 
     @Override

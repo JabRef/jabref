@@ -140,4 +140,9 @@ public class UnitFormatter implements Formatter {
         return Localization.lang("UnitFormatter");
     }
 
+    @Override
+    public String getKey() {
+        return "UnitFormatter";
+    }
+
 }

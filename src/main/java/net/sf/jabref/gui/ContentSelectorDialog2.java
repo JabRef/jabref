@@ -47,6 +47,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
@@ -351,7 +352,7 @@ class ContentSelectorDialog2 extends JDialog {
                     start++;
                 }
             }
-            Vector<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName);
+            List<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName);
             boolean bNewField = false;
             if (data == null) {
                 bNewField = true;
@@ -522,7 +523,7 @@ class ContentSelectorDialog2 extends JDialog {
         bsb.addButton(apply);
         bsb.addButton(cancel);
         bsb.addRelatedGap();
-        bsb.addButton(new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp).getIconButton());
+        bsb.addButton(new HelpAction(HelpFiles.contentSelectorHelp).getHelpButton());
         bsb.addGlue();
 
         // Add panels to dialog:

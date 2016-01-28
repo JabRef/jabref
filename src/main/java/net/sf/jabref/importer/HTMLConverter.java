@@ -934,4 +934,9 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
     public String getName() {
         return "HTMLConverter";
     }
+
+    @Override
+    public String getKey() {
+        return "HtmlConverter";
+    }
 }

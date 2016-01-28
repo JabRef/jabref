@@ -54,7 +54,7 @@ public class KeyBindingsListener extends KeyAdapter {
         if ("".equals(modifier)) {
             newKey = code;
         } else {
-            newKey = modifier.toLowerCase().replaceAll("\\+", " ") + " " + code;
+            newKey = modifier.toLowerCase().replace("+", " ") + " " + code;
         }
 
         // SHOW new key binding

@@ -131,7 +131,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         citProperties.put("SuperscriptCitations", Boolean.FALSE);
         citProperties.put("SubscriptCitations", Boolean.FALSE);
         citProperties.put("MultiCiteChronological", Boolean.TRUE);
-        citProperties.put("BibtexKeyCitations", Boolean.FALSE);
+        citProperties.put("BibTeXKeyCitations", Boolean.FALSE);
         citProperties.put("ItalicEtAl", Boolean.FALSE);
     }
 
@@ -845,7 +845,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public boolean isBibtexKeyCiteMarkers() {
-        return (Boolean) citProperties.get("BibtexKeyCitations");
+        return (Boolean) citProperties.get("BibTeXKeyCitations");
     }
 
     /**

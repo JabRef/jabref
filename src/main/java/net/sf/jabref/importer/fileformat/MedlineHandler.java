@@ -264,7 +264,7 @@ class MedlineHandler extends DefaultHandler
                 b.setField("medline-pst", pst);
             }
             if (!"".equals(abstractText)) {
-                b.setField("abstract", abstractText.replaceAll("%", "\\\\%"));
+                b.setField("abstract", abstractText.replace("%", "\\%"));
             }
             if (!"".equals(keywords)) {
                 b.setField("keywords", keywords);
@@ -288,7 +288,7 @@ class MedlineHandler extends DefaultHandler
                 b.setField("pmc", pmc);
             }
             if (!"".equals(affiliation)) {
-                b.setField("institution", affiliation.replaceAll("#", "\\\\#"));
+                b.setField("institution", affiliation.replace("#", "\\#"));
             }
 
             // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added "pmid" bibtex field

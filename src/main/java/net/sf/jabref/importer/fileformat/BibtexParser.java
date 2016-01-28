@@ -58,17 +58,12 @@ public class BibtexParser {
     private final FieldContentParser fieldContentParser = new FieldContentParser();
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
-    private final boolean autoDoubleBraces;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
 
 
     public BibtexParser(Reader in) {
         Objects.requireNonNull(in);
 
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
-        autoDoubleBraces = Globals.prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES);
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
     }
 
@@ -522,20 +517,6 @@ public class BibtexParser {
             if (character == '"') {
                 StringBuffer text = parseQuotedFieldExactly();
                 value.append(fieldContentParser.format(text, key));
-                /*
-                 *
-                 * The following code doesn't handle {"} correctly: // value is
-                 * a string consume('"');
-                 *
-                 * while (!((peek() == '"') && (j != '\\'))) { j = read(); if
-                 * (_eof || (j == -1) || (j == 65535)) { throw new
-                 * IOException("Error in line "+line+ ": EOF in
-                 * mid-string"); }
-                 *
-                 * value.append((char) j); }
-                 *
-                 * consume('"');
-                 */
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside of a field, so we need to count the
@@ -559,50 +540,8 @@ public class BibtexParser {
             }
             skipWhitespace();
         }
-
-        // Check if we are to strip extra pairs of braces before returning:
-        if (autoDoubleBraces) {
-            // Do it:
-            while ((value.length() > 1) && (value.charAt(0) == '{')
-                    && (value.charAt(value.length() - 1) == '}')) {
-                value.deleteCharAt(value.length() - 1);
-                value.deleteCharAt(0);
-            }
-            // Problem: if the field content is "{DNA} blahblah {EPA}", one pair
-            // too much will be removed.
-            // Check if this is the case, and re-add as many pairs as needed.
-            while (hasNegativeBraceCount(value.toString())) {
-                value.insert(0, '{');
-                value.append('}');
-            }
-        }
         return value.toString();
 
-    }
-
-    /**
-     * Check if a string at any point has had more ending braces (}) than
-     * opening ones ({). Will e.g. return true for the string "DNA} blahblal
-     * {EPA"
-     *
-     * @param toCheck The string to check.
-     * @return true if at any index the brace count is negative.
-     */
-    private boolean hasNegativeBraceCount(String toCheck) {
-        int index = 0;
-        int braceCount = 0;
-        while (index < toCheck.length()) {
-            if (toCheck.charAt(index) == '{') {
-                braceCount++;
-            } else if (toCheck.charAt(index) == '}') {
-                braceCount--;
-            }
-            if (braceCount < 0) {
-                return true;
-            }
-            index++;
-        }
-        return false;
     }
 
     /**

@@ -51,53 +51,34 @@
 
 package net.sf.jabref.wizard.text.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.importer.fileformat.FreeCiteImporter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.util.Util;
+import net.sf.jabref.wizard.text.TagToMarkedTextStore;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.text.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.text.EditorKit;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
-
-import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
-import net.sf.jabref.importer.fileformat.FreeCiteImporter;
-import net.sf.jabref.wizard.text.TagToMarkedTextStore;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class TextInputDialog extends JDialog implements ActionListener {
     private final JButton okButton = new JButton();
@@ -221,7 +202,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         testPanel.addMouseListener(popupListener);
 
         // Toolbar
-        JToolBar toolBar = new JToolBar();
+        JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.add(new ClearAction());
         toolBar.setBorderPainted(false);
         toolBar.addSeparator();
