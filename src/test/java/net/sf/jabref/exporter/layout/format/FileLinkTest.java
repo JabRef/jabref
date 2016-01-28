@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.exporter.layout.ParamLayoutFormatter;
 
 
 public class FileLinkTest {
@@ -36,6 +37,26 @@ public class FileLinkTest {
     @Test
     public void testCompleteRecord() {
         assertEquals("test.pdf", new FileLink().format("paper:test.pdf:PDF"));
+    }
+
+    @Test
+    public void testMultipleFiles() {
+        ParamLayoutFormatter a = new FileLink();
+        assertEquals("test.pdf", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
+    }
+
+    @Test
+    public void testMultipleFilesPick() {
+        ParamLayoutFormatter a = new FileLink();
+        a.setArgument("ppt");
+        assertEquals("pres.ppt", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
+    }
+
+    @Test
+    public void testMultipleFilesPickNonExistant() {
+        ParamLayoutFormatter a = new FileLink();
+        a.setArgument("doc");
+        assertEquals("", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }
 
 }
