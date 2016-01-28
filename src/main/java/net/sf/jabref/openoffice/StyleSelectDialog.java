@@ -189,7 +189,7 @@ class StyleSelectDialog {
                 String link = tableModel.getElementAt(i).getFile().getPath();
                 try {
                     if (type == null) {
-                        JabRefDesktop.openExternalFileUnknown(frame, null, new MetaData(), link,
+                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new MetaData(), link,
                                 new UnknownExternalFileType("jstyle"));
                     } else {
                         JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
