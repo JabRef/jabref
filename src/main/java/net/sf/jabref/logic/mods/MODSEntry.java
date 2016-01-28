@@ -187,7 +187,7 @@ class MODSEntry {
     }
 
     private Node getDOMrepresentation() {
-        Node result = null;
+        Node result;
         try {
             DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 

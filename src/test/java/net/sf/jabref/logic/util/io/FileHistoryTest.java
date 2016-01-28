@@ -27,7 +27,7 @@ public class FileHistoryTest {
     }
     @Test
     public void testConstructor() {
-        FileHistory fh = new FileHistory(prefs);
+        new FileHistory(prefs);
     }
 
 

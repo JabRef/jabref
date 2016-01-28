@@ -84,7 +84,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(new ExplicitGroup(
                         Localization.lang("Automatically created groups"), GroupHierarchyType.INCLUDING));
-                Set<String> hs = null;
+                Set<String> hs;
                 String fieldText = field.getText();
                 if (keywords.isSelected()) {
                     if (nd.isSelected()) {

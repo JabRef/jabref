@@ -227,8 +227,8 @@ public class ExportFormat implements IExportFormat {
             List<BibEntry> sorted = FileActions.getSortedEntries(database, metaData, entryIds, false);
 
             // Load default layout
-            Layout defLayout = null;
-            LayoutHelper layoutHelper = null;
+            Layout defLayout;
+            LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + ".layout")) {
                 layoutHelper = new LayoutHelper(reader);
                 defLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);

@@ -120,7 +120,7 @@ public class OOPreFormatter implements LayoutFormatter {
                     }
                 }
             } else {
-                String argument = null;
+                String argument;
 
                 if (!incommand) {
                     sb.append(c);

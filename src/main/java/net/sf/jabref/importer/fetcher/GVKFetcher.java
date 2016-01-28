@@ -97,7 +97,7 @@ public class GVKFetcher implements EntryFetcher {
             }
         }
 
-        String gvkQuery = "";
+        String gvkQuery;
         if (searchKeys.containsKey(qterms[0])) {
             gvkQuery = processComplexQuery(qterms);
         } else {
@@ -158,7 +158,7 @@ public class GVKFetcher implements EntryFetcher {
         String searchstring = (urlPrefix + query + urlSuffix);
         LOGGER.debug(searchstring);
         try {
-            URI uri = null;
+            URI uri;
             try {
                 uri = new URI(searchstring);
             } catch (URISyntaxException e) {

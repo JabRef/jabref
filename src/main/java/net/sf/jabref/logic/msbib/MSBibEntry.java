@@ -174,7 +174,7 @@ class MSBibEntry {
     }
 
     private void populateFromXml(Element entry, String bcol) {
-        String temp = null;
+        String temp;
 
         sourceType = getFromXml(bcol + "SourceType", entry);
 
@@ -544,7 +544,7 @@ class MSBibEntry {
         if (value == null) {
             return null;
         }
-        String result = null;
+        String result;
         LayoutFormatter chars = new XMLChars();
         result = chars.format(value);
         return result;
@@ -934,7 +934,7 @@ class MSBibEntry {
 
     public BibEntry getBibtexRepresentation() {
 
-        BibEntry entry = null;
+        BibEntry entry;
         if (tag == null) {
             entry = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID,
                     mapMSBibToBibtexType(sourceType));
