@@ -305,7 +305,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         this.metaData = metaData;
     }
 
-    public void updateLayout(String layoutFormat) throws IOException {
+    public void updateLayout(String layoutFormat) {
         layoutFile = layoutFormat;
         updateLayout();
     }
