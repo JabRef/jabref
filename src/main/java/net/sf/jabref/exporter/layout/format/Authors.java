@@ -239,6 +239,10 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     @Override
     public String format(String fieldText) {
+        if (fieldText == null) {
+            return "";
+        }
+
         StringBuilder sb = new StringBuilder();
         AuthorList al = AuthorList.getAuthorList(fieldText);
 
