@@ -30,8 +30,8 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.net.NetUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.model.DuplicateCheck;
 
 public class DBLPFetcher implements EntryFetcher {
@@ -73,7 +73,7 @@ public class DBLPFetcher implements EntryFetcher {
             String address = makeSearchURL();
             //System.out.println(address);
             URL url = new URL(address);
-            String page = Util.getResults(url);
+            String page = NetUtil.getResults(url);
 
             //System.out.println(page);
             String[] lines = page.split("\n");
@@ -103,7 +103,7 @@ public class DBLPFetcher implements EntryFetcher {
 
                 final URL bibUrl = new URL(urlStr);
 
-                final String bibtexHTMLPage = Util.getResults(bibUrl);
+                final String bibtexHTMLPage = NetUtil.getResults(bibUrl);
 
                 final String[] htmlLines = bibtexHTMLPage.split("\n");
 
@@ -119,7 +119,7 @@ public class DBLPFetcher implements EntryFetcher {
 
                         final URL bibFileURL = new URL(bibtexUrl);
                         //System.out.println("URL:|"+bibtexUrl+"|");
-                        final String bibtexPage = Util.getResults(bibFileURL);
+                        final String bibtexPage = NetUtil.getResults(bibFileURL);
 
                         Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
 
