@@ -123,33 +123,22 @@ public class FileUtil {
      * @throws IOException
      */
     public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
-
-        BufferedInputStream in = null;
-        BufferedOutputStream out = null;
-        try {
-            // Check if the file already exists.
-            if (dest.exists()) {
-                if (!deleteIfExists) {
-                    return false;
-                    // else dest.delete();
-                }
+        // Check if the file already exists.
+        if (dest.exists()) {
+            if (!deleteIfExists) {
+                return false;
+                // else dest.delete();
             }
+        }
+        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(source));
+                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
 
-            in = new BufferedInputStream(new FileInputStream(source));
-            out = new BufferedOutputStream(new FileOutputStream(dest));
+
             int el;
-            // int tell = 0;
             while ((el = in.read()) >= 0) {
                 out.write(el);
             }
-        } finally {
-            if (out != null) {
-                out.flush();
-                out.close();
-            }
-            if (in != null) {
-                in.close();
-            }
+            out.flush();
         }
         return true;
     }
@@ -236,7 +225,7 @@ public class FileUtil {
         }
 
         File file = new File(name);
-        if (file.exists() || dir == null) {
+        if (file.exists() || (dir == null)) {
             return file;
         }
 

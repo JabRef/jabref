@@ -100,12 +100,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     }
 
     public void updatePreviews() {
-        try {
-            previewPanel[0].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
-            previewPanel[1].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
-        } catch (IOException e) {
-            LOGGER.debug("error while updating preview", e);
-        }
+        previewPanel[0].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        previewPanel[1].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
     }
 
     @Override

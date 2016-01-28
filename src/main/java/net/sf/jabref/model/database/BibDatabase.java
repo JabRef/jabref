@@ -40,14 +40,9 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.TypedBibEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
- * A bibliograhpy database.
+ * A bibliography database.
  */
 public class BibDatabase {
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);

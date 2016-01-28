@@ -212,13 +212,11 @@ public class LabelPatternUtilTest {
                 .firstAuthor("K{\\\"o}ning"));
 
         Assert.assertEquals("", LabelPatternUtil.firstAuthor(""));
+    }
 
-        try {
+    @Test(expected = NullPointerException.class)
+    public void testFirstAuthorNull() {
             LabelPatternUtil.firstAuthor(null);
-            Assert.fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
     }
 
     @Test
@@ -244,13 +242,11 @@ public class LabelPatternUtilTest {
 
         Assert.assertEquals("Newton", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 6));
         Assert.assertEquals("Newton", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 7));
+    }
 
-        try {
+    @Test(expected = NullPointerException.class)
+    public void testAuthIniNNull() {
             LabelPatternUtil.authIniN(null, 3);
-            Assert.fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
     }
 
     /**
@@ -548,13 +544,11 @@ public class LabelPatternUtilTest {
         Assert.assertEquals("7", LabelPatternUtil.firstPage("7,41,73--97"));
         Assert.assertEquals("7", LabelPatternUtil.firstPage("41,7,73--97"));
         Assert.assertEquals("43", LabelPatternUtil.firstPage("43+"));
+    }
 
-        try {
-            LabelPatternUtil.firstPage(null);
-            Assert.fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
+    @Test(expected = NullPointerException.class)
+    public void testFirstPageNull() {
+        LabelPatternUtil.firstPage(null);
     }
 
     @Test
@@ -567,12 +561,11 @@ public class LabelPatternUtilTest {
         Assert.assertEquals("97", LabelPatternUtil.lastPage("7,41,73--97"));
         Assert.assertEquals("97", LabelPatternUtil.lastPage("7,41,97--73"));
         Assert.assertEquals("43", LabelPatternUtil.lastPage("43+"));
-        try {
-            LabelPatternUtil.lastPage(null);
-            Assert.fail();
-        } catch (NullPointerException ignored) {
-            // Ignored
-        }
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testLastPageNull() {
+        LabelPatternUtil.lastPage(null);
     }
 
     /**
