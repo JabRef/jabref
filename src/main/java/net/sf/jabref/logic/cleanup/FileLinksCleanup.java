@@ -11,39 +11,39 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
 package net.sf.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FileField;
 
 /**
- * Removes a given field.
+ * Fixes the format of the file field. For example, if the file link is empty but the description wrongly contains the path.
  */
-public class RemoveFieldCleanup implements CleanupJob {
-
-    private final String field;
-
-
-    public RemoveFieldCleanup(String field) {
-        this.field = field;
-    }
+public class FileLinksCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        String oldValue = entry.getField(field);
-        if (oldValue == null) {
-            // Not set -> nothing to do
+        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        if (!oldValue.isPresent()) {
             return new ArrayList<>();
         }
 
-        entry.clearField(field);
-        FieldChange change = new FieldChange(entry, field, oldValue, null);
-        return Collections.singletonList(change);
-    }
+        List<FileField.ParsedFileField> fileList = FileField.parse(oldValue.get());
 
+        // Parsing automatically moves a single description to link, so we just need to write the fileList back again
+        String newValue = FileField.getStringRepresentation(fileList);
+        if (!oldValue.get().equals(newValue)) {
+            entry.setField(Globals.FILE_FIELD, newValue);
+            FieldChange change = new FieldChange(entry, Globals.FILE_FIELD, oldValue.get(), newValue);
+            return Collections.singletonList(change);
+        }
+        return new ArrayList<>();
+    }
 }

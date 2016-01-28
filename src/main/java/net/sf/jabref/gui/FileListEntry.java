@@ -50,8 +50,4 @@ public class FileListEntry {
     public String toString() {
         return description + " : " + link + " : " + type;
     }
-
-    public FileListEntry switchLinkAndDescription() {
-        return new FileListEntry(link, description, type);
-    }
 }

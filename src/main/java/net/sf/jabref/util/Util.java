@@ -48,7 +48,6 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.util.strings.UnicodeToReadableCharMap;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FileField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -317,60 +316,6 @@ public class Util {
 
         if (setTimeStamp) {
             entry.setField(timeStampField, timeStamp);
-        }
-    }
-
-    /**
-     * Collect file links from the given set of fields, and add them to the list contained in the field
-     * GUIGlobals.FILE_FIELD.
-     *
-     * @param database The database to modify.
-     * @param fields   The fields to find links in.
-     * @return A CompoundEdit specifying the undo operation for the whole operation.
-     */
-    public static NamedCompound upgradePdfPsToFile(BibDatabase database, String[] fields) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
-
-        for (BibEntry entry : database.getEntryMap().values()) {
-            upgradePdfPsToFile(entry, fields, ce);
-        }
-
-        ce.end();
-        return ce;
-    }
-
-    /**
-     * TODO: Move this to cleanup class. Collect file links from the given set of fields, and add them to the list
-     * contained in the field GUIGlobals.FILE_FIELD.
-     * <p>
-     * @param entry   The entry to modify.
-     *                >>>>>>> origin/master
-     * @param fields  The fields to find links in.
-     * @return A CompoundEdit specifying the undo operation for the whole operation.
-     */
-    public static void upgradePdfPsToFile(BibEntry entry, String[] fields, NamedCompound ce) {
-        // If there are already links in the file field, keep those on top:
-        String oldFileContent = entry.getField(Globals.FILE_FIELD);
-        List<FileField.ParsedFileField> fileList = FileField.parse(oldFileContent);
-        int oldItemCount = fileList.size();
-        for (String field : fields) {
-            entry.getFieldOptional(field).ifPresent(o -> {
-                if (o.trim().isEmpty()) {
-                    return;
-                }
-                File f = new File(o);
-                FileField.ParsedFileField flEntry = new FileField.ParsedFileField(f.getName(), o,
-                        ExternalFileTypes.getInstance().getExternalFileTypeNameByExt(field));
-                fileList.add(flEntry);
-
-                entry.clearField(field);
-                ce.addEdit(new UndoableFieldChange(entry, field, o, null));
-            });
-        }
-        if (fileList.size() != oldItemCount) {
-            String newValue = FileField.getStringRepresentation(fileList);
-            entry.setField(Globals.FILE_FIELD, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
         }
     }
 
