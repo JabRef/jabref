@@ -150,9 +150,11 @@ public class DownloadExternalFile {
         String suffix;
         if (suggestedType != null) {
             suffix = suggestedType.getExtension();
+            suffix = suffix == null ? "" : suffix;
         } else {
             // If we didn't find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
+            suffix = suffix == null ? "" : suffix;
             suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix);
         }
 
