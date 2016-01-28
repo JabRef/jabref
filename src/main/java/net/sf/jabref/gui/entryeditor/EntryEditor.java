@@ -35,6 +35,8 @@ import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -198,38 +200,58 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         tabbed.removeAll();
         tabs.clear();
 
+<<<<<<< f8f83d27c2c83599d36292009ddb2e2359ecf975
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+=======
+        EntryType type = EntryTypes.getType(this.entry.getType());
+>>>>>>> Add an optional tab that shows fields that are not displayed inside the predefined tabs
 
-        List<String> fieldList = type.getRequiredFieldsFlat();
-
-        EntryEditorTab reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Localization.lang("Required fields"));
-        if (reqPan.fileListEditor != null) {
-            fileListEditor = reqPan.fileListEditor;
+        // required fields
+        List<String> requiredFields = type.getRequiredFieldsFlat();
+        EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, requiredFields, this, true, false, Localization.lang("Required fields"));
+        if (requiredPanel.fileListEditor != null) {
+            fileListEditor = requiredPanel.fileListEditor;
         }
-        tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), reqPan
+        tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), requiredPanel
                 .getPane(), Localization.lang("Show required fields"));
-        tabs.add(reqPan);
+        tabs.add(requiredPanel);
 
+        // optional fields
+        List<String> displayedOptionalFields = new ArrayList<>();
+
+        if ((type.getOptionalFields() != null) && (type.getOptionalFields().size() > 0)) {
+            EntryEditorTab optionalPanel;
+
+<<<<<<< f8f83d27c2c83599d36292009ddb2e2359ecf975
         if ((type.getOptionalFields() != null) && (type.getOptionalFields().size() >= 1)) {
             EntryEditorTab optPan;
             if (!this.frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
                 optPan = new EntryEditorTab(frame, panel, type.getOptionalFields(), this,
+=======
+            if (!prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+                displayedOptionalFields = type.getOptionalFields();
+
+                optionalPanel = new EntryEditorTab(frame, panel, type.getOptionalFields(), this,
+>>>>>>> Add an optional tab that shows fields that are not displayed inside the predefined tabs
                         false, false, Localization.lang("Optional fields"));
-                if (optPan.fileListEditor != null) {
-                    fileListEditor = optPan.fileListEditor;
+                if (optionalPanel.fileListEditor != null) {
+                    fileListEditor = optionalPanel.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan
+                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optionalPanel
                         .getPane(), Localization.lang("Show optional fields"));
-                tabs.add(optPan);
+                tabs.add(optionalPanel);
             } else {
-                optPan = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
+                displayedOptionalFields.addAll(type.getPrimaryOptionalFields());
+                displayedOptionalFields.addAll(type.getSecondaryOptionalFields());
+
+                optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
                         false, true, Localization.lang("Optional fields"));
-                if (optPan.fileListEditor != null) {
-                    fileListEditor = optPan.fileListEditor;
+                if (optionalPanel.fileListEditor != null) {
+                    fileListEditor = optionalPanel.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan
+                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optionalPanel
                         .getPane(), Localization.lang("Show optional fields"));
-                tabs.add(optPan);
+                tabs.add(optionalPanel);
 
                 Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
                 deprecatedFields.add("year");
@@ -275,6 +297,22 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     tabs.add(optPan3);
                 }
             }
+        }
+
+        // other fields
+        List<String> displayedFields = Stream.concat(requiredFields.stream(), displayedOptionalFields.stream()).collect(Collectors.toList());
+        List<String> otherFields = this.entry.getFieldNames().stream().filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
+        otherFields.remove("bibtexkey");
+
+        if(!otherFields.isEmpty()) {
+            EntryEditorTab otherPanel = new EntryEditorTab(frame, panel, otherFields, this,
+                    false, false, Localization.lang("Other fields"));
+            if (otherPanel.fileListEditor != null) {
+                fileListEditor = otherPanel.fileListEditor;
+            }
+            tabbed.addTab(Localization.lang("Other fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), otherPanel
+                    .getPane(), Localization.lang("Show remaining fields"));
+            tabs.add(otherPanel);
         }
 
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
@@ -483,12 +521,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 source.setText(srcString);
                 lastSourceStringAccepted = srcString;
 
-                //////////////////////////////////////////////////////////
                 // Set the current Entry to be selected.
-                // Fixes the bug of losing selection after, e.g.
-                // an autogeneration of a BibTeX key.
-                // - ILC (16/02/2010) -
-                //////////////////////////////////////////////////////////
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
@@ -503,8 +536,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         }
                     }
                 });
-                //////////////////////////////////////////////////////////
-
             } catch (IOException ex) {
                 source.setText(ex.getMessage() + "\n\n" +
                         Localization.lang("Correct the entry, and "
