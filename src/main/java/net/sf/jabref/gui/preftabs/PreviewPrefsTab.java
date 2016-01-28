@@ -52,9 +52,6 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final JButton testButton2 = new JButton(Localization.lang("Test"));
     private final JButton defaultButton2 = new JButton(Localization.lang("Default"));
 
-    private final JPanel pdfPreviewPanel = new JPanel(new BorderLayout());
-
-    private final JCheckBox pdfPreview = new JCheckBox(Localization.lang("Enable PDF preview"));
     private final JPanel firstPanel = new JPanel();
     private final JScrollPane firstScrollPane = new JScrollPane(layout1);
 
@@ -139,16 +136,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         layoutConstraints.weighty = 1;
         layout.setConstraints(secondPanel, layoutConstraints);
         add(secondPanel);
-
-        // PDF Preview button
-        pdfPreviewPanel.add(pdfPreview, BorderLayout.WEST);
-
-        // Help Button
-        pdfPreviewPanel.add(help, BorderLayout.EAST);
-
         layoutConstraints.weighty = 0;
-        layout.setConstraints(pdfPreviewPanel, layoutConstraints);
-        add(pdfPreviewPanel);
 
         defaultButton.addActionListener(new ActionListener() {
 
@@ -263,14 +251,12 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
     public void setValues() {
         layout1.setText(prefs.get(JabRefPreferences.PREVIEW_0).replace("__NEWLINE__", "\n"));
         layout2.setText(prefs.get(JabRefPreferences.PREVIEW_1).replace("__NEWLINE__", "\n"));
-        pdfPreview.setSelected(prefs.getBoolean(JabRefPreferences.PDF_PREVIEW));
     }
 
     @Override
     public void storeSettings() {
         prefs.put(JabRefPreferences.PREVIEW_0, layout1.getText().replace("\n", "__NEWLINE__"));
         prefs.put(JabRefPreferences.PREVIEW_1, layout2.getText().replace("\n", "__NEWLINE__"));
-        prefs.putBoolean(JabRefPreferences.PDF_PREVIEW, pdfPreview.isSelected());
     }
 
     @Override
