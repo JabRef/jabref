@@ -73,6 +73,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
         AssertUtil.assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
 
         File fullPath = FileUtil.expandFilename(pdf, root.getAbsolutePath() + "/pdfs/");
+        Assert.assertNotNull(fullPath);
         Assert.assertTrue(fullPath.exists());
     }
 
