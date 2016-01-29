@@ -328,6 +328,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Edit strings"),
             Globals.getKeyPrefs().getKey(KeyBinding.EDIT_STRINGS),
             IconTheme.JabRefIcon.EDIT_STRINGS.getIcon());
+    private final AbstractAction customizeAction = new CustomizeEntryTypeAction();
     private final AbstractAction toggleToolbar = new AbstractAction(Localization.menuTitle("Hide/show toolbar")) {
 
         {
@@ -1271,6 +1272,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         bibtex.add(editPreamble);
         bibtex.add(editStrings);
         bibtex.addSeparator();
+        bibtex.add(customizeAction);
+        bibtex.addSeparator();
         bibtex.add(deleteEntry);
         mb.add(bibtex);
 
@@ -1305,9 +1308,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(tools);
 
         options.add(showPrefs);
-        AbstractAction customizeAction = new CustomizeEntryTypeAction();
+
         AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
-        options.add(customizeAction);
         options.add(genFieldsCustomization);
         options.add(customExpAction);
         options.add(customImpAction);
