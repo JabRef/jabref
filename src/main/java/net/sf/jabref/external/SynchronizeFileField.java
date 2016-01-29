@@ -151,7 +151,9 @@ public class SynchronizeFileField extends AbstractWorker {
                         File file = FileUtil.expandFilename(flEntry.link, dirsS);
                         if ((file == null) || !file.exists()) {
                             int answer;
-                            if (!removeAllBroken) {
+                            if (removeAllBroken) {
+                                answer = 2; // We should delete this link.
+                            } else {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
                                         Localization.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
                                                 flEntry.link, aSel.getCiteKey()),
@@ -159,8 +161,6 @@ public class SynchronizeFileField extends AbstractWorker {
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
                                         );
-                            } else {
-                                answer = 2; // We should delete this link.
                             }
                             switch (answer) {
                             case 1:
@@ -356,8 +356,7 @@ public class SynchronizeFileField extends AbstractWorker {
             }
 
             List<String> dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
-            if (dirs.size() == 0) {
-
+            if (dirs.isEmpty()) {
                 autoSetNone.setSelected(true);
                 autoSetNone.setEnabled(false);
                 autoSetAll.setEnabled(false);

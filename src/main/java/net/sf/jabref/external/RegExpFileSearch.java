@@ -24,6 +24,10 @@ import java.io.IOException;
 import java.io.FilenameFilter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.*;
 
 /**
@@ -34,6 +38,8 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class RegExpFileSearch {
+
+    private static final Log LOGGER = LogFactory.getLog(RegExpFileSearch.class);
 
     private static final String EXT_MARKER = "__EXTENSION__";
 
@@ -165,7 +171,7 @@ public class RegExpFileSearch {
                     res.set(i, new File(tmp));
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Problem searching", e);
                 }
             }
         }

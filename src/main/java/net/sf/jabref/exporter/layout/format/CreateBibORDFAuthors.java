@@ -61,15 +61,11 @@ public class CreateBibORDFAuthors implements LayoutFormatter
 
         StringBuffer sb = new StringBuffer(100);
 
-        if (!fieldText.contains(" and "))
-        {
+        if (!fieldText.contains(" and ")) {
             singleAuthor(sb, fieldText, 1);
-        }
-        else
-        {
+        } else {
             String[] names = fieldText.split(" and ");
-            for (int i = 0; i < names.length; i++)
-            {
+            for (int i = 0; i < names.length; i++) {
                 singleAuthor(sb, names[i], i + 1);
                 if (i < (names.length - 1)) {
                     sb.append('\n');

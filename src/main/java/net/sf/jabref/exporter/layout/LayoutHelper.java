@@ -48,7 +48,7 @@ public class LayoutHelper {
     private final PushbackReader _in;
     private final List<StringInt> parsedEntries = new ArrayList<>();
 
-    private boolean _eof;
+    private boolean endOfFile;
 
 
     public LayoutHelper(Reader in) {
@@ -86,11 +86,11 @@ public class LayoutHelper {
         int c;
         boolean start = false;
 
-        while (!_eof) {
+        while (!endOfFile) {
             c = read();
 
             if (c == -1) {
-                _eof = true;
+                endOfFile = true;
 
                 if (buffer != null) {
                     parsedEntries.add(new StringInt(buffer.toString(), field));
@@ -135,12 +135,12 @@ public class LayoutHelper {
         String option = null;
         String tmp;
 
-        while (!_eof) {
+        while (!endOfFile) {
             c = read();
 
             //System.out.println((char)c);
             if (c == -1) {
-                _eof = true;
+                endOfFile = true;
 
                 if (buffer != null) {
                     //myStrings.add(buffer.toString());
@@ -227,11 +227,11 @@ public class LayoutHelper {
         StringBuffer buffer = null;
         boolean escaped = false;
 
-        while (!_eof) {
+        while (!endOfFile) {
             c = read();
 
             if (c == -1) {
-                _eof = true;
+                endOfFile = true;
 
                 /*
                  * CO 2006-11-11: Added check for null, otherwise a Layout that
@@ -279,11 +279,11 @@ public class LayoutHelper {
         char firstLetter;
         String name;
 
-        while (!_eof) {
+        while (!endOfFile) {
             c = read();
             // System.out.print((char)c);
             if (c == -1) {
-                _eof = true;
+                endOfFile = true;
             }
 
             if (!Character.isLetter((char) c) && (c != '_') && (c != '-')) {
@@ -396,7 +396,7 @@ public class LayoutHelper {
             c = read();
 
             if ((c == -1) || (c == 65535)) {
-                _eof = true;
+                endOfFile = true;
 
                 return;
             }

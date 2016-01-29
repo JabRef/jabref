@@ -183,7 +183,6 @@ public class DroppedFileHandler {
 
     public void linkPdfToEntry(String fileName, MainTable entryTable, BibEntry entry) {
         ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
-        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         // Show dialog
         boolean newEntry = false;
@@ -198,6 +197,7 @@ public class DroppedFileHandler {
 
         boolean success = true;
         String destFilename;
+        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
             destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
@@ -273,7 +273,8 @@ public class DroppedFileHandler {
         List<BibEntry> xmpEntriesInFile;
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            LOGGER.warn("Problem reading XMP", e);
             return false;
         }
 
@@ -457,13 +458,13 @@ public class DroppedFileHandler {
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
             List<String> dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
-            String absFilename = !new File(filename).isAbsolute() && (dirs.size() > 0) ?
+            String absFilename = !new File(filename).isAbsolute() && (!dirs.isEmpty()) ?
                     FileUtil.expandFilename(filename, dirs).getAbsolutePath() : filename;
 
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
                 // Find the absolute filename for this existing link:
-                String absName = !new File(flEntry.link).isAbsolute() && (dirs.size() > 0) ?
+                String absName = !new File(flEntry.link).isAbsolute() && (!dirs.isEmpty()) ?
                         FileUtil.expandFilename(flEntry.link, dirs).getAbsolutePath() : flEntry.link;
                 System.out.println("absName: " + absName);
                 // If the filenames are equal, we don't need to link, so we simply return:
@@ -511,7 +512,6 @@ public class DroppedFileHandler {
             // This should not happen!!
             return false;
         }
-        File fromFile = new File(fileName);
         File toFile = new File(dirs.get(found) + System.getProperty("file.separator") + destFilename);
         if (toFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame,
@@ -523,14 +523,15 @@ public class DroppedFileHandler {
             }
         }
 
-        if (!fromFile.renameTo(toFile)) {
+        File fromFile = new File(fileName);
+        if (fromFile.renameTo(toFile)) {
+            return true;
+        } else {
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not move file '%0'.", toFile.getAbsolutePath()) +
                             Localization.lang("Please move the file manually and link in place."),
                     Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
             return false;
-        } else {
-            return true;
         }
 
     }
