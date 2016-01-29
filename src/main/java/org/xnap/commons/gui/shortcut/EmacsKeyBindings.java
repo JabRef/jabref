@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2015  Oliver Kopp
+ *  Copyright (C) 2016  Oscar Gustafsson
  *
  *  This file is part of JabRef and is based on XNap Commons.
  *  This file may be used under the LGPL 2.1 license if used without JabRef.
@@ -369,7 +370,10 @@ public class EmacsKeyBindings
                     jtc.setSelectionStart(offs);
                     offs = EmacsKeyBindings.getWordEnd(jtc, offs);
                     jtc.setSelectionEnd(offs);
-                    KillRing.getInstance().add(jtc.getSelectedText());
+                    String selectedText = jtc.getSelectedText();
+                    if (selectedText != null) {
+                        KillRing.getInstance().add(selectedText);
+                    }
                     jtc.cut();
                 } catch (BadLocationException ble) {
                     jtc.getToolkit().beep();
@@ -403,7 +407,10 @@ public class EmacsKeyBindings
                     jtc.setSelectionEnd(offs);
                     offs = Utilities.getPreviousWord(jtc, offs);
                     jtc.setSelectionStart(offs);
-                    KillRing.getInstance().add(jtc.getSelectedText());
+                    String selectedText = jtc.getSelectedText();
+                    if (selectedText != null) {
+                        KillRing.getInstance().add(selectedText);
+                    }
                     jtc.cut();
                 } catch (BadLocationException ble) {
                     jtc.getToolkit().beep();
@@ -519,7 +526,11 @@ public class EmacsKeyBindings
                     else {
                         jtc.setSelectionStart(start);
                         jtc.setSelectionEnd(end);
-                        KillRing.getInstance().add(jtc.getSelectedText());
+                        String selectedText = jtc.getSelectedText();
+                        if (selectedText != null) {
+                            KillRing.getInstance().add(selectedText);
+                        }
+
                         jtc.cut();
                         // jtc.replaceSelection("");
                     }
@@ -625,7 +636,7 @@ public class EmacsKeyBindings
             JTextComponent jtc = getTextComponent(event);
             boolean jtcNotNull = jtc != null;
             boolean jtcIsCurrentTextComponent = KillRing.getInstance().getCurrentTextComponent() == jtc;
-            boolean caretPositionIsEndOfLastYank = jtc.getCaretPosition() == YankAction.end;
+            boolean caretPositionIsEndOfLastYank = jtcNotNull && (jtc.getCaretPosition() == YankAction.end);
             boolean killRingNotEmpty = !KillRing.getInstance().isEmpty();
             if (jtcNotNull && jtcIsCurrentTextComponent && caretPositionIsEndOfLastYank && killRingNotEmpty) {
                 jtc.setSelectionStart(YankAction.start);
