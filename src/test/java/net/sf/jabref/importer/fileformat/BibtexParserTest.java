@@ -19,9 +19,6 @@ import java.util.List;
 
 /**
  * Test the BibtexParser
- *
- * @author Christopher Oezbek <oezi@oezi.de>
- * @version $revision: 1.1$ $date: $
  */
 public class BibtexParserTest {
 
@@ -30,6 +27,7 @@ public class BibtexParserTest {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
+    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void initalizationWithNullThrowsNullPointerException() {
         new BibtexParser(null);
