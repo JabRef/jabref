@@ -58,11 +58,11 @@ import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
@@ -77,7 +77,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TextInputDialog extends JDialog implements ActionListener {
@@ -494,19 +493,15 @@ public class TextInputDialog extends JDialog implements ActionListener {
     }
 
     private String[] getAllFields() {
-        ArrayList<String> f = new ArrayList<>();
-        EntryType type = EntryTypes.getType(entry.getType(), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-        List<String> req = type.getRequiredFieldsFlat();
-        List<String> opt = type.getOptionalFields();
-        List<String> allFields = BibtexFields.getAllFieldNames();
-        f.addAll(req);
-        f.addAll(opt);
-        for (String allField : allFields) {
-            if (!f.contains(allField)) {
-                f.add(allField);
+        List<String> texFields = EntryTypes.getType(entry.getType(), frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).getAllFields();
+        List<String> internalFields = InternalBibtexFields.getAllFieldNames();
+
+        for (String field : internalFields) {
+            if (!texFields.contains(field)) {
+                texFields.add(field);
             }
         }
-        return f.toArray(new String[f.size()]);
+        return texFields.toArray(new String[texFields.size()]);
     }
 
     class PasteAction extends BasicAction {

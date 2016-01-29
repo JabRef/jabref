@@ -45,7 +45,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
@@ -265,7 +265,7 @@ public class SearchResultsDialog {
         }
 
         for (int i = 0; i < fields.length; i++) {
-            int width = BibtexFields.getFieldLength(fields[i]);
+            int width = InternalBibtexFields.getFieldLength(fields[i]);
             cm.getColumn(i + PAD).setPreferredWidth(width);
         }
     }

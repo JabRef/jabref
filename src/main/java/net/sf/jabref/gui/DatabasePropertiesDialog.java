@@ -225,7 +225,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveInOriginalOrder.addActionListener(listener);
         saveInSpecifiedOrder.addActionListener(listener);
 
-        List<String> v = new ArrayList<>(BibtexFields.getAllFieldNames());
+        List<String> v = new ArrayList<>(InternalBibtexFields.getAllFieldNames());
         v.add(BibEntry.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);

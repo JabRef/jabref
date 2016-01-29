@@ -403,7 +403,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     /**
-     * getExtra checks the field name against BibtexFields.getFieldExtras(name).
+     * getExtra checks the field name against InternalBibtexFields.getFieldExtras(name).
      * If the name has an entry, the proper component to be shown is created and
      * returned. Otherwise, null is returned. In addition, e.g. listeners can be
      * added to the field editor, even if no component is returned.
@@ -414,18 +414,18 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     public Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
-        final String fieldExtras = BibtexFields.getFieldExtras(fieldName);
+        final String fieldExtras = InternalBibtexFields.getFieldExtras(fieldName);
 
         // timestamp or a other field with datepicker command
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName)
-                || BibtexFields.EXTRA_DATEPICKER.equals(fieldExtras)) {
+                || InternalBibtexFields.EXTRA_DATEPICKER.equals(fieldExtras)) {
             // double click AND datefield => insert the current date (today)
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
-                    BibtexFields.EXTRA_DATEPICKER.equals(fieldExtras));
-        } else if (BibtexFields.EXTRA_EXTERNAL.equals(fieldExtras)) {
+                    InternalBibtexFields.EXTRA_DATEPICKER.equals(fieldExtras));
+        } else if (InternalBibtexFields.EXTRA_EXTERNAL.equals(fieldExtras)) {
             // Add external viewer listener for "pdf" and "url" fields.
             return FieldExtraComponents.getExternalExtraComponent(editor, this);
-        } else if (BibtexFields.EXTRA_JOURNAL_NAMES.equals(fieldExtras)) {
+        } else if (InternalBibtexFields.EXTRA_JOURNAL_NAMES.equals(fieldExtras)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
@@ -433,19 +433,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         } else if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
-        } else if (BibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
+        } else if (InternalBibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
             return FieldExtraComponents.getBrowseExtraComponent(frame, editor, this);
-        } else if (BibtexFields.EXTRA_BROWSE_DOC.equals(fieldExtras)
-                || BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
+        } else if (InternalBibtexFields.EXTRA_BROWSE_DOC.equals(fieldExtras)
+                || InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
             return FieldExtraComponents.getBrowseDocExtraComponent(frame, panel, editor, this,
-                    BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras));
-        } else if (BibtexFields.EXTRA_URL.equals(fieldExtras)) {
+                    InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras));
+        } else if (InternalBibtexFields.EXTRA_URL.equals(fieldExtras)) {
             return FieldExtraComponents.getURLExtraComponent(editor, storeFieldAction);
-        } else if (BibtexFields.EXTRA_SET_OWNER.equals(fieldExtras)) {
+        } else if (InternalBibtexFields.EXTRA_SET_OWNER.equals(fieldExtras)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, storeFieldAction);
-        } else if (BibtexFields.EXTRA_YES_NO.equals(fieldExtras)) {
+        } else if (InternalBibtexFields.EXTRA_YES_NO.equals(fieldExtras)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
-        } else if (BibtexFields.EXTRA_MONTH.equals(fieldExtras)) {
+        } else if (InternalBibtexFields.EXTRA_MONTH.equals(fieldExtras)) {
             return FieldExtraComponents.getMonthExtraComponent(editor, this, this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
         }
         return Optional.empty();
@@ -742,7 +742,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             for (String field : entry.getFieldNames()) {
-                if (BibtexFields.isDisplayableField(field) && !newEntry.hasField(field)) {
+                if (InternalBibtexFields.isDisplayableField(field) && !newEntry.hasField(field)) {
                     compound.addEdit(new UndoableFieldChange(entry, field, entry.getField(field), null));
                     entry.clearField(field);
                     anyChanged = true;

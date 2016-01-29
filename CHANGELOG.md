@@ -21,6 +21,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Improved layout for OSX: Toolbar buttons and search field
 - Migrated JabRef help to markdown at https://github.com/JabRef/help.jabref.org
 - BibTeX and BibLaTeX mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
+- Moved all quality-related database actions inside a new quality menu
 
 ### Fixed
 - Make BibTex parser more robust against missing newlines
@@ -44,7 +45,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Removed save session functionality as it just saved the last opened tabs which is done by default
 - Removed CLI option -l to load a session
 - Removed JabRef offline help files which are replaced by the new online documentation at https://github.com/JabRef/help.jabref.org
-
+- Removed PDF preview functionality
 
 
 

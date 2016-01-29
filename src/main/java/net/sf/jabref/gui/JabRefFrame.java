@@ -1731,7 +1731,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             @Override
             public void run() {
                 ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
-                        panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"),
+                        panel, InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"),
                         openInNew);
                 diag.addEntries(entries);
                 diag.entryListComplete();

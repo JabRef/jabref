@@ -85,7 +85,7 @@ public class JabRef {
         Globals.prefs.setLanguageDependentDefaultValues();
 
         // Update which fields should be treated as numeric, based on preferences:
-        BibtexFields.setNumericFieldsFromPrefs();
+        InternalBibtexFields.setNumericFieldsFromPrefs();
 
         /* Build list of Import and Export formats */
         Globals.importFormatReader.resetImportFormats();

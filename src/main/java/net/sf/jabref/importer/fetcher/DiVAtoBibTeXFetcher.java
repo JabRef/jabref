@@ -108,7 +108,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             entry.getFieldOptional("institution")
                     .ifPresent(institution -> entry.setField("institution", htmlConverter.formatUnicode(institution)));
             // Do not use the provided key
-            // entry.clearField(BibtexFields.KEY_FIELD);
+            // entry.clearField(InternalBibtexFields.KEY_FIELD);
             inspector.addEntry(entry);
 
             return true;

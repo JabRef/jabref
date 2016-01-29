@@ -135,11 +135,11 @@ class EntryEditorTab {
         // BibTex edit fields are defined here
         for (int i = 0; i < fields.length; i++) {
             // Create the text area:
-            int editorType = BibtexFields.getEditorType(fields[i]);
+            int editorType = InternalBibtexFields.getEditorType(fields[i]);
 
             FieldEditor fieldEditor;
             int defaultHeight;
-            int wHeight = (int) (50.0 * BibtexFields.getFieldWeight(fields[i]));
+            int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(fields[i]));
             if (editorType == GUIGlobals.FILE_LIST_EDITOR) {
                 fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext().getMetaData(), fields[i], null, parent);
                 fileListEditor = (FileListEditor) fieldEditor;

@@ -798,7 +798,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
 
         for (int i = 0; i < fields.length; i++) {
-            int width = BibtexFields.getFieldLength(fields[i]);
+            int width = InternalBibtexFields.getFieldLength(fields[i]);
             glTable.getColumnModel().getColumn(i + PAD).setPreferredWidth(width);
         }
     }

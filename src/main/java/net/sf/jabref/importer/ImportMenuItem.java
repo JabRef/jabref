@@ -188,7 +188,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 } else {
                     final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
 
-                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
                     diag.addEntries(bibtexResult.getDatabase().getEntries());
                     diag.entryListComplete();
                     PositionWindow.placeDialog(diag, frame);

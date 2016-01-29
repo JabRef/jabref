@@ -46,13 +46,11 @@ public class BibEntry {
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
-    private static final String ID_FIELD = "id";
-    private static final String DEFAULT_TYPE = "misc";
+    public static final String ID_FIELD = "id";
+    public static final String DEFAULT_TYPE = "misc";
 
     private String id;
-
     private String type;
-
     private Map<String, String> fields = new HashMap<>();
 
     private final VetoableChangeSupport changeSupport = new VetoableChangeSupport(this);
@@ -68,7 +66,6 @@ public class BibEntry {
     * Is set to false, if parts of the entry change
      */
     private boolean changed;
-
 
     public BibEntry() {
         this(IdGenerator.next());

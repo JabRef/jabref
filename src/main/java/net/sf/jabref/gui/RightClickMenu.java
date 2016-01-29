@@ -98,7 +98,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
             addSeparator();
         } else if (be != null) {
-            String marked = be.getField(BibtexFields.MARKED);
+            String marked = be.getField(InternalBibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
             if ((marked == null) || marked.isEmpty()) {
                 add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));

@@ -65,9 +65,9 @@ public class FieldWeightDialog extends JDialog {
         TreeSet<String> fields = new TreeSet<>();
         // We use this map to remember which slider represents which field name:
         sliders.clear();
-        for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; i++)
+        for (int i = 0, len = InternalBibtexFields.numberOfPublicFields(); i < len; i++)
         {
-            fields.add(BibtexFields.getFieldName(i));
+            fields.add(InternalBibtexFields.getFieldName(i));
         }
         fields.remove("bibtexkey"); // bibtex key doesn't need weight.
         // Here is the place to add other fields:
@@ -76,7 +76,7 @@ public class FieldWeightDialog extends JDialog {
 
         for (String field : fields) {
             builder.append(field);
-            int weight = (int) ((100 * BibtexFields.getFieldWeight(field)) / GUIGlobals.MAX_FIELD_WEIGHT);
+            int weight = (int) ((100 * InternalBibtexFields.getFieldWeight(field)) / GUIGlobals.MAX_FIELD_WEIGHT);
             //System.out.println(weight);
             JSlider slider = new JSlider(0, 100, weight);//,);
             sliders.put(slider, new SliderInfo(field, weight));
@@ -120,7 +120,7 @@ public class FieldWeightDialog extends JDialog {
             // Only list the value if it has changed:
             if (sInfo.originalValue != slider.getValue()) {
                 double weight = (GUIGlobals.MAX_FIELD_WEIGHT * slider.getValue()) / 100d;
-                BibtexFields.setFieldWeight(sInfo.fieldName, weight);
+                InternalBibtexFields.setFieldWeight(sInfo.fieldName, weight);
             }
         }
         frame.removeCachedEntryEditors();
