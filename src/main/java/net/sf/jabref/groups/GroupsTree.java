@@ -90,8 +90,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
         DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
                 .createDefaultDragGestureRecognizer(this,
                         DnDConstants.ACTION_MOVE, this);
-        // Eliminates right mouse clicks as valid actions
-        dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
+        if (dgr != null) {
+            // Eliminates right mouse clicks as valid actions
+            dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
+        }
         new DropTarget(this, this);
         setCellRenderer(localCellRenderer);
         setFocusable(false);
@@ -112,19 +114,20 @@ public class GroupsTree extends JTree implements DragSourceListener,
     @Override
     public void dragOver(DragSourceDragEvent dsde) {
         final Point p = dsde.getLocation(); // screen coordinates!
-        SwingUtilities.convertPointFromScreen(p, this);
-        final TreePath path = getPathForLocation(p.x, p.y);
-        if (path == null) {
-            dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
-            return;
+        if (p != null) {
+            SwingUtilities.convertPointFromScreen(p, this);
+            final TreePath path = getPathForLocation(p.x, p.y);
+            if (path == null) {
+                dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
+                return;
+            }
+            final GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
+            if ((target == null) || dragNode.isNodeDescendant(target) || (dragNode.equals(target))) {
+                dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
+                return;
+            }
+            dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
         }
-        final GroupTreeNode target = (GroupTreeNode) path
-                .getLastPathComponent();
-        if ((target == null) || dragNode.isNodeDescendant(target) || (dragNode.equals(target))) {
-            dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
-            return;
-        }
-        dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
     }
 
     @Override

@@ -390,6 +390,9 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
+                if (context == null) {
+                    throw new VMException("Must have an entry to cite$");
+                }
                 stack.push(context.getBibtexEntry().getCiteKey());
             }
         });
@@ -1294,6 +1297,7 @@ public class VM implements Warn {
         }
 
         if (functions.containsKey(name)) {
+            // OK to have a null context
             functions.get(name).execute(context);
             return;
         }

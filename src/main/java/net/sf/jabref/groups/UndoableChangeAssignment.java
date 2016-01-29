@@ -86,22 +86,26 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     @Override
     public void undo() {
         super.undo();
-        ExplicitGroup group = (ExplicitGroup) mGroupsRootHandle.getChildAt(
-                mPathToNode).getGroup();
-        group.clearAssignments();
-        for (final BibEntry aM_previousAssignmentBackup : m_previousAssignmentBackup) {
-            group.addEntry(aM_previousAssignmentBackup);
+        GroupTreeNode treeNode =  mGroupsRootHandle.getChildAt(mPathToNode);
+        if (treeNode != null) {
+            ExplicitGroup group = (ExplicitGroup) treeNode.getGroup();
+            group.clearAssignments();
+            for (final BibEntry aM_previousAssignmentBackup : m_previousAssignmentBackup) {
+                group.addEntry(aM_previousAssignmentBackup);
+            }
         }
     }
 
     @Override
     public void redo() {
         super.redo();
-        ExplicitGroup group = (ExplicitGroup) mGroupsRootHandle.getChildAt(
-                mPathToNode).getGroup();
-        group.clearAssignments();
-        for (final BibEntry aM_newAssignmentBackup : m_newAssignmentBackup) {
-            group.addEntry(aM_newAssignmentBackup);
+        GroupTreeNode treeNode = mGroupsRootHandle.getChildAt(mPathToNode);
+        if (treeNode != null) {
+            ExplicitGroup group = (ExplicitGroup) treeNode.getGroup();
+            group.clearAssignments();
+            for (final BibEntry aM_newAssignmentBackup : m_newAssignmentBackup) {
+                group.addEntry(aM_newAssignmentBackup);
+            }
         }
     }
 }

@@ -58,6 +58,8 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
 
+        addParameters("User-Agent", "JabRef");
+
         URLDownload.setCookieHandler();
     }
 
@@ -103,7 +105,6 @@ public class URLDownload {
 
     private URLConnection openConnection() throws IOException {
         URLConnection connection = source.openConnection();
-        connection.setRequestProperty("User-Agent", "JabRef");
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
