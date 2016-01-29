@@ -16,7 +16,7 @@
 package net.sf.jabref.exporter;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -183,7 +183,7 @@ public class LatexFieldFormatter {
             }
         } else {
             // Default operation - we only resolve strings for standard fields:
-            resolveStrings = BibtexFields.isStandardField(fieldName)
+            resolveStrings = InternalBibtexFields.isStandardField(fieldName)
                     || BIBTEX_STRING.equals(fieldName);
         }
         return resolveStrings;

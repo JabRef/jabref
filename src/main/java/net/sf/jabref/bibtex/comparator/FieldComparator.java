@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
@@ -79,7 +79,7 @@ public class FieldComparator implements Comparator<BibEntry> {
                 || "editor".equals(this.field[0]);
         isYearField = "year".equals(this.field[0]);
         isMonthField = "month".equals(this.field[0]);
-        isNumeric = BibtexFields.isNumeric(this.field[0]);
+        isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
     }
 
     @Override

@@ -29,13 +29,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
@@ -236,11 +236,11 @@ public class FileActions {
                 // Check if the entry should be written.
                 boolean write = true;
 
-                if (checkSearch && !FileActions.nonZeroField(entry, BibtexFields.SEARCH)) {
+                if (checkSearch && !FileActions.nonZeroField(entry, InternalBibtexFields.SEARCH)) {
                     write = false;
                 }
 
-                if (checkGroup && !FileActions.nonZeroField(entry, BibtexFields.GROUPSEARCH)) {
+                if (checkGroup && !FileActions.nonZeroField(entry, InternalBibtexFields.GROUPSEARCH)) {
                     write = false;
                 }
 

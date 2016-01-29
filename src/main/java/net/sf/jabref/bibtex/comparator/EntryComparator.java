@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -43,7 +43,7 @@ public class EntryComparator implements Comparator<BibEntry> {
         this.sortField = field;
         this.descending = desc;
         this.next = next;
-        this.numeric = BibtexFields.isNumeric(sortField);
+        this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
     public EntryComparator(boolean binary, boolean desc, String field) {
@@ -51,7 +51,7 @@ public class EntryComparator implements Comparator<BibEntry> {
         this.sortField = field;
         this.descending = desc;
         this.next = null;
-        this.numeric = BibtexFields.isNumeric(sortField);
+        this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
     @Override

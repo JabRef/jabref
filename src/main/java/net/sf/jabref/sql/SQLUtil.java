@@ -26,7 +26,7 @@ import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 
 /**
  * @author pattonlk
@@ -58,8 +58,8 @@ final public class SQLUtil {
         } else {
             SQLUtil.allFields.clear();
         }
-        SQLUtil.uniqueListInsert(SQLUtil.allFields, BibtexFields.getAllFieldNames());
-        SQLUtil.uniqueListInsert(SQLUtil.allFields, BibtexFields.getAllPrivateFieldNames());
+        SQLUtil.uniqueListInsert(SQLUtil.allFields, InternalBibtexFields.getAllFieldNames());
+        SQLUtil.uniqueListInsert(SQLUtil.allFields, InternalBibtexFields.getAllPrivateFieldNames());
     }
 
     /**

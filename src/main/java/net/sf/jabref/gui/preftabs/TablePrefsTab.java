@@ -35,7 +35,7 @@ import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -84,7 +84,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
          *
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
          */
-        List<String> fieldNames = new ArrayList<>(BibtexFields.getAllFieldNames());
+        List<String> fieldNames = new ArrayList<>(InternalBibtexFields.getAllFieldNames());
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
@@ -319,7 +319,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
                 || ((newVal == null) && (oldVal != null))
                 || ((newVal != null) && !newVal.equals(oldVal))) {
             prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
-            BibtexFields.setNumericFieldsFromPrefs();
+            InternalBibtexFields.setNumericFieldsFromPrefs();
         }
 
     }

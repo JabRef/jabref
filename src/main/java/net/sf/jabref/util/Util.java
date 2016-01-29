@@ -269,7 +269,7 @@ public class Util {
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(BibtexFields.OWNER)));
+            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(InternalBibtexFields.OWNER)));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
             net.sf.jabref.util.Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
             if (markEntries) {
@@ -291,7 +291,7 @@ public class Util {
         String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                && (overwriteOwner || (!entry.hasField(BibtexFields.OWNER)));
+                && (overwriteOwner || (!entry.hasField(InternalBibtexFields.OWNER)));
         boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
                 && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
@@ -306,7 +306,7 @@ public class Util {
             // if (entry.getField(Globals.OWNER) == null
             // || ((String) entry.getField(Globals.OWNER)).isEmpty()) {
             // Set owner field to default value
-            entry.setField(BibtexFields.OWNER, owner);
+            entry.setField(InternalBibtexFields.OWNER, owner);
             // }
         }
 
@@ -323,10 +323,10 @@ public class Util {
      * @return The file filter.
      */
     public static OpenFileFilter getFileFilterForField(String fieldName) {
-        String s = BibtexFields.getFieldExtras(fieldName);
+        String s = InternalBibtexFields.getFieldExtras(fieldName);
         final String ext = "." + fieldName.toLowerCase();
         OpenFileFilter off;
-        if (BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(s)) {
+        if (InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(s)) {
             off = new OpenFileFilter(new String[]{ext, ext + ".gz", ext + ".bz2"});
         } else {
             off = new OpenFileFilter(new String[]{ext});
@@ -527,8 +527,8 @@ public class Util {
                 if ("keywords".equals(field)) {
                     continue; // this is not undesired
                 }
-                for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {
-                    if (field.equals(BibtexFields.getFieldName(i))) {
+                for (int i = 0, len = InternalBibtexFields.numberOfPublicFields(); i < len; ++i) {
+                    if (field.equals(InternalBibtexFields.getFieldName(i))) {
                         affectedFields.add(field);
                         break;
                     }

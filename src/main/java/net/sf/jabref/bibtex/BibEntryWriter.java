@@ -1,6 +1,6 @@
 package net.sf.jabref.bibtex;
 
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -88,8 +88,8 @@ public class BibEntryWriter {
         // Then write remaining fields in alphabetic order.
         TreeSet<String> remainingFields = new TreeSet<>();
         for (String key : entry.getFieldNames()) {
-            boolean writeIt = write ? BibtexFields.isWriteableField(key) :
-                    BibtexFields.isDisplayableField(key);
+            boolean writeIt = write ? InternalBibtexFields.isWriteableField(key) :
+                    InternalBibtexFields.isDisplayableField(key);
             if (!written.contains(key) && writeIt) {
                 remainingFields.add(key);
             }
