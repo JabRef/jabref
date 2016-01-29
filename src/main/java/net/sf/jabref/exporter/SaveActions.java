@@ -10,10 +10,11 @@ import net.sf.jabref.model.entry.BibEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SaveActions {
 
-    private HashMap<String, Formatter> actions;
+    private final Map<String, Formatter> actions;
 
     private List<Formatter> availableFormatters;
 

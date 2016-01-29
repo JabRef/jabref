@@ -26,6 +26,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
@@ -41,6 +44,8 @@ import net.sf.jabref.model.entry.BibEntry;
  * Time: 9:35:08 PM
  */
 public class ExportFormats {
+
+    private static final Log LOGGER = LogFactory.getLog(ExportFormats.class);
 
     private static final Map<String, IExportFormat> EXPORT_FORMATS = new TreeMap<>();
 
@@ -232,7 +237,7 @@ public class ExportFormats {
                                         finFile.getPath(), frame
                                                 .getCurrentBasePanel().getEncoding(), finEntryIDs);
                             } catch (Exception ex) {
-                                ex.printStackTrace();
+                                LOGGER.warn("Problem exporting", ex);
                                 if (ex.getMessage() == null) {
                                     errorMessage = ex.toString();
                                 } else {

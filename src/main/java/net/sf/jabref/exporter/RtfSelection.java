@@ -21,7 +21,12 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 class RtfSelection implements Transferable {
+
+    private static final Log LOGGER = LogFactory.getLog(RtfSelection.class);
 
     private DataFlavor rtfFlavor;
     private DataFlavor[] supportedFlavors;
@@ -34,7 +39,7 @@ class RtfSelection implements Transferable {
             rtfFlavor = new DataFlavor("text/rtf; class=java.io.InputStream");
             supportedFlavors = new DataFlavor[] {rtfFlavor, DataFlavor.stringFlavor};
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Cannot find class", ex);
         }
     }
 

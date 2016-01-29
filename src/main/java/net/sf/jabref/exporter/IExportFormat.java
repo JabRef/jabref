@@ -59,6 +59,7 @@ public interface IExportFormat {
      */
     void performExport(BibDatabase database, MetaData metaData,
  String file, Charset encoding,
-            Set<String> entryIds) throws Exception;
+ Set<String> entryIds)
+            throws Exception;
 
 }

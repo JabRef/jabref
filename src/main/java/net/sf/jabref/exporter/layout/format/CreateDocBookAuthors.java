@@ -38,8 +38,8 @@ package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.exporter.layout.WSITools;
 
-import java.util.Vector;
-
+import java.util.ArrayList;
+import java.util.List;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.model.entry.AuthorList;
 
@@ -100,18 +100,15 @@ public class CreateDocBookAuthors implements LayoutFormatter
             sb.append('<').append(tagName).append('>');
             AuthorList.Author a = al.getAuthor(i);
             if ((a.getFirst() != null) && !a.getFirst().isEmpty()) {
-                sb.append("<firstname>");
-                sb.append(CreateDocBookAuthors.XML_CHARS.format(a.getFirst()));
-                sb.append("</firstname>");
+                sb.append("<firstname>").append(CreateDocBookAuthors.XML_CHARS.format(a.getFirst()))
+                        .append("</firstname>");
             }
             if ((a.getVon() != null) && !a.getVon().isEmpty()) {
-                sb.append("<othername>");
-                sb.append(CreateDocBookAuthors.XML_CHARS.format(a.getVon()));
-                sb.append("</othername>");
+                sb.append("<othername>").append(CreateDocBookAuthors.XML_CHARS.format(a.getVon()))
+                        .append("</othername>");
             }
             if ((a.getLast() != null) && !a.getLast().isEmpty()) {
-                sb.append("<surname>");
-                sb.append(CreateDocBookAuthors.XML_CHARS.format(a.getLast()));
+                sb.append("<surname>").append(CreateDocBookAuthors.XML_CHARS.format(a.getLast()));
                 if ((a.getJr() != null) && !a.getJr().isEmpty()) {
                     sb.append(' ').append(CreateDocBookAuthors.XML_CHARS.format(a.getJr()));
                 }
@@ -133,48 +130,29 @@ public class CreateDocBookAuthors implements LayoutFormatter
     protected void singleAuthor(StringBuffer sb, String author)
     {
         // TODO: replace special characters
-        Vector<String> v = new Vector<>();
+        List<String> v = new ArrayList<>();
 
         String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
 
         WSITools.tokenize(v, authorMod, " \n\r");
 
-        if (v.size() == 1)
-        {
-            sb.append("<surname>");
-            sb.append(v.get(0));
-            sb.append("</surname>");
-        }
-        else if (v.size() == 2)
-        {
-            sb.append("<firstname>");
-            sb.append(v.get(0));
-            sb.append("</firstname>");
-            sb.append("<surname>");
-            sb.append(v.get(1));
-            sb.append("</surname>");
-        }
-        else
-        {
-            sb.append("<firstname>");
-            sb.append(v.get(0));
-            sb.append("</firstname>");
-            sb.append("<othername role=\"mi\">");
+        if (v.size() == 1) {
+            sb.append("<surname>").append(v.get(0)).append("</surname>");
+        } else if (v.size() == 2) {
+            sb.append("<firstname>").append(v.get(0)).append("</firstname><surname>").append(v.get(1))
+                    .append("</surname>");
+        } else {
+            sb.append("<firstname>").append(v.get(0)).append("</firstname><othername role=\"mi\">");
 
-            for (int i = 1; i < (v.size() - 1); i++)
-            {
+            for (int i = 1; i < (v.size() - 1); i++) {
                 sb.append(v.get(i));
 
-                if (i < (v.size() - 2))
-                {
+                if (i < (v.size() - 2)) {
                     sb.append(' ');
                 }
             }
 
-            sb.append("</othername>");
-            sb.append("<surname>");
-            sb.append(v.get(v.size() - 1));
-            sb.append("</surname>");
+            sb.append("</othername><surname>").append(v.get(v.size() - 1)).append("</surname>");
         }
     }
 }

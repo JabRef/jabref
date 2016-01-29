@@ -137,7 +137,9 @@ public class FileActions {
         String suffix = suffixSB.toString();
 
         fw.write("@String { " + bs.getName() + suffix + " = ");
-        if (!bs.getContent().isEmpty()) {
+        if (bs.getContent().isEmpty()) {
+            fw.write("{}");
+        } else {
             try {
                 String formatted = new LatexFieldFormatter().format(bs.getContent(), LatexFieldFormatter.BIBTEX_STRING);
                 fw.write(formatted);
@@ -146,9 +148,6 @@ public class FileActions {
                         "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
                                 + "Before saving, please edit any strings containing the # character.");
             }
-
-        } else {
-            fw.write("{}");
         }
 
         fw.write(" }" + Globals.NEWLINE);
@@ -284,10 +283,7 @@ public class FileActions {
     }
 
     private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
-        if (metaData.getData(SaveActions.META_KEY) != null) {
-            // no save actions defined -> do nothing
-            return toChange;
-        } else {
+        if (metaData.getData(SaveActions.META_KEY) == null) {
             // save actions defined -> apply for every entry
             List<BibEntry> result = new ArrayList<>(toChange.size());
 
@@ -298,6 +294,9 @@ public class FileActions {
             }
 
             return result;
+        } else {
+            // no save actions defined -> do nothing
+            return toChange;
         }
     }
 
@@ -479,16 +478,16 @@ public class FileActions {
         URL reso = Globals.class.getResource(name);
 
         // If that didn't work, try loading as a normal file URL:
-        if (reso != null) {
+        if (reso == null) {
+            File f = new File(name);
             try {
-                reader = new InputStreamReader(reso.openStream());
+                reader = new FileReader(f);
             } catch (FileNotFoundException ex) {
                 throw new IOException("Cannot find layout file: '" + name + "'.");
             }
         } else {
-            File f = new File(name);
             try {
-                reader = new FileReader(f);
+                reader = new InputStreamReader(reso.openStream());
             } catch (FileNotFoundException ex) {
                 throw new IOException("Cannot find layout file: '" + name + "'.");
             }

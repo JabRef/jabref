@@ -22,6 +22,10 @@ import net.sf.jabref.JabRefPreferences;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
@@ -30,6 +34,8 @@ import java.io.File;
  * Background task and utilities for autosave feature.
  */
 public class AutoSaveManager {
+
+    private static final Log LOGGER = LogFactory.getLog(AutoSaveManager.class);
 
     private final JabRefFrame frame;
     private Timer t;
@@ -101,10 +107,7 @@ public class AutoSaveManager {
                     false, false, panel.getEncoding(), true);
             ss.commit();
         } catch (SaveException e) {
-            e.printStackTrace();
-            return false;
-        } catch (Throwable ex) {
-            ex.printStackTrace();
+            LOGGER.error("Problem with automatic save", e);
             return false;
         }
         return true;
