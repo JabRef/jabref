@@ -26,8 +26,6 @@ import java.util.TimerTask;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.File;
 
 /**
@@ -70,12 +68,7 @@ public class AutoSaveManager {
             // Since this method is running in the background, we must be prepared that
             // there could be changes done by the user while this method is running.
 
-            List<BasePanel> panels = new ArrayList<>();
-            for (int i = 0; i < frame.getBasePanelCount(); i++) {
-                panels.add(frame.getBasePanelAt(i));
-            }
-
-            for (BasePanel panel : panels) {
+            for (BasePanel panel : frame.getBasePanelList()) {
                 if (panel.isModified() && (panel.getDatabaseFile() != null)) {
                         AutoSaveManager.autoSave(panel);
                 }
@@ -135,11 +128,7 @@ public class AutoSaveManager {
      * if they exist.
      */
     public void clearAutoSaves() {
-        List<BasePanel> panels = new ArrayList<>();
-        for (int i = 0; i < frame.getBasePanelCount(); i++) {
-            panels.add(frame.getBasePanelAt(i));
-        }
-        for (BasePanel panel : panels) {
+        for (BasePanel panel : frame.getBasePanelList()) {
             AutoSaveManager.deleteAutoSaveFile(panel);
         }
     }
