@@ -3,6 +3,8 @@ package net.sf.jabref.logic.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
+
 public class DOITest {
     @Test
     public void acceptPlainDoi() {
@@ -26,6 +28,11 @@ public class DOITest {
     public void rejectInvalidDirectoryIndicator() {
         // wrong directory indicator
         new DOI("12.1006/jmbi.1998.2354 end");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectInvalidDoiUri() {
+        new DOI("https://thisisnouri");
     }
 
     @Test(expected=IllegalArgumentException.class)
