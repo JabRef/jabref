@@ -56,7 +56,9 @@ public class GVKParser {
         List<Element> records = getChildren("zs:record", srwrecords);
         for (Element record : records) {
             Element e = getChild("zs:recordData", record);
-            e = getChild("record", e);
+            if (e != null) {
+                e = getChild("record", e);
+            }
             result.add(parseEntry(e));
         }
         return result;
@@ -232,7 +234,9 @@ public class GVKParser {
             if ("037C".equals(tag)) {
                 if (address == null) {
                     address = getSubfield("b", datafield);
-                    address = removeSortCharacters(address);
+                    if (address != null) {
+                        address = removeSortCharacters(address);
+                    }
                 }
 
                 String st = getSubfield("a", datafield);

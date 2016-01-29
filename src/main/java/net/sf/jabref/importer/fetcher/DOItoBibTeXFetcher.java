@@ -39,8 +39,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.NetUtil;
 import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.util.Util;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
 
@@ -120,7 +120,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
         String bibtexString;
         try {
-            bibtexString = Util.getResultsWithEncoding(conn, StandardCharsets.UTF_8);
+            bibtexString = NetUtil.getResultsWithEncoding(conn, StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
 
             if (status != null) {

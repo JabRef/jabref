@@ -23,6 +23,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 
+import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -85,9 +87,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.tableRows = table.getTableRows();
         previewPanel = new PreviewPanel[] {
                 new PreviewPanel(panel.database(), null, panel, panel.getLoadedDatabase().getMetaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_0), true),
+                        .get(JabRefPreferences.PREVIEW_0)),
                 new PreviewPanel(panel.database(), null, panel, panel.getLoadedDatabase().getMetaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_1), true)};
+                        .get(JabRefPreferences.PREVIEW_1))};
 
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
@@ -421,8 +423,15 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     if (specialField == null) {
                         if (entry.hasField(field)) {
                             String content = entry.getField(field);
-                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content,
-                                    GUIGlobals.getTableIcon(field).getIcon(), panel.getLoadedDatabase().getMetaData(), field));
+                            Icon icon;
+                            JLabel iconLabel = GUIGlobals.getTableIcon(field);
+                            if (iconLabel == null) {
+                                icon = IconTheme.JabRefIcon.FILE.getIcon();
+                            } else {
+                                icon = iconLabel.getIcon();
+                            }
+                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content, icon,
+                                    panel.getLoadedDatabase().getMetaData(), field));
                             showDefaultPopup = false;
                         }
                     } else {

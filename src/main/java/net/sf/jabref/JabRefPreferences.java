@@ -357,8 +357,6 @@ public final class JabRefPreferences {
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
     private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
-    public static final String PDF_PREVIEW = "pdfPreview";
-
 
     private static final char[][] VALUE_DELIMITERS = new char[][] { {'"', '"'}, {'{', '}'}};
 
@@ -475,7 +473,6 @@ public final class JabRefPreferences {
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
 
-        defaults.put(PDF_PREVIEW, Boolean.FALSE);
         defaults.put(USE_DEFAULT_LOOK_AND_FEEL, Boolean.TRUE);
         defaults.put(LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(VIM, "vim");

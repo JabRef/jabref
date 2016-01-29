@@ -307,7 +307,8 @@ public class MainTable extends JTable {
 
         Rectangle bounds = getCellRect(row, col, false);
 
-        if ((comp.getPreferredSize().width > bounds.width) && (getValueAt(row, col) != null)) {
+        Dimension d = comp.getPreferredSize();
+        if ((d != null) && (d.width > bounds.width) && (getValueAt(row, col) != null)) {
             toolTipText = getValueAt(row, col).toString();
         }
         return toolTipText;

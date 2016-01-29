@@ -248,7 +248,7 @@ public class JabRef {
 
                 //export database
                 if ((newBase != null) && (newBase.getEntryCount() > 0)) {
-                    String formatName = null;
+                    String formatName;
 
                     //read in the export format, take default format if no format entered
                     switch (data.length) {

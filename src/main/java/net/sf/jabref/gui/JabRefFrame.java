@@ -1137,6 +1137,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JMenu search = JabRefFrame.subMenu(Localization.menuTitle("Search"));
         JMenu groups = JabRefFrame.subMenu(Localization.menuTitle("Groups"));
         JMenu bibtex = JabRefFrame.subMenu(Localization.menuTitle("BibTeX"));
+        JMenu quality = JabRefFrame.subMenu(Localization.menuTitle("Quality"));
         JMenu view = JabRefFrame.subMenu(Localization.menuTitle("View"));
         JMenu tools = JabRefFrame.subMenu(Localization.menuTitle("Tools"));
         JMenu options = JabRefFrame.subMenu(Localization.menuTitle("Options"));
@@ -1237,10 +1238,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         search.add(replaceAll);
         search.add(massSetField);
         search.addSeparator();
-        search.add(dupliCheck);
-        search.add(resolveDuplicateKeys);
-        //search.add(strictDupliCheck);
-        search.addSeparator();
         search.add(generalFetcher.getAction());
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
@@ -1293,10 +1290,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         bibtex.add(deleteEntry);
         mb.add(bibtex);
 
-        tools.add(makeKeyAction);
-        tools.add(cleanupEntries);
-        tools.add(mergeEntries);
-        tools.add(downloadFullText);
+        quality.add(dupliCheck);
+        quality.add(mergeEntries);
+        quality.addSeparator();
+        quality.add(resolveDuplicateKeys);
+        quality.add(checkIntegrity);
+        quality.add(cleanupEntries);
+        quality.add(makeKeyAction);
+        quality.addSeparator();
+        quality.add(autoSetFile);
+        quality.add(findUnlinkedFiles);
+        quality.add(autoLinkFile);
+        quality.add(downloadFullText);
+        mb.add(quality);
+
         tools.add(newSubDatabaseAction);
         tools.add(writeXmpAction);
         OpenOfficePanel otp = OpenOfficePanel.getInstance();
@@ -1304,22 +1311,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(otp.getMenuItem());
         tools.add(pushExternalButton.getMenuAction());
         tools.addSeparator();
-        tools.add(manageSelectors);
-        tools.addSeparator();
         tools.add(openFolder);
         tools.add(openFile);
         tools.add(openUrl);
-        //tools.add(openSpires);
-        tools.addSeparator();
-        tools.add(autoSetFile);
-        tools.add(findUnlinkedFiles);
-        tools.add(autoLinkFile);
         tools.addSeparator();
         tools.add(abbreviateIso);
         tools.add(abbreviateMedline);
         tools.add(unabbreviate);
-        tools.addSeparator();
-        tools.add(checkIntegrity);
         mb.add(tools);
 
         options.add(showPrefs);
@@ -1331,7 +1329,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(customImpAction);
         options.add(customFileTypesAction);
         options.add(manageJournals);
-
+        options.add(manageSelectors);
         options.add(selectKeys);
         mb.add(options);
 
@@ -1383,16 +1381,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setBorder(null);
         tlb.setRollover(true);
 
-        //tlb.setBorderPainted(true);
-        //tlb.setBackground(GUIGlobals.lightGray);
-        //tlb.setForeground(GUIGlobals.lightGray);
         tlb.setFloatable(false);
         tlb.addAction(newDatabaseAction);
         tlb.addAction(open);
         tlb.addAction(save);
         tlb.addAction(saveAll);
-        //tlb.addAction(dbConnect);
-        //tlb.addAction(dbExport);
 
         tlb.addSeparator();
         tlb.addAction(cut);

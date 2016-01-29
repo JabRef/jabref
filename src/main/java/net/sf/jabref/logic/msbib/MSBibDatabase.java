@@ -67,7 +67,7 @@ public class MSBibDatabase {
 
     public List<BibEntry> importEntries(InputStream stream) {
         entries = new HashSet<>();
-        Document inputDocument = null;
+        Document inputDocument;
         try {
             DocumentBuilder documentBuilder = DocumentBuilderFactory.
                     newInstance().

@@ -24,6 +24,9 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.maintable.MainTable;
@@ -54,6 +57,8 @@ import com.jgoodies.forms.layout.FormLayout;
  * 3) Move the file to ??? directory, rename after bibtex key, and extension
  */
 public class DroppedFileHandler {
+
+    private static final Log LOGGER = LogFactory.getLog(DroppedFileHandler.class);
 
     public static final String DFH_LEAVE = "DroppedFileHandler_LeaveFileInDir";
     public static final String DFH_COPY = "DroppedFileHandler_CopyFile";
@@ -576,7 +581,7 @@ public class DroppedFileHandler {
         try {
             FileUtil.copyFile(new File(fileName), destFile, true);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Problem copying file", e);
             return false;
         }
 

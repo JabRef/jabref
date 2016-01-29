@@ -189,24 +189,27 @@ public class GroupAddRemoveDialog implements BaseAction {
 
 
     private boolean doAddOrRemove() {
-        GroupTreeNode node = (GroupTreeNode) tree.getSelectionPath().getLastPathComponent();
-        AbstractGroup group = node.getGroup();
-        if (checkGroupEnable(group)) {
-
-            if (add) {
-                AddToGroupAction action = new AddToGroupAction(node, move, panel);
-                action.actionPerformed(new ActionEvent(node, 0, "add"));
-            } else {
-                RemoveFromGroupAction action = new RemoveFromGroupAction(node, panel);
-                action.actionPerformed(new ActionEvent(node, 0, "remove"));
-            }
-
-            return true;
-        }
-        else {
+        TreePath path = tree.getSelectionPath();
+        if (path == null) {
             return false;
-        }
+        } else {
+            GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            AbstractGroup group = node.getGroup();
+            if (checkGroupEnable(group)) {
 
+                if (add) {
+                    AddToGroupAction action = new AddToGroupAction(node, move, panel);
+                    action.actionPerformed(new ActionEvent(node, 0, "add"));
+                } else {
+                    RemoveFromGroupAction action = new RemoveFromGroupAction(node, panel);
+                    action.actionPerformed(new ActionEvent(node, 0, "remove"));
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     /**

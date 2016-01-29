@@ -349,7 +349,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
             Optional<String> extension = FileUtil.getFileExtension(fileName);
-            ExternalFileType fileType = null;
+            ExternalFileType fileType;
 
             if (extension.isPresent() && "bib".equals(extension.get())) {
                 // we assume that it is a BibTeX file.

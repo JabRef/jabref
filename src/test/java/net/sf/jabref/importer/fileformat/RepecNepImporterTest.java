@@ -47,7 +47,7 @@ public class RepecNepImporterTest {
 
     @Test(expected = IOException.class)
     public final void testImportEntriesNull() throws IOException {
-        List<BibEntry> entries = testImporter.importEntries(null, new OutputPrinterToNull());
+        testImporter.importEntries(null, new OutputPrinterToNull());
     }
 
     @Test
