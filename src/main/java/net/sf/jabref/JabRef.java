@@ -41,6 +41,7 @@ import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
@@ -308,8 +309,9 @@ public class JabRef {
                         if (!pr.isInvalid()) {
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + data[0]);
+                                Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
                                 SaveSession session = FileActions.saveDatabase(
-                                        new LoadedDatabase(pr.getDatabase(), pr.getMetaData()),
+                                        new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults),
                                         new File(data[0]), Globals.prefs, false, false,
                                         Globals.prefs.getDefaultEncoding(), false);
                                 // Show just a warning message if encoding didn't work for all characters:
@@ -397,7 +399,8 @@ public class JabRef {
 
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + subName);
-                                SaveSession session = FileActions.saveDatabase(new LoadedDatabase(newBase, new MetaData()),
+                                Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                                SaveSession session = FileActions.saveDatabase(new BibDatabaseContext(newBase, defaults),
                                         new File(subName), Globals.prefs, false, false,
                                         Globals.prefs.getDefaultEncoding(), false);
                                 // Show just a warning message if encoding didn't work for all characters:

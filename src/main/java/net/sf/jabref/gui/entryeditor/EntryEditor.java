@@ -198,7 +198,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         tabbed.removeAll();
         tabs.clear();
 
-        EntryType type = EntryTypes.getType(entry.getType(), this.frame.getCurrentBasePanel().getLoadedDatabase().getMode());
+        EntryType type = EntryTypes.getType(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
         List<String> fieldList = type.getRequiredFieldsFlat();
 
@@ -212,7 +212,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         if ((type.getOptionalFields() != null) && (type.getOptionalFields().size() >= 1)) {
             EntryEditorTab optPan;
-            if (!this.frame.getCurrentBasePanel().getLoadedDatabase().isBiblatexMode()) {
+            if (!this.frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
                 optPan = new EntryEditorTab(frame, panel, type.getOptionalFields(), this,
                         false, false, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
@@ -356,7 +356,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         leftPan.add(closeBut, BorderLayout.NORTH);
 
         // Create type-label
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), panel.getLoadedDatabase().getMode());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), panel.getBibDatabaseContext().getMode());
         leftPan.add(new TypeLabel(typedEntry.getTypeForDisplay()), BorderLayout.CENTER);
         TypeButton typeButton = new TypeButton();
 
@@ -430,7 +430,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
                     storeFieldAction);
-        } else if (panel.getLoadedDatabase().getMetaData().getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
+        } else if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
         } else if (BibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
@@ -446,7 +446,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         } else if (BibtexFields.EXTRA_YES_NO.equals(fieldExtras)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
         } else if (BibtexFields.EXTRA_MONTH.equals(fieldExtras)) {
-            return FieldExtraComponents.getMonthExtraComponent(editor, this, this.frame.getCurrentBasePanel().getLoadedDatabase().getMode());
+            return FieldExtraComponents.getMonthExtraComponent(editor, this, this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
         }
         return Optional.empty();
     }
@@ -479,7 +479,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         if (updateSource) {
 
             try {
-                String srcString = getSourceString(entry, panel.getLoadedDatabase().getMode());
+                String srcString = getSourceString(entry, panel.getBibDatabaseContext().getMode());
                 source.setText(srcString);
                 lastSourceStringAccepted = srcString;
 
@@ -688,17 +688,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * @param switchEntry a <code>BibEntry</code> value
      */
     public synchronized void switchTo(BibEntry switchEntry) {
-        if (this.entry == switchEntry) {
-            /**
-             * Even if the editor is already showing the same entry, update
-             * the source panel. I'm not sure if this is the correct place to
-             * do this, but in some cases the source panel will otherwise not
-             * be up-to-date when an entry is changed while the entry editor
-             * is existing, set to the same entry, but not visible.
-             */
-            updateSource();
-            return;
-        }
         storeCurrentEdit();
 
         // Remove this instance as property listener for the entry:
@@ -1329,7 +1318,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
             }
 
-            LabelPatternUtil.makeLabel(panel.getLoadedDatabase().getMetaData(), panel.getDatabase(), entry);
+            LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
 
             // Store undo information:
             panel.undoManager.addEdit(new UndoableKeyChange(panel.getDatabase(), entry.getId(), (String) oldValue, entry.getCiteKey()));
@@ -1410,7 +1399,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 String link = tf.getText(); // get selected ? String
 
                 try {
-                    JabRefDesktop.openExternalViewer(panel.getLoadedDatabase().getMetaData(), link, tf.getFieldName());
+                    JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link, tf.getFieldName());
                 } catch (IOException ex) {
                     LOGGER.warn("Error opening file.", ex);
                 }

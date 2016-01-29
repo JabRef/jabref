@@ -229,7 +229,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         panel.storeCurrentEdit();
-        GroupTreeNode groups = panel.getLoadedDatabase().getMetaData().getGroups();
+        GroupTreeNode groups = panel.getBibDatabaseContext().getMetaData().getGroups();
         if (groups == null) {
             groupAdd.setEnabled(false);
             groupRemove.setEnabled(false);

@@ -67,7 +67,7 @@ public class Localization {
             LOGGER.warn("Warning: no " + idForErrorMessage + " translation for \"" + key + "\" for locale "
                     + Locale.getDefault());
 
-            return key;
+            translation = key;
         }
 
         return new LocalizationKeyParams(translation, params).replacePlaceholders();

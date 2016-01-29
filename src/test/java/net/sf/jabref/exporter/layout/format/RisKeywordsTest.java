@@ -2,6 +2,7 @@ package net.sf.jabref.exporter.layout.format;
 
 import static org.junit.Assert.*;
 
+import net.sf.jabref.Globals;
 import org.junit.Test;
 
 
@@ -9,22 +10,22 @@ public class RisKeywordsTest {
 
     @Test
     public void testEmpty() {
-        assertEquals("", new RisMonth().format(""));
+        assertEquals("", new RisKeywords().format(""));
     }
 
     @Test
     public void testNull() {
-        assertEquals("", new RisMonth().format(null));
+        assertEquals("", new RisKeywords().format(null));
     }
 
     @Test
-    public void testMonth() {
-        assertEquals("12", new RisMonth().format("dec"));
+    public void testSingleKeyword() {
+        assertEquals("KW  - abcd", new RisKeywords().format("abcd"));
     }
 
     @Test
-    public void testInvalidMonth() {
-        assertEquals("abcd", new RisMonth().format("abcd"));
+    public void testTwoKeywords() {
+        assertEquals("KW  - abcd" + Globals.NEWLINE + "KW  - efg", new RisKeywords().format("abcd, efg"));
     }
 
 }

@@ -35,26 +35,8 @@ public class BibDatabaseModeDetection {
             return BibDatabaseMode.BIBLATEX;
         } else {
             // field-based check
-            if(database.getEntries().stream().anyMatch(hasBiblatexFields())) {
-                return BibDatabaseMode.BIBLATEX;
-            }
+            return BibDatabaseMode.BIBTEX;
         }
-        return BibDatabaseMode.BIBTEX;
-    }
-
-    private static List<String> exclusiveBiblatexFields(String type) {
-        final Optional<EntryType> biblatexType = BibLatexEntryTypes.getType(type);
-        final Optional<EntryType> bibtexType = BibtexEntryTypes.getType(type);
-
-        // return empty array if this is no Biblatex or BibTex type
-        if (!biblatexType.isPresent() || !bibtexType.isPresent()) {
-            return new ArrayList<>(0);
-        }
-
-        final List<String> bibtexFields = bibtexType.get().getAllFields();
-        final List<String> biblatexFields = biblatexType.get().getAllFields();
-
-        return biblatexFields.stream().filter(f -> !bibtexFields.contains(f)).collect(Collectors.toList());
     }
 
     private static List<String> getEntryTypes(Collection<BibEntry> collection) {
@@ -73,8 +55,4 @@ public class BibDatabaseModeDetection {
         return entry -> collection.stream().anyMatch(c -> c.getName().equalsIgnoreCase(entry));
     }
 
-    private static Predicate<BibEntry> hasBiblatexFields() {
-        return e -> e.getFieldNames().stream()
-                .anyMatch(name -> exclusiveBiblatexFields(e.getType()).stream().anyMatch(c -> c.equalsIgnoreCase(name)));
-    }
 }

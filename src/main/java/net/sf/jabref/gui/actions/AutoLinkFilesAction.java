@@ -43,7 +43,7 @@ public class AutoLinkFilesAction extends AbstractAction {
         JDialog diag = new JDialog(JabRef.jrf, true);
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
         Runnable runnable = Util.autoSetLinks(entries, nc, null, null,
-                JabRef.jrf.getCurrentBasePanel().getLoadedDatabase().getMetaData(), new ActionListener() {
+                JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

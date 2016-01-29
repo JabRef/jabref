@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.gui.util;
 
-import net.sf.jabref.LoadedDatabase;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.TypedBibEntry;
 
@@ -24,9 +24,9 @@ import java.util.Optional;
 
 public class FirstColumnComparator implements Comparator<BibEntry> {
 
-    private final LoadedDatabase database;
+    private final BibDatabaseContext database;
 
-    public FirstColumnComparator(LoadedDatabase database) {
+    public FirstColumnComparator(BibDatabaseContext database) {
         this.database = database;
     }
 

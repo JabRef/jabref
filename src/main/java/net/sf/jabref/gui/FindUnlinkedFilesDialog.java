@@ -973,7 +973,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         if ((userObject instanceof FileNodeWrapper) && node.isLeaf()) {
                             FileNodeWrapper fnw = (FileNodeWrapper) userObject;
                             try {
-                                JabRefDesktop.openExternalViewer(JabRef.jrf.getCurrentBasePanel().getLoadedDatabase().getMetaData(), fnw.file.getAbsolutePath(), "pdf");
+                                JabRefDesktop.openExternalViewer(JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
                                 LOGGER.info("Error opening file", e1);
                             }
@@ -1042,7 +1042,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void createEntryTypesCombobox() {
 
-        Iterator<EntryType> iterator = EntryTypes.getAllValues(frame.getCurrentBasePanel().getLoadedDatabase().getMode()).iterator();
+        Iterator<EntryType> iterator = EntryTypes.getAllValues(frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).iterator();
         Vector<BibtexEntryTypeWrapper> list = new Vector<>();
         list.add(new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {

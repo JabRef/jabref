@@ -116,7 +116,7 @@ public class EndnoteImporter extends ImportFormat {
         for (String entry : entries) {
             hm.clear();
             author = "";
-            type = "";
+            type = "misc";
             editor = "";
             artnum = "";
 

@@ -52,6 +52,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -201,7 +202,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             String undoName, boolean newDatabase) {
         this.frame = frame;
         this.panel = panel;
-        this.metaData = (panel == null) ? new MetaData() : panel.getLoadedDatabase().getMetaData();
+        this.metaData = (panel == null) ? new MetaData() : panel.getBibDatabaseContext().getMetaData();
         this.fields = Arrays.copyOf(fields, fields.length);
         this.undoName = undoName;
         this.newDatabase = newDatabase;
@@ -369,7 +370,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Checking duplicates means both checking against the background
             // database (if
             // applicable) and against entries already in the table.
-            if (((panel != null) && (DuplicateCheck.containsDuplicate(panel.database(), entry, panel.getLoadedDatabase().getMode()).isPresent()))
+            if (((panel != null) && (DuplicateCheck.containsDuplicate(panel.database(), entry, panel.getBibDatabaseContext().getMode()).isPresent()))
                     || (internalDuplicate(this.entries, entry).isPresent())) {
                 entry.setGroupHit(true);
                 deselectAllDuplicates.setEnabled(true);
@@ -393,7 +394,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             if (othEntry.equals(entry)) {
                 continue; // Don't compare the entry to itself
             }
-            if (DuplicateCheck.isDuplicate(entry, othEntry, panel.getLoadedDatabase().getMode())) {
+            if (DuplicateCheck.isDuplicate(entry, othEntry, panel.getBibDatabaseContext().getMode())) {
                 return Optional.of(othEntry);
             }
         }
@@ -479,7 +480,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             localMetaData = new MetaData();
         } else {
             database = panel.database();
-            localMetaData = panel.getLoadedDatabase().getMetaData();
+            localMetaData = panel.getBibDatabaseContext().getMetaData();
         }
 
         entry.setId(IdGenerator.next());
@@ -514,7 +515,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             localMetaData = new MetaData();
         } else {
             database = panel.database();
-            localMetaData = panel.getLoadedDatabase().getMetaData();
+            localMetaData = panel.getBibDatabaseContext().getMetaData();
         }
 
         List<String> keys = new ArrayList<>(entries.size());
@@ -685,7 +686,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
                 if (newDatabase) {
                     // Create a new BasePanel for the entries:
-                    panel = new BasePanel(frame, new LoadedDatabase(), Globals.prefs.getDefaultEncoding());
+                    Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                    panel = new BasePanel(frame, new BibDatabaseContext(defaults), Globals.prefs.getDefaultEncoding());
                 }
 
                 boolean groupingCanceled = false;
@@ -916,7 +918,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null, panel.getLoadedDatabase().getMetaData(), fl.type))
+                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null, panel.getBibDatabaseContext().getMetaData(), fl.type))
                                 .actionPerformed(null);
                     }
                 } else { // Must be URL_COL
@@ -975,7 +977,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     description = flEntry.link;
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry
-                        .link, flEntry.type.getIcon(), panel.getLoadedDatabase().getMetaData(), flEntry.type));
+                        .link, flEntry.type.getIcon(), panel.getBibDatabaseContext().getMetaData(), flEntry.type));
                 count++;
             }
             if (count == 0) {
@@ -997,7 +999,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             entry.getFieldOptional(fieldName).ifPresent(link -> {
                 try {
-                    JabRefDesktop.openExternalViewer(panel.getLoadedDatabase().getMetaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link, fieldName);
                 } catch (IOException ex) {
                     LOGGER.warn("Could not open link", ex);
                 }
@@ -1028,7 +1030,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Is this the duplicate icon column, and is there an icon?
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibEntry first = sortedList.get(row);
-                Optional<BibEntry> other = DuplicateCheck.containsDuplicate(panel.database(), first, panel.getLoadedDatabase().getMode());
+                Optional<BibEntry> other = DuplicateCheck.containsDuplicate(panel.database(), first, panel.getBibDatabaseContext().getMode());
                 if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.

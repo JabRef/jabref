@@ -230,7 +230,7 @@ public class OvidImporter extends ImportFormat {
             }
 
             // Set the entrytype properly:
-            String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "other";
+            String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "misc";
             h.remove("entrytype");
             if ("book".equals(entryType) && h.containsKey("chaptertitle")) {
                 // This means we have an "incollection" entry.

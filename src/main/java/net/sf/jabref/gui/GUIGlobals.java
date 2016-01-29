@@ -48,7 +48,8 @@ public class GUIGlobals {
     private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
 
     // Frame titles.
-    public static final String frameTitle = "JabRef";
+    public static final String FRAME_TITLE = "JabRef";
+
     public static final String stringsTitle = Localization.lang("Strings for database");
     public static final String untitledTitle = Localization.lang("untitled");
     public static final String NUMBER_COL = "#";

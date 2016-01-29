@@ -105,7 +105,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 continue;
             }
 
-            String type = "";
+            String type = "misc";
             String author = "";
             String editor = "";
             String comment = "";

@@ -20,6 +20,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [#668](https://github.com/JabRef/jabref/issues/668): Replace clear with icon to reduce search bar width
 - Improved layout for OSX: Toolbar buttons and search field
 - Migrated JabRef help to markdown at https://github.com/JabRef/help.jabref.org
+- BibTeX and BibLaTeX mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
 
 ### Fixed
 - Make BibTex parser more robust against missing newlines

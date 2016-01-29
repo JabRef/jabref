@@ -100,10 +100,10 @@ public class ExportToClipboardAction extends AbstractWorker {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getLoadedDatabase().getMetaData()
+        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData()
                 .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
         // Also store the database's file in a global variable:
-        Globals.prefs.databaseFile = frame.getCurrentBasePanel().getLoadedDatabase().getDatabaseFile();
+        Globals.prefs.databaseFile = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile();
 
         File tmp = null;
         try {
@@ -118,7 +118,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             }
 
             // Write to file:
-            format.performExport(database, panel.getLoadedDatabase().getMetaData(),
+            format.performExport(database, panel.getBibDatabaseContext().getMetaData(),
                     tmp.getPath(), panel.getEncoding(), entries);
             // Read the file and put the contents on the clipboard:
             StringBuilder sb = new StringBuilder();

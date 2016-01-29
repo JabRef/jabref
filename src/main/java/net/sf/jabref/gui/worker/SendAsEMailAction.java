@@ -84,7 +84,7 @@ public class SendAsEMailAction extends AbstractWorker {
 
         for (BibEntry entry : bes) {
             try {
-                bibtexEntryWriter.write(entry, sw, panel.getLoadedDatabase().getMode());
+                bibtexEntryWriter.write(entry, sw, panel.getBibDatabaseContext().getMode());
             } catch (IOException e) {
                 LOGGER.warn("Problem creating BibTeX file for mailing.", e);
             }
@@ -97,7 +97,7 @@ public class SendAsEMailAction extends AbstractWorker {
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
         List<File> fileList = FileUtil.getListOfLinkedFiles(Arrays.asList(bes),
-                frame.getCurrentBasePanel().getLoadedDatabase().getMetaData().getFileDirectory(Globals.FILE_FIELD));
+                frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD));
         for (File f : fileList) {
             attachments.add(f.getPath());
             if (openFolders) {

@@ -74,7 +74,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
         // Ask about rules for the operation:
         if (optDiag == null) {
-            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.getLoadedDatabase().getMetaData());
+            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.getBibDatabaseContext().getMetaData());
         }
         PositionWindow.placeDialog(optDiag, panel.frame());
         optDiag.setVisible(true);
@@ -111,7 +111,7 @@ public class SynchronizeFileField extends AbstractWorker {
             Collections.addAll(entries, sel);
 
             // Start the autosetting process:
-            Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.getLoadedDatabase().getMetaData(), null, null);
+            Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.getBibDatabaseContext().getMetaData(), null, null);
             JabRefExecutorService.INSTANCE.executeAndWait(r);
         }
         progress += sel.length * weightAutoSet;
@@ -128,7 +128,7 @@ public class SynchronizeFileField extends AbstractWorker {
                     tableModel.setContentDontGuessTypes(old);
 
                     // We need to specify which directories to search in for Util.expandFilename:
-                    List<String> dirsS = panel.getLoadedDatabase().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+                    List<String> dirsS = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
                     ArrayList<File> dirs = new ArrayList<>();
                     for (String dirs1 : dirsS) {
                         dirs.add(new File(dirs1));
@@ -166,7 +166,7 @@ public class SynchronizeFileField extends AbstractWorker {
                             case 1:
                                 // Assign new file.
                                 FileListEntryEditor flEditor = new FileListEntryEditor
-                                (panel.frame(), flEntry, false, true, panel.getLoadedDatabase().getMetaData());
+                                (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext().getMetaData());
                                 flEditor.setVisible(true, true);
                                 break;
                             case 2:
@@ -222,7 +222,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User wants to change the type of this link.
                                 // First get a model of all file links for this entry:
                                 FileListEntryEditor editor = new FileListEntryEditor
-                                        (panel.frame(), flEntry, false, true, panel.getLoadedDatabase().getMetaData());
+                                        (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext().getMetaData());
                                 editor.setVisible(true, false);
                             }
                         }

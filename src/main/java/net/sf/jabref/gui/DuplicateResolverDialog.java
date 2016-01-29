@@ -79,28 +79,28 @@ public class DuplicateResolverDialog extends JDialog {
             first = new JButton(Localization.lang("Keep left"));
             second = new JButton(Localization.lang("Keep right"));
             both = new JButton(Localization.lang("Keep both"));
-            me = new MergeEntries(one, two, frame.getCurrentBasePanel().getLoadedDatabase().getMode());
+            me = new MergeEntries(one, two, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             break;
         case INSPECTION:
             first = new JButton(Localization.lang("Remove old entry"));
             second = new JButton(Localization.lang("Remove entry from import"));
             both = new JButton(Localization.lang("Keep both"));
             me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                    Localization.lang("From import"), frame.getCurrentBasePanel().getLoadedDatabase().getMode());
+                    Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             break;
         case DUPLICATE_SEARCH_WITH_EXACT:
             first = new JButton(Localization.lang("Keep left"));
             second = new JButton(Localization.lang("Keep right"));
             both = new JButton(Localization.lang("Keep both"));
             removeExact = new JButton(Localization.lang("Automatically remove exact duplicates"));
-            me = new MergeEntries(one, two, frame.getCurrentBasePanel().getLoadedDatabase().getMode());
+            me = new MergeEntries(one, two, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             break;
         default:
             first = new JButton(Localization.lang("Import and remove old entry"));
             second = new JButton(Localization.lang("Do not import entry"));
             both = new JButton(Localization.lang("Import and keep old entry"));
             me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                    Localization.lang("From import"), frame.getCurrentBasePanel().getLoadedDatabase().getMode());
+                    Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
         }
 
         if (removeExact != null) {

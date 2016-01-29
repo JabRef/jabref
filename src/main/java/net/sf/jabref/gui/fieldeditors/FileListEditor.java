@@ -474,7 +474,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
         }
         DownloadExternalFile def = new DownloadExternalFile(frame,
-                frame.getCurrentBasePanel().getLoadedDatabase().getMetaData(), bibtexKey);
+                frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), bibtexKey);
         try {
             def.download(this);
         } catch (IOException ex) {

@@ -76,7 +76,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             ExternalFileType type = fileType;
             if (this.fileType == null) {
                 if (this.fieldName != null) {
-                    JabRefDesktop.openExternalViewer(frame.getCurrentBasePanel().getLoadedDatabase().getMetaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), link, fieldName);
                     return true;
                 }
                 else {

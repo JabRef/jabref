@@ -52,8 +52,8 @@ public class TypedBibEntry {
      */
     public String getTypeForDisplay() {
         EntryType entryType = EntryTypes.getType(entry.getType(), type);
-        if (entryType != null) {
-            return entryType.getName();
+        if (entryType == null) {
+            return "";
         } else {
             return EntryUtil.capitalizeFirst(entry.getType());
         }

@@ -143,7 +143,11 @@ public class XMPUtil {
                 for (XMPSchema schema : schemas) {
                     XMPSchemaBibtex bib = (XMPSchemaBibtex) schema;
 
-                    result.add(bib.getBibtexEntry());
+                    BibEntry entry = bib.getBibtexEntry();
+                    if(entry.getType() == null) {
+                        entry.setType("misc");
+                    }
+                    result.add(entry);
                 }
 
                 // If we did not find anything have a look if a Dublin Core exists
@@ -156,6 +160,9 @@ public class XMPUtil {
                         BibEntry entry = XMPUtil.getBibtexEntryFromDublinCore(dc);
 
                         if (entry != null) {
+                            if(entry.getType() == null) {
+                                entry.setType("misc");
+                            }
                             result.add(entry);
                         }
                     }
@@ -166,6 +173,9 @@ public class XMPUtil {
                         .getDocumentInformation());
 
                 if (entry != null) {
+                    if(entry.getType() == null) {
+                        entry.setType("misc");
+                    }
                     result.add(entry);
                 }
             }
@@ -173,7 +183,7 @@ public class XMPUtil {
 
         // return null, if no metadata was found
         if (result.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
         return result;
     }
@@ -866,7 +876,7 @@ public class XMPUtil {
          */
         TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), BibDatabaseMode.BIBTEX);
         String o = typedEntry.getTypeForDisplay();
-        if (o != null) {
+        if (!o.isEmpty()) {
             dcSchema.addType(o);
         }
     }

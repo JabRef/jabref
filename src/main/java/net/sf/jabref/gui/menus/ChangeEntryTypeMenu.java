@@ -48,7 +48,7 @@ public class ChangeEntryTypeMenu {
         menu.removeAll();
 
         // biblatex?
-        if(panel.getLoadedDatabase().isBiblatexMode()) {
+        if(panel.getBibDatabaseContext().isBiblatexMode()) {
             for (String key : EntryTypes.getAllTypes(BibDatabaseMode.BIBLATEX)) {
                 menu.add(new ChangeTypeAction(EntryTypes.getType(key, BibDatabaseMode.BIBLATEX), panel));
             }

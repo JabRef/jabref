@@ -21,24 +21,6 @@ public class BibDatabaseModeDetectionTest {
     }
 
     @Test
-    public void detectBiblatexBasedOnFields() {
-        BibEntry entry = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
-        entry.setField("translator", "Stefan Kolb");
-        Collection<BibEntry> entries = Arrays.asList(entry);
-
-        assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
-    }
-
-    @Test
-    public void detectBibtexBasedOnFields() {
-        BibEntry entry = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
-        entry.setField("journal", "IEEE Trans. Services Computing");
-        Collection<BibEntry> entries = Arrays.asList(entry);
-
-        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
-    }
-
-    @Test
     public void detectUndistinguishableAsBibtex() {
         BibEntry entry = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
         entry.setField("title", "My cool paper");
@@ -55,21 +37,12 @@ public class BibDatabaseModeDetectionTest {
         biblatex.setField("translator", "Stefan Kolb");
         Collection<BibEntry> entries = Arrays.asList(bibtex, biblatex);
 
-        assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
+        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
     public void detectUnknownTypeAsBibtex() {
         BibEntry entry = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
-        Collection<BibEntry> entries = Arrays.asList(entry);
-
-        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
-    }
-
-    @Test
-    public void detectUnknownTypeAsBibtexBasedOnFields() {
-        BibEntry entry = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
-        entry.setField("someunknownfield", "value");
         Collection<BibEntry> entries = Arrays.asList(entry);
 
         assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
@@ -86,20 +59,6 @@ public class BibDatabaseModeDetectionTest {
     }
 
     @Test
-    public void ignoreUnknownTypesForBibtexDecisionBasedOnFields() {
-        BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
-        custom.setField("someunknownfield", "value");
-        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
-        bibtex.setField("journal", "IEEE Trans. Services Computing");
-        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.ARTICLE.getName());
-        biblatex.setField("title", "someothertitle");
-        Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
-
-
-        assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
-    }
-
-    @Test
     public void ignoreUnknownTypesForBiblatexDecision() {
         BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
         BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
@@ -109,16 +68,4 @@ public class BibDatabaseModeDetectionTest {
         assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
-    @Test
-    public void ignoreUnknownTypesForBiblatexDecisionBasedOnFields() {
-        BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
-        custom.setField("someunknownfield", "value");
-        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
-        bibtex.setField("title", "IEEE Trans. Services Computing");
-        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.ARTICLE.getName());
-        biblatex.setField("translator", "Stefan Kolb");
-        Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
-
-        assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
-    }
 }

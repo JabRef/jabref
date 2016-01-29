@@ -85,7 +85,7 @@ public class MergeEntriesDialog extends JDialog {
         one = selected[0];
         two = selected[1];
 
-        mergeEntries = new MergeEntries(one, two, panel.getLoadedDatabase().getMode());
+        mergeEntries = new MergeEntries(one, two, panel.getBibDatabaseContext().getMode());
 
         // Create undo-compound
         ce = new NamedCompound(MERGE_ENTRIES);

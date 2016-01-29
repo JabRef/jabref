@@ -299,7 +299,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
     public BibEntry getBibtexEntry() {
         String type = getTextProperty("entrytype");
-        BibEntry e = new BibEntry(IdGenerator.next(), String.valueOf(type));
+        BibEntry e = new BibEntry(IdGenerator.next(), Optional.ofNullable(type).orElse("misc"));
 
         // Get Text Properties
         Map<String, String> text = XMPSchemaBibtex.getAllProperties(this, "bibtex");

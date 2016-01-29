@@ -15,15 +15,14 @@
  */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.LoadedDatabase;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.database.BibDatabaseMode;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.List;
@@ -72,7 +71,7 @@ public class AutoSaveManager {
             }
 
             for (BasePanel panel : panels) {
-                if (panel.isModified() && (panel.getLoadedDatabase().getDatabaseFile() != null)) {
+                if (panel.isModified() && (panel.getBibDatabaseContext().getDatabaseFile() != null)) {
                         AutoSaveManager.autoSave(panel);
                 }
             }
@@ -95,10 +94,11 @@ public class AutoSaveManager {
      * @return true if successful, false otherwise.
      */
     private static boolean autoSave(BasePanel panel) {
-        File databaseFile = panel.getLoadedDatabase().getDatabaseFile();
+        File databaseFile = panel.getBibDatabaseContext().getDatabaseFile();
         File backupFile = AutoSaveManager.getAutoSaveFile(databaseFile);
         try {
-            SaveSession ss = FileActions.saveDatabase(new LoadedDatabase(panel.database(), panel.getLoadedDatabase().getMetaData()),
+            Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+            SaveSession ss = FileActions.saveDatabase(new BibDatabaseContext(panel.database(), panel.getBibDatabaseContext().getMetaData(), defaults),
                     backupFile, Globals.prefs, false, false, panel.getEncoding(), true);
             ss.commit();
         } catch (SaveException e) {
@@ -117,10 +117,10 @@ public class AutoSaveManager {
      * @return true if there was no autosave or if the autosave was successfully deleted, false otherwise.
      */
     public static boolean deleteAutoSaveFile(BasePanel panel) {
-        if (panel.getLoadedDatabase().getDatabaseFile() == null) {
+        if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
             return true;
         }
-        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getLoadedDatabase().getDatabaseFile());
+        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getBibDatabaseContext().getDatabaseFile());
         if (backupFile.exists()) {
             return backupFile.delete();
         } else {
