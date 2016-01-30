@@ -37,6 +37,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.journals.Abbreviation;
@@ -408,8 +409,8 @@ class ManageJournalsPanel extends JPanel {
 
         // Update the autocompleter for the "journal" field in all base panels,
         // so added journal names are available:
-        for (int i = 0; i < frame.getBasePanelCount(); i++) {
-            frame.getBasePanelAt(i).getAutoCompleters().addJournalListToAutoCompleter();
+        for (BasePanel basePanel : frame.getBasePanelList()) {
+            basePanel.getAutoCompleters().addJournalListToAutoCompleter();
         }
 
     }
