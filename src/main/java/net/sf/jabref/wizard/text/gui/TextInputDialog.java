@@ -99,7 +99,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private final TagToMarkedTextStore marked;
 
-    private final JabRefFrame _frame;
+    private final JabRefFrame frame;
 
     private boolean okPressed;
 
@@ -107,17 +107,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
     public TextInputDialog(JabRefFrame frame, String title, boolean modal, BibEntry bibEntry) {
         super(frame, title, modal);
 
-        _frame = frame;
+        this.frame = frame;
 
         entry = bibEntry;
         marked = new TagToMarkedTextStore();
 
-        try {
-            jbInit();
-            pack();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        jbInit();
+        pack();
         updateSourceView();
     }
 
@@ -126,12 +122,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
         //this.setResizable( false ) ;
         getContentPane().setLayout(new BorderLayout());
         String typeStr = Localization.lang("for");
-        if (entry != null)
-        {
-            if (entry.getType() != null)
-            {
-                typeStr = typeStr + " " + entry.getType();
-            }
+        if ((entry != null) && (entry.getType() != null)) {
+            typeStr = typeStr + " " + entry.getType();
         }
 
         this.setTitle(Localization.lang("Plain_text_import") + " " + typeStr);
@@ -177,7 +169,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
         try {
             doc.insertString(0, "", doc.getStyle("regular"));
-        } catch (Exception ignored) {
+        } catch (BadLocationException ignored) {
             // Ignored
         }
 
@@ -402,17 +394,16 @@ public class TextInputDialog extends JDialog implements ActionListener {
                     String old = entry.getField(type);
 
                     // merge old and selected text
-                    if (old != null) {
+                    if (old == null) {
+                        // "null"+"txt" Strings forbidden
+                        entry.setField(type, txt);
+                    } else {
                         // insert a new author with an additional "and"
                         if (type.hashCode() == "author".hashCode()) {
                             entry.setField(type, old + " and " + txt);
                         } else {
                             entry.setField(type, old + txt);
                         }
-                    }
-                    // "null"+"txt" Strings forbidden
-                    else {
-                        entry.setField(type, txt);
                     }
                 }
                 // make the new data in bibtex source code visible
@@ -434,18 +425,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
         if (source == this.okButton) {
             okPressed = true;
             dispose();
-        }
-        else if (source == this.cancelButton) {
+        } else if (source == this.cancelButton) {
             dispose();
-        }
-        else if (source == this.insertButton) {
+        } else if (source == this.insertButton) {
             insertTextForTag();
-        }
-        else if (source == this.parseWithFreeCiteButton) {
-            if (parseWithFreeCiteAndAddEntries()) {
+        } else if ((source == this.parseWithFreeCiteButton) && parseWithFreeCiteAndAddEntries()) {
                 okPressed = false; // we do not want to have the super method to handle our entries, we do it on our own
                 dispose();
-            }
         }
     }
 
@@ -466,14 +452,14 @@ public class TextInputDialog extends JDialog implements ActionListener {
         text = text.replace("##NEWLINE##", Globals.NEWLINE);
 
         List<BibEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
-        if (importedEntries != null) {
+        if (importedEntries == null) {
+            return false;
+        } else {
             Util.setAutomaticFields(importedEntries, false, false, true);
             for (BibEntry e : importedEntries) {
                 JabRef.jrf.getCurrentBasePanel().insertEntry(e);
             }
             return true;
-        } else {
-            return false;
         }
     }
 
@@ -522,7 +508,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
                 int cPos = textPane.getCaretPosition();
                 try {
                     doc.insertString(cPos, data, doc.getStyle("regular"));
-                } catch (Exception ignored) {
+                } catch (BadLocationException ignored) {
                     // Ignored
                 }
             }
@@ -539,7 +525,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = FileDialogs.getNewFile(_frame, null, null,
+                String chosen = FileDialogs.getNewFile(frame, null, null,
                         ".txt",
                         JFileChooser.OPEN_DIALOG, false);
                 if (chosen != null) {
@@ -553,7 +539,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
                         }
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (BadLocationException | IOException ignored) {
                 // Ignored
             }
         }
