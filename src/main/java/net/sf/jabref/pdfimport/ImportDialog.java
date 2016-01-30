@@ -210,7 +210,7 @@ public class ImportDialog extends JDialog {
         }
     }
 
-    public boolean getDoNotShowAgain() {
+    public boolean isDoNotShowAgain() {
         return this.checkBoxDoNotShowAgain.isSelected();
     }
 
