@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.specialfields;
 
+import java.util.Optional;
+
 import javax.swing.*;
 
 import net.sf.jabref.gui.JabRefFrame;
@@ -42,10 +44,10 @@ public class SpecialFieldValue {
 
 
     // value when used in a separate vield
-    //private String fieldValue; 
+    //private String fieldValue;
 
     /**
-     * 
+     *
      * @param field The special field this value is a value of
      * @param keyword - The keyword to be used at BibTex's keyword field. May be "null" if no keyword is to be set
      * @param actionName - the action to call
@@ -68,8 +70,8 @@ public class SpecialFieldValue {
         this.toolTipText = toolTipText;
     }
 
-    public String getKeyword() {
-        return this.keyword;
+    public Optional<String> getKeyword() {
+        return Optional.ofNullable(this.keyword);
     }
 
     public String getActionName() {
@@ -86,8 +88,8 @@ public class SpecialFieldValue {
         return label;
     }
 
-    public String getFieldValue() {
-        return this.keyword;
+    public Optional<String> getFieldValue() {
+        return Optional.ofNullable(this.keyword);
     }
 
     public Icon getIcon() {
@@ -103,7 +105,7 @@ public class SpecialFieldValue {
             action = new SpecialFieldAction(
                     frame,
                     this.field,
-                    this.getFieldValue(),
+ this.getFieldValue().get(),
                     // if field contains only one value, it has to be nulled
                     // otherwise, another setting does not empty the field
                     this.field.getValues().size() == 1,
