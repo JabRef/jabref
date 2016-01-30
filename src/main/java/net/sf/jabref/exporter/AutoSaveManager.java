@@ -25,14 +25,18 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.List;
-import java.util.ArrayList;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 
 /**
  * Background task and utilities for autosave feature.
  */
 public class AutoSaveManager {
+
+    private static final Log LOGGER = LogFactory.getLog(AutoSaveManager.class);
 
     private final JabRefFrame frame;
     private Timer t;
@@ -65,12 +69,7 @@ public class AutoSaveManager {
             // Since this method is running in the background, we must be prepared that
             // there could be changes done by the user while this method is running.
 
-            List<BasePanel> panels = new ArrayList<>();
-            for (int i = 0; i < frame.getBasePanelCount(); i++) {
-                panels.add(frame.getBasePanelAt(i));
-            }
-
-            for (BasePanel panel : panels) {
+            for (BasePanel panel : frame.getBasePanelList()) {
                 if (panel.isModified() && (panel.getBibDatabaseContext().getDatabaseFile() != null)) {
                         AutoSaveManager.autoSave(panel);
                 }
@@ -101,10 +100,7 @@ public class AutoSaveManager {
                     backupFile, Globals.prefs, false, false, panel.getEncoding(), true);
             ss.commit();
         } catch (SaveException e) {
-            e.printStackTrace();
-            return false;
-        } catch (Throwable ex) {
-            ex.printStackTrace();
+            LOGGER.error("Problem with automatic save", e);
             return false;
         }
         return true;
@@ -132,11 +128,7 @@ public class AutoSaveManager {
      * if they exist.
      */
     public void clearAutoSaves() {
-        List<BasePanel> panels = new ArrayList<>();
-        for (int i = 0; i < frame.getBasePanelCount(); i++) {
-            panels.add(frame.getBasePanelAt(i));
-        }
-        for (BasePanel panel : panels) {
+        for (BasePanel panel : frame.getBasePanelList()) {
             AutoSaveManager.deleteAutoSaveFile(panel);
         }
     }

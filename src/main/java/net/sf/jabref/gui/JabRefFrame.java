@@ -1018,6 +1018,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return (BasePanel) tabbedPane.getComponentAt(i);
     }
 
+    /**
+     * Returns a list of BasePanel.
+     *
+     * @param i Index of base
+     */
+    public List<BasePanel> getBasePanelList() {
+        List<BasePanel> returnList = new ArrayList<>(getBasePanelCount());
+        for (int i=0; i< getBasePanelCount(); i++) {
+            returnList.add((BasePanel) tabbedPane.getComponentAt(i));
+        }
+        return returnList;
+    }
+
     public void showBasePanelAt(int i) {
         tabbedPane.setSelectedIndex(i);
     }
@@ -1591,13 +1604,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private List<String> collectDatabaseFilePaths() {
         List<String> dbPaths = new ArrayList<>(getBasePanelCount());
 
-        for (int i = 0; i < getBasePanelCount(); i++) {
+        for (BasePanel basePanel : getBasePanelList()) {
             try {
                 // db file exists
-                if (getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile() == null) {
+                if (basePanel.getBibDatabaseContext().getDatabaseFile() == null) {
                     dbPaths.add("");
                 } else {
-                    dbPaths.add(getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile().getCanonicalPath());
+                    dbPaths.add(basePanel.getBibDatabaseContext().getDatabaseFile().getCanonicalPath());
                 }
             } catch (IOException ex) {
                 LOGGER.error("Invalid database file path: " + ex.getMessage());
@@ -2020,8 +2033,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize + 1);
             Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize + 1);
-            for (int i = 0; i < getBasePanelCount(); i++) {
-                getBasePanelAt(i).updateTableFont();
+            for (BasePanel basePanel : getBasePanelList()) {
+                basePanel.updateTableFont();
             }
         }
     }
@@ -2042,8 +2055,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize - 1);
             Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize - 1);
-            for (int i = 0; i < getBasePanelCount(); i++) {
-                getBasePanelAt(i).updateTableFont();
+            for (BasePanel basePanel : getBasePanelList()) {
+                basePanel.updateTableFont();
             }
         }
     }

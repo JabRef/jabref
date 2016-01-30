@@ -176,20 +176,18 @@ public class ExplicitGroup extends AbstractGroup {
         BibEntry entry;
         String key;
         // compare bibtex keys for all entries that have one
-        for (BibEntry m_entry1 : entries) {
-            entry = m_entry1;
+        for (BibEntry mEntry1 : entries) {
+            entry = mEntry1;
             key = entry.getCiteKey();
             if (key != null) {
                 keys.add(key);
             }
         }
-        for (BibEntry m_entry : other.entries) {
-            entry = m_entry;
+        for (BibEntry mEntry : other.entries) {
+            entry = mEntry;
             key = entry.getCiteKey();
-            if (key != null) {
-                if (!keys.remove(key)) {
-                    return false;
-                }
+            if ((key != null) && !keys.remove(key)) {
+                return false;
             }
         }
         if (!keys.isEmpty()) {
@@ -213,8 +211,8 @@ public class ExplicitGroup extends AbstractGroup {
         String s;
         // write entries in well-defined order for CVS compatibility
         Set<String> sortedKeys = new TreeSet<>();
-        for (BibEntry m_entry : entries) {
-            s = m_entry.getCiteKey();
+        for (BibEntry mEntry : entries) {
+            s = mEntry.getCiteKey();
             if ((s != null) && !s.isEmpty()) {
                 sortedKeys.add(s);
             }

@@ -39,12 +39,8 @@ public abstract class SpecialField {
         this.keywords = new ArrayList<>();
         this.map = new HashMap<>();
         for (SpecialFieldValue v : values) {
-            if (v.getKeyword() != null) {
-                keywords.add(v.getKeyword());
-            }
-            if (v.getFieldValue() != null) {
-                map.put(v.getFieldValue(), v);
-            }
+            v.getKeyword().ifPresent(keywords::add);
+            v.getFieldValue().ifPresent(fieldValue -> map.put(fieldValue, v));
         }
     }
 

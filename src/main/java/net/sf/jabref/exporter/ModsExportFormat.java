@@ -23,7 +23,9 @@ import net.sf.jabref.logic.mods.MODSDatabase;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.OutputKeys;
 import java.util.Set;
 import java.io.IOException;
@@ -54,11 +56,11 @@ class ModsExportFormat extends ExportFormat {
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
-            } catch (Exception e) {
+            } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
             finalizeSaveSession(ss);
-        } catch (Exception ex) {
+        } catch (SaveException | IOException ex) {
             throw new IOException(ex.getMessage());
         }
     }

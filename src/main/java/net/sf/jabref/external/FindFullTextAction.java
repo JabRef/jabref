@@ -25,6 +25,10 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -34,6 +38,8 @@ import java.util.Optional;
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
 public class FindFullTextAction extends AbstractWorker {
+
+    private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
     private final BasePanel basePanel;
     private BibEntry entry;
@@ -61,7 +67,7 @@ public class FindFullTextAction extends AbstractWorker {
     public void update() {
         if (result.isPresent()) {
             List<String> dirs = basePanel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
-            if (dirs.size() == 0) {
+            if (dirs.isEmpty()) {
                 // FIXME: Localization
                 JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -85,7 +91,7 @@ public class FindFullTextAction extends AbstractWorker {
                     }
                 });
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Problem downloading file", e);
             }
             basePanel.output(Localization.lang("Finished downloading full text document"));
         }

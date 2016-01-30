@@ -19,6 +19,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -180,7 +181,7 @@ public class PdfImporter {
                 }
                 centerRelativeToWindow(importDialog, frame);
                 importDialog.showDialog();
-                doNotShowAgain = importDialog.getDoNotShowAgain();
+                doNotShowAgain = importDialog.isDoNotShowAgain();
             }
             if (neverShow || (importDialog.getResult() == JOptionPane.OK_OPTION)) {
                 int choice = neverShow ? globalChoice : importDialog.getChoice();
@@ -195,11 +196,11 @@ public class PdfImporter {
                         in = new FileInputStream(fileName);
                         localRes = importer.importEntries(in, frame);
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+                        LOGGER.warn("Cannot import entries", ex);
                     } finally {
                         try {
                             in.close();
-                        } catch (Exception ignored) {
+                        } catch (IOException ignored) {
                             // Ignored
                         }
                     }
@@ -234,27 +235,25 @@ public class PdfImporter {
 
                     try {
                         in = new FileInputStream(file);
-                    } catch (Exception e) {
+                    } catch (FileNotFoundException e) {
                         // import failed -> generate default entry
                         LOGGER.info("Import failed", e);
-                        e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
                     }
                     try {
                         localRes = contentImporter.importEntries(in, status);
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         // import failed -> generate default entry
                         LOGGER.info("Import failed", e);
-                        e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
                     } finally {
                         try {
                             in.close();
-                        } catch (Exception ignored) {
+                        } catch (IOException ignored) {
                             // Ignored
                         }
                     }
@@ -374,7 +373,7 @@ public class PdfImporter {
         List<BibEntry> xmpEntriesInFile = null;
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName);
-        } catch (Exception e) {
+        } catch (IOException e) {
             // Todo Logging
         }
         return xmpEntriesInFile;

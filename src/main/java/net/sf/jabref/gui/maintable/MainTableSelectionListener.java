@@ -268,7 +268,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         // Check if the clicked colum is a specialfield column
-        if(modelColumn.isIconColumn() && (SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(modelColumn.getColumnName())!=null)) {
+        if (modelColumn.isIconColumn() && (SpecialFieldsUtils.isSpecialField(modelColumn.getColumnName()))) {
             // handle specialfield
             handleSpecialFieldLeftClick(e, modelColumn.getColumnName());
         } else if (modelColumn.isIconColumn()) { // left click on icon field
@@ -419,8 +419,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         showDefaultPopup = false;
                     }
                 } else {
-                    SpecialField specialField = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(column.getColumnName());
-                    if (specialField == null) {
+                    if (SpecialFieldsUtils.isSpecialField(column.getColumnName())) {
+                        // full pop should be shown as left click already shows short popup
+                        showDefaultPopup = true;
+                    } else {
                         if (entry.hasField(field)) {
                             String content = entry.getField(field);
                             Icon icon;
@@ -434,9 +436,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                                     panel.getBibDatabaseContext().getMetaData(), field));
                             showDefaultPopup = false;
                         }
-                    } else {
-                        // full pop should be shown as left click already shows short popup
-                        showDefaultPopup = true;
                     }
                 }
             }

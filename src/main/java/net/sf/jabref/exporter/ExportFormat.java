@@ -174,9 +174,8 @@ public class ExportFormat implements IExportFormat {
      *      net.sf.jabref.MetaData, java.lang.String, java.lang.String, java.util.Set)
      */
     @Override
-    public void performExport(final BibDatabase database,
-            final MetaData metaData, final String file,
-            final Charset enc, Set<String> entryIds) throws Exception {
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file, final Charset enc,
+            Set<String> entryIds) throws Exception {
 
         File outFile = new File(file);
         SaveSession ss = null;
@@ -363,7 +362,7 @@ public class ExportFormat implements IExportFormat {
         return fileFilter;
     }
 
-    public void finalizeSaveSession(final SaveSession ss) throws Exception {
+    public void finalizeSaveSession(final SaveSession ss) throws SaveException, IOException {
         ss.getWriter().flush();
         ss.getWriter().close();
 

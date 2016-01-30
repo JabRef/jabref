@@ -1067,16 +1067,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
         actions.put(Relevance.getInstance().getValues().get(0).getActionName(),
                 new SpecialFieldAction(frame, Relevance.getInstance(),
-                        Relevance.getInstance().getValues().get(0).getFieldValue(), true,
+                        Relevance.getInstance().getValues().get(0).getFieldValue().get(), true,
                         Localization.lang("Toggle relevance"),
                         Localization.lang("Toggled relevance for %0 entries")));
         actions.put(Quality.getInstance().getValues().get(0).getActionName(),
                 new SpecialFieldAction(frame, Quality.getInstance(),
-                        Quality.getInstance().getValues().get(0).getFieldValue(), true,
+                        Quality.getInstance().getValues().get(0).getFieldValue().get(), true,
                         Localization.lang("Toggle quality"),
                         Localization.lang("Toggled quality for %0 entries")));
         actions.put(Printed.getInstance().getValues().get(0).getActionName(), new SpecialFieldAction(frame,
-                Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue(), true,
+                Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue().get(), true,
                 Localization.lang("Toggle print status"),
                 Localization.lang("Toggled print status for %0 entries")));
 

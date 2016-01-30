@@ -149,11 +149,11 @@ public class ExternalFilePanel extends JPanel {
     }
 
     private BibDatabase getDatabase() {
-        return database != null ? database : entryEditor.getDatabase();
+        return database == null ? entryEditor.getDatabase() : database;
     }
 
     private BibEntry getEntry() {
-        return entry != null ? entry : entryEditor.getEntry();
+        return entry == null ? entryEditor.getEntry() : entry;
     }
 
     private Object getKey() {
@@ -217,7 +217,7 @@ public class ExternalFilePanel extends JPanel {
     public void browseFile(final String fieldName, final FieldEditor editor) {
         List<String> dirs = metaData.getFileDirectory(fieldName);
         String directory = null;
-        if (dirs.size() > 0) {
+        if (!dirs.isEmpty()) {
             directory = dirs.get(0); // Default to the first directory in the list
         }
 
@@ -225,10 +225,10 @@ public class ExternalFilePanel extends JPanel {
         String retVal;
 
         if ((directory == null) || !new File(dir).isAbsolute()) {
-            if (directory != null) {
-                dir = directory;
-            } else {
+            if (directory == null) {
                 dir = Globals.prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
+            } else {
+                dir = directory;
             }
         }
 
@@ -273,11 +273,11 @@ public class ExternalFilePanel extends JPanel {
          * If this panel belongs in an entry editor, note which entry is
          * currently shown:
          */
-        final BibEntry targetEntry;
-        if (entryEditor != null) {
-            targetEntry = entryEditor.getEntry();
-        } else {
+        BibEntry targetEntry;
+        if (entryEditor == null) {
             targetEntry = entry;
+        } else {
+            targetEntry = entryEditor.getEntry();
         }
 
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
@@ -289,14 +289,14 @@ public class ExternalFilePanel extends JPanel {
                 }
 
                 String plannedName;
-                if (getKey() != null) {
-                    plannedName = getKey() + suffix;
-                } else {
+                if (getKey() == null) {
                     plannedName = JOptionPane.showInputDialog(parent,
                             Localization.lang("BibTeX key not set. Enter a name for the downloaded file"));
                     if ((plannedName != null) && !off.accept(plannedName)) {
                         plannedName += suffix;
                     }
+                } else {
+                    plannedName = getKey() + suffix;
                 }
 
                 /*
@@ -337,11 +337,14 @@ public class ExternalFilePanel extends JPanel {
                         }
                     }
                     if (directory == null) {
-                        if (dirs.size() > 0) {
-                            JOptionPane.showMessageDialog(parent, Localization.lang("Could not find directory for %0-files: %1", fieldName, dirs.get(0)),
+                        if (dirs.isEmpty()) {
+                            JOptionPane.showMessageDialog(parent,
+                                    Localization.lang("No directory defined for %0-files", fieldName),
                                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                         } else {
-                            JOptionPane.showMessageDialog(parent, Localization.lang("No directory defined for %0-files", fieldName),
+                            JOptionPane.showMessageDialog(parent,
+                                    Localization.lang("Could not find directory for %0-files: %1", fieldName,
+                                            dirs.get(0)),
                                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                         }
                         return;
@@ -465,14 +468,14 @@ public class ExternalFilePanel extends JPanel {
             // String found = Util.findFile(getEntry(), null, dir,
             // ".*[bibtexkey].*");
 
-            if (found != null) {
+            if (found == null) {
+                output(Localization.lang("No %0 found", fieldName.toUpperCase()) + '.');
+            } else {
                 editor.setText(found);
                 if (entryEditor != null) {
                     entryEditor.updateField(editor);
                 }
                 output(Localization.lang("%0 field set", fieldName.toUpperCase()) + '.');
-            } else {
-                output(Localization.lang("No %0 found", fieldName.toUpperCase()) + '.');
             }
         };
     }

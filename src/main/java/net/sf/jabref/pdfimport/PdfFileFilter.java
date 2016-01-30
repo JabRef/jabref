@@ -20,7 +20,7 @@ import java.io.FileFilter;
 
 public class PdfFileFilter implements FileFilter {
 
-    public static PdfFileFilter INSTANCE = new PdfFileFilter();
+    public final static PdfFileFilter INSTANCE = new PdfFileFilter();
 
     @Override
     public boolean accept(File file) {
@@ -38,7 +38,7 @@ public class PdfFileFilter implements FileFilter {
     }
 
     private static boolean isMatchingFileFilter(String path) {
-        String extension = path.substring(path.lastIndexOf(".") + 1);
+        String extension = path.substring(path.lastIndexOf('.') + 1);
         return "pdf".equalsIgnoreCase(extension);
     }
 

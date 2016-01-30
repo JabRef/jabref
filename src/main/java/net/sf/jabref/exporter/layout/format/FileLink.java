@@ -27,11 +27,16 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Export formatter that handles the file link list of JabRef 2.3 and later, by
  * selecting the first file link, if any, specified by the field.
  */
 public class FileLink implements ParamLayoutFormatter {
+
+    private static final Log LOGGER = LogFactory.getLog(FileLink.class);
 
     private String fileType;
 
@@ -70,10 +75,10 @@ public class FileLink implements ParamLayoutFormatter {
         // but that is not available from a formatter. Therefore, as an
         // ugly hack, the export routine has set a global variable before
         // starting the export, which contains the database's file directory:
-        if (Globals.prefs.fileDirForDatabase != null) {
-            dirs = Globals.prefs.fileDirForDatabase;
-        } else {
+        if (Globals.prefs.fileDirForDatabase == null) {
             dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX)};
+        } else {
+            dirs = Globals.prefs.fileDirForDatabase;
         }
 
         File f = FileUtil.expandFilename(link, Arrays.asList(dirs));
@@ -83,15 +88,15 @@ public class FileLink implements ParamLayoutFormatter {
          *
          * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
          */
-        if (f != null) {
+        if (f == null) {
+            return link;
+        } else {
             try {
                 return f.getCanonicalPath();//f.toURI().toString();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Problem getting path", e);
                 return f.getPath();
             }
-        } else {
-            return link;
         }
 
     }
