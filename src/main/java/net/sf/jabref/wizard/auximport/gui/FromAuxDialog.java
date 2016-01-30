@@ -112,13 +112,9 @@ public class FromAuxDialog extends JDialog {
 
         auxParser = new AuxSubGenerator(null);
 
-        try {
-            jbInit();
-            pack();
-            setSize(600, 500);
-        } catch (Exception ex) {
-            LOGGER.warn("Problem creating dialog", ex);
-        }
+        jbInit();
+        pack();
+        setSize(600, 500);
     }
 
     private void jbInit() {
@@ -236,12 +232,12 @@ public class FromAuxDialog extends JDialog {
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    void generate_actionPerformed(ActionEvent e) {
+    void generate_actionPerformed() {
         generatePressed = true;
         dispose();
     }
 
-    void cancel_actionPerformed(ActionEvent e) {
+    void cancel_actionPerformed() {
         dispose();
     }
 
@@ -260,7 +256,7 @@ public class FromAuxDialog extends JDialog {
         }
     }
 
-    void parse_actionPerformed(ActionEvent e) {
+    void parse_actionPerformed() {
         parseButton.setEnabled(false);
         BasePanel bp = (BasePanel) parentTabbedPane.getComponentAt(
                 dbChooser.getSelectedIndex());
@@ -337,7 +333,7 @@ class FromAuxDialog_generate_actionAdapter implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.generate_actionPerformed(e);
+        adaptee.generate_actionPerformed();
     }
 }
 
@@ -352,7 +348,7 @@ class FromAuxDialog_Cancel_actionAdapter implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.cancel_actionPerformed(e);
+        adaptee.cancel_actionPerformed();
     }
 }
 
@@ -367,6 +363,6 @@ class FromAuxDialog_parse_actionAdapter implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.parse_actionPerformed(e);
+        adaptee.parse_actionPerformed();
     }
 }

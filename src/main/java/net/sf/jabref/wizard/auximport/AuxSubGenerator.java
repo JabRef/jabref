@@ -86,6 +86,10 @@ public class AuxSubGenerator {
 
     private static final Log LOGGER = LogFactory.getLog(AuxSubGenerator.class);
 
+    private static final Pattern TAG_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
+
+
+
 
     public AuxSubGenerator(BibDatabase refDBase) {
         db = refDBase;
@@ -129,7 +133,6 @@ public class AuxSubGenerator {
     //   x is a label for an item and y is the index in bibliography
     private boolean parseAuxFile(String filename) {
         // regular expressions
-        Pattern pattern;
         Matcher matcher;
 
         // while condition
@@ -138,8 +141,6 @@ public class AuxSubGenerator {
         // return value -> default: no error
         boolean back = true;
 
-        // the important tag
-        pattern = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
 
         // file list, used for nested aux files
         List<String> fileList = new ArrayList<>(5);
@@ -174,7 +175,7 @@ public class AuxSubGenerator {
 
                     if (maybeLine.isPresent()) {
                         String line = maybeLine.get();
-                        matcher = pattern.matcher(line);
+                        matcher = TAG_PATTERN.matcher(line);
 
                         while (matcher.find()) {
                             // extract the bibtex-key(s) XXX from \citation{XXX} string
