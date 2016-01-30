@@ -1197,13 +1197,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         SaveSession session;
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save database");
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
         try {
             if (selectedOnly) {
-                session = FileActions.savePartOfDatabase(new BibDatabaseContext(database, bibDatabaseContext.getMetaData(), defaults),
+                session = FileActions.savePartOfDatabase(bibDatabaseContext,
                         file, Globals.prefs, mainTable.getSelectedEntries(), enc, saveType);
             } else {
-                session = FileActions.saveDatabase(new BibDatabaseContext(database, bibDatabaseContext.getMetaData(), defaults),
+                session = FileActions.saveDatabase(bibDatabaseContext,
                         file, Globals.prefs, false, false, enc, false);
             }
 

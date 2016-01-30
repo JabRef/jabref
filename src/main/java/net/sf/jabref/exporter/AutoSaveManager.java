@@ -97,8 +97,7 @@ public class AutoSaveManager {
         File databaseFile = panel.getBibDatabaseContext().getDatabaseFile();
         File backupFile = AutoSaveManager.getAutoSaveFile(databaseFile);
         try {
-            Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
-            SaveSession ss = FileActions.saveDatabase(new BibDatabaseContext(panel.database(), panel.getBibDatabaseContext().getMetaData(), defaults),
+            SaveSession ss = FileActions.saveDatabase(panel.getBibDatabaseContext(),
                     backupFile, Globals.prefs, false, false, panel.getEncoding(), true);
             ss.commit();
         } catch (SaveException e) {

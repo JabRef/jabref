@@ -226,15 +226,13 @@ public class SaveDatabaseAction extends AbstractWorker {
         SaveSession session;
         frame.block();
         try {
-            Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
             if (selectedOnly) {
                 session = FileActions.savePartOfDatabase(
-                        new BibDatabaseContext(panel.database(), panel.getBibDatabaseContext().getMetaData(), defaults),
+                        panel.getBibDatabaseContext(),
                         file, Globals.prefs,
                         panel.getSelectedEntries(), encoding, FileActions.DatabaseSaveType.DEFAULT);
             } else {
-                session = FileActions.saveDatabase(
-                        new BibDatabaseContext(panel.database(), panel.getBibDatabaseContext().getMetaData(), defaults),
+                session = FileActions.saveDatabase(panel.getBibDatabaseContext(),
                         file, Globals.prefs, false, false, encoding, false);
             }
 
