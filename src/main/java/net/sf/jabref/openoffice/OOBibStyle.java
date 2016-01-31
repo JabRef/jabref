@@ -238,21 +238,22 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             }
 
             switch (mode) {
-                case NAME:
-                    if (!line.trim().isEmpty()) {
-                        name = line.trim();
-                    }
-                case LAYOUT:
-                    handleStructureLine(line);
-                    break;
-                case PROPERTIES:
-                    handlePropertiesLine(line, properties);
-                    break;
-                case CITATION:
-                    handlePropertiesLine(line, citProperties);
-                    break;
-                case JOURNALS:
-                    handleJournalsLine(line);
+            case NAME:
+                if (!line.trim().isEmpty()) {
+                    name = line.trim();
+                }
+                break;
+            case LAYOUT:
+                handleStructureLine(line);
+                break;
+            case PROPERTIES:
+                handlePropertiesLine(line, properties);
+                break;
+            case CITATION:
+                handlePropertiesLine(line, citProperties);
+                break;
+            case JOURNALS:
+                handleJournalsLine(line);
             }
 
         }
@@ -494,7 +495,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                         String author = getCitationMarkerField(entries[i], database, authorField);
                         AuthorList al = AuthorList.getAuthorList(author);
                         //System.out.println("i="+i+" thisMarker='"+thisMarker+"'");
-                        int prevALim = i > 0 ? unlimAuthors[i - 1] : unlimAuthors[0];
+                        int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
                         if (!thisMarker.equals(tmpMarker)
                                 || ((al.size() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
                             // No match. Update piv to exclude the previous entry. But first check if the
@@ -891,9 +892,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     public boolean equals(Object o) {
         if (o == null) {
             return false;
-        } else {
+        } else if (o instanceof OOBibStyle) {
             return styleFile.equals(((OOBibStyle) o).styleFile);
         }
+        return false;
     }
 
     @Override
