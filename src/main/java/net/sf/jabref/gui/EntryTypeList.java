@@ -19,6 +19,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -40,12 +41,12 @@ import net.sf.jabref.util.Util;
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener {
 
     private final JButton def = new JButton(Localization.lang("Default"));
-    private final BibDatabaseMode type;
+    private final BibDatabaseMode mode;
 
     /** Creates a new instance of EntryTypeList */
-    public EntryTypeList(List<String> fields, BibDatabaseMode type) {
+    public EntryTypeList(List<String> fields, BibDatabaseMode mode) {
         super(Localization.lang("Entry types"), fields, false, true);
-        this.type = type;
+        this.mode = mode;
 
         con.gridx = 0;
         con.gridy = 2;
@@ -95,12 +96,12 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         }
         for (int i = 0; i < selected.length; i++) {
             String typeName = listModel.get(selected[selected.length - 1 - i]);
-            EntryType type = EntryTypes.getType(typeName, this.type);
+            Optional<EntryType> type = EntryTypes.getType(typeName, this.mode);
 
             // If it is a custom entry type, we can remove it. If type == null, it means
             // the user must have added it and not yet applied it, so we can remove it
             // in this case as well. If it is a standard type it cannot be removed.
-            if ((type instanceof CustomEntryType)) {
+            if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
                 listModel.removeElementAt(selected[selected.length - 1 - i]);
             } else {
                 // This shouldn't happen, since the Remove button should be disabled.
@@ -118,18 +119,18 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     public void enable(String typeName, boolean isChanged) {
         //String s = (String)list.getSelectedValue();
 
-        if (EntryTypes.getStandardType(typeName, type) == null) {
-            def.setEnabled(false);
-            remove.setEnabled(true);
-        } else {
-
-            if (isChanged || (EntryTypes.getType(typeName, type) instanceof CustomEntryType)) {
+        if (EntryTypes.getStandardType(typeName, mode).isPresent()) {
+            Optional<EntryType> entryType = EntryTypes.getType(typeName, mode);
+            if (isChanged || (entryType.isPresent() && entryType.get() instanceof CustomEntryType)) {
                 def.setEnabled(true);
             } else {
                 def.setEnabled(false);
             }
 
             remove.setEnabled(false);
+        } else {
+            def.setEnabled(false);
+            remove.setEnabled(true);
         }
     }
 

@@ -26,16 +26,16 @@ public class TypedBibEntry {
 
     private final BibEntry entry;
     private final Optional<BibDatabase> database;
-    private final BibDatabaseMode type;
+    private final BibDatabaseMode mode;
 
-    public TypedBibEntry(BibEntry entry, BibDatabaseMode type) {
-        this(entry, Optional.empty(), type);
+    public TypedBibEntry(BibEntry entry, BibDatabaseMode mode) {
+        this(entry, Optional.empty(), mode);
     }
 
-    public TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseMode type) {
+    public TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseMode mode) {
         this.entry = Objects.requireNonNull(entry);
         this.database = Objects.requireNonNull(database);
-        this.type = type;
+        this.mode = mode;
     }
 
     /**
@@ -43,17 +43,21 @@ public class TypedBibEntry {
      * complete.
      */
     public boolean hasAllRequiredFields() {
-        EntryType type = EntryTypes.getType(entry.getType(), this.type);
-        return entry.allFieldsPresent(type.getRequiredFields(), database.orElse(null));
+        Optional<EntryType> type = EntryTypes.getType(entry.getType(), this.mode);
+        if(type.isPresent()) {
+            return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
+        } else {
+            return true;
+        }
     }
 
     /**
      * Gets the display name for the type of the entry.
      */
     public String getTypeForDisplay() {
-        EntryType entryType = EntryTypes.getType(entry.getType(), type);
-        if (entryType == null) {
-            return "";
+        Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), mode);
+        if (entryType.isPresent()) {
+            return entryType.get().getName();
         } else {
             return EntryUtil.capitalizeFirst(entry.getType());
         }

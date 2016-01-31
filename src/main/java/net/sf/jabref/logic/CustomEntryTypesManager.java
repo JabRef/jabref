@@ -39,11 +39,11 @@ public class CustomEntryTypesManager {
      * JabRefFrame when the program closes.
      */
     public static void saveCustomEntryTypes(JabRefPreferences prefs) {
-        Iterator<String> iterator = EntryTypes.getAllTypes(BibDatabaseMode.BIBTEX).iterator();
+        Iterator<EntryType> iterator = EntryTypes.getAllValues(BibDatabaseMode.BIBTEX).iterator();
         int number = 0;
 
         while (iterator.hasNext()) {
-            EntryType entryType = EntryTypes.getType(iterator.next(), BibDatabaseMode.BIBTEX);
+            EntryType entryType = iterator.next();
             if (entryType instanceof CustomEntryType) {
                 // Store this entry type.
                 prefs.storeCustomEntryType((CustomEntryType) entryType, number);

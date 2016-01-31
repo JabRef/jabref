@@ -198,7 +198,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         tabbed.removeAll();
         tabs.clear();
 
-        EntryType type = EntryTypes.getType(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
         List<String> fieldList = type.getRequiredFieldsFlat();
 
@@ -408,7 +408,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * returned. Otherwise, null is returned. In addition, e.g. listeners can be
      * added to the field editor, even if no component is returned.
      *
-     * @param string Field name
+     * @param editor Field editor
      * @return Component to show, or null if none.
      */
     public Optional<JComponent> getExtra(final FieldEditor editor) {
