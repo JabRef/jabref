@@ -22,7 +22,13 @@ import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import com.sun.star.beans.IllegalTypeException;
+import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.PropertyExistException;
+import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.container.XNameAccess;
+import com.sun.star.lang.IllegalArgumentException;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -87,7 +93,8 @@ class CitationManager {
             public void actionPerformed(ActionEvent actionEvent) {
                 try {
                     storeSettings();
-                } catch (Exception ex) {
+                } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException |
+                        IllegalTypeException | IllegalArgumentException ex) {
                     LOGGER.warn("Problem modifying citation", ex);
                     JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
                 }
@@ -115,7 +122,8 @@ class CitationManager {
         table.addMouseListener(new TableClickListener());
     }
 
-    private void storeSettings() throws Exception {
+    private void storeSettings() throws UnknownPropertyException, NotRemoveableException, PropertyExistException,
+            IllegalTypeException, IllegalArgumentException {
         for (CitEntry entry : list) {
             if (entry.pageInfoChanged()) {
                 ooBase.setCustomProperty(entry.refMarkName, entry.pageInfo);

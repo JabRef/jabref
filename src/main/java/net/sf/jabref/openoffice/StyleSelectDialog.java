@@ -56,6 +56,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.actions.BrowseAction;
@@ -89,6 +92,8 @@ import com.jgoodies.forms.layout.FormLayout;
  * This class produces a dialog box for choosing a style file.
  */
 class StyleSelectDialog {
+
+    private static final Log LOGGER = LogFactory.getLog(StyleSelectDialog.class);
 
     private static final String STYLE_FILE_EXTENSION = ".jstyle";
     private final JabRefFrame frame;
@@ -195,8 +200,7 @@ class StyleSelectDialog {
                         JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
-
+                    LOGGER.warn("Problem open style file editor", e);
                 }
             }
         });
@@ -466,9 +470,8 @@ class StyleSelectDialog {
             if (style.isValid() && !styles.contains(style)) {
                 styles.add(style);
             }
-        } catch (Exception e) {
-            System.out.println("Unable to read style file: '" + file.getPath() + "'");
-            e.printStackTrace();
+        } catch (IOException e) {
+            LOGGER.warn("Unable to read style file: '" + file.getPath() + "'", e);
         }
     }
 
@@ -613,7 +616,7 @@ class StyleSelectDialog {
             dd.setLocationRelativeTo(diag);
             dd.setVisible(true);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Problem showing defualt style", ex);
         }
     }
 

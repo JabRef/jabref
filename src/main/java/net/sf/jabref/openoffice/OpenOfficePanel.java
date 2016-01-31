@@ -159,12 +159,8 @@ public class OpenOfficePanel extends AbstractWorker {
         frame = jrFrame;
         this.manager = spManager;
         comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), Localization.lang("OpenOffice"), this);
-        try {
-            initPanel();
-            spManager.register(getName(), comp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        initPanel();
+        spManager.register(getName(), comp);
     }
 
     public JMenuItem getMenuItem() {
@@ -312,7 +308,7 @@ public class OpenOfficePanel extends AbstractWorker {
                             ex.getBibtexKey()), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                 }
                 catch (Exception e1) {
-                    e1.printStackTrace();
+                    LOGGER.warn("Could not update bibliography", e1);
                 }
             }
         };
@@ -328,7 +324,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 } catch (UndefinedCharacterFormatException e) {
                     reportUndefinedCharacterFormat(e);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Problem combining cite markers", e);
                 }
 
             }
@@ -350,7 +346,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     CitationManager cm = new CitationManager(frame, ooBase);
                     cm.showDialog();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Problem showing citation manager", e);
                 }
             }
         });
@@ -496,12 +492,12 @@ public class OpenOfficePanel extends AbstractWorker {
             manageCitations.setEnabled(true);
 
         } catch (UnsatisfiedLinkError e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Unable to connect. One possible reason is that JabRef "
                             + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not connect to running OpenOffice.")
                         + "\n"
@@ -696,7 +692,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 } catch (UndefinedParagraphFormatException ex) {
                     reportUndefinedParagraphFormat(ex);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Could not insert entry", ex);
                 }
             }
 

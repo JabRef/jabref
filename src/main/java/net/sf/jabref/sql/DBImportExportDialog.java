@@ -67,6 +67,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         IMPORTER, EXPORTER
     }
 
+
     public DBImportExportDialog(JabRefFrame frame, Vector<Vector<String>> rows, DialogType dialogType) {
         this.dialogType = dialogType;
 

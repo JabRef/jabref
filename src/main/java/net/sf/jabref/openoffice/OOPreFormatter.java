@@ -19,7 +19,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.strings.LatexToUnicodeCharMap;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This formatter preprocesses JabRef fields before they are run through the layout of the
@@ -29,7 +29,7 @@ import java.util.HashMap;
  */
 public class OOPreFormatter implements LayoutFormatter {
 
-    private static final HashMap<String, String> CHARS = new LatexToUnicodeCharMap();
+    private static final Map<String, String> CHARS = new LatexToUnicodeCharMap();
 
     @Override
     public String format(String field) {
@@ -53,10 +53,10 @@ public class OOPreFormatter implements LayoutFormatter {
                     /* Close Command */
                     String command = currentCommand.toString();
                     Object result = OOPreFormatter.CHARS.get(command);
-                    if (result != null) {
-                        sb.append((String) result);
-                    } else {
+                    if (result == null) {
                         sb.append(command);
+                    } else {
+                        sb.append((String) result);
                     }
                 }
                 escaped = true;
@@ -110,10 +110,10 @@ public class OOPreFormatter implements LayoutFormatter {
                              * then keep
                              * the text of the parameter intact.
                              */
-                            if (result != null) {
-                                sb.append((String) result);
-                            } else {
+                            if (result == null) {
                                 sb.append(command);
+                            } else {
+                                sb.append((String) result);
                             }
 
                         }
@@ -150,15 +150,13 @@ public class OOPreFormatter implements LayoutFormatter {
                         if (argument != null) {
                             // handle common case of general latex command
                             Object result = OOPreFormatter.CHARS.get(command + argument);
-                            // System.out.print("command: "+command+", arg: "+argument);
-                            // System.out.print(", result: ");
                             // If found, then use translated version. If not, then keep
                             // the
                             // text of the parameter intact.
-                            if (result != null) {
-                                sb.append((String) result);
-                            } else {
+                            if (result == null) {
                                 sb.append(argument);
+                            } else {
+                                sb.append((String) result);
                             }
                         }
                     } else if (c == '}') {
@@ -166,18 +164,18 @@ public class OOPreFormatter implements LayoutFormatter {
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
                         Object result = OOPreFormatter.CHARS.get(command);
-                        if (result != null) {
-                            sb.append((String) result);
-                        } else {
+                        if (result == null) {
                             // If the command is unknown, just print it:
                             sb.append(command);
+                        } else {
+                            sb.append((String) result);
                         }
                     } else {
                         Object result = OOPreFormatter.CHARS.get(command);
-                        if (result != null) {
-                            sb.append((String) result);
-                        } else {
+                        if (result == null) {
                             sb.append(command);
+                        } else {
+                            sb.append((String) result);
                         }
                         sb.append(' ');
                     }
