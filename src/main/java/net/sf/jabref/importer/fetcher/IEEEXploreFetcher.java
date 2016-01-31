@@ -26,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.net.HttpURLConnection;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -49,7 +48,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.net.NetUtil;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class IEEEXploreFetcher implements EntryFetcher {
@@ -99,14 +98,18 @@ public class IEEEXploreFetcher implements EntryFetcher {
         try {
             //open the search URL
             URL url = new URL(IEEEXploreFetcher.URL_SEARCH);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            URLDownload dl = new URLDownload(url);
 
             //add request header
-            con.setRequestProperty("Accept", "application/json");
-            con.setRequestProperty("Content-type", "application/json");
+            dl.addParameters("Accept", "application/json");
+            dl.addParameters("Content-type", "application/json");
+
+            // set post data
+            dl.setPostData(postData);
 
             //retrieve the search results
-            String page = NetUtil.getPostResults(con, postData, StandardCharsets.UTF_8);
+            String page = dl.downloadToString(StandardCharsets.UTF_8);
 
             //the page can be blank if the search did not work (not sure the exact conditions that lead to this, but declaring it an invalid search for now)
             if (page.isEmpty()) {
@@ -137,7 +140,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //fetch the raw Bibtex results from IEEEXplore
             URL bibtexURL = new URL(createBibtexQueryURL(searchResultsJson));
-            String bibtexPage = NetUtil.getResults(bibtexURL);
+            String bibtexPage = new URLDownload(bibtexURL).downloadToString();
 
             //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);
