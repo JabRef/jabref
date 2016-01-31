@@ -128,10 +128,10 @@ class StringDialog extends JDialog {
         conPane.add(tlb, BorderLayout.NORTH);
         conPane.add(pan, BorderLayout.CENTER);
 
-        if (panel.getDatabaseFile() == null) {
+        if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
             setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
         } else {
-            setTitle(GUIGlobals.stringsTitle + ": " + panel.getDatabaseFile().getName());
+            setTitle(GUIGlobals.stringsTitle + ": " + panel.getBibDatabaseContext().getDatabaseFile().getName());
         }
         pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);

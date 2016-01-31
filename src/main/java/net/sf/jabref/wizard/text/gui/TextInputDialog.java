@@ -58,6 +58,7 @@ import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -467,7 +468,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored) {
@@ -478,7 +479,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     }
 
     private String[] getAllFields() {
-        List<String> texFields = EntryTypes.getType(entry.getType()).getAllFields();
+        List<String> texFields = EntryTypes.getType(entry.getType(), frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).getAllFields();
         List<String> internalFields = InternalBibtexFields.getAllFieldNames();
 
         for (String field : internalFields) {

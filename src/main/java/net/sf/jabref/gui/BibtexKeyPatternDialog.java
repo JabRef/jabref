@@ -37,7 +37,7 @@ public class BibtexKeyPatternDialog extends JDialog {
 
     public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
         super(parent, Localization.lang("BibTeX key patterns"), true);
-        this.labelPatternPanel = new LabelPatternPanel(parent.helpDiag);
+        this.labelPatternPanel = new LabelPatternPanel(parent.helpDiag, panel);
         setPanel(panel);
         init();
     }
@@ -49,7 +49,7 @@ public class BibtexKeyPatternDialog extends JDialog {
      */
     public void setPanel(BasePanel panel) {
         this.panel = panel;
-        this.metaData = panel.metaData();
+        this.metaData = panel.getBibDatabaseContext().getMetaData();
         AbstractLabelPattern keypatterns = metaData.getLabelPattern();
         labelPatternPanel.setValues(keypatterns);
     }

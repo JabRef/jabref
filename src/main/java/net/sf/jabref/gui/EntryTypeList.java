@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.EntryTypes;
@@ -39,11 +40,12 @@ import net.sf.jabref.util.Util;
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener {
 
     private final JButton def = new JButton(Localization.lang("Default"));
-
+    private final BibDatabaseMode type;
 
     /** Creates a new instance of EntryTypeList */
-    public EntryTypeList(List<String> fields) {
+    public EntryTypeList(List<String> fields, BibDatabaseMode type) {
         super(Localization.lang("Entry types"), fields, false, true);
+        this.type = type;
 
         con.gridx = 0;
         con.gridy = 2;
@@ -93,7 +95,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         }
         for (int i = 0; i < selected.length; i++) {
             String typeName = listModel.get(selected[selected.length - 1 - i]);
-            EntryType type = EntryTypes.getType(typeName);
+            EntryType type = EntryTypes.getType(typeName, this.type);
 
             // If it is a custom entry type, we can remove it. If type == null, it means
             // the user must have added it and not yet applied it, so we can remove it
@@ -116,12 +118,12 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     public void enable(String typeName, boolean isChanged) {
         //String s = (String)list.getSelectedValue();
 
-        if (EntryTypes.getStandardType(typeName) == null) {
+        if (EntryTypes.getStandardType(typeName, type) == null) {
             def.setEnabled(false);
             remove.setEnabled(true);
         } else {
 
-            if (isChanged || (EntryTypes.getType(typeName) instanceof CustomEntryType)) {
+            if (isChanged || (EntryTypes.getType(typeName, type) instanceof CustomEntryType)) {
                 def.setEnabled(true);
             } else {
                 def.setEnabled(false);

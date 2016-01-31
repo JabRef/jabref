@@ -20,6 +20,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
@@ -114,9 +115,12 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
             } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
-                for (BibEntry entry : JabRef.jrf.getCurrentBasePanel().getDatabase().getEntries()) {
-                    if (group.contains(entry)) {
-                        hits++;
+                BasePanel currentBasePanel = JabRef.jrf.getCurrentBasePanel();
+                if(currentBasePanel != null) {
+                    for (BibEntry entry : currentBasePanel.getDatabase().getEntries()) {
+                        if (group.contains(entry)) {
+                            hits++;
+                        }
                     }
                 }
                 sb.append(" [").append(hits).append(']');

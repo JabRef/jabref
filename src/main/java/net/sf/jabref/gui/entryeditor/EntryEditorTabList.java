@@ -30,7 +30,6 @@ public final class EntryEditorTabList {
     private List<List<String>> list;
     private List<String> names;
 
-
     public EntryEditorTabList() {
         init();
     }

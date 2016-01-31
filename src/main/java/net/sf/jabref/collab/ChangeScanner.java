@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import net.sf.jabref.model.database.BibDatabaseMode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -77,7 +78,7 @@ public class ChangeScanner implements Runnable {
         this.panel = bp;
         this.frame = frame;
         this.inMem = bp.database();
-        this.mdInMem = bp.metaData();
+        this.mdInMem = bp.getBibDatabaseContext().getMetaData();
         this.f = file;
     }
 
@@ -158,7 +159,8 @@ public class ChangeScanner implements Runnable {
             @Override
             public void run() {
                 try {
-                    SaveSession ss = FileActions.saveDatabase(inTemp, mdInTemp,
+                    Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                    SaveSession ss = FileActions.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults),
                             Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs,
                             false, false, panel.getEncoding(), true);
                     ss.commit();

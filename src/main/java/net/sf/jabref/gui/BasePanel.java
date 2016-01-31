@@ -21,10 +21,7 @@ import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.Matcher;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
+import net.sf.jabref.*;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
@@ -68,11 +65,8 @@ import net.sf.jabref.logic.search.matchers.EverythingMatcher;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.DatabaseChangeEvent;
+import net.sf.jabref.model.database.*;
 import net.sf.jabref.model.database.DatabaseChangeEvent.ChangeType;
-import net.sf.jabref.model.database.DatabaseChangeListener;
-import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -109,10 +103,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public static final int SHOWING_EDITOR = 2;
     public static final int WILL_SHOW_EDITOR = 3;
 
-    /*
-     * The database shown in this panel.
-     */
     private final BibDatabase database;
+    private final BibDatabaseContext bibDatabaseContext;
 
     private int mode;
     private EntryEditor currentEditor;
@@ -169,9 +161,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private StringDialog stringDialog;
     // Keeps track of the string dialog if it is open.
 
-    // MetaData parses, keeps and writes meta data.
-    public final MetaData metaData;
-
     private final Map<String, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
 
@@ -190,19 +179,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
 
-    public BasePanel(JabRefFrame frame, BibDatabase db, File file, MetaData metaData, Charset encoding) {
+    public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext, Charset encoding) {
         Objects.requireNonNull(frame);
-        Objects.requireNonNull(db);
-        //file may be null
         Objects.requireNonNull(encoding);
-        Objects.requireNonNull(metaData);
+        Objects.requireNonNull(bibDatabaseContext);
 
         this.encoding = encoding;
-        this.metaData = metaData;
+        this.bibDatabaseContext = bibDatabaseContext;
 
         this.sidePaneManager = GUIGlobals.sidePaneManager;
         this.frame = frame;
-        database = db;
+        this.database = bibDatabaseContext.getDatabase();
 
         searchBar = new SearchBar(this);
 
@@ -210,10 +197,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         setupActions();
 
-        metaData.setFile(file);
+        File file = bibDatabaseContext.getDatabaseFile();
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
-        db.addDatabaseChangeListener(new GroupTreeUpdater());
+        this.database.addDatabaseChangeListener(new GroupTreeUpdater());
 
         if (file == null) {
             if (!database.getEntries().isEmpty()) {
@@ -238,7 +225,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public String getTabTitle() {
         String title;
 
-        if (getDatabaseFile() == null) {
+        if (getBibDatabaseContext().getDatabaseFile() == null) {
             title = GUIGlobals.untitledTitle;
 
             if (!database().getEntries().isEmpty()) {
@@ -251,7 +238,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else {
             // check if file is modified
             String changeFlag = isModified() ? "*" : "";
-            title = getDatabaseFile().getName() + changeFlag;
+            title = getBibDatabaseContext().getDatabaseFile().getName() + changeFlag;
         }
         return title;
     }
@@ -270,10 +257,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public BibDatabase database() {
         return database;
-    }
-
-    public MetaData metaData() {
-        return metaData;
     }
 
     public JabRefFrame frame() {
@@ -522,7 +505,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void init() {
 
-                DBStrings dbs = metaData.getDBStrings();
+                DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
 
                 // get DBStrings from user if necessary
                 if (dbs.isConfigValid()) {
@@ -543,7 +526,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // store database strings
                     if (connectToDB) {
                         dbs = dbd.getDBStrings();
-                        metaData.setDBStrings(dbs);
+                        bibDatabaseContext.getMetaData().setDBStrings(dbs);
                         dbd.dispose();
                     }
                 }
@@ -555,13 +538,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 if (connectToDB) {
 
-                    final DBStrings dbs = metaData.getDBStrings();
+                    final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
 
                     try {
                         frame.output(Localization.lang("Attempting SQL export..."));
                         final DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
                         final DBExporter exporter = factory.getExporter(dbs.getServerType());
-                        exporter.exportDatabaseToDBMS(database, metaData, null, dbs, frame);
+                        exporter.exportDatabaseToDBMS(database, bibDatabaseContext.getMetaData(), null, dbs, frame);
                         dbs.isConfigValid(true);
                     } catch (Exception ex) {
                         final String preamble = Localization
@@ -573,7 +556,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
                     }
 
-                    metaData.setDBStrings(dbs);
+                    bibDatabaseContext.getMetaData().setDBStrings(dbs);
                 }
             }
 
@@ -685,7 +668,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Finally, set the new keys:
                 for (BibEntry entry : entries) {
                     bes = entry;
-                    LabelPatternUtil.makeLabel(metaData, database, bes);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes.getId(), (String) oldvals.get(bes),
                             bes.getField(BibEntry.KEY_FIELD)));
                 }
@@ -893,7 +876,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                         FileListEntry flEntry = tableModel.getEntry(0);
                         ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
-                                flEntry.type.getIcon(), metaData(), flEntry.type);
+                                flEntry.type.getIcon(), bibDatabaseContext.getMetaData(), flEntry.type);
                         item.openLink();
                     }
                 });
@@ -907,7 +890,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 JabRefExecutorService.INSTANCE.execute(() -> {
                     final BibEntry[] bes = mainTable.getSelectedEntries();
                     final List<File> files = FileUtil.getListOfLinkedFiles(Arrays.asList(bes),
-                            metaData().getFileDirectory(Globals.FILE_FIELD));
+                            bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD));
                     for (final File f : files) {
                         try {
                             JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
@@ -952,7 +935,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             output(Localization.lang("No url defined") + '.');
                         } else {
                             try {
-                                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.link, entry.type);
+                                JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext.getMetaData(), entry.link, entry.type);
                                 output(Localization.lang("External viewer called") + '.');
                             } catch (IOException e) {
                                 output(Localization.lang("Could not open link"));
@@ -961,7 +944,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                     } else {
                         try {
-                            JabRefDesktop.openExternalViewer(metaData(), link.toString(), field);
+                            JabRefDesktop.openExternalViewer(bibDatabaseContext.getMetaData(), link.toString(), field);
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException ex) {
                             output(Localization.lang("Error") + ": " + ex.getMessage());
@@ -1025,7 +1008,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
 
                 String id = IdGenerator.next();
-                BibEntry bibEntry = new BibEntry(id, tp);
+                BibEntry bibEntry = new BibEntry(id, tp.getName());
                 TextInputDialog tidialog = new TextInputDialog(frame, "import", true, bibEntry);
                 PositionWindow.placeDialog(tidialog, BasePanel.this);
                 tidialog.setVisible(true);
@@ -1138,7 +1121,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
             ContentSelectorDialog2 csd = new ContentSelectorDialog2
-                    (frame, frame, BasePanel.this, false, metaData, null);
+                    (frame, frame, BasePanel.this, false, bibDatabaseContext.getMetaData(), null);
             PositionWindow.placeDialog(csd, frame);
             csd.setVisible(true);
         });
@@ -1216,10 +1199,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         final String SAVE_DATABASE = Localization.lang("Save database");
         try {
             if (selectedOnly) {
-                session = FileActions.savePartOfDatabase(database, metaData, file, Globals.prefs,
-                        mainTable.getSelectedEntries(), enc, saveType);
+                session = FileActions.savePartOfDatabase(bibDatabaseContext,
+                        file, Globals.prefs, mainTable.getSelectedEntries(), enc, saveType);
             } else {
-                session = FileActions.saveDatabase(database, metaData, file, Globals.prefs, false, false, enc, false);
+                session = FileActions.saveDatabase(bibDatabaseContext,
+                        file, Globals.prefs, false, false, enc, false);
             }
 
         } catch (UnsupportedCharsetException ex2) {
@@ -1309,7 +1293,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
         if (type != null) { // Only if the dialog was not cancelled.
             String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, type);
+            final BibEntry be = new BibEntry(id, type.getName());
             try {
                 database.insertEntry(be);
                 // Set owner/timestamp if options are enabled:
@@ -1657,7 +1641,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
-            autoCompleters = new ContentAutoCompleters(getDatabase(), metaData, autoCompletePreferences);
+            autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(), autoCompletePreferences);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         } else {
@@ -1949,7 +1933,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             EntryEditor ed = stringEntryEditorEntry.getValue();
             ed.rebuildPanels();
         }
-
     }
 
     public void markBaseChanged() {
@@ -1979,10 +1962,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
-            if (getDatabaseFile() == null) {
+            if (getBibDatabaseContext().getDatabaseFile() == null) {
                 frame.setTabTitle(this, GUIGlobals.untitledTitle, null);
             } else {
-                frame.setTabTitle(this, getTabTitle(), getDatabaseFile().getAbsolutePath());
+                frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabaseFile().getAbsolutePath());
             }
         }
         frame.setWindowTitle();
@@ -2149,7 +2132,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibEntry bes : database.getEntries()) {
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || oldKey.isEmpty()) {
-                    LabelPatternUtil.makeLabel(metaData, database, bes);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes.getId(), null, bes.getCiteKey()));
                     any = true;
                 }
@@ -2279,11 +2262,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //LOGGER.debug("File '"+file.getPath()+"' has been modified.");
         updatedExternally = true;
 
-        final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this, BasePanel.this.getDatabaseFile());
+        final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this, getBibDatabaseContext().getDatabaseFile());
 
         // Test: running scan automatically in background
-        if ((BasePanel.this.getDatabaseFile() != null)
-                && !FileBasedLock.waitForFileLock(BasePanel.this.getDatabaseFile(), 10)) {
+        if ((getBibDatabaseContext().getDatabaseFile() != null)
+                && !FileBasedLock.waitForFileLock(getBibDatabaseContext().getDatabaseFile(), 10)) {
             // The file is locked even after the maximum wait. Do nothing.
             LOGGER.error("File updated externally, but change scan failed because the file is locked.");
             // Perturb the stored timestamp so successive checks are made:
@@ -2307,7 +2290,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     sidePaneManager.hideComponent(FileUpdatePanel.NAME);
                     sidePaneManager.unregisterComponent(FileUpdatePanel.NAME);
                 }
-                FileUpdatePanel pan = new FileUpdatePanel(BasePanel.this, sidePaneManager, getDatabaseFile(), scanner);
+                FileUpdatePanel pan = new FileUpdatePanel(BasePanel.this, sidePaneManager, getBibDatabaseContext().getDatabaseFile(), scanner);
                 sidePaneManager.register(FileUpdatePanel.NAME, pan);
                 sidePaneManager.show(FileUpdatePanel.NAME);
                 //setUpdatedExternally(false);
@@ -2325,7 +2308,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     @Override
     public void fileRemoved() {
-        LOGGER.info("File '" + getDatabaseFile().getPath() + "' has been deleted.");
+        LOGGER.info("File '" + getBibDatabaseContext().getDatabaseFile().getPath() + "' has been deleted.");
     }
 
     /**
@@ -2359,13 +2342,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return mainTable.getSelectedEntries();
     }
 
-    /**
-     * Get the file where this database was last saved to or loaded from, if any.
-     *
-     * @return The relevant File, or null if none is defined.
-     */
-    public File getDatabaseFile() {
-        return metaData.getFile();
+    public BibDatabaseContext getBibDatabaseContext() {
+        return this.bibDatabaseContext;
     }
 
     /**
@@ -2556,8 +2534,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
-            if (basePanel.metaData.getFileDirectory(Globals.FILE_FIELD).size() > 0) {
-                final List<String> mdDirs = basePanel.metaData.getFileDirectory(Globals.FILE_FIELD);
+            if (basePanel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD).size() > 0) {
+                final List<String> mdDirs = basePanel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
                 for (final String mdDir : mdDirs) {
                     dirs.add(new File(mdDir));
 
@@ -2585,7 +2563,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 .getExternalFileTypeByExt(extension.get());
                         if (type != null) {
                             try {
-                                JabRefDesktop.openExternalFileAnyFormat(basePanel.metaData, filepath, type);
+                                JabRefDesktop.openExternalFileAnyFormat(basePanel.getBibDatabaseContext().getMetaData(), filepath, type);
                                 basePanel.output(Localization.lang("External viewer called") + '.');
                                 return Optional.of(filepath);
                             } catch (IOException ex) {

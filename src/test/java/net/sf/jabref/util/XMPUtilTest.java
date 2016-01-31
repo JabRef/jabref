@@ -8,6 +8,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
 import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -116,7 +117,7 @@ public class XMPUtilTest {
 
     public static String bibtexEntry2BibtexString(BibEntry e) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibEntryWriter(new LatexFieldFormatter(), false).write(e, sw);
+        new BibEntryWriter(new LatexFieldFormatter(), false).write(e, sw, BibDatabaseMode.BIBTEX);
         return sw.getBuffer().toString();
     }
 
@@ -146,7 +147,7 @@ public class XMPUtilTest {
     }
 
     public BibEntry t2BibtexEntry() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION);
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
         e.setField("title", "�pt�mz�t��n");
         e.setField("bibtexkey", "OezbekC06");
         e.setField("year", "2003");
@@ -269,7 +270,6 @@ public class XMPUtilTest {
         Assert.assertEquals("2003", e.getField("year"));
         Assert.assertEquals("Beach sand convolution by surf-wave optimzation", e.getField("title"));
         Assert.assertEquals("misc", e.getType());
-
     }
 
     /**
@@ -513,7 +513,7 @@ public class XMPUtilTest {
     @Test
     public void testEmpty() throws Exception {
 
-        Assert.assertEquals(null, XMPUtil.readXMP(pdfFile));
+        Assert.assertEquals(Collections.emptyList(), XMPUtil.readXMP(pdfFile));
 
     }
 
@@ -541,7 +541,7 @@ public class XMPUtilTest {
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(s));
 
         // Nothing there yet, but should not crash
-        Assert.assertNull(XMPUtil.readXMP(pdfFile));
+        Assert.assertEquals(Collections.emptyList(), XMPUtil.readXMP(pdfFile));
 
         s = " <rdf:Description rdf:about=''" + "  xmlns:xmp='http://ns.adobe.com/xap/1.0/'>"
                 + "  <xmp:CreatorTool>Acrobat PDFMaker 7.0.7</xmp:CreatorTool>"
@@ -923,7 +923,7 @@ public class XMPUtilTest {
             Assert.assertEquals("Huey Duck", dcSchema.getContributors().get(0));
             Assert.assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
             Assert.assertEquals("Louie Duck", dcSchema.getContributors().get(2));
-            Assert.assertEquals("InProceedings", dcSchema.getTypes().get(0));
+            Assert.assertEquals("InProceedings".toLowerCase(), dcSchema.getTypes().get(0).toLowerCase());
             Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
             Assert.assertEquals("peanut", dcSchema.getSubjects().get(0));
             Assert.assertEquals("butter", dcSchema.getSubjects().get(1));
@@ -989,7 +989,7 @@ public class XMPUtilTest {
             Assert.assertEquals("Huey Duck", dcSchema.getContributors().get(0));
             Assert.assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
             Assert.assertEquals("Louie Duck", dcSchema.getContributors().get(2));
-            Assert.assertEquals("InProceedings", dcSchema.getTypes().get(0));
+            Assert.assertEquals("InProceedings".toLowerCase(), dcSchema.getTypes().get(0).toLowerCase());
             Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
             Assert.assertEquals("peanut", dcSchema.getSubjects().get(0));
             Assert.assertEquals("butter", dcSchema.getSubjects().get(1));
@@ -1037,7 +1037,7 @@ public class XMPUtilTest {
         Assert.assertEquals("J. Howison", authors.get(2));
         Assert.assertEquals("C. Masango", authors.get(3));
 
-        Assert.assertEquals("Article", bib.getTextProperty("entrytype"));
+        Assert.assertEquals("article", bib.getTextProperty("entrytype"));
         Assert.assertEquals("Effective work practices for floss development: A model and propositions",
                 bib.getTextProperty("title"));
         Assert.assertEquals("Hawaii International Conference On System Sciences (HICSS)",

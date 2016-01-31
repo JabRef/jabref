@@ -449,7 +449,7 @@ public class RepecNepImporter extends ImportFormat {
                 }
                 if (isStartOfWorkingPaper()) {
                     BibEntry be = new BibEntry(IdGenerator.next());
-                    be.setType(EntryTypes.getType("techreport"));
+                    be.setType("techreport");
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be);
                     if (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {

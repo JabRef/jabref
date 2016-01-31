@@ -31,6 +31,7 @@ public class MetaData implements Iterable<String> {
     public static final String META_FLAG = "jabref-meta: ";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
+    static final String DATABASE_TYPE = "DATABASE_TYPE";
 
     private final HashMap<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;

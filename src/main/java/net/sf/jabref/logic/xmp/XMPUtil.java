@@ -22,11 +22,11 @@ import java.util.*;
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.database.BibDatabase;
@@ -143,7 +143,11 @@ public class XMPUtil {
                 for (XMPSchema schema : schemas) {
                     XMPSchemaBibtex bib = (XMPSchemaBibtex) schema;
 
-                    result.add(bib.getBibtexEntry());
+                    BibEntry entry = bib.getBibtexEntry();
+                    if(entry.getType() == null) {
+                        entry.setType("misc");
+                    }
+                    result.add(entry);
                 }
 
                 // If we did not find anything have a look if a Dublin Core exists
@@ -156,6 +160,9 @@ public class XMPUtil {
                         BibEntry entry = XMPUtil.getBibtexEntryFromDublinCore(dc);
 
                         if (entry != null) {
+                            if(entry.getType() == null) {
+                                entry.setType("misc");
+                            }
                             result.add(entry);
                         }
                     }
@@ -166,6 +173,9 @@ public class XMPUtil {
                         .getDocumentInformation());
 
                 if (entry != null) {
+                    if(entry.getType() == null) {
+                        entry.setType("misc");
+                    }
                     result.add(entry);
                 }
             }
@@ -173,7 +183,7 @@ public class XMPUtil {
 
         // return null, if no metadata was found
         if (result.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
         return result;
     }
@@ -197,6 +207,7 @@ public class XMPUtil {
             PDDocumentInformation di) {
 
         BibEntry entry = new BibEntry();
+        entry.setType("misc");
 
         String s = di.getAuthor();
         if (s != null) {
@@ -225,10 +236,7 @@ public class XMPUtil {
                 String value = dict.getString(key);
                 key = key.substring("bibtex/".length());
                 if ("entrytype".equals(key)) {
-                    EntryType type = EntryTypes.getStandardType(value);
-                    if (type != null) {
-                        entry.setType(type);
-                    }
+                    entry.setType(value);
                 } else {
                     entry.setField(key, value);
                 }
@@ -254,8 +262,7 @@ public class XMPUtil {
      *
      * @return The bibtex entry found in the document information.
      */
-    public static BibEntry getBibtexEntryFromDublinCore(
-            XMPSchemaDublinCore dcSchema) {
+    public static BibEntry getBibtexEntryFromDublinCore(XMPSchemaDublinCore dcSchema) {
 
         BibEntry entry = new BibEntry();
 
@@ -425,10 +432,7 @@ public class XMPUtil {
         if ((l != null) && !l.isEmpty()) {
             s = l.get(0);
             if (s != null) {
-                EntryType type = EntryTypes.getStandardType(s);
-                if (type != null) {
-                    entry.setType(type);
-                }
+                entry.setType(s);
             }
         }
 
@@ -870,9 +874,9 @@ public class XMPUtil {
          *
          * Bibtex-Fields used: title
          */
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), BibDatabaseMode.BIBTEX);
         String o = typedEntry.getTypeForDisplay();
-        if (o != null) {
+        if (!o.isEmpty()) {
             dcSchema.addType(o);
         }
     }
@@ -1024,8 +1028,7 @@ public class XMPUtil {
                         entry.getField(field));
             }
         }
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty());
-        di.setCustomMetadataValue("bibtex/entrytype", typedEntry.getTypeForDisplay());
+        di.setCustomMetadataValue("bibtex/entrytype", EntryUtil.capitalizeFirst(entry.getType()));
     }
 
     /**
@@ -1186,7 +1189,7 @@ public class XMPUtil {
 
                 for (BibEntry entry : l) {
                     StringWriter sw = new StringWriter();
-                    bibtexEntryWriter.write(entry, sw);
+                    bibtexEntryWriter.write(entry, sw, BibDatabaseMode.BIBTEX);
                     System.out.println(sw.getBuffer());
                 }
 

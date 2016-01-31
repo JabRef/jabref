@@ -92,7 +92,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
                     fileType = type;
                 } else {
-                    JabRefDesktop.openExternalViewer(frame.getCurrentBasePanel().metaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), link, fieldName);
                     return true;
                 }
             }

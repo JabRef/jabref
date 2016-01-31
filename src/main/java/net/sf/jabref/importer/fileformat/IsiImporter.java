@@ -335,8 +335,7 @@ public class IsiImporter extends ImportFormat {
                 continue;
             }
 
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getTypeOrDefault(Type));
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, Type);
             // id assumes an existing database so don't
 
             // Remove empty fields:

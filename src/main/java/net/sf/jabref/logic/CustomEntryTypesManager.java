@@ -2,6 +2,7 @@ package net.sf.jabref.logic;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -38,11 +39,11 @@ public class CustomEntryTypesManager {
      * JabRefFrame when the program closes.
      */
     public static void saveCustomEntryTypes(JabRefPreferences prefs) {
-        Iterator<String> iterator = EntryTypes.getAllTypes().iterator();
+        Iterator<String> iterator = EntryTypes.getAllTypes(BibDatabaseMode.BIBTEX).iterator();
         int number = 0;
 
         while (iterator.hasNext()) {
-            EntryType entryType = EntryTypes.getType(iterator.next());
+            EntryType entryType = EntryTypes.getType(iterator.next(), BibDatabaseMode.BIBTEX);
             if (entryType instanceof CustomEntryType) {
                 // Store this entry type.
                 prefs.storeCustomEntryType((CustomEntryType) entryType, number);

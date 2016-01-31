@@ -170,8 +170,7 @@ public class FileActions {
      * let the user save only the results of a search. False and false means all
      * entries are saved.
      */
-    public static SaveSession saveDatabase(BibDatabase database,
-                                           MetaData metaData, File file, JabRefPreferences prefs,
+    public static SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, File target, JabRefPreferences prefs,
                                            boolean checkSearch, boolean checkGroup, Charset encoding, boolean suppressBackup)
             throws SaveException {
 
@@ -183,7 +182,7 @@ public class FileActions {
         SaveSession session;
         BibEntry exceptionCause = null;
         try {
-            session = new SaveSession(file, encoding, backup);
+            session = new SaveSession(target, encoding, backup);
         } catch (Throwable e) {
             if (encoding != null) {
                 LOGGER.error("Error from encoding: '" + encoding.displayName(), e);
@@ -205,18 +204,18 @@ public class FileActions {
             FileActions.writeBibFileHeader(writer, encoding);
 
             // Write preamble if there is one.
-            FileActions.writePreamble(writer, database.getPreamble());
+            FileActions.writePreamble(writer, bibDatabaseContext.getDatabase().getPreamble());
 
             // Write strings if there are any.
-            FileActions.writeStrings(writer, database);
+            FileActions.writeStrings(writer, bibDatabaseContext.getDatabase());
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            List<BibEntry> sorter = FileActions.getSortedEntries(database, metaData, null, true);
+            List<BibEntry> sorter = FileActions.getSortedEntries(bibDatabaseContext.getDatabase(), bibDatabaseContext.getMetaData(), null, true);
 
-            sorter = FileActions.applySaveActions(sorter, metaData);
+            sorter = FileActions.applySaveActions(sorter, bibDatabaseContext.getMetaData());
 
             BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
 
@@ -226,9 +225,9 @@ public class FileActions {
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                EntryType entryType = EntryTypes.getType(entry.getType());
+                EntryType entryType = EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode());
 
-                if (EntryTypes.getStandardType(entryType.getName()) == null) {
+                if (EntryTypes.getStandardType(entryType.getName(), bibDatabaseContext.getMode()) == null) {
                     types.put(entryType.getName(), entryType);
                 }
 
@@ -244,13 +243,13 @@ public class FileActions {
                 }
 
                 if (write) {
-                    bibtexEntryWriter.write(entry, writer);
+                    bibtexEntryWriter.write(entry, writer, bibDatabaseContext.getMode());
                 }
             }
 
             // Write meta data.
-            if (metaData != null) {
-                metaData.writeMetaData(writer);
+            if (bibDatabaseContext.getMetaData() != null) {
+                bibDatabaseContext.getMetaData().writeMetaData(writer);
             }
 
             // Write type definitions, if any:
@@ -266,8 +265,8 @@ public class FileActions {
             }
 
             //finally write whatever remains of the file, but at least a concluding newline
-            if ((database.getEpilog() != null) && !(database.getEpilog().isEmpty())) {
-                writer.write(database.getEpilog());
+            if ((bibDatabaseContext.getDatabase().getEpilog() != null) && !(bibDatabaseContext.getDatabase().getEpilog().isEmpty())) {
+               writer.write(bibDatabaseContext.getDatabase().getEpilog());
             } else {
                 writer.write(Globals.NEWLINE);
             }
@@ -378,8 +377,7 @@ public class FileActions {
      *
      * @return A List containing warnings, if any.
      */
-    public static SaveSession savePartOfDatabase(BibDatabase database, MetaData metaData,
-                                                 File file,
+    public static SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, File target,
                                                  JabRefPreferences prefs, BibEntry[] bes, Charset encoding, DatabaseSaveType saveType)
             throws SaveException {
 
@@ -389,7 +387,7 @@ public class FileActions {
 
         SaveSession session;
         try {
-            session = new SaveSession(file, encoding, backup);
+            session = new SaveSession( target, encoding, backup);
         } catch (IOException e) {
             throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
@@ -407,16 +405,16 @@ public class FileActions {
             }
 
             // Write preamble if there is one.
-            FileActions.writePreamble(fw, database.getPreamble());
+            FileActions.writePreamble(fw, bibDatabaseContext.getDatabase().getPreamble());
 
             // Write strings if there are any.
-            FileActions.writeStrings(fw, database);
+            FileActions.writeStrings(fw, bibDatabaseContext.getDatabase());
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            List<Comparator<BibEntry>> comparators = FileActions.getSaveComparators(true, metaData);
+            List<Comparator<BibEntry>> comparators = FileActions.getSaveComparators(true, bibDatabaseContext.getMetaData());
 
             // Use glazed lists to get a sorted view of the entries:
             List<BibEntry> sorter = new ArrayList<>(bes.length);
@@ -431,12 +429,12 @@ public class FileActions {
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
-                EntryType tp = EntryTypes.getType(be.getType());
-                if (EntryTypes.getStandardType(tp.getName()) == null) {
+                EntryType tp = EntryTypes.getType(be.getType(), bibDatabaseContext.getMode());
+                if (EntryTypes.getStandardType(tp.getName(), bibDatabaseContext.getMode()) == null) {
                     types.put(tp.getName(), tp);
                 }
 
-                bibtexEntryWriter.write(be, fw);
+                bibtexEntryWriter.write(be, fw, bibDatabaseContext.getMode());
                 //only append newline if the entry has changed
                 if (!be.hasChanged()) {
                     fw.write(Globals.NEWLINE);
@@ -444,8 +442,8 @@ public class FileActions {
             }
 
             // Write meta data.
-            if ((saveType != DatabaseSaveType.PLAIN_BIBTEX) && (metaData != null)) {
-                metaData.writeMetaData(fw);
+            if ((saveType != DatabaseSaveType.PLAIN_BIBTEX) && (bibDatabaseContext.getMetaData() != null)) {
+                bibDatabaseContext.getMetaData().writeMetaData(fw);
             }
 
             // Write type definitions, if any:

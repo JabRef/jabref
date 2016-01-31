@@ -168,7 +168,7 @@ public class PdfImporter {
         int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
         // Get a list of file directories:
-        List<String> dirsS = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirsS = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
 
         List<BibEntry> res = new ArrayList<>();
 
@@ -272,7 +272,7 @@ public class PdfImporter {
 
                     panel.database().insertEntry(entry);
                     panel.markBaseChanged();
-                    LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
+                    LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
                     dfh = new DroppedFileHandler(frame, panel);
                     dfh.linkPdfToEntry(fileName, entryTable, entry);
                     panel.highlightEntry(entry);
@@ -318,7 +318,7 @@ public class PdfImporter {
 
         if (type != null) { // Only if the dialog was not cancelled.
             String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, type);
+            final BibEntry be = new BibEntry(id, type.getName());
             try {
                 panel.database().insertEntry(be);
 

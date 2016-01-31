@@ -15,10 +15,13 @@
  */
 package net.sf.jabref.exporter;
 
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.database.BibDatabaseMode;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,9 +41,7 @@ public class AutoSaveManager {
     private final JabRefFrame frame;
     private Timer t;
 
-
     public AutoSaveManager(JabRefFrame frame) {
-
         this.frame = frame;
     }
 
@@ -69,7 +70,7 @@ public class AutoSaveManager {
             // there could be changes done by the user while this method is running.
 
             for (BasePanel panel : frame.getBasePanelList()) {
-                if (panel.isModified() && (panel.getDatabaseFile() != null)) {
+                if (panel.isModified() && (panel.getBibDatabaseContext().getDatabaseFile() != null)) {
                         AutoSaveManager.autoSave(panel);
                 }
             }
@@ -83,8 +84,7 @@ public class AutoSaveManager {
      * @return its corresponding autosave file.
      */
     public static File getAutoSaveFile(File f) {
-        String n = f.getName();
-        return new File(f.getParentFile(), ".$" + n + '$');
+        return new File(f.getParentFile(), ".$" + f.getName() + '$');
     }
 
     /**
@@ -93,11 +93,11 @@ public class AutoSaveManager {
      * @return true if successful, false otherwise.
      */
     private static boolean autoSave(BasePanel panel) {
-        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getDatabaseFile());
+        File databaseFile = panel.getBibDatabaseContext().getDatabaseFile();
+        File backupFile = AutoSaveManager.getAutoSaveFile(databaseFile);
         try {
-            SaveSession ss = FileActions.saveDatabase(panel.database(), panel.metaData(),
-                    backupFile, Globals.prefs,
-                    false, false, panel.getEncoding(), true);
+            SaveSession ss = FileActions.saveDatabase(panel.getBibDatabaseContext(),
+                    backupFile, Globals.prefs, false, false, panel.getEncoding(), true);
             ss.commit();
         } catch (SaveException e) {
             LOGGER.error("Problem with automatic save", e);
@@ -112,10 +112,10 @@ public class AutoSaveManager {
      * @return true if there was no autosave or if the autosave was successfully deleted, false otherwise.
      */
     public static boolean deleteAutoSaveFile(BasePanel panel) {
-        if (panel.getDatabaseFile() == null) {
+        if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
             return true;
         }
-        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getDatabaseFile());
+        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getBibDatabaseContext().getDatabaseFile());
         if (backupFile.exists()) {
             return backupFile.delete();
         } else {

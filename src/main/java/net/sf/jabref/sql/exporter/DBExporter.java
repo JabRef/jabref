@@ -28,6 +28,8 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.*;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,7 +37,6 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -81,7 +82,8 @@ public abstract class DBExporter extends DBImporterExporter {
 
         final int database_id = getDatabaseIDByName(metaData, out, dbName);
         removeAllRecordsForAGivenDB(out, database_id);
-        populateEntryTypesTable(out);
+        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+        populateEntryTypesTable(out, new BibDatabaseContext(database, metaData, defaults).getMode());
         populateEntriesTable(database_id, entries, out);
         populateStringTable(database, out, database_id);
         populateGroupTypesTable(out);
@@ -186,9 +188,10 @@ public abstract class DBExporter extends DBImporterExporter {
      * Generates the SQL required to populate the entry_types table with jabref data.
      *
      * @param out The output (PrintSream or Connection) object to which the DML should be written.
+     * @param type
      */
 
-    private void populateEntryTypesTable(Object out) throws SQLException {
+    private void populateEntryTypesTable(Object out, BibDatabaseMode type) throws SQLException {
         List<String> fieldRequirement = new ArrayList<>();
 
         List<String> existentTypes = new ArrayList<>();
@@ -200,7 +203,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
             }
         }
-        for (EntryType val : EntryTypes.getAllValues()) {
+        for (EntryType val : EntryTypes.getAllValues(type)) {
             StringBuilder querySB = new StringBuilder();
 
             fieldRequirement.clear();

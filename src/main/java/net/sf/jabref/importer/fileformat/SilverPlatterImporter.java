@@ -212,8 +212,7 @@ public class SilverPlatterImporter extends ImportFormat {
 
                 }
 
-                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                        .getTypeOrDefault(type)); // id assumes an existing database so don't
+                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
                 // create one here
                 b.setField(h);
 

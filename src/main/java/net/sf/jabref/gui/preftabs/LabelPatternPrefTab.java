@@ -28,6 +28,7 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
@@ -57,8 +58,8 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
     private final JTextField KeyPatternReplacement = new JTextField(20);
 
 
-    public LabelPatternPrefTab(JabRefPreferences prefs, AboutDialog helpDiag) {
-        super(helpDiag);
+    public LabelPatternPrefTab(JabRefPreferences prefs, AboutDialog helpDiag, BasePanel panel) {
+        super(helpDiag, panel);
         this.prefs = prefs;
         appendKeyGeneratorSettings();
     }

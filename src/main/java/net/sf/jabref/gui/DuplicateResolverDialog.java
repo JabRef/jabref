@@ -16,8 +16,6 @@
 package net.sf.jabref.gui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -53,19 +51,22 @@ public class DuplicateResolverDialog extends JDialog {
 
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton merge = new JButton(Localization.lang("Keep merged entry only"));
+    private final JabRefFrame frame;
     private JButton removeExact;
     private final JPanel options = new JPanel();
     private int status = DuplicateResolverDialog.NOT_CHOSEN;
     private MergeEntries me;
     private PositionWindow pw;
 
-    public DuplicateResolverDialog(JFrame frame, BibEntry one, BibEntry two, int type) {
+    public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
+        this.frame = frame;
         init(one, two, type);
     }
 
-    public DuplicateResolverDialog(JDialog frame, BibEntry one, BibEntry two, int type) {
+    public DuplicateResolverDialog(ImportInspectionDialog frame, BibEntry one, BibEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
+        this.frame = frame.frame;
         init(one, two, type);
     }
 
@@ -78,28 +79,28 @@ public class DuplicateResolverDialog extends JDialog {
             first = new JButton(Localization.lang("Keep left"));
             second = new JButton(Localization.lang("Keep right"));
             both = new JButton(Localization.lang("Keep both"));
-            me = new MergeEntries(one, two);
+            me = new MergeEntries(one, two, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             break;
         case INSPECTION:
             first = new JButton(Localization.lang("Remove old entry"));
             second = new JButton(Localization.lang("Remove entry from import"));
             both = new JButton(Localization.lang("Keep both"));
             me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                    Localization.lang("From import"));
+                    Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             break;
         case DUPLICATE_SEARCH_WITH_EXACT:
             first = new JButton(Localization.lang("Keep left"));
             second = new JButton(Localization.lang("Keep right"));
             both = new JButton(Localization.lang("Keep both"));
             removeExact = new JButton(Localization.lang("Automatically remove exact duplicates"));
-            me = new MergeEntries(one, two);
+            me = new MergeEntries(one, two, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             break;
         default:
             first = new JButton(Localization.lang("Import and remove old entry"));
             second = new JButton(Localization.lang("Do not import entry"));
             both = new JButton(Localization.lang("Import and keep old entry"));
             me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                    Localization.lang("From import"));
+                    Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
         }
 
         if (removeExact != null) {
@@ -112,56 +113,14 @@ public class DuplicateResolverDialog extends JDialog {
         options.add(Box.createHorizontalStrut(5));
         options.add(cancel);
 
-        first.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(KEEP_UPPER);
-            }
-        });
-
-        second.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(KEEP_LOWER);
-            }
-        });
-
-        both.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(KEEP_BOTH);
-            }
-        });
-
-        merge.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(KEEP_MERGE);
-            }
-        });
-
+        first.addActionListener(e -> buttonPressed(KEEP_UPPER));
+        second.addActionListener(e -> buttonPressed(KEEP_LOWER));
+        both.addActionListener(e -> buttonPressed(KEEP_BOTH));
+        merge.addActionListener(e -> buttonPressed(KEEP_MERGE));
         if (removeExact != null) {
-            removeExact.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    buttonPressed(AUTOREMOVE_EXACT);
-                }
-            });
+            removeExact.addActionListener(e -> buttonPressed(AUTOREMOVE_EXACT));
         }
-
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(BREAK);
-            }
-        });
-
+        cancel.addActionListener(e -> buttonPressed(BREAK));
 
         getContentPane().add(me.getMergeEntryPanel());
         getContentPane().add(options, BorderLayout.SOUTH);
@@ -203,24 +162,6 @@ public class DuplicateResolverDialog extends JDialog {
 
     public BibEntry getMergedEntry() {
         return me.getMergeEntry();
-    }
-
-    public static int resolveDuplicate(JFrame frame, BibEntry one, BibEntry two) {
-        DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two, DuplicateResolverDialog.DUPLICATE_SEARCH);
-        drd.setVisible(true); // drd.show(); -> deprecated since 1.5
-        return drd.getSelected();
-    }
-
-    public static int resolveDuplicate(JDialog frame, BibEntry one, BibEntry two) {
-        DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two, DuplicateResolverDialog.DUPLICATE_SEARCH);
-        drd.setVisible(true); // drd.show(); -> deprecated since 1.5
-        return drd.getSelected();
-    }
-
-    public static int resolveDuplicateInImport(JabRefFrame frame, BibEntry existing, BibEntry imported) {
-        DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, existing, imported, DuplicateResolverDialog.IMPORT_CHECK);
-        drd.setVisible(true); // drd.show(); -> deprecated since 1.5
-        return drd.getSelected();
     }
 
 }

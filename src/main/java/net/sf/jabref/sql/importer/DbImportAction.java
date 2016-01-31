@@ -163,7 +163,7 @@ public class DbImportAction extends AbstractWorker {
                             importer.removeDB(dialogo, dbName, conn, metaData);
                             performImport();
                         } else if (dialogo.moreThanOne) {
-                            databases = importer.performImport(dbs, dialogo.listOfDBs);
+                            databases = importer.performImport(dbs, dialogo.listOfDBs, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
                             for (DBImporterResult res : databases) {
                                 database = res.getDatabase();
                                 metaData = res.getMetaData();
@@ -199,7 +199,7 @@ public class DbImportAction extends AbstractWorker {
             metaData = res.getMetaData();
             if (database != null) {
                 BasePanel pan = frame.addTab(database, null, metaData, Globals.prefs.getDefaultEncoding(), true);
-                pan.metaData().setDBStrings(dbs);
+                pan.getBibDatabaseContext().getMetaData().setDBStrings(dbs);
                 frame.setTabTitle(pan, res.getName() + "(Imported)", "Imported DB");
                 pan.markBaseChanged();
             }

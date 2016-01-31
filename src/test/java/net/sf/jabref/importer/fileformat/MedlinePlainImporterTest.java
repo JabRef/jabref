@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.jabref.model.database.BibDatabaseMode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -174,7 +175,7 @@ public class MedlinePlainImporterTest {
             List<BibEntry> actualEntries = importer.importEntries(stream, new OutputPrinterToNull());
 
             BibEntry expectedEntry = new BibEntry();
-            expectedEntry.setType(EntryTypes.getType("article"));
+            expectedEntry.setType(EntryTypes.getType("article", BibDatabaseMode.BIBTEX));
             BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
         }
     }

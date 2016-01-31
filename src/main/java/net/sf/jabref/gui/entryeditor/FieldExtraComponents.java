@@ -49,6 +49,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -76,8 +77,8 @@ public class FieldExtraComponents {
             BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
-        if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
-            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.metaData,
+        if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
+            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                     storeFieldAction, false, ", ");
             contentSelectors.add(ws);
             controls.add(ws, BorderLayout.NORTH);
@@ -166,7 +167,7 @@ public class FieldExtraComponents {
             off = new OpenFileFilter(new String[] {ext});
         }
 
-        return Optional.of(new ExternalFilePanel(frame, panel.metaData(), entryEditor, fieldEditor.getFieldName(), off,
+        return Optional.of(new ExternalFilePanel(frame, panel.getBibDatabaseContext().getMetaData(), entryEditor, fieldEditor.getFieldName(), off,
                 fieldEditor));
     }
 
@@ -211,9 +212,10 @@ public class FieldExtraComponents {
      *
      * @param fieldEditor
      * @param entryEditor
+     * @param type
      * @return
      */
-    public static Optional<JComponent> getMonthExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
+    public static Optional<JComponent> getMonthExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor, BibDatabaseMode type) {
         final String[] options = new String[13];
         options[0] = Localization.lang("Select");
         for (int i = 1; i <= 12; i++) {
@@ -226,7 +228,7 @@ public class FieldExtraComponents {
             public void actionPerformed(ActionEvent actionEvent) {
                 int monthnumber = month.getSelectedIndex();
                 if (monthnumber >= 1) {
-                    if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+                    if (type == BibDatabaseMode.BIBLATEX) {
                         fieldEditor.setText(String.valueOf(monthnumber));
                     } else {
                         fieldEditor.setText((MonthUtil.getMonthByNumber(monthnumber).bibtexFormat));
@@ -290,7 +292,7 @@ public class FieldExtraComponents {
      */
     public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
             Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
-        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.metaData,
+        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                 storeFieldAction, false,
                 "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");
         contentSelectors.add(ws);

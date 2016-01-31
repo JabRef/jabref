@@ -39,7 +39,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.common.base.Strings;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class BibEntry {
@@ -48,6 +47,7 @@ public class BibEntry {
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
     public static final String ID_FIELD = "id";
+    public static final String DEFAULT_TYPE = "misc";
 
     private String id;
     private String type;
@@ -72,11 +72,7 @@ public class BibEntry {
     }
 
     public BibEntry(String id) {
-        this(id, EntryTypes.getTypeOrDefault("misc"));
-    }
-
-    public BibEntry(String id, EntryType type) {
-        this(id, type.getName());
+        this(id, DEFAULT_TYPE);
     }
 
     public BibEntry(String id, String type) {

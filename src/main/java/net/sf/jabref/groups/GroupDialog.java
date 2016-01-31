@@ -149,7 +149,7 @@ class GroupDialog extends JDialog {
         builderKG.append(Localization.lang("Keyword"));
         builderKG.append(m_kgSearchTerm);
         builderKG.append(new FieldContentSelector(jabrefFrame, m_basePanel, this,
-                m_kgSearchTerm, m_basePanel.metaData(), null, true, ", "));
+                m_kgSearchTerm, m_basePanel.getBibDatabaseContext().getMetaData(), null, true, ", "));
         builderKG.nextLine();
         builderKG.append(m_kgCaseSensitive, 3);
         builderKG.nextLine();

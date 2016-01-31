@@ -204,7 +204,7 @@ public class OAI2Fetcher implements EntryFetcher {
             oai2Connection.setRequestProperty("User-Agent", "JabRef");
 
             /* create an empty BibEntry and set the oai2identifier field */
-            BibEntry be = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
+            BibEntry be = new BibEntry(IdGenerator.next(), "article");
             be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, key);
             DefaultHandler handlerBase = new OAI2Handler(be);
 

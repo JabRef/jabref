@@ -60,7 +60,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     public RightClickMenu(BasePanel panel, MetaData metaData) {
         this.panel = panel;
         this.metaData = metaData;
-        JMenu typeMenu = ChangeEntryTypeMenu.getChangeEntryTypeMenu(panel);
+        JMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
         boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
 
@@ -229,7 +229,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         panel.storeCurrentEdit();
-        GroupTreeNode groups = panel.metaData().getGroups();
+        GroupTreeNode groups = panel.getBibDatabaseContext().getMetaData().getGroups();
         if (groups == null) {
             groupAdd.setEnabled(false);
             groupRemove.setEnabled(false);

@@ -37,7 +37,7 @@ public class OAI2ImportTest {
     public void setUp() throws Exception {
         parserFactory = SAXParserFactory.newInstance();
         saxParser = parserFactory.newSAXParser();
-        be = new BibEntry(IdGenerator.next(), EntryTypes.getType("article"));
+        be = new BibEntry(IdGenerator.next(), "article");
         handler = new OAI2Handler(be);
     }
 

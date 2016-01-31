@@ -31,8 +31,8 @@ package net.sf.jabref.model.database;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.entry.TypedBibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,6 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * A bibliography database.
  */
 public class BibDatabase {
+
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**
@@ -68,8 +69,8 @@ public class BibDatabase {
      */
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
-    public BibDatabaseType getBibType() {
-        return BibDatabaseTypeDetection.inferType(entries.values());
+    public BibDatabaseMode getBibType() {
+        return BibDatabaseModeDetection.inferMode(this);
     }
 
     /**
@@ -543,7 +544,7 @@ public class BibDatabase {
      * unset fields in the entry linked by the "crossref" field, if any.
      *
      * @param field    The field to return the value of.
-     * @param entry   maybenull
+     * @param entry    maybenull
      *                 The bibtex entry which contains the field.
      * @param database maybenull
      *                 The database of the bibtex entry.
@@ -551,8 +552,7 @@ public class BibDatabase {
      */
     public static String getResolvedField(String field, BibEntry entry, BibDatabase database) {
         if ("bibtextype".equals(field)) {
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.ofNullable(database));
-            return typedEntry.getTypeForDisplay();
+            return EntryUtil.capitalizeFirst(entry.getType());
         }
 
         // TODO: Changed this to also consider alias fields, which is the expected

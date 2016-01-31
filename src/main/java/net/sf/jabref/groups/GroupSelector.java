@@ -1419,7 +1419,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             frame.sidePaneManager.hide("groups");
             return;
         }
-        MetaData metaData = panel.metaData();
+        MetaData metaData = panel.getBibDatabaseContext().getMetaData();
         if (metaData.getGroups() == null) {
             GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());
             metaData.setGroups(newGroupsRoot);
