@@ -48,8 +48,6 @@ class OOUtil {
 
     private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
 
-    public static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();
-
     private static final String UNIQUEFIER_FIELD = "uniq";
 
 
@@ -107,8 +105,7 @@ class OOUtil {
      * @throws UnknownPropertyException
      * @throws IllegalArgumentException
      */
-    public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor,
- String lText,
+    public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor, String lText,
             String parStyle) throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
                     WrappedTargetException, IllegalArgumentException {
 
@@ -186,11 +183,10 @@ class OOUtil {
         cursor.collapseToEnd();
     }
 
-    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-            boolean bold, boolean italic, boolean monospace, boolean smallCaps, boolean superscript,
- boolean subscript)
-                    throws UnknownPropertyException, PropertyVetoException,
-                    WrappedTargetException, IllegalArgumentException {
+    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, boolean bold,
+            boolean italic, boolean monospace, boolean smallCaps, boolean superscript, boolean subscript)
+                    throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
+                    IllegalArgumentException {
         text.insertString(cursor, string, true);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
@@ -298,31 +294,5 @@ class OOUtil {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Make a cloned BibEntry and do the necessary preprocessing for use by the plugin.
-     * If the running JabRef version doesn't support post-processing in Layout, this
-     * preprocessing includes running the OOPreFormatter formatter for all fields except the
-     * BibTeX key.
-     * @param entry the original entry
-     * @return the cloned and processed entry
-     */
-    public static BibEntry createAdaptedEntry(BibEntry entry) {
-        if (entry == null) {
-            return null;
-        }
-        BibEntry e = (BibEntry) entry.clone();
-        for (String field : e.getFieldNames()) {
-            if (field.equals(BibEntry.KEY_FIELD)) {
-                continue;
-            }
-            // If the running JabRef version doesn't support post-processing in Layout,
-            // preprocess fields instead:
-            if (!OpenOfficePanel.postLayoutSupported && (e.hasField(field))) {
-                e.setField(field, OOUtil.POSTFORMATTER.format(e.getField(field)));
-            }
-        }
-        return e;
     }
 }

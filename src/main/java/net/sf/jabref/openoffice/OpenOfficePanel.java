@@ -19,8 +19,6 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
-import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -56,23 +54,6 @@ public class OpenOfficePanel extends AbstractWorker {
 
     public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
     public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
-
-    // This field indicates whether the running JabRef supports post formatters in Layout:
-    public static boolean postLayoutSupported;
-
-    static {
-        postLayoutSupported = true;
-        try {
-            Layout l = new LayoutHelper(new StringReader("")).
-                    getLayoutFromText(Globals.FORMATTER_PACKAGE);
-            l.setPostFormatter(null);
-        } catch (NoSuchMethodError ex) {
-            postLayoutSupported = false;
-        } catch (Exception ignore) {
-            // Ignored
-        }
-
-    }
 
     private OOPanel comp;
     private JDialog diag;
