@@ -24,11 +24,15 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         awtExceptionHandler = new AWTExceptionHandler();
         awtExceptionHandler.installExceptionDetectionInEDT();
         application(JabRefMain.class).start();
+
+        robot().settings().timeoutToFindSubMenu(1_000);
     }
+
+
 
     @Test
     public void testExit() {
-        FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10000).using(robot());
+        FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
         Pause.pause(1_000);
         exitJabRef(mainFrame);
     }
@@ -40,7 +44,7 @@ public class GUITest extends AssertJSwingJUnitTestCase {
 
     @Test
     public void testNewFile() {
-        FrameFixture mainFrame = findFrame(JabRefFrame.class).using(robot());
+        FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
         newDatabase(mainFrame);
 
         mainFrame.menuItemWithPath("File", "Close database").click();
@@ -53,12 +57,12 @@ public class GUITest extends AssertJSwingJUnitTestCase {
 
     @Test
     public void testCreateBibtexEntry() {
-        FrameFixture mainFrame = findFrame(JabRefFrame.class).using(robot());
+        FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
 
         newDatabase(mainFrame);
 
         mainFrame.menuItemWithPath("BibTeX", "New entry").click();
-        findDialog(EntryTypeDialog.class).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
+        findDialog(EntryTypeDialog.class).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
 
             @Override protected boolean isMatching(@Nonnull JButton jButton) {
                 return "Book".equals(jButton.getText());
@@ -70,10 +74,10 @@ public class GUITest extends AssertJSwingJUnitTestCase {
 
     @Test
     public void testOpenAndSavePreferences() {
-        FrameFixture mainFrame = findFrame(JabRefFrame.class).using(robot());
+        FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
 
         mainFrame.menuItemWithPath("Options", "Preferences").click();
-        findDialog(PreferencesDialog.class).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
+        findDialog(PreferencesDialog.class).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
 
             @Override protected boolean isMatching(@Nonnull JButton jButton) {
                 return "OK".equals(jButton.getText());
@@ -85,7 +89,7 @@ public class GUITest extends AssertJSwingJUnitTestCase {
 
     @Test
     public void testViewChanges() {
-        FrameFixture mainFrame = findFrame(JabRefFrame.class).using(robot());
+        FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
 
         newDatabase(mainFrame);
 
