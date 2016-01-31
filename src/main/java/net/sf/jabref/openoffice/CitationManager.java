@@ -26,8 +26,10 @@ import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyExistException;
 import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.IllegalArgumentException;
+import com.sun.star.lang.WrappedTargetException;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
@@ -58,13 +60,14 @@ class CitationManager {
     private static final Log LOGGER = LogFactory.getLog(CitationManager.class);
 
 
-    public CitationManager(final JabRefFrame frame, OOBibBase ooBase) throws Exception {
+    public CitationManager(final JabRefFrame frame, OOBibBase ooBase)
+            throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
         diag = new JDialog(frame, Localization.lang("Manage citations"), true);
         this.ooBase = ooBase;
 
         list = new BasicEventList<>();
         XNameAccess nameAccess = ooBase.getReferenceMarks();
-        String[] names = ooBase.getJabRefReferenceMarks(nameAccess);
+        java.util.List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
             list.add(new CitEntry(name,
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",

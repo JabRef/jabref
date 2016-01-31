@@ -29,6 +29,10 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.container.NoSuchElementException;
+import com.sun.star.lang.WrappedTargetException;
+
 import javax.swing.*;
 
 import org.apache.commons.logging.Log;
@@ -38,6 +42,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -81,7 +86,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private boolean dialogOkPressed;
     private boolean autoDetected;
     private String sOffice;
-    private Throwable connectException;
+    private IOException connectException;
 
     private static OpenOfficePanel instance;
 
@@ -187,8 +192,10 @@ public class OpenOfficePanel extends AbstractWorker {
             public void actionPerformed(ActionEvent event) {
                 try {
                     ooBase.selectDocument();
-                    frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle());
-                } catch (Exception ex) {
+                    frame.output(Localization.lang("Connected to document") + ": "
+                            + ooBase.getCurrentDocumentTitle().orElse(""));
+                } catch (UnknownPropertyException | WrappedTargetException | IndexOutOfBoundsException |
+                        NoSuchElementException | NoDocumentException ex) {
                     JOptionPane.showMessageDialog(frame, ex.getMessage(), Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -209,7 +216,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
                     try {
                         readStyleFile();
-                    } catch (Exception ex) {
+                    } catch (IOException ex) {
                         LOGGER.warn("Could not read style file", ex);
                     }
                 }
@@ -261,7 +268,7 @@ public class OpenOfficePanel extends AbstractWorker {
                         } else {
                             style.ensureUpToDate();
                         }
-                    } catch (Throwable ex) {
+                    } catch (IOException ex) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
                                 Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
                         return;
@@ -326,7 +333,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 try {
                     CitationManager cm = new CitationManager(frame, ooBase);
                     cm.showDialog();
-                } catch (Exception e) {
+                } catch (NoSuchElementException | WrappedTargetException | UnknownPropertyException e) {
                     LOGGER.warn("Problem showing citation manager", e);
                 }
             }
@@ -442,7 +449,7 @@ public class OpenOfficePanel extends AbstractWorker {
             URL[] jarList = new URL[jarFiles.length];
             for (int i = 0; i < jarList.length; i++) {
                 if (!jarFiles[i].exists()) {
-                    throw new Exception("File not found: " + jarFiles[i].getPath());
+                    throw new IOException("File not found: " + jarFiles[i].getPath());
                 }
                 jarList[i] = jarFiles[i].toURI().toURL();
             }
@@ -459,7 +466,8 @@ public class OpenOfficePanel extends AbstractWorker {
             }
 
             if (ooBase.isConnectedToDocument()) {
-                frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle());
+                frame.output(Localization.lang("Connected to document") + ": "
+                        + ooBase.getCurrentDocumentTitle().orElse(""));
             }
 
             // Enable actions that depend on Connect:
@@ -477,7 +485,7 @@ public class OpenOfficePanel extends AbstractWorker {
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Unable to connect. One possible reason is that JabRef "
                             + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
-        } catch (Throwable e) {
+        } catch (IOException e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not connect to running OpenOffice.")
@@ -496,10 +504,9 @@ public class OpenOfficePanel extends AbstractWorker {
         try {
             // Connect:
             ooBase = new OOBibBase(sOffice, true);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             ooBase = null;
-            connectException = e;
-            //JOptionPane.showMessageDialog(frame, Globals.lang("Unable to connect"));
+            connectException = new IOException(e.getMessage());
         }
     }
 
@@ -507,7 +514,7 @@ public class OpenOfficePanel extends AbstractWorker {
      * Read the style file. Record the last modified time of the file.
      * @throws Exception
      */
-    private void readStyleFile() throws Exception {
+    private void readStyleFile() throws IOException {
         if (useDefaultAuthoryearStyle) {
             URL defPath = JabRef.class.getResource(DEFAULT_AUTHORYEAR_STYLE_PATH);
             Reader r = new InputStreamReader(defPath.openStream());
@@ -539,8 +546,9 @@ public class OpenOfficePanel extends AbstractWorker {
             for (URL anU : u) {
                 method.invoke(sysloader, anU);
             }
-        } catch (Throwable t) {
-            LOGGER.error("Could not add URL to system classloader", t);
+        } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
+                InvocationTargetException e) {
+            LOGGER.error("Could not add URL to system classloader", e);
             throw new IOException("Error, could not add URL to system classloader");
         }
     }

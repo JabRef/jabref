@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,36 +15,14 @@
 */
 package net.sf.jabref.openoffice;
 
-import com.sun.star.awt.Point;
-
 /**
- *
+ * Exception used to indicate that the plugin attempted to set a character format that is
+ * not defined in the current OpenOffice document.
  */
-class ComparableMark implements Comparable<ComparableMark> {
+class NoDocumentException extends Exception {
 
-    private final String name;
-    private final Point position;
-
-
-    public ComparableMark(String name, Point position) {
-        this.name = name;
-        this.position = position;
+    public NoDocumentException(String message) {
+        super(message);
     }
 
-    @Override
-    public int compareTo(ComparableMark other) {
-        if (position.Y == other.position.Y) {
-            return position.X - other.position.X;
-        } else {
-            return position.Y - other.position.Y;
-        }
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Point getPosition() {
-        return position;
-    }
 }

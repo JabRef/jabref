@@ -81,9 +81,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private File styleFile;
     private static long styleFileModificationTime = Long.MIN_VALUE;
 
-    //private Pattern quoted = Pattern.compile("\".*^\\\\\"");
-    private static final Pattern quoted = Pattern.compile("\".*\"");
     private final JournalAbbreviationRepository repository;
+    private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
     private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
@@ -315,7 +314,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         if ((index > 0) && (index <= (line.length() - 1))) {
             String propertyName = line.substring(0, index).trim();
             String value = line.substring(index + 1);
-            if ((value.trim().length() > 2) && quoted.matcher(value.trim()).matches()) {
+            if ((value.trim().length() > 2) && QUOTED.matcher(value.trim()).matches()) {
                 value = value.trim().substring(1, value.trim().length() - 1);
             }
             Object toSet = value;
@@ -565,7 +564,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     * Modify entry and uniqiefier arrays to facilitate a grouped presentation of uniqiefied entries.
+     * Modify entry and uniquefier arrays to facilitate a grouped presentation of uniquefied entries.
      *
      * @param entries     The entry array.
      * @param uniquefiers The uniquefier array.
@@ -610,16 +609,15 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
         StringBuffer sb = new StringBuffer(startBrace);
         for (int j = 0; j < entries.length; j++) {
-
-            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
-            int maxAuthors = unlimA > 0 ? unlimA : maxA;
-
             BibEntry entry = entries[j];
 
             // Check if this entry has been nulled due to grouping with the previous entry(ies):
             if (entry == null) {
                 continue;
             }
+
+            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
+            int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             if (j > 0) {
                 sb.append(citationSeparator);
