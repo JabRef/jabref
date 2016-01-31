@@ -554,7 +554,7 @@ public class BibEntry {
     public void addKeyword(String keyword) {
         Objects.requireNonNull(keyword, "keyword must not be empty");
 
-        if ((keyword == null) || (keyword.isEmpty())) {
+        if (keyword.isEmpty()) {
             return;
         }
 

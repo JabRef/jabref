@@ -19,8 +19,6 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
-import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -56,23 +54,6 @@ public class OpenOfficePanel extends AbstractWorker {
 
     public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
     public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
-
-    // This field indicates whether the running JabRef supports post formatters in Layout:
-    public static boolean postLayoutSupported;
-
-    static {
-        postLayoutSupported = true;
-        try {
-            Layout l = new LayoutHelper(new StringReader("")).
-                    getLayoutFromText(Globals.FORMATTER_PACKAGE);
-            l.setPostFormatter(null);
-        } catch (NoSuchMethodError ex) {
-            postLayoutSupported = false;
-        } catch (Exception ignore) {
-            // Ignored
-        }
-
-    }
 
     private OOPanel comp;
     private JDialog diag;
@@ -159,12 +140,8 @@ public class OpenOfficePanel extends AbstractWorker {
         frame = jrFrame;
         this.manager = spManager;
         comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), Localization.lang("OpenOffice"), this);
-        try {
-            initPanel();
-            spManager.register(getName(), comp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        initPanel();
+        spManager.register(getName(), comp);
     }
 
     public JMenuItem getMenuItem() {
@@ -312,7 +289,7 @@ public class OpenOfficePanel extends AbstractWorker {
                             ex.getBibtexKey()), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                 }
                 catch (Exception e1) {
-                    e1.printStackTrace();
+                    LOGGER.warn("Could not update bibliography", e1);
                 }
             }
         };
@@ -328,7 +305,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 } catch (UndefinedCharacterFormatException e) {
                     reportUndefinedCharacterFormat(e);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Problem combining cite markers", e);
                 }
 
             }
@@ -350,7 +327,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     CitationManager cm = new CitationManager(frame, ooBase);
                     cm.showDialog();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Problem showing citation manager", e);
                 }
             }
         });
@@ -496,12 +473,12 @@ public class OpenOfficePanel extends AbstractWorker {
             manageCitations.setEnabled(true);
 
         } catch (UnsatisfiedLinkError e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Unable to connect. One possible reason is that JabRef "
                             + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not connect to running OpenOffice.")
                         + "\n"
@@ -696,7 +673,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 } catch (UndefinedParagraphFormatException ex) {
                     reportUndefinedParagraphFormat(ex);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Could not insert entry", ex);
                 }
             }
 

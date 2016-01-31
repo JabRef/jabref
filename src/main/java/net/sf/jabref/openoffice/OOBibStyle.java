@@ -27,6 +27,9 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This class embodies a bibliography formatting for OpenOffice, which is composed
  * of the following elements:
@@ -81,8 +84,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     //private Pattern quoted = Pattern.compile("\".*^\\\\\"");
     private final Pattern quoted = Pattern.compile("\".*\"");
 
+    private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
-    public OOBibStyle(File styleFile) throws Exception {
+
+    public OOBibStyle(File styleFile) throws IOException {
         setDefaultProperties();
         try (Reader in = new FileReader(styleFile)) {
             initialize(in);
@@ -91,7 +96,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         OOBibStyle.styleFileModificationTime = styleFile.lastModified();
     }
 
-    public OOBibStyle(Reader in) throws Exception {
+    public OOBibStyle(Reader in) throws IOException {
         setDefaultProperties();
         initialize(in);
     }
@@ -158,7 +163,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * @throws Exception
      */
-    public void ensureUpToDate() throws Exception {
+    public void ensureUpToDate() throws IOException {
         if (!isUpToDate()) {
             reload();
         }
@@ -170,7 +175,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * @throws Exception
      */
-    private void reload() throws Exception {
+    private void reload() throws IOException {
         if (styleFile != null) {
             OOBibStyle.styleFileModificationTime = styleFile.lastModified();
             try (FileReader fr = new FileReader(styleFile)) {
@@ -233,21 +238,22 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             }
 
             switch (mode) {
-                case NAME:
-                    if (!line.trim().isEmpty()) {
-                        name = line.trim();
-                    }
-                case LAYOUT:
-                    handleStructureLine(line);
-                    break;
-                case PROPERTIES:
-                    handlePropertiesLine(line, properties);
-                    break;
-                case CITATION:
-                    handlePropertiesLine(line, citProperties);
-                    break;
-                case JOURNALS:
-                    handleJournalsLine(line);
+            case NAME:
+                if (!line.trim().isEmpty()) {
+                    name = line.trim();
+                }
+                break;
+            case LAYOUT:
+                handleStructureLine(line);
+                break;
+            case PROPERTIES:
+                handlePropertiesLine(line, properties);
+                break;
+            case CITATION:
+                handlePropertiesLine(line, citProperties);
+                break;
+            case JOURNALS:
+                handleJournalsLine(line);
             }
 
         }
@@ -291,9 +297,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                     bibLayout.put(type.toLowerCase(), layout);
                 }
 
-            } catch (Exception ex) {
-                ex.printStackTrace();
-
+            } catch (IOException ex) {
+                LOGGER.warn("Cannot parse bibliography structure", ex);
             }
         }
     }
@@ -364,7 +369,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @param number The citation numbers.
      * @return The text for the citation.
      */
-    public String getNumCitationMarker(int[] number, int minGroupingCount, boolean inList) {
+    public String getNumCitationMarker(List<Integer> number, int minGroupingCount, boolean inList) {
         String bracketBefore = (String) citProperties.get("BracketBefore");
         if (inList && (citProperties.get("BracketBeforeInList") != null)) {
             bracketBefore = (String) citProperties.get("BracketBeforeInList");
@@ -374,31 +379,29 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             bracketAfter = (String) citProperties.get("BracketAfterInList");
         }
         // Sort the numbers:
-        int[] lNum = new int[number.length];
-        System.arraycopy(number, 0, lNum, 0, lNum.length);
-        //Arrays.copyOf(number, number.length);
-        Arrays.sort(lNum);
+        List<Integer> lNum = new ArrayList<>(number);
+        Collections.sort(lNum);
         StringBuilder sb = new StringBuilder(bracketBefore);
         int combineFrom = -1;
         int written = 0;
-        for (int i = 0; i < lNum.length; i++) {
-            int i1 = lNum[i];
+        for (int i = 0; i < lNum.size(); i++) {
+            int i1 = lNum.get(i);
             if (combineFrom < 0) {
                 // Check if next entry is the next in the ref list:
-                if ((i < (lNum.length - 1)) && (lNum[i + 1] == (i1 + 1))) {
+                if ((i < (lNum.size() - 1)) && (lNum.get(i + 1) == (i1 + 1))) {
                     combineFrom = i1;
                 } else {
                     // Add single entry:
                     if (i > 0) {
                         sb.append((String) citProperties.get("CitationSeparator"));
                     }
-                    sb.append(lNum[i] > 0 ? String.valueOf(lNum[i]) : OOBibStyle.UNDEFINED_CITATION_MARKER);
+                    sb.append(lNum.get(i) > 0 ? String.valueOf(lNum.get(i)) : OOBibStyle.UNDEFINED_CITATION_MARKER);
                     written++;
                 }
             } else {
                 // We are building a list of combined entries.
                 // Check if it ends here:
-                if ((i == (lNum.length - 1)) || (lNum[i + 1] != (i1 + 1))) {
+                if ((i == (lNum.size() - 1)) || (lNum.get(i + 1) != (i1 + 1))) {
                     if (written > 0) {
                         sb.append((String) citProperties.get("CitationSeparator"));
                     }
@@ -492,7 +495,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                         String author = getCitationMarkerField(entries[i], database, authorField);
                         AuthorList al = AuthorList.getAuthorList(author);
                         //System.out.println("i="+i+" thisMarker='"+thisMarker+"'");
-                        int prevALim = i > 0 ? unlimAuthors[i - 1] : unlimAuthors[0];
+                        int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
                         if (!thisMarker.equals(tmpMarker)
                                 || ((al.size() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
                             // No match. Update piv to exclude the previous entry. But first check if the
@@ -889,9 +892,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     public boolean equals(Object o) {
         if (o == null) {
             return false;
-        } else {
+        } else if (o instanceof OOBibStyle) {
             return styleFile.equals(((OOBibStyle) o).styleFile);
         }
+        return false;
     }
 
     @Override

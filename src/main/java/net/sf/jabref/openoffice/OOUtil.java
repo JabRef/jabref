@@ -28,7 +28,11 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.Layout;
 
+import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.lang.IllegalArgumentException;
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.ControlCharacter;
 import com.sun.star.text.XParagraphCursor;
 import com.sun.star.text.XText;
@@ -43,8 +47,6 @@ import net.sf.jabref.logic.l10n.Localization;
 class OOUtil {
 
     private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
-
-    static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();
 
     private static final String UNIQUEFIER_FIELD = "uniq";
 
@@ -63,7 +65,8 @@ class OOUtil {
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
             Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
-            throws Exception {
+                    throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
+                    WrappedTargetException, IllegalArgumentException {
 
         // Backup the value of the uniq field, just in case the entry already has it:
         String oldUniqVal = entry.getField(UNIQUEFIER_FIELD);
@@ -97,10 +100,14 @@ class OOUtil {
      * @param cursor The cursor giving the insert location.
      * @param lText The marked-up text to insert.
      * @param parStyle The name of the paragraph style to use.
-     * @throws Exception
+     * @throws WrappedTargetException
+     * @throws PropertyVetoException
+     * @throws UnknownPropertyException
+     * @throws IllegalArgumentException
      */
-    public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor,
-            String lText, String parStyle) throws Exception {
+    public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor, String lText,
+            String parStyle) throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
+                    WrappedTargetException, IllegalArgumentException {
 
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
                 XParagraphCursor.class, cursor);
@@ -171,14 +178,15 @@ class OOUtil {
         cursor.collapseToEnd();
     }
 
-    public static void insertParagraphBreak(XText text, XTextCursor cursor) throws Exception {
+    public static void insertParagraphBreak(XText text, XTextCursor cursor) throws IllegalArgumentException {
         text.insertControlCharacter(cursor, ControlCharacter.PARAGRAPH_BREAK, true);
         cursor.collapseToEnd();
     }
 
-    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-            boolean bold, boolean italic, boolean monospace, boolean smallCaps, boolean superscript,
-            boolean subscript) throws Exception {
+    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, boolean bold,
+            boolean italic, boolean monospace, boolean smallCaps, boolean superscript, boolean subscript)
+                    throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
+                    IllegalArgumentException {
         text.insertString(cursor, string, true);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
@@ -242,8 +250,9 @@ class OOUtil {
 
     }
 
-    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-            String parStyle) throws Exception {
+    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, String parStyle)
+            throws WrappedTargetException, PropertyVetoException, UnknownPropertyException,
+            UndefinedParagraphFormatException {
         text.insertString(cursor, string, true);
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
                 XParagraphCursor.class, cursor);
@@ -260,13 +269,15 @@ class OOUtil {
 
     }
 
-    public static Object getProperty(Object o, String property) throws Exception {
+    public static Object getProperty(Object o, String property)
+            throws UnknownPropertyException, WrappedTargetException {
         XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, o);
         return props.getPropertyValue(property);
     }
 
-    public static XTextDocument selectComponent(List<XTextDocument> list) throws Exception {
+    public static XTextDocument selectComponent(List<XTextDocument> list)
+            throws UnknownPropertyException, WrappedTargetException, IndexOutOfBoundsException {
         String[] values = new String[list.size()];
         int ii = 0;
         for (XTextDocument doc : list) {
@@ -283,31 +294,5 @@ class OOUtil {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Make a cloned BibEntry and do the necessary preprocessing for use by the plugin.
-     * If the running JabRef version doesn't support post-processing in Layout, this
-     * preprocessing includes running the OOPreFormatter formatter for all fields except the
-     * BibTeX key.
-     * @param entry the original entry
-     * @return the cloned and processed entry
-     */
-    public static BibEntry createAdaptedEntry(BibEntry entry) {
-        if (entry == null) {
-            return null;
-        }
-        BibEntry e = (BibEntry) entry.clone();
-        for (String field : e.getFieldNames()) {
-            if (field.equals(BibEntry.KEY_FIELD)) {
-                continue;
-            }
-            // If the running JabRef version doesn't support post-processing in Layout,
-            // preprocess fields instead:
-            if (!OpenOfficePanel.postLayoutSupported && (e.hasField(field))) {
-                e.setField(field, OOUtil.POSTFORMATTER.format(e.getField(field)));
-            }
-        }
-        return e;
     }
 }
