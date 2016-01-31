@@ -5,6 +5,7 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.FrameFixture;
+import org.assertj.swing.timing.Pause;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 
@@ -27,7 +28,8 @@ public class GUITest extends AssertJSwingJUnitTestCase {
 
     @Test
     public void testExit() {
-        FrameFixture mainFrame = findFrame(JabRefFrame.class).using(robot());
+        FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10000).using(robot());
+        Pause.pause(1_000);
         exitJabRef(mainFrame);
     }
 
