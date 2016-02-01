@@ -1469,13 +1469,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     public void output(final String s) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                statusLine.setText(s);
-                statusLine.repaint();
-            }
+        SwingUtilities.invokeLater(() -> {
+            statusLine.setText(s);
+            statusLine.repaint();
         });
     }
 

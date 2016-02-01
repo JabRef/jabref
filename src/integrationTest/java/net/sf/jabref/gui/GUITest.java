@@ -25,7 +25,10 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         awtExceptionHandler.installExceptionDetectionInEDT();
         application(JabRefMain.class).start();
 
+        robot().waitForIdle();
+
         robot().settings().timeoutToFindSubMenu(1_000);
+        robot().settings().delayBetweenEvents(50);
     }
 
 
@@ -75,8 +78,10 @@ public class GUITest extends AssertJSwingJUnitTestCase {
     @Test
     public void testOpenAndSavePreferences() {
         FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
-
         mainFrame.menuItemWithPath("Options", "Preferences").click();
+
+        testPanelFixture.robot.waitForIdle();
+
         findDialog(PreferencesDialog.class).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
 
             @Override protected boolean isMatching(@Nonnull JButton jButton) {
