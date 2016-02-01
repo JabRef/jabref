@@ -22,6 +22,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Migrated JabRef help to markdown at https://github.com/JabRef/help.jabref.org
 - BibTeX and BibLaTeX mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
 - Moved all quality-related database actions inside a new quality menu
+- [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear 
+
 
 ### Fixed
 - Make BibTex parser more robust against missing newlines
