@@ -75,12 +75,12 @@ public abstract class DBImporter extends DBImporterExporter {
      * Worker method to perform the import from a database
      *
      * @param dbs The necessary database connection information
-     * @param type
+     * @param mode
      * @return An ArrayList containing pairs of Objects. Each position of the ArrayList stores three Objects: a
      * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
      * @throws Exception
      */
-    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs, BibDatabaseMode type) throws Exception {
+    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs, BibDatabaseMode mode) throws Exception {
         List<DBImporterResult> result = new ArrayList<>();
         try (Connection conn = this.connectToDB(dbs)) {
 
@@ -102,8 +102,10 @@ public abstract class DBImporter extends DBImporterExporter {
                     try (Statement entryTypes = SQLUtil.queryAllFromTable(conn, "entry_types");
                             ResultSet rsEntryType = entryTypes.getResultSet()) {
                         while (rsEntryType.next()) {
-                            types.put(rsEntryType.getString("entry_types_id"),
-                                    EntryTypes.getType(rsEntryType.getString("label"), type));
+                            Optional<EntryType> entryType = EntryTypes.getType(rsEntryType.getString("label"), mode);
+                            if(entryType.isPresent()) {
+                                types.put(rsEntryType.getString("entry_types_id"), entryType.get());
+                            }
                         }
                         rsEntryType.getStatement().close();
                     }

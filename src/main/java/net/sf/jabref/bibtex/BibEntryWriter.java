@@ -66,7 +66,7 @@ public class BibEntryWriter {
         boolean hasWritten = false;
         int indentation = getLengthOfLongestFieldName(entry);
 
-        EntryType type = EntryTypes.getType(entry.getType(), bibDatabaseMode);
+        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), bibDatabaseMode);
 
         // Write required fields first.
         List<String> fields = type.getRequiredFieldsFlat();

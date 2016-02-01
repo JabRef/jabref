@@ -224,11 +224,12 @@ public class FileActions {
 
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
-                // types (*not* customized standard types) must be written.
-                EntryType entryType = EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode());
-
-                if (EntryTypes.getStandardType(entryType.getName(), bibDatabaseContext.getMode()) == null) {
-                    types.put(entryType.getName(), entryType);
+                // types (*not* all customized standard types) must be written.
+                if (! EntryTypes.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
+                    // If user-defined entry type, then add it
+                    // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
+                    EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
+                            entryType -> types.put(entryType.getName(), entryType));
                 }
 
                 // Check if the entry should be written.
@@ -428,10 +429,12 @@ public class FileActions {
 
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
-                // types (*not* customized standard types) must be written.
-                EntryType tp = EntryTypes.getType(be.getType(), bibDatabaseContext.getMode());
-                if (EntryTypes.getStandardType(tp.getName(), bibDatabaseContext.getMode()) == null) {
-                    types.put(tp.getName(), tp);
+                // types (*not* all customized standard types) must be written.
+                if (! EntryTypes.getStandardType(be.getType(), bibDatabaseContext.getMode()).isPresent()) {
+                    // If user-defined entry type, then add it
+                    // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
+                    EntryTypes.getType(be.getType(), bibDatabaseContext.getMode()).ifPresent(
+                            entryType -> types.put(entryType.getName(), entryType));
                 }
 
                 bibtexEntryWriter.write(be, fw, bibDatabaseContext.getMode());

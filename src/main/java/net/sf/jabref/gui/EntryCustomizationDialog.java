@@ -180,8 +180,26 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         }
         List<String> rl = reqLists.get(s);
         if (rl == null) {
-            EntryType type = EntryTypes.getType(s, bibDatabaseContext.getMode());
-            if (type == null) {
+            Optional<EntryType> type = EntryTypes.getType(s, bibDatabaseContext.getMode());
+            if (type.isPresent()) {
+                List<String> req = type.get().getRequiredFields();
+
+                List<String> opt;
+                if (biblatexMode) {
+                    opt = type.get().getPrimaryOptionalFields();
+
+                    List<String> opt2 = type.get().getSecondaryOptionalFields();
+
+                    optComp2.setFields(opt2);
+                    optComp2.setEnabled(true);
+                } else {
+                    opt = type.get().getOptionalFields();
+                }
+                reqComp.setFields(req);
+                reqComp.setEnabled(true);
+                optComp.setFields(opt);
+                optComp.setEnabled(true);
+            } else {
                 // New entry
                 reqComp.setFields(new ArrayList<>());
                 reqComp.setEnabled(true);
@@ -192,24 +210,6 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                     optComp2.setEnabled(true);
                 }
                 new FocusRequester(reqComp);
-            } else {
-                List<String> req = type.getRequiredFields();
-
-                List<String> opt;
-                if (biblatexMode) {
-                    opt = type.getPrimaryOptionalFields();
-
-                    List<String> opt2 = type.getSecondaryOptionalFields();
-
-                    optComp2.setFields(opt2);
-                    optComp2.setEnabled(true);
-                } else {
-                    opt = type.getOptionalFields();
-                }
-                reqComp.setFields(req);
-                reqComp.setEnabled(true);
-                optComp.setFields(opt);
-                optComp.setEnabled(true);
             }
         } else {
             reqComp.setFields(rl);
@@ -254,13 +254,13 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                 continue;
             }
 
-            EntryType oldType = EntryTypes.getType(stringListEntry.getKey(), bibDatabaseContext.getMode());
-            if (oldType != null) {
-                List<String> oldReq = oldType.getRequiredFieldsFlat();
-                List<String> oldOpt = oldType.getOptionalFields();
+            Optional<EntryType> oldType = EntryTypes.getType(stringListEntry.getKey(), bibDatabaseContext.getMode());
+            if (oldType.isPresent()) {
+                List<String> oldReq = oldType.get().getRequiredFieldsFlat();
+                List<String> oldOpt = oldType.get().getOptionalFields();
                 if (biblatexMode) {
-                    List<String> oldPriOpt = oldType.getPrimaryOptionalFields();
-                    List<String> oldSecOpt = oldType.getSecondaryOptionalFields();
+                    List<String> oldPriOpt = oldType.get().getPrimaryOptionalFields();
+                    List<String> oldSecOpt = oldType.get().getSecondaryOptionalFields();
                     if (equalLists(oldReq, reqStr) && equalLists(oldPriOpt, optStr) &&
                             equalLists(oldSecOpt, opt2Str)) {
                         changesMade = false;
@@ -298,10 +298,10 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     }
 
     private void typeDeletion(String name) {
-        EntryType type = EntryTypes.getType(name, bibDatabaseContext.getMode());
+        Optional<EntryType> type = EntryTypes.getType(name, bibDatabaseContext.getMode());
 
-        if (type instanceof CustomEntryType) {
-            if (EntryTypes.getStandardType(name, bibDatabaseContext.getMode()) == null) {
+        if (type.isPresent() && type.get() instanceof CustomEntryType) {
+            if (! EntryTypes.getStandardType(name, bibDatabaseContext.getMode()).isPresent()) {
                 int reply = JOptionPane.showConfirmDialog
                         (frame, Localization.lang("All entries of this "
                                         + "type will be declared "
@@ -372,10 +372,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
             bp.entryEditors.remove(typeName);
 
             for (BibEntry entry : bp.database().getEntries()) {
-                EntryType newType = EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode());
-                if (newType != null) {
-                    entry.setType(newType);
-                }
+                EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(newType -> entry.setType(newType));
             }
         }
 
@@ -399,17 +396,17 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
             }
             defaulted.add(lastSelected);
 
-            EntryType type = EntryTypes.getStandardType(lastSelected, bibDatabaseContext.getMode());
-            if (type != null) {
-                List<String> of = type.getOptionalFields();
-                List<String> req = type.getRequiredFields();
+            Optional<EntryType> type = EntryTypes.getStandardType(lastSelected, bibDatabaseContext.getMode());
+            if (type.isPresent()) {
+                List<String> of = type.get().getOptionalFields();
+                List<String> req = type.get().getRequiredFields();
                 List<String> opt1 = new ArrayList<>();
                 List<String> opt2 = new ArrayList<>();
 
                 if (!(of.isEmpty())) {
                     if (biblatexMode) {
-                        opt1 = type.getPrimaryOptionalFields();
-                        opt2 = type.getSecondaryOptionalFields();
+                        opt1 = type.get().getPrimaryOptionalFields();
+                        opt2 = type.get().getSecondaryOptionalFields();
                     } else {
                         opt1 = of;
                     }

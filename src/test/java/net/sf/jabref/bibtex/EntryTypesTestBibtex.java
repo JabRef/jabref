@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 
 import net.sf.jabref.model.database.BibDatabaseMode;
+import java.util.Optional;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,9 +38,9 @@ public class EntryTypesTestBibtex {
         // Bibtex mode
         EntryTypes bibtexentrytypes = new EntryTypes();
 
-        assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article", BibDatabaseMode.BIBTEX));
-        assertNull(bibtexentrytypes.getType("aaaaarticle", BibDatabaseMode.BIBTEX));
-        assertNull(bibtexentrytypes.getStandardType("aaaaarticle", BibDatabaseMode.BIBTEX));
+        assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article", BibDatabaseMode.BIBTEX).get());
+        assertEquals(Optional.empty(), bibtexentrytypes.getType("aaaaarticle", BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), bibtexentrytypes.getStandardType("aaaaarticle", BibDatabaseMode.BIBTEX));
         assertEquals(19, bibtexentrytypes.getAllValues(BibDatabaseMode.BIBTEX).size());
         assertEquals(19, bibtexentrytypes.getAllTypes(BibDatabaseMode.BIBTEX).size());
 
@@ -51,12 +53,12 @@ public class EntryTypesTestBibtex {
 
         bibtexentrytypes.addOrModifyCustomEntryType(newArticle);
         // Should not be the same any more
-        assertNotEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article", BibDatabaseMode.BIBTEX));
+        assertNotEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article", BibDatabaseMode.BIBTEX).get());
 
         // Remove the custom "article" entry type, which should restore the original
         bibtexentrytypes.removeType("article", BibDatabaseMode.BIBTEX);
         // Should not be possible to remove a standard type
-        assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article", BibDatabaseMode.BIBTEX));
+        assertEquals(BibtexEntryTypes.ARTICLE, bibtexentrytypes.getType("article", BibDatabaseMode.BIBTEX).get());
     }
 
     @Test

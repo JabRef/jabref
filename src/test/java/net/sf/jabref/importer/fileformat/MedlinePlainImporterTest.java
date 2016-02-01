@@ -175,7 +175,7 @@ public class MedlinePlainImporterTest {
             List<BibEntry> actualEntries = importer.importEntries(stream, new OutputPrinterToNull());
 
             BibEntry expectedEntry = new BibEntry();
-            expectedEntry.setType(EntryTypes.getType("article", BibDatabaseMode.BIBTEX));
+            expectedEntry.setType("article");
             BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
         }
     }

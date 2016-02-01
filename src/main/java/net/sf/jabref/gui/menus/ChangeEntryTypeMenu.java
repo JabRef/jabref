@@ -49,8 +49,8 @@ public class ChangeEntryTypeMenu {
 
         // biblatex?
         if(panel.getBibDatabaseContext().isBiblatexMode()) {
-            for (String key : EntryTypes.getAllTypes(BibDatabaseMode.BIBLATEX)) {
-                menu.add(new ChangeTypeAction(EntryTypes.getType(key, BibDatabaseMode.BIBLATEX), panel));
+            for (EntryType type : EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX)) {
+                menu.add(new ChangeTypeAction(type, panel));
             }
         } else {
             // Bibtex

@@ -104,7 +104,9 @@ public class BibEntry {
      * Sets this entry's type.
      */
     public void setType(String type) {
-        Objects.requireNonNull(type, "Every BibEntry must have a type.");
+        if(type == null) {
+            type = DEFAULT_TYPE;
+        }
 
         String oldType = this.type;
         type = type.toLowerCase();

@@ -30,8 +30,8 @@ public class EntryTypes {
          * This method returns the BibtexEntryType for the name of a type,
          * or null if it does not exist.
          */
-        public EntryType getType(String name) {
-            return ALL_TYPES.get(name.toLowerCase());
+        public Optional<EntryType> getType(String name) {
+            return Optional.ofNullable(ALL_TYPES.get(name.toLowerCase()));
         }
 
         /**
@@ -40,19 +40,15 @@ public class EntryTypes {
          */
         // Get an entry type defined in BibtexEntryType
         public EntryType getTypeOrDefault(String type) {
-            EntryType entryType = getType(type);
-            if (entryType == null) {
-                return defaultType;
-            }
-            return entryType;
+            return getType(type).orElse(defaultType);
         }
 
         /**
          * This method returns the standard BibtexEntryType for the
          * name of a type, or null if it does not exist.
          */
-        public EntryType getStandardType(String name) {
-            return STANDARD_TYPES.get(name.toLowerCase());
+        public Optional<EntryType> getStandardType(String name) {
+            return Optional.ofNullable(STANDARD_TYPES.get(name.toLowerCase()));
         }
 
         public void addOrModifyCustomEntryType(CustomEntryType type) {
@@ -100,8 +96,9 @@ public class EntryTypes {
      * This method returns the BibtexEntryType for the name of a type,
      * or null if it does not exist.
      */
-    public static EntryType getType(String name, BibDatabaseMode type) {
+    public static Optional<EntryType> getType(String name, BibDatabaseMode type) {
         return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getType(name) : BIBTEX.getType(name);
+
     }
 
     /**
@@ -109,16 +106,16 @@ public class EntryTypes {
      * or the default type (*.MISC) if it does not exist.
      */
     // Get an entry type defined in BibtexEntryType
-    public static EntryType getTypeOrDefault(String name, BibDatabaseMode type) {
-        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getTypeOrDefault(name) : BIBTEX.getTypeOrDefault(name);
+    public static EntryType getTypeOrDefault(String name, BibDatabaseMode mode) {
+        return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.getTypeOrDefault(name) : BIBTEX.getTypeOrDefault(name);
     }
 
     /**
      * This method returns the standard BibtexEntryType for the
      * name of a type, or null if it does not exist.
      */
-    public static EntryType getStandardType(String name, BibDatabaseMode type) {
-        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getStandardType(name) : BIBTEX.getStandardType(name);
+    public static Optional<EntryType> getStandardType(String name, BibDatabaseMode mode) {
+        return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.getStandardType(name) : BIBTEX.getStandardType(name);
     }
 
     public static void addOrModifyCustomEntryType(CustomEntryType customEntryType) {

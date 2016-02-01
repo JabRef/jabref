@@ -565,13 +565,15 @@ public class MainTable extends JTable {
     private int getCellStatus(int row, int col) {
         try {
             BibEntry be = sortedForGrouping.get(row);
-            EntryType type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
-            String columnName = getColumnName(col).toLowerCase();
-            if (columnName.equals(BibEntry.KEY_FIELD) || type.getRequiredFieldsFlat().contains(columnName)) {
-                return MainTable.REQUIRED;
-            }
-            if (type.getOptionalFields().contains(columnName)) {
-                return MainTable.OPTIONAL;
+            Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
+            if(type.isPresent()) {
+                String columnName = getColumnName(col).toLowerCase();
+                if (columnName.equals(BibEntry.KEY_FIELD) || type.get().getRequiredFieldsFlat().contains(columnName)) {
+                    return MainTable.REQUIRED;
+                }
+                if (type.get().getOptionalFields().contains(columnName)) {
+                    return MainTable.OPTIONAL;
+                }
             }
             return MainTable.OTHER;
         } catch (NullPointerException ex) {

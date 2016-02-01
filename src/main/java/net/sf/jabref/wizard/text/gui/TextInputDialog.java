@@ -63,6 +63,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
@@ -77,7 +78,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TextInputDialog extends JDialog implements ActionListener {
     private final JButton okButton = new JButton();
@@ -479,9 +482,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
     }
 
     private String[] getAllFields() {
-        List<String> texFields = EntryTypes.getType(entry.getType(), frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).getAllFields();
+        List<String> texFields = new ArrayList<>();
+        Optional<EntryType> type = EntryTypes.getType(entry.getType(),
+                frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+        if (type.isPresent()) {
+            texFields.addAll(type.get().getAllFields());
+        }
         List<String> internalFields = InternalBibtexFields.getAllFieldNames();
-
         for (String field : internalFields) {
             if (!texFields.contains(field)) {
                 texFields.add(field);

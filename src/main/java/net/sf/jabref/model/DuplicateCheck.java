@@ -79,7 +79,7 @@ public class DuplicateCheck {
         if (!one.getType().equals(two.getType())) {
             return false;
         }
-        EntryType type = EntryTypes.getType(one.getType(), bibDatabaseMode);
+        EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
 
         // The check if they have the same required fields:
         java.util.List<String> var = type.getRequiredFieldsFlat();
