@@ -1,4 +1,4 @@
-package net.sf.jabref.util;
+package net.sf.jabref.logic.xmp;
 
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.LatexFieldFormatter;

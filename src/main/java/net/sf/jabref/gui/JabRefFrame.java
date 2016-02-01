@@ -60,8 +60,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.openoffice.OpenOfficePanel;
 import net.sf.jabref.specialfields.*;
 import net.sf.jabref.sql.importer.DbImportAction;
-import net.sf.jabref.util.ManageKeywordsAction;
-import net.sf.jabref.util.MassSetFieldAction;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
