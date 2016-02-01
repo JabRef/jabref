@@ -28,7 +28,7 @@ public class SpecialMainTableColumns {
 
     public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_RANKING,
             new String[] {SpecialFieldsUtils.FIELDNAME_RANKING},
-            new JLabel(EntryUtil.capitalizeFirst(SpecialFieldsUtils.FIELDNAME_RANKING))) {
+            new JLabel(SpecialFieldsUtils.FIELDNAME_RANKING)) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
