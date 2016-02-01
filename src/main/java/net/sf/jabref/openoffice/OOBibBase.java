@@ -73,7 +73,7 @@ class OOBibBase {
     private static final String BIB_SECTION_NAME = "JR_bib";
     private static final String BIB_SECTION_END_NAME = "JR_bib_end";
     private static final String BIB_CITATION = "JR_cite";
-    private final Pattern citePattern = Pattern.compile(OOBibBase.BIB_CITATION + "\\d*_(\\d*)_(.*)");
+    private static final Pattern CITE_PATTERN = Pattern.compile(OOBibBase.BIB_CITATION + "\\d*_(\\d*)_(.*)");
 
     private static final int AUTHORYEAR_PAR = 1;
     private static final int AUTHORYEAR_INTEXT = 2;
@@ -359,7 +359,7 @@ class OOBibBase {
         // Remove all reference marks that don't look like JabRef citations:
         ArrayList<String> tmp = new ArrayList<>();
         for (String name : names) {
-            if (citePattern.matcher(name).find()) {
+            if (CITE_PATTERN.matcher(name).find()) {
                 tmp.add(name);
             }
         }
@@ -404,7 +404,7 @@ class OOBibBase {
         // Remove all reference marks that don't look like JabRef citations:
         List<String> tmp = new ArrayList<>();
         for (String name : names) {
-            if (citePattern.matcher(name).find()) {
+            if (CITE_PATTERN.matcher(name).find()) {
                 tmp.add(name);
             }
         }
@@ -421,7 +421,7 @@ class OOBibBase {
 
         int[] types = new int[names.length];
         for (int i = 0; i < names.length; i++) {
-            Matcher m = citePattern.matcher(names[i]);
+            Matcher m = CITE_PATTERN.matcher(names[i]);
             if (m.find()) {
                 String typeStr = m.group(1);
                 int type = Integer.parseInt(typeStr);
@@ -784,7 +784,7 @@ class OOBibBase {
         Map<BibEntry, BibDatabase> newList = new LinkedHashMap<>();
         Map<BibEntry, BibEntry> adaptedEntries = new HashMap<>();
         for (String name : names) {
-            Matcher m = citePattern.matcher(name);
+            Matcher m = CITE_PATTERN.matcher(name);
             if (m.find()) {
                 String[] keys = m.group(2).split(",");
                 for (String key : keys) {
@@ -826,7 +826,7 @@ class OOBibBase {
      */
     public List<String> parseRefMarkName(String name) {
         List<String> keys = new ArrayList<>();
-        Matcher m = citePattern.matcher(name);
+        Matcher m = CITE_PATTERN.matcher(name);
         if (m.find()) {
             String[] keystring = m.group(2).split(",");
             for (String aKeystring : keystring) {
@@ -848,7 +848,7 @@ class OOBibBase {
      */
 
     private List<Integer> findCitedEntryIndex(String citRefName, List<String> keys) {
-        Matcher m = citePattern.matcher(citRefName);
+        Matcher m = CITE_PATTERN.matcher(citRefName);
         if (m.find()) {
             List<String> keyStrings = Arrays.asList(m.group(2).split(","));
             List<Integer> res = new ArrayList<>(keyStrings.size());

@@ -71,8 +71,6 @@ public class Util {
 
     private static final Log LOGGER = LogFactory.getLog(Util.class);
 
-    public static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
-
     private static final EasyDateFormat dateFormatter = new EasyDateFormat();
 
     public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";

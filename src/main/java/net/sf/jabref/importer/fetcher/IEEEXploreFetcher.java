@@ -62,6 +62,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     private static final Pattern PUBLICATION_PATTERN = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
     private static final Pattern PROCEEDINGS_PATTERN = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
+    private static final Pattern MONTH_PATTERN = Pattern.compile("(\\d*+)\\s*([a-z]*+)-*(\\d*+)\\s*([a-z]*+)");
+
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
@@ -323,8 +325,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             month = month.replace(".", "");
             month = month.toLowerCase();
 
-            Pattern monthPattern = Pattern.compile("(\\d*+)\\s*([a-z]*+)-*(\\d*+)\\s*([a-z]*+)");
-            Matcher mm = monthPattern.matcher(month);
+            Matcher mm = MONTH_PATTERN.matcher(month);
             String date = month;
             if (mm.find()) {
                 if (mm.group(3).isEmpty()) {

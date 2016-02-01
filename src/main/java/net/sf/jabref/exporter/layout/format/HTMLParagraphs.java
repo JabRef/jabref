@@ -26,7 +26,7 @@ import net.sf.jabref.exporter.layout.LayoutFormatter;
  */
 public class HTMLParagraphs implements LayoutFormatter {
 
-    private static Pattern beforeNewLines;
+    private static final Pattern BEFORE_NEW_LINES_PATTERN = Pattern.compile("(.*?)\\n\\s*\\n");
 
 
     @Override
@@ -38,11 +38,7 @@ public class HTMLParagraphs implements LayoutFormatter {
             return fieldText;
         }
 
-        if (HTMLParagraphs.beforeNewLines == null) {
-            HTMLParagraphs.beforeNewLines = Pattern.compile("(.*?)\\n\\s*\\n");
-        }
-
-        Matcher m = HTMLParagraphs.beforeNewLines.matcher(fieldText);
+        Matcher m = HTMLParagraphs.BEFORE_NEW_LINES_PATTERN.matcher(fieldText);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
             String middle = m.group(1).trim();

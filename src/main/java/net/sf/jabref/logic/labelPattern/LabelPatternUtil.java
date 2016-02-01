@@ -46,6 +46,8 @@ public class LabelPatternUtil {
 
     private static final Log LOGGER = LogFactory.getLog(LabelPatternUtil.class);
 
+    private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
+
     public static List<String> DEFAULT_LABELPATTERN;
 
     static {
@@ -254,8 +256,7 @@ public class LabelPatternUtil {
         }
         content = LabelPatternUtil.unifyDiacritics(content);
         content = content.replaceAll("^\\{", "").replaceAll("\\}$", "");
-        Pattern regex = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
-        Matcher matcher = regex.matcher(content);
+        Matcher matcher = REGEX_PATTERN.matcher(content);
         if (matcher.matches()) {
             return matcher.group(1);
         }

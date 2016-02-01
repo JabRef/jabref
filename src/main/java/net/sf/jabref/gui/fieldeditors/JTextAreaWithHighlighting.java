@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -129,7 +129,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryH
      *
      * @param words to highlight
      */
-    private void highLight(Optional<Pattern> highlightPattern) {
+    private void highLight() {
         // highlight all characters that appear in charsToHighlight
         Highlighter highlighter = getHighlighter();
         highlighter.removeAllHighlights();
@@ -159,7 +159,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryH
     @Override
     public void setText(String text) {
         super.setText(text);
-        highLight(highlightPattern);
+        highLight();
         if (undo != null) {
             undo.discardAllEdits();
         }
@@ -168,7 +168,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryH
     @Override
     public void highlightPattern(Optional<Pattern> highlightPattern) {
         this.highlightPattern = highlightPattern;
-        highLight(highlightPattern);
+        highLight();
     }
 
 }

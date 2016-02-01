@@ -15,6 +15,10 @@ import java.util.regex.Pattern;
  * a single dash (as in 7-33) to the double dash used in TEX to denote number ranges (as in 7--33).
  */
 public class PageNumbersFormatter implements Formatter {
+
+    private static final Pattern PAGES_PATTERN = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
+
+
     @Override
     public String getName() {
         return "Page numbers";
@@ -42,7 +46,6 @@ public class PageNumbersFormatter implements Formatter {
     @Override
     public String format(String value) {
         final String rejectLiterals = "[^0-9,\\-\\+]";
-        final Pattern pagesPattern = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
         final String replace = "$1--$2";
 
         // nothing to do
@@ -53,7 +56,7 @@ public class PageNumbersFormatter implements Formatter {
         // remove unwanted literals incl. whitespace
         String cleanValue = value.replaceAll(rejectLiterals, "");
         // try to find pages pattern
-        Matcher matcher = pagesPattern.matcher(cleanValue);
+        Matcher matcher = PAGES_PATTERN.matcher(cleanValue);
         // replace
         String newValue = matcher.replaceFirst(replace);
         // replacement?
