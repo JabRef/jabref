@@ -75,27 +75,27 @@ import org.apache.commons.logging.LogFactory;
 public class EmacsKeyBindings
 {
 
-    private static final String killLineAction = "emacs-kill-line";
+    private static final String KILL_LINE_ACTION = "emacs-kill-line";
 
-    private static final String killRingSaveAction = "emacs-kill-ring-save";
+    private static final String KILL_RING_SAVE_ACTION = "emacs-kill-ring-save";
 
-    private static final String killRegionAction = "emacs-kill-region";
+    private static final String KILL_REGION_ACTION = "emacs-kill-region";
 
-    private static final String backwardKillWordAction = "emacs-backward-kill-word";
+    private static final String BACKWARD_KILL_WORD_ACTION = "emacs-backward-kill-word";
 
-    private static final String capitalizeWordAction = "emacs-capitalize-word";
+    private static final String CAPITALIZE_WORD_ACTION = "emacs-capitalize-word";
 
-    private static final String downcaseWordAction = "emacs-downcase-word";
+    private static final String DOWNCASE_WORD_ACTION = "emacs-downcase-word";
 
-    private static final String killWordAction = "emacs-kill-word";
+    private static final String KILL_WORD_ACTION = "emacs-kill-word";
 
-    private static final String setMarkCommandAction = "emacs-set-mark-command";
+    private static final String SET_MARK_COMMAND_ACTION = "emacs-set-mark-command";
 
-    private static final String yankAction = "emacs-yank";
+    private static final String YANK_ACTION = "emacs-yank";
 
-    private static final String yankPopAction = "emacs-yank-pop";
+    private static final String YANK_POP_ACTION = "emacs-yank-pop";
 
-    private static final String upcaseWordAction = "emacs-upcase-word";
+    private static final String UPCASE_WORD_ACTION = "emacs-upcase-word";
 
     private static final JTextComponent.KeyBinding[] EMACS_KEY_BINDINGS_BASE = {
             new JTextComponent.
@@ -147,53 +147,53 @@ public class EmacsKeyBindings
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_D,
                     InputEvent.ALT_MASK),
-                    EmacsKeyBindings.killWordAction),
+                    EmacsKeyBindings.KILL_WORD_ACTION),
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,
                     InputEvent.ALT_MASK),
-                    EmacsKeyBindings.backwardKillWordAction),
+                    EmacsKeyBindings.BACKWARD_KILL_WORD_ACTION),
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
                     InputEvent.CTRL_MASK),
-                    EmacsKeyBindings.setMarkCommandAction),
+                    EmacsKeyBindings.SET_MARK_COMMAND_ACTION),
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_W,
                     InputEvent.ALT_MASK),
-                    EmacsKeyBindings.killRingSaveAction),
+                    EmacsKeyBindings.KILL_RING_SAVE_ACTION),
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_W,
                     InputEvent.CTRL_MASK),
-                    EmacsKeyBindings.killRegionAction),
+                    EmacsKeyBindings.KILL_REGION_ACTION),
 
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_K,
                     InputEvent.CTRL_MASK),
-                    EmacsKeyBindings.killLineAction),
+                    EmacsKeyBindings.KILL_LINE_ACTION),
 
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
                     InputEvent.CTRL_MASK),
-                    EmacsKeyBindings.yankAction),
+                    EmacsKeyBindings.YANK_ACTION),
 
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
                     InputEvent.ALT_MASK),
-                    EmacsKeyBindings.yankPopAction),
+                    EmacsKeyBindings.YANK_POP_ACTION),
 
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C,
                     InputEvent.ALT_MASK),
-                    EmacsKeyBindings.capitalizeWordAction),
+                    EmacsKeyBindings.CAPITALIZE_WORD_ACTION),
 
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_L,
                     InputEvent.ALT_MASK),
-                    EmacsKeyBindings.downcaseWordAction),
+                    EmacsKeyBindings.DOWNCASE_WORD_ACTION),
 
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_U,
                     InputEvent.ALT_MASK),
-                    EmacsKeyBindings.upcaseWordAction),
+                    EmacsKeyBindings.UPCASE_WORD_ACTION),
     };
 
     private static final JTextComponent.KeyBinding EMACS_KEY_BINDING_C_A = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_A,
@@ -205,17 +205,17 @@ public class EmacsKeyBindings
             DefaultEditorKit.forwardAction);
 
     private static final TextAction[] EMACS_ACTIONS = {
-            new KillWordAction(EmacsKeyBindings.killWordAction),
-            new BackwardKillWordAction(EmacsKeyBindings.backwardKillWordAction),
-            new SetMarkCommandAction(EmacsKeyBindings.setMarkCommandAction),
-            new KillRingSaveAction(EmacsKeyBindings.killRingSaveAction),
-            new KillRegionAction(EmacsKeyBindings.killRegionAction),
-            new KillLineAction(EmacsKeyBindings.killLineAction),
-            new YankAction(EmacsKeyBindings.yankAction),
-            new YankPopAction(EmacsKeyBindings.yankPopAction),
-            new CapitalizeWordAction(EmacsKeyBindings.capitalizeWordAction),
-            new DowncaseWordAction(EmacsKeyBindings.downcaseWordAction),
-            new UpcaseWordAction(EmacsKeyBindings.upcaseWordAction)
+            new KillWordAction(EmacsKeyBindings.KILL_WORD_ACTION),
+            new BackwardKillWordAction(EmacsKeyBindings.BACKWARD_KILL_WORD_ACTION),
+            new SetMarkCommandAction(EmacsKeyBindings.SET_MARK_COMMAND_ACTION),
+            new KillRingSaveAction(EmacsKeyBindings.KILL_RING_SAVE_ACTION),
+            new KillRegionAction(EmacsKeyBindings.KILL_REGION_ACTION),
+            new KillLineAction(EmacsKeyBindings.KILL_LINE_ACTION),
+            new YankAction(EmacsKeyBindings.YANK_ACTION),
+            new YankPopAction(EmacsKeyBindings.YANK_POP_ACTION),
+            new CapitalizeWordAction(EmacsKeyBindings.CAPITALIZE_WORD_ACTION),
+            new DowncaseWordAction(EmacsKeyBindings.DOWNCASE_WORD_ACTION),
+            new UpcaseWordAction(EmacsKeyBindings.UPCASE_WORD_ACTION)
     };
 
     // components to modify
@@ -226,7 +226,7 @@ public class EmacsKeyBindings
             new JEditorPane(),
     };
 
-    private static final Log logger = LogFactory.getLog(EmacsKeyBindings.class);
+    private static final Log LOGGER = LogFactory.getLog(EmacsKeyBindings.class);
 
 
     /**
@@ -250,10 +250,10 @@ public class EmacsKeyBindings
             return;
         }
 
-        for (JTextComponent JTC : EmacsKeyBindings.JTCS) {
-            Keymap orig = JTC.getKeymap();
+        for (JTextComponent jtc : EmacsKeyBindings.JTCS) {
+            Keymap orig = jtc.getKeymap();
             Keymap backup = JTextComponent.addKeymap
-                    (JTC.getClass().getName(), null);
+                    (jtc.getClass().getName(), null);
             Action[] bound = orig.getBoundActions();
             for (Action aBound : bound) {
                 KeyStroke[] strokes = orig.getKeyStrokesForAction(aBound);
@@ -299,15 +299,15 @@ public class EmacsKeyBindings
      */
     private static void loadEmacsKeyBindings()
     {
-        EmacsKeyBindings.logger.debug("Loading emacs keybindings");
+        EmacsKeyBindings.LOGGER.debug("Loading emacs keybindings");
 
-        for (JTextComponent JTC : EmacsKeyBindings.JTCS) {
-            Action[] origActions = JTC.getActions();
+        for (JTextComponent jtc : EmacsKeyBindings.JTCS) {
+            Action[] origActions = jtc.getActions();
             Action[] actions = new Action[origActions.length + EmacsKeyBindings.EMACS_ACTIONS.length];
             System.arraycopy(origActions, 0, actions, 0, origActions.length);
             System.arraycopy(EmacsKeyBindings.EMACS_ACTIONS, 0, actions, origActions.length, EmacsKeyBindings.EMACS_ACTIONS.length);
 
-            Keymap k = JTC.getKeymap();
+            Keymap k = jtc.getKeymap();
 
             JTextComponent.KeyBinding[] keybindings;
             boolean rebindCA = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA);
@@ -317,14 +317,14 @@ public class EmacsKeyBindings
 
                 // determine size of new array and position of the new key bindings in the array
                 int size = EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE.length;
-                int CAPos = -1;
-                int CFPos = -1;
+                int posCA = -1;
+                int posCF = -1;
                 if (rebindCA) {
-                    CAPos = size;
+                    posCA = size;
                     size++;
                 }
                 if (rebindCF) {
-                    CFPos = size;
+                    posCF = size;
                     size++;
                 }
 
@@ -332,10 +332,10 @@ public class EmacsKeyBindings
                 keybindings = new JTextComponent.KeyBinding[size];
                 System.arraycopy(EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE, 0, keybindings, 0, EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE.length);
                 if (rebindCA) {
-                    keybindings[CAPos] = EmacsKeyBindings.EMACS_KEY_BINDING_C_A;
+                    keybindings[posCA] = EmacsKeyBindings.EMACS_KEY_BINDING_C_A;
                 }
                 if (rebindCF) {
-                    keybindings[CFPos] = EmacsKeyBindings.EMACS_KEY_BINDING_C_F;
+                    keybindings[posCF] = EmacsKeyBindings.EMACS_KEY_BINDING_C_F;
                 }
             } else {
                 keybindings = EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE;
@@ -479,7 +479,9 @@ public class EmacsKeyBindings
                 SetMarkCommandAction.reset();
             }
             text = jtc.getSelectedText();
-            if (text != null) {
+            if (text == null) {
+                jtc.getToolkit().beep();
+            } else {
                 if (copy) {
                     jtc.copy();
                     // clear the selection
@@ -491,8 +493,6 @@ public class EmacsKeyBindings
                     jtc.setCaretPosition(newCaretPos);
                 }
                 KillRing.getInstance().add(text);
-            } else {
-                jtc.getToolkit().beep();
             }
         }
     }
@@ -611,8 +611,8 @@ public class EmacsKeyBindings
                     YankAction.end = jtc.getCaretPosition();
                     KillRing.getInstance().add(jtc.getText(YankAction.start, YankAction.end));
                     KillRing.getInstance().setCurrentTextComponent(jtc);
-                } catch (Exception ignored) {
-                    // Ignored
+                } catch (BadLocationException e) {
+                    LOGGER.info("Bad location when yanking", e);
                 }
             }
         }
@@ -642,12 +642,11 @@ public class EmacsKeyBindings
                 jtc.setSelectionStart(YankAction.start);
                 jtc.setSelectionEnd(YankAction.end);
                 String toYank = KillRing.getInstance().next();
-                if (toYank != null) {
+                if (toYank == null) {
+                    jtc.getToolkit().beep();
+                } else {
                     jtc.replaceSelection(toYank);
                     YankAction.end = jtc.getCaretPosition();
-                }
-                else {
-                    jtc.getToolkit().beep();
                 }
             }
         }
@@ -664,22 +663,22 @@ public class EmacsKeyBindings
 
         private JTextComponent jtc;
         private final LinkedList<String> ring = new LinkedList<>();
-        Iterator<String> iter = ring.iterator();
+        private Iterator<String> iter = ring.iterator();
 
-        private static final KillRing instance = new KillRing();
+        private static final KillRing INSTANCE = new KillRing();
 
 
         public static KillRing getInstance()
         {
-            return KillRing.instance;
+            return KillRing.INSTANCE;
         }
 
-        void setCurrentTextComponent(JTextComponent jtc)
+        public void setCurrentTextComponent(JTextComponent jtc)
         {
             this.jtc = jtc;
         }
 
-        JTextComponent getCurrentTextComponent()
+        public JTextComponent getCurrentTextComponent()
         {
             return jtc;
         }
@@ -690,7 +689,7 @@ public class EmacsKeyBindings
          * Deviating from the Emacs implementation we make sure the
          * exact same text is not somewhere else in the ring.
          */
-        void add(String text)
+        public void add(String text)
         {
             if (text.isEmpty()) {
                 return;
@@ -725,7 +724,7 @@ public class EmacsKeyBindings
          * Returns the next text element which is to be yank-popped.
          * @return <code>null</code> if the ring is empty
          */
-        String next()
+        public String next()
         {
             if (ring.isEmpty()) {
                 return null;
