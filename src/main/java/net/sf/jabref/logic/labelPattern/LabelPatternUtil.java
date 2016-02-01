@@ -433,10 +433,8 @@ public class LabelPatternUtil {
             String entryType = entry.getType();
             // Get the arrayList corresponding to the type
             typeList = metaData.getLabelPattern().getValue(entryType);
-            int typeListSize = typeList.size();
             boolean field = false;
-            for (int i = 1; i < typeListSize; i++) {
-                String typeListEntry = typeList.get(i);
+            for (String typeListEntry : typeList) {
                 if ("[".equals(typeListEntry)) {
                     field = true;
                 } else if ("]".equals(typeListEntry)) {
@@ -883,7 +881,7 @@ public class LabelPatternUtil {
      */
     static String firstAuthor(String authorField) {
         AuthorList authorList = AuthorList.getAuthorList(authorField);
-        if (authorList.size() == 0) {
+        if (authorList.isEmpty()) {
             return "";
         }
         String s = authorList.getAuthor(0).getLast();
@@ -904,7 +902,7 @@ public class LabelPatternUtil {
      */
     static String firstAuthorForenameInitials(String authorField) {
         AuthorList authorList = AuthorList.getAuthorList(authorField);
-        if (authorList.size() == 0) {
+        if (authorList.isEmpty()) {
             return "";
         }
         String s = authorList.getAuthor(0).getFirstAbbr();
@@ -925,7 +923,7 @@ public class LabelPatternUtil {
      */
     static String firstAuthorVonAndLast(String authorField) {
         AuthorList authorList = AuthorList.getAuthorList(authorField);
-        if (authorList.size() == 0) {
+        if (authorList.isEmpty()) {
             return "";
         }
         String vonAuthor = authorList.getAuthor(0).getVon().replaceAll(" ", "");
@@ -969,7 +967,7 @@ public class LabelPatternUtil {
      */
     static String lastAuthorForenameInitials(String authorField) {
         AuthorList authorList = AuthorList.getAuthorList(authorField);
-        if (authorList.size() == 0) {
+        if (authorList.isEmpty()) {
             return "";
         }
         String s = authorList.getAuthor(authorList.size() - 1).getFirstAbbr();

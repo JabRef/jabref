@@ -57,7 +57,7 @@ public class DbImportAction extends AbstractWorker {
 
     private BibDatabase database;
     private MetaData metaData;
-    private boolean connectToDB;
+    private boolean connectedToDB;
     private final JabRefFrame frame;
     private DBStrings dbs;
     private List<DBImporterResult> databases;
@@ -103,7 +103,7 @@ public class DbImportAction extends AbstractWorker {
 
         // get DBStrings from user if necessary
         if (dbs.isConfigValid()) {
-            connectToDB = true;
+            connectedToDB = true;
         } else {
             // init DB strings if necessary
             if (!dbs.isInitialized()) {
@@ -115,10 +115,10 @@ public class DbImportAction extends AbstractWorker {
             PositionWindow.placeDialog(dbd, frame);
             dbd.setVisible(true);
 
-            connectToDB = dbd.getConnectToDB();
+            connectedToDB = dbd.isConnectedToDB();
 
             // store database strings
-            if (connectToDB) {
+            if (connectedToDB) {
                 dbs = dbd.getDBStrings();
                 dbd.dispose();
             }
@@ -133,7 +133,7 @@ public class DbImportAction extends AbstractWorker {
     }
 
     private void performImport() {
-        if (connectToDB) {
+        if (connectedToDB) {
             try {
                 frame.output(Localization.lang("Attempting SQL import..."));
                 DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();

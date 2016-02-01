@@ -1,6 +1,6 @@
 /*
  Copyright (C) 2004 R. Nagel
- Copyright (C) 2015 JabRef Contributors.
+ Copyright (C) 2015-2016 JabRef Contributors.
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -58,7 +58,6 @@ import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -83,16 +82,18 @@ import java.util.List;
 import java.util.Optional;
 
 public class TextInputDialog extends JDialog implements ActionListener {
-    private final JButton okButton = new JButton();
-    private final JButton cancelButton = new JButton();
-    private final JButton insertButton = new JButton();
-    private final JButton parseWithFreeCiteButton = new JButton();
+    private final JButton okButton = new JButton(Localization.lang("Accept"));
+    private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
+    private final JButton insertButton = new JButton(Localization.lang("Insert"));
+    private final JButton parseWithFreeCiteButton = new JButton(Localization.lang("Parse with FreeCite"));
     private final JPanel panel1 = new JPanel();
     private final JPanel buttons = new JPanel();
     private final JPanel rawPanel = new JPanel();
     private final JPanel sourcePanel = new JPanel();
     private JList<String> fieldList;
-    private JRadioButton overRadio;
+    private final JRadioButton overRadio = new JRadioButton(Localization.lang("Override"));
+    private final JRadioButton appRadio = new JRadioButton(Localization.lang("Append"));
+
 
     private final BibEntry entry;
 
@@ -125,12 +126,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
         this.setModal(true);
         //this.setResizable( false ) ;
         getContentPane().setLayout(new BorderLayout());
-        String typeStr = Localization.lang("for");
+        StringBuilder typeStr = new StringBuilder(Localization.lang("for"));
         if ((entry != null) && (entry.getType() != null)) {
-            typeStr = typeStr + " " + entry.getType();
+            typeStr.append(' ').append(entry.getType());
         }
 
-        this.setTitle(Localization.lang("Plain_text_import") + " " + typeStr);
+        typeStr.insert(0, Localization.lang("Plain_text_import") + " ");
+        this.setTitle(typeStr.toString());
         getContentPane().add(panel1, BorderLayout.CENTER);
 
         initRawPanel();
@@ -242,20 +244,16 @@ public class TextInputDialog extends JDialog implements ActionListener {
         //fieldScroller.setMinimumSize( new Dimension( 180, 190 ) ) ;
 
         // insert buttons
-        insertButton.setText(Localization.lang("Insert"));
         insertButton.addActionListener(this);
 
         // parse with FreeCite button
-        parseWithFreeCiteButton.setText(Localization.lang("Parse with FreeCite"));
         parseWithFreeCiteButton.addActionListener(this);
 
         // Radio buttons
-        JRadioButton appRadio = new JRadioButton(Localization.lang("Append"));
         appRadio.setToolTipText(Localization.lang("Append_the_selected_text_to_bibtex_key"));
         appRadio.setMnemonic(KeyEvent.VK_A);
         appRadio.setSelected(true);
 
-        overRadio = new JRadioButton(Localization.lang("Override"));
         overRadio.setToolTipText(Localization.lang("Override_the_bibtex_key_by_the_selected_text"));
         overRadio.setMnemonic(KeyEvent.VK_O);
         overRadio.setSelected(false);
@@ -311,9 +309,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     }
 
     private void initButtonPanel() {
-        okButton.setText(Localization.lang("Accept"));
         okButton.addActionListener(this);
-        cancelButton.setText(Localization.lang("Cancel"));
         cancelButton.addActionListener(this);
 
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);

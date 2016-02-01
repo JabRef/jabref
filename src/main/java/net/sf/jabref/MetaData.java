@@ -33,7 +33,7 @@ public class MetaData implements Iterable<String> {
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
     static final String DATABASE_TYPE = "DATABASE_TYPE";
 
-    private final HashMap<String, List<String>> metaData = new HashMap<>();
+    private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
     private File file; // The File where this base gets saved.
     private boolean groupTreeValid = true;
@@ -49,7 +49,7 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(HashMap<String, String> inData, BibDatabase db) {
+    public MetaData(Map<String, String> inData, BibDatabase db) {
         boolean groupsTreePresent = false;
         List<String> flatGroupsData = null;
         List<String> treeGroupsData = null;
@@ -71,7 +71,7 @@ public class MetaData implements Iterable<String> {
                     System.err.println("Weird error while parsing meta data.");
                 }
                 if ("groupsversion".equals(entry.getKey())) {
-                    if (orderedData.size() >= 1) {
+                    if (!orderedData.isEmpty()) {
                         groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
                     }
                 } else if ("groupstree".equals(entry.getKey())) {
@@ -271,14 +271,13 @@ public class MetaData implements Iterable<String> {
         for (String key : sortedKeys) {
 
             StringBuffer sb = new StringBuffer();
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE).append(Globals.NEWLINE);
             List<String> orderedData = metaData.get(key);
-            sb.append("@comment{").append(META_FLAG).append(key).append(":");
-            for (int j = 0; j < orderedData.size(); j++) {
-                sb.append(StringUtil.quote(orderedData.get(j), ";", '\\')).append(";");
+            sb.append("@comment{").append(META_FLAG).append(key).append(':');
+            for (String data : orderedData) {
+                sb.append(StringUtil.quote(data, ";", '\\')).append(';');
             }
-            sb.append("}");
+            sb.append('}');
 
             out.write(sb.toString());
         }
@@ -287,29 +286,25 @@ public class MetaData implements Iterable<String> {
         if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
             StringBuffer sb = new StringBuffer();
             // write version first
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE).append(Globals.NEWLINE);
             sb.append("@comment{").append(META_FLAG).append("groupsversion:");
-            sb.append("" + VersionHandling.CURRENT_VERSION + ";");
-            sb.append("}");
+            sb.append(VersionHandling.CURRENT_VERSION).append(";}");
 
             out.write(sb.toString());
 
             // now write actual groups
             sb = new StringBuffer();
-            sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE).append(Globals.NEWLINE);
             sb.append("@comment{").append(META_FLAG).append("groupstree:");
             sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
             StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
             while (tok.hasMoreTokens()) {
-                StringBuffer s =
-                        new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
+                StringBuffer s = new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\')).append(';');
                 sb.append(s);
                 sb.append(Globals.NEWLINE);
             }
-            sb.append("}");
+            sb.append('}');
             out.write(sb.toString());
         }
     }

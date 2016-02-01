@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.sf.jabref.util;
+package net.sf.jabref.gui.actions;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -48,7 +48,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
@@ -67,12 +66,8 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
- * An Action for launching mass field.
+ * An Action for launching keyword managing dialog
  *
- * Functionality:
- * * Defaults to selected entries, or all entries if none are selected.
- * * Input field name
- * * Either set field, or clear field.
  */
 public class ManageKeywordsAction extends MnemonicAwareAction {
     private final JabRefFrame frame;

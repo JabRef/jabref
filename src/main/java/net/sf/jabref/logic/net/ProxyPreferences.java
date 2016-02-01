@@ -1,15 +1,15 @@
-package net.sf.jabref.logic;
+package net.sf.jabref.logic.net;
 
 import net.sf.jabref.JabRefPreferences;
 
 public class ProxyPreferences {
 
-    private Boolean useProxy;
-    private String hostname;
-    private String port;
-    private Boolean useAuthentication;
-    private String username;
-    private String password;
+    private final Boolean useProxy;
+    private final String hostname;
+    private final String port;
+    private final Boolean useAuthentication;
+    private final String username;
+    private final String password;
 
     public ProxyPreferences(Boolean useProxy, String hostname, String port, Boolean useAuthentication, String username,
             String password) {

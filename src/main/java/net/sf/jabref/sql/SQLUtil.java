@@ -77,14 +77,13 @@ final public class SQLUtil {
      */
     public static String getFieldStr() {
         // create comma separated list of field names
-        String field;
         List<String> fieldNames = new ArrayList<>();
         for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
-            field = SQLUtil.allFields.get(i);
-            if (SQLUtil.RESERVED_DB_WORDS.contains(field)) {
-                field += "_";
+            StringBuilder field = new StringBuilder(SQLUtil.allFields.get(i));
+            if (SQLUtil.RESERVED_DB_WORDS.contains(field.toString())) {
+                field.append('_');
             }
-            fieldNames.add(field);
+            fieldNames.add(field.toString());
         }
         return String.join(", ", fieldNames);
     }
@@ -93,16 +92,14 @@ final public class SQLUtil {
      * Inserts the elements of a List into another List making sure not to duplicate entries in the resulting List
      *
      * @param list1 The List containing unique entries
-     * @param list2 The second List to be inserted into the first ArrayList
+     * @param list2 The second List to be inserted into the first List
      * @return The updated list1 with new unique entries
      */
     private static List<String> uniqueListInsert(List<String> list1, List<String> list2) {
         if (list2 != null) {
             for (String fromList2 : list2) {
-                if (!list1.contains(fromList2)) {
-                    if (!"#".equals(fromList2)) {
-                        list1.add(fromList2);
-                    }
+                if (!list1.contains(fromList2) && (!"#".equals(fromList2))) {
+                    list1.add(fromList2);
                 }
             }
         }
@@ -118,14 +115,14 @@ final public class SQLUtil {
      * @return The SQL code to be included in a CREATE TABLE statement.
      */
     public static String fieldsAsCols(List<String> fields, String datatype) {
-        String field;
         List<String> newFields = new ArrayList<>();
         for (String field1 : fields) {
-            field = field1;
-            if (SQLUtil.RESERVED_DB_WORDS.contains(field)) {
-                field = field + '_';
+            StringBuilder field = new StringBuilder(field1);
+            if (SQLUtil.RESERVED_DB_WORDS.contains(field.toString())) {
+                field.append('_');
             }
-            newFields.add(field + datatype);
+            field.append(datatype);
+            newFields.add(field.toString());
         }
         return String.join(", ", newFields);
     }

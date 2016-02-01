@@ -60,8 +60,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.openoffice.OpenOfficePanel;
 import net.sf.jabref.specialfields.*;
 import net.sf.jabref.sql.importer.DbImportAction;
-import net.sf.jabref.util.ManageKeywordsAction;
-import net.sf.jabref.util.MassSetFieldAction;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
@@ -454,7 +453,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction manageJournals = new ManageJournalsAction(this);
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
-    private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.streamEavesdropper, GuiAppender.cache);
+    private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.streamEavesdropper, GuiAppender.CACHE);
 
     private final AbstractAction dbConnect = new GeneralAction(Actions.DB_CONNECT,
             Localization.menuTitle("Connect to external SQL database"),

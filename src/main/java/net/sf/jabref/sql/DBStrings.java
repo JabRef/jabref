@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,6 +15,10 @@
 */
 package net.sf.jabref.sql;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
@@ -30,14 +34,14 @@ public class DBStrings {
     private String username;
     private String password;
 
-    private String[] serverTypes;
+    private List<String> serverTypes;
     private boolean isInitialized;
     private boolean configValid;
 
 
     /** Creates a new instance of DBStrings */
     public DBStrings() {
-        this.setServerType(null);
+        this.serverTypes = Collections.emptyList();
         this.setServerHostname(null);
         this.setDatabase(null);
         this.setUsername(null);
@@ -50,8 +54,7 @@ public class DBStrings {
      * Initializes the variables needed with defaults
      */
     public void initialize() {
-        String[] servers = {"MySQL", "PostgreSQL"};
-        setServerTypes(servers);
+        this.serverTypes = Arrays.asList("MySQL", "PostgreSQL");
         setServerType(Globals.prefs.get(JabRefPreferences.DB_CONNECT_SERVER_TYPE));
         setServerHostname(Globals.prefs.get(JabRefPreferences.DB_CONNECT_HOSTNAME));
         setDatabase(Globals.prefs.get(JabRefPreferences.DB_CONNECT_DATABASE));
@@ -100,12 +103,8 @@ public class DBStrings {
         return password;
     }
 
-    public String[] getServerTypes() {
+    public List<String> getServerTypes() {
         return serverTypes;
-    }
-
-    private void setServerTypes(String[] serverTypes) {
-        this.serverTypes = serverTypes;
     }
 
     public boolean isInitialized() {

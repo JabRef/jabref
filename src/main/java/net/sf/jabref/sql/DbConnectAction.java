@@ -72,7 +72,7 @@ public class DbConnectAction implements BaseAction {
         dbd.setVisible(true);
 
         // connect to database to test DBStrings
-        if (dbd.getConnectToDB()) {
+        if (dbd.isConnectedToDB()) {
 
             dbs = dbd.getDBStrings();
 

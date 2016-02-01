@@ -53,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.swing.*;
 import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.UndoableEdit;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -333,72 +333,6 @@ public class Util {
     }
 
     /**
-     * Set a given field to a given value for all entries in a Collection. This method DOES NOT update any UndoManager,
-     * but returns a relevant CompoundEdit that should be registered by the caller.
-     *
-     * @param entries         The entries to set the field for.
-     * @param field           The name of the field to set.
-     * @param text            The value to set. This value can be null, indicating that the field should be cleared.
-     * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
-     * @return A CompoundEdit for the entire operation.
-     */
-    public static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String text, boolean overwriteValues) {
-
-        NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
-        for (BibEntry entry : entries) {
-            String oldVal = entry.getField(field);
-            // If we are not allowed to overwrite values, check if there is a
-            // nonempty
-            // value already for this entry:
-            if (!overwriteValues && (oldVal != null) && !oldVal.isEmpty()) {
-                continue;
-            }
-            if (text == null) {
-                entry.clearField(field);
-            } else {
-                entry.setField(field, text);
-            }
-            ce.addEdit(new UndoableFieldChange(entry, field, oldVal, text));
-        }
-        ce.end();
-        return ce;
-    }
-
-    /**
-     * Move contents from one field to another for a Collection of entries.
-     *
-     * @param entries         The entries to do this operation for.
-     * @param field           The field to move contents from.
-     * @param newField        The field to move contents into.
-     * @param overwriteValues If true, overwrites any existing values in the new field. If false, makes no change for
-     *                        entries with existing value in the new field.
-     * @return A CompoundEdit for the entire operation.
-     */
-    public static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField, boolean overwriteValues) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Rename field"));
-        for (BibEntry entry : entries) {
-            String valToMove = entry.getField(field);
-            // If there is no value, do nothing:
-            if ((valToMove == null) || valToMove.isEmpty()) {
-                continue;
-            }
-            // If we are not allowed to overwrite values, check if there is a
-            // non-empty value already for this entry for the new field:
-            String valInNewField = entry.getField(newField);
-            if (!overwriteValues && (valInNewField != null) && !valInNewField.isEmpty()) {
-                continue;
-            }
-
-            entry.setField(newField, valToMove);
-            ce.addEdit(new UndoableFieldChange(entry, newField, valInNewField, valToMove));
-            entry.clearField(field);
-            ce.addEdit(new UndoableFieldChange(entry, field, valToMove, null));
-        }
-        ce.end();
-        return ce;
-    }
-
-    /**
      * Run an AbstractWorker's methods using Spin features to put each method on the correct thread.
      *
      * @param worker The worker to run.
@@ -437,8 +371,8 @@ public class Util {
         Layout layout = null;
         try {
             layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
-        } catch (Exception e) {
-            net.sf.jabref.util.Util.LOGGER.info("Wrong format " + e.getMessage(), e);
+        } catch (IOException e) {
+            LOGGER.info("Wrong format " + e.getMessage(), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);

@@ -499,7 +499,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.DB_EXPORT, new AbstractWorker() {
 
             String errorMessage = "";
-            boolean connectToDB;
+            boolean connectedToDB;
 
             // run first, in EDT:
             @Override
@@ -509,7 +509,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 // get DBStrings from user if necessary
                 if (dbs.isConfigValid()) {
-                    connectToDB = true;
+                    connectedToDB = true;
                 } else {
                     // init DB strings if necessary
                     if (!dbs.isInitialized()) {
@@ -521,10 +521,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     PositionWindow.placeDialog(dbd, BasePanel.this);
                     dbd.setVisible(true);
 
-                    connectToDB = dbd.getConnectToDB();
+                    connectedToDB = dbd.isConnectedToDB();
 
                     // store database strings
-                    if (connectToDB) {
+                    if (connectedToDB) {
                         dbs = dbd.getDBStrings();
                         bibDatabaseContext.getMetaData().setDBStrings(dbs);
                         dbd.dispose();
@@ -536,7 +536,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void run() {
 
-                if (connectToDB) {
+                if (connectedToDB) {
 
                     final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
 
@@ -566,7 +566,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 // if no error, report success
                 if (errorMessage.isEmpty()) {
-                    if (connectToDB) {
+                    if (connectedToDB) {
                         frame.output(Localization.lang("%0 export successful"));
                     }
                 } else { // show an error dialog if an error occurred
