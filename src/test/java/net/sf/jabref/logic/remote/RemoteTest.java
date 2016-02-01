@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 public class RemoteTest {
 
@@ -89,7 +90,7 @@ public class RemoteTest {
 
                 @Override
                 public void run() {
-                    try (OutputStream os = socket.accept().getOutputStream()) {
+                    try (Socket socket2 = socket.accept(); OutputStream os = socket.accept().getOutputStream()) {
                         os.write("whatever".getBytes());
                     } catch (IOException e) {
                         // Ignored

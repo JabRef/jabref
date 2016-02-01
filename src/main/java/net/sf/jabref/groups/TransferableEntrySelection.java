@@ -84,8 +84,11 @@ class TransferableEntrySelection implements Transferable {
         String s = includeCiteKeyword ?
                 "\\cite{" + selectedEntriesCiteKeys + "}"
                 : selectedEntriesCiteKeys;
-        return new ByteArrayInputStream(s.getBytes(
-                TransferableEntrySelection.FLAVOR_EXTERNAL.getParameter("charset").trim()));
+        String charset = TransferableEntrySelection.FLAVOR_EXTERNAL.getParameter("charset");
+        if (charset == null) {
+            charset = "";
+        }
+        return new ByteArrayInputStream(s.getBytes(charset.trim()));
     }
 
     public BibEntry[] getSelection() {

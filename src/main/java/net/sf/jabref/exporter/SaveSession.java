@@ -135,12 +135,15 @@ public class SaveSession {
                 deleteLockFile();
             }
         }
-
-        tmp.delete();
+        if (!tmp.delete()) {
+            LOGGER.info("Cannot delete temporary file");
+        }
     }
 
     public void cancel() {
-        tmp.delete();
+        if (!tmp.delete()) {
+            LOGGER.info("Cannot delete temporary file");
+        }
     }
 
     /**
@@ -175,7 +178,9 @@ public class SaveSession {
         if (!lock.exists()) {
             return false;
         }
-        lock.delete();
+        if (!lock.delete()) {
+            LOGGER.info("Cannot delete lock file");
+        }
         return true;
     }
 

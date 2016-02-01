@@ -105,7 +105,9 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
         }
         // Delete the temporary file:
-        tmpFile.delete();
+        if (!tmpFile.delete()) {
+            LOGGER.info("Cannot delete temporary export file");
+        }
     }
 
     private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, Set<String> keySet) {

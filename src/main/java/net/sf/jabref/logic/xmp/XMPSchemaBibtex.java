@@ -22,7 +22,6 @@ import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.*;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.model.database.BibDatabase;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -288,6 +287,9 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         for (String field : fields) {
             String value = BibDatabase.getResolvedField(field, entry, database);
+            if (value == null) {
+                value = "";
+            }
             if ("author".equals(field) || "editor".equals(field)) {
                 setPersonList(field, value);
             } else {

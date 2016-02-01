@@ -280,18 +280,20 @@ public class JabRefDesktop {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        final String ln = temp.getPath();
-        SwingUtilities.invokeLater(new Runnable() {
+        if (temp != null) {
+            final String ln = temp.getPath();
+            SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
-            public void run() {
-                try {
-                    openExternalFileAnyFormat(metaData, ln, fileType);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                @Override
+                public void run() {
+                    try {
+                        openExternalFileAnyFormat(metaData, ln, fileType);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, MetaData metaData,

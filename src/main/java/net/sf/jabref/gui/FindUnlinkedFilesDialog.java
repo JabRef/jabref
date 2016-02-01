@@ -40,7 +40,6 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -226,7 +225,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             try {
                 String[] dim = store.split(";");
                 dimension = new Dimension(Integer.valueOf(dim[0]), Integer.valueOf(dim[1]));
-            } catch (Exception ignored) {
+            } catch (NumberFormatException ignored) {
                 // Ignored
             }
         }
