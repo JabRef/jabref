@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -100,7 +101,7 @@ public class DBConnectDialog extends JDialog {
 
         // init input fields to current DB strings
         String srvSel = dbStrings.getServerType();
-        String[] srv = dbStrings.getServerTypes();
+        List<String> srv = dbStrings.getServerTypes();
         for (String aSrv : srv) {
             cmbServerType.addItem(aSrv);
         }
