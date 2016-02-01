@@ -233,11 +233,15 @@ public class DownloadExternalFile {
                 LOGGER.warn("Problem downloading file", ex);
             }
 
-            tmp.delete();
+            if (!tmp.delete()) {
+                LOGGER.info("Cannot delete temporary file");
+            }
         } else {
             // Cancelled. Just delete the temp file:
             if (downloadFinished) {
-                tmp.delete();
+                if (!tmp.delete()) {
+                    LOGGER.info("Cannot delete temporary file");
+                }
             }
         }
 

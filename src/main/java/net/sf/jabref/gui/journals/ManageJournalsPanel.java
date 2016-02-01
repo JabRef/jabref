@@ -445,7 +445,7 @@ class ManageJournalsPanel extends JPanel {
                 URL url = new URL(chosen);
                 MonitoredURLDownload.buildMonitoredDownload(comp, url).downloadToFile(toFile);
                 comp.setText(toFile.getPath());
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, Localization.lang("Error downloading file '%0'", chosen),
                         Localization.lang("Download failed"), JOptionPane.ERROR_MESSAGE);
             }

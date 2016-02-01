@@ -30,6 +30,7 @@ import java.util.Scanner;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.logging.Log;
@@ -219,7 +220,7 @@ public class FreeCiteImporter extends ImportFormat {
                 parser.next();
             }
             parser.close();
-        } catch (Exception ex) {
+        } catch (IOException | XMLStreamException ex) {
             LOGGER.warn("Could not parse", ex);
             return null;
         }

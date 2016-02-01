@@ -180,12 +180,15 @@ public class INSPIREFetcher implements EntryFetcher {
 
             frame.setStatus("Adding fetched entries");
             /* add the entry to the inspection dialog */
-            if (bd.getEntryCount() > 0) {
-                for (BibEntry entry : bd.getEntries()) {
-                    dialog.addEntry(entry);
+            if (bd != null) {
+                if (bd.getEntryCount() > 0) {
+                    for (BibEntry entry : bd.getEntries()) {
+                        dialog.addEntry(entry);
+                    }
                 }
+            } else {
+                LOGGER.warn("Error while fetching from Inspire");
             }
-
             /* update the dialogs progress bar */
             // dialog.setProgress(i + 1, keys.length);
             /* inform the inspection dialog, that we're done */

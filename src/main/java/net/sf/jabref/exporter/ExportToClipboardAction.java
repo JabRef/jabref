@@ -143,7 +143,9 @@ public class ExportToClipboardAction extends AbstractWorker {
         } finally {
             // Clean up:
             if (tmp != null) {
-                tmp.delete();
+                if (!tmp.delete()) {
+                    LOGGER.info("Cannot delete temporary clipboard file");
+                }
             }
         }
     }

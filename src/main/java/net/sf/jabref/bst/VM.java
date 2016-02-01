@@ -832,7 +832,7 @@ public class VM implements Warn {
                         }
                     }
                     // else
- else {
+                    else {
                         // incr(num_text_chars);
                         result++;
                     }
@@ -873,6 +873,10 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
+                if (context == null) {
+                    throw new VMException("type$ need a context.");
+                }
+
                 stack.push(context.getBibtexEntry().getType());
             }
         });

@@ -370,8 +370,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Checking duplicates means both checking against the background
             // database (if
             // applicable) and against entries already in the table.
-            if (((panel != null) && (DuplicateCheck.containsDuplicate(panel.database(), entry, panel.getBibDatabaseContext().getMode()).isPresent()))
-                    || (internalDuplicate(this.entries, entry).isPresent())) {
+            if ((panel != null) && (DuplicateCheck
+                    .containsDuplicate(panel.database(), entry, panel.getBibDatabaseContext().getMode()).isPresent()
+                    || (internalDuplicate(this.entries, entry).isPresent()))) {
                 entry.setGroupHit(true);
                 deselectAllDuplicates.setEnabled(true);
             }

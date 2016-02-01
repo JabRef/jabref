@@ -158,7 +158,9 @@ public class MoveFileAction extends AbstractAction {
                     }
                     if (success) {
                         // Remove the original file:
-                        file.delete();
+                        if (!file.delete()) {
+                            LOGGER.info("Cannot delete original file");
+                        }
                         // Relativise path, if possible.
                         String canPath = new File(dirs.get(found)).getCanonicalPath();
                         if (newFile.getCanonicalPath().startsWith(canPath)) {

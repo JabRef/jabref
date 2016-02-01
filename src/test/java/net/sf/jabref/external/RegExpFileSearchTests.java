@@ -34,7 +34,7 @@ import org.junit.Test;
 
 public class RegExpFileSearchTests {
 
-    private final String filesDirectory = "/src/test/resources/net/sf/jabref/imports/unlinkedFilesTestFolder";
+    private static final String filesDirectory = "/src/test/resources/net/sf/jabref/imports/unlinkedFilesTestFolder";
 
 
     @Before

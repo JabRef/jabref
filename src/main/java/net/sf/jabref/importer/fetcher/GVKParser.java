@@ -12,7 +12,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -58,7 +57,9 @@ public class GVKParser {
             Element e = getChild("zs:recordData", record);
             if (e != null) {
                 e = getChild("record", e);
-                result.add(parseEntry(e));
+                if (e != null) {
+                    result.add(parseEntry(e));
+                }
             }
         }
         return result;
