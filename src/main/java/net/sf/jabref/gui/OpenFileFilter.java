@@ -82,7 +82,7 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
             return false;
         }
 
-        int dotDotPos = filenm.lastIndexOf(".", dotPos - 1); // for dot.dot extensions
+        int dotDotPos = filenm.lastIndexOf('.', dotPos - 1); // for dot.dot extensions
 
         return extSet.contains(filenm.substring(dotPos)) ||
                 ((dotDotPos >= 0) && extSet.contains(filenm.substring(dotDotPos)));
@@ -103,7 +103,7 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
             return suffix;
         }
 
-        dotPos = filenm.lastIndexOf(".", dotPos - 1); // for dot.dot extensions
+        dotPos = filenm.lastIndexOf('.', dotPos - 1); // for dot.dot extensions
         if (dotPos == -1) {
             return null;
         }
