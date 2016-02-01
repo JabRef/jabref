@@ -29,9 +29,9 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.ProxyPreferences;
-import net.sf.jabref.logic.ProxyRegisterer;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.ProxyPreferences;
+import net.sf.jabref.logic.net.ProxyRegisterer;
 
 public class NetworkTab extends JPanel implements PrefsTab {
 

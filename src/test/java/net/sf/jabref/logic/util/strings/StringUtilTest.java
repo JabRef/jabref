@@ -146,14 +146,14 @@ public class StringUtilTest {
     }
 
 
-    static final String[][] stringArray1 = {{"a", "b"}, {"c", "d"}};
-    static final String encStringArray1 = "a:b;c:d";
-    static final String[][] stringArray2null = {{"a", null}, {"c", "d"}};
-    static final String encStringArray2 = "a:;c:d";
-    static final String[][] stringArray2 = {{"a", ""}, {"c", "d"}};
-    static final String encStringArray2null = "a:" + null + ";c:d";
-    static final String[][] stringArray3 = {{"a", ":b"}, {"c;", "d"}};
-    static final String encStringArray3 = "a:\\:b;c\\;:d";
+    private static final String[][] stringArray1 = {{"a", "b"}, {"c", "d"}};
+    private static final String encStringArray1 = "a:b;c:d";
+    private static final String[][] stringArray2null = {{"a", null}, {"c", "d"}};
+    private static final String encStringArray2 = "a:;c:d";
+    private static final String[][] stringArray2 = {{"a", ""}, {"c", "d"}};
+    private static final String encStringArray2null = "a:" + null + ";c:d";
+    private static final String[][] stringArray3 = {{"a", ":b"}, {"c;", "d"}};
+    private static final String encStringArray3 = "a:\\:b;c\\;:d";
 
 
     @Test

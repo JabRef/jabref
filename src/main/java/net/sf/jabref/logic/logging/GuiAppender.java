@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.logging;
 
-import net.sf.jabref.logic.logging.Cache;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -16,7 +15,7 @@ import java.io.Serializable;
 @Plugin(name = "GuiAppender", category = "Core", elementType = "appender", printObject = true)
 public class GuiAppender extends AbstractAppender {
 
-    public static final Cache cache = new Cache();
+    public static final Cache CACHE = new Cache();
 
     protected GuiAppender(String name, Filter filter, Layout<? extends Serializable> layout) {
         super(name, filter, layout);
@@ -41,7 +40,7 @@ public class GuiAppender extends AbstractAppender {
 
     @Override
     public void append(LogEvent event) {
-        cache.add(new String(this.getLayout().toByteArray(event)));
+        CACHE.add(new String(this.getLayout().toByteArray(event)));
     }
 
 }

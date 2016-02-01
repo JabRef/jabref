@@ -274,8 +274,8 @@ public class MetaData implements Iterable<String> {
             sb.append(Globals.NEWLINE).append(Globals.NEWLINE);
             List<String> orderedData = metaData.get(key);
             sb.append("@comment{").append(META_FLAG).append(key).append(':');
-            for (int j = 0; j < orderedData.size(); j++) {
-                sb.append(StringUtil.quote(orderedData.get(j), ";", '\\')).append(';');
+            for (String data : orderedData) {
+                sb.append(StringUtil.quote(data, ";", '\\')).append(';');
             }
             sb.append('}');
 

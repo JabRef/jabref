@@ -329,6 +329,13 @@ public class AuthorListTest {
     }
 
     @Test
+    public void testIsEmpty() {
+
+        Assert.assertTrue(AuthorList.getAuthorList("").isEmpty());
+        Assert.assertFalse(AuthorList.getAuthorList("Bar").isEmpty());
+    }
+
+    @Test
     public void testGetAuthor() {
 
         try {

@@ -628,8 +628,9 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
             if (author != null) {
                 AuthorList al = AuthorList.getAuthorList(author);
-                sb.append(getAuthorLastName(al, 0));
-
+                if (!al.isEmpty()) {
+                    sb.append(getAuthorLastName(al, 0));
+                }
                 if ((al.size() > 1) && ((al.size() <= maxAuthors) || (maxAuthors < 0))) {
                     int i = 1;
                     while (i < (al.size() - 1)) {
@@ -696,7 +697,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             String author = getCitationMarkerField(entries[i], database, authorField);
             if (author != null) {
                 AuthorList al = AuthorList.getAuthorList(author);
-                if (al.size() > 0) {
+                if (!al.isEmpty()) {
                     sb.append(getAuthorLastName(al, 0));
                 }
                 if ((al.size() > 1) && ((al.size() <= maxAuthors) || (maxAuthors < 0))) {

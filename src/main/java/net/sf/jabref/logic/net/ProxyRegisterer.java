@@ -1,4 +1,4 @@
-package net.sf.jabref.logic;
+package net.sf.jabref.logic.net;
 
 public class ProxyRegisterer {
 

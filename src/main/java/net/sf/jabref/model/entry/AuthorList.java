@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -634,6 +634,15 @@ public class AuthorList {
      */
     public int size() {
         return authors.size();
+    }
+
+    /**
+     * Returns true if there are no authors in the list.
+     *
+     * @return true if there are no authors in the list.
+     */
+    public boolean isEmpty() {
+        return authors.isEmpty();
     }
 
     /**
