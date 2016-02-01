@@ -27,7 +27,6 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.util.Util;
 
 /**
@@ -41,6 +40,9 @@ import net.sf.jabref.util.Util;
 public class EndnoteImporter extends ImportFormat {
 
     private static final String ENDOFRECORD = "__EOREOR__";
+
+    private static final Pattern A_PATTERN = Pattern.compile("%A .*");
+    private static final Pattern E_PATTERN = Pattern.compile("%E .*");
 
 
     /**
@@ -68,11 +70,9 @@ public class EndnoteImporter extends ImportFormat {
 
         // Our strategy is to look for the "%A *" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("%A .*");
-        Pattern pat2 = Pattern.compile("%E .*");
         String str;
         while ((str = in.readLine()) != null) {
-            if (pat1.matcher(str).matches() || pat2.matcher(str).matches()) {
+            if (A_PATTERN.matcher(str).matches() || E_PATTERN.matcher(str).matches()) {
                 return true;
             }
         }

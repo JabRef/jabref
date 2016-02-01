@@ -81,6 +81,8 @@ public class VM implements Warn {
 
     private String preamble;
 
+    private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
+
 
     public static class Identifier {
 
@@ -296,9 +298,6 @@ public class VM implements Warn {
 
         buildInFunctions.put("add.period$", new BstFunction() {
 
-            final Pattern p = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
-
-
             /**
              * Pops the top (string) literal, adds a `.' to it if the last non
              * '}' character isn't a `.', `?', or `!', and pushes this resulting
@@ -316,7 +315,7 @@ public class VM implements Warn {
                 }
 
                 String s = (String) o1;
-                Matcher m = p.matcher(s);
+                Matcher m = ADD_PERIOD_PATTERN.matcher(s);
 
                 if (m.find()) {
                     StringBuffer sb = new StringBuffer();

@@ -28,6 +28,9 @@ public class StringUtil {
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
 
+    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
+
+
     /**
      * Returns the string, after shaving off whitespace at the beginning and end,
      * and removing (at most) one pair of braces or " surrounding it.
@@ -424,7 +427,6 @@ public class StringUtil {
      * @return A new String with braces removed.
      */
     private static String removeSingleBracesAroundCapitals(String s) {
-        final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
 
         Matcher mcr = BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
         StringBuffer buf = new StringBuffer();
@@ -491,11 +493,11 @@ public class StringUtil {
         int end;
         boolean sign = false;
         char ch;
-    
+
         if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
             throw new NumberFormatException(str);
         }
-    
+
         for (;; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {

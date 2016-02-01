@@ -156,6 +156,20 @@ class MSBibEntry {
 
     private static final String bcol = "b:";
 
+    // reduced subset, supports only "CITY , STATE, COUNTRY"
+    // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
+    // WORD SPACE , SPACE WORD SPACE , SPACE WORD
+    // tested using http://www.javaregex.com/test.html
+    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s*[,]?\\s*(\\w+)\\s*[,]?\\s*(\\w+)\\b");
+
+    // Allows 20.3-2007|||20/3-  2007 etc.
+    // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
+    // 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
+    // tested using http://www.javaregex.com/test.html
+    private static final Pattern DATE_PATTERN = Pattern
+            .compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
+
+
     public MSBibEntry(BibEntry bibtex) {
         populateFromBibtex(bibtex);
     }
@@ -727,17 +741,12 @@ class MSBibEntry {
         allAuthors.appendChild(authorTop);
     }
 
-    private void addAdrress(Document document, Element parent, String address) {
+    private void addAddress(Document document, Element parent, String address) {
         if (address == null) {
             return;
         }
 
-        // reduced subset, supports only "CITY , STATE, COUNTRY"
-        // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
-        // WORD SPACE , SPACE WORD SPACE , SPACE WORD
-        // tested using http://www.javaregex.com/test.html
-        Pattern pattern = Pattern.compile("\\b(\\w+)\\s*[,]?\\s*(\\w+)\\s*[,]?\\s*(\\w+)\\b");
-        Matcher matcher = pattern.matcher(address);
+        Matcher matcher = ADDRESS_PATTERN.matcher(address);
         if (matcher.matches() && (matcher.groupCount() > 3)) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
@@ -753,12 +762,7 @@ class MSBibEntry {
             return;
         }
 
-        // Allows 20.3-2007|||20/3-  2007 etc.
-        // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
-        // 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
-        // tested using http://www.javaregex.com/test.html
-        Pattern pattern = Pattern.compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
-        Matcher matcher = pattern.matcher(date);
+        Matcher matcher = DATE_PATTERN.matcher(date);
         if (matcher.matches() && (matcher.groupCount() > 3)) {
             addField(document, parent, "Month" + extra, matcher.group(1));
             addField(document, parent, "Day" + extra, matcher.group(2));
@@ -814,7 +818,7 @@ class MSBibEntry {
         addField(document, msbibEntry, "StandardNumber", standardNumber);
         addField(document, msbibEntry, "Publisher", publisher);
 
-        addAdrress(document, msbibEntry, address);
+        addAddress(document, msbibEntry, address);
 
         addField(document, msbibEntry, "BookTitle", bookTitle);
         addField(document, msbibEntry, "ChapterNumber", chapterNumber);

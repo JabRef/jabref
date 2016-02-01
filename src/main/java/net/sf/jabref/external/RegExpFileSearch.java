@@ -43,6 +43,8 @@ public class RegExpFileSearch {
 
     private static final String EXT_MARKER = "__EXTENSION__";
 
+    private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\([^\\\\])");
+
     /**
      * Search for file links for a set of entries using regexp. Lists of extensions and directories
      * are given.
@@ -192,7 +194,7 @@ public class RegExpFileSearch {
         }
 
         // Escape handling...
-        Matcher m = Pattern.compile("([^\\\\])\\\\([^\\\\])").matcher(file);
+        Matcher m = ESCAPE_PATTERN.matcher(file);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
             m.appendReplacement(s, m.group(1) + '/' + m.group(2));

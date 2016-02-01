@@ -73,6 +73,8 @@ public class PdfContentImporter extends ImportFormat {
 
     private String year;
 
+    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d\\d\\d\\d");
+
 
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
@@ -549,8 +551,7 @@ public class PdfContentImporter extends ImportFormat {
             return;
         }
 
-        final Pattern p = Pattern.compile("\\d\\d\\d\\d");
-        Matcher m = p.matcher(curString);
+        Matcher m = YEAR_EXTRACT_PATTERN.matcher(curString);
         if (m.find()) {
             year = curString.substring(m.start(), m.end());
         }

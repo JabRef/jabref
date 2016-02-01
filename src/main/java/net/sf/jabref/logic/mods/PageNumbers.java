@@ -33,14 +33,14 @@ public class PageNumbers {
     private int start;
     private int end;
 
+    private static final Pattern PAGE_PATTERN = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
 
     public PageNumbers(String s) {
         parsePageNums(s);
     }
 
     private void parsePageNums(String numberString) {
-        Pattern pattern = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
-        Matcher matcher = pattern.matcher(numberString);
+        Matcher matcher = PAGE_PATTERN.matcher(numberString);
         if (matcher.matches()) {
             start = Integer.parseInt(matcher.group(1));
             end = Integer.parseInt(matcher.group(2));

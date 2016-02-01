@@ -23,6 +23,12 @@ import java.util.regex.Pattern;
  * This class transforms ordinal numbers into LaTex superscripts.
  */
 public class SuperscriptFormatter implements Formatter {
+
+    // find possible superscripts on word boundaries
+    private static final Pattern PATTERN = Pattern.compile("\\b(\\d+)(st|nd|rd|th)\\b",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
+
     @Override
     public String getName() {
         return "Superscripts";
@@ -43,8 +49,6 @@ public class SuperscriptFormatter implements Formatter {
      */
     @Override
     public String format(String value) {
-        // find possible superscripts on word boundaries
-        final Pattern pattern = Pattern.compile("\\b(\\d+)(st|nd|rd|th)\\b", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
         // adds superscript tag
         final String replace = "$1\\\\textsuperscript{$2}";
 
@@ -53,7 +57,7 @@ public class SuperscriptFormatter implements Formatter {
             return value;
         }
 
-        Matcher matcher = pattern.matcher(value);
+        Matcher matcher = PATTERN.matcher(value);
         // replace globally
 
         return matcher.replaceAll(replace);

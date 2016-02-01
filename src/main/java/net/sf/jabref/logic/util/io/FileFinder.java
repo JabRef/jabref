@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 public class FileFinder {
 
+    private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\([^\\\\])");
 
     public static Set<File> findFiles(Collection<String> extensions, Collection<File> directories) {
         Set<File> result = new HashSet<>();
@@ -200,7 +201,7 @@ public class FileFinder {
         }
 
         // Escape handling...
-        Matcher m = Pattern.compile("([^\\\\])\\\\([^\\\\])").matcher(file);
+        Matcher m = ESCAPE_PATTERN.matcher(file);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
             m.appendReplacement(s, m.group(1) + '/' + m.group(2));

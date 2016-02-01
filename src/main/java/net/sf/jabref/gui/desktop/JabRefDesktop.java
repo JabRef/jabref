@@ -24,12 +24,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
+
+    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
+
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
@@ -188,7 +192,7 @@ public class JabRefDesktop {
 
         boolean httpLink = false;
 
-        if (Util.REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
+        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
             httpLink = true;
         }
         /*if (link.toLowerCase().startsWith("file://")) {

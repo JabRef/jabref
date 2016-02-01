@@ -73,7 +73,7 @@ public class FileListEntryEditor {
     private boolean openBrowseWhenShown;
     private boolean dontOpenBrowseUntilDisposed;
 
-    private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
+    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
@@ -217,7 +217,7 @@ public class FileListEntryEditor {
         if ((types.getSelectedIndex() == -1) && (!link.getText().trim().isEmpty())) {
 
             // Check if this looks like a remote link:
-            if (FileListEntryEditor.remoteLinkPattern.matcher(link.getText()).matches()) {
+            if (FileListEntryEditor.REMOTE_LINK_PATTERN.matcher(link.getText()).matches()) {
                 ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
                 if (type != null) {
                     types.setSelectedItem(type);

@@ -29,12 +29,13 @@ import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.regex.Pattern;
 
-import net.sf.jabref.bibtex.EntryTypes;
-
 /**
  * INSPEC format importer.
  */
 public class InspecImporter extends ImportFormat {
+
+    private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
+
 
     /**
      * Return the name of this import format.
@@ -61,7 +62,6 @@ public class InspecImporter extends ImportFormat {
         // Our strategy is to look for the "PY <year>" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         //Pattern pat1 = Pattern.compile("PY:  \\d{4}");
-        Pattern pat1 = Pattern.compile("Record.*INSPEC.*");
 
         //was PY \\\\d{4}? before
         String str;
@@ -71,7 +71,7 @@ public class InspecImporter extends ImportFormat {
             //str = str.replace(" - ", "");
             //System.out.println(str);
 
-            if (pat1.matcher(str).find()) {
+            if (INSPEC_PATTERN.matcher(str).find()) {
                 return true;
             }
         }

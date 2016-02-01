@@ -772,6 +772,11 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
     private final Map<Integer, String> numSymbols = new HashMap<>();
     private final Map<Character, String> unicodeSymbols = new HashMap<>();
 
+    private static final Pattern ESCAPED_PATTERN = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
+    private static final Pattern ESCAPED_PATTERN2 = Pattern.compile("(.)&#([x]*)([0]*)(\\p{XDigit}+);");
+    private static final Pattern ESCAPED_PATTERN3 = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
+    private static final Pattern ESCAPED_PATTERN4 = Pattern.compile("&(\\w+);");
+
 
     public HTMLConverter() {
         super();
@@ -855,8 +860,7 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
         }
 
         // Handle numerical HTML entities
-        Pattern escapedPattern = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
-        Matcher m = escapedPattern.matcher(text);
+        Matcher m = ESCAPED_PATTERN.matcher(text);
         while (m.find()) {
             //      System.err.println("Found pattern: " + m.group(1));
             //      System.err.println("Found pattern: " + m.group(2));
@@ -866,8 +870,7 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
             }
         }
 
-        escapedPattern = Pattern.compile("(.)&#([x]*)([0]*)(\\p{XDigit}+);");
-        m = escapedPattern.matcher(text);
+        m = ESCAPED_PATTERN2.matcher(text);
         while (m.find()) {
             //      System.err.println("Found pattern: " + m.group(1));
             //      System.err.println("Found pattern: " + m.group(2));
@@ -883,8 +886,7 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
             }
         }
 
-        escapedPattern = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
-        m = escapedPattern.matcher(text);
+        m = ESCAPED_PATTERN3.matcher(text);
         while (m.find()) {
             //      System.err.println("Found pattern: " + m.group(1));
             //      System.err.println("Found pattern: " + m.group(2));
@@ -896,8 +898,7 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
         text = text.replace("$$", "");
 
         // Find non-covered special characters with alphabetic codes
-        escapedPattern = Pattern.compile("&(\\w+);");
-        m = escapedPattern.matcher(text);
+        m = ESCAPED_PATTERN4.matcher(text);
         while (m.find()) {
             LOGGER.warn("HTML escaped char not converted: " + m.group(1));
         }

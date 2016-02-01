@@ -62,7 +62,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private final Map<String, Object> properties = new HashMap<>();
     private final Map<String, Object> citProperties = new HashMap<>();
 
-    private final Pattern numPattern = Pattern.compile("-?\\d+");
+    private static final Pattern numPattern = Pattern.compile("-?\\d+");
 
     private boolean valid;
 
@@ -82,7 +82,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private static long styleFileModificationTime = Long.MIN_VALUE;
 
     //private Pattern quoted = Pattern.compile("\".*^\\\\\"");
-    private final Pattern quoted = Pattern.compile("\".*\"");
+    private static final Pattern quoted = Pattern.compile("\".*\"");
 
     private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
