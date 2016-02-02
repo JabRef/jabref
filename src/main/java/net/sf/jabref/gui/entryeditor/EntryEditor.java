@@ -200,11 +200,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         tabbed.removeAll();
         tabs.clear();
 
-<<<<<<< f8f83d27c2c83599d36292009ddb2e2359ecf975
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-=======
-        EntryType type = EntryTypes.getType(this.entry.getType());
->>>>>>> Add an optional tab that shows fields that are not displayed inside the predefined tabs
 
         // required fields
         List<String> requiredFields = type.getRequiredFieldsFlat();
@@ -219,20 +215,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         // optional fields
         List<String> displayedOptionalFields = new ArrayList<>();
 
-        if ((type.getOptionalFields() != null) && (type.getOptionalFields().size() > 0)) {
+        if ((type.getOptionalFields() != null) && (type.getOptionalFields().size() >= 1)) {
             EntryEditorTab optionalPanel;
 
-<<<<<<< f8f83d27c2c83599d36292009ddb2e2359ecf975
-        if ((type.getOptionalFields() != null) && (type.getOptionalFields().size() >= 1)) {
-            EntryEditorTab optPan;
             if (!this.frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
-                optPan = new EntryEditorTab(frame, panel, type.getOptionalFields(), this,
-=======
-            if (!prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-                displayedOptionalFields = type.getOptionalFields();
-
                 optionalPanel = new EntryEditorTab(frame, panel, type.getOptionalFields(), this,
->>>>>>> Add an optional tab that shows fields that are not displayed inside the predefined tabs
                         false, false, Localization.lang("Optional fields"));
                 if (optionalPanel.fileListEditor != null) {
                     fileListEditor = optionalPanel.fileListEditor;
