@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,6 +16,9 @@
 package net.sf.jabref.gui.journals;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
+
+import java.util.List;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.model.entry.BibEntry;
@@ -42,10 +45,7 @@ public class UnabbreviateAction extends AbstractWorker {
 
     @Override
     public void run() {
-        BibEntry[] entries = panel.getSelectedEntries();
-        if (entries == null) {
-            return;
-        }
+        List<BibEntry> entries = panel.getSelectedEntries();
 
         UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Abbreviations.journalAbbrev);
 

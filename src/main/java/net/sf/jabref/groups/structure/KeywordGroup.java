@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.groups.structure;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.undo.AbstractUndoableEdit;
@@ -162,11 +163,11 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibEntry[] entries) {
+    public AbstractUndoableEdit add(List<BibEntry> entries) {
         if (!supportsAdd()) {
             return null;
         }
-        if ((entries != null) && (entries.length > 0)) {
+        if ((entries != null) && (!entries.isEmpty())) {
             NamedCompound ce = new NamedCompound(
                     Localization.lang("add entries to group"));
             boolean modified = false;
@@ -197,12 +198,12 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibEntry[] entries) {
+    public AbstractUndoableEdit remove(List<BibEntry> entries) {
         if (!supportsRemove()) {
             return null;
         }
 
-        if ((entries != null) && (entries.length > 0)) {
+        if ((entries != null) && (!entries.isEmpty())) {
             NamedCompound ce = new NamedCompound(Localization.lang("remove from group"));
             boolean modified = false;
             for (BibEntry entry : entries) {

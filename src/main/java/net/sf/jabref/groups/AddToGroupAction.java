@@ -16,10 +16,10 @@
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Vector;
-
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
 
@@ -64,8 +64,8 @@ public class AddToGroupAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        final BibEntry[] entries = mPanel.getSelectedEntries();
-        final Vector<GroupTreeNode> removeGroupsNodes = new Vector<>(); // used only when moving
+        final List<BibEntry> entries = mPanel.getSelectedEntries();
+        final List<GroupTreeNode> removeGroupsNodes = new ArrayList<>(); // used only when moving
 
         if (m_move) {
             // collect warnings for removal
@@ -82,17 +82,20 @@ public class AddToGroupAction extends AbstractAction {
             }
             // warning for all groups from which the entries are removed, and
             // for the one to which they are added! hence the magical +1
-            AbstractGroup[] groups = new AbstractGroup[removeGroupsNodes.size() + 1];
-            for (int i = 0; i < removeGroupsNodes.size(); ++i) {
-                groups[i] = removeGroupsNodes.elementAt(i).getGroup();
+            List<AbstractGroup> groups = new ArrayList<>(removeGroupsNodes.size() + 1);
+            for (GroupTreeNode node : removeGroupsNodes) {
+                groups.add(node.getGroup());
             }
-            groups[groups.length - 1] = mNode.getGroup();
-            if (!Util.warnAssignmentSideEffects(groups, entries, mPanel.getDatabase(), mPanel.frame())) {
+            groups.set(groups.size() - 1, mNode.getGroup());
+            if (!Util.warnAssignmentSideEffects(groups.toArray(new AbstractGroup[groups.size()]),
+                    entries.toArray(new BibEntry[entries.size()]),
+                    mPanel.getDatabase(), mPanel.frame())) {
                 return; // user aborted operation
             }
         } else {
             // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()}, entries, mPanel.getDatabase(),
+            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()},
+                    entries.toArray(new BibEntry[entries.size()]), mPanel.getDatabase(),
                     mPanel.frame())) {
                 return; // user aborted operation
             }
@@ -107,8 +110,7 @@ public class AddToGroupAction extends AbstractAction {
 
         if (m_move) {
             // first remove
-            for (int i = 0; i < removeGroupsNodes.size(); ++i) {
-                GroupTreeNode node = removeGroupsNodes.elementAt(i);
+            for (GroupTreeNode node : removeGroupsNodes) {
                 if (node.getGroup().containsAny(entries)) {
                     AbstractUndoableEdit undoRemove = node.removeFromGroup(entries);
                     if (undoRemove != null) {

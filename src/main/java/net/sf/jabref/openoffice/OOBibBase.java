@@ -250,24 +250,24 @@ class OOBibBase {
      * @param sync Indicates whether the reference list should be refreshed.
      * @throws Exception
      */
-    public void insertEntry(BibEntry[] entries, BibDatabase database, List<BibDatabase> allBases, OOBibStyle style,
+    public void insertEntry(List<BibEntry> entries, BibDatabase database, List<BibDatabase> allBases, OOBibStyle style,
             boolean inParenthesis, boolean withText, String pageInfo, boolean sync) throws Exception {
 
         try {
 
             XTextViewCursor xViewCursor = xViewCursorSupplier.getViewCursor();
 
-            if (entries.length > 1) {
+            if (entries.size() > 1) {
                 if (style.getBooleanCitProperty("MultiCiteChronological")) {
-                    Arrays.sort(entries, yearAuthorTitleComparator);
+                    Collections.sort(entries, yearAuthorTitleComparator);
                 } else {
-                    Arrays.sort(entries, entryComparator);
+                    Collections.sort(entries, entryComparator);
                 }
             }
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < entries.length; i++) {
-                BibEntry entry = entries[i];
+            for (int i = 0; i < entries.size(); i++) {
+                BibEntry entry = entries.get(i);
                 if (i > 0) {
                     sb.append(',');
                 }
@@ -512,10 +512,11 @@ class OOBibBase {
                     }
 
                     citationMarker = style.getCitationMarker(cEntries, entries.get(cEntries),
-                            type == OOBibBase.AUTHORYEAR_PAR, (String[]) null, (int[]) null);
+                            type == OOBibBase.AUTHORYEAR_PAR, null, null);
                     // We need "normalized" (in parenthesis) markers for uniqueness checking purposes:
                     for (int j = 0; j < cEntries.length; j++) {
-                        normCitMarker[j] = style.getCitationMarker(cEntries[j], entries.get(cEntries), true, null, -1);
+                        normCitMarker[j] = style.getCitationMarker(new BibEntry[] {cEntries[j]}, entries.get(cEntries),
+                                true, null, new int[] {-1});
                     }
                 }
                 citMarkers[i] = citationMarker;

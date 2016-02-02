@@ -379,7 +379,7 @@ public class FileActions {
      * @return A List containing warnings, if any.
      */
     public static SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, File target,
-                                                 JabRefPreferences prefs, BibEntry[] bes, Charset encoding, DatabaseSaveType saveType)
+            JabRefPreferences prefs, List<BibEntry> bes, Charset encoding, DatabaseSaveType saveType)
             throws SaveException {
 
 
@@ -418,8 +418,7 @@ public class FileActions {
             List<Comparator<BibEntry>> comparators = FileActions.getSaveComparators(true, bibDatabaseContext.getMetaData());
 
             // Use glazed lists to get a sorted view of the entries:
-            List<BibEntry> sorter = new ArrayList<>(bes.length);
-            Collections.addAll(sorter, bes);
+            List<BibEntry> sorter = new ArrayList<>(bes);
             Collections.sort(sorter, new FieldComparatorStack<>(comparators));
 
             BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);

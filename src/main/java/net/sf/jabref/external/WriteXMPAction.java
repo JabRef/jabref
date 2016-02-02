@@ -21,7 +21,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -50,7 +49,7 @@ public class WriteXMPAction extends AbstractWorker {
 
     private final BasePanel panel;
 
-    private BibEntry[] entries;
+    private List<BibEntry> entries;
 
     private BibDatabase database;
 
@@ -74,12 +73,11 @@ public class WriteXMPAction extends AbstractWorker {
         // Get entries and check if it makes sense to perform this operation
         entries = panel.getSelectedEntries();
 
-        if (entries.length == 0) {
+        if (entries.isEmpty()) {
 
-            Collection<BibEntry> var = database.getEntries();
-            entries = var.toArray(new BibEntry[var.size()]);
+            entries.addAll(database.getEntries());
 
-            if (entries.length == 0) {
+            if (entries.isEmpty()) {
 
                 JOptionPane.showMessageDialog(panel, Localization.lang("This operation requires at least one entry."),
                         Localization.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);

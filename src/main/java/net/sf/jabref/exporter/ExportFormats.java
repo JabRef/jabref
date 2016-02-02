@@ -202,7 +202,7 @@ public class ExportFormats {
                     final IExportFormat format = eff.getExportFormat();
                     Set<String> entryIds = null;
                     if (selectedOnly) {
-                        BibEntry[] selected = frame.getCurrentBasePanel().getSelectedEntries();
+                        List<BibEntry> selected = frame.getCurrentBasePanel().getSelectedEntries();
                         entryIds = new HashSet<>();
                         for (BibEntry bibtexEntry : selected) {
                             entryIds.add(bibtexEntry.getId());

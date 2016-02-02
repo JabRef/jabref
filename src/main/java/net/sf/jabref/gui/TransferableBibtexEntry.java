@@ -26,6 +26,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 
 /*
  * A transferable object containing an array of BibEntry objects. Used
@@ -33,11 +34,11 @@ import java.io.StringWriter;
  */
 public class TransferableBibtexEntry implements Transferable {
 
-    private final BibEntry[] data;
+    private final List<BibEntry> data;
     public static final DataFlavor entryFlavor = new DataFlavor(BibEntry.class, "JabRef entry");
 
 
-    public TransferableBibtexEntry(BibEntry[] data) {
+    public TransferableBibtexEntry(List<BibEntry> data) {
         this.data = data;
     }
 
@@ -56,7 +57,7 @@ public class TransferableBibtexEntry implements Transferable {
     public Object getTransferData(DataFlavor flavor)
             throws UnsupportedFlavorException {
         if (flavor.equals(TransferableBibtexEntry.entryFlavor)) {
-            return data;
+            return data.toArray(new BibEntry[data.size()]);
         } else if (flavor.equals(DataFlavor.stringFlavor)) {
             try {
                 StringWriter sw = new StringWriter();

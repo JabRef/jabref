@@ -42,7 +42,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -479,15 +480,15 @@ class GroupDialog extends JDialog {
         if (i == JOptionPane.NO_OPTION) {
             return;
         }
-        Vector<BibEntry> vec = new Vector<>();
+        List<BibEntry> list = new ArrayList<>();
         for (BibEntry entry : m_basePanel.database().getEntries()) {
             if (m_editedGroup.contains(entry)) {
-                vec.add(entry);
+                list.add(entry);
             }
         }
-        if (!vec.isEmpty()) {
-            BibEntry[] entries = new BibEntry[vec.size()];
-            vec.toArray(entries);
+        if (!list.isEmpty()) {
+            BibEntry[] entries = new BibEntry[list.size()];
+            list.toArray(entries);
             if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mResultingGroup},
                     entries, m_basePanel.getDatabase(), this)) {
                 return;
@@ -495,7 +496,7 @@ class GroupDialog extends JDialog {
             // the undo information for a conversion to an ExplicitGroup is
             // contained completely in the UndoableModifyGroup object.
             if (!(mResultingGroup instanceof ExplicitGroup)) {
-                mUndoAddPreviousEntires = mResultingGroup.add(entries);
+                mUndoAddPreviousEntires = mResultingGroup.add(list);
             }
         }
     }

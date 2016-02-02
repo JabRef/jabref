@@ -17,6 +17,9 @@ package net.sf.jabref.specialfields;
 
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.model.entry.BibEntry;
+
+import java.util.List;
+
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
@@ -32,7 +35,7 @@ public class SpecialFieldAction implements BaseAction {
 
 
     /**
-     * 
+     *
      * @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
      * @param doneTextPattern - the pattern to use to update status information shown in MainFrame
      */
@@ -55,10 +58,7 @@ public class SpecialFieldAction implements BaseAction {
     public void action() {
         try {
             NamedCompound ce = new NamedCompound(undoText);
-            BibEntry[] bes = frame.getCurrentBasePanel().getSelectedEntries();
-            if (bes == null) {
-                return;
-            }
+            List<BibEntry> bes = frame.getCurrentBasePanel().getSelectedEntries();
             for (BibEntry be : bes) {
                 // if (value==null) and then call nullField has been ommited as updatefield also handles value==null
                 SpecialFieldsUtils.updateField(c, value, be, ce, nullFieldIfValueIsTheSame);
@@ -70,9 +70,9 @@ public class SpecialFieldAction implements BaseAction {
                 frame.getCurrentBasePanel().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame) {
-                    outText = Localization.lang(doneTextPattern, Integer.toString(bes.length));
+                    outText = Localization.lang(doneTextPattern, Integer.toString(bes.size()));
                 } else {
-                    outText = Localization.lang(doneTextPattern, value, Integer.toString(bes.length));
+                    outText = Localization.lang(doneTextPattern, value, Integer.toString(bes.size()));
                 }
                 frame.output(outText);
             } else {

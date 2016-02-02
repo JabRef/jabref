@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 7, 2007 Time: 6:55:56 PM To change this template use File | Settings
@@ -73,7 +74,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void pushEntries(BibDatabase database, BibEntry[] entries, String keys, MetaData metaData) {
+    public void pushEntries(BibDatabase database, List<BibEntry> entries, String keys, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;
