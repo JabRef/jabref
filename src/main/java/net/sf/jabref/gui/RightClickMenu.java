@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -25,8 +24,6 @@ import javax.swing.event.PopupMenuListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.*;
-import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
@@ -48,18 +45,15 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private static final Log LOGGER = LogFactory.getLog(RightClickMenu.class);
 
     private final BasePanel panel;
-    private final MetaData metaData;
-    private final JMenu groupAddMenu = new JMenu(Localization.lang("Add to group"));
-    private final JMenu groupRemoveMenu = new JMenu(Localization.lang("Remove from group"));
-    private final JMenu groupMoveMenu = new JMenu(Localization.lang("Assign exclusively to group"));
     private final JMenuItem groupAdd;
     private final JMenuItem groupRemove;
+    private final JMenuItem groupMoveTo;
     private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Localization.lang("Float marked entries"),
             Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
-    public RightClickMenu(BasePanel panel, MetaData metaData) {
+
+    public RightClickMenu(BasePanel panel) {
         this.panel = panel;
-        this.metaData = metaData;
         JMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
         boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
@@ -194,7 +188,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         groupRemove = new JMenuItem(new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang("Remove from group")));
         add(groupRemove);
 
-        JMenuItem groupMoveTo = add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
+        groupMoveTo = add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
         add(groupMoveTo);
 
         floatMarked.addActionListener(new ActionListener() {
@@ -233,9 +227,11 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (groups == null) {
             groupAdd.setEnabled(false);
             groupRemove.setEnabled(false);
+            groupMoveTo.setEnabled(false);
         } else {
             groupAdd.setEnabled(true);
             groupRemove.setEnabled(true);
+            groupMoveTo.setEnabled(true);
         }
 
         addSeparator();
@@ -243,110 +239,10 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(floatMarked);
     }
 
-    private JMenu buildGroupMenu(BibEntry[] bes, boolean add, boolean move) {
-        if (bes == null) {
-            return null;
-        }
-        GroupTreeNode groups = metaData.getGroups();
-        if (groups == null) {
-            groupAddMenu.setEnabled(false);
-            groupMoveMenu.setEnabled(false);
-            groupRemoveMenu.setEnabled(false);
-            return null;
-        }
-
-        JMenu groupMenu = new JMenu();
-        insertNodes(groupMenu, metaData.getGroups(), bes, add, move);
-
-        return groupMenu;
-
-    }
-
-    /**
-     * @param move For add: if true, remove from previous groups
-     */
-    private void insertNodes(JMenu menu, GroupTreeNode node, BibEntry[] selection,
-                             boolean add, boolean move) {
-        final AbstractAction action = getAction(node, selection, add, move);
-
-        if (node.getChildCount() == 0) {
-            JMenuItem menuItem = new JMenuItem(action);
-            setGroupFontAndIcon(menuItem, node.getGroup());
-            menu.add(menuItem);
-            if (action.isEnabled()) {
-                menu.setEnabled(true);
-            }
-            return;
-        }
-
-        JMenu submenu;
-        if (node.getGroup() instanceof AllEntriesGroup) {
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(menu, (GroupTreeNode) node.getChildAt(i), selection, add, move);
-            }
-        } else {
-            submenu = new JMenu('[' + node.getGroup().getName() + ']');
-            setGroupFontAndIcon(submenu, node.getGroup());
-            // setEnabled(true) is done above/below if at least one menu
-            // entry (item or submenu) is enabled
-            submenu.setEnabled(action.isEnabled());
-            JMenuItem menuItem = new JMenuItem(action);
-            setGroupFontAndIcon(menuItem, node.getGroup());
-            submenu.add(menuItem);
-            submenu.add(new Separator());
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(submenu, (GroupTreeNode) node.getChildAt(i), selection, add, move);
-            }
-            menu.add(submenu);
-            if (submenu.isEnabled()) {
-                menu.setEnabled(true);
-            }
-        }
-    }
-
-    /** Sets the font and icon to be used, depending on the group */
-    private void setGroupFontAndIcon(JMenuItem menuItem, AbstractGroup group) {
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)) {
-            menuItem.setFont(menuItem.getFont().deriveFont(group.isDynamic() ?
-                    Font.ITALIC : Font.PLAIN));
-        }
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
-            switch (group.getHierarchicalContext()) {
-            case INCLUDING:
-                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon());
-                break;
-            case REFINING:
-                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon());
-                break;
-            default:
-                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_REGULAR.getSmallIcon());
-                break;
-            }
-        }
-    }
-
-    /**
-     * @param move For add: if true, remove from all previous groups
-     */
-    private AbstractAction getAction(GroupTreeNode node, BibEntry[] selection,
-            boolean add, boolean move) {
-        AbstractAction action = add ? new AddToGroupAction(node, move,
-                panel) : new RemoveFromGroupAction(node, panel);
-        AbstractGroup group = node.getGroup();
-        if (move) {
-            action.setEnabled(group.supportsAdd());
-        } else {
-            action.setEnabled(add ? group.supportsAdd() && !group.containsAll(selection)
-                    : group.supportsRemove() && group.containsAny(selection));
-        }
-        return action;
-    }
 
     @Override
     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-        remove(groupAddMenu);
-        remove(groupMoveMenu);
-        remove(groupRemoveMenu);
+        // Nothing to do
     }
 
     @Override
