@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,6 +20,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -28,7 +29,7 @@ class TransferableEntrySelection implements Transferable {
     public static final DataFlavor FLAVOR_INTERNAL;
     private static final DataFlavor FLAVOR_EXTERNAL;
     private static final DataFlavor[] FLAVORS;
-    private final BibEntry[] selectedEntries;
+    private final List<BibEntry> selectedEntries;
     private final String selectedEntriesCiteKeys;
 
     private boolean includeCiteKeyword;
@@ -49,12 +50,12 @@ class TransferableEntrySelection implements Transferable {
     }
 
 
-    public TransferableEntrySelection(BibEntry[] selectedEntries) {
+    public TransferableEntrySelection(List<BibEntry> selectedEntries) {
         this.selectedEntries = selectedEntries;
         StringBuilder keys = new StringBuilder();
-        for (int i = 0; i < selectedEntries.length; ++i) {
-            keys.append(selectedEntries[i].getCiteKey());
-            if ((i + 1) < selectedEntries.length) {
+        for (int i = 0; i < selectedEntries.size(); ++i) {
+            keys.append(selectedEntries.get(i).getCiteKey());
+            if ((i + 1) < selectedEntries.size()) {
                 keys.append(',');
             }
         }
@@ -91,7 +92,7 @@ class TransferableEntrySelection implements Transferable {
         return new ByteArrayInputStream(s.getBytes(charset.trim()));
     }
 
-    public BibEntry[] getSelection() {
+    public List<BibEntry> getSelection() {
         return selectedEntries;
     }
 

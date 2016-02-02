@@ -25,6 +25,7 @@ import java.awt.dnd.*;
 import java.awt.event.InputEvent;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JTree;
@@ -277,7 +278,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 }
                 final TransferableEntrySelection selection = (TransferableEntrySelection) transferable
                         .getTransferData(TransferableEntrySelection.FLAVOR_INTERNAL);
-                final BibEntry[] entries = selection.getSelection();
+                final List<BibEntry> entries = selection.getSelection();
                 int assignedEntries = 0;
                 for (BibEntry entry : entries) {
                     if (!target.getGroup().contains(entry)) {
@@ -289,8 +290,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // field != keywords)
                 if (!Util.warnAssignmentSideEffects(
                         new AbstractGroup[] {group},
-                        selection.getSelection(), groupSelector
-                                .getActiveBasePanel().getDatabase(),
+                        selection.getSelection().toArray(new BibEntry[selection.getSelection().size()]),
+                        groupSelector.getActiveBasePanel().getDatabase(),
                         groupSelector.frame))
                  {
                     return; // user aborted operation

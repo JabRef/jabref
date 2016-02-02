@@ -27,6 +27,7 @@ import javax.swing.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 /**
  *
@@ -69,12 +70,12 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
     @Override
     public void run() {
         BasePanel panel = frame.getCurrentBasePanel();
-        BibEntry[] bes = panel.getSelectedEntries();
+        List<BibEntry> bes = panel.getSelectedEntries();
 
         // used at update() to determine output string
-        besLength = bes.length;
+        besLength = bes.size();
 
-        if (bes.length != 0) {
+        if (!bes.isEmpty()) {
             NamedCompound ce = new NamedCompound(Localization.lang("Mark entries"));
             for (BibEntry be : bes) {
                 EntryMarker.markEntry(be, level + 1, false, ce);

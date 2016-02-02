@@ -26,6 +26,8 @@ import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
+import java.util.List;
+
 import javax.swing.undo.AbstractUndoableEdit;
 
 /**
@@ -143,13 +145,13 @@ public class SearchGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibEntry[] entries) {
+    public AbstractUndoableEdit add(List<BibEntry> entries) {
         // nothing to do, add is not supported
         return null;
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibEntry[] entries) {
+    public AbstractUndoableEdit remove(List<BibEntry> entries) {
         // nothing to do, remove is not supported
         return null;
     }

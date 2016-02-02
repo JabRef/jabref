@@ -17,6 +17,7 @@ package net.sf.jabref.external.push;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -79,7 +80,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     }
 
     @Override
-    public void pushEntries(BibDatabase database, BibEntry[] entries, String keys, MetaData metaData) {
+    public void pushEntries(BibDatabase database, List<BibEntry> entries, String keys, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;

@@ -621,8 +621,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             moveNodeLeftPopupAction.setNode(node);
             moveNodeRightPopupAction.setNode(node);
             // add/remove entries to/from group
-            BibEntry[] selection = frame.getCurrentBasePanel().getSelectedEntries();
-            if (selection.length > 0) {
+            List<BibEntry> selection = frame.getCurrentBasePanel().getSelectedEntries();
+            if (!selection.isEmpty()) {
                 if (node.getGroup().supportsAdd() && !node.getGroup().containsAll(selection)) {
                     addToGroup.setNode(node);
                     addToGroup.setBasePanel(panel);
@@ -672,7 +672,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * @param node deletion != addition
      */
     private void updateGroupContent(GroupTreeNode node) {
-        BibEntry[] entries = panel.getSelectedEntries();
+        List<BibEntry> entries = panel.getSelectedEntries();
         AbstractGroup group = node.getGroup();
         AbstractUndoableEdit undoRemove = null;
         AbstractUndoableEdit undoAdd = null;
@@ -680,8 +680,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // Sort entries into current members and non-members of the group
         // Current members will be removed
         // Current non-members will be added
-        ArrayList<BibEntry> toRemove = new ArrayList<>(entries.length);
-        ArrayList<BibEntry> toAdd = new ArrayList<>(entries.length);
+        ArrayList<BibEntry> toRemove = new ArrayList<>(entries.size());
+        ArrayList<BibEntry> toAdd = new ArrayList<>(entries.size());
 
         for (BibEntry entry : entries) {
             // Sort according to current state of the entries
@@ -696,11 +696,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         // If there are entries to remove
         if (!toRemove.isEmpty()) {
-            undoRemove = node.removeFromGroup(toRemove.toArray(new BibEntry[toRemove.size()]));
+            undoRemove = node.removeFromGroup(toRemove);
         }
         // If there are entries to add
         if (!toAdd.isEmpty()) {
-            undoAdd = node.addToGroup(toAdd.toArray(new BibEntry[toAdd.size()]));
+            undoAdd = node.addToGroup(toAdd);
         }
 
         // Remember undo information

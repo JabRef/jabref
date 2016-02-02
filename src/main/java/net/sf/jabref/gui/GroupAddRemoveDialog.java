@@ -9,6 +9,7 @@ import net.sf.jabref.groups.*;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.logic.l10n.Localization;
 
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -33,7 +34,7 @@ public class GroupAddRemoveDialog implements BaseAction {
     private final BasePanel panel;
     private final boolean add;
     private final boolean move;
-    private BibEntry[] selection;
+    private List<BibEntry> selection;
     private JTree tree;
     private JButton ok;
 
@@ -220,8 +221,8 @@ public class GroupAddRemoveDialog implements BaseAction {
      * @return true if this dialog's action can be performed on the group
      */
     private boolean checkGroupEnable(AbstractGroup group) {
-        return (add ? group.supportsAdd() && !group.containsAll(selection)
-                : group.supportsRemove() && group.containsAny(selection));
+        return (add ? group.supportsAdd() && !group.containsAll(selection) : group.supportsRemove()
+                && group.containsAny(selection));
     }
 
 

@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.external.push;
 
+import java.util.List;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -55,12 +56,12 @@ public interface PushToApplication {
     /**
      * The actual operation. This method will not be called on the event dispatch thread, so it should not do GUI
      * operations without utilizing invokeLater().
-     * 
+     *
      * @param database
      * @param entries
      * @param metaData
      */
-    void pushEntries(BibDatabase database, BibEntry[] entries, String keyString, MetaData metaData);
+    void pushEntries(BibDatabase database, List<BibEntry> entries, String keyString, MetaData metaData);
 
     /**
      * Reporting etc., this method is called on the event dispatch thread after pushEntries() returns.
@@ -70,7 +71,7 @@ public interface PushToApplication {
     /**
      * Check whether this operation requires BibTeX keys to be set for the entries. If true is returned an error message
      * will be displayed if keys are missing.
-     * 
+     *
      * @return true if BibTeX keys are required for this operation.
      */
     boolean requiresBibtexKeys();

@@ -23,6 +23,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 public class RemoveFromGroupAction extends AbstractAction {
@@ -53,7 +54,7 @@ public class RemoveFromGroupAction extends AbstractAction {
     public void actionPerformed(ActionEvent evt) {
         // warn if assignment has undesired side effects (modifies a field != keywords)
         if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()},
-                mPanel.getSelectedEntries(),
+                mPanel.getSelectedEntries().toArray(new BibEntry[mPanel.getSelectedEntries().size()]),
                 mPanel.getDatabase(),
                 mPanel.frame()))
          {

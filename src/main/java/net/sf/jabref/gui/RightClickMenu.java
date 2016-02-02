@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -22,6 +22,8 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+
+import java.util.List;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.*;
@@ -243,7 +245,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(floatMarked);
     }
 
-    private JMenu buildGroupMenu(BibEntry[] bes, boolean add, boolean move) {
+    private JMenu buildGroupMenu(List<BibEntry> bes, boolean add, boolean move) {
         if (bes == null) {
             return null;
         }
@@ -265,8 +267,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     /**
      * @param move For add: if true, remove from previous groups
      */
-    private void insertNodes(JMenu menu, GroupTreeNode node, BibEntry[] selection,
-                             boolean add, boolean move) {
+    private void insertNodes(JMenu menu, GroupTreeNode node, List<BibEntry> selection, boolean add, boolean move) {
         final AbstractAction action = getAction(node, selection, add, move);
 
         if (node.getChildCount() == 0) {
@@ -328,8 +329,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     /**
      * @param move For add: if true, remove from all previous groups
      */
-    private AbstractAction getAction(GroupTreeNode node, BibEntry[] selection,
-            boolean add, boolean move) {
+    private AbstractAction getAction(GroupTreeNode node, List<BibEntry> selection, boolean add, boolean move) {
         AbstractAction action = add ? new AddToGroupAction(node, move,
                 panel) : new RemoveFromGroupAction(node, panel);
         AbstractGroup group = node.getGroup();
