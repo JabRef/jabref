@@ -43,8 +43,7 @@ class ModsExportFormat extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData,
- final String file,
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, Set<String> keySet) throws IOException {
         SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
         try (VerifyingWriter ps = ss.getWriter()) {

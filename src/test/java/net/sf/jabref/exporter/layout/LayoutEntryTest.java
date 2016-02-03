@@ -1,5 +1,6 @@
 package net.sf.jabref.exporter.layout;
 
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import java.io.StringReader;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import static org.mockito.Mockito.*;
 
 /**
  * The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry.
@@ -50,6 +52,7 @@ public class LayoutEntryTest {
             Globals.prefs = JabRefPreferences.getInstance();
             Globals.prefs.putBoolean("highLightWords", Boolean.TRUE);
         }
+        Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
 
         // create Bibtext Entry
 
@@ -82,7 +85,7 @@ public class LayoutEntryTest {
 
     public String layout(String layoutFile, BibEntry entry, Optional<Pattern> highlightPattern) throws Exception {
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+        Layout layout = new LayoutHelper(sr).getLayoutFromText();
 
         return layout.doLayout(entry, null, highlightPattern);
     }

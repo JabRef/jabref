@@ -57,7 +57,7 @@ import net.sf.jabref.importer.CustomImportList;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
-public final class JabRefPreferences {
+public class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
 

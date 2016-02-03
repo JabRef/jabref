@@ -101,7 +101,8 @@ public class MoveFileAction extends AbstractAction {
                 String chosenFile;
                 if (toFileDir) {
                     // Determine which name to suggest:
-                    String suggName = Util.getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry())
+                    String suggName = Util
+                            .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry())
                             .concat(flEntry.type == null ? "" : "." + flEntry.type.getExtension());
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),

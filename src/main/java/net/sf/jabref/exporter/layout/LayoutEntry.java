@@ -21,10 +21,13 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.gui.search.MatchesHighlighter;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
+import net.sf.jabref.exporter.layout.format.JournalAbbreviator;
 import net.sf.jabref.exporter.layout.format.NameFormatter;
 import net.sf.jabref.exporter.layout.format.NotFoundFormatter;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
@@ -45,16 +48,13 @@ class LayoutEntry {
 
     private final int type;
 
-    private final String classPrefix;
-
     private List<String> invalidFormatter;
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
 
-    public LayoutEntry(StringInt si, final String classPrefix_) {
+    public LayoutEntry(StringInt si, JournalAbbreviationRepository repository) {
         type = si.i;
-        classPrefix = classPrefix_;
 
         if (type == LayoutHelper.IS_LAYOUT_TEXT) {
             text = si.s;
@@ -71,7 +71,7 @@ class LayoutEntry {
             } else {
                 text = v.get(0).trim();
 
-                option = LayoutEntry.getOptionalLayout(v.get(1), classPrefix);
+                option = LayoutEntry.getOptionalLayout(v.get(1), repository);
                 // See if there was an undefined formatter:
                 for (LayoutFormatter anOption : option) {
                     if (anOption instanceof NotFoundFormatter) {
@@ -88,8 +88,7 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(List<StringInt> parsedEntries, final String classPrefix_, int layoutType) {
-        classPrefix = classPrefix_;
+    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JournalAbbreviationRepository repository) {
         List<StringInt> blockEntries = null;
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         LayoutEntry le;
@@ -113,9 +112,9 @@ class LayoutEntry {
                 if (blockStart.equals(parsedEntry.s)) {
                     blockEntries.add(parsedEntry);
                     if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
-                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_GROUP_START, repository);
                     } else {
-                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_FIELD_START, repository);
                     }
                     tmpEntries.add(le);
                     blockEntries = null;
@@ -127,7 +126,7 @@ class LayoutEntry {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, classPrefix));
+                tmpEntries.add(new LayoutEntry(parsedEntry, repository));
             } else {
                 blockEntries.add(parsedEntry);
             }
@@ -355,33 +354,37 @@ class LayoutEntry {
 
     // added section - end (arudert)
 
-    private static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
+    private static LayoutFormatter getLayoutFormatterByClassName(String className,
+            JournalAbbreviationRepository repostiory)
             throws Exception {
 
-        if (!className.isEmpty()) {
-            try {
-                try {
-                    return (LayoutFormatter) Class.forName(classPrefix + className).newInstance();
-                } catch (Throwable ex2) {
-                    return (LayoutFormatter) Class.forName(className).newInstance();
-                }
-            } catch (ClassNotFoundException ex) {
-                throw new Exception("Formatter not found: " + className);
-            } catch (InstantiationException ex) {
-                throw new Exception(className + " cannot be instantiated.");
-            } catch (IllegalAccessException ex) {
-                throw new Exception(className + " cannot be accessed.");
-            }
+        if (className.isEmpty()) {
+            return null;
         }
-        return null;
+
+        if (className.equals("JournalAbbreviator")) {
+            return new JournalAbbreviator(repostiory);
+        }
+
+        try {
+            String prefix = "net.sf.jabref.exporter.layout.format.";
+            return (LayoutFormatter) Class.forName(prefix + className).newInstance();
+        } catch (ClassNotFoundException ex) {
+            throw new Exception("Formatter not found: " + className);
+        } catch (InstantiationException ex) {
+            throw new Exception(className + " cannot be instantiated.");
+        } catch (IllegalAccessException ex) {
+            throw new Exception(className + " cannot be accessed.");
+        }
     }
 
     /**
      * Return an array of LayoutFormatters found in the given formatterName
      * string (in order of appearance).
+     * @param repository
      *
      */
-    private static LayoutFormatter[] getOptionalLayout(String formatterName, String classPrefix) {
+    private static LayoutFormatter[] getOptionalLayout(String formatterName, JournalAbbreviationRepository repository) {
 
         List<String[]> formatterStrings = Util.parseMethodsCalls(formatterName);
 
@@ -406,7 +409,7 @@ class LayoutEntry {
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, classPrefix);
+                LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, repository);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if ((f instanceof ParamLayoutFormatter) && (strings.length >= 2)) {

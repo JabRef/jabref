@@ -52,8 +52,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData,
- final String file,
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, Set<String> keySet) throws Exception {
         OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), database, keySet);
     }

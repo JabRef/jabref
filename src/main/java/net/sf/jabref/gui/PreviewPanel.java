@@ -94,6 +94,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private Optional<Pattern> highlightPattern = Optional.empty();
 
+
     /**
      * @param database
      *            (may be null) Optionally used to resolve strings.
@@ -254,7 +255,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     private void updateLayout() {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
-            layout = Optional.of(new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE));
+            layout = Optional.of(
+                    new LayoutHelper(sr).getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
             LOGGER.debug("no layout could be set", e);

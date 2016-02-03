@@ -57,7 +57,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         super(p0, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
-        List<EntryFetcher> fetchers = EntryFetchers.INSTANCE.getEntryFetchers();
+        List<EntryFetcher> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
         fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
         Arrays.sort(fetcherArray, new EntryFetcherComparator());
         //JLabel[] choices = new JLabel[fetchers.size()];

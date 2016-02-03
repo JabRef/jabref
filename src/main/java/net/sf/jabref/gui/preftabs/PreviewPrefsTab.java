@@ -15,26 +15,22 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.*;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 class PreviewPrefsTab extends JPanel implements PrefsTab {
 

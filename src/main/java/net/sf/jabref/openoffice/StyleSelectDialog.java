@@ -465,7 +465,7 @@ class StyleSelectDialog {
      */
     private void addSingleFile(File file) {
         try {
-            OOBibStyle style = new OOBibStyle(file);
+            OOBibStyle style = new OOBibStyle(file, Globals.journalAbbreviationLoader.getRepository());
             // Check if the parse was successful before adding it:
             if (style.isValid() && !styles.contains(style)) {
                 styles.add(style);

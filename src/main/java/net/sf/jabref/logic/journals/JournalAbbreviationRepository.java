@@ -18,8 +18,6 @@ package net.sf.jabref.logic.journals;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
@@ -34,23 +32,6 @@ public class JournalAbbreviationRepository {
     private final SortedSet<Abbreviation> abbreviations = new TreeSet<>();
 
     private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationRepository.class);
-
-    public void readJournalListFromResource(String resource) {
-        AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromResource(Objects.requireNonNull(resource));
-        for (Abbreviation abbreviation : parser.getAbbreviations()) {
-            addEntry(abbreviation);
-        }
-    }
-
-    public void readJournalListFromFile(File file) throws FileNotFoundException {
-        LOGGER.debug("Reading journal list from file " + file);
-        AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromFile(Objects.requireNonNull(file));
-        for (Abbreviation abbreviation : parser.getAbbreviations()) {
-            addEntry(abbreviation);
-        }
-    }
 
     public int size() {
         return abbreviations.size();
@@ -104,6 +85,10 @@ public class JournalAbbreviationRepository {
         fullNameLowerCase2Abbreviation.put(abbreviation.getName().toLowerCase(), abbreviation);
         isoLowerCase2Abbreviation.put(abbreviation.getIsoAbbreviation().toLowerCase(), abbreviation);
         medlineLowerCase2Abbreviation.put(abbreviation.getMedlineAbbreviation().toLowerCase(), abbreviation);
+    }
+
+    public void addEntries(List<Abbreviation> abbreviationsToAdd) {
+        abbreviationsToAdd.forEach(abbreviation -> addEntry(abbreviation));
     }
 
     public SortedSet<Abbreviation> getAbbreviations() {

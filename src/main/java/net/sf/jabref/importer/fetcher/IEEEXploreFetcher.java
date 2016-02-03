@@ -28,6 +28,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,7 @@ import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
@@ -71,9 +72,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
     private boolean shouldContinue;
+    private final JournalAbbreviationLoader abbreviationLoader;
 
-    public IEEEXploreFetcher() {
+
+    public IEEEXploreFetcher(JournalAbbreviationLoader abbreviationLoader) {
         super();
+        this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
         CookieHandler.setDefault(new CookieManager());
     }
 
@@ -436,7 +440,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
                 fullName = fullName.trim();
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-                    fullName = Abbreviations.journalAbbrev.getMedlineAbbreviation(fullName).orElse(fullName);
+                    fullName = abbreviationLoader.getRepository().getMedlineAbbreviation(fullName).orElse(fullName);
                 }
             }
             if ("inproceedings".equals(type)) {

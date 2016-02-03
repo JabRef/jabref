@@ -370,7 +370,7 @@ public class Util {
         StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+            layout = new LayoutHelper(sr).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }

@@ -806,7 +806,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
                     Layout layout;
                     try {
-                        layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+                        layout = new LayoutHelper(sr).getLayoutFromText();
                     } catch (IOException e) {
                         LOGGER.info("Could not get layout", e);
                         return;
@@ -1641,12 +1641,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
-            autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(), autoCompletePreferences);
+            autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(), autoCompletePreferences,
+                    Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
-            autoCompleters = new ContentAutoCompleters(autoCompletePreferences);
+            autoCompleters = new ContentAutoCompleters(autoCompletePreferences, Globals.journalAbbreviationLoader);
         }
 
         // restore floating search result

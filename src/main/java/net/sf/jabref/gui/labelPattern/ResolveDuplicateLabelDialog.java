@@ -55,8 +55,7 @@ class ResolveDuplicateLabelDialog {
             "<p></p></font>";
 
 
-    public ResolveDuplicateLabelDialog(BasePanel panel, String key,
-            List<BibEntry> entries) {
+    public ResolveDuplicateLabelDialog(BasePanel panel, String key, List<BibEntry> entries) {
         diag = new JDialog(panel.frame(), Localization.lang("Duplicate BibTeX key"), true);
 
         FormBuilder b = FormBuilder.create().layout(new FormLayout(

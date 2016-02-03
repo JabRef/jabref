@@ -1,9 +1,9 @@
-/* 
+/*
  * Copyright (C) 2006 Jabref-Team
  *               2005 Dept. Computer Architecture, University of Tuebingen, Germany
  *               2005 Joerg K. Wegner
  *               2003 Morten O. Alver, Nizar N. Batada
- *               
+ *
  * All programs in this directory and subdirectories are published under the GNU
  * General Public License as described below.
  *
@@ -27,28 +27,37 @@
  */
 package net.sf.jabref.exporter.layout.format;
 
+import java.util.Objects;
+
 import net.sf.jabref.exporter.layout.LayoutFormatter;
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 /**
  * JournalAbbreviator formats the given text in an abbreviated form
  * according to the journal abbreviation lists.
- * 
+ *
  * The given input text is abbreviated according to the journal abbreviation lists.
  * If no abbreviation for input is found (e.g. not in list or already abbreviated), the input will be returned unmodified.
- * 
+ *
  * Usage:
  *    \format[JournalAbbreviator]{\journal}
  * Example result:
  *    "Phys. Rev. Lett." instead of "Physical Review Letters"
- * 
+ *
  * @author  Meigel
- * 
+ *
  */
 public class JournalAbbreviator implements LayoutFormatter {
 
+    private final JournalAbbreviationRepository repostiory;
+
+
+    public JournalAbbreviator(JournalAbbreviationRepository repostiory) {
+        this.repostiory = Objects.requireNonNull(repostiory);
+    }
+
     @Override
     public String format(String fieldText) {
-        return Abbreviations.journalAbbrev.getIsoAbbreviation(fieldText).orElse(fieldText);
+        return repostiory.getIsoAbbreviation(fieldText).orElse(fieldText);
     }
 }

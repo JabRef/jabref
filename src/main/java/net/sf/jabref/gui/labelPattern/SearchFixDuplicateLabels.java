@@ -88,8 +88,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
     public void update() {
         List<BibEntry> toGenerateFor = new ArrayList<>();
         for (String key : dupes.keySet()) {
-            ResolveDuplicateLabelDialog rdld = new ResolveDuplicateLabelDialog(panel,
-                    key, dupes.get(key));
+            ResolveDuplicateLabelDialog rdld = new ResolveDuplicateLabelDialog(panel, key, dupes.get(key));
             rdld.show();
             if (rdld.isOkPressed()) {
                 List<JCheckBox> cbs = rdld.getCheckBoxes();

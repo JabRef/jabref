@@ -71,7 +71,6 @@ public class ChangeScanner implements Runnable {
     //ArrayList changes = new ArrayList();
     private final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Localization.lang("External changes"));
 
-
     //  NamedCompound edit = new NamedCompound("Merged external changes")
 
     public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) { //, BibDatabase inMem, MetaData mdInMem) {
@@ -161,8 +160,8 @@ public class ChangeScanner implements Runnable {
                 try {
                     Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
                     SaveSession ss = FileActions.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults),
-                            Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs,
-                            false, false, panel.getEncoding(), true);
+                            Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs, false,
+                            false, panel.getEncoding(), true);
                     ss.commit();
                 } catch (SaveException ex) {
                     LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
@@ -221,7 +220,8 @@ public class ChangeScanner implements Runnable {
         // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
         // match being "stolen" from another entry.
-        mainLoop: for (piv1 = 0; piv1 < tmp.getEntryCount(); piv1++) {
+        mainLoop:
+        for (piv1 = 0; piv1 < tmp.getEntryCount(); piv1++) {
 
             // First check if the similarly placed entry in the other base matches exactly.
             double comp = -1;
@@ -260,7 +260,7 @@ public class ChangeScanner implements Runnable {
         // for close matches.
         if (!notMatched.isEmpty()) {
 
-            for (Iterator<Integer> it = notMatched.iterator(); it.hasNext();) {
+            for (Iterator<Integer> it = notMatched.iterator(); it.hasNext(); ) {
 
                 piv1 = it.next();
 
@@ -275,8 +275,7 @@ public class ChangeScanner implements Runnable {
                         if (used.contains(String.valueOf(i))) {
                             comp = -1;
                         } else {
-                            comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1),
-                                    disk.getEntryAt(i));
+                            comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
                         }
 
                         if (comp > bestMatch) {
@@ -327,8 +326,7 @@ public class ChangeScanner implements Runnable {
                     // See if there is an identical dupe in the mem database:
                     boolean hasAlready = false;
                     for (int j = 0; j < mem.getEntryCount(); j++) {
-                        if (DuplicateCheck.compareEntriesStrictly(mem.getEntryAt(j),
-                                disk.getEntryAt(i)) >= 1) {
+                        if (DuplicateCheck.compareEntriesStrictly(mem.getEntryAt(j), disk.getEntryAt(i)) >= 1) {
                             hasAlready = true;
                             break;
                         }
@@ -350,8 +348,9 @@ public class ChangeScanner implements Runnable {
     /**
      * Finds the entry in neu best fitting the specified entry in old. If no entries get a score
      * above zero, an entry is still returned.
-     * @param old EntrySorter
-     * @param neu EntrySorter
+     *
+     * @param old   EntrySorter
+     * @param neu   EntrySorter
      * @param index int
      * @return BibEntry
      */
@@ -359,8 +358,7 @@ public class ChangeScanner implements Runnable {
         double comp = -1;
         int found = 0;
         for (int i = 0; i < neu.getEntryCount(); i++) {
-            double res = DuplicateCheck.compareEntriesStrictly(old.getEntryAt(index),
-                    neu.getEntryAt(i));
+            double res = DuplicateCheck.compareEntriesStrictly(old.getEntryAt(index), neu.getEntryAt(i));
             if (res > comp) {
                 comp = res;
                 found = i;
@@ -400,7 +398,8 @@ public class ChangeScanner implements Runnable {
 
         // First try to match by string names.
         //int piv2 = -1;
-        mainLoop: for (String key : onTmp.getStringKeySet()) {
+        mainLoop:
+        for (String key : onTmp.getStringKeySet()) {
             BibtexString tmp = onTmp.getString(key);
 
             //      for (int j=piv2+1; j<nDisk; j++)
@@ -433,7 +432,7 @@ public class ChangeScanner implements Runnable {
 
         // See if we can detect a name change for those entries that we couldn't match.
         if (!notMatched.isEmpty()) {
-            for (Iterator<String> i = notMatched.iterator(); i.hasNext();) {
+            for (Iterator<String> i = notMatched.iterator(); i.hasNext(); ) {
                 BibtexString tmp = onTmp.getString(i.next());
 
                 // If we get to this point, we found no string with matching name. See if we
@@ -452,8 +451,8 @@ public class ChangeScanner implements Runnable {
 
                             for (String memId : inMem1.getStringKeySet()) {
                                 BibtexString bsMemCandidate = inMem1.getString(memId);
-                                if (bsMemCandidate.getContent().equals(disk.getContent()) &&
-                                        !usedInMem.contains(memId)) {
+                                if (bsMemCandidate.getContent().equals(disk.getContent()) && !usedInMem.contains(
+                                        memId)) {
                                     usedInMem.add(memId);
                                     bsMem = bsMemCandidate;
                                     break;
@@ -461,8 +460,9 @@ public class ChangeScanner implements Runnable {
                             }
 
                             if (bsMem != null) {
-                                changes.add(new StringNameChange(bsMem, tmp, bsMem.getName(), tmp.getName(),
-                                        disk.getName(), tmp.getContent()));
+                                changes.add(
+                                        new StringNameChange(bsMem, tmp, bsMem.getName(), tmp.getName(), disk.getName(),
+                                                tmp.getContent()));
                                 i.remove();
                                 used.add(diskId);
                             }
@@ -478,8 +478,8 @@ public class ChangeScanner implements Runnable {
             for (String nmId : notMatched) {
                 BibtexString tmp = onTmp.getString(nmId);
                 // The removed string is not removed from the mem version.
-                findString(inMem1, tmp.getName(), usedInMem)
-                        .ifPresent(x -> changes.add(new StringRemoveChange(tmp, tmp, x)));
+                findString(inMem1, tmp.getName(), usedInMem).ifPresent(
+                        x -> changes.add(new StringRemoveChange(tmp, tmp, x)));
             }
         }
 
@@ -528,8 +528,8 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-
     public interface DisplayResultCallback {
+
         void scanResultsResolved(boolean resolved);
     }
 }

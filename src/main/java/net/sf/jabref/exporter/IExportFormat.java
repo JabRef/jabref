@@ -15,13 +15,12 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
-
-import java.nio.charset.Charset;
-import java.util.Set;
+import net.sf.jabref.model.database.BibDatabase;
 
 import javax.swing.filechooser.FileFilter;
+import java.nio.charset.Charset;
+import java.util.Set;
 
 public interface IExportFormat {
 
@@ -57,9 +56,7 @@ public interface IExportFormat {
      *            should be exported. If null, all entries will be exported.
      * @throws Exception
      */
-    void performExport(BibDatabase database, MetaData metaData,
- String file, Charset encoding,
- Set<String> entryIds)
+    void performExport(BibDatabase database, MetaData metaData, String file, Charset encoding, Set<String> entryIds)
             throws Exception;
 
 }

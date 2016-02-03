@@ -25,7 +25,7 @@ import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.logging.JabRefLogger;
@@ -92,8 +92,8 @@ public class JabRef {
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
         ExportFormats.initAllExports();
 
-        // Read list(s) of journal names and abbreviations:
-        Abbreviations.initializeJournalNames(Globals.prefs);
+        // Read list(s) of journal names and abbreviations
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
@@ -492,8 +492,9 @@ public class JabRef {
         String[] split = fetchCommand.split(":");
         String engine = split[0];
 
+        EntryFetchers fetchers = new EntryFetchers(Globals.journalAbbreviationLoader);
         EntryFetcher fetcher = null;
-        for (EntryFetcher e : EntryFetchers.INSTANCE.getEntryFetchers()) {
+        for (EntryFetcher e : fetchers.getEntryFetchers()) {
             if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replaceAll("Fetcher", ""))) {
                 fetcher = e;
             }
@@ -503,7 +504,7 @@ public class JabRef {
             System.out.println(Localization.lang("Could not find fetcher '%0'", engine));
             System.out.println(Localization.lang("The following fetchers are available:"));
 
-            for (EntryFetcher e : EntryFetchers.INSTANCE.getEntryFetchers()) {
+            for (EntryFetcher e : fetchers.getEntryFetchers()) {
                 System.out.println("  " + e.getClass().getSimpleName().replaceAll("Fetcher", "").toLowerCase());
             }
             return Optional.empty();

@@ -23,18 +23,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-public class Abbreviations {
+public class JournalAbbreviationLoader {
 
-    private static final Log LOGGER = LogFactory.getLog(Abbreviations.class);
+    private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationLoader.class);
 
     // journal initialization
-    public static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
-    public static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE = "/journals/IEEEJournalListCode.txt";
-    public static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
-    public static JournalAbbreviationRepository journalAbbrev;
+    private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
+    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE = "/journals/IEEEJournalListCode.txt";
+    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
+    private JournalAbbreviationRepository journalAbbrev;
 
-    public static void initializeJournalNames(JabRefPreferences jabRefPreferences) {
+
+    public JournalAbbreviationLoader(JabRefPreferences preferences) {
+        update(preferences);
+    }
+
+    public void update(JabRefPreferences jabRefPreferences) {
         journalAbbrev = new JournalAbbreviationRepository();
 
         // the order of reading the journal lists is important
@@ -42,13 +48,13 @@ public class Abbreviations {
         // for instance, in the personal list one can overwrite abbreviations in the built in list
 
         // Read builtin list
-        journalAbbrev.readJournalListFromResource(JOURNALS_FILE_BUILTIN);
+        journalAbbrev.addEntries(readJournalListFromResource(JOURNALS_FILE_BUILTIN));
 
         // read IEEE list
         if (jabRefPreferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-            journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE);
+            journalAbbrev.addEntries(getOfficialIEEEAbbreviations());
         } else {
-            journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT);
+            journalAbbrev.addEntries(getStandardIEEEAbbreviations());
         }
 
         // Read external lists
@@ -57,7 +63,7 @@ public class Abbreviations {
             Collections.reverse(lists);
             for (String filename : lists) {
                 try {
-                    journalAbbrev.readJournalListFromFile(new File(filename));
+                    journalAbbrev.addEntries(readJournalListFromFile(new File(filename)));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
                     LOGGER.info("Cannot find external journal list file " + filename, e);
@@ -69,7 +75,7 @@ public class Abbreviations {
         String personalJournalList = jabRefPreferences.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
         if ((personalJournalList != null) && !personalJournalList.trim().isEmpty()) {
             try {
-                journalAbbrev.readJournalListFromFile(new File(personalJournalList));
+                journalAbbrev.addEntries(readJournalListFromFile(new File(personalJournalList)));
             } catch (FileNotFoundException e) {
                 LOGGER.info("Personal journal list file '" + personalJournalList + "' not found.", e);
             }
@@ -77,7 +83,32 @@ public class Abbreviations {
 
     }
 
-    public static String toggleAbbreviation(String text) {
-        return journalAbbrev.getNextAbbreviation(text).orElse(text);
+    public static List<Abbreviation> getOfficialIEEEAbbreviations() {
+        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE);
+    }
+
+    public static List<Abbreviation> getStandardIEEEAbbreviations() {
+        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT);
+    }
+
+    public static List<Abbreviation> getBuiltInAbbreviations() {
+        return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
+    }
+
+    public JournalAbbreviationRepository getRepository() {
+        return journalAbbrev;
+    }
+
+    public static List<Abbreviation> readJournalListFromResource(String resource) {
+        AbbreviationParser parser = new AbbreviationParser();
+        parser.readJournalListFromResource(Objects.requireNonNull(resource));
+        return parser.getAbbreviations();
+    }
+
+    public static List<Abbreviation> readJournalListFromFile(File file) throws FileNotFoundException {
+        LOGGER.debug("Reading journal list from file " + file);
+        AbbreviationParser parser = new AbbreviationParser();
+        parser.readJournalListFromFile(Objects.requireNonNull(file));
+        return parser.getAbbreviations();
     }
 }
