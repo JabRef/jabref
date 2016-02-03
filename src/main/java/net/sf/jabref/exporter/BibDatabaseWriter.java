@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +45,11 @@ public class BibDatabaseWriter {
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     private static final Log LOGGER = LogFactory.getLog(BibDatabaseWriter.class);
+    private static final String STRING_PREFIX = "@String";
+    private static final String COMMENT_PREFIX = "@Comment";
+    private static final String PREAMBLE_PREFIX = "@Preamble";
     private BibEntry exceptionCause;
+    private boolean isFirstStringInType;
 
     private static List<Comparator<BibEntry>> getSaveComparators(SavePreferences preferences, MetaData metaData) {
 
@@ -145,8 +148,6 @@ public class BibDatabaseWriter {
         }
         return inOriginalOrder;
     }
-
-    private BibtexString.Type previousStringType;
 
     public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences)
             throws SaveException {
@@ -297,7 +298,9 @@ public class BibDatabaseWriter {
 
     private void writeEpilogue(Writer writer, BibDatabase database) throws IOException {
         if ((database.getEpilog() != null) && !(database.getEpilog().isEmpty())) {
-           writer.write(database.getEpilog());
+            writer.write(Globals.NEWLINE);
+            writer.write(database.getEpilog());
+            writer.write(Globals.NEWLINE);
         }
     }
 
@@ -314,13 +317,13 @@ public class BibDatabaseWriter {
 
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
-            stringBuilder.append(Globals.NEWLINE);
             List<String> orderedData = metaData.getData(key);
-            stringBuilder.append("@comment{").append(MetaData.META_FLAG).append(key).append(":");
+            stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(key).append(":");
             for (int j = 0; j < orderedData.size(); j++) {
                 stringBuilder.append(StringUtil.quote(orderedData.get(j), ";", '\\')).append(";");
             }
             stringBuilder.append("}");
+            stringBuilder.append(Globals.NEWLINE);
 
             out.write(stringBuilder.toString());
         }
@@ -331,18 +334,14 @@ public class BibDatabaseWriter {
             StringBuffer sb = new StringBuffer();
             // write version first
             sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
-            sb.append("@comment{").append(MetaData.META_FLAG).append(MetaData.GROUPSVERSION).append(":");
+            sb.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(MetaData.GROUPSVERSION).append(":");
             sb.append("" + VersionHandling.CURRENT_VERSION + ";");
             sb.append("}");
-
-            out.write(sb.toString());
+            sb.append(Globals.NEWLINE);
 
             // now write actual groups
-            sb = new StringBuffer();
             sb.append(Globals.NEWLINE);
-            sb.append(Globals.NEWLINE);
-            sb.append("@comment{").append(MetaData.META_FLAG).append(MetaData.GROUPSTREE).append(":");
+            sb.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(MetaData.GROUPSTREE).append(":");
             sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
             StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
@@ -353,6 +352,7 @@ public class BibDatabaseWriter {
                 sb.append(Globals.NEWLINE);
             }
             sb.append("}");
+            sb.append(Globals.NEWLINE);
             out.write(sb.toString());
         }
     }
@@ -360,7 +360,7 @@ public class BibDatabaseWriter {
     private void writePreamble(Writer fw, String preamble) throws IOException {
         if (preamble != null) {
             fw.write(Globals.NEWLINE);
-            fw.write("@PREAMBLE{");
+            fw.write(PREAMBLE_PREFIX + "{");
             fw.write(preamble);
             fw.write('}' + Globals.NEWLINE);
         }
@@ -375,6 +375,10 @@ public class BibDatabaseWriter {
         if (!bs.hasChanged()) {
             fw.write(bs.getParsedSerialization());
             return;
+        }
+
+        if(isFirstStringInType) {
+            fw.write(Globals.NEWLINE);
         }
 
         // Then we go through the string looking for references to other strings. If we find references
@@ -393,18 +397,13 @@ public class BibDatabaseWriter {
             }
         }
 
-        if (previousStringType != bs.getType()) {
-            fw.write(Globals.NEWLINE);
-            previousStringType = bs.getType();
-        }
-
         StringBuilder suffixSB = new StringBuilder();
         for (int i = maxKeyLength - bs.getName().length(); i > 0; i--) {
             suffixSB.append(' ');
         }
         String suffix = suffixSB.toString();
 
-        fw.write("@String { " + bs.getName() + suffix + " = ");
+        fw.write(STRING_PREFIX + "{" + bs.getName() + suffix + " = ");
         if (bs.getContent().isEmpty()) {
             fw.write("{}");
         } else {
@@ -418,7 +417,7 @@ public class BibDatabaseWriter {
             }
         }
 
-        fw.write(" }" + Globals.NEWLINE);
+        fw.write("}" + Globals.NEWLINE);
     }
 
     /**
@@ -430,7 +429,6 @@ public class BibDatabaseWriter {
      * @throws IOException If anything goes wrong in writing.
      */
     private void writeStrings(Writer fw, BibDatabase database) throws IOException {
-        previousStringType = BibtexString.Type.AUTHOR;
         List<BibtexString> strings = database.getStringKeySet().stream().map(database::getString).collect(
                 Collectors.toList());
         strings.sort(new BibtexStringComparator(true));
@@ -443,23 +441,30 @@ public class BibDatabaseWriter {
         }
 
         for (BibtexString.Type t : BibtexString.Type.values()) {
+            isFirstStringInType = true;
             for (BibtexString bs : strings) {
                 if (remaining.containsKey(bs.getName()) && (bs.getType() == t)) {
                     writeString(fw, bs, remaining, maxKeyLength);
+                    isFirstStringInType = false;
                 }
             }
         }
     }
 
     private void writeTypeDefinitions(Writer writer, Map<String, EntryType> types) throws IOException {
-        if (!types.isEmpty()) {
-            for (Map.Entry<String, EntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
-                EntryType type = stringBibtexEntryTypeEntry.getValue();
-                if (type instanceof CustomEntryType) {
-                    CustomEntryType customType = (CustomEntryType) type;
-                    CustomEntryTypesManager.save(customType, writer);
-                    writer.write(Globals.NEWLINE);
-                }
+        for (EntryType type : types.values()) {
+            if (type instanceof CustomEntryType) {
+                CustomEntryType customType = (CustomEntryType) type;
+                writer.write(Globals.NEWLINE);
+                writer.write(COMMENT_PREFIX + "{");
+                writer.write(CustomEntryType.ENTRYTYPE_FLAG);
+                writer.write(customType.getName());
+                writer.write(": req[");
+                writer.write(customType.getRequiredFieldsString());
+                writer.write("] opt[");
+                writer.write(String.join(";", customType.getOptionalFields()));
+                writer.write("]}");
+                writer.write(Globals.NEWLINE);
             }
         }
     }

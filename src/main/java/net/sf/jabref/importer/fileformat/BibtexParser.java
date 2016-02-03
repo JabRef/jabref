@@ -164,6 +164,8 @@ public class BibtexParser {
 
             if ("preamble".equals(entryType)) {
                 database.setPreamble(parsePreamble());
+                // Consume new line which signals end of preamble
+                skipOneNewline();
                 // the preamble is saved verbatim anyways, so the text read so far can be dropped
                 dumpTextReadSoFarToString();
             } else if ("string".equals(entryType)) {
@@ -187,7 +189,7 @@ public class BibtexParser {
     }
 
     private void parseRemainingContent() {
-        database.setEpilog(dumpTextReadSoFarToString());
+        database.setEpilog(dumpTextReadSoFarToString().trim());
     }
 
     private void parseAndAddEntry(String type) {
@@ -465,7 +467,10 @@ public class BibtexParser {
         String content = parseFieldContent(name);
         LOGGER.debug("Now I'm going to consume a }");
         consume('}', ')');
+        // Consume new line which signals end of entry
+        skipOneNewline();
         LOGGER.debug("Finished string parsing.");
+
         String id = IdGenerator.next();
         return new BibtexString(id, name, content);
     }

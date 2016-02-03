@@ -859,6 +859,17 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseSavesOneNewlineAfterStringInParsedSerialization() throws IOException {
+
+        String string = "@string{bourdieu = {Bourdieu, Pierre}}" + Globals.NEWLINE;
+        ParserResult result = BibtexParser.parse(new StringReader(string + Globals.NEWLINE + Globals.NEWLINE));
+        Assert.assertEquals(1, result.getDatabase().getStringCount());
+
+        BibtexString s = result.getDatabase().getStringValues().iterator().next();
+        Assert.assertEquals(string, s.getParsedSerialization());
+    }
+
+    @Test
     public void parseRecognizesStringWithWhitespace() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader("@string {bourdieu = {Bourdieu, Pierre}}"));
@@ -1240,5 +1251,39 @@ public class BibtexParserTest {
 
         Assert.assertEquals(testEntryOne + Globals.NEWLINE, a.getParsedSerialization());
         Assert.assertEquals(Globals.NEWLINE + Globals.NEWLINE + testEntryTwo, b.getParsedSerialization());
+    }
+
+    @Test
+    public void parseIgnoresWhitespaceInEpilogue() throws IOException {
+        ParserResult result = BibtexParser
+                .parse(new StringReader("   " + Globals.NEWLINE));
+
+        Assert.assertEquals("", result.getDatabase().getEpilog());
+    }
+
+    @Test
+    public void parseIgnoresWhitespaceInEpilogueAfterEntry() throws IOException {
+        String testEntry = "@article{test,author={Ed von Test}}";
+        ParserResult result = BibtexParser
+                .parse(new StringReader(testEntry + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + "  " + Globals.NEWLINE));
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(testEntry + Globals.NEWLINE, e.getParsedSerialization());
+        Assert.assertEquals("", result.getDatabase().getEpilog());
+    }
+
+    @Test
+    public void parseTrimsWhitespaceInEpilogueAfterEntry() throws IOException {
+        String testEntry = "@article{test,author={Ed von Test}}";
+        ParserResult result = BibtexParser
+                .parse(new StringReader(testEntry + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + " epilogue " + Globals.NEWLINE));
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        Assert.assertEquals(1, c.size());
+
+        BibEntry e = c.iterator().next();
+        Assert.assertEquals(testEntry + Globals.NEWLINE, e.getParsedSerialization());
+        Assert.assertEquals("epilogue", result.getDatabase().getEpilog());
     }
 }
