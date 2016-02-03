@@ -53,47 +53,22 @@ public class BibDatabaseWriter {
 
     private static List<Comparator<BibEntry>> getSaveComparators(SavePreferences preferences, MetaData metaData) {
 
-        /* three options:
-         * 1. original order
-         * 2. order specified in metaData
-         * 3. order specified in preferences
-         */
-
         List<Comparator<BibEntry>> comparators = new ArrayList<>();
+        Optional<SaveOrderConfig> saveOrder = getSaveOrder(preferences, metaData);
 
-        if (shouldSaveInOriginalOrder(preferences, metaData)) {
+        if (! saveOrder.isPresent()) {
             // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be sorted based on their creation order,
             // utilizing the fact that IDs used for entries are increasing, sortable numbers.
             comparators.add(new CrossRefEntryComparator());
             comparators.add(new IdComparator());
         } else {
-            if (preferences.isSaveOperation()) {
-                List<String> storedSaveOrderConfig = metaData.getData(
-                        net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
+            comparators.add(new CrossRefEntryComparator());
 
-                if (storedSaveOrderConfig != null) {
-                    // follow the metaData and overwrite provided sort settings
-                    SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
-                    assert!saveOrderConfig.saveInOriginalOrder;
-                    assert saveOrderConfig.saveInSpecifiedOrder;
-                    preferences.pri = saveOrderConfig.sortCriteria[0].field;
-                    preferences.sec = saveOrderConfig.sortCriteria[1].field;
-                    preferences.ter = saveOrderConfig.sortCriteria[2].field;
-                    preferences.priD = saveOrderConfig.sortCriteria[0].descending;
-                    preferences.secD = saveOrderConfig.sortCriteria[1].descending;
-                    preferences.terD = saveOrderConfig.sortCriteria[2].descending;
-                }
-            }
+            comparators.add(new FieldComparator(saveOrder.get().sortCriteria[0]));
+            comparators.add(new FieldComparator(saveOrder.get().sortCriteria[1]));
+            comparators.add(new FieldComparator(saveOrder.get().sortCriteria[2]));
 
-            if (preferences.isSaveOperation()) {
-                comparators.add(new CrossRefEntryComparator());
-            }
-            if(preferences.pri != null && preferences.sec != null && preferences.ter != null) {
-                comparators.add(new FieldComparator(preferences.pri, preferences.priD));
-                comparators.add(new FieldComparator(preferences.sec, preferences.secD));
-                comparators.add(new FieldComparator(preferences.ter, preferences.terD));
-            }
             comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
         }
 
@@ -132,21 +107,25 @@ public class BibDatabaseWriter {
         return sorted;
     }
 
-    private static boolean shouldSaveInOriginalOrder(SavePreferences preferences, MetaData metaData) {
-        boolean inOriginalOrder;
-        if (preferences.isSaveOperation()) {
-            List<String> storedSaveOrderConfig = metaData.getData(
-                    net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
-            if (storedSaveOrderConfig == null) {
-                inOriginalOrder = preferences.isSaveInOriginalOrder();
-            } else {
-                SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
-                inOriginalOrder = saveOrderConfig.saveInOriginalOrder;
-            }
-        } else {
-            inOriginalOrder = preferences.isSaveInOriginalOrder();
+    private static Optional<SaveOrderConfig> getSaveOrder(SavePreferences preferences, MetaData metaData) {
+        /* three options:
+         * 1. original order
+         * 2. order specified in metaData
+         * 3. order specified in preferences
+         */
+
+        if(preferences.isSaveInOriginalOrder()) {
+            return Optional.empty();
         }
-        return inOriginalOrder;
+
+        if(preferences.getTakeMetadataSaveOrderInAccount()) {
+            List<String> storedSaveOrderConfig = metaData.getData(MetaData.SAVE_ORDER_CONFIG);
+            if(storedSaveOrderConfig != null) {
+                return Optional.of(new SaveOrderConfig(storedSaveOrderConfig));
+            }
+        }
+
+        return Optional.ofNullable(preferences.getSaveOrder());
     }
 
     /**
@@ -298,10 +277,9 @@ public class BibDatabaseWriter {
 
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
-            List<String> orderedData = metaData.getData(key);
             stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(key).append(":");
-            for (int j = 0; j < orderedData.size(); j++) {
-                stringBuilder.append(StringUtil.quote(orderedData.get(j), ";", '\\')).append(";");
+            for (String metaItem : metaData.getData(key)) {
+                stringBuilder.append(StringUtil.quote(metaItem, ";", '\\')).append(";");
             }
             stringBuilder.append("}");
             stringBuilder.append(Globals.NEWLINE);
@@ -312,24 +290,23 @@ public class BibDatabaseWriter {
         // (which is always the AllEntriesGroup).
         GroupTreeNode groupsRoot = metaData.getGroups();
         if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             // write version first
             sb.append(Globals.NEWLINE);
-            sb.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(MetaData.GROUPSVERSION).append(":");
-            sb.append("" + VersionHandling.CURRENT_VERSION + ";");
+            sb.append(COMMENT_PREFIX).append("{").append(MetaData.META_FLAG).append(MetaData.GROUPSVERSION).append(":");
+            sb.append(VersionHandling.CURRENT_VERSION).append(";");
             sb.append("}");
             sb.append(Globals.NEWLINE);
 
             // now write actual groups
             sb.append(Globals.NEWLINE);
-            sb.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(MetaData.GROUPSTREE).append(":");
+            sb.append(COMMENT_PREFIX).append("{").append(MetaData.META_FLAG).append(MetaData.GROUPSTREE).append(":");
             sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
             StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
             while (tok.hasMoreTokens()) {
-                StringBuilder s =
-                        new StringBuilder(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
-                sb.append(s);
+                sb.append(StringUtil.quote(tok.nextToken(), ";", '\\'));
+                sb.append(";");
                 sb.append(Globals.NEWLINE);
             }
             sb.append("}");

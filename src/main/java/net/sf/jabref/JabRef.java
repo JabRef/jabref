@@ -309,12 +309,12 @@ public class JabRef {
                         if (!pr.isInvalid()) {
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + data[0]);
-                                SavePreferences prefs = new SavePreferences(Globals.prefs);
-                                Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                                Defaults defaults = new Defaults(BibDatabaseMode
+                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
                                 BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-                                SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults),
-                                        prefs);
-
+                                SaveSession session = databaseWriter.saveDatabase(
+                                        new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
 
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
@@ -401,7 +401,7 @@ public class JabRef {
 
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + subName);
-                                SavePreferences prefs = new SavePreferences(Globals.prefs);
+                                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
                                 BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
                                 Defaults defaults = new Defaults(BibDatabaseMode
                                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));

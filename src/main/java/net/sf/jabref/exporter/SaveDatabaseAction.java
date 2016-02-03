@@ -226,7 +226,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         SaveSession session;
         frame.block();
         try {
-            SavePreferences prefs = new SavePreferences(Globals.prefs);
+            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
             prefs.setEncoding(encoding);
             BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
             if (selectedOnly) {

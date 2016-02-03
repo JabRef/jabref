@@ -28,6 +28,7 @@ import net.sf.jabref.sql.DBStrings;
 public class MetaData implements Iterable<String> {
 
     public static final String META_FLAG = "jabref-meta: ";
+    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
     static final String DATABASE_TYPE = "DATABASE_TYPE";

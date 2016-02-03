@@ -75,9 +75,6 @@ public class DatabasePropertiesDialog extends JDialog {
     private JRadioButton saveInOriginalOrder;
     private JRadioButton saveInSpecifiedOrder;
 
-
-    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
-
     private final JCheckBox protect = new JCheckBox(Localization.lang("Refuse to save the database before external changes have been reviewed."));
     private boolean oldProtectVal;
     private SaveOrderConfigDisplay saveOrderPanel;
@@ -202,7 +199,7 @@ public class DatabasePropertiesDialog extends JDialog {
     private void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
-        List<String> storedSaveOrderConfig = metaData.getData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
+        List<String> storedSaveOrderConfig = metaData.getData(MetaData.SAVE_ORDER_CONFIG);
         boolean selected;
         if (storedSaveOrderConfig == null) {
             saveInOriginalOrder.setSelected(true);
@@ -277,7 +274,7 @@ public class DatabasePropertiesDialog extends JDialog {
             newSaveOrderConfig.setSaveInSpecifiedOrder();
         }
         Vector<String> serialized = newSaveOrderConfig.getVector();
-        metaData.putData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG, serialized);
+        metaData.putData(MetaData.SAVE_ORDER_CONFIG, serialized);
 
         Charset oldEncoding = panel.getEncoding();
         Charset newEncoding = (Charset) encoding.getSelectedItem();

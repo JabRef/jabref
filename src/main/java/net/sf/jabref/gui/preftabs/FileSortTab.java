@@ -34,6 +34,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -113,7 +114,7 @@ class FileSortTab extends JPanel implements PrefsTab {
 
         boolean selected = prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER);
         exportOrderPanel.setEnabled(selected);
-        exportOrderPanel.setSaveOrderConfig(prefs.retriveExportOrderConfig());
+        exportOrderPanel.setSaveOrderConfig(SaveOrderConfig.loadExportSaveOrderFromPreferences(prefs));
     }
 
     @Override
@@ -121,7 +122,7 @@ class FileSortTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER, exportInOriginalOrder.isSelected());
         prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, exportInSpecifiedOrder.isSelected());
 
-        prefs.storeExportOrderConfig(exportOrderPanel.getSaveOrderConfig());
+        exportOrderPanel.getSaveOrderConfig().storeAsExportSaveOrderInPreferences(prefs);
     }
 
     @Override

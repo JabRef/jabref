@@ -1198,7 +1198,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save database");
         try {
-            SavePreferences prefs = new SavePreferences(Globals.prefs);
+            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
             prefs.setEncoding(enc);
             prefs.setSaveType(saveType);
             BibDatabaseWriter databaseWriter = new BibDatabaseWriter();

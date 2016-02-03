@@ -96,7 +96,7 @@ public class AutoSaveManager {
         File databaseFile = panel.getBibDatabaseContext().getDatabaseFile();
         File backupFile = AutoSaveManager.getAutoSaveFile(databaseFile);
         try {
-            SavePreferences prefs = new SavePreferences(Globals.prefs);
+            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
             prefs.setMakeBackup(false);
             prefs.setEncoding(panel.getEncoding());
 

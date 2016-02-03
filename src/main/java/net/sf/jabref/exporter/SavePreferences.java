@@ -1,79 +1,77 @@
 package net.sf.jabref.exporter;
 
-import java.nio.charset.Charset;
-
-import com.google.common.base.Charsets;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.config.SaveOrderConfig;
+
+import java.nio.charset.Charset;
 
 public class SavePreferences {
 
+    private boolean saveInOriginalOrder;
+    private SaveOrderConfig saveOrder;
+    private Charset encoding;
+    private boolean makeBackup;
+    private DatabaseSaveType saveType;
+    private boolean takeMetadataSaveOrderInAccount;
 
+    public SavePreferences() {
 
-    public enum DatabaseSaveType {
-        ALL,
-        PLAIN_BIBTEX
     }
 
-    boolean makeBackup;
-    Charset encoding;
-    DatabaseSaveType saveType;
+    public SavePreferences(Boolean saveInOriginalOrder, SaveOrderConfig saveOrder, Charset encoding, Boolean makeBackup,
+            DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount) {
+        this.saveInOriginalOrder = saveInOriginalOrder;
+        this.saveOrder = saveOrder;
+        this.encoding = encoding;
+        this.makeBackup = makeBackup;
+        this.saveType = saveType;
+        this.takeMetadataSaveOrderInAccount = takeMetadataSaveOrderInAccount;
+    }
 
+    public static SavePreferences loadForExportFromPreferences(JabRefPreferences preferences) {
+        Boolean saveInOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+        SaveOrderConfig saveOrder = null;
+        if (!saveInOriginalOrder) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+                saveOrder = SaveOrderConfig.loadExportSaveOrderFromPreferences(preferences);
+            } else {
+                saveOrder = SaveOrderConfig.loadTableSaveOrderFromPreferences(preferences);
+            }
+        }
+        Charset encoding = preferences.getDefaultEncoding();
+        Boolean makeBackup = preferences.getBoolean(JabRefPreferences.BACKUP);
+        DatabaseSaveType saveType = DatabaseSaveType.ALL;
+        Boolean takeMetadataSaveOrderInAccount = false;
+        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
+                takeMetadataSaveOrderInAccount);
+    }
 
-    private final boolean isSaveOperation;
+    public static SavePreferences loadForSaveFromPreferences(JabRefPreferences preferences) {
+        Boolean saveInOriginalOrder = true;
+        SaveOrderConfig saveOrder = null;
+        Charset encoding = preferences.getDefaultEncoding();
+        Boolean makeBackup = preferences.getBoolean(JabRefPreferences.BACKUP);
+        DatabaseSaveType saveType = DatabaseSaveType.ALL;
+        Boolean takeMetadataSaveOrderInAccount = true;
+        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
+                takeMetadataSaveOrderInAccount);
+    }
+
+    public Boolean getTakeMetadataSaveOrderInAccount() {
+        return takeMetadataSaveOrderInAccount;
+    }
+
+    public SaveOrderConfig getSaveOrder() {
+        return saveOrder;
+    }
 
     public boolean isSaveInOriginalOrder() {
         return saveInOriginalOrder;
     }
 
-    public void setSaveInOriginalOrder(boolean saveInOriginalOrder) {
+    public void setSaveInOriginalOrder(Boolean saveInOriginalOrder) {
         this.saveInOriginalOrder = saveInOriginalOrder;
-    }
-
-    private  boolean saveInOriginalOrder;
-    public String pri;
-    public String sec;
-    public String ter;
-    public boolean priD;
-    public boolean secD;
-    public boolean terD;
-
-    public SavePreferences() {
-        //this.makeBackup = false;
-        //this.encoding = Charsets.UTF_8;
-        this.isSaveOperation = true;
-    }
-
-    public SavePreferences(JabRefPreferences prefs) {
-        this(prefs, true);
-    }
-
-    public SavePreferences(JabRefPreferences prefs, boolean isSaveOperation) {
-        this.makeBackup = prefs.getBoolean(JabRefPreferences.BACKUP);
-        this.encoding = prefs.getDefaultEncoding();
-        this.isSaveOperation = isSaveOperation;
-        this.saveType = DatabaseSaveType.ALL;
-        if(isSaveOperation)
-            this.saveInOriginalOrder = true;
-        else
-            this.saveInOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
-
-        if (!isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
-            pri = prefs.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD);
-            sec = prefs.get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD);
-            ter = prefs.get(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD);
-            priD = prefs.getBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING);
-            secD = prefs.getBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING);
-            terD = prefs.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING);
-        } else {
-            // The setting is to save according to the current table order.
-            pri = prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD);
-            sec = prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD);
-            ter = prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD);
-            priD = prefs.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING);
-            secD = prefs.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING);
-            terD = prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING);
-        }
     }
 
     public boolean getMakeBackup() {
@@ -92,15 +90,16 @@ public class SavePreferences {
         this.encoding = encoding;
     }
 
-    public boolean isSaveOperation() {
-        return isSaveOperation;
-    }
-
     public DatabaseSaveType getSaveType() {
         return saveType;
     }
 
     public void setSaveType(DatabaseSaveType saveType) {
         this.saveType = saveType;
+    }
+
+    public enum DatabaseSaveType {
+        ALL,
+        PLAIN_BIBTEX
     }
 }

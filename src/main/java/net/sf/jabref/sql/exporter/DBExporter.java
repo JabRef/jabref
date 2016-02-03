@@ -82,9 +82,8 @@ public abstract class DBExporter extends DBImporterExporter {
                 BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, metaData, defaults);
 
-        SavePreferences savePrefs = new SavePreferences(Globals.prefs, false);
-        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(
-                bibDatabaseContext, keySet, savePrefs);
+        SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext, keySet, savePrefs);
         GroupTreeNode gtn = metaData.getGroups();
 
         final int database_id = getDatabaseIDByName(metaData, out, dbName);
