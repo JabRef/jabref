@@ -406,7 +406,7 @@ public class JabRef {
                                 Defaults defaults = new Defaults(BibDatabaseMode
                                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
                                 SaveSession session = databaseWriter.saveDatabase(
-                                        new BibDatabaseContext(newBase, defaults), prefs, false, false);
+                                        new BibDatabaseContext(newBase, defaults), prefs);
 
 
                                 // Show just a warning message if encoding didn't work for all characters:

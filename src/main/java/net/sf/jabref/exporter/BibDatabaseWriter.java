@@ -149,25 +149,18 @@ public class BibDatabaseWriter {
         return inOriginalOrder;
     }
 
-    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences)
-            throws SaveException {
-        return saveDatabase(bibDatabaseContext, preferences, false, false);
-    }
-
     /**
      * Saves the database to file. Two boolean values indicate whether only
      * entries which are marked as search / group hit should be saved. This can be used to
      * let the user save only the results of a search. False and false means all
      * entries are saved.
      */
-    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences,
-            boolean checkSearch, boolean checkGroup) throws SaveException {
-        return savePartOfDatabase(bibDatabaseContext, bibDatabaseContext.getDatabase().getEntries(), preferences,
-                checkSearch, checkGroup);
+    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences) throws SaveException {
+        return savePartOfDatabase(bibDatabaseContext, bibDatabaseContext.getDatabase().getEntries(), preferences);
     }
 
     public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
-            SavePreferences preferences, boolean checkSearch, boolean checkGroup) throws SaveException {
+            SavePreferences preferences) throws SaveException {
 
         SaveSession session;
         try {
@@ -179,7 +172,7 @@ public class BibDatabaseWriter {
         exceptionCause = null;
         // Get our data stream. This stream writes only to a temporary file until committed.
         try (VerifyingWriter writer = session.getWriter()) {
-            writePartOfDatabase(writer, bibDatabaseContext, entries, preferences, checkSearch, checkGroup);
+            writePartOfDatabase(writer, bibDatabaseContext, entries, preferences);
         } catch (IOException ex) {
             LOGGER.error("Could not write file", ex);
             session.cancel();
@@ -191,7 +184,7 @@ public class BibDatabaseWriter {
     }
 
     public void writePartOfDatabase(Writer writer, BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
-            SavePreferences preferences, boolean checkSearch, boolean checkGroup) throws IOException {
+            SavePreferences preferences) throws IOException {
         Objects.requireNonNull(writer);
 
         // Map to collect entry type definitions that we must save along with entries using them.
@@ -216,30 +209,18 @@ public class BibDatabaseWriter {
         for (BibEntry entry : sortedEntries) {
             exceptionCause = entry;
 
-            // Check if the entry should be written.
-            boolean write = true;
-
-            if (checkSearch && entry.isSearchHit()) {
-                write = false;
+            // Check if we must write the type definition for this
+            // entry, as well. Our criterion is that all non-standard
+            // types (*not* all customized standard types) must be written.
+            if (!EntryTypes.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
+                // If user-defined entry type, then add it
+                // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
+                EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
+                        entryType -> typesToWrite.put(entryType.getName(), entryType));
             }
 
-            if (checkGroup && entry.isGroupHit()) {
-                write = false;
-            }
+            bibtexEntryWriter.write(entry, writer, bibDatabaseContext.getMode());
 
-            if (write) {
-                // Check if we must write the type definition for this
-                // entry, as well. Our criterion is that all non-standard
-                // types (*not* all customized standard types) must be written.
-                if (!EntryTypes.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
-                    // If user-defined entry type, then add it
-                    // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
-                    EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
-                            entryType -> typesToWrite.put(entryType.getName(), entryType));
-                }
-
-                bibtexEntryWriter.write(entry, writer, bibDatabaseContext.getMode());
-            }
         }
 
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
@@ -261,7 +242,7 @@ public class BibDatabaseWriter {
     public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences,
             Collection<BibEntry> entries) throws SaveException {
 
-        return savePartOfDatabase(bibDatabaseContext, entries, preferences, false, false);
+        return savePartOfDatabase(bibDatabaseContext, entries, preferences);
     }
 
     private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
