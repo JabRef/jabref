@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,6 +20,9 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
@@ -66,7 +69,7 @@ public class ExportCustomizationDialog extends JDialog {
                 CustomExportDialog ecd = new CustomExportDialog(frame);
                 ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
                 if (ecd.okPressed()) {
-                    String[] newFormat = new String[]{ecd.name(), ecd.layoutFile(), ecd.extension()};
+                    List<String> newFormat = Arrays.asList(ecd.name(), ecd.layoutFile(), ecd.extension());
                     Globals.prefs.customExports.addFormat(newFormat);
                     Globals.prefs.customExports.store();
                 }
@@ -82,13 +85,13 @@ public class ExportCustomizationDialog extends JDialog {
                 if (row == -1) {
                     return;
                 }
-                String[] old = Globals.prefs.customExports.getSortedList().get(row);
-                CustomExportDialog ecd = new CustomExportDialog(frame, old[0], old[1], old[2]);
+                List<String> old = Globals.prefs.customExports.getSortedList().get(row);
+                CustomExportDialog ecd = new CustomExportDialog(frame, old.get(0), old.get(1), old.get(2));
                 ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
                 if (ecd.okPressed()) {
-                    old[0] = ecd.name();
-                    old[1] = ecd.layoutFile();
-                    old[2] = ecd.extension();
+                    old.set(0, ecd.name());
+                    old.set(1, ecd.layoutFile());
+                    old.set(2, ecd.extension());
                     table.revalidate();
                     table.repaint();
                     Globals.prefs.customExports.store();
@@ -105,12 +108,12 @@ public class ExportCustomizationDialog extends JDialog {
                 if (rows.length == 0) {
                     return;
                 }
-                String[][] entries = new String[rows.length][];
+                List<List<String>> entries = new ArrayList<>();
                 for (int i = 0; i < rows.length; i++) {
-                    entries[i] = Globals.prefs.customExports.getSortedList().get(rows[i]);
+                    entries.add(Globals.prefs.customExports.getSortedList().get(rows[i]));
                 }
-                for (int i = 0; i < rows.length; i++) {
-                    Globals.prefs.customExports.remove(entries[i]);
+                for (List<String> list : entries) {
+                    Globals.prefs.customExports.remove(list);
                 }
                 Globals.prefs.customExports.store();
             }
@@ -129,7 +132,7 @@ public class ExportCustomizationDialog extends JDialog {
 
         JButton help = new HelpAction(HelpFiles.exportCustomizationHelp).getHelpButton();
 
-        DefaultEventTableModel<String[]> tableModel = new DefaultEventTableModel<>(
+        DefaultEventTableModel<List<String>> tableModel = new DefaultEventTableModel<>(
                 Globals.prefs.customExports.getSortedList(),
                 new ExportTableFormat());
         table = new JTable(tableModel);
@@ -178,11 +181,11 @@ public class ExportCustomizationDialog extends JDialog {
     }
 
 
-    private static class ExportTableFormat implements TableFormat<String[]> {
+    private static class ExportTableFormat implements TableFormat<List<String>> {
 
         @Override
-        public Object getColumnValue(String[] strings, int i) {
-            return strings[i];
+        public Object getColumnValue(List<String> strings, int i) {
+            return strings.get(i);
         }
 
         @Override
