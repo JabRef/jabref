@@ -27,7 +27,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 
 ### Fixed
-- Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#666](https://github.com/JabRef/jabref/issues/669) #669: Encoding and preamble now end with newline.
+- Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#669](https://github.com/JabRef/jabref/issues/669): Encoding and preamble now end with newline.
 - Make BibTex parser more robust against missing newlines
 - Fix bug that prevented the import of BibTex entries having only a key as content
 - Fixed [#666](https://github.com/JabRef/jabref/issues/666): MS Office 2007 export is working again
