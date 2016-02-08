@@ -48,7 +48,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Removed CLI option -l to load a session
 - Removed JabRef offline help files which are replaced by the new online documentation at https://github.com/JabRef/help.jabref.org
 - Removed PDF preview functionality
-
+- Removed Sixpackimporter it is not used in the wild anymore
 
 
 
