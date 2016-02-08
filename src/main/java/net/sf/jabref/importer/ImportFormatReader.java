@@ -60,7 +60,6 @@ public class ImportFormatReader {
         formats.add(new RepecNepImporter());
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());
-        formats.add(new SixpackImporter());
 
         /**
          * Get custom import formats
