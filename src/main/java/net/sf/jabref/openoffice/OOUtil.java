@@ -116,7 +116,7 @@ class OOUtil {
 
         try {
             props.setPropertyValue("ParaStyleName", parStyle);
-        } catch (com.sun.star.lang.IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             throw new UndefinedParagraphFormatException(parStyle);
         }
 
@@ -262,7 +262,7 @@ class OOUtil {
                 XPropertySet.class, parCursor);
         try {
             props.setPropertyValue("ParaStyleName", parStyle);
-        } catch (com.sun.star.lang.IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             throw new UndefinedParagraphFormatException(parStyle);
         }
         cursor.collapseToEnd();

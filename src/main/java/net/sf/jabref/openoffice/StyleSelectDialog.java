@@ -27,8 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -439,21 +439,17 @@ class StyleSelectDialog {
     private void addStyles(String dir, boolean recurse) {
         File dirF = new File(dir);
         if (dirF.isDirectory()) {
-            File[] files = dirF.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    // If the file looks like a style file, parse it:
-                    if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
-                        addSingleFile(file);
-                    }
+            List<File> files = Arrays.asList(dirF.listFiles());
+            for (File file : files) {
+                // If the file looks like a style file, parse it:
+                if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
+                    addSingleFile(file);
+                } else if (file.isDirectory() && recurse) {
                     // If the file is a directory, and we should recurse, do:
-                    else if (file.isDirectory() && recurse) {
-                        addStyles(file.getPath(), recurse);
-                    }
+                    addStyles(file.getPath(), recurse);
                 }
             }
-        }
-        else {
+        } else {
             // The file wasn't a directory, so we simply parse it:
             addSingleFile(dirF);
         }
@@ -542,23 +538,12 @@ class StyleSelectDialog {
             case 0:
                 return style.getName();
             case 1:
-                return formatJournals(style.getJournals());
+                return String.join(", ", style.getJournals());
             case 2:
                 return style.getFile().getName();
             default:
                 return "";
             }
-        }
-
-        private static String formatJournals(Set<String> journals) {
-            StringBuilder sb = new StringBuilder("");
-            for (Iterator<String> i = journals.iterator(); i.hasNext();) {
-                sb.append(i.next());
-                if (i.hasNext()) {
-                    sb.append(", ");
-                }
-            }
-            return sb.toString();
         }
     }
 
@@ -616,7 +601,7 @@ class StyleSelectDialog {
             dd.setLocationRelativeTo(diag);
             dd.setVisible(true);
         } catch (IOException ex) {
-            LOGGER.warn("Problem showing defualt style", ex);
+            LOGGER.warn("Problem showing default style", ex);
         }
     }
 
