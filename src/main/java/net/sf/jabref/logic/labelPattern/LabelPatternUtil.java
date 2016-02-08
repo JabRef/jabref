@@ -422,7 +422,6 @@ public class LabelPatternUtil {
      */
     public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry) {
         LabelPatternUtil.database = dBase;
-        List<String> typeList;
         String key;
         StringBuilder stringBuilder = new StringBuilder();
         boolean forceUpper = false;
@@ -432,7 +431,10 @@ public class LabelPatternUtil {
             // get the type of entry
             String entryType = entry.getType();
             // Get the arrayList corresponding to the type
-            typeList = metaData.getLabelPattern().getValue(entryType);
+            List<String> typeList = new ArrayList<>(metaData.getLabelPattern().getValue(entryType));
+            if(! typeList.isEmpty()) {
+                typeList.remove(0);
+            }
             boolean field = false;
             for (String typeListEntry : typeList) {
                 if ("[".equals(typeListEntry)) {
