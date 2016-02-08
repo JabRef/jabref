@@ -374,7 +374,7 @@ public class PdfImporter {
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName);
         } catch (IOException e) {
-            // Todo Logging
+            LOGGER.error("XMPUtil.readXMP failed", e);
         }
         return xmpEntriesInFile;
     }
