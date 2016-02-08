@@ -319,4 +319,79 @@ public class BibDatabaseWriterTest {
 
         Assert.assertEquals(new Scanner(testBibtexFile).useDelimiter("\\A").next(), stringWriter.toString());
     }
+
+    @Test
+    public void writeSavedSerializationOfEntryIfUnchanged() throws IOException {
+        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+        BibEntry entry = new BibEntry();
+        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setField("author", "Mr. author");
+        entry.setParsedSerialization("presaved serialization");
+        entry.setChanged(false);
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
+
+        StringWriter stringWriter = new StringWriter();
+        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.singletonList(entry),
+                new SavePreferences());
+
+        Assert.assertEquals("presaved serialization", stringWriter.toString());
+    }
+
+    @Test
+    public void reformatEntryIfAskedToDoSo() throws IOException {
+        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+        BibEntry entry = new BibEntry();
+        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setField("author", "Mr. author");
+        entry.setParsedSerialization("wrong serialization");
+        entry.setChanged(false);
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
+
+        StringWriter stringWriter = new StringWriter();
+        SavePreferences preferences = new SavePreferences();
+        preferences.setReformatFile(true);
+        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.singletonList(entry), preferences);
+
+        Assert.assertEquals(Globals.NEWLINE +
+                        "@Article{," + Globals.NEWLINE + "  author = {Mr. author}" + Globals.NEWLINE + "}" + Globals.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    public void writeSavedSerializationOfStringIfUnchanged() throws IOException {
+        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+        BibDatabase database = new BibDatabase();
+        BibtexString string = new BibtexString("id", "name", "content");
+        string.setParsedSerialization("serialization");
+        database.addString(string);
+        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
+
+        StringWriter stringWriter = new StringWriter();
+        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), new SavePreferences());
+
+        Assert.assertEquals("serialization", stringWriter.toString());
+    }
+
+    @Test
+    public void reformatStringIfAskedToDoSo() throws IOException {
+        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+        BibDatabase database = new BibDatabase();
+        BibtexString string = new BibtexString("id", "name", "content");
+        string.setParsedSerialization("wrong serialization");
+        database.addString(string);
+        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
+
+        SavePreferences preferences = new SavePreferences();
+        preferences.setReformatFile(true);
+
+        StringWriter stringWriter = new StringWriter();
+        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), preferences);
+
+        Assert.assertEquals(Globals.NEWLINE + "@String{name = {content}}" + Globals.NEWLINE, stringWriter.toString());
+
+    }
 }

@@ -27,8 +27,11 @@ public class BibEntryWriter {
     }
 
     public void write(BibEntry entry, Writer out, BibDatabaseMode bibDatabaseMode) throws IOException {
+        write(entry, out, bibDatabaseMode, false);
+    }
+    public void write(BibEntry entry, Writer out, BibDatabaseMode bibDatabaseMode, Boolean reformat) throws IOException {
         // if the entry has not been modified, write it as it was
-        if (!entry.hasChanged()) {
+        if (!reformat && !entry.hasChanged()) {
             out.write(entry.getParsedSerialization());
             return;
         }

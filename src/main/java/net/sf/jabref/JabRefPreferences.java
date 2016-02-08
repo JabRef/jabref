@@ -60,7 +60,6 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
-
     /**
      * HashMap that contains all preferences which are set by default
      */
@@ -110,6 +109,7 @@ public class JabRefPreferences {
     public static final String TABLE_SECONDARY_SORT_DESCENDING = "secDescending";
     public static final String TABLE_TERTIARY_SORT_FIELD = "terSort";
     public static final String TABLE_TERTIARY_SORT_DESCENDING = "terDescending";
+    public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
     public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
     public static final String EXPORT_PRIMARY_SORT_FIELD = "exportPriSort";
@@ -504,6 +504,8 @@ public class JabRefPreferences {
         defaults.put(TABLE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
         defaults.put(TABLE_TERTIARY_SORT_FIELD, "title");
         defaults.put(TABLE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
+
+        defaults.put(REFORMAT_FILE_ON_SAVE_AND_EXPORT, Boolean.FALSE);
 
         // export order
         defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);

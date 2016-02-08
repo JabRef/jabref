@@ -178,7 +178,7 @@ public class BibDatabaseWriter {
         writePreamble(writer, bibDatabaseContext.getDatabase().getPreamble());
 
         // Write strings if there are any.
-        writeStrings(writer, bibDatabaseContext.getDatabase());
+        writeStrings(writer, bibDatabaseContext.getDatabase(), preferences.isReformatFile());
 
         // Write database entries.
         List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext,
@@ -198,7 +198,7 @@ public class BibDatabaseWriter {
                         entryType -> typesToWrite.put(entryType.getName(), entryType));
             }
 
-            bibtexEntryWriter.write(entry, writer, bibDatabaseContext.getMode());
+            bibtexEntryWriter.write(entry, writer, bibDatabaseContext.getMode(), preferences.isReformatFile());
 
         }
 
@@ -324,13 +324,14 @@ public class BibDatabaseWriter {
         }
     }
 
-    private void writeString(Writer fw, BibtexString bs, Map<String, BibtexString> remaining, int maxKeyLength)
+    private void writeString(Writer fw, BibtexString bs, Map<String, BibtexString> remaining, int maxKeyLength,
+            Boolean reformatFile)
             throws IOException {
         // First remove this from the "remaining" list so it can't cause problem with circular refs:
         remaining.remove(bs.getName());
 
         //if the string has not been modified, write it back as it was
-        if (!bs.hasChanged()) {
+        if (!reformatFile && !bs.hasChanged()) {
             fw.write(bs.getParsedSerialization());
             return;
         }
@@ -351,7 +352,7 @@ public class BibDatabaseWriter {
             Object referred = remaining.get(foundLabel.substring(1, foundLabel.length() - 1));
             // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
             if (referred != null) {
-                writeString(fw, (BibtexString) referred, remaining, maxKeyLength);
+                writeString(fw, (BibtexString) referred, remaining, maxKeyLength, reformatFile);
             }
         }
 
@@ -384,9 +385,10 @@ public class BibDatabaseWriter {
      *
      * @param fw       The Writer to send the output to.
      * @param database The database whose strings we should write.
+     * @param reformatFile
      * @throws IOException If anything goes wrong in writing.
      */
-    private void writeStrings(Writer fw, BibDatabase database) throws IOException {
+    private void writeStrings(Writer fw, BibDatabase database, Boolean reformatFile) throws IOException {
         List<BibtexString> strings = database.getStringKeySet().stream().map(database::getString).collect(
                 Collectors.toList());
         strings.sort(new BibtexStringComparator(true));
@@ -402,7 +404,7 @@ public class BibDatabaseWriter {
             isFirstStringInType = true;
             for (BibtexString bs : strings) {
                 if (remaining.containsKey(bs.getName()) && (bs.getType() == t)) {
-                    writeString(fw, bs, remaining, maxKeyLength);
+                    writeString(fw, bs, remaining, maxKeyLength, reformatFile);
                     isFirstStringInType = false;
                 }
             }

@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 
 public class SavePreferences {
 
+    private boolean reformatFile;
     private boolean saveInOriginalOrder;
     private SaveOrderConfig saveOrder;
     private Charset encoding;
@@ -20,13 +21,14 @@ public class SavePreferences {
     }
 
     public SavePreferences(Boolean saveInOriginalOrder, SaveOrderConfig saveOrder, Charset encoding, Boolean makeBackup,
-            DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount) {
+            DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount, Boolean reformatFile) {
         this.saveInOriginalOrder = saveInOriginalOrder;
         this.saveOrder = saveOrder;
         this.encoding = encoding;
         this.makeBackup = makeBackup;
         this.saveType = saveType;
         this.takeMetadataSaveOrderInAccount = takeMetadataSaveOrderInAccount;
+        this.reformatFile = reformatFile;
     }
 
     public static SavePreferences loadForExportFromPreferences(JabRefPreferences preferences) {
@@ -43,8 +45,9 @@ public class SavePreferences {
         Boolean makeBackup = preferences.getBoolean(JabRefPreferences.BACKUP);
         DatabaseSaveType saveType = DatabaseSaveType.ALL;
         Boolean takeMetadataSaveOrderInAccount = false;
+        Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
         return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
-                takeMetadataSaveOrderInAccount);
+                takeMetadataSaveOrderInAccount, reformatFile);
     }
 
     public static SavePreferences loadForSaveFromPreferences(JabRefPreferences preferences) {
@@ -54,8 +57,9 @@ public class SavePreferences {
         Boolean makeBackup = preferences.getBoolean(JabRefPreferences.BACKUP);
         DatabaseSaveType saveType = DatabaseSaveType.ALL;
         Boolean takeMetadataSaveOrderInAccount = true;
+        Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
         return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
-                takeMetadataSaveOrderInAccount);
+                takeMetadataSaveOrderInAccount, reformatFile);
     }
 
     public Boolean getTakeMetadataSaveOrderInAccount() {
@@ -96,6 +100,14 @@ public class SavePreferences {
 
     public void setSaveType(DatabaseSaveType saveType) {
         this.saveType = saveType;
+    }
+
+    public Boolean isReformatFile() {
+        return reformatFile;
+    }
+
+    public void setReformatFile(boolean reformatFile) {
+        this.reformatFile = reformatFile;
     }
 
     public enum DatabaseSaveType {
