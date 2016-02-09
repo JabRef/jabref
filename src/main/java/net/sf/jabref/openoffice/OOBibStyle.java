@@ -62,7 +62,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private final Map<String, Object> properties = new HashMap<>();
     private final Map<String, Object> citProperties = new HashMap<>();
 
-    private static final Pattern numPattern = Pattern.compile("-?\\d+");
+    private static final Pattern NUM_PATTERN = Pattern.compile("-?\\d+");
 
     private boolean valid;
 
@@ -81,9 +81,44 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private File styleFile;
     private static long styleFileModificationTime = Long.MIN_VALUE;
 
-    //private Pattern quoted = Pattern.compile("\".*^\\\\\"");
-    private static final Pattern quoted = Pattern.compile("\".*\"");
+    private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
+    private static final String BRACKET_BEFORE_IN_LIST = "BracketBeforeInList";
+    private static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
+    public static final String ITALIC_ET_AL = "ItalicEtAl";
+    private static final String BIBTEX_KEY_CITATIONS = "BibTeXKeyCitations";
+    public static final String MULTI_CITE_CHRONOLOGICAL = "MultiCiteChronological";
+    private static final String SUBSCRIPT_CITATIONS = "SubscriptCitations";
+    private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
+    private static final String BOLD_CITATIONS = "BoldCitations";
+    private static final String ITALIC_CITATIONS = "ItalicCitations";
+    private static final String CITATION_CHARACTER_FORMAT = "CitationCharacterFormat";
+    private static final String FORMAT_CITATIONS = "FormatCitations";
+    public static final String MINIMUM_GROUPING_COUNT = "MinimumGroupingCount";
+    private static final String GROUPED_NUMBERS_SEPARATOR = "GroupedNumbersSeparator";
+    private static final String PAGE_INFO_SEPARATOR = "PageInfoSeparator";
+    private static final String CITATION_SEPARATOR = "CitationSeparator";
+    private static final String IN_TEXT_YEAR_SEPARATOR = "InTextYearSeparator";
+    public static final String ET_AL_STRING = "EtAlString";
+    public static final String MAX_AUTHORS_FIRST = "MaxAuthorsFirst";
+    private static final String MAX_AUTHORS = "MaxAuthors";
+    private static final String YEAR_FIELD = "YearField";
+    private static final String AUTHOR_FIELD = "AuthorField";
+    public static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
+    public static final String REFERENCE_PARAGRAPH_FORMAT = "ReferenceParagraphFormat";
+    private static final String BRACKET_AFTER = "BracketAfter";
+    private static final String BRACKET_BEFORE = "BracketBefore";
+    private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
+    private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
+    private static final String SORT_ALGORITHM = "SortAlgorithm";
+    public static final String TITLE = "Title";
+    private static final String YEAR_SEPARATOR = "YearSeparator";
+    private static final String AUTHOR_LAST_SEPARATOR_IN_TEXT = "AuthorLastSeparatorInText";
+    private static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
+    private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
+
+
     private final JournalAbbreviationRepository repository;
+    private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
     private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
@@ -105,41 +140,41 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     private void setDefaultProperties() {
         // Set default property values:
-        properties.put("Title", "Bibliography");
-        properties.put("SortAlgorithm", "alphanumeric");
-        properties.put("IsSortByPosition", Boolean.FALSE);
-        properties.put("IsNumberEntries", Boolean.FALSE);
-        properties.put("BracketBefore", "[");
-        properties.put("BracketAfter", "]");
-        properties.put("ReferenceParagraphFormat", "Default");
-        properties.put("ReferenceHeaderParagraphFormat", "Heading 1");
+        properties.put(TITLE, "Bibliography");
+        properties.put(SORT_ALGORITHM, "alphanumeric");
+        properties.put(IS_SORT_BY_POSITION, Boolean.FALSE);
+        properties.put(IS_NUMBER_ENTRIES, Boolean.FALSE);
+        properties.put(BRACKET_BEFORE, "[");
+        properties.put(BRACKET_AFTER, "]");
+        properties.put(REFERENCE_PARAGRAPH_FORMAT, "Default");
+        properties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
 
         // Set default properties for the citation marker:
-        citProperties.put("AuthorField", "author/editor");
-        citProperties.put("YearField", "year");
-        citProperties.put("MaxAuthors", 3);
-        citProperties.put("MaxAuthorsFirst", -1);
-        citProperties.put("AuthorSeparator", ", ");
-        citProperties.put("AuthorLastSeparator", " & ");
-        citProperties.put("AuthorLastSeparatorInText", null);
-        citProperties.put("EtAlString", " et al.");
-        citProperties.put("YearSeparator", ", ");
-        citProperties.put("InTextYearSeparator", " ");
-        citProperties.put("BracketBefore", "(");
-        citProperties.put("BracketAfter", ")");
-        citProperties.put("CitationSeparator", "; ");
-        citProperties.put("PageInfoSeparator", "; ");
-        citProperties.put("GroupedNumbersSeparator", "-");
-        citProperties.put("MinimumGroupingCount", 3);
-        citProperties.put("FormatCitations", Boolean.FALSE);
-        citProperties.put("CitationCharacterFormat", "Default");
-        citProperties.put("ItalicCitations", Boolean.FALSE);
-        citProperties.put("BoldCitations", Boolean.FALSE);
-        citProperties.put("SuperscriptCitations", Boolean.FALSE);
-        citProperties.put("SubscriptCitations", Boolean.FALSE);
-        citProperties.put("MultiCiteChronological", Boolean.TRUE);
-        citProperties.put("BibTeXKeyCitations", Boolean.FALSE);
-        citProperties.put("ItalicEtAl", Boolean.FALSE);
+        citProperties.put(AUTHOR_FIELD, "author/editor");
+        citProperties.put(YEAR_FIELD, "year");
+        citProperties.put(MAX_AUTHORS, 3);
+        citProperties.put(MAX_AUTHORS_FIRST, -1);
+        citProperties.put(AUTHOR_SEPARATOR, ", ");
+        citProperties.put(AUTHOR_LAST_SEPARATOR, " & ");
+        citProperties.put(AUTHOR_LAST_SEPARATOR_IN_TEXT, null);
+        citProperties.put(ET_AL_STRING, " et al.");
+        citProperties.put(YEAR_SEPARATOR, ", ");
+        citProperties.put(IN_TEXT_YEAR_SEPARATOR, " ");
+        citProperties.put(BRACKET_BEFORE, "(");
+        citProperties.put(BRACKET_AFTER, ")");
+        citProperties.put(CITATION_SEPARATOR, "; ");
+        citProperties.put(PAGE_INFO_SEPARATOR, "; ");
+        citProperties.put(GROUPED_NUMBERS_SEPARATOR, "-");
+        citProperties.put(MINIMUM_GROUPING_COUNT, 3);
+        citProperties.put(FORMAT_CITATIONS, Boolean.FALSE);
+        citProperties.put(CITATION_CHARACTER_FORMAT, "Default");
+        citProperties.put(ITALIC_CITATIONS, Boolean.FALSE);
+        citProperties.put(BOLD_CITATIONS, Boolean.FALSE);
+        citProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);
+        citProperties.put(SUBSCRIPT_CITATIONS, Boolean.FALSE);
+        citProperties.put(MULTI_CITE_CHRONOLOGICAL, Boolean.TRUE);
+        citProperties.put(BIBTEX_KEY_CITATIONS, Boolean.FALSE);
+        citProperties.put(ITALIC_ET_AL, Boolean.FALSE);
     }
 
     public String getName() {
@@ -163,7 +198,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * If this style was initialized from a file on disk, reload the style
      * if the file has been modified since it was read.
      *
-     * @throws Exception
+     * @throws IOException
      */
     public void ensureUpToDate() throws IOException {
         if (!isUpToDate()) {
@@ -269,7 +304,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     * After initalizing this style from a file, this method can be used to check
+     * After initializing this style from a file, this method can be used to check
      * whether the file appeared to be a proper style file.
      *
      * @return true if the file could be parsed as a style file, false otherwise.
@@ -315,15 +350,15 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         if ((index > 0) && (index <= (line.length() - 1))) {
             String propertyName = line.substring(0, index).trim();
             String value = line.substring(index + 1);
-            if ((value.trim().length() > 2) && quoted.matcher(value.trim()).matches()) {
+            if ((value.trim().length() > 2) && QUOTED.matcher(value.trim()).matches()) {
                 value = value.trim().substring(1, value.trim().length() - 1);
             }
             Object toSet = value;
-            if (numPattern.matcher(value).matches()) {
+            if (NUM_PATTERN.matcher(value).matches()) {
                 toSet = Integer.parseInt(value);
-            } else if ("true".equals(value.toLowerCase().trim())) {
+            } else if ("true".equalsIgnoreCase(value.trim())) {
                 toSet = Boolean.TRUE;
-            } else if ("false".equals(value.toLowerCase().trim())) {
+            } else if ("false".equalsIgnoreCase(value.trim())) {
                 toSet = Boolean.FALSE;
             }
             map.put(propertyName, toSet);
@@ -371,13 +406,13 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The text for the citation.
      */
     public String getNumCitationMarker(List<Integer> number, int minGroupingCount, boolean inList) {
-        String bracketBefore = (String) citProperties.get("BracketBefore");
-        if (inList && (citProperties.get("BracketBeforeInList") != null)) {
-            bracketBefore = (String) citProperties.get("BracketBeforeInList");
+        String bracketBefore = (String) citProperties.get(BRACKET_BEFORE);
+        if (inList && (citProperties.get(BRACKET_BEFORE_IN_LIST) != null)) {
+            bracketBefore = (String) citProperties.get(BRACKET_BEFORE_IN_LIST);
         }
-        String bracketAfter = (String) citProperties.get("BracketAfter");
-        if (inList && (citProperties.get("BracketAfterInList") != null)) {
-            bracketAfter = (String) citProperties.get("BracketAfterInList");
+        String bracketAfter = (String) citProperties.get(BRACKET_AFTER);
+        if (inList && (citProperties.get(BRACKET_AFTER_IN_LIST) != null)) {
+            bracketAfter = (String) citProperties.get(BRACKET_AFTER_IN_LIST);
         }
         // Sort the numbers:
         List<Integer> lNum = new ArrayList<>(number);
@@ -394,7 +429,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 } else {
                     // Add single entry:
                     if (i > 0) {
-                        sb.append((String) citProperties.get("CitationSeparator"));
+                        sb.append((String) citProperties.get(CITATION_SEPARATOR));
                     }
                     sb.append(lNum.get(i) > 0 ? String.valueOf(lNum.get(i)) : OOBibStyle.UNDEFINED_CITATION_MARKER);
                     written++;
@@ -404,11 +439,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 // Check if it ends here:
                 if ((i == (lNum.size() - 1)) || (lNum.get(i + 1) != (i1 + 1))) {
                     if (written > 0) {
-                        sb.append((String) citProperties.get("CitationSeparator"));
+                        sb.append((String) citProperties.get(CITATION_SEPARATOR));
                     }
                     if ((minGroupingCount > 0) && (((i1 + 1) - combineFrom) >= minGroupingCount)) {
                         sb.append(combineFrom);
-                        sb.append((String) citProperties.get("GroupedNumbersSeparator"));
+                        sb.append((String) citProperties.get(GROUPED_NUMBERS_SEPARATOR));
                         sb.append(i1);
                         written++;
                     } else {
@@ -417,7 +452,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                         for (int jj = combineFrom; jj <= i1; jj++) {
                             sb.append(jj);
                             if (jj < i1) {
-                                sb.append((String) citProperties.get("CitationSeparator"));
+                                sb.append((String) citProperties.get(CITATION_SEPARATOR));
                             }
                             written++;
                         }
@@ -471,27 +506,27 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             for (int i = 0; i < uniquefiers.length; i++) {
 
                 if ((uniquefiers[i] != null) && !uniquefiers[i].isEmpty()) {
-                    String authorField = (String) citProperties.get("AuthorField");
-                    int maxAuthors = (Integer) citProperties.get("MaxAuthors");
+                    String authorField = (String) citProperties.get(AUTHOR_FIELD);
+                    int maxAuthors = (Integer) citProperties.get(MAX_AUTHORS);
                     if (piv == -1) {
                         piv = i;
                         tmpMarker = getAuthorYearParenthesisMarker(new BibEntry[] {entries[i]}, database, authorField,
-                                (String) citProperties.get("YearField"), maxAuthors,
-                                (String) citProperties.get("AuthorSeparator"),
-                                (String) citProperties.get("AuthorLastSeparator"),
-                                (String) citProperties.get("EtAlString"), (String) citProperties.get("YearSeparator"),
-                                (String) citProperties.get("BracketBefore"), (String) citProperties.get("BracketAfter"),
-                                (String) citProperties.get("CitationSeparator"), null, unlimAuthors);
+                                (String) citProperties.get(YEAR_FIELD), maxAuthors,
+                                (String) citProperties.get(AUTHOR_SEPARATOR),
+                                (String) citProperties.get(AUTHOR_LAST_SEPARATOR),
+                                (String) citProperties.get(ET_AL_STRING), (String) citProperties.get(YEAR_SEPARATOR),
+                                (String) citProperties.get(BRACKET_BEFORE), (String) citProperties.get(BRACKET_AFTER),
+                                (String) citProperties.get(CITATION_SEPARATOR), null, unlimAuthors);
                         //System.out.println("piv="+piv+" tmpMarker='"+tmpMarker+"'");
                     } else {
                         // See if this entry can go into a group with the previous one:
                         String thisMarker = getAuthorYearParenthesisMarker(new BibEntry[] {entries[i]}, database,
-                                authorField, (String) citProperties.get("YearField"), maxAuthors,
-                                (String) citProperties.get("AuthorSeparator"),
-                                (String) citProperties.get("AuthorLastSeparator"),
-                                (String) citProperties.get("EtAlString"), (String) citProperties.get("YearSeparator"),
-                                (String) citProperties.get("BracketBefore"), (String) citProperties.get("BracketAfter"),
-                                (String) citProperties.get("CitationSeparator"), null, unlimAuthors);
+                                authorField, (String) citProperties.get(YEAR_FIELD), maxAuthors,
+                                (String) citProperties.get(AUTHOR_SEPARATOR),
+                                (String) citProperties.get(AUTHOR_LAST_SEPARATOR),
+                                (String) citProperties.get(ET_AL_STRING), (String) citProperties.get(YEAR_SEPARATOR),
+                                (String) citProperties.get(BRACKET_BEFORE), (String) citProperties.get(BRACKET_AFTER),
+                                (String) citProperties.get(CITATION_SEPARATOR), null, unlimAuthors);
 
                         String author = getCitationMarkerField(entries[i], database, authorField);
                         AuthorList al = AuthorList.getAuthorList(author);
@@ -504,7 +539,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                             if ((piv > -1) && (i > (piv + 1))) {
                                 // Do the grouping:
                                 group(entries, uniquefiers, piv, i - 1,
-                                        (String) citProperties.get("UniquefierSeparator"));
+                                        (String) citProperties.get(UNIQUEFIER_SEPARATOR));
                             }
                             tmpMarker = thisMarker;
                             piv = i;
@@ -515,7 +550,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                     // Check if we just passed a group of more than one entry with uniquefier:
                     if ((piv > -1) && (i > (piv + 1))) {
                         // Do the grouping:
-                        group(entries, uniquefiers, piv, i - 1, (String) citProperties.get("UniquefierSeparator"));
+                        group(entries, uniquefiers, piv, i - 1, (String) citProperties.get(UNIQUEFIER_SEPARATOR));
                     }
 
                     piv = -1;
@@ -526,46 +561,46 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             if (piv >= 0) {
                 // Do the grouping:
                 group(entries, uniquefiers, piv, uniquefiers.length - 1,
-                        (String) citProperties.get("UniquefierSeparator"));
+                        (String) citProperties.get(UNIQUEFIER_SEPARATOR));
             }
         }
 
         if (inParenthesis) {
             return getAuthorYearParenthesisMarker(entries, database,
-                    (String) citProperties.get("AuthorField"),
-                    (String) citProperties.get("YearField"),
-                    (Integer) citProperties.get("MaxAuthors"),
-                    (String) citProperties.get("AuthorSeparator"),
-                    (String) citProperties.get("AuthorLastSeparator"),
-                    (String) citProperties.get("EtAlString"),
-                    (String) citProperties.get("YearSeparator"),
-                    (String) citProperties.get("BracketBefore"),
-                    (String) citProperties.get("BracketAfter"),
-                    (String) citProperties.get("CitationSeparator"),
+                    (String) citProperties.get(AUTHOR_FIELD),
+                    (String) citProperties.get(YEAR_FIELD),
+                    (Integer) citProperties.get(MAX_AUTHORS),
+                    (String) citProperties.get(AUTHOR_SEPARATOR),
+                    (String) citProperties.get(AUTHOR_LAST_SEPARATOR),
+                    (String) citProperties.get(ET_AL_STRING),
+                    (String) citProperties.get(YEAR_SEPARATOR),
+                    (String) citProperties.get(BRACKET_BEFORE),
+                    (String) citProperties.get(BRACKET_AFTER),
+                    (String) citProperties.get(CITATION_SEPARATOR),
                     uniquefiers, unlimAuthors);
         } else {
-            String authorLastSeparator = (String) citProperties.get("AuthorLastSeparator");
-            String alsInText = (String) citProperties.get("AuthorLastSeparatorInText");
+            String authorLastSeparator = (String) citProperties.get(AUTHOR_LAST_SEPARATOR);
+            String alsInText = (String) citProperties.get(AUTHOR_LAST_SEPARATOR_IN_TEXT);
             if (alsInText != null) {
                 authorLastSeparator = alsInText;
             }
             return getAuthorYearInTextMarker(entries, database,
-                    (String) citProperties.get("AuthorField"),
-                    (String) citProperties.get("YearField"),
-                    (Integer) citProperties.get("MaxAuthors"),
-                    (String) citProperties.get("AuthorSeparator"),
+                    (String) citProperties.get(AUTHOR_FIELD),
+                    (String) citProperties.get(YEAR_FIELD),
+                    (Integer) citProperties.get(MAX_AUTHORS),
+                    (String) citProperties.get(AUTHOR_SEPARATOR),
                     authorLastSeparator,
-                    (String) citProperties.get("EtAlString"),
-                    (String) citProperties.get("InTextYearSeparator"),
-                    (String) citProperties.get("BracketBefore"),
-                    (String) citProperties.get("BracketAfter"),
-                    (String) citProperties.get("CitationSeparator"),
+                    (String) citProperties.get(ET_AL_STRING),
+                    (String) citProperties.get(IN_TEXT_YEAR_SEPARATOR),
+                    (String) citProperties.get(BRACKET_BEFORE),
+                    (String) citProperties.get(BRACKET_AFTER),
+                    (String) citProperties.get(CITATION_SEPARATOR),
  uniquefiers, unlimAuthors);
         }
     }
 
     /**
-     * Modify entry and uniqiefier arrays to facilitate a grouped presentation of uniqiefied entries.
+     * Modify entry and uniquefier arrays to facilitate a grouped presentation of uniquefied entries.
      *
      * @param entries     The entry array.
      * @param uniquefiers The uniquefier array.
@@ -610,16 +645,15 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
         StringBuffer sb = new StringBuffer(startBrace);
         for (int j = 0; j < entries.length; j++) {
-
-            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
-            int maxAuthors = unlimA > 0 ? unlimA : maxA;
-
             BibEntry entry = entries[j];
 
             // Check if this entry has been nulled due to grouping with the previous entry(ies):
             if (entry == null) {
                 continue;
             }
+
+            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
+            int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             if (j > 0) {
                 sb.append(citationSeparator);
@@ -730,7 +764,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     * This method looks up a field for en entry in a database. Any number of backup fields can be used
+     * This method looks up a field for an entry in a database. Any number of backup fields can be used
      * if the primary field is empty.
      *
      * @param entry    The entry.
@@ -789,12 +823,12 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return
      */
     public String insertPageInfo(String citation, String pageInfo) {
-        String bracketAfter = getStringCitProperty("BracketAfter");
+        String bracketAfter = getStringCitProperty(BRACKET_AFTER);
         if (citation.endsWith(bracketAfter)) {
             String first = citation.substring(0, citation.length() - bracketAfter.length());
-            return first + getStringCitProperty("PageInfoSeparator") + pageInfo + bracketAfter;
+            return first + getStringCitProperty(PAGE_INFO_SEPARATOR) + pageInfo + bracketAfter;
         } else {
-            return citation + getStringCitProperty("PageInfoSeparator") + pageInfo;
+            return citation + getStringCitProperty(PAGE_INFO_SEPARATOR) + pageInfo;
         }
     }
 
@@ -805,7 +839,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return true if we use numbered citations, false otherwise.
      */
     public boolean isNumberEntries() {
-        return (Boolean) getProperty("IsNumberEntries");
+        return (Boolean) getProperty(IS_NUMBER_ENTRIES);
     }
 
     /**
@@ -815,17 +849,17 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return true to sort by appearance, false to sort alphabetically.
      */
     public boolean isSortByPosition() {
-        return (Boolean) getProperty("IsSortByPosition");
+        return (Boolean) getProperty(IS_SORT_BY_POSITION);
     }
 
     /**
-     * Convenience method for checking whether citation markers should be italicised.
+     * Convenience method for checking whether citation markers should be italicized.
      * Will only be relevant if isFormatCitations() returns true.
      *
      * @return true to indicate that citations should be in italics.
      */
     public boolean isItalicCitations() {
-        return (Boolean) citProperties.get("ItalicCitations");
+        return (Boolean) citProperties.get(ITALIC_CITATIONS);
     }
 
     /**
@@ -835,7 +869,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return true to indicate that citations should be in bold.
      */
     public boolean isBoldCitations() {
-        return (Boolean) citProperties.get("BoldCitations");
+        return (Boolean) citProperties.get(BOLD_CITATIONS);
     }
 
     /**
@@ -846,11 +880,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return true to indicate that citations should be in italics.
      */
     public boolean isFormatCitations() {
-        return (Boolean) citProperties.get("FormatCitations");
+        return (Boolean) citProperties.get(FORMAT_CITATIONS);
     }
 
     public boolean isBibtexKeyCiteMarkers() {
-        return (Boolean) citProperties.get("BibTeXKeyCitations");
+        return (Boolean) citProperties.get(BIBTEX_KEY_CITATIONS);
     }
 
     /**
@@ -872,7 +906,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public String getCitationCharacterFormat() {
-        return (String) citProperties.get("CitationCharacterFormat");
+        return (String) citProperties.get(CITATION_CHARACTER_FORMAT);
     }
 
     /**

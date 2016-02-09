@@ -26,8 +26,10 @@ import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyExistException;
 import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.IllegalArgumentException;
+import com.sun.star.lang.WrappedTargetException;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
@@ -43,6 +45,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 /**
  * Dialog for modifying existing citations.
@@ -58,13 +61,14 @@ class CitationManager {
     private static final Log LOGGER = LogFactory.getLog(CitationManager.class);
 
 
-    public CitationManager(final JabRefFrame frame, OOBibBase ooBase) throws Exception {
+    public CitationManager(final JabRefFrame frame, OOBibBase ooBase)
+            throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
         diag = new JDialog(frame, Localization.lang("Manage citations"), true);
         this.ooBase = ooBase;
 
         list = new BasicEventList<>();
         XNameAccess nameAccess = ooBase.getReferenceMarks();
-        String[] names = ooBase.getJabRefReferenceMarks(nameAccess);
+        java.util.List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
             list.add(new CitEntry(name,
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
@@ -125,8 +129,9 @@ class CitationManager {
     private void storeSettings() throws UnknownPropertyException, NotRemoveableException, PropertyExistException,
             IllegalTypeException, IllegalArgumentException {
         for (CitEntry entry : list) {
-            if (entry.pageInfoChanged()) {
-                ooBase.setCustomProperty(entry.refMarkName, entry.pageInfo);
+            Optional<String> pageInfo = entry.getPageInfo();
+            if (entry.pageInfoChanged() && pageInfo.isPresent()) {
+                ooBase.setCustomProperty(entry.getRefMarkName(), pageInfo.get());
             }
         }
     }
@@ -139,9 +144,9 @@ class CitationManager {
 
     static class CitEntry implements Comparable<CitEntry> {
 
-        final String refMarkName;
-        String pageInfo;
-        final String context;
+        private final String refMarkName;
+        private String pageInfo;
+        private final String context;
         private final String origPageInfo;
 
 
@@ -150,6 +155,14 @@ class CitationManager {
             this.context = context;
             this.pageInfo = pageInfo;
             this.origPageInfo = pageInfo;
+        }
+
+        public Optional<String> getPageInfo() {
+            return Optional.ofNullable(pageInfo);
+        }
+
+        public String getRefMarkName() {
+            return refMarkName;
         }
 
         public boolean pageInfoChanged() {
@@ -167,6 +180,15 @@ class CitationManager {
         @Override
         public int compareTo(CitEntry other) {
             return this.refMarkName.compareTo(other.refMarkName);
+        }
+
+        public String getContext() {
+            return context;
+        }
+
+        public void setPageInfo(String trim) {
+            pageInfo = trim;
+
         }
     }
 
@@ -189,9 +211,9 @@ class CitationManager {
         @Override
         public Object getColumnValue(CitEntry citEntry, int i) {
             if (i == 0) {
-                return citEntry.context;
+                return citEntry.getContext();
             } else {
-                return citEntry.pageInfo == null ? "" : citEntry.pageInfo;
+                return citEntry.getPageInfo().orElse("");
             }
         }
     }
@@ -222,8 +244,8 @@ class CitationManager {
 
         public SingleCitDialog(CitEntry entry) {
             this._entry = entry;
-            title = new JLabel(entry.context);
-            pageInfo.setText(entry.pageInfo);
+            title = new JLabel(entry.getContext());
+            pageInfo.setText(entry.getPageInfo().orElse(""));
 
             singleCiteDialog = new JDialog(CitationManager.this.diag, Localization.lang("Citation"), true);
 
@@ -249,9 +271,9 @@ class CitationManager {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (pageInfo.getText().trim().isEmpty()) {
-                        _entry.pageInfo = null;
+                        _entry.setPageInfo(null);
                     } else {
-                        _entry.pageInfo = pageInfo.getText().trim();
+                        _entry.setPageInfo(pageInfo.getText().trim());
                     }
                     tableModel.fireTableDataChanged();
                     singleCiteDialog.dispose();
