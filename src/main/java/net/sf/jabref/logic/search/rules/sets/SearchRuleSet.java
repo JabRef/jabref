@@ -17,12 +17,13 @@ package net.sf.jabref.logic.search.rules.sets;
 
 import net.sf.jabref.logic.search.SearchRule;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
 public abstract class SearchRuleSet implements SearchRule {
 
-    protected final Vector<SearchRule> ruleSet = new Vector<>();
+    protected final List<SearchRule> ruleSet = new Vector<>();
 
     public void addRule(SearchRule newRule) {
         ruleSet.add(Objects.requireNonNull(newRule));

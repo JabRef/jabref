@@ -41,8 +41,8 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
     public String getDescription() {
         StringBuilder stringBuilder = new StringBuilder();
         // describe advanced search expression
-        stringBuilder.append(Localization.lang("This search contains entries in which")).append(' ');
-        stringBuilder.append(new SearchBaseVisitor<String>() {
+        stringBuilder.append(Localization.lang("This search contains entries in which")).append(' ')
+                .append(new SearchBaseVisitor<String>() {
 
             @Override
             public String visitStart(SearchParser.StartContext context) {
@@ -109,8 +109,8 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
             }
 
         }.visit(parseTree));
-        stringBuilder.append(". ");
-        stringBuilder.append(caseSensitive ? Localization.lang("The search is case sensitive.") :
+        stringBuilder.append(". ").append(caseSensitive ? Localization
+                .lang("The search is case sensitive.") :
             Localization.lang("The search is case insensitive."));
         return stringBuilder.toString();
     }

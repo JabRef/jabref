@@ -488,7 +488,6 @@ public class StringUtil {
      * @return the int value of str
      */
     public static int intValueOf(String str) {
-        int ival = 0;
         int idx = 0;
         int end;
         boolean sign = false;
@@ -498,6 +497,7 @@ public class StringUtil {
             throw new NumberFormatException(str);
         }
 
+        int ival = 0;
         for (;; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {

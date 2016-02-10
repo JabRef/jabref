@@ -28,6 +28,8 @@ public class SuperscriptFormatter implements Formatter {
     private static final Pattern PATTERN = Pattern.compile("\\b(\\d+)(st|nd|rd|th)\\b",
             Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
+    // adds superscript tag
+    private static final String REPLACE = "$1\\\\textsuperscript{$2}";
 
     @Override
     public String getName() {
@@ -49,8 +51,6 @@ public class SuperscriptFormatter implements Formatter {
      */
     @Override
     public String format(String value) {
-        // adds superscript tag
-        final String replace = "$1\\\\textsuperscript{$2}";
 
         // nothing to do
         if ((value == null) || value.isEmpty()) {
@@ -60,6 +60,6 @@ public class SuperscriptFormatter implements Formatter {
         Matcher matcher = PATTERN.matcher(value);
         // replace globally
 
-        return matcher.replaceAll(replace);
+        return matcher.replaceAll(REPLACE);
     }
 }

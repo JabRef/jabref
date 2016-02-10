@@ -18,6 +18,9 @@ public class PageNumbersFormatter implements Formatter {
 
     private static final Pattern PAGES_PATTERN = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
 
+    private static final String REJECT_LITERALS = "[^0-9,\\-\\+]";
+    private static final String REPLACE = "$1--$2";
+
 
     @Override
     public String getName() {
@@ -45,8 +48,6 @@ public class PageNumbersFormatter implements Formatter {
      */
     @Override
     public String format(String value) {
-        final String rejectLiterals = "[^0-9,\\-\\+]";
-        final String replace = "$1--$2";
 
         // nothing to do
         if ((value == null) || value.isEmpty()) {
@@ -54,11 +55,11 @@ public class PageNumbersFormatter implements Formatter {
         }
 
         // remove unwanted literals incl. whitespace
-        String cleanValue = value.replaceAll(rejectLiterals, "");
+        String cleanValue = value.replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern
         Matcher matcher = PAGES_PATTERN.matcher(cleanValue);
         // replace
-        String newValue = matcher.replaceFirst(replace);
+        String newValue = matcher.replaceFirst(REPLACE);
         // replacement?
         if(!newValue.equals(cleanValue)) {
             // write field

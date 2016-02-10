@@ -41,6 +41,13 @@ public class GrammarBasedSearchRule implements SearchRule {
 
     private static final Log LOGGER = LogFactory.getLog(GrammarBasedSearchRule.class);
 
+    private final boolean caseSensitiveSearch;
+    private final boolean regExpSearch;
+
+    private ParseTree tree;
+    private String query;
+
+
     public static class ThrowingErrorListener extends BaseErrorListener {
 
         public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
@@ -52,12 +59,6 @@ public class GrammarBasedSearchRule implements SearchRule {
             throw new ParseCancellationException("line " + line + ":" + charPositionInLine + " " + msg);
         }
     }
-
-    private final boolean caseSensitiveSearch;
-    private final boolean regExpSearch;
-
-    private ParseTree tree;
-    private String query;
 
     public GrammarBasedSearchRule(boolean caseSensitiveSearch, boolean regExpSearch) throws RecognitionException {
         this.caseSensitiveSearch = caseSensitiveSearch;
@@ -149,13 +150,13 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
 
         public boolean compare(BibEntry entry) {
-            // specification of fieldsKeys to search is done in the search expression itself
-            Set<String> fieldsKeys = entry.getFieldNames();
-
             // special case for searching for entrytype=phdthesis
             if (fieldPattern.matcher("entrytype").matches()) {
                 return matchFieldValue(entry.getType());
             }
+
+            // specification of fieldsKeys to search is done in the search expression itself
+            Set<String> fieldsKeys = entry.getFieldNames();
 
             List<String> matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());
 

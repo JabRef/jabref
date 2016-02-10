@@ -124,11 +124,8 @@ public class FileUtil {
      */
     public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
         // Check if the file already exists.
-        if (dest.exists()) {
-            if (!deleteIfExists) {
-                return false;
-                // else dest.delete();
-            }
+        if (dest.exists() && !deleteIfExists) {
+            return false;
         }
         try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(source));
                 BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
@@ -261,7 +258,7 @@ public class FileUtil {
      * @param dirs     directories to check.
      */
     public static File shortenFileName(File fileName, List<String> dirs) {
-        if (fileName == null || !fileName.isAbsolute() || (dirs == null)) {
+        if ((fileName == null) || !fileName.isAbsolute() || (dirs == null)) {
             return fileName;
         }
 
@@ -277,7 +274,7 @@ public class FileUtil {
     }
 
     private static File shortenFileName(File fileName, String dir) {
-        if (fileName == null || !fileName.isAbsolute() || (dir == null)) {
+        if ((fileName == null) || !fileName.isAbsolute() || (dir == null)) {
             return fileName;
         }
 
