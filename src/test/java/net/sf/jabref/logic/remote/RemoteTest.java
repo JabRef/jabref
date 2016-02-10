@@ -57,7 +57,6 @@ public class RemoteTest {
     @Test
     public void testPortAlreadyInUse() throws IOException {
         final int port = 34567;
-        final String message = "MYMESSAGE";
 
         try (ServerSocket socket = new ServerSocket(port)) {
             Assert.assertTrue(socket.isBound());
@@ -90,8 +89,8 @@ public class RemoteTest {
 
                 @Override
                 public void run() {
-                    try (Socket socket2 = socket.accept(); OutputStream os = socket.accept().getOutputStream()) {
-                        os.write("whatever".getBytes());
+                    try (Socket socket2 = socket.accept(); OutputStream os = socket2.getOutputStream()) {
+                        os.write("whatever".getBytes("UTF8"));
                     } catch (IOException e) {
                         // Ignored
                     }

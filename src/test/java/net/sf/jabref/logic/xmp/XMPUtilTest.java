@@ -241,7 +241,9 @@ public class XMPUtilTest {
      */
     @After
     public void tearDown() {
-        pdfFile.delete();
+        if (!pdfFile.delete()) {
+            System.err.println("Error: Cannot delete temporary file (already deleted).");
+        }
 
         prefs.putBoolean("useXmpPrivacyFilter", use);
         prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, privacyFilters);
@@ -337,10 +339,10 @@ public class XMPUtilTest {
         Set<String> ts = x.getFieldNames();
         Assert.assertEquals(8, ts.size());
 
-        ts.contains("bibtextype");
-        ts.contains("bibtexkey");
-        ts.contains("year");
-        ts.contains("url");
+        Assert.assertFalse(ts.contains("bibtextype"));
+        Assert.assertTrue(ts.contains("bibtexkey"));
+        Assert.assertTrue(ts.contains("year"));
+        Assert.assertTrue(ts.contains("url"));
 
     }
 
@@ -1024,6 +1026,8 @@ public class XMPUtilTest {
 
         XMPMetadata metadata = XMPUtil.readRawXMP(pdfFile);
 
+        Assert.assertNotNull(metadata);
+
         List<XMPSchema> schemas = metadata.getSchemas();
         Assert.assertEquals(2, schemas.size());
         schemas = metadata.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
@@ -1076,7 +1080,9 @@ public class XMPUtilTest {
             assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
 
         } finally {
-            tempBib.delete();
+            if (!tempBib.delete()) {
+                System.err.println("Cannot delete temporary file");
+            }
         }
     }
 
@@ -1186,7 +1192,9 @@ public class XMPUtilTest {
             Assert.assertEquals(1, l.size());
             assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
         } finally {
-            tempBib.delete();
+            if (!tempBib.delete()) {
+                System.err.println("Cannot delete temporary file");
+            }
         }
     }
 
@@ -1234,7 +1242,9 @@ public class XMPUtilTest {
             assertEqualsBibtexEntry(t3, b);
 
         } finally {
-            tempBib.delete();
+            if (!tempBib.delete()) {
+                System.err.println("Cannot delete temporary file");
+            }
         }
     }
 
@@ -1329,7 +1339,7 @@ public class XMPUtilTest {
 
                 // Test whether we the main function can load the bibtex correctly
                 BibEntry b = XMPUtil.readXMP(pdfFile).get(0);
-
+                Assert.assertNotNull(b);
                 Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
 
                 // Next check from Document Information
@@ -1364,10 +1374,13 @@ public class XMPUtilTest {
                     Assert.assertEquals("Krste Asanov\\'\\i{}c", dcSchema.getCreators().get(2));
 
                     b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema);
+                    Assert.assertNotNull(b);
                     Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
                 }
             } finally {
-                pdfFile.delete();
+                if (!pdfFile.delete()) {
+                    System.err.println("Cannot delete temporary file");
+                }
             }
         }
     }
