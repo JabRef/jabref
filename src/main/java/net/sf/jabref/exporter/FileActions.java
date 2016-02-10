@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.InternalBibtexFields;
+import net.sf.jabref.gui.databaseProperties.DatabasePropertiesDialog;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
@@ -321,7 +322,7 @@ public class FileActions {
 
             List<String> storedSaveOrderConfig = null;
             if (isSaveOperation) {
-                storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
+                storedSaveOrderConfig = metaData.getData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             }
 
             // This case should never be hit as SaveSettings() is never called if InOriginalOrder is true
@@ -515,7 +516,7 @@ public class FileActions {
         boolean inOriginalOrder;
         if (isSaveOperation) {
             List<String> storedSaveOrderConfig = metaData
-                    .getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
+                    .getData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             if (storedSaveOrderConfig == null) {
                 inOriginalOrder = true;
             } else {

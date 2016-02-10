@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.databaseProperties;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -39,6 +39,8 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.Globals;
