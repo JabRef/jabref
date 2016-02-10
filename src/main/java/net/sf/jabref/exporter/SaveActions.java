@@ -46,6 +46,10 @@ public class SaveActions {
         return Collections.unmodifiableMap(actions);
     }
 
+    public List<Formatter> getAvailableFormatters() {
+        return Collections.unmodifiableList(availableFormatters);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -7,6 +7,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.List;
 
 public class SaveActionsPanel extends JPanel {
 
@@ -25,8 +27,26 @@ public class SaveActionsPanel extends JPanel {
 
         enabled.setSelected(saveActions.isEnabled());
 
-        this.setLayout(new GridLayout(1, 1));
+        this.setLayout(new GridLayout(2, 1));
         this.add(enabled);
+        this.add(getSelectorPanel());
+    }
+
+    private JPanel getSelectorPanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(1, 3));
+
+        JTextField keyField = new JTextField(20);
+        panel.add(keyField);
+
+        List<String> formatterNames = saveActions.getAvailableFormatters().stream().map(formatter -> formatter.getKey()).collect(Collectors.toList());
+        JComboBox formatters = new JComboBox(formatterNames.toArray());
+        panel.add(formatters);
+
+        JButton addButton = new JButton(Localization.lang("Add"));
+        panel.add(addButton);
+
+        return panel;
     }
 
     public boolean storeSetting(MetaData metaData) {
