@@ -7,10 +7,7 @@ import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.formatter.IdentityFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SaveActions {
 
@@ -23,6 +20,9 @@ public class SaveActions {
     private boolean enabled;
 
     public SaveActions(MetaData metaData) {
+        if(metaData == null) {
+            throw new IllegalArgumentException("MetaData must not be null");
+        }
         actions = new HashMap<>();
         setAvailableFormatters();
 
@@ -36,6 +36,14 @@ public class SaveActions {
             parseSaveActions(formatters);
         }
 
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public Map<String, Formatter> getConfiguredActions() {
+        return Collections.unmodifiableMap(actions);
     }
 
     private void parseSaveActions(List<String> formatters) {

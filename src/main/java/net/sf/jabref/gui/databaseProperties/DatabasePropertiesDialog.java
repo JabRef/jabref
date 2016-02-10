@@ -89,7 +89,6 @@ public class DatabasePropertiesDialog extends JDialog {
         encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
         ok = new JButton(Localization.lang("OK"));
         cancel = new JButton(Localization.lang("Cancel"));
-        saveActionsPanel = new SaveActionsPanel();
         init(parent);
     }
 
@@ -150,6 +149,7 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
 
+        saveActionsPanel = new SaveActionsPanel();
         builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
         builder.add(saveActionsPanel).xyw(1, 29, 5);
 
@@ -363,6 +363,9 @@ public class DatabasePropertiesDialog extends JDialog {
         // Store original values to see if they get changed:
         oldFileVal = fileDir.getText();
         oldProtectVal = protect.isSelected();
+
+        //set save actions
+        saveActionsPanel.setValues(metaData);
     }
 
     private void storeSettings() {
