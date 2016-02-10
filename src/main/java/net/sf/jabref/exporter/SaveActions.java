@@ -46,6 +46,25 @@ public class SaveActions {
         return Collections.unmodifiableMap(actions);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SaveActions that = (SaveActions) o;
+
+        if (enabled != that.enabled) return false;
+        return actions.equals(that.actions);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = actions.hashCode();
+        result = 31 * result + (enabled ? 1 : 0);
+        return result;
+    }
+
     private void parseSaveActions(List<String> formatters) {
         //read concrete actions
         for (int i = 1; i < formatters.size(); i += 2) {

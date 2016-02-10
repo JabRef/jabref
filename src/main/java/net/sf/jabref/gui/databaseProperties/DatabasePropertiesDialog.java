@@ -428,10 +428,12 @@ public class DatabasePropertiesDialog extends JDialog {
             saveOrderConfigChanged = !oldSaveOrderConfig.getVector().equals(newSaveOrderConfig.getVector());
         }
 
+        boolean saveActionsChanged = saveActionsPanel.storeSetting(metaData);
+
         boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
                 || !oldFileVal.equals(fileDir.getText())
                 || !oldFileIndvVal.equals(fileDirIndv.getText())
-                || (oldProtectVal != protect.isSelected());
+                || (oldProtectVal != protect.isSelected()) || saveActionsChanged;
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:
         if (changed) {
