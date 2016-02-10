@@ -40,7 +40,7 @@ public class SaveActions {
 
     private void parseSaveActions(List<String> formatters) {
         //read concrete actions
-        for (int i = 0; i < formatters.size(); i += 2) {
+        for (int i = 1; i < formatters.size(); i += 2) {
             try {
                 String field = formatters.get(i);
                 Formatter formatter = getFormatterFromString(formatters.get(i + 1));

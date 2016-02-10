@@ -283,7 +283,8 @@ public class FileActions {
     }
 
     private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
-        if (metaData.getData(SaveActions.META_KEY) == null) {
+        List<String> saveActionConfig = metaData.getData(SaveActions.META_KEY);
+        if (saveActionConfig != null) {
             // save actions defined -> apply for every entry
             List<BibEntry> result = new ArrayList<>(toChange.size());
 
