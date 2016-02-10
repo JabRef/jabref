@@ -118,7 +118,7 @@ public class DatabasePropertiesDialog extends JDialog {
         setupSortOrderConfiguration();
 
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, fill:pref",
-                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         builder.add(Localization.lang("Database encoding")).xy(1, 1);
@@ -164,6 +164,8 @@ public class DatabasePropertiesDialog extends JDialog {
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
+
+        builder.addSeparator(Localization.lang("Save actions")).xyw(1, 25, 5);
 
         getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
