@@ -159,9 +159,9 @@ public class ChangeScanner implements Runnable {
             @Override
             public void run() {
                 try {
-                    SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                    prefs.setMakeBackup(false);
-                    prefs.setEncoding(panel.getEncoding());
+                    SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
+                        .withMakeBackup(false)
+                        .withEncoding(panel.getEncoding());
 
                     Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
                     BibDatabaseWriter databaseWriter = new BibDatabaseWriter();

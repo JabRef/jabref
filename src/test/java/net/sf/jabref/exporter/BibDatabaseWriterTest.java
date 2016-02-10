@@ -67,8 +67,7 @@ public class BibDatabaseWriterTest {
     @Test
     public void writeEncoding() throws IOException {
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        SavePreferences preferences = new SavePreferences();
-        preferences.setEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
 
         StringWriter stringWriter = new StringWriter();
         databaseWriter.writePartOfDatabase(stringWriter, new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX)),
@@ -93,8 +92,7 @@ public class BibDatabaseWriterTest {
     @Test
     public void writePreambleAndEncoding() throws IOException {
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        SavePreferences preferences = new SavePreferences();
-        preferences.setEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         BibDatabase database = new BibDatabase();
         database.setPreamble("Test preamble");
         BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
@@ -126,8 +124,7 @@ public class BibDatabaseWriterTest {
     @Test
     public void writeEncodingAndEntry() throws IOException {
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        SavePreferences preferences = new SavePreferences();
-        preferences.setEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
         BibDatabase database = new BibDatabase();
@@ -157,8 +154,7 @@ public class BibDatabaseWriterTest {
     @Test
     public void writeEpilogueAndEncoding() throws IOException {
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        SavePreferences preferences = new SavePreferences();
-        preferences.setEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         BibDatabase database = new BibDatabase();
         database.setEpilog("Test epilog");
         BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
@@ -187,8 +183,7 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeMetadataAndEncoding() throws IOException {
-        SavePreferences preferences = new SavePreferences();
-        preferences.setEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         MetaData metaData = new MetaData();
         DatabaseLabelPattern labelPattern = new DatabaseLabelPattern();
@@ -228,8 +223,7 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeGroupsAndEncoding() throws IOException {
-        SavePreferences preferences = new SavePreferences();
-        preferences.setEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         MetaData metaData = new MetaData();
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
@@ -269,8 +263,7 @@ public class BibDatabaseWriterTest {
     @Test
     public void writeStringAndEncoding() throws IOException {
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        SavePreferences preferences = new SavePreferences();
-        preferences.setEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         BibDatabase database = new BibDatabase();
         database.addString(new BibtexString("id", "name", "content"));
         BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
@@ -309,9 +302,7 @@ public class BibDatabaseWriterTest {
         ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, encoding));
 
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        SavePreferences preferences = new SavePreferences();
-        preferences.setEncoding(encoding);
-        preferences.setSaveInOriginalOrder(true);
+        SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
                 new Defaults(BibDatabaseMode.BIBTEX));
         StringWriter stringWriter = new StringWriter();
@@ -352,8 +343,7 @@ public class BibDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
         StringWriter stringWriter = new StringWriter();
-        SavePreferences preferences = new SavePreferences();
-        preferences.setReformatFile(true);
+        SavePreferences preferences = new SavePreferences().withReformatFile(true);
         databaseWriter.writePartOfDatabase(stringWriter, context, Collections.singletonList(entry), preferences);
 
         Assert.assertEquals(Globals.NEWLINE +
@@ -385,8 +375,7 @@ public class BibDatabaseWriterTest {
         database.addString(string);
         BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        SavePreferences preferences = new SavePreferences();
-        preferences.setReformatFile(true);
+        SavePreferences preferences = new SavePreferences().withReformatFile(true);
 
         StringWriter stringWriter = new StringWriter();
         databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), preferences);

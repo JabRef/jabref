@@ -8,16 +8,16 @@ import java.nio.charset.Charset;
 
 public class SavePreferences {
 
-    private boolean reformatFile;
-    private boolean saveInOriginalOrder;
-    private SaveOrderConfig saveOrder;
-    private Charset encoding;
-    private boolean makeBackup;
-    private DatabaseSaveType saveType;
-    private boolean takeMetadataSaveOrderInAccount;
+    private final boolean reformatFile;
+    private final boolean saveInOriginalOrder;
+    private final SaveOrderConfig saveOrder;
+    private final Charset encoding;
+    private final boolean makeBackup;
+    private final DatabaseSaveType saveType;
+    private final boolean takeMetadataSaveOrderInAccount;
 
     public SavePreferences() {
-
+        this(true, null, null, false, DatabaseSaveType.ALL, true, false);
     }
 
     public SavePreferences(Boolean saveInOriginalOrder, SaveOrderConfig saveOrder, Charset encoding, Boolean makeBackup,
@@ -74,40 +74,45 @@ public class SavePreferences {
         return saveInOriginalOrder;
     }
 
-    public void setSaveInOriginalOrder(Boolean saveInOriginalOrder) {
-        this.saveInOriginalOrder = saveInOriginalOrder;
+    public SavePreferences withSaveInOriginalOrder(Boolean saveInOriginalOrder) {
+        return new SavePreferences(saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, this.saveType,
+                this.takeMetadataSaveOrderInAccount, this.reformatFile);
     }
 
     public boolean getMakeBackup() {
         return makeBackup;
     }
 
-    public void setMakeBackup(Boolean makeBackup) {
-        this.makeBackup = makeBackup;
+    public SavePreferences withMakeBackup(Boolean makeBackup) {
+        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, makeBackup, this.saveType,
+                this.takeMetadataSaveOrderInAccount, this.reformatFile);
     }
 
     public Charset getEncoding() {
         return encoding;
     }
 
-    public void setEncoding(Charset encoding) {
-        this.encoding = encoding;
+    public SavePreferences withEncoding(Charset encoding) {
+        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, encoding, this.makeBackup, this.saveType,
+                this.takeMetadataSaveOrderInAccount, this.reformatFile);
     }
 
     public DatabaseSaveType getSaveType() {
         return saveType;
     }
 
-    public void setSaveType(DatabaseSaveType saveType) {
-        this.saveType = saveType;
+    public SavePreferences withSaveType(DatabaseSaveType saveType) {
+        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, saveType,
+                this.takeMetadataSaveOrderInAccount, this.reformatFile);
     }
 
     public Boolean isReformatFile() {
         return reformatFile;
     }
 
-    public void setReformatFile(boolean reformatFile) {
-        this.reformatFile = reformatFile;
+    public SavePreferences withReformatFile(boolean reformatFile) {
+        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup,
+                this.saveType, this.takeMetadataSaveOrderInAccount, reformatFile);
     }
 
     public enum DatabaseSaveType {
