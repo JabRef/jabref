@@ -377,7 +377,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             table.setRowSelectionInterval(row, row);
             //panel.updateViewToSelected();
         }
-        RightClickMenu rightClickMenu = new RightClickMenu(panel, panel.getBibDatabaseContext().getMetaData());
+        RightClickMenu rightClickMenu = new RightClickMenu(panel);
         rightClickMenu.show(table, e.getX(), e.getY());
     }
 
