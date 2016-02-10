@@ -16,6 +16,10 @@
 package net.sf.jabref.gui;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -45,7 +49,8 @@ public class FileDialogs {
      * @param updateWorkingdirectory
      * @return an array of selected file paths, or an empty array if no selection is made.
      */
-    public static String[] getMultipleFiles(JFrame owner, File directory, String extension, boolean updateWorkingdirectory) {
+    public static List<String> getMultipleFiles(JFrame owner, File directory, String extension,
+            boolean updateWorkingdirectory) {
 
         OpenFileFilter off = null;
         if (extension == null) {
@@ -57,14 +62,14 @@ public class FileDialogs {
         Object files = FileDialogs.getNewFileImpl(owner, directory, extension, null, off, JFileChooser.OPEN_DIALOG, updateWorkingdirectory, false, true, null);
 
         if (files instanceof String[]) {
-            return (String[]) files;
+            return Arrays.asList((String[]) files);
         }
         // Fix for:
         // http://sourceforge.net/tracker/index.php?func=detail&aid=1538769&group_id=92314&atid=600306
         if (files != null) {
-            return new String[] {(String) files};
+            return Arrays.asList((String) files);
         }
-        return new String[0];
+        return Collections.emptyList();
     }
 
     public static String getNewFile(JFrame owner, File directory, String extension, int dialogType, boolean updateWorkingDirectory) {

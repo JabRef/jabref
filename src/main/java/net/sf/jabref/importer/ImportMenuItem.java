@@ -75,7 +75,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
      * Automatically imports the files given as arguments
      * @param filenames List of files to import
      */
-    public void automatedImport(String[] filenames) {
+    public void automatedImport(List<String> filenames) {
         // replace the work of the init step:
         MyWorker worker = new MyWorker();
         worker.fileOk = true;
@@ -88,7 +88,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     class MyWorker extends AbstractWorker {
 
-        private String[] filenames;
+        private List<String> filenames;
         private ParserResult bibtexResult; // Contains the merged import results
         private boolean fileOk;
 
@@ -100,12 +100,12 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
                     importer == null ? null : importer.getExtensions(), true);
 
-            if ((filenames != null) && (filenames.length > 0)) {
+            if (!filenames.isEmpty()) {
                 frame.block();
                 frame.output(Localization.lang("Starting import"));
                 fileOk = true;
 
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, filenames[0]);
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, filenames.get(0));
             }
         }
 
