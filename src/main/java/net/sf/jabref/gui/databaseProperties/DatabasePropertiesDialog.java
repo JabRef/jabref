@@ -15,7 +15,7 @@
  */
 package net.sf.jabref.gui.databaseProperties;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
@@ -24,20 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.InternalBibtexFields;
@@ -93,6 +80,8 @@ public class DatabasePropertiesDialog extends JDialog {
     private final JCheckBox protect = new JCheckBox(Localization.lang("Refuse to save the database before external changes have been reviewed."));
     private boolean oldProtectVal;
 
+    private SaveActionsPanel saveActionsPanel;
+
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Localization.lang("Database properties"), true);
@@ -100,6 +89,7 @@ public class DatabasePropertiesDialog extends JDialog {
         encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
         ok = new JButton(Localization.lang("OK"));
         cancel = new JButton(Localization.lang("Cancel"));
+        saveActionsPanel = new SaveActionsPanel();
         init(parent);
     }
 
@@ -118,7 +108,7 @@ public class DatabasePropertiesDialog extends JDialog {
         setupSortOrderConfiguration();
 
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, fill:pref",
-                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         builder.add(Localization.lang("Database encoding")).xy(1, 1);
@@ -159,13 +149,15 @@ public class DatabasePropertiesDialog extends JDialog {
 
         builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
+
+        builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
+        builder.add(saveActionsPanel).xyw(1, 29, 5);
+
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-
-        builder.addSeparator(Localization.lang("Save actions")).xyw(1, 25, 5);
 
         getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
