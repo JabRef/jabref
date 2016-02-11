@@ -75,7 +75,7 @@ public class BibEntryWriter {
         List<String> fields = type.getRequiredFieldsFlat();
         if (fields != null) {
             for (String value : fields) {
-                hasWritten = hasWritten | writeField(entry, out, value, hasWritten, indentation);
+                hasWritten = hasWritten || writeField(entry, out, value, hasWritten, indentation);
                 written.add(value);
             }
         }
@@ -84,7 +84,7 @@ public class BibEntryWriter {
         if (fields != null) {
             for (String value : fields) {
                 if (!written.contains(value)) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten, indentation);
+                    hasWritten = hasWritten || writeField(entry, out, value, hasWritten, indentation);
                     written.add(value);
                 }
             }
@@ -99,7 +99,7 @@ public class BibEntryWriter {
             }
         }
         for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, indentation);
+            hasWritten = hasWritten || writeField(entry, out, field, hasWritten, indentation);
         }
 
         // Finally, end the entry.

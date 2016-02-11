@@ -432,7 +432,7 @@ class GroupDialog extends JDialog {
             setNameFontItalic(true);
         } else if (m_searchRadioButton.isSelected()) {
             s1 = m_sgSearchExpression.getText().trim();
-            okEnabled = okEnabled & !s1.isEmpty();
+            okEnabled = okEnabled && !s1.isEmpty();
             if (okEnabled) {
                 setDescription(SearchDescribers.getSearchDescriberFor(SearchRules.getSearchRuleByQuery(s1, isCaseSensitive(), isRegex()), s1).getDescription());
 
