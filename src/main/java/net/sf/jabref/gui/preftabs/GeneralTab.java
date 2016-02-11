@@ -173,7 +173,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(encodings);
 
         builder.nextLine();
-        builder.appendSeparator(Localization.lang("Default TeX mode"));
+        builder.appendSeparator(Localization.lang("Default bibliography mode"));
         builder.append(new JPanel());
         builder.append(biblatexMode);
 

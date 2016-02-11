@@ -25,7 +25,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - BibTeX and BibLaTeX mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
 - Moved all quality-related database actions inside a new quality menu
 - [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
-- Moved default TeX mode to general preferences tab
+- Moved default bibliography mode to general preferences tab
 
 
 ### Fixed
