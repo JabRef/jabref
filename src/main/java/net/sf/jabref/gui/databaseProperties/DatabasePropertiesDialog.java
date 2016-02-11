@@ -27,6 +27,7 @@ import javax.swing.*;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.InternalBibtexFields;
+import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.Globals;
