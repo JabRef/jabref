@@ -36,10 +36,7 @@ public class MimeTypeDetectorTest {
 
     @Test
     public void useGetRequestIfHeadRequestHasNoContentType() {
-        // FIXME: Fails on CI server
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
-        String pdfUrl = "http://iopscience.iop.org/article/10.1088/0004-637X/815/1/23/pdf";
+        String pdfUrl = "http://iopscience.iop.org/article/10.1088/1749-4699/8/1/014010/pdf";
         assertEquals("application/pdf", MimeTypeDetector.getMimeType(pdfUrl));
     }
 }
