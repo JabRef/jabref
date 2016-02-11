@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.databaseProperties;
 
 import net.sf.jabref.MetaData;
+import net.sf.jabref.exporter.SaveAction;
 import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -26,15 +27,19 @@ public class SaveActionsPanel extends JPanel {
 
     public void setValues(MetaData metaData) {
         saveActions = new SaveActions(metaData);
+        List<SaveAction> configuredActions = saveActions.getConfiguredActions();
 
         enabled.setSelected(saveActions.isEnabled());
 
-        this.setLayout(new GridLayout(2, 1));
+        this.setLayout(new GridLayout(2 + configuredActions.size(), 1));
         this.add(enabled);
         this.add(getSelectorPanel());
+        for (SaveAction action : configuredActions) {
+            this.add(getActionsPanel(action));
+        }
     }
 
-    private JPanel getSelectorPanel(){
+    private JPanel getSelectorPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(1, 3));
 
@@ -57,10 +62,29 @@ public class SaveActionsPanel extends JPanel {
         return panel;
     }
 
+    private JPanel getActionsPanel(SaveAction action) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(1, 2));
+
+        String labelText = action.getFieldName() + ": " + action.getFormatter().getKey();
+        panel.add(new JLabel(labelText));
+
+        JButton deleteButton = new JButton(Localization.lang("Delete"));
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        panel.add(deleteButton);
+
+        return panel;
+    }
+
     public boolean storeSetting(MetaData metaData) {
         java.util.List<String> actions = new ArrayList<>();
 
-        if(enabled.isSelected()) {
+        if (enabled.isSelected()) {
             actions.add("enabled;");
         } else {
             actions.add("disabled;");
