@@ -62,6 +62,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JCheckBox overwriteTimeStamp;
     private final JCheckBox markImportedEntries;
     private final JCheckBox unmarkAllEntriesBeforeImporting;
+    private final JCheckBox biblatexMode;
 
     private final JTextField defOwnerField;
     private final JTextField timeStampFormat;
@@ -75,6 +76,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         this.prefs = prefs;
         setLayout(new BorderLayout());
 
+        biblatexMode = new JCheckBox(Localization.lang("%0 mode", "BibLaTeX"));
         allowEditing = new JCheckBox(Localization.lang("Allow editing in table cells"));
 
         memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
@@ -169,6 +171,11 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(lab, 3);
         builder.append(encodings);
 
+        builder.nextLine();
+        builder.appendSeparator(Localization.lang("Default TeX mode"));
+        builder.append(new JPanel());
+        builder.append(biblatexMode);
+
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
@@ -197,6 +204,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         inspectionWarnDupli.setSelected(prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
         markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
+        biblatexMode.setSelected(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE));
 
         Charset enc = Globals.prefs.getDefaultEncoding();
         encodings.setSelectedItem(enc);
@@ -243,6 +251,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.setDefaultEncoding((Charset) encodings.getSelectedItem());
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
+        prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, biblatexMode.isSelected());
 
         if (!LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
             prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getSelectedItem()));
