@@ -32,6 +32,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 
@@ -56,6 +57,7 @@ class FileTab extends JPanel implements PrefsTab {
     private final JCheckBox promptBeforeUsingAutoSave;
     private final JComboBox<String> valueDelimiter;
     private final JComboBox<String> newlineSeparator;
+    private final JCheckBox reformatFileOnSaveAndExport;
     private final JRadioButton resolveStringsStandard;
     private final JRadioButton resolveStringsAll;
     private final JTextField bracesAroundCapitalsFields;
@@ -85,6 +87,8 @@ class FileTab extends JPanel implements PrefsTab {
 
         // This is sort of a quick hack
         newlineSeparator = new JComboBox<>(new String[] {"CR", "CR/LF", "LF"});
+
+        reformatFileOnSaveAndExport = new JCheckBox(Localization.lang("Always reformat .bib file on save and export"));
 
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
@@ -128,6 +132,9 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(newlineSeparator);
         builder.nextLine();
 
+        builder.append(reformatFileOnSaveAndExport, 3);
+        builder.nextLine();
+
         builder.appendSeparator(Localization.lang("Autosave"));
         builder.append(autoSave, 1);
         JButton help = new HelpAction(HelpFiles.autosaveHelp).getHelpButton();
@@ -164,6 +171,7 @@ class FileTab extends JPanel implements PrefsTab {
             // fallback: windows standard
             newlineSeparator.setSelectedIndex(1);
         }
+        reformatFileOnSaveAndExport.setSelected(prefs.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
 
         resolveStringsAll.setSelected(prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS));
         resolveStringsStandard.setSelected(!resolveStringsAll.isSelected());
@@ -195,6 +203,7 @@ class FileTab extends JPanel implements PrefsTab {
         // we also have to change Globals variable as globals is not a getter, but a constant
         Globals.NEWLINE = newline;
 
+        prefs.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, reformatFileOnSaveAndExport.isSelected());
         prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());
         prefs.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLast.isSelected());
         prefs.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAll.isSelected());

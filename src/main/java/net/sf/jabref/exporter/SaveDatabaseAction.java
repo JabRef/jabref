@@ -226,14 +226,15 @@ public class SaveDatabaseAction extends AbstractWorker {
         SaveSession session;
         frame.block();
         try {
+            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
+            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
             if (selectedOnly) {
-                session = FileActions.savePartOfDatabase(
-                        panel.getBibDatabaseContext(),
-                        file, Globals.prefs,
-                        panel.getSelectedEntries(), encoding, FileActions.DatabaseSaveType.DEFAULT);
+                session = databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), prefs,
+                        panel.getSelectedEntries());
+
             } else {
-                session = FileActions.saveDatabase(panel.getBibDatabaseContext(),
-                        file, Globals.prefs, false, false, encoding, false);
+                session = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
+
             }
 
         } catch (UnsupportedCharsetException ex2) {
@@ -286,8 +287,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
                 Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"),
-                        Localization.lang("Save database"),
- JOptionPane.QUESTION_MESSAGE, null,
+                        Localization.lang("Save database"), JOptionPane.QUESTION_MESSAGE, null,
                         Encodings.ENCODINGS_DISPLAYNAMES, encoding);
                 if (choice == null) {
                     commit = false;
@@ -303,7 +303,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         try {
             if (commit) {
-                session.commit();
+                session.commit(file);
                 panel.setEncoding(encoding); // Make sure to remember which encoding we used.
             } else {
                 session.cancel();
@@ -315,7 +315,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     JOptionPane.YES_NO_OPTION);
             if (ans == JOptionPane.YES_OPTION) {
                 session.setUseBackup(false);
-                session.commit();
+                session.commit(file);
                 panel.setEncoding(encoding);
             } else {
                 commit = false;

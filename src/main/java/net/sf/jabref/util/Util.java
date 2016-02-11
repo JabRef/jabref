@@ -450,7 +450,7 @@ public class Util {
      * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
      * otherwise (this indicates that the user has aborted the assignment).
      */
-    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibEntry[] entries, BibDatabase db, Component parent) {
+    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, Component parent) {
         List<String> affectedFields = new ArrayList<>();
         for (AbstractGroup group : groups) {
             if (group instanceof KeywordGroup) {

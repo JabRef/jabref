@@ -20,7 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -51,7 +50,6 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Created by IntelliJ IDEA.
@@ -76,20 +74,10 @@ public class DatabasePropertiesDialog extends JDialog {
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
     private JRadioButton saveInOriginalOrder;
     private JRadioButton saveInSpecifiedOrder;
-    private JComboBox<String> savePriSort;
-    private JComboBox<String> saveSecSort;
-    private JComboBox<String> saveTerSort;
-    private JTextField savePriField;
-    private JTextField saveSecField;
-    private JTextField saveTerField;
-    private JCheckBox savePriDesc;
-    private JCheckBox saveSecDesc;
-    private JCheckBox saveTerDesc;
-
-    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
     private final JCheckBox protect = new JCheckBox(Localization.lang("Refuse to save the database before external changes have been reviewed."));
     private boolean oldProtectVal;
+    private SaveOrderConfigDisplay saveOrderPanel;
 
 
     public DatabasePropertiesDialog(JFrame parent) {
@@ -134,26 +122,8 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.add(saveInOriginalOrder).xyw(1, 15, 5);
         builder.add(saveInSpecifiedOrder).xyw(1, 17, 5);
 
-        // Create a new panel with its own FormLayout for these items:
-        FormLayout layout2 = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref",
-                "pref, 2dlu, pref, 2dlu, pref");
-        FormBuilder builder2 = FormBuilder.create().layout(layout2);
-        builder2.add(Localization.lang("Primary sort criterion")).xy(1, 1);
-        builder2.add(savePriSort).xy(3, 1);
-        builder2.add(savePriField).xy(5, 1);
-        builder2.add(savePriDesc).xy(7, 1);
-
-        builder2.add(Localization.lang("Secondary sort criterion")).xy(1, 3);
-        builder2.add(saveSecSort).xy(3, 3);
-        builder2.add(saveSecField).xy(5, 3);
-        builder2.add(saveSecDesc).xy(7, 3);
-
-        builder2.add(Localization.lang("Tertiary sort criterion")).xy(1, 5);
-        builder2.add(saveTerSort).xy(3, 5);
-        builder2.add(saveTerField).xy(5, 5);
-        builder2.add(saveTerDesc).xy(7, 5);
-
-        builder.add(builder2.getPanel()).xyw(1, 21, 5);
+        saveOrderPanel = new SaveOrderConfigDisplay();
+        builder.add(saveOrderPanel.getPanel()).xyw(1, 21, 5);
 
         builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
@@ -210,72 +180,12 @@ public class DatabasePropertiesDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean selected = e.getSource() == saveInSpecifiedOrder;
-                savePriSort.setEnabled(selected);
-                savePriField.setEnabled(selected);
-                savePriDesc.setEnabled(selected);
-                saveSecSort.setEnabled(selected);
-                saveSecField.setEnabled(selected);
-                saveSecDesc.setEnabled(selected);
-                saveTerSort.setEnabled(selected);
-                saveTerField.setEnabled(selected);
-                saveTerDesc.setEnabled(selected);
+                saveOrderPanel.setEnabled(selected);
             }
         };
 
         saveInOriginalOrder.addActionListener(listener);
         saveInSpecifiedOrder.addActionListener(listener);
-
-        List<String> v = new ArrayList<>(InternalBibtexFields.getAllFieldNames());
-        v.add(BibEntry.KEY_FIELD);
-        Collections.sort(v);
-        String[] allPlusKey = v.toArray(new String[v.size()]);
-        savePriSort = new JComboBox<>(allPlusKey);
-        saveSecSort = new JComboBox<>(allPlusKey);
-        saveTerSort = new JComboBox<>(allPlusKey);
-
-        savePriSort.insertItemAt(Localization.lang("<select>"), 0);
-        saveSecSort.insertItemAt(Localization.lang("<select>"), 0);
-        saveTerSort.insertItemAt(Localization.lang("<select>"), 0);
-
-        savePriField = new JTextField(10);
-        saveSecField = new JTextField(10);
-        saveTerField = new JTextField(10);
-
-        savePriSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (savePriSort.getSelectedIndex() > 0) {
-                    savePriField.setText(savePriSort.getSelectedItem().toString());
-                    savePriSort.setSelectedIndex(0);
-                }
-            }
-        });
-        saveSecSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (saveSecSort.getSelectedIndex() > 0) {
-                    saveSecField.setText(saveSecSort.getSelectedItem().toString());
-                    saveSecSort.setSelectedIndex(0);
-                }
-            }
-        });
-        saveTerSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (saveTerSort.getSelectedIndex() > 0) {
-                    saveTerField.setText(saveTerSort.getSelectedItem().toString());
-                    saveTerSort.setSelectedIndex(0);
-                }
-            }
-        });
-
-        savePriDesc = new JCheckBox(Localization.lang("Descending"));
-        saveSecDesc = new JCheckBox(Localization.lang("Descending"));
-        saveTerDesc = new JCheckBox(Localization.lang("Descending"));
-
     }
 
     @Override
@@ -289,7 +199,7 @@ public class DatabasePropertiesDialog extends JDialog {
     private void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
-        List<String> storedSaveOrderConfig = metaData.getData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
+        List<String> storedSaveOrderConfig = metaData.getData(MetaData.SAVE_ORDER_CONFIG);
         boolean selected;
         if (storedSaveOrderConfig == null) {
             saveInOriginalOrder.setSelected(true);
@@ -307,22 +217,9 @@ public class DatabasePropertiesDialog extends JDialog {
                 saveInSpecifiedOrder.setSelected(true);
                 selected = true;
             }
-            savePriField.setText(saveOrderConfig.sortCriteria[0].field);
-            savePriDesc.setSelected(saveOrderConfig.sortCriteria[0].descending);
-            saveSecField.setText(saveOrderConfig.sortCriteria[1].field);
-            saveSecDesc.setSelected(saveOrderConfig.sortCriteria[1].descending);
-            saveTerField.setText(saveOrderConfig.sortCriteria[2].field);
-            saveTerDesc.setSelected(saveOrderConfig.sortCriteria[2].descending);
+            saveOrderPanel.setSaveOrderConfig(saveOrderConfig);
         }
-        savePriSort.setEnabled(selected);
-        savePriField.setEnabled(selected);
-        savePriDesc.setEnabled(selected);
-        saveSecSort.setEnabled(selected);
-        saveSecField.setEnabled(selected);
-        saveSecDesc.setEnabled(selected);
-        saveTerSort.setEnabled(selected);
-        saveTerField.setEnabled(selected);
-        saveTerDesc.setEnabled(selected);
+        saveOrderPanel.setEnabled(selected);
 
         List<String> fileD = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         if (fileD == null) {
@@ -370,23 +267,14 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void storeSettings() {
-        SaveOrderConfig newSaveOrderConfig;
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig();
-        newSaveOrderConfig = saveOrderConfig;
+        SaveOrderConfig newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
         if (saveInOriginalOrder.isSelected()) {
-            saveOrderConfig.setSaveInOriginalOrder();
+            newSaveOrderConfig.setSaveInOriginalOrder();
         } else {
-            saveOrderConfig.setSaveInSpecifiedOrder();
+            newSaveOrderConfig.setSaveInSpecifiedOrder();
         }
-        saveOrderConfig.sortCriteria[0].field = savePriField.getText();
-        saveOrderConfig.sortCriteria[0].descending = savePriDesc.isSelected();
-        saveOrderConfig.sortCriteria[1].field = saveSecField.getText();
-        saveOrderConfig.sortCriteria[1].descending = saveSecDesc.isSelected();
-        saveOrderConfig.sortCriteria[2].field = saveTerField.getText();
-        saveOrderConfig.sortCriteria[2].descending = saveTerDesc.isSelected();
-
-        Vector<String> serialized = saveOrderConfig.getVector();
-        metaData.putData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG, serialized);
+        Vector<String> serialized = newSaveOrderConfig.getVector();
+        metaData.putData(MetaData.SAVE_ORDER_CONFIG, serialized);
 
         Charset oldEncoding = panel.getEncoding();
         Charset newEncoding = (Charset) encoding.getSelectedItem();

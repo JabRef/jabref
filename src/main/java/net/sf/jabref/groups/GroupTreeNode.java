@@ -20,6 +20,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.List;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -291,7 +293,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Adds the selected entries to this node's group.
      */
-    public AbstractUndoableEdit addToGroup(BibEntry[] entries) {
+    public AbstractUndoableEdit addToGroup(List<BibEntry> entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }
@@ -305,7 +307,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Removes the selected entries from this node's group.
      */
-    public AbstractUndoableEdit removeFromGroup(BibEntry[] entries) {
+    public AbstractUndoableEdit removeFromGroup(List<BibEntry> entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }

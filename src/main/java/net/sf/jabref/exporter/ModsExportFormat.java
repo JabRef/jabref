@@ -45,7 +45,7 @@ class ModsExportFormat extends ExportFormat {
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, Set<String> keySet) throws IOException {
-        SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
+        SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
         try (VerifyingWriter ps = ss.getWriter()) {
             MODSDatabase md = new MODSDatabase(database, keySet);
 
@@ -58,7 +58,7 @@ class ModsExportFormat extends ExportFormat {
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
-            finalizeSaveSession(ss);
+            finalizeSaveSession(ss, new File(file));
         } catch (SaveException | IOException ex) {
             throw new IOException(ex.getMessage());
         }

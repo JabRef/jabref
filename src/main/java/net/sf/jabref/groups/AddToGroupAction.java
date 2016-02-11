@@ -16,8 +16,10 @@
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -64,7 +66,7 @@ public class AddToGroupAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        final BibEntry[] entries = mPanel.getSelectedEntries();
+        final List<BibEntry> entries = mPanel.getSelectedEntries();
         final Vector<GroupTreeNode> removeGroupsNodes = new Vector<>(); // used only when moving
 
         if (m_move) {
@@ -87,13 +89,12 @@ public class AddToGroupAction extends AbstractAction {
                 groups[i] = removeGroupsNodes.elementAt(i).getGroup();
             }
             groups[groups.length - 1] = mNode.getGroup();
-            if (!Util.warnAssignmentSideEffects(groups, entries, mPanel.getDatabase(), mPanel.frame())) {
+            if (!Util.warnAssignmentSideEffects(groups, mPanel.frame())) {
                 return; // user aborted operation
             }
         } else {
             // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()}, entries, mPanel.getDatabase(),
-                    mPanel.frame())) {
+            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()}, mPanel.frame())) {
                 return; // user aborted operation
             }
         }

@@ -17,6 +17,9 @@ package net.sf.jabref.gui.journals;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibEntry;
+
+import java.util.List;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -44,7 +47,7 @@ public class AbbreviateAction extends AbstractWorker {
 
     @Override
     public void run() {
-        BibEntry[] entries = panel.getSelectedEntries();
+        List<BibEntry> entries = panel.getSelectedEntries();
         if (entries == null) {
             return;
         }

@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.groups.structure;
 
+import java.util.List;
+
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.model.database.BibDatabase;
@@ -121,7 +123,7 @@ public abstract class AbstractGroup {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit add(BibEntry[] entries);
+    public abstract AbstractUndoableEdit add(List<BibEntry> entries);
 
     /**
      * Removes the specified entries from this group.
@@ -130,7 +132,7 @@ public abstract class AbstractGroup {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit remove(BibEntry[] entries);
+    public abstract AbstractUndoableEdit remove(List<BibEntry> entries);
 
     /**
      * @param query The search option to apply.
@@ -147,7 +149,7 @@ public abstract class AbstractGroup {
      * @return true if this group contains any of the specified entries, false
      * otherwise.
      */
-    public boolean containsAny(BibEntry[] entries) {
+    public boolean containsAny(List<BibEntry> entries) {
         for (BibEntry entry : entries) {
             if (contains(entry)) {
                 return true;
@@ -160,7 +162,7 @@ public abstract class AbstractGroup {
      * @return true if this group contains all of the specified entries, false
      * otherwise.
      */
-    public boolean containsAll(BibEntry[] entries) {
+    public boolean containsAll(List<BibEntry> entries) {
         for (BibEntry entry : entries) {
             if (!contains(entry)) {
                 return false;
