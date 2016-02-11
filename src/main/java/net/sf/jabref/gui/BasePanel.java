@@ -324,7 +324,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.CUT, (BaseAction) () -> {
             runCommand(Actions.COPY);
-            List<BibEntry> bes = mainTable.getSelectedEntries();
+            List<BibEntry> bes = new ArrayList<>(mainTable.getSelectedEntries());
             //int row0 = mainTable.getSelectedRow();
             if ((bes != null) && (!bes.isEmpty())) {
                 // Create a CompoundEdit to make the action undoable.
@@ -332,11 +332,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         (bes.size() > 1 ?
                     Localization.lang("cut entries") :
                     Localization.lang("cut entry")));
-                // Loop through the array of entries, and delete them.
+                // Loop through the list of entries, and delete them.
                 for (BibEntry be : bes) {
+                    ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                     database.removeEntry(be);
                     ensureNotShowing(be);
-                    ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                 }
                 //entryTable.clearSelection();
                 frame.output(formatOutputMessage(Localization.lang("Cut"), bes.size()));
@@ -347,7 +347,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put(Actions.DELETE, (BaseAction) () -> {
-            List<BibEntry> bes = mainTable.getSelectedEntries();
+            List<BibEntry> bes = new ArrayList<>(mainTable.getSelectedEntries());
             if ((bes != null) && (!bes.isEmpty())) {
 
                 boolean goOn = showDeleteConfirmationDialog(bes.size());
@@ -357,11 +357,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             (bes.size() > 1 ?
                         Localization.lang("delete entries") :
                         Localization.lang("delete entry")));
-                    // Loop through the array of entries, and delete them.
+                    // Loop through the list of entries, and delete them.
                     for (BibEntry be : bes) {
+                        ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                         database.removeEntry(be);
                         ensureNotShowing(be);
-                        ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                     }
                     markBaseChanged();
                     frame.output(formatOutputMessage(Localization.lang("Deleted"), bes.size()));
