@@ -1,9 +1,11 @@
 package net.sf.jabref.model.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class FileField {
 
@@ -16,14 +18,8 @@ public class FileField {
      * @return The encoded String.
      */
     public static String encodeStringArray(String[][] values) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < values.length; i++) {
-            sb.append(encodeStringArray(values[i]));
-            if (i < (values.length - 1)) {
-                sb.append(';');
-            }
-        }
-        return sb.toString();
+        return String.join(";",
+                Arrays.asList(values).stream().map(entry -> encodeStringArray(entry)).collect(Collectors.toList()));
     }
 
     /**
@@ -33,15 +29,8 @@ public class FileField {
      * @return The encoded String.
      */
     private static String encodeStringArray(String[] entry) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < entry.length; i++) {
-            sb.append(encodeString(entry[i]));
-            if (i < (entry.length - 1)) {
-                sb.append(':');
-            }
-
-        }
-        return sb.toString();
+        return String.join(":",
+                Arrays.asList(entry).stream().map(string -> encodeString(string)).collect(Collectors.toList()));
     }
 
     private static String encodeString(String s) {
@@ -73,17 +62,21 @@ public class FileField {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || this.getClass() != o.getClass())
+            }
+            if ((o == null) || (this.getClass() != o.getClass())) {
                 return false;
+            }
 
             FileField.ParsedFileField that = (FileField.ParsedFileField) o;
 
-            if (this.description != null ? !this.description.equals(that.description) : that.description != null)
+            if (this.description != null ? !this.description.equals(that.description) : that.description != null) {
                 return false;
-            if (this.link != null ? !this.link.equals(that.link) : that.link != null)
+            }
+            if (this.link != null ? !this.link.equals(that.link) : that.link != null) {
                 return false;
+            }
             return this.fileType != null ? this.fileType.equals(that.fileType) : that.fileType == null;
 
         }
@@ -91,8 +84,8 @@ public class FileField {
         @Override
         public int hashCode() {
             int result = this.description != null ? this.description.hashCode() : 0;
-            result = 31 * result + (this.link != null ? this.link.hashCode() : 0);
-            result = 31 * result + (this.fileType != null ? this.fileType.hashCode() : 0);
+            result = (31 * result) + (this.link != null ? this.link.hashCode() : 0);
+            result = (31 * result) + (this.fileType != null ? this.fileType.hashCode() : 0);
             return result;
         }
 
@@ -111,7 +104,7 @@ public class FileField {
     }
 
     public static List<FileField.ParsedFileField> parse(String value) {
-        if (value == null || value.trim().isEmpty()) {
+        if ((value == null) || value.trim().isEmpty()) {
             return Collections.emptyList();
         }
 

@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -944,17 +945,7 @@ public class JabRefPreferences {
             return;
         }
 
-        if (value.isEmpty()) {
-            put(key, "");
-        } else {
-            StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < (value.size() - 1); i++) {
-                linked.append(makeEscape(value.get(i)));
-                linked.append(';');
-            }
-            linked.append(makeEscape(value.get(value.size() - 1)));
-            put(key, linked.toString());
-        }
+        put(key, String.join(";", value.stream().map(val -> makeEscape(val)).collect(Collectors.toList())));
     }
 
 
