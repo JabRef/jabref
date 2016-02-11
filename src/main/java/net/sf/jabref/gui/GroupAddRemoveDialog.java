@@ -16,10 +16,14 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,7 +37,7 @@ public class GroupAddRemoveDialog implements BaseAction {
     private final BasePanel panel;
     private final boolean add;
     private final boolean move;
-    private BibEntry[] selection;
+    private List<BibEntry> selection;
     private JTree tree;
     private JButton ok;
 
@@ -220,8 +224,8 @@ public class GroupAddRemoveDialog implements BaseAction {
      * @return true if this dialog's action can be performed on the group
      */
     private boolean checkGroupEnable(AbstractGroup group) {
-        return (add ? group.supportsAdd() && !group.containsAll(selection)
-                : group.supportsRemove() && group.containsAny(selection));
+        return (add ? group.supportsAdd() && !group.containsAll(selection) : group.supportsRemove()
+                && group.containsAny(selection));
     }
 
 

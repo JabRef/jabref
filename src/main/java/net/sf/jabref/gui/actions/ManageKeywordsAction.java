@@ -201,8 +201,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-                List<String> var = keywordList.getSelectedValuesList();
-                String[] values = var.toArray(new String[var.size()]);
+                List<String> values = keywordList.getSelectedValuesList();
 
                 for (String val : values) {
                     keywordListModel.removeElement(val);
@@ -270,7 +269,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         if (bp == null) {
             return;
         }
-        if (bp.getSelectedEntries().length == 0) {
+        if (bp.getSelectedEntries().isEmpty()) {
             bp.output(Localization.lang("Select at least one entry to manage keywords."));
             return;
         }
@@ -291,8 +290,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        HashSet<String> keywordsToAdd = new HashSet<>();
-        HashSet<String> userSelectedKeywords = new HashSet<>();
+        Set<String> keywordsToAdd = new HashSet<>();
+        Set<String> userSelectedKeywords = new HashSet<>();
         // build keywordsToAdd and userSelectedKeywords in parallel
         for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
             String kword = keywords.nextElement();
@@ -302,7 +301,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         }
 
-        HashSet<String> keywordsToRemove = new HashSet<>();
+        Set<String> keywordsToRemove = new HashSet<>();
         for (String kword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
             if (!userSelectedKeywords.contains(kword)) {
                 keywordsToRemove.add(kword);
@@ -367,7 +366,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         }
 
-        BibEntry[] entries = bp.getSelectedEntries();
+        List<BibEntry> entries = bp.getSelectedEntries();
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibEntry entry : entries) {
             List<String> separatedKeywords = entry.getSeparatedKeywords();
@@ -407,7 +406,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private void fillKeyWordList() {
         BasePanel bp = frame.getCurrentBasePanel();
-        BibEntry[] entries = bp.getSelectedEntries();
+        List<BibEntry> entries = bp.getSelectedEntries();
 
         // fill dialog with values
         keywordListModel.clear();
@@ -422,14 +421,14 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             assert intersectKeywords.isSelected();
 
             // all keywords from first entry have to be added
-            BibEntry firstEntry = entries[0];
+            BibEntry firstEntry = entries.get(0);
             List<String> separatedKeywords = firstEntry.getSeparatedKeywords();
             sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
 
             // for the remaining entries, intersection has to be used
             // this approach ensures that one empty keyword list leads to an empty set of common keywords
-            for (int i = 1; i < entries.length; i++) {
-                BibEntry entry = entries[i];
+            for (int i = 1; i < entries.size(); i++) {
+                BibEntry entry = entries.get(i);
                 separatedKeywords = entry.getSeparatedKeywords();
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
             }

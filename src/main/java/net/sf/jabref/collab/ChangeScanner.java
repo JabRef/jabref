@@ -28,8 +28,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
-import net.sf.jabref.exporter.FileActions;
+import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.SaveException;
+import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.BasePanel;
@@ -158,11 +159,14 @@ public class ChangeScanner implements Runnable {
             @Override
             public void run() {
                 try {
+                    SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
+                        .withMakeBackup(false)
+                        .withEncoding(panel.getEncoding());
+
                     Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
-                    SaveSession ss = FileActions.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults),
-                            Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs, false,
-                            false, panel.getEncoding(), true);
-                    ss.commit();
+                    BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                    SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
+                    ss.commit(Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()));
                 } catch (SaveException ex) {
                     LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
                 }

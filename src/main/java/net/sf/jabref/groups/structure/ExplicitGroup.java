@@ -26,6 +26,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import javax.swing.undo.AbstractUndoableEdit;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -112,13 +113,13 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibEntry[] entries) {
-        if (entries.length == 0) {
+    public AbstractUndoableEdit add(List<BibEntry> entries) {
+        if (entries.isEmpty()) {
             return null; // nothing to do
         }
 
         HashSet<BibEntry> entriesBeforeEdit = new HashSet<>(this.entries);
-        Collections.addAll(this.entries, entries);
+        this.entries.addAll(entries);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, this.entries);
     }
@@ -128,8 +129,8 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibEntry[] entries) {
-        if (entries.length == 0) {
+    public AbstractUndoableEdit remove(List<BibEntry> entries) {
+        if (entries.isEmpty()) {
             return null; // nothing to do
         }
 

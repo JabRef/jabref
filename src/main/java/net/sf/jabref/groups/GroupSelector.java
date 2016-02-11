@@ -30,8 +30,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Vector;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -621,8 +619,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             moveNodeLeftPopupAction.setNode(node);
             moveNodeRightPopupAction.setNode(node);
             // add/remove entries to/from group
-            BibEntry[] selection = frame.getCurrentBasePanel().getSelectedEntries();
-            if (selection.length > 0) {
+            List<BibEntry> selection = frame.getCurrentBasePanel().getSelectedEntries();
+            if (selection.size() > 0) {
                 if (node.getGroup().supportsAdd() && !node.getGroup().containsAll(selection)) {
                     addToGroup.setNode(node);
                     addToGroup.setBasePanel(panel);
@@ -672,7 +670,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * @param node deletion != addition
      */
     private void updateGroupContent(GroupTreeNode node) {
-        BibEntry[] entries = panel.getSelectedEntries();
+        List<BibEntry> entries = panel.getSelectedEntries();
         AbstractGroup group = node.getGroup();
         AbstractUndoableEdit undoRemove = null;
         AbstractUndoableEdit undoAdd = null;
@@ -680,8 +678,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // Sort entries into current members and non-members of the group
         // Current members will be removed
         // Current non-members will be added
-        ArrayList<BibEntry> toRemove = new ArrayList<>(entries.length);
-        ArrayList<BibEntry> toAdd = new ArrayList<>(entries.length);
+        List<BibEntry> toRemove = new ArrayList<>(entries.size());
+        List<BibEntry> toAdd = new ArrayList<>(entries.size());
 
         for (BibEntry entry : entries) {
             // Sort according to current state of the entries
@@ -696,11 +694,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         // If there are entries to remove
         if (!toRemove.isEmpty()) {
-            undoRemove = node.removeFromGroup(toRemove.toArray(new BibEntry[toRemove.size()]));
+            undoRemove = node.removeFromGroup(toRemove);
         }
         // If there are entries to add
         if (!toAdd.isEmpty()) {
-            undoAdd = node.addToGroup(toAdd.toArray(new BibEntry[toAdd.size()]));
+            undoAdd = node.addToGroup(toAdd);
         }
 
         // Remember undo information
@@ -1447,39 +1445,40 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * Highlight all groups that contain any/all of the specified entries. If entries is null or has zero length,
      * highlight is cleared.
      */
-    public void showMatchingGroups(BibEntry[] entries, boolean requireAll) {
-        if ((entries == null) || (entries.length == 0)) { // nothing selected
+    public void showMatchingGroups(List<BibEntry> list, boolean requireAll) {
+        if ((list == null) || (list.isEmpty())) { // nothing selected
             groupsTree.setHighlight3Cells(null);
             groupsTree.revalidate();
             return;
         }
-        Vector<GroupTreeNode> vec = new Vector<>();
+        List<GroupTreeNode> nodeList = new ArrayList<>();
         for (Enumeration<GroupTreeNode> e = groupsRoot.preorderEnumeration(); e.hasMoreElements();) {
             GroupTreeNode node = e.nextElement();
             AbstractGroup group = node.getGroup();
-            int i;
-            for (i = 0; i < entries.length; ++i) {
+            boolean breakFromLoop = false;
+            for (BibEntry entry : list) {
                 if (requireAll) {
-                    if (!group.contains(entries[i])) {
+                    if (!group.contains(entry)) {
+                        breakFromLoop = true;
                         break;
                     }
                 } else {
-                    if (group.contains(entries[i])) {
-                        vec.add(node);
+                    if (group.contains(entry)) {
+                        nodeList.add(node);
                     }
                 }
             }
-            if (requireAll && (i >= entries.length)) // did not break from loop
+            if (requireAll && (!breakFromLoop)) // did not break from loop
             {
-                vec.add(node);
+                nodeList.add(node);
             }
         }
-        groupsTree.setHighlight3Cells(vec.toArray());
+        groupsTree.setHighlight3Cells(nodeList.toArray());
         // ensure that all highlighted nodes are visible
-        for (int i = 0; i < vec.size(); ++i) {
-            GroupTreeNode node = (GroupTreeNode) vec.elementAt(i).getParent();
-            if (node != null) {
-                groupsTree.expandPath(new TreePath(node.getPath()));
+        for (GroupTreeNode node : nodeList) {
+            GroupTreeNode parentNode = (GroupTreeNode) node.getParent();
+            if (parentNode != null) {
+                groupsTree.expandPath(new TreePath(parentNode.getPath()));
             }
         }
         groupsTree.revalidate();

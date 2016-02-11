@@ -50,7 +50,7 @@ public class WriteXMPAction extends AbstractWorker {
 
     private final BasePanel panel;
 
-    private BibEntry[] entries;
+    private Collection<BibEntry> entries;
 
     private BibDatabase database;
 
@@ -74,12 +74,11 @@ public class WriteXMPAction extends AbstractWorker {
         // Get entries and check if it makes sense to perform this operation
         entries = panel.getSelectedEntries();
 
-        if (entries.length == 0) {
+        if (entries.isEmpty()) {
 
-            Collection<BibEntry> var = database.getEntries();
-            entries = var.toArray(new BibEntry[var.size()]);
+            entries = database.getEntries();
 
-            if (entries.length == 0) {
+            if (entries.isEmpty()) {
 
                 JOptionPane.showMessageDialog(panel, Localization.lang("This operation requires at least one entry."),
                         Localization.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);

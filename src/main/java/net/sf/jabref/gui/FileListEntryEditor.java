@@ -40,6 +40,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -284,7 +285,9 @@ public class FileListEntryEditor {
         link.setText(entry.link);
         //if (link.getText().length() > 0)
         //    checkExtension();
-        types.setModel(new DefaultComboBoxModel<>(ExternalFileTypes.getInstance().getExternalFileTypeSelection()));
+        Collection<ExternalFileType> list = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+
+        types.setModel(new DefaultComboBoxModel<>(list.toArray(new ExternalFileType[list.size()])));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
         if ((entry.type != null) && !(entry.type instanceof UnknownExternalFileType)) {

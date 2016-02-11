@@ -38,7 +38,7 @@ import javax.swing.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -47,6 +47,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
@@ -663,8 +664,8 @@ public class OpenOfficePanel extends AbstractWorker {
         BasePanel panel = frame.getCurrentBasePanel();
         if (panel != null) {
             final BibDatabase database = panel.database();
-            BibEntry[] entries = panel.getSelectedEntries();
-            if (entries.length > 0) {
+            List<BibEntry> entries = panel.getSelectedEntries();
+            if (!entries.isEmpty()) {
                 try {
                     if (style == null) {
                         readStyleFile();

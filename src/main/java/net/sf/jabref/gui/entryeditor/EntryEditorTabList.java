@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -39,13 +39,12 @@ public final class EntryEditorTabList {
         names = new ArrayList<>();
         int i = 0;
         String name;
-        String[] fields;
         if (Globals.prefs.hasKey(JabRefPreferences.CUSTOM_TAB_NAME + 0)) {
             // The user has modified from the default values:
             while (Globals.prefs.hasKey(JabRefPreferences.CUSTOM_TAB_NAME + i)) {
                 name = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_NAME + i);
-                fields = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + i).split(";");
-                List<String> entry = Arrays.asList(fields);
+                List<String> entry = Arrays
+                        .asList(Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + i).split(";"));
                 names.add(name);
                 list.add(entry);
                 i++;
@@ -54,8 +53,8 @@ public final class EntryEditorTabList {
             // Nothing set, so we use the default values:
             while (Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i) != null) {
                 name = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
-                fields = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i).split(";");
-                List<String> entry = Arrays.asList(fields);
+                List<String> entry = Arrays
+                        .asList(Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i).split(";"));
                 names.add(name);
                 list.add(entry);
                 i++;

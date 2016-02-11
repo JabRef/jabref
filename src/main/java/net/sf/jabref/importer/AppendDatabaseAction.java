@@ -74,11 +74,12 @@ public class AppendDatabaseAction implements BaseAction {
         PositionWindow.placeDialog(md, panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
-            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
+            List<String> chosen = FileDialogs.getMultipleFiles(frame,
+                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
                     null, false);
             //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
             //                                       null, JFileChooser.OPEN_DIALOG, false);
-            if (chosen == null) {
+            if (chosen.isEmpty()) {
                 return;
             }
             for (String aChosen : chosen) {
@@ -117,9 +118,7 @@ public class AppendDatabaseAction implements BaseAction {
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (Throwable ex) {
                 LOGGER.warn("Could not open database", ex);
-                JOptionPane.showMessageDialog
-                (panel, ex.getMessage(),
- Localization.lang("Open database"),
+                JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open database"),
                         JOptionPane.ERROR_MESSAGE);
             }
         }

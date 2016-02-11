@@ -1915,10 +1915,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             LOGGER.debug(Globals.focusListener.getFocused().toString());
             JComponent source = Globals.focusListener.getFocused();
-            try {
-                source.getActionMap().get(command).actionPerformed(new ActionEvent(source, 0, command));
-            } catch (NullPointerException ex) {
-                // No component is focused, so we do nothing.
+            Action action = source.getActionMap().get(command);
+            if (action != null) {
+                action.actionPerformed(new ActionEvent(source, 0, command));
             }
         }
     }

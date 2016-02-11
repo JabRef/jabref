@@ -26,8 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,7 +53,6 @@ public class SaveSession {
     private static final String TEMP_PREFIX = "jabref";
 
     private static final String TEMP_SUFFIX = "save.bib";
-    private final File file;
     private final File tmp;
     private final Charset encoding;
     private boolean backup;
@@ -64,8 +61,7 @@ public class SaveSession {
     private final VerifyingWriter writer;
 
 
-    public SaveSession(File file, Charset encoding, boolean backup) throws IOException, UnsupportedCharsetException {
-        this.file = file;
+    public SaveSession(Charset encoding, boolean backup) throws IOException {
         tmp = File.createTempFile(SaveSession.TEMP_PREFIX, SaveSession.TEMP_SUFFIX);
         useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
         this.backup = backup;
@@ -92,7 +88,7 @@ public class SaveSession {
         this.backup = useBackup;
     }
 
-    public void commit() throws SaveException {
+    public void commit(File file) throws SaveException {
         if (file == null) {
             return;
         }
@@ -110,7 +106,7 @@ public class SaveSession {
         try {
             if (useLockFile) {
                 try {
-                    if (createLockFile()) {
+                    if (createLockFile(file)) {
                         // Oops, the lock file already existed. Try to wait it out:
                         if (!FileBasedLock.waitForFileLock(file, 10)) {
                             throw SaveException.FILE_LOCKED;
@@ -132,7 +128,7 @@ public class SaveSession {
                     Localization.lang("Save failed while committing changes: %0", ex2.getMessage()));
         } finally {
             if (useLockFile) {
-                deleteLockFile();
+                deleteLockFile(file);
             }
         }
         if (!tmp.delete()) {
@@ -152,7 +148,7 @@ public class SaveSession {
      * @return true if the lock file already existed
      * @throws IOException if something happens during creation.
      */
-    private boolean createLockFile() throws IOException {
+    private boolean createLockFile(File file) throws IOException {
         File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
         if (lock.exists()) {
             return true;
@@ -173,7 +169,7 @@ public class SaveSession {
      * @return true if the lock file existed, false otherwise.
      * @throws IOException if something goes wrong.
      */
-    private boolean deleteLockFile() {
+    private boolean deleteLockFile(File file) {
         File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
         if (!lock.exists()) {
             return false;

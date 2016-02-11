@@ -114,14 +114,14 @@ public class MainTable extends JTable {
     private static GeneralRenderer grayedOutRenderer;
     private static GeneralRenderer veryGrayedOutRenderer;
 
-    private static GeneralRenderer[] markedRenderers;
+    private static List<GeneralRenderer> markedRenderers;
 
     private static IncompleteRenderer incRenderer;
     private static CompleteRenderer compRenderer;
     private static CompleteRenderer grayedOutNumberRenderer;
     private static CompleteRenderer veryGrayedOutNumberRenderer;
 
-    private static CompleteRenderer[] markedNumberRenderers;
+    private static List<CompleteRenderer> markedNumberRenderers;
 
 
     static {
@@ -354,8 +354,8 @@ public class MainTable extends JTable {
                 int marking = isMarked(row);
                 if (marking > 0) {
                     marking = Math.min(marking, EntryMarker.MARK_COLOR_LEVELS);
-                    renderer = MainTable.markedNumberRenderers[marking - 1];
-                    MainTable.markedNumberRenderers[marking - 1].setNumber(row);
+                    renderer = MainTable.markedNumberRenderers.get(marking - 1);
+                    MainTable.markedNumberRenderers.get(marking - 1).setNumber(row);
                 } else {
                     renderer = MainTable.compRenderer;
                 }
@@ -380,7 +380,7 @@ public class MainTable extends JTable {
         int marking = isMarked(row);
         if ((column != 0) && (marking > 0)) {
             marking = Math.min(marking, EntryMarker.MARK_COLOR_LEVELS);
-            renderer = MainTable.markedRenderers[marking - 1];
+            renderer = MainTable.markedRenderers.get(marking - 1);
         }
 
         return renderer;
@@ -429,9 +429,8 @@ public class MainTable extends JTable {
     /**
      * @return the return value is never null
      */
-    public BibEntry[] getSelectedEntries() {
-        final BibEntry[] BE_ARRAY = new BibEntry[0];
-        return getSelected().toArray(BE_ARRAY);
+    public List<BibEntry> getSelectedEntries() {
+        return getSelected();
     }
 
     private List<Boolean> getCurrentSortOrder() {
@@ -731,13 +730,13 @@ public class MainTable extends JTable {
                 Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
                         sel));
 
-        MainTable.markedRenderers = new GeneralRenderer[EntryMarker.MARK_COLOR_LEVELS];
-        MainTable.markedNumberRenderers = new CompleteRenderer[EntryMarker.MARK_COLOR_LEVELS];
+        MainTable.markedRenderers = new ArrayList<>(EntryMarker.MARK_COLOR_LEVELS);
+        MainTable.markedNumberRenderers = new ArrayList<>(EntryMarker.MARK_COLOR_LEVELS);
         for (int i = 0; i < EntryMarker.MARK_COLOR_LEVELS; i++) {
             Color c = Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i);
-            MainTable.markedRenderers[i] = new GeneralRenderer(c,
-                    Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i), sel));
-            MainTable.markedNumberRenderers[i] = new CompleteRenderer(c);
+            MainTable.markedRenderers.add(new GeneralRenderer(c, Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT),
+                    MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i), sel)));
+            MainTable.markedNumberRenderers.add(new CompleteRenderer(c));
         }
 
     }

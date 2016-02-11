@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.config;
 
+import net.sf.jabref.JabRefPreferences;
+
 import java.util.List;
 import java.util.Vector;
 
@@ -16,8 +18,7 @@ public class SaveOrderConfig {
     // quick hack for outside modifications
     public final SortCriterion[] sortCriteria = new SortCriterion[3];
 
-
-    public static class SortCriterion {
+        public static class SortCriterion {
 
         public String field;
         public boolean descending;
@@ -82,6 +83,40 @@ public class SaveOrderConfig {
     public void setSaveInSpecifiedOrder() {
         this.saveInOriginalOrder = false;
         this.saveInSpecifiedOrder = true;
+    }
+
+    public static SaveOrderConfig loadExportSaveOrderFromPreferences(JabRefPreferences preferences) {
+        SaveOrderConfig config = new SaveOrderConfig();
+        config.sortCriteria[0].field = preferences.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD);
+        config.sortCriteria[0].descending = preferences.getBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING);
+        config.sortCriteria[1].field = preferences.get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD);
+        config.sortCriteria[1].descending = preferences.getBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING);
+        config.sortCriteria[2].field = preferences.get(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD);
+        config.sortCriteria[2].descending = preferences.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING);
+
+        return config;
+    }
+
+    public static SaveOrderConfig loadTableSaveOrderFromPreferences(JabRefPreferences preferences) {
+        SaveOrderConfig config = new SaveOrderConfig();
+        config.sortCriteria[0].field = preferences.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD);
+        config.sortCriteria[0].descending = preferences.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING);
+        config.sortCriteria[1].field = preferences.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD);
+        config.sortCriteria[1].descending = preferences.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING);
+        config.sortCriteria[2].field = preferences.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD);
+        config.sortCriteria[2].descending = preferences.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING);
+
+        return config;
+    }
+
+    public void storeAsExportSaveOrderInPreferences(JabRefPreferences preferences) {
+        preferences.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, sortCriteria[0].descending);
+        preferences.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, sortCriteria[1].descending);
+        preferences.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, sortCriteria[2].descending);
+
+        preferences.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, sortCriteria[0].field);
+        preferences.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, sortCriteria[1].field);
+        preferences.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, sortCriteria[2].field);
     }
 
     /**

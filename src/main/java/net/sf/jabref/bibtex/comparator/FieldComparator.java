@@ -17,6 +17,7 @@ package net.sf.jabref.bibtex.comparator;
 
 import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.maintable.MainTableFormat;
+import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -27,6 +28,7 @@ import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  *
@@ -71,7 +73,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     public FieldComparator(String field, boolean reversed) {
-        this.fieldName = field;
+        this.fieldName = Objects.requireNonNull(field);
         this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
         multiplier = reversed ? -1 : 1;
         isTypeHeader = this.field[0].equals(BibEntry.TYPE_HEADER);
@@ -80,6 +82,10 @@ public class FieldComparator implements Comparator<BibEntry> {
         isYearField = "year".equals(this.field[0]);
         isMonthField = "month".equals(this.field[0]);
         isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
+    }
+
+    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
+        this(sortCriterion.field, sortCriterion.descending);
     }
 
     @Override

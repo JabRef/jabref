@@ -60,12 +60,12 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
+        String expected = Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
                 "  author =  {Foo Bar}," + Globals.NEWLINE +
                 "  journal = {International Journal of Something}," + Globals.NEWLINE +
                 "  number =  {1}," + Globals.NEWLINE +
                 "  note =    {some note}" + Globals.NEWLINE +
-                "}";
+                "}" + Globals.NEWLINE;
         // @formatter:on
 
         assertEquals(expected, actual);
@@ -169,12 +169,12 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+        String expected = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
                 "  author =  {BlaBla}," + Globals.NEWLINE +
                 "  journal = {International Journal of Something}," + Globals.NEWLINE +
                 "  number =  {1}," + Globals.NEWLINE +
                 "  note =    {some note}" + Globals.NEWLINE +
-                "}";
+                "}" + Globals.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
     }
@@ -215,13 +215,13 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+        String expected = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
                 "  author =       {BlaBla}," + Globals.NEWLINE +
                 "  journal =      {International Journal of Something}," + Globals.NEWLINE +
                 "  number =       {1}," + Globals.NEWLINE +
                 "  note =         {some note}," + Globals.NEWLINE +
                 "  howpublished = {asdf}" + Globals.NEWLINE +
-                "}";
+                "}" + Globals.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
     }
@@ -255,8 +255,8 @@ public class BibEntryWriterTest {
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
-        //appending newlines are not written by the writer, but by FileActions. So, these should be removed here.
-        assertEquals(bibtexEntry.substring(0, bibtexEntry.length() - 2), actual);
+        // Only one appending newline is written by the writer, the rest by FileActions. So, these should be removed here.
+        assertEquals(bibtexEntry.substring(0, bibtexEntry.length() - 1), actual);
     }
 
     @Test
@@ -357,13 +357,13 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+        String expected = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
                 "  author =       {BlaBla}," + Globals.NEWLINE +
                 "  journal =      {International Journal of Something}," + Globals.NEWLINE +
                 "  number =       {1}," + Globals.NEWLINE +
                 "  note =         {some note}," + Globals.NEWLINE +
                 "  howpublished = {asdf}" + Globals.NEWLINE +
-                "}";
+                "}" + Globals.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
     }

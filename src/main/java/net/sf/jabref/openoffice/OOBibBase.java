@@ -255,30 +255,25 @@ class OOBibBase {
      * @param sync Indicates whether the reference list should be refreshed.
      * @throws Exception
      */
-    public void insertEntry(BibEntry[] entries, BibDatabase database, List<BibDatabase> allBases, OOBibStyle style,
-            boolean inParenthesis, boolean withText, String pageInfo, boolean sync) throws Exception {
+    public void insertEntry(List<BibEntry> entries, BibDatabase database,
+            List<BibDatabase> allBases, OOBibStyle style,
+            boolean inParenthesis, boolean withText, String pageInfo,
+            boolean sync) throws Exception {
 
         try {
 
             XTextViewCursor xViewCursor = xViewCursorSupplier.getViewCursor();
 
-            if (entries.length > 1) {
+            if (entries.size() > 1) {
                 if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
-                    Arrays.sort(entries, yearAuthorTitleComparator);
+                    entries.sort(yearAuthorTitleComparator);
                 } else {
-                    Arrays.sort(entries, entryComparator);
+                    entries.sort(entryComparator);
                 }
             }
 
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < entries.length; i++) {
-                BibEntry entry = entries[i];
-                if (i > 0) {
-                    sb.append(',');
-                }
-                sb.append(entry.getCiteKey());
-            }
-            String keyString = sb.toString();
+            String keyString = String.join(",",
+                    entries.stream().map(entry -> entry.getCiteKey()).collect(Collectors.toList()));
             // Insert bookmark:
             String bName = getUniqueReferenceMarkName(keyString,
                     withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);
@@ -516,7 +511,7 @@ class OOBibBase {
                         }
                     }
 
-                    citationMarker = style.getCitationMarker(cEntries, entries.get(cEntries),
+                    citationMarker = style.getCitationMarker(Arrays.asList(cEntries), entries.get(cEntries),
                             type == OOBibBase.AUTHORYEAR_PAR, null, null);
                     // We need "normalized" (in parenthesis) markers for uniqueness checking purposes:
                     for (int j = 0; j < cEntries.length; j++) {
@@ -612,7 +607,7 @@ class OOBibBase {
                     }
                 }
                 if (needsChange) {
-                    citMarkers[j] = style.getCitationMarker(cEntries, entries.get(cEntries),
+                    citMarkers[j] = style.getCitationMarker(Arrays.asList(cEntries), entries.get(cEntries),
                             types[j] == OOBibBase.AUTHORYEAR_PAR, uniquif, firstLimAuthors);
                 }
             }

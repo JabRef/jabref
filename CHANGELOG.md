@@ -13,6 +13,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Implemented [#756](https://github.com/JabRef/jabref/issues/756): Add possibility to reformat all entries on save (under Preferences, File)
+- Comments and preamble are serialized with capitalized first letter, i.e. `@Comment` instead of `@comment` and `@Preamble` instead of `@PREAMBLE`.
 - Global sorting options and preferences are removed. Databases can still be sorted on save, but this is configured locally and stored in the file
 - OvidImporter now also imports fields: doi, issn, language and keywords
 - Implemented [#647](https://github.com/JabRef/jabref/issues/647): The preview can now be copied
@@ -26,6 +28,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 
 ### Fixed
+- Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#669](https://github.com/JabRef/jabref/issues/669): Encoding and preamble now end with newline.
 - Make BibTex parser more robust against missing newlines
 - Fix bug that prevented the import of BibTex entries having only a key as content
 - Fixed [#666](https://github.com/JabRef/jabref/issues/666): MS Office 2007 export is working again
@@ -39,6 +42,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - IEEEXplore fetcher replaces keyword separator with the preferred
 - Fixed [#710](https://github.com/JabRef/jabref/issues/710): Fixed quit behaviour under OSX
 - Merge from DOI now honors removed fields
+- Fixed [#778](https://github.com/JabRef/jabref/issues/778): Fixed NPE when exporting to .sql File
 
 
 ### Removed

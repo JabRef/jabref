@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     Copyright (C) 2015 Oliver Kopp
 
     This program is free software; you can redistribute it and/or modify
@@ -450,7 +450,7 @@ public class Util {
      * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
      * otherwise (this indicates that the user has aborted the assignment).
      */
-    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibEntry[] entries, BibDatabase db, Component parent) {
+    public static boolean warnAssignmentSideEffects(List<AbstractGroup> groups, Component parent) {
         List<String> affectedFields = new ArrayList<>();
         for (AbstractGroup group : groups) {
             if (group instanceof KeywordGroup) {
@@ -578,9 +578,9 @@ public class Util {
      * @return the thread performing the autosetting
      */
     public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
-        final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+        final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         if (diag != null) {
-            final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length - 1);
+            final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.size() - 1);
             final JLabel label = new JLabel(Localization.lang("Searching for files"));
             prog.setIndeterminate(true);
             prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

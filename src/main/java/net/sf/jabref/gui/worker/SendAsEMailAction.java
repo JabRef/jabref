@@ -71,13 +71,13 @@ public class SendAsEMailAction extends AbstractWorker {
         if (panel == null) {
             return;
         }
-        if (panel.getSelectedEntries().length == 0) {
+        if (panel.getSelectedEntries().isEmpty()) {
             message = Localization.lang("No entries selected.");
             return;
         }
 
         StringWriter sw = new StringWriter();
-        BibEntry[] bes = panel.getSelectedEntries();
+        List<BibEntry> bes = panel.getSelectedEntries();
 
         // write the entries using sw, which is used later to form the email content
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
@@ -96,7 +96,7 @@ public class SendAsEMailAction extends AbstractWorker {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<File> fileList = FileUtil.getListOfLinkedFiles(Arrays.asList(bes),
+        List<File> fileList = FileUtil.getListOfLinkedFiles(bes,
                 frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD));
         for (File f : fileList) {
             attachments.add(f.getPath());
@@ -135,8 +135,7 @@ public class SendAsEMailAction extends AbstractWorker {
             return;
         }
 
-        message = String.format("%s: %d",
-                Localization.lang("Entries added to an email"), bes.length);
+        message = String.format("%s: %d", Localization.lang("Entries added to an email"), bes.size());
     }
 
     @Override

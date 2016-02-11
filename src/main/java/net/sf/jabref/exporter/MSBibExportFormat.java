@@ -48,7 +48,7 @@ class MSBibExportFormat extends ExportFormat {
             final Charset encoding, Set<String> keySet) throws IOException {
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings
-        SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
+        SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
         MSBibDatabase md = new MSBibDatabase(database, keySet);
         try (VerifyingWriter ps = ss.getWriter()) {
 
@@ -63,7 +63,7 @@ class MSBibExportFormat extends ExportFormat {
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
-            finalizeSaveSession(ss);
+            finalizeSaveSession(ss, new File(file));
         } catch (SaveException | IOException ex) {
             throw new IOException(ex.getMessage());
         }

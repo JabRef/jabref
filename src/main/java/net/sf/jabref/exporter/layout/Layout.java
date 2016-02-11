@@ -33,7 +33,7 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 public class Layout {
 
-    private final LayoutEntry[] layoutEntries;
+    private final List<LayoutEntry> layoutEntries;
 
     private final List<String> missingFormatters = new ArrayList<>();
 
@@ -93,14 +93,11 @@ public class Layout {
             }
         }
 
-        layoutEntries = new LayoutEntry[tmpEntries.size()];
+        layoutEntries = new ArrayList<>(tmpEntries);
 
-        for (int i = 0; i < tmpEntries.size(); i++)
-        {
-            layoutEntries[i] = tmpEntries.get(i);
-            // Note if one of the entries has an invalid formatter:
-            if (layoutEntries[i].isInvalidFormatter()) {
-                missingFormatters.addAll(layoutEntries[i].getInvalidFormatters());
+        for (LayoutEntry layoutEntry : layoutEntries) {
+            if (layoutEntry.isInvalidFormatter()) {
+                missingFormatters.addAll(layoutEntry.getInvalidFormatters());
             }
         }
     }

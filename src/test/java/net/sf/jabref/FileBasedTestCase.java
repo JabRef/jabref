@@ -38,6 +38,8 @@ public class FileBasedTestCase {
         // Create file structure
         try {
             root = FileBasedTestHelper.createTempDir("UtilFindFileTest");
+            
+            Assert.assertNotNull(root);
 
             Globals.prefs.put("pdfDirectory", root.getPath());
 

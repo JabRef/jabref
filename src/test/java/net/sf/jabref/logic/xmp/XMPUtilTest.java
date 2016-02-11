@@ -242,7 +242,8 @@ public class XMPUtilTest {
     @After
     public void tearDown() {
         if (!pdfFile.delete()) {
-            System.err.println("Error: Cannot delete temporary file (already deleted).");
+            System.err
+                    .println("Note: Cannot delete temporary file (already deleted so the corresponding test passed).");
         }
 
         prefs.putBoolean("useXmpPrivacyFilter", use);
@@ -744,6 +745,8 @@ public class XMPUtilTest {
     }
 
     public void assertEqualsBibtexEntry(BibEntry expected, BibEntry actual) {
+        Assert.assertNotNull(expected);
+        Assert.assertNotNull(actual);
         Assert.assertEquals(expected.getCiteKey(), actual.getCiteKey());
         Assert.assertEquals(expected.getType(), actual.getType());
 

@@ -24,10 +24,10 @@ public class AttachFileAction implements BaseAction {
 
     @Override
     public void action() {
-        if (panel.getSelectedEntries().length != 1) {
+        if (panel.getSelectedEntries().size() != 1) {
             return; // TODO: display error message?
         }
-        BibEntry entry = panel.getSelectedEntries()[0];
+        BibEntry entry = panel.getSelectedEntries().get(0);
         FileListEntry flEntry = new FileListEntry("", "", null);
         FileListEntryEditor editor = new FileListEntryEditor(panel.frame(), flEntry, false, true,
                 panel.getBibDatabaseContext().getMetaData());
