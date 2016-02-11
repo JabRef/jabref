@@ -25,14 +25,10 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 
-/**
- * This is a non-modal help Dialog. The contents of the help is specified by
- * calling showPage().
- */
 public class AboutDialog extends JDialog {
 
     public AboutDialog(JabRefFrame bf) {
-        super(bf, Localization.lang("About JabRef"), false);
+        super(bf, Localization.lang("About JabRef"), true);
         setSize(new Dimension(750, 600));
         setLocationRelativeTo(null);
 
@@ -68,5 +64,4 @@ public class AboutDialog extends JDialog {
 
         getContentPane().add(panel);
     }
-
 }
