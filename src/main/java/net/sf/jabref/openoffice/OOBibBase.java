@@ -272,15 +272,8 @@ class OOBibBase {
                 }
             }
 
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < entries.size(); i++) {
-                BibEntry entry = entries.get(i);
-                if (i > 0) {
-                    sb.append(',');
-                }
-                sb.append(entry.getCiteKey());
-            }
-            String keyString = sb.toString();
+            String keyString = String.join(",",
+                    entries.stream().map(entry -> entry.getCiteKey()).collect(Collectors.toList()));
             // Insert bookmark:
             String bName = getUniqueReferenceMarkName(keyString,
                     withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);

@@ -68,7 +68,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         if (panel == null) {
             return;
         }
-        if (panel.getSelectedEntries().size() == 0) {
+        if (panel.getSelectedEntries().isEmpty()) {
             message = Localization.lang("No entries selected.");
             getCallBack().update();
             return;
@@ -112,7 +112,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
             List<BibEntry> bes = panel.getSelectedEntries();
-            HashSet<String> entries = new HashSet<>(bes.size());
+            Set<String> entries = new HashSet<>(bes.size());
             for (BibEntry be : bes) {
                 entries.add(be.getId());
             }

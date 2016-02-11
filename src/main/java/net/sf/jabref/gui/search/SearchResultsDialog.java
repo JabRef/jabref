@@ -166,13 +166,12 @@ public class SearchResultsDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!selectionModel.getSelected().isEmpty()) {
-                    BibEntry[] bes = selectionModel.getSelected().toArray
-                            (new BibEntry[selectionModel.getSelected().size()]);
+                    List<BibEntry> bes = selectionModel.getSelected();
                     TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.getCurrentBasePanel());
-                    frame.output(Localization.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
+                    frame.output(Localization.lang("Copied") + ' ' + (bes.size() > 1 ? bes.size() + " "
                             + Localization.lang("entries")
                             : "1 " + Localization.lang("entry") + '.'));
                 }

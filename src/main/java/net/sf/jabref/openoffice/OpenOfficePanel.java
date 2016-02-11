@@ -665,7 +665,7 @@ public class OpenOfficePanel extends AbstractWorker {
         if (panel != null) {
             final BibDatabase database = panel.database();
             List<BibEntry> entries = panel.getSelectedEntries();
-            if (entries.size() > 0) {
+            if (!entries.isEmpty()) {
                 try {
                     if (style == null) {
                         readStyleFile();

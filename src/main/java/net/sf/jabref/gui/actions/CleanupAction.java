@@ -60,15 +60,15 @@ public class CleanupAction extends AbstractWorker {
     public void init() {
         cancelled = false;
         modifiedEntriesCount = 0;
-        int numSelected = panel.getSelectedEntries().size();
-        if (numSelected == 0) { // None selected. Inform the user to select entries first.
+        if (panel.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
             JOptionPane.showMessageDialog(frame, Localization.lang("First select entries to clean up."),
                     Localization.lang("Cleanup entry"), JOptionPane.INFORMATION_MESSAGE);
             cancelled = true;
             return;
         }
         frame.block();
-        panel.output(Localization.lang("Doing a cleanup for %0 entries...", Integer.toString(numSelected)));
+        panel.output(Localization.lang("Doing a cleanup for %0 entries...",
+                Integer.toString(panel.getSelectedEntries().size())));
     }
 
     @Override

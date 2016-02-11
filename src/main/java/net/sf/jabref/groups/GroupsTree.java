@@ -26,6 +26,7 @@ import java.awt.event.InputEvent;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JTree;
@@ -278,7 +279,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 }
                 final TransferableEntrySelection selection = (TransferableEntrySelection) transferable
                         .getTransferData(TransferableEntrySelection.FLAVOR_INTERNAL);
-                final BibEntry[] entries = selection.getSelection();
+                final List<BibEntry> entries = selection.getSelection();
                 int assignedEntries = 0;
                 for (BibEntry entry : entries) {
                     if (!target.getGroup().contains(entry)) {
@@ -298,7 +299,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // edit has to be stored:
                 groupSelector.getActiveBasePanel().storeCurrentEdit();
 
-                AbstractUndoableEdit undo = group.add(Arrays.asList(selection.getSelection()));
+                AbstractUndoableEdit undo = group.add(selection.getSelection());
                 if (undo instanceof UndoableChangeAssignment) {
                     ((UndoableChangeAssignment) undo).setEditedNode(target);
                 }
