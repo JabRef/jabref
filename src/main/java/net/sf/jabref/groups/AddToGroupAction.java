@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,6 +16,7 @@
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -84,17 +85,17 @@ public class AddToGroupAction extends AbstractAction {
             }
             // warning for all groups from which the entries are removed, and
             // for the one to which they are added! hence the magical +1
-            AbstractGroup[] groups = new AbstractGroup[removeGroupsNodes.size() + 1];
+            List<AbstractGroup> groups = new ArrayList<>(removeGroupsNodes.size() + 1);
             for (int i = 0; i < removeGroupsNodes.size(); ++i) {
-                groups[i] = removeGroupsNodes.elementAt(i).getGroup();
+                groups.add(removeGroupsNodes.elementAt(i).getGroup());
             }
-            groups[groups.length - 1] = mNode.getGroup();
+            groups.add(mNode.getGroup());
             if (!Util.warnAssignmentSideEffects(groups, mPanel.frame())) {
                 return; // user aborted operation
             }
         } else {
             // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()}, mPanel.frame())) {
+            if (!Util.warnAssignmentSideEffects(Arrays.asList(mNode.getGroup()), mPanel.frame())) {
                 return; // user aborted operation
             }
         }

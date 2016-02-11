@@ -276,10 +276,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 listOfFileColumns.setEnabled(extraFileColumns.isSelected());
             }
         });
-        ExternalFileType[] fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-        String[] fileTypeNames = new String[fileTypes.length];
-        for (int i = 0; i < fileTypes.length; i++) {
-            fileTypeNames[i] = fileTypes[i].getName();
+        Collection<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+        String[] fileTypeNames = new String[fileTypes.size()];
+        int i = 0;
+        for (ExternalFileType fileType : fileTypes) {
+            fileTypeNames[i++] = fileType.getName();
         }
         listOfFileColumns = new JList<>(fileTypeNames);
         JScrollPane listOfFileColumnsScrollPane = new JScrollPane(listOfFileColumns);

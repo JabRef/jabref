@@ -21,6 +21,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +57,7 @@ class EntryEditorTab {
     private final JScrollPane scrollPane = new JScrollPane(panel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-    private final String[] fields;
+    private final List<String> fields;
 
     private final EntryEditor parent;
 
@@ -83,9 +84,9 @@ class EntryEditorTab {
     public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
             boolean addKeyField, boolean compressed, String tabTitle) {
         if (fields == null) {
-            this.fields = new String[] {};
+            this.fields = Collections.emptyList();
         } else {
-            this.fields = fields.toArray(new String[fields.size()]);
+            this.fields = fields;
         }
 
         this.parent = parent;
@@ -118,7 +119,7 @@ class EntryEditorTab {
                 + "8dlu, fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref"
                 : "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
         StringBuilder stringBuilder = new StringBuilder();
-        int rows = (int) Math.ceil((double) fields.length / fieldsPerRow);
+        int rows = (int) Math.ceil((double) fields.size() / fieldsPerRow);
         for (int i = 0; i < rows; i++) {
             stringBuilder.append("fill:pref:grow, ");
         }
@@ -133,19 +134,22 @@ class EntryEditorTab {
                 (new FormLayout(colSpec, rowSpec), panel);
 
         // BibTex edit fields are defined here
-        for (int i = 0; i < fields.length; i++) {
+        for (int i = 0; i < fields.size(); i++) {
+            String field = fields.get(i);
+
             // Create the text area:
-            int editorType = InternalBibtexFields.getEditorType(fields[i]);
+            int editorType = InternalBibtexFields.getEditorType(field);
 
             FieldEditor fieldEditor;
             int defaultHeight;
-            int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(fields[i]));
+            int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
             if (editorType == GUIGlobals.FILE_LIST_EDITOR) {
-                fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext().getMetaData(), fields[i], null, parent);
+                fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext().getMetaData(), field,
+                        null, parent);
                 fileListEditor = (FileListEditor) fieldEditor;
                 defaultHeight = 0;
             } else {
-                fieldEditor = new TextArea(fields[i], null);
+                fieldEditor = new TextArea(field, null);
                 bPanel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
@@ -153,7 +157,7 @@ class EntryEditorTab {
             Optional<JComponent> extra = parent.getExtra(fieldEditor);
 
             // Add autocompleter listener, if required for this field:
-            AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(fields[i]);
+            AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(field);
             AutoCompleteListener autoCompleteListener = null;
             if (autoCompleter != null) {
                 autoCompleteListener = new AutoCompleteListener(autoCompleter);
@@ -162,7 +166,7 @@ class EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
 
             // Store the editor for later reference:
-            editors.put(fields[i], fieldEditor);
+            editors.put(field, fieldEditor);
             if (i == 0) {
                 activeField = fieldEditor;
             }
@@ -254,7 +258,7 @@ class EntryEditorTab {
     }
 
     public List<String> getFields() {
-        return java.util.Arrays.asList(fields);
+        return fields;
     }
 
     public void activate() {

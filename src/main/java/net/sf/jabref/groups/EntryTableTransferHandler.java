@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -237,7 +238,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         // System.out.println("importing from " + tmpfile.getAbsolutePath());
 
         ImportMenuItem importer = new ImportMenuItem(frame, false);
-        importer.automatedImport(new String[] {tmpfile.getAbsolutePath()});
+        importer.automatedImport(Arrays.asList(tmpfile.getAbsolutePath()));
 
         return true;
     }
@@ -387,13 +388,10 @@ public class EntryTableTransferHandler extends TransferHandler {
         openAction.openFilesAsStringList(bibFiles, true);
 
         if (!notBibFiles.isEmpty()) {
-            String[] toImport = new String[notBibFiles.size()];
-            notBibFiles.toArray(toImport);
-
             // Import into new if entryTable==null, otherwise into current
             // database:
             ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
-            importer.automatedImport(toImport);
+            importer.automatedImport(notBibFiles);
         }
     }
 
@@ -408,7 +406,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         // Import into new if entryTable==null, otherwise into current database:
         ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
-        importer.automatedImport(new String[] {tmpfile.getAbsolutePath()});
+        importer.automatedImport(Arrays.asList(tmpfile.getAbsolutePath()));
 
         return true;
     }

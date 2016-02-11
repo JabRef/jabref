@@ -18,6 +18,7 @@ package net.sf.jabref.importer;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public final class EntryFromFileCreatorManager {
 
         // add a creator for each ExternalFileType if there is no specialised
         // creator existing.
-        ExternalFileType[] fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+        Collection<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
 
         for (ExternalFileType exFileType : fileTypes) {
             if (!hasSpecialisedCreatorForExternalFileType(exFileType)) {

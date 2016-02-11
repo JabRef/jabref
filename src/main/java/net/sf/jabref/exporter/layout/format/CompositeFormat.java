@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,16 +15,19 @@
 */
 package net.sf.jabref.exporter.layout.format;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 /**
  * A layout formatter that is the composite of the given Formatters executed in
  * order.
- * 
+ *
  */
 public class CompositeFormat implements LayoutFormatter {
 
-    private LayoutFormatter[] formatters;
+    private List<LayoutFormatter> formatters;
 
 
     /**
@@ -35,11 +38,11 @@ public class CompositeFormat implements LayoutFormatter {
     }
 
     public CompositeFormat(LayoutFormatter first, LayoutFormatter second) {
-        formatters = new LayoutFormatter[] {first, second};
+        formatters = Arrays.asList(first, second);
     }
 
     public CompositeFormat(LayoutFormatter[] formatters) {
-        this.formatters = formatters;
+        this.formatters = Arrays.asList(formatters);
     }
 
     @Override

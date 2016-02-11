@@ -288,7 +288,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
                 // warn if assignment has undesired side effects (modifies a
                 // field != keywords)
-                if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {group}, groupSelector.frame))
+                if (!Util.warnAssignmentSideEffects(Arrays.asList(group), groupSelector.frame))
                  {
                     return; // user aborted operation
                 }

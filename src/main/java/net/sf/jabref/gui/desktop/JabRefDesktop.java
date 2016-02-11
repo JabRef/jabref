@@ -323,9 +323,8 @@ public class JabRefDesktop {
             editor.setVisible(true);
             if (editor.okPressed()) {
                 // Get the old list of types, add this one, and update the list in prefs:
-                List<ExternalFileType> fileTypes = new ArrayList<>();
-                ExternalFileType[] oldTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-                Collections.addAll(fileTypes, oldTypes);
+                List<ExternalFileType> fileTypes = new ArrayList<>(
+                        ExternalFileTypes.getInstance().getExternalFileTypeSelection());
                 fileTypes.add(newType);
                 Collections.sort(fileTypes);
                 ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);

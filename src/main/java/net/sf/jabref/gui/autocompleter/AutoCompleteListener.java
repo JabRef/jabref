@@ -39,7 +39,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     private String toSetIn; // null indicates that there are no completions available
     private String lastBeginning; // the letters, the user has typed until know
     private int lastCaretPosition = -1;
-    private String[] lastCompletions;
+    private List<String> lastCompletions;
     private int lastShownCompletion;
     private boolean consumeEnterKey = true;
 
@@ -86,7 +86,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             JTextComponent comp = (JTextComponent) e.getSource();
 
             // replace typed characters by characters from completion
-            lastBeginning = lastCompletions[lastShownCompletion];
+            lastBeginning = lastCompletions.get(lastShownCompletion);
 
             int end = comp.getSelectionEnd();
             comp.select(end, end);
@@ -123,14 +123,14 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
     private void cycle(JTextComponent comp, int increment) {
         assert (lastCompletions != null);
-        assert (lastCompletions.length > 0);
+        assert (!lastCompletions.isEmpty());
         lastShownCompletion += increment;
-        if (lastShownCompletion >= lastCompletions.length) {
+        if (lastShownCompletion >= lastCompletions.size()) {
             lastShownCompletion = 0;
         } else if (lastShownCompletion < 0) {
-            lastShownCompletion = lastCompletions.length - 1;
+            lastShownCompletion = lastCompletions.size() - 1;
         }
-        String sno = lastCompletions[lastShownCompletion];
+        String sno = lastCompletions.get(lastShownCompletion);
         toSetIn = sno.substring(lastBeginning.length() - 1);
 
         StringBuilder alltext = new StringBuilder(comp.getText());
@@ -216,7 +216,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     private void startCompletion(StringBuffer currentword, KeyEvent e) {
         JTextComponent comp = (JTextComponent) e.getSource();
 
-        String[] completed = findCompletions(currentword.toString());
+        List<String> completed = findCompletions(currentword.toString());
         String prefix = completer.getPrefix();
         String cWord = (prefix != null) && (!prefix.isEmpty()) ? currentword.toString()
                 .substring(prefix.length()) : currentword.toString();
@@ -225,10 +225,10 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                 + '<');
 
         int no = 0; // We use the first word in the array of completions.
-        if ((completed != null) && (completed.length > 0)) {
+        if ((completed != null) && (!completed.isEmpty())) {
             lastShownCompletion = 0;
             lastCompletions = completed;
-            String sno = completed[no];
+            String sno = completed.get(no);
 
             // these two lines obey the user's input
             //toSetIn = Character.toString(ch);
@@ -304,8 +304,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
                         lastCompletions = findCompletions(lastBeginning);
                         lastShownCompletion = 0;
-                        for (int i = 0; i < lastCompletions.length; i++) {
-                            String lastCompletion = lastCompletions[i];
+                        for (int i = 0; i < lastCompletions.size(); i++) {
+                            String lastCompletion = lastCompletions.get(i);
                             //System.out.println("Completion["+i+"] = "+lastCompletion);
                             if (lastCompletion.endsWith(toSetIn)) {
                                 lastShownCompletion = i;
@@ -336,11 +336,11 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
                     LOGGER.debug("discont toSetIn: >" + toSetIn + "'<' lastBeginning: >" + lastBeginning + '<');
 
-                    String[] completed = findCompletions(lastBeginning);
-                    if ((completed != null) && (completed.length > 0)) {
+                    List<String> completed = findCompletions(lastBeginning);
+                    if ((completed != null) && (!completed.isEmpty())) {
                         lastShownCompletion = 0;
                         lastCompletions = completed;
-                        String sno = completed[0];
+                        String sno = completed.get(0);
                         // toSetIn = string used for autocompletion last time
                         // this string has to be removed
                         // lastCaretPosition is the position of the caret after toSetIn.
@@ -407,9 +407,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         lastBeginning = null;
     }
 
-    private String[] findCompletions(String beginning) {
-        List<String> results = completer.complete(beginning);
-        return results.toArray(new String[results.size()]);
+    private List<String> findCompletions(String beginning) {
+        return completer.complete(beginning);
     }
 
     private StringBuffer getCurrentWord(JTextComponent comp) {

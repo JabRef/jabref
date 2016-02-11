@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -235,8 +235,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
                 List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
-                List<String> temp = EntryUtil.getRemainder((secondaryOptionalFields), new ArrayList<>(deprecatedFields));
-                String[] optionalFieldsNotPrimaryOrDeprecated = temp.toArray(new String[temp.size()]);
+                List<String> optionalFieldsNotPrimaryOrDeprecated = EntryUtil.getRemainder((secondaryOptionalFields),
+                        new ArrayList<>(deprecatedFields));
 
                 // Get list of all optional fields of this entry and their aliases
                 Set<String> optionalFieldsAndAliases = new HashSet<>();
@@ -252,8 +252,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 usedOptionalFieldsDeprecated.retainAll(optionalFieldsAndAliases);
 
                 // Add tabs
-                EntryEditorTab optPan2 = new EntryEditorTab(frame, panel,
-                        java.util.Arrays.asList(optionalFieldsNotPrimaryOrDeprecated), this,
+                EntryEditorTab optPan2 = new EntryEditorTab(frame, panel, optionalFieldsNotPrimaryOrDeprecated, this,
                         false, true, Localization.lang("Optional fields 2"));
                 if (optPan2.fileListEditor != null) {
                     fileListEditor = optPan2.fileListEditor;
@@ -264,8 +263,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 if (!usedOptionalFieldsDeprecated.isEmpty()) {
                     EntryEditorTab optPan3;
-                    optPan3 = new EntryEditorTab(frame, panel,
-                            java.util.Arrays.asList(usedOptionalFieldsDeprecated.toArray(new String[usedOptionalFieldsDeprecated.size()])), this,
+                    optPan3 = new EntryEditorTab(frame, panel, new ArrayList<>(usedOptionalFieldsDeprecated), this,
                             false, true, Localization.lang("Deprecated fields"));
                     if (optPan3.fileListEditor != null) {
                         fileListEditor = optPan3.fileListEditor;
