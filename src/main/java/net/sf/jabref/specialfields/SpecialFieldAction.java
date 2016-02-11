@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -59,11 +59,11 @@ public class SpecialFieldAction implements BaseAction {
         try {
             NamedCompound ce = new NamedCompound(undoText);
             List<BibEntry> bes = frame.getCurrentBasePanel().getSelectedEntries();
-            if (bes == null) {
+            if ((bes == null) || bes.isEmpty()) {
                 return;
             }
             for (BibEntry be : bes) {
-                // if (value==null) and then call nullField has been ommited as updatefield also handles value==null
+                // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
                 SpecialFieldsUtils.updateField(c, value, be, ce, nullFieldIfValueIsTheSame);
             }
             ce.end();

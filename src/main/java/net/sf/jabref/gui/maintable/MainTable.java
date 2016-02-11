@@ -429,9 +429,8 @@ public class MainTable extends JTable {
     /**
      * @return the return value is never null
      */
-    public BibEntry[] getSelectedEntries() {
-        final BibEntry[] BE_ARRAY = new BibEntry[0];
-        return getSelected().toArray(BE_ARRAY);
+    public List<BibEntry> getSelectedEntries() {
+        return getSelected();
     }
 
     private List<Boolean> getCurrentSortOrder() {

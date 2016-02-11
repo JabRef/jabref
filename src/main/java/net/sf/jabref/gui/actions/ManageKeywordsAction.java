@@ -269,7 +269,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         if (bp == null) {
             return;
         }
-        if (bp.getSelectedEntries().size() == 0) {
+        if (bp.getSelectedEntries().isEmpty()) {
             bp.output(Localization.lang("Select at least one entry to manage keywords."));
             return;
         }
@@ -290,8 +290,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        HashSet<String> keywordsToAdd = new HashSet<>();
-        HashSet<String> userSelectedKeywords = new HashSet<>();
+        Set<String> keywordsToAdd = new HashSet<>();
+        Set<String> userSelectedKeywords = new HashSet<>();
         // build keywordsToAdd and userSelectedKeywords in parallel
         for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
             String kword = keywords.nextElement();
@@ -301,7 +301,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         }
 
-        HashSet<String> keywordsToRemove = new HashSet<>();
+        Set<String> keywordsToRemove = new HashSet<>();
         for (String kword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
             if (!userSelectedKeywords.contains(kword)) {
                 keywordsToRemove.add(kword);
