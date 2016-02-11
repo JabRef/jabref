@@ -11,7 +11,7 @@ import java.util.*;
 
 public class SaveActions {
 
-    private final Map<String, Formatter> actions;
+    private final List<SaveAction> actions;
 
     private List<Formatter> availableFormatters;
 
@@ -20,10 +20,10 @@ public class SaveActions {
     private boolean enabled;
 
     public SaveActions(MetaData metaData) {
-        if(metaData == null) {
+        if (metaData == null) {
             throw new IllegalArgumentException("MetaData must not be null");
         }
-        actions = new HashMap<>();
+        actions = new ArrayList<>();
         setAvailableFormatters();
 
         List<String> formatters = metaData.getData(META_KEY);
@@ -42,8 +42,8 @@ public class SaveActions {
         return enabled;
     }
 
-    public Map<String, Formatter> getConfiguredActions() {
-        return Collections.unmodifiableMap(actions);
+    public List<SaveAction> getConfiguredActions() {
+        return Collections.unmodifiableList(actions);
     }
 
     public List<Formatter> getAvailableFormatters() {
@@ -76,7 +76,7 @@ public class SaveActions {
                 String field = formatters.get(i);
                 Formatter formatter = getFormatterFromString(formatters.get(i + 1));
 
-                actions.put(field, formatter);
+                actions.add(new SaveAction(field, formatter));
             } catch (IndexOutOfBoundsException e) {
                 // the meta data string in the file is broken. -> Ignore the last item
                 break;
@@ -109,17 +109,22 @@ public class SaveActions {
     }
 
     private void applyAllActions(BibEntry entry) {
-        for (String key : actions.keySet()) {
-            applyActionForField(entry, key);
+        for (SaveAction action : actions) {
+            applyActionForField(entry, action);
         }
     }
 
-    private void applyActionForField(BibEntry entry, String key) {
-        Formatter formatter = actions.get(key);
+    private void applyActionForField(BibEntry entry, SaveAction action) {
+        Formatter formatter = action.getFormatter();
 
-        String fieldContent = entry.getField(key);
-        String formattedContent = formatter.format(fieldContent);
-        entry.setField(key, formattedContent);
+        String fieldContent = entry.getField(action.getFieldName());
+        if (fieldContent != null) {
+            String formattedContent = formatter.format(fieldContent);
+            // only set if something has changed
+            if (!fieldContent.equals(formattedContent)) {
+                entry.setField(action.getFieldName(), formattedContent);
+            }
+        }
     }
 
     private Formatter getFormatterFromString(String formatterName) {

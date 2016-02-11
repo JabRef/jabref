@@ -6,6 +6,8 @@ import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.List;
@@ -44,6 +46,12 @@ public class SaveActionsPanel extends JPanel {
         panel.add(formatters);
 
         JButton addButton = new JButton(Localization.lang("Add"));
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
         panel.add(addButton);
 
         return panel;
