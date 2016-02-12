@@ -15,19 +15,11 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -63,21 +55,30 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JCheckBox overwriteTimeStamp;
     private final JCheckBox markImportedEntries;
     private final JCheckBox unmarkAllEntriesBeforeImporting;
-    private final JComboBox<BibDatabaseMode> biblatexMode;
-
     private final JTextField defOwnerField;
+
     private final JTextField timeStampFormat;
     private final JTextField timeStampField;
     private final JabRefPreferences prefs;
     private final JComboBox<String> language = new JComboBox<>(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
     private final JComboBox<Charset> encodings;
+    private final JComboBox<BibDatabaseMode> biblatexMode;
 
+    public class DefaultBibModeRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            setText(((BibDatabaseMode) value).getFormattedName());
+            return this;
+        }
+    }
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
         this.prefs = prefs;
         setLayout(new BorderLayout());
 
         biblatexMode = new JComboBox(BibDatabaseMode.values());
+        biblatexMode.setRenderer(new DefaultBibModeRenderer());
         allowEditing = new JCheckBox(Localization.lang("Allow editing in table cells"));
 
         memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
