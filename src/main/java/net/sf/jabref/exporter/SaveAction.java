@@ -25,4 +25,27 @@ public final class SaveAction {
         return fieldName;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SaveAction that = (SaveAction) o;
+
+        if (fieldName != null ? !fieldName.equals(that.fieldName) : that.fieldName != null) return false;
+        return !(formatter != null ? !formatter.equals(that.formatter) : that.formatter != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = fieldName != null ? fieldName.hashCode() : 0;
+        result = 31 * result + (formatter != null ? formatter.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return fieldName + ": " + formatter.getKey();
+    }
 }

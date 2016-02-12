@@ -120,7 +120,7 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
 
-        saveActionsPanel = new SaveActionsPanel();
+        saveActionsPanel = new SaveActionsPanel(this);
         builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
         builder.add(saveActionsPanel).xyw(1, 29, 5);
 
@@ -317,7 +317,7 @@ public class DatabasePropertiesDialog extends JDialog {
             saveOrderConfigChanged = !oldSaveOrderConfig.getVector().equals(newSaveOrderConfig.getVector());
         }
 
-        boolean saveActionsChanged = saveActionsPanel.storeSetting(metaData);
+        boolean saveActionsChanged = saveActionsPanel.storeSettings(metaData);
 
         boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
                 || !oldFileVal.equals(fileDir.getText())
