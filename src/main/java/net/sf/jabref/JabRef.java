@@ -311,7 +311,7 @@ public class JabRef {
                                 System.out.println(Localization.lang("Saving") + ": " + data[0]);
                                 SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
                                 Defaults defaults = new Defaults(BibDatabaseMode
-                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
                                 BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
                                 SaveSession session = databaseWriter.saveDatabase(
                                         new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
@@ -404,7 +404,7 @@ public class JabRef {
                                 SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
                                 BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
                                 Defaults defaults = new Defaults(BibDatabaseMode
-                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
                                 SaveSession session = databaseWriter.saveDatabase(
                                         new BibDatabaseContext(newBase, defaults), prefs);
 

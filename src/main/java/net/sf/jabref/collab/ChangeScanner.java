@@ -163,7 +163,7 @@ public class ChangeScanner implements Runnable {
                         .withMakeBackup(false)
                         .withEncoding(panel.getEncoding());
 
-                    Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                    Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
                     BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
                     SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
                     ss.commit(Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()));
