@@ -82,7 +82,7 @@ public class JabRefPreferences {
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
     public static final String NAMES_NATBIB = "namesNatbib";
     public static final String NAMES_FIRST_LAST = "namesFf";
-    public static final String BIBLATEX_MODE = "biblatexMode";
+    public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
     public static final String NAMES_AS_IS = "namesAsIs";
     public static final String TABLE_COLOR_CODES_ON = "tableColorCodesOn";
     public static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeight";
@@ -431,7 +431,7 @@ public class JabRefPreferences {
         defaults.put(LATEX_EDITOR_PATH, OS.guessProgramPath("LEd", "LEd"));
         defaults.put(TEXSTUDIO_PATH, OS.guessProgramPath("texstudio", "TeXstudio"));
 
-        defaults.put(BIBLATEX_MODE, false);
+        defaults.put(BIBLATEX_DEFAULT_MODE, false);
 
         if (OS.OS_X) {
             //defaults.put(JabRefPreferences.PDFVIEWER, "/Applications/Preview.app");

@@ -205,7 +205,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         inspectionWarnDupli.setSelected(prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
         markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
-        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             biblatexMode.setSelectedItem(BibDatabaseMode.BIBLATEX);
         } else {
             biblatexMode.setSelectedItem(BibDatabaseMode.BIBTEX);
@@ -256,7 +256,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.setDefaultEncoding((Charset) encodings.getSelectedItem());
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
-        prefs.putBoolean(JabRefPreferences.BIBLATEX_MODE, biblatexMode.getSelectedItem() == BibDatabaseMode.BIBLATEX);
+        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getSelectedItem() == BibDatabaseMode.BIBLATEX);
 
         if (!LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
             prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getSelectedItem()));

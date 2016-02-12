@@ -39,7 +39,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult pr) {
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BibDatabaseMode mode = new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults).getMode();
         // See if any custom entry types were imported, but disregard those we already know:
         for (Iterator<String> i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {

@@ -79,7 +79,7 @@ public abstract class DBExporter extends DBImporterExporter {
     private void performExport(final BibDatabase database, final MetaData metaData, Set<String> keySet, Object out,
                                String dbName) throws Exception {
         Defaults defaults = new Defaults(
-                BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, metaData, defaults);
 
         SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);

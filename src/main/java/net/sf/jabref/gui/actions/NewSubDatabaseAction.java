@@ -37,7 +37,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
         dialog.setVisible(true);
 
         if (dialog.generatePressed()) {
-            Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+            Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
             BasePanel bp = new BasePanel(jabRefFrame,
                     new BibDatabaseContext(dialog.getGenerateDB(), defaults), Globals.prefs.getDefaultEncoding()); // meta data
             jabRefFrame.tabbedPane.add(GUIGlobals.untitledTitle, bp);

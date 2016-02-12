@@ -225,7 +225,7 @@ public class ExportFormat implements IExportFormat {
              * null, and be ignored.
              */
             Defaults defaults = new Defaults(
-                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
             SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
             List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(
                     new BibDatabaseContext(database, metaData, defaults), entryIds, savePrefs);
