@@ -11,7 +11,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.EntryUtil;
 
 public final class ExternalFileTypes {
 
@@ -282,7 +282,7 @@ public final class ExternalFileTypes {
             array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};
             i++;
         }
-        Globals.prefs.put("externalFileTypes", FileField.encodeStringArray(array));
+        Globals.prefs.put("externalFileTypes", EntryUtil.encodeStringArray(array));
     }
 
     /**

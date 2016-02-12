@@ -901,8 +901,7 @@ class MSBibEntry {
         if (authors == null) {
             return;
         }
-        String allAuthors = String.join(" and ",
-                authors.stream().map(name -> name.getFullname()).collect(Collectors.toList()));
+        String allAuthors = authors.stream().map(name -> name.getFullname()).collect(Collectors.joining(" and "));
 
         map.put(type, allAuthors);
     }

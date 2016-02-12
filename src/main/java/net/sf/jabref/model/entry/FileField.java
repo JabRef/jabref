@@ -1,52 +1,13 @@
 package net.sf.jabref.model.entry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class FileField {
 
     private static final FileField.ParsedFileField NULL_OBJECT = new FileField.ParsedFileField("", "", "");
-
-    /**
-     * Encodes a two-dimensional String array into a single string, using ':' and
-     * ';' as separators. The characters ':' and ';' are escaped with '\'.
-     * @param values The String array.
-     * @return The encoded String.
-     */
-    public static String encodeStringArray(String[][] values) {
-        return String.join(";",
-                Arrays.asList(values).stream().map(entry -> encodeStringArray(entry)).collect(Collectors.toList()));
-    }
-
-    /**
-     * Encodes a String array into a single string, using ':' as separator.
-     * The characters ':' and ';' are escaped with '\'.
-     * @param entry The String array.
-     * @return The encoded String.
-     */
-    private static String encodeStringArray(String[] entry) {
-        return String.join(":",
-                Arrays.asList(entry).stream().map(string -> encodeString(string)).collect(Collectors.toList()));
-    }
-
-    private static String encodeString(String s) {
-        if (s == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if ((c == ';') || (c == ':') || (c == '\\')) {
-                sb.append('\\');
-            }
-            sb.append(c);
-        }
-        return sb.toString();
-    }
 
     public static class ParsedFileField {
 
@@ -71,21 +32,20 @@ public class FileField {
 
             FileField.ParsedFileField that = (FileField.ParsedFileField) o;
 
-            if (this.description != null ? !this.description.equals(that.description) : that.description != null) {
+            if (!this.description.equals(that.description)) {
                 return false;
             }
-            if (this.link != null ? !this.link.equals(that.link) : that.link != null) {
+            if (!this.link.equals(that.link)) {
                 return false;
             }
-            return this.fileType != null ? this.fileType.equals(that.fileType) : that.fileType == null;
-
+            return this.fileType.equals(that.fileType);
         }
 
         @Override
         public int hashCode() {
-            int result = this.description != null ? this.description.hashCode() : 0;
-            result = (31 * result) + (this.link != null ? this.link.hashCode() : 0);
-            result = (31 * result) + (this.fileType != null ? this.fileType.hashCode() : 0);
+            int result = this.description.hashCode();
+            result = (31 * result) + this.link.hashCode();
+            result = (31 * result) + this.fileType.hashCode();
             return result;
         }
 
@@ -175,11 +135,10 @@ public class FileField {
         String[][] array = new String[fields.size()][];
         int i = 0;
         for (ParsedFileField entry : fields) {
-            String type = entry.fileType != null ? entry.fileType : "";
-            array[i] = new String[] {entry.description, entry.link, type};
+            array[i] = new String[] {entry.description, entry.link, entry.fileType};
             i++;
         }
-        return encodeStringArray(array);
+        return EntryUtil.encodeStringArray(array);
     }
 
     public static String getStringRepresentation(ParsedFileField field) {

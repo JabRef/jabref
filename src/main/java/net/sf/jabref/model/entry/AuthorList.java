@@ -819,8 +819,8 @@ public class AuthorList {
         }
 
 
-        authorLastFirstAnds[abbrInt] = String.join(" and ",
-                getAuthorList().stream().map(author -> author.getLastFirst(abbreviate)).collect(Collectors.toList()));
+        authorLastFirstAnds[abbrInt] = getAuthorList().stream().map(author -> author.getLastFirst(abbreviate))
+                .collect(Collectors.joining(" and "));
         return authorLastFirstAnds[abbrInt];
     }
 
@@ -940,8 +940,8 @@ public class AuthorList {
             return authorsFirstFirstAnds;
         }
 
-        authorsFirstFirstAnds = String.join(" and ",
-                getAuthorList().stream().map(author -> author.getFirstLast(false)).collect(Collectors.toList()));
+        authorsFirstFirstAnds = getAuthorList().stream().map(author -> author.getFirstLast(false))
+                .collect(Collectors.joining(" and "));
         return authorsFirstFirstAnds;
     }
 
@@ -963,8 +963,8 @@ public class AuthorList {
             return authorsAlph;
         }
 
-        authorsAlph = String.join(" and ", getAuthorList().stream().map(author -> author.getNameForAlphabetization())
-                .collect(Collectors.toList()));
+        authorsAlph = getAuthorList().stream().map(author -> author.getNameForAlphabetization())
+                .collect(Collectors.joining(" and "));
         return authorsAlph;
     }
 

@@ -37,7 +37,6 @@ import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.model.database.BibDatabase;
 
@@ -279,7 +278,7 @@ public class BibDatabaseWriter {
             stringBuilder.append(Globals.NEWLINE);
             stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(key).append(":");
             for (String metaItem : metaData.getData(key)) {
-                stringBuilder.append(StringUtil.quote(metaItem, ";", '\\')).append(";");
+                stringBuilder.append(EntryUtil.quote(metaItem, ";", '\\')).append(";");
             }
             stringBuilder.append("}");
             stringBuilder.append(Globals.NEWLINE);
@@ -305,7 +304,7 @@ public class BibDatabaseWriter {
             // GroupsTreeNode.toString() uses "\n" for separation
             StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
             while (tok.hasMoreTokens()) {
-                sb.append(StringUtil.quote(tok.nextToken(), ";", '\\'));
+                sb.append(EntryUtil.quote(tok.nextToken(), ";", '\\'));
                 sb.append(";");
                 sb.append(Globals.NEWLINE);
             }

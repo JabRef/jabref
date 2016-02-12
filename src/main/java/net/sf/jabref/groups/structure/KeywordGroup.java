@@ -32,6 +32,7 @@ import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
 
 /**
  * @author jzieren
@@ -131,11 +132,11 @@ public class KeywordGroup extends AbstractGroup {
      */
     @Override
     public String toString() {
-        return KeywordGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) +
+        return KeywordGroup.ID + EntryUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) +
                 AbstractGroup.SEPARATOR
                 + context.ordinal() + AbstractGroup.SEPARATOR
-                + StringUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + EntryUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+                + EntryUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
                 + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
                 + StringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
     }

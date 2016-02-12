@@ -15,10 +15,10 @@
 */
 package net.sf.jabref.groups.structure;
 
-import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -113,11 +113,11 @@ public class SearchGroup extends AbstractGroup {
      */
     @Override
     public String toString() {
-        return SearchGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + context.ordinal() + AbstractGroup.SEPARATOR
-                + StringUtil.quote(getSearchExpression(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isCaseSensitive()) + AbstractGroup.SEPARATOR
-                + StringUtil.booleanToBinaryString(isRegExp()) + AbstractGroup.SEPARATOR;
+        return SearchGroup.ID + EntryUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + context.ordinal() + AbstractGroup.SEPARATOR
+                + EntryUtil.quote(getSearchExpression(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isCaseSensitive())
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isRegExp()) + AbstractGroup.SEPARATOR;
     }
 
     public String getSearchExpression() {

@@ -1,5 +1,7 @@
 package net.sf.jabref.model.entry;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.junit.Assert;
@@ -21,6 +23,14 @@ public class EntryUtilTest {
         List<String> separatedKeywords = EntryUtil.getSeparatedKeywords(keywords);
         String[] expected = new String[] {"w1", "w2a w2b", "w3"};
         Assert.assertArrayEquals(expected, separatedKeywords.toArray());
+    }
+
+    @Test
+    public void testQuote() {
+        assertEquals("a::", EntryUtil.quote("a:", "", ':'));
+        assertEquals("a::", EntryUtil.quote("a:", null, ':'));
+        assertEquals("a:::;", EntryUtil.quote("a:;", ";", ':'));
+        assertEquals("a::b:%c:;", EntryUtil.quote("a:b%c;", "%;", ':'));
     }
 
 }

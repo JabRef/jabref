@@ -945,7 +945,7 @@ public class JabRefPreferences {
             return;
         }
 
-        put(key, String.join(";", value.stream().map(val -> makeEscape(val)).collect(Collectors.toList())));
+        put(key, value.stream().map(val -> EntryUtil.quote(val, ";", '\\')).collect(Collectors.joining(";")));
     }
 
 
@@ -1157,19 +1157,6 @@ public class JabRefPreferences {
         } else {
             return "";
         }
-    }
-
-    private static String makeEscape(String s) {
-        StringBuilder sb = new StringBuilder();
-        int c;
-        for (int i = 0; i < s.length(); i++) {
-            c = s.charAt(i);
-            if ((c == '\\') || (c == ';')) {
-                sb.append('\\');
-            }
-            sb.append((char) c);
-        }
-        return sb.toString();
     }
 
     /**

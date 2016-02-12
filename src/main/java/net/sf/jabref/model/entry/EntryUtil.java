@@ -1,9 +1,11 @@
 package net.sf.jabref.model.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 public class EntryUtil {
 
@@ -87,5 +89,59 @@ public class EntryUtil {
             res.add(word);
         }
         return res;
+    }
+
+    /**
+     * Encodes a two-dimensional String array into a single string, using ':' and
+     * ';' as separators. The characters ':' and ';' are escaped with '\'.
+     * @param values The String array.
+     * @return The encoded String.
+     */
+    public static String encodeStringArray(String[][] values) {
+        return Arrays.asList(values).stream().map(entry -> EntryUtil.encodeStringArray(entry)).collect(Collectors.joining(";"));
+    }
+
+    /**
+     * Encodes a String array into a single string, using ':' as separator.
+     * The characters ':' and ';' are escaped with '\'.
+     * @param entry The String array.
+     * @return The encoded String.
+     */
+    private static String encodeStringArray(String[] entry) {
+        return Arrays.asList(entry).stream().map(string -> EntryUtil.quote(string, ":;", '\\'))
+                .collect(Collectors.joining(":"));
+    }
+
+    /**
+     * Quote special characters.
+     *
+     * @param toQuote         The String which may contain special characters.
+     * @param specials  A String containing all special characters except the quoting
+     *                  character itself, which is automatically quoted.
+     * @param quoteChar The quoting character.
+     * @return A String with every special character (including the quoting
+     * character itself) quoted.
+     */
+    public static String quote(String toQuote, String specials, char quoteChar) {
+        if (toQuote == null) {
+            return null;
+        }
+    
+        StringBuilder result = new StringBuilder();
+        char c;
+        boolean isSpecial;
+        for (int i = 0; i < toQuote.length(); ++i) {
+            c = toQuote.charAt(i);
+    
+            isSpecial = (c == quoteChar);
+            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
+            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
+    
+            if (isSpecial) {
+                result.append(quoteChar);
+            }
+            result.append(c);
+        }
+        return result.toString();
     }
 }

@@ -2,7 +2,8 @@ package net.sf.jabref.logic.util.strings;
 
 import static org.junit.Assert.*;
 
-import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.EntryUtil;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -129,14 +130,6 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testQuote() {
-        assertEquals("a::", StringUtil.quote("a:", "", ':'));
-        assertEquals("a::", StringUtil.quote("a:", null, ':'));
-        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
-        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
-    }
-
-    @Test
     public void testUnquote() {
         assertEquals("a:", StringUtil.unquote("a::", ':'));
         assertEquals("a:;", StringUtil.unquote("a:::;", ':'));
@@ -156,10 +149,10 @@ public class StringUtilTest {
 
     @Test
     public void testEncodeStringArray() {
-        assertEquals(encStringArray1, FileField.encodeStringArray(stringArray1));
-        assertEquals(encStringArray2, FileField.encodeStringArray(stringArray2));
-        assertEquals(encStringArray2null, FileField.encodeStringArray(stringArray2null));
-        assertEquals(encStringArray3, FileField.encodeStringArray(stringArray3));
+        assertEquals(encStringArray1, EntryUtil.encodeStringArray(stringArray1));
+        assertEquals(encStringArray2, EntryUtil.encodeStringArray(stringArray2));
+        assertEquals(encStringArray2null, EntryUtil.encodeStringArray(stringArray2null));
+        assertEquals(encStringArray3, EntryUtil.encodeStringArray(stringArray3));
     }
 
     @Test

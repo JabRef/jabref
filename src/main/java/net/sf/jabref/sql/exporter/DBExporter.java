@@ -39,12 +39,12 @@ import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.sql.DBImportExportDialog;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
@@ -271,10 +271,10 @@ public abstract class DBExporter extends DBImporterExporter {
         }
         // Protect all quotes in the group descriptions:
         if (searchField != null) {
-            searchField = StringUtil.quote(searchField, "'", '\\');
+            searchField = EntryUtil.quote(searchField, "'", '\\');
         }
         if (searchExpr != null) {
-            searchExpr = StringUtil.quote(searchExpr, "'", '\\');
+            searchExpr = EntryUtil.quote(searchExpr, "'", '\\');
         }
 
         SQLUtil.processQuery(out, "INSERT INTO groups (label, parent_id, group_types_id, search_field, "
@@ -349,14 +349,14 @@ public abstract class DBExporter extends DBImporterExporter {
         String insert = "INSERT INTO strings (label, content, database_id) VALUES (";
 
         if (database.getPreamble() != null) {
-            String dml = insert + "'@PREAMBLE', " + '\'' + StringUtil.quote(database.getPreamble(), "'", '\\') + "', "
+            String dml = insert + "'@PREAMBLE', " + '\'' + EntryUtil.quote(database.getPreamble(), "'", '\\') + "', "
                     + '\'' + database_id + "');";
             SQLUtil.processQuery(out, dml);
         }
         for (String key : database.getStringKeySet()) {
             BibtexString string = database.getString(key);
-            String dml = insert + '\'' + StringUtil.quote(string.getName(), "'", '\\') + "', " + '\''
-                    + StringUtil.quote(string.getContent(), "'", '\\') + "', " + '\'' + database_id + '\'' + ");";
+            String dml = insert + '\'' + EntryUtil.quote(string.getName(), "'", '\\') + "', " + '\''
+                    + EntryUtil.quote(string.getContent(), "'", '\\') + "', " + '\'' + database_id + '\'' + ");";
             SQLUtil.processQuery(out, dml);
         }
     }
