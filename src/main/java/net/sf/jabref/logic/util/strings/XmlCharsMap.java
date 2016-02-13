@@ -1,8 +1,8 @@
-package net.sf.jabref.exporter.layout.format;
+package net.sf.jabref.logic.util.strings;
 
 import java.util.HashMap;
 
-class XmlCharsMap extends HashMap<String, String> {
+public class XmlCharsMap extends HashMap<String, String> {
     public XmlCharsMap() {
         put("\\{\\\\\\\"\\{a\\}\\}", "&#x00E4;");
         put("\\{\\\\\\\"\\{A\\}\\}", "&#x00C4;");
