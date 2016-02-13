@@ -85,7 +85,7 @@ public class MoveFileAction extends AbstractAction {
         }
         File file = new File(ln);
         if (!file.isAbsolute()) {
-            file = FileUtil.expandFilename(ln, dirs);
+            file = FileUtil.expandFilename(ln, dirs).get();
         }
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:

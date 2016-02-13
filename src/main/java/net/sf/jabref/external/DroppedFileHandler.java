@@ -455,14 +455,14 @@ public class DroppedFileHandler {
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
             List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
-            String absFilename = !new File(filename).isAbsolute() && (dirs.isEmpty()) ?
-                    FileUtil.expandFilename(filename, dirs).getAbsolutePath() : filename;
+            String absFilename = !new File(filename).isAbsolute() && (dirs.isEmpty()) ? FileUtil
+                    .expandFilename(filename, dirs).get().getAbsolutePath() : filename;
 
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
                 // Find the absolute filename for this existing link:
-                String absName = !new File(flEntry.link).isAbsolute() && (!dirs.isEmpty()) ?
-                        FileUtil.expandFilename(flEntry.link, dirs).getAbsolutePath() : flEntry.link;
+                String absName = !new File(flEntry.link).isAbsolute() && (!dirs.isEmpty()) ? FileUtil
+                        .expandFilename(flEntry.link, dirs).get().getAbsolutePath() : flEntry.link;
                 System.out.println("absName: " + absName);
                 // If the filenames are equal, we don't need to link, so we simply return:
                 if (absFilename.equals(absName)) {

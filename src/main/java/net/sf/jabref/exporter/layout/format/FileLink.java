@@ -26,6 +26,7 @@ import net.sf.jabref.model.entry.FileField.ParsedFileField;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -81,22 +82,22 @@ public class FileLink implements ParamLayoutFormatter {
             dirs = Globals.prefs.fileDirForDatabase;
         }
 
-        File f = FileUtil.expandFilename(link, Arrays.asList(dirs));
+        Optional<File> f = FileUtil.expandFilename(link, Arrays.asList(dirs));
 
         /*
          * Stumbled over this while investigating
          *
          * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
          */
-        if (f == null) {
-            return link;
-        } else {
+        if (f.isPresent()) {
             try {
-                return f.getCanonicalPath();//f.toURI().toString();
+                return f.get().getCanonicalPath();//f.toURI().toString();
             } catch (IOException e) {
                 LOGGER.warn("Problem getting path", e);
-                return f.getPath();
+                return f.get().getPath();
             }
+        } else {
+            return link;
         }
 
     }
