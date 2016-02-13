@@ -17,7 +17,6 @@ package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -80,15 +79,6 @@ public class StringUtil {
             stringBuilder.append(strings[i]).append(separator);
         }
         return stringBuilder.append(strings[to - 1]).toString();
-    }
-
-    public static String join(Collection<String> strings, String separator) {
-        String[] arr = strings.toArray(new String[strings.size()]);
-        return join(arr, separator, 0, arr.length);
-    }
-
-    public static String join(String[] strings, String separator) {
-        return join(strings, separator, 0, strings.length);
     }
 
     /**

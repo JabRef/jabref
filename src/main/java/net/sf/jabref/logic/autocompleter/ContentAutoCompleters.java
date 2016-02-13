@@ -12,12 +12,11 @@ import net.sf.jabref.logic.journals.Abbreviation;
 
 public class ContentAutoCompleters extends AutoCompleters {
 
-    AutoCompletePreferences preferences;
     private final JournalAbbreviationLoader abbreviationLoader;
 
 
     public ContentAutoCompleters(AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
-        this.preferences = Objects.requireNonNull(preferences);
+        Objects.requireNonNull(preferences);
         this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
     }
 

@@ -136,25 +136,25 @@ class MSBibEntry {
     private String reporter;
     private String caseNumber;
     private String abbreviatedCaseNumber;
-    private String bibTex_Series;
-    private String bibTex_Abstract;
-    private String bibTex_KeyWords;
-    private String bibTex_CrossRef;
+    private String bibTexSeries;
+    private String bibTexAbstract;
+    private String bibTexKeyWords;
+    private String bibTexCrossRef;
     private String bibTex_HowPublished;
-    private String bibTex_Affiliation;
-    private String bibTex_Contents;
-    private String bibTex_Copyright;
-    private String bibTex_Price;
-    private String bibTex_Size;
+    private String bibTexAffiliation;
+    private String bibTexContents;
+    private String bibTexCopyright;
+    private String bibTexPrice;
+    private String bibTexSize;
 
     /* SM 2010.10 intype, paper support */
-    private String bibTex_InType;
-    private String bibTex_Paper;
+    private String bibTexInType;
+    private String bibTexPaper;
 
     private static final String BIBTEX = "BIBTEX_";
     private static final String MSBIB = "msbib-";
 
-    private static final String bcol = "b:";
+    private static final String B_COLON = "b:";
 
     // reduced subset, supports only "CITY , STATE, COUNTRY"
     // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
@@ -296,16 +296,16 @@ class MSBibEntry {
         reporter = getFromXml(bcol + "Reporter", entry);
         caseNumber = getFromXml(bcol + "CaseNumber", entry);
         abbreviatedCaseNumber = getFromXml(bcol + "AbbreviatedCaseNumber", entry);
-        bibTex_Series = getFromXml(bcol + BIBTEX + "Series", entry);
-        bibTex_Abstract = getFromXml(bcol + BIBTEX + "Abstract", entry);
-        bibTex_KeyWords = getFromXml(bcol + BIBTEX + "KeyWords", entry);
-        bibTex_CrossRef = getFromXml(bcol + BIBTEX + "CrossRef", entry);
+        bibTexSeries = getFromXml(bcol + BIBTEX + "Series", entry);
+        bibTexAbstract = getFromXml(bcol + BIBTEX + "Abstract", entry);
+        bibTexKeyWords = getFromXml(bcol + BIBTEX + "KeyWords", entry);
+        bibTexCrossRef = getFromXml(bcol + BIBTEX + "CrossRef", entry);
         bibTex_HowPublished = getFromXml(bcol + BIBTEX + "HowPublished", entry);
-        bibTex_Affiliation = getFromXml(bcol + BIBTEX + "Affiliation", entry);
-        bibTex_Contents = getFromXml(bcol + BIBTEX + "Contents", entry);
-        bibTex_Copyright = getFromXml(bcol + BIBTEX + "Copyright", entry);
-        bibTex_Price = getFromXml(bcol + BIBTEX + "Price", entry);
-        bibTex_Size = getFromXml(bcol + BIBTEX + "Size", entry);
+        bibTexAffiliation = getFromXml(bcol + BIBTEX + "Affiliation", entry);
+        bibTexContents = getFromXml(bcol + BIBTEX + "Contents", entry);
+        bibTexCopyright = getFromXml(bcol + BIBTEX + "Copyright", entry);
+        bibTexPrice = getFromXml(bcol + BIBTEX + "Price", entry);
+        bibTexSize = getFromXml(bcol + BIBTEX + "Size", entry);
 
         NodeList nodeLst = entry.getElementsByTagName(bcol + "Author");
         if (nodeLst.getLength() > 0) {
@@ -502,42 +502,42 @@ class MSBibEntry {
         }
 
         if (bibtex.hasField("series")) {
-            bibTex_Series = bibtex.getField("series");
+            bibTexSeries = bibtex.getField("series");
         }
         if (bibtex.hasField("abstract")) {
-            bibTex_Abstract = bibtex.getField("abstract");
+            bibTexAbstract = bibtex.getField("abstract");
         }
         if (bibtex.hasField("keywords")) {
-            bibTex_KeyWords = bibtex.getField("keywords");
+            bibTexKeyWords = bibtex.getField("keywords");
         }
         if (bibtex.hasField("crossref")) {
-            bibTex_CrossRef = bibtex.getField("crossref");
+            bibTexCrossRef = bibtex.getField("crossref");
         }
         if (bibtex.hasField("howpublished")) {
             bibTex_HowPublished = bibtex.getField("howpublished");
         }
         if (bibtex.hasField("affiliation")) {
-            bibTex_Affiliation = bibtex.getField("affiliation");
+            bibTexAffiliation = bibtex.getField("affiliation");
         }
         if (bibtex.hasField("contents")) {
-            bibTex_Contents = bibtex.getField("contents");
+            bibTexContents = bibtex.getField("contents");
         }
         if (bibtex.hasField("copyright")) {
-            bibTex_Copyright = bibtex.getField("copyright");
+            bibTexCopyright = bibtex.getField("copyright");
         }
         if (bibtex.hasField("price")) {
-            bibTex_Price = bibtex.getField("price");
+            bibTexPrice = bibtex.getField("price");
         }
         if (bibtex.hasField("size")) {
-            bibTex_Size = bibtex.getField("size");
+            bibTexSize = bibtex.getField("size");
         }
 
         /* SM: 2010.10 end intype, paper support */
         if (bibtex.hasField("intype")) {
-            bibTex_InType = bibtex.getField("intype");
+            bibTexInType = bibtex.getField("intype");
         }
         if (bibtex.hasField("paper")) {
-            bibTex_Paper = bibtex.getField("paper");
+            bibTexPaper = bibtex.getField("paper");
         }
 
         if (bibtex.hasField("author")) {
@@ -550,7 +550,7 @@ class MSBibEntry {
         boolean FORMATXML = false;
         if (FORMATXML) {
             title = format(title);
-            bibTex_Abstract = format(bibTex_Abstract);
+            bibTexAbstract = format(bibTexAbstract);
         }
     }
 
@@ -718,7 +718,7 @@ class MSBibEntry {
         if (value == null) {
             return;
         }
-        Element elem = document.createElement(bcol + name);
+        Element elem = document.createElement(B_COLON + name);
         elem.appendChild(document.createTextNode(StringUtil.stripNonValidXMLCharacters(value)));
         parent.appendChild(elem);
     }
@@ -727,10 +727,10 @@ class MSBibEntry {
         if (authorsLst == null) {
             return;
         }
-        Element authorTop = document.createElement(bcol + entryName);
-        Element nameList = document.createElement(bcol + "NameList");
+        Element authorTop = document.createElement(B_COLON + entryName);
+        Element nameList = document.createElement(B_COLON + "NameList");
         for (PersonName name : authorsLst) {
-            Element person = document.createElement(bcol + "Person");
+            Element person = document.createElement(B_COLON + "Person");
             addField(document, person, "Last", name.getSurname());
             addField(document, person, "Middle", name.getMiddlename());
             addField(document, person, "First", name.getFirstname());
@@ -773,7 +773,7 @@ class MSBibEntry {
     public Element getDOMrepresentation(Document document) {
 
 
-        Element msbibEntry = document.createElement(bcol + "Source");
+        Element msbibEntry = document.createElement(B_COLON + "Source");
 
         addField(document, msbibEntry, "SourceType", sourceType);
         addField(document, msbibEntry, BIBTEX + "Entry", bibTexEntry);
@@ -788,7 +788,7 @@ class MSBibEntry {
         addField(document, msbibEntry, "ShortTitle", shortTitle);
         addField(document, msbibEntry, "Comments", comments);
 
-        Element allAuthors = document.createElement(bcol + "Author");
+        Element allAuthors = document.createElement(B_COLON + "Author");
 
         addAuthor(document, allAuthors, "Author", authors);
         String bookAuthor = "BookAuthor";
@@ -856,20 +856,20 @@ class MSBibEntry {
         addField(document, msbibEntry, "CaseNumber", caseNumber);
         addField(document, msbibEntry, "AbbreviatedCaseNumber", abbreviatedCaseNumber);
 
-        addField(document, msbibEntry, BIBTEX + "Series", bibTex_Series);
-        addField(document, msbibEntry, BIBTEX + "Abstract", bibTex_Abstract);
-        addField(document, msbibEntry, BIBTEX + "KeyWords", bibTex_KeyWords);
-        addField(document, msbibEntry, BIBTEX + "CrossRef", bibTex_CrossRef);
+        addField(document, msbibEntry, BIBTEX + "Series", bibTexSeries);
+        addField(document, msbibEntry, BIBTEX + "Abstract", bibTexAbstract);
+        addField(document, msbibEntry, BIBTEX + "KeyWords", bibTexKeyWords);
+        addField(document, msbibEntry, BIBTEX + "CrossRef", bibTexCrossRef);
         addField(document, msbibEntry, BIBTEX + "HowPublished", bibTex_HowPublished);
-        addField(document, msbibEntry, BIBTEX + "Affiliation", bibTex_Affiliation);
-        addField(document, msbibEntry, BIBTEX + "Contents", bibTex_Contents);
-        addField(document, msbibEntry, BIBTEX + "Copyright", bibTex_Copyright);
-        addField(document, msbibEntry, BIBTEX + "Price", bibTex_Price);
-        addField(document, msbibEntry, BIBTEX + "Size", bibTex_Size);
+        addField(document, msbibEntry, BIBTEX + "Affiliation", bibTexAffiliation);
+        addField(document, msbibEntry, BIBTEX + "Contents", bibTexContents);
+        addField(document, msbibEntry, BIBTEX + "Copyright", bibTexCopyright);
+        addField(document, msbibEntry, BIBTEX + "Price", bibTexPrice);
+        addField(document, msbibEntry, BIBTEX + "Size", bibTexSize);
 
             /* SM: 2010.10 end intype, paper support */
-        addField(document, msbibEntry, BIBTEX + "InType", bibTex_InType);
-        addField(document, msbibEntry, BIBTEX + "Paper", bibTex_Paper);
+        addField(document, msbibEntry, BIBTEX + "InType", bibTexInType);
+        addField(document, msbibEntry, BIBTEX + "Paper", bibTexPaper);
 
         return msbibEntry;
     }
@@ -1088,35 +1088,35 @@ class MSBibEntry {
             hm.put(MSBIB + "abbreviatedcasenumber", abbreviatedCaseNumber);
         }
 
-        if (bibTex_Series != null) {
-            hm.put("series", bibTex_Series);
+        if (bibTexSeries != null) {
+            hm.put("series", bibTexSeries);
         }
-        if (bibTex_Abstract != null) {
-            hm.put("abstract", bibTex_Abstract);
+        if (bibTexAbstract != null) {
+            hm.put("abstract", bibTexAbstract);
         }
-        if (bibTex_KeyWords != null) {
-            hm.put("keywords", bibTex_KeyWords);
+        if (bibTexKeyWords != null) {
+            hm.put("keywords", bibTexKeyWords);
         }
-        if (bibTex_CrossRef != null) {
-            hm.put("crossref", bibTex_CrossRef);
+        if (bibTexCrossRef != null) {
+            hm.put("crossref", bibTexCrossRef);
         }
         if (bibTex_HowPublished != null) {
             hm.put("howpublished", bibTex_HowPublished);
         }
-        if (bibTex_Affiliation != null) {
-            hm.put("affiliation", bibTex_Affiliation);
+        if (bibTexAffiliation != null) {
+            hm.put("affiliation", bibTexAffiliation);
         }
-        if (bibTex_Contents != null) {
-            hm.put("contents", bibTex_Contents);
+        if (bibTexContents != null) {
+            hm.put("contents", bibTexContents);
         }
-        if (bibTex_Copyright != null) {
-            hm.put("copyright", bibTex_Copyright);
+        if (bibTexCopyright != null) {
+            hm.put("copyright", bibTexCopyright);
         }
-        if (bibTex_Price != null) {
-            hm.put("price", bibTex_Price);
+        if (bibTexPrice != null) {
+            hm.put("price", bibTexPrice);
         }
-        if (bibTex_Size != null) {
-            hm.put("size", bibTex_Size);
+        if (bibTexSize != null) {
+            hm.put("size", bibTexSize);
         }
 
         entry.setField(hm);

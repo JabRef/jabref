@@ -20,7 +20,7 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class BibEntryWriterTest {
 
@@ -86,14 +86,14 @@ public class BibEntryWriterTest {
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
 
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        Assert.assertEquals(1, entries.size());
+        assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("test", entry.getCiteKey());
-        Assert.assertEquals(5, entry.getFieldNames().size());
+        assertEquals("test", entry.getCiteKey());
+        assertEquals(5, entry.getFieldNames().size());
         Set<String> fields = entry.getFieldNames();
-        Assert.assertTrue(fields.contains("author"));
-        Assert.assertEquals("Foo Bar", entry.getField("author"));
+        assertTrue(fields.contains("author"));
+        assertEquals("Foo Bar", entry.getField("author"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -118,14 +118,14 @@ public class BibEntryWriterTest {
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
 
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        Assert.assertEquals(1, entries.size());
+        assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("test", entry.getCiteKey());
-        Assert.assertEquals(5, entry.getFieldNames().size());
+        assertEquals("test", entry.getCiteKey());
+        assertEquals(5, entry.getFieldNames().size());
         Set<String> fields = entry.getFieldNames();
-        Assert.assertTrue(fields.contains("author"));
-        Assert.assertEquals("Foo Bar", entry.getField("author"));
+        assertTrue(fields.contains("author"));
+        assertEquals("Foo Bar", entry.getField("author"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -150,18 +150,18 @@ public class BibEntryWriterTest {
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
 
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        Assert.assertEquals(1, entries.size());
+        assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("test", entry.getCiteKey());
-        Assert.assertEquals(5, entry.getFieldNames().size());
+        assertEquals("test", entry.getCiteKey());
+        assertEquals(5, entry.getFieldNames().size());
 
         // Modify entry
         entry.setField("author", "BlaBla");
 
         Set<String> fields = entry.getFieldNames();
-        Assert.assertTrue(fields.contains("author"));
-        Assert.assertEquals("BlaBla", entry.getField("author"));
+        assertTrue(fields.contains("author"));
+        assertEquals("BlaBla", entry.getField("author"));
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -195,18 +195,18 @@ public class BibEntryWriterTest {
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
 
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        Assert.assertEquals(1, entries.size());
+        assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("test", entry.getCiteKey());
-        Assert.assertEquals(6, entry.getFieldNames().size());
+        assertEquals("test", entry.getCiteKey());
+        assertEquals(6, entry.getFieldNames().size());
 
         // modify entry
         entry.setField("author", "BlaBla");
 
         Set<String> fields = entry.getFieldNames();
-        Assert.assertTrue(fields.contains("author"));
-        Assert.assertEquals("BlaBla", entry.getField("author"));
+        assertTrue(fields.contains("author"));
+        assertEquals("BlaBla", entry.getField("author"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -241,14 +241,14 @@ public class BibEntryWriterTest {
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
 
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        Assert.assertEquals(1, entries.size());
+        assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("test", entry.getCiteKey());
-        Assert.assertEquals(5, entry.getFieldNames().size());
+        assertEquals("test", entry.getCiteKey());
+        assertEquals(5, entry.getFieldNames().size());
         Set<String> fields = entry.getFieldNames();
-        Assert.assertTrue(fields.contains("author"));
-        Assert.assertEquals("Foo Bar", entry.getField("author"));
+        assertTrue(fields.contains("author"));
+        assertEquals("Foo Bar", entry.getField("author"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -282,14 +282,14 @@ public class BibEntryWriterTest {
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
 
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        Assert.assertEquals(1, entries.size());
+        assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("test", entry.getCiteKey());
-        Assert.assertEquals(5, entry.getFieldNames().size());
+        assertEquals("test", entry.getCiteKey());
+        assertEquals(5, entry.getFieldNames().size());
         Set<String> fields = entry.getFieldNames();
-        Assert.assertTrue(fields.contains("author"));
-        Assert.assertEquals("Foo Bar", entry.getField("author"));
+        assertTrue(fields.contains("author"));
+        assertEquals("Foo Bar", entry.getField("author"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -314,14 +314,14 @@ public class BibEntryWriterTest {
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
 
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        Assert.assertEquals(1, entries.size());
+        assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("test", entry.getCiteKey());
-        Assert.assertEquals(4, entry.getFieldNames().size());
+        assertEquals("test", entry.getCiteKey());
+        assertEquals(4, entry.getFieldNames().size());
         Set<String> fields = entry.getFieldNames();
-        Assert.assertTrue(fields.contains("month"));
-        Assert.assertEquals("#mar#", entry.getField("month"));
+        assertTrue(fields.contains("month"));
+        assertEquals("#mar#", entry.getField("month"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();

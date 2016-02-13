@@ -52,8 +52,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
                 unprocessedWordsInHtmlFormat.add(String.format("<b>%s</b>", StringUtil.quoteForHTML(word)));
             }
             String andSeparator = String.format(" %s ", Localization.lang("and"));
-            String[] unprocessedWordsInHtmlFormatArray = unprocessedWordsInHtmlFormat.toArray(new String[unprocessedWordsInHtmlFormat.size()]);
-            searchDescription.append(StringUtil.join(unprocessedWordsInHtmlFormatArray, andSeparator));
+            searchDescription.append(String.join(andSeparator, unprocessedWordsInHtmlFormat));
         }
 
         String caseSensitiveDescription = getCaseSensitiveDescription();
