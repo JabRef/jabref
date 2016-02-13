@@ -1,51 +1,52 @@
-/*
- * Copyright (C) 2015 Jabref-Team
- *
- * All programs in this directory and subdirectories are published under the GNU
- * General Public License as described below.
- *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
- * Place, Suite 330, Boston, MA 02111-1307 USA
- *
- * Further information about the GNU GPL is available at:
- * http://www.gnu.org/copyleft/gpl.ja.html
- *
- */
-
 package net.sf.jabref.exporter.layout.format;
 
-import static org.junit.Assert.*;
+import net.sf.jabref.exporter.layout.LayoutFormatter;
 
+import org.junit.Assert;
 import org.junit.Test;
-
 
 public class HTMLCharsTest {
 
     @Test
-    public void testPlainFormat() {
-        assertEquals("aaa", new HTMLChars().format("aaa"));
+    public void testBasicFormat() {
+
+        LayoutFormatter layout = new HTMLChars();
+
+        Assert.assertEquals("", layout.format(""));
+
+        Assert.assertEquals("hallo", layout.format("hallo"));
+
+        Assert.assertEquals("Réflexions sur le timing de la quantité",
+                layout.format("Réflexions sur le timing de la quantité"));
+
+        Assert.assertEquals("h&aacute;llo", layout.format("h\\'allo"));
+
+        Assert.assertEquals("&#305; &#305;", layout.format("\\i \\i"));
+        Assert.assertEquals("&#305;", layout.format("\\i"));
+        Assert.assertEquals("&#305;", layout.format("\\{i}"));
+        Assert.assertEquals("&#305;&#305;", layout.format("\\i\\i"));
+
+        Assert.assertEquals("&#319;&#305;", layout.format("\\Lmidot\\i"));
+
+        Assert.assertEquals("&ntilde; &ntilde; &iacute; &#305; &#305;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
     }
 
     @Test
-    public void testFormatUmlaut() {
-        assertEquals("&auml;", new HTMLChars().format("{\\\"{a}}"));
-        assertEquals("&Auml;", new HTMLChars().format("{\\\"{A}}"));
+    public void testLaTeXHighlighting() {
+
+        LayoutFormatter layout = new HTMLChars();
+
+        Assert.assertEquals("<em>hallo</em>", layout.format("\\emph{hallo}"));
+        Assert.assertEquals("<em>hallo</em>", layout.format("{\\emph hallo}"));
+
+        Assert.assertEquals("<em>hallo</em>", layout.format("\\textit{hallo}"));
+        Assert.assertEquals("<em>hallo</em>", layout.format("{\\textit hallo}"));
+
+        Assert.assertEquals("<b>hallo</b>", layout.format("\\textbf{hallo}"));
+        Assert.assertEquals("<b>hallo</b>", layout.format("{\\textbf hallo}"));
     }
 
-    @Test
-    public void testFormatStripLatexCommands() {
-        assertEquals("-", new HTMLChars().format("\\mbox{-}"));
-    }
-
+    /*
+     * Is missing a lot of test cases for the individual chars...
+     */
 }
